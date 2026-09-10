@@ -1,6 +1,6 @@
 # S2-001 tracked file inventory
 
-Generated from `git ls-files`; count: 79.
+Generated from `git ls-files`; count: 82.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -27,6 +27,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
 - `drizzle.config.ts`
 - `eslint.config.mjs`
+- `evidence/closure-record.json`
+- `evidence/commit-record.json`
 - `evidence/contract-tests.json`
 - `evidence/dependency-audit-full.json`
 - `evidence/dependency-audit-runtime.json`
@@ -35,6 +37,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/policy-probes.json`
 - `evidence/probe-registry.json`
 - `evidence/public-artifact-check.json`
+- `evidence/root-manifest.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
