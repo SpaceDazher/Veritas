@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "mode": "acceptance",
   "verdict": "BLOCKED",
-  "draftContractVerdict": "BLOCKED",
+  "draftContractVerdict": "PASS_WITH_LIMITS",
   "acceptanceVerdict": "BLOCKED",
   "pilotExecutions": 0,
   "executionAuthorized": false,
-  "sourceCommit": "3190c2f8c9399479e1fd0d0424ab53c297a1fcdf",
-  "sourceTree": "27e7d474b773c4c9d6166cab4178874aa9d98baa",
-  "trackedFiles": 82,
+  "sourceCommit": "03ffb31add0afb59f51b6cc85a42edcfd4d7ebf6",
+  "sourceTree": "abd328e5480bac49b11a46a90a51974687828525",
+  "trackedFiles": 79,
   "checks": [
     {
       "id": "contracts",
@@ -80,9 +80,9 @@
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 1,
-      "status": "FAIL",
-      "fallbackError": "root manifest file records differ from git inventory\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      bytes: 205,\n      path: '.env.example',\n      sha256: '45f5aff555cf6aa40db7138a8561af10a87c72f02390fd4c4fd000d3b4a5ce40'\n...\n      path: 'evidence/public-artifact-check.json',\n+     sha256: '484e1425a294a7803ad06a1bbe59d2518205415021fe6042caa98d6834f5026b'\n-     sha256: 'bb9e57b5b025e4c6bd01e576cf6115dc3216db688c613ed64ab3fa0dd67f2fcf'\n    },\n    {\n      bytes: 428,\n      path: 'evidence/synthetic-smoke.json',\n      sha256: 'c8da9ff7c74937e79621adb72d5801c299c722ff6786b8f6aabf8b0833c62239'\n...\n    {\n+     bytes: 3025,\n-     bytes: 3575,\n      path: 'evidence/validation-summary.json',\n+     sha256: '155ce11990724c8b39886791b3f88dfb58062bfec178c652a6715904f3adf191'\n-     sha256: '872c3791279584b26f7e961314454f7f877c8479bff28f5978ad4a5e834541d1'\n    },\n    {\n      bytes: 203,\n      path: 'next.config.ts',\n      sha256: '6e85f42d5e48ebc31743872c97ffe3a90e59f0cca4c25e7d192c03ed7e7102a2'\n"
+      "exitCode": null,
+      "status": "NOT_RUN",
+      "reason": "root manifest is generated after the implementation commit"
     }
   ],
   "limitations": [
