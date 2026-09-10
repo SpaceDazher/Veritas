@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "s2-001-fail-closed-v1",
+  "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+  "total": 34,
+  "passed": 34,
+  "pilotExecutions": 0,
+  "results": [
+    {
+      "id": "NEG-01",
+      "probe": "goal-change",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "GOAL_CHANGED",
+          "message": "frozen goal changed"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-02",
+      "probe": "threshold-change",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "POLICY_CHANGED",
+          "message": "frozen policy changed"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-03",
+      "probe": "missing-budget",
+      "expected": "NEEDS_INPUT",
+      "actual": "NEEDS_INPUT",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "needs_input",
+          "code": "BUDGET_NOT_APPROVED",
+          "message": "spending requires an approved budget"
+        },
+        {
+          "level": "needs_input",
+          "code": "CURRENCY_REQUIRED",
+          "message": "currency is required for spending"
+        },
+        {
+          "level": "needs_input",
+          "code": "TIMEOUT_REQUIRED",
+          "message": "a positive timeout is required for spending"
+        },
+        {
+          "level": "needs_input",
+          "code": "ACTOR_ID_REQUIRED",
+          "message": "spending requires an authenticated actor id"
+        },
+        {
+          "level": "needs_input",
+          "code": "BUDGET_REQUIRED",
+          "message": "positive task, campaign and daily budgets are required"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-04",
+      "probe": "unknown-model",
+      "expected": "NEEDS_INPUT",
+      "actual": "NEEDS_INPUT",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "needs_input",
+          "code": "MODEL_ACCESS_REQUIRED",
+          "message": "model and verified access are required"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-05",
+      "probe": "absolute-best",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "ABSOLUTEBEST",
+          "message": "absoluteBest is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-06",
+      "probe": "self-approval",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "SELFAPPROVAL",
+          "message": "selfApproval is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-07",
+      "probe": "private-export",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "PRIVATEEXPORT",
+          "message": "privateExport is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-08",
+      "probe": "source-injection",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "SOURCEGRANTS",
+          "message": "sourceGrants is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-09",
+      "probe": "opinion-as-fact",
+      "expected": "HUMAN_REVIEW",
+      "actual": "HUMAN_REVIEW",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "human_review",
+          "code": "HUMAN_REVIEW_REQUIRED",
+          "message": "disputed or unsupported claim requires human review"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-10",
+      "probe": "causal-overclaim",
+      "expected": "HUMAN_REVIEW",
+      "actual": "HUMAN_REVIEW",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "human_review",
+          "code": "HUMAN_REVIEW_REQUIRED",
+          "message": "disputed or unsupported claim requires human review"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-11",
+      "probe": "missing-source",
+      "expected": "NEEDS_INPUT",
+      "actual": "NEEDS_INPUT",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "needs_input",
+          "code": "SOURCE_REQUIRED",
+          "message": "authorized source is required"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-12",
+      "probe": "research-rollout",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "RESEARCHROLLOUT",
+          "message": "researchRollout is a hard policy violation"
+        },
+        {
+          "level": "blocked",
+          "code": "UNRELATED_PRIVILEGED_FIELD",
+          "message": "local/read/planning inputs cannot carry privileged operation fields"
+        },
+        {
+          "level": "blocked",
+          "code": "ROLLOUT_OPERATION_REQUIRED",
+          "message": "rollout requires operation=rollout"
+        },
+        {
+          "level": "blocked",
+          "code": "ROLLOUT_BLOCKED",
+          "message": "rollout requires a separate production grant"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-13",
+      "probe": "double-claim",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "ACTIVELEASE",
+          "message": "activeLease is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-14",
+      "probe": "forged-capability",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "FORGEDCAPABILITY",
+          "message": "forgedCapability is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-15",
+      "probe": "expired-lease",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "EXPIREDFENCE",
+          "message": "expiredFence is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-16",
+      "probe": "agent-crash",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "CRASHED",
+          "message": "crashed is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-17",
+      "probe": "empty-response",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "EMPTYRESPONSE",
+          "message": "emptyResponse is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-18",
+      "probe": "done-no-artifacts",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "AGENTDONE",
+          "message": "agentDone is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-19",
+      "probe": "failed-tests",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "FAILEDTESTS",
+          "message": "failedTests is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-20",
+      "probe": "adapter-criteria",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "ADAPTERCRITERIA",
+          "message": "adapterCriteria is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-21",
+      "probe": "self-grant",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "SELFGRANT",
+          "message": "selfGrant is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-22",
+      "probe": "replay",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "DUPLICATEEFFECT",
+          "message": "duplicateEffect is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-23",
+      "probe": "open-dependency",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "OPENDEPENDENCY",
+          "message": "openDependency is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-24",
+      "probe": "cancel-zombie",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "CANCELLEDWORKER",
+          "message": "cancelledWorker is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-25",
+      "probe": "unknown-retry",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "UNKNOWNOUTCOME",
+          "message": "unknownOutcome is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-26",
+      "probe": "private-leak",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "CROSSUSERREAD",
+          "message": "crossUserRead is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "NEG-27",
+      "probe": "state-divergence",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "DIVERGENTREVISION",
+          "message": "divergentRevision is a hard policy violation"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-01",
+      "probe": "permission-change",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "permission",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "SEPARATE_GRANT_REQUIRED",
+          "message": "permission changes require a separate authenticated grant"
+        },
+        {
+          "level": "blocked",
+          "code": "PRIVILEGED_OPERATION_AUTHORITY_REQUIRED",
+          "message": "privileged operations require confirmed human identity and authority binding"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-02",
+      "probe": "rollout-alternative",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "rollout",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "ROLLOUT_BLOCKED",
+          "message": "rollout requires a separate production grant"
+        },
+        {
+          "level": "blocked",
+          "code": "ROLLOUT_BLOCKED",
+          "message": "rollout operation requires a separate production grant"
+        },
+        {
+          "level": "blocked",
+          "code": "PRIVILEGED_OPERATION_AUTHORITY_REQUIRED",
+          "message": "privileged operations require confirmed human identity and authority binding"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-03",
+      "probe": "final-approval-unbound-human",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "terminal",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "PRIVILEGED_OPERATION_AUTHORITY_REQUIRED",
+          "message": "privileged operations require confirmed human identity and authority binding"
+        },
+        {
+          "level": "blocked",
+          "code": "DONE_REQUIRES_FINAL_APPROVAL",
+          "message": "DONE requires an explicit final approval operation"
+        },
+        {
+          "level": "blocked",
+          "code": "TERMINAL_OPERATION_REQUIRED",
+          "message": "terminal operation requires DONE and finalApproval=true"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-04",
+      "probe": "service-done",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "terminal",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "PRIVILEGED_OPERATION_AUTHORITY_REQUIRED",
+          "message": "privileged operations require confirmed human identity and authority binding"
+        },
+        {
+          "level": "blocked",
+          "code": "SERVICE_AGENT_DONE_FORBIDDEN",
+          "message": "DONE cannot be reported by an agent, service or unassigned actor"
+        },
+        {
+          "level": "blocked",
+          "code": "DONE_REQUIRES_FINAL_APPROVAL",
+          "message": "DONE requires an explicit final approval operation"
+        },
+        {
+          "level": "blocked",
+          "code": "TERMINAL_OPERATION_REQUIRED",
+          "message": "terminal operation requires DONE and finalApproval=true"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-05",
+      "probe": "negative-artifact-count",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "INVALID_ARTIFACT_COUNT",
+          "message": "artifactCount must be a finite non-negative integer"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-06",
+      "probe": "nan-coverage",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "INVALID_COVERAGE",
+          "message": "coverage must be a finite number in [0,1]"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    },
+    {
+      "id": "S2-001-07",
+      "probe": "unknown-authority-field",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "pass": true,
+      "entryPoint": "../src/lib/contract-policy.mjs#evaluatePolicy",
+      "policyVersion": "s2-001-fail-closed-v1",
+      "operation": "local_check",
+      "issues": [
+        {
+          "level": "blocked",
+          "code": "UNKNOWN_FIELD",
+          "message": "unknown policy field(s): authorityOverride"
+        }
+      ],
+      "scope": "synthetic production-facing policy entry point; no runtime authority is granted"
+    }
+  ]
+}

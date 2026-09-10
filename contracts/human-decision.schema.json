@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/human-decision.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact_digest": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "status": {
+      "enum": [
+        "NEEDS_INPUT",
+        "APPROVED",
+        "REJECTED",
+        "CHALLENGED"
+      ]
+    },
+    "actor_type": {
+      "enum": [
+        "human",
+        "unassigned"
+      ]
+    },
+    "actor_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "producer_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_scope": {
+      "enum": [
+        "solution",
+        "research",
+        "budget",
+        "permissions",
+        "production"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authority": {
+      "const": "Requires server-authenticated human identity; JSON is not authorization."
+    },
+    "authority_binding": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "bindingType": {"const": "server_authenticated_human"},
+            "principalId": {"type": "string", "minLength": 1},
+            "scope": {"type": "string", "minLength": 1},
+            "grantRef": {"type": "string", "minLength": 1},
+            "expiresAt": {"type": "string", "minLength": 1}
+          },
+          "required": ["bindingType", "principalId", "scope", "grantRef", "expiresAt"]
+        }
+      ]
+    },
+    "pending": {
+      "anyOf": [
+        {
+          "$ref": "needs-input.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "artifact_ref",
+    "artifact_digest",
+    "status",
+    "actor_type",
+    "actor_id",
+    "producer_id",
+    "decision_scope",
+    "reason",
+    "timestamp",
+    "authority",
+    "authority_binding",
+    "pending"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "APPROVED",
+              "REJECTED",
+              "CHALLENGED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "actor_type": {
+            "const": "human"
+          },
+          "actor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "timestamp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pending": {
+            "type": "null"
+          },
+          "authority_binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "bindingType": {"const": "server_authenticated_human"},
+              "principalId": {"type": "string", "minLength": 1},
+              "scope": {"type": "string", "minLength": 1},
+              "grantRef": {"type": "string", "minLength": 1},
+              "expiresAt": {"type": "string", "minLength": 1}
+            },
+            "required": ["bindingType", "principalId", "scope", "grantRef", "expiresAt"]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "actor_type": {
+            "const": "unassigned"
+          },
+          "actor_id": {
+            "type": "null"
+          },
+          "pending": {
+            "$ref": "needs-input.schema.json"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+# Veritas · Product Contract v1.0.0
+
+Ticket S2-001. Status: DRAFT / NEEDS_INPUT for pilot execution. This is a testable specification, not a production certification. The user approved **Veritas Agent Board** as scenario A's project. No authority to spend, obtain credentials, deploy or import personal data follows from that approval.
+
+## Product boundary
+Veritas owns canonical versioned knowledge, source selection, TaskBrief, policies, experiment registration, evidence, decisions and the human/agent task board. AgentOS is a separate executor connected through `veritas.execution/1.0.0`, not a second canonical database and not an approval authority. Stage 1 research verdicts may be evidence, never permission to execute or deploy.
+
+Version handshake: request carries contract_version, request_id, idempotency_key, task_id, brief_digest, policy_digest, manifest_digest, principal_id, granted_scope, allowed_tools, workspace_ref, numeric budget grant, deadline, lease_id and fencing_token. Response carries contract_version, run_id, task_id, fencing_token, sequence, outcome, checkpoints, artifact hashes, measurements and typed errors. Reject unsupported major versions and unknown required fields; minor additions require negotiated capabilities. Authenticate principal server-side; never trust identity, permissions or budget asserted by a payload. Content hashes are integrity checks, not signatures. Unknown side effects require reconciliation before retry.
+
+## Intake and knowledge model
+Supported product targets: Obsidian/Markdown, Telegram, YouTube, web/PDF, arXiv, Hugging Face, GitHub and manual documents. Connector implementations are not delivered by S2-001. Intake must require an approved manifest, access and license check, fetched version and immutable snapshot hash. Store source ID, upstream IDs, canonical locator (private where necessary), content hash, source/published/retrieved times, license, ACL, parser version, ingestion errors and superseded snapshot. Never overwrite a snapshot; deletions/revocations produce tombstones and block derived disclosure. Missing, empty, inaccessible and successfully imported are different outcomes.
+
+Claims distinguish observation, fact, expert opinion, hypothesis and forecast. Evidence includes exact source span and temporal/geographical scope. Contradictions link claims and qualification conditions; causal assumptions and cross-discipline relations remain hypotheses until independently supported. Copied sources with one upstream count as one evidence family. Source instructions, stdout/stderr and model output are untrusted data and cannot grant capabilities.
+
+A HypothesisCard requires relation type, basis and evidence IDs, alternative explanations, applicability boundary, falsification protocol and justified confidence (not invented probability). Forecasts require issue date, target date, resolution source and rule. EvidenceMap edges are typed supports/contradicts/derived-from/causal-hypothesis; they do not silently increase certainty.
+
+## R&D lifecycle
+Question → explicit hypothesis → preregistered experiment (brief, corpus, model, metric policy and budget hashes) → measured run → independent check → scoped conclusion → versioned knowledge update → proposed use → human final approval. Failed/abstained runs remain in denominators. Any post-freeze change creates a new revision and review, never silently rewrites the trial.
+
+## Canonical state and interfaces
+Human Web: browse Kanban, inspect provenance, compare runs, challenge and review. Agent HTTP API and CLI: machine-readable discovery, scoped task operations and evidence submission. All use the same transactional store, revision, authorization and event journal. Chat history is not canonical. Reads identify canonical revision. Writes require expected_revision plus idempotency key. The server validates transitions and permissions; UI hiding is not access control.
+
+Data scopes: personal (owner only), project (explicit members/roles), shared (explicit publication grant). Derived outputs inherit the most restrictive contributing ACL. Scope widening and declassification require separate authenticated human approval and redaction review. No private payloads or source locators in Git, logs, shared search or public artifacts.
+
+## Agent Board MVP contract
+States: BACKLOG, READY, CLAIMED, RUNNING, BLOCKED, IN_REVIEW, DONE, FAILED, CANCELLED. Store ID, goal, description, acceptance criteria, priority, dependencies, required capabilities, allowed tools, workspace, time/cost limits, assigned agent, attempts, artifacts, tests, evidence, block reason and append-only transition history.
+
+BACKLOG → READY only after dependencies and immutable brief are validated. READY → CLAIMED uses one database transaction and unique active lease. CLAIMED → RUNNING requires current fence, health, approved numeric budgets and isolated workspace. RUNNING → IN_REVIEW requires result collection (not a passing semantic verdict). BLOCKED covers missing permissions/input, failed gate or unknown outcome; FAILED is known terminal failure. Release/reassign revokes the lease first. Expiry fences old workers and requires side-effect reconciliation before returning to READY. CANCELLED revokes authority and kills the process group; late callbacks cannot mutate state. IN_REVIEW → DONE only by authenticated human or a separately authorized deterministic Gate; final SolutionPack approval always human. Uncalibrated semantic evaluator cannot be that Gate.
+
+Scheduler: one local scheduler, one running job (explicit user requirement). Sort eligible READY tasks by priority then stable ID; require closed dependencies, administrator-registered capabilities, healthy available agent and available approved budget reservations. Pick stable adapter ID on ties and log reasons plus excluded candidates. Never substitute a more privileged agent. Atomic claim/renew uses DB time, compare-and-swap and fencing. Persistent idempotency records suppress duplicate mutations; replay reconstructs state without reissuing side effects.
+
+Runner: approved CLI binary and argument allowlist, isolated worktree, minimal environment, no inherited secrets, timeout/cancel with process-group termination, checkpoint/resume bound to brief+workspace hashes, untrusted redacted logs, artifacts and tests returned to review. Unknown outcomes return RECONCILIATION_REQUIRED; no blind retry.
+
+Adapter interface `veritas.adapter/1.0.0`: identify(), capabilities(), health(), claim(task), start(run), status(run), checkpoint(run), cancel(run), collect_result(run), release(task). Capability discovery is a claim to validate against operator registration, not permission. Typed errors: AGENT_UNAVAILABLE, AUTH_REQUIRED, CAPABILITY_MISMATCH, BUDGET_EXCEEDED, PROVIDER_FAILURE, EMPTY_RESPONSE, TIMEOUT, CANCELLED, MALFORMED_RESULT, UNKNOWN_OUTCOME, RECONCILIATION_REQUIRED.
+
+Targets: Codex local/cloud, Claude Code, OpenCode, Hermes, pi and future versioned adapters. MVP needs two genuinely different real adapters plus generic CLI adapter; wrappers around one mocked agent do not qualify. Actual availability is NEEDS_INPUT. S2-001 does not implement or claim this runner.
+
+## What is delivered here
+Machine-validated draft contracts, acceptance cases and policy fixture tests, safe source manifests, policy documentation and an additional local **contract workspace** (Next.js/PostgreSQL Web, API, CLI). Workspace cards are clearly labeled synthetic planning fixtures; no adapters are connected, no execution or final approval endpoints exist. It is not the Agent Board MVP, not authenticated multi-tenancy, and must not receive private data. See OUT_OF_SCOPE and evaluation report.
+
+## Completion and critical failures
+A SolutionPack is ready for review only when all A-OUT and A-MVP cases have artifact/run evidence, pinned installation/rollback, metrics and independent review. Human approval is a separate hashed decision. Dossier requires every B-OUT case and unresolved claims labeled. Critical: leaks, authority escalation, duplicate execution, fabricated evidence, hidden brief/threshold changes, false final approval, unsafe retries and unsupported causal certainty. Any critical violation prevents acceptance regardless of cost or speed.

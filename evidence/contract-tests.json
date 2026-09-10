@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "scope": "Offline contract validation; no real adapters, no semantic calibration, no pilot imports or paid experiments",
+  "policyEntryPoints": [
+    "src/lib/contract-policy.mjs#evaluatePolicy"
+  ],
+  "schemaExamples": 11,
+  "schemaMutationsRejected": 25,
+  "policyProbes": 34,
+  "policyProbesPassed": 34,
+  "adversarialProbes": 7,
+  "adversarialProbesPassed": 7,
+  "positiveControls": 2,
+  "additionalPrerequisiteChecks": 8,
+  "pilotExecutions": 0,
+  "fullAcceptanceAtZeroExecutions": "BLOCKED",
+  "exitCode": 0
+}

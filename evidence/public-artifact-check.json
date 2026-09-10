@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "exitCode": 0,
+  "sourceCommit": "3190c2f8c9399479e1fd0d0424ab53c297a1fcdf",
+  "sourceTree": "27e7d474b773c4c9d6166cab4178874aa9d98baa",
+  "inventorySource": "git ls-files -z",
+  "trackedFiles": 82,
+  "scannedTextFiles": 82,
+  "binaryFiles": [],
+  "findings": [],
+  "privateSourceImports": 0,
+  "environmentIgnored": true,
+  "scope": "Heuristic scan of the real committed Git inventory; not comprehensive DLP or security certification. No private sources read."
+}

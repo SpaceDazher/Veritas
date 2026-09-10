@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "id": "SSM-A-001",
+  "scenario": "A",
+  "status": "NEEDS_INPUT",
+  "contains_private_content": false,
+  "import_authorized": false,
+  "sources": [
+    {
+      "id": "A-SRC-01",
+      "category": "github",
+      "scope": "project",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:github-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "a.import.github"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    },
+    {
+      "id": "A-SRC-02",
+      "category": "manual",
+      "scope": "project",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:manual-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "a.import.manual"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    }
+  ]
+}

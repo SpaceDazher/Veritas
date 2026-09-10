@@ -1,0 +1,103 @@
+{
+  "version": "1.0.0",
+  "id": "B-OUTPUT-TEMPLATE",
+  "brief_ref": "pilots/scenario-b/task-brief.json",
+  "status": "HUMAN_REVIEW",
+  "execution_status": "NOT_RUN",
+  "artifacts": {
+    "source-map": {
+      "id": "source-map",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-01"
+    },
+    "claim-register": {
+      "id": "claim-register",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-02"
+    },
+    "support-contradiction-map": {
+      "id": "support-contradiction-map",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-03"
+    },
+    "expert-lenses": {
+      "id": "expert-lenses",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-04"
+    },
+    "timeline": {
+      "id": "timeline",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-05"
+    },
+    "evidence-map": {
+      "id": "evidence-map",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-06"
+    },
+    "hypothesis-cards": {
+      "id": "hypothesis-cards",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-07"
+    },
+    "alternative-explanations": {
+      "id": "alternative-explanations",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-08"
+    },
+    "dated-forecasts": {
+      "id": "dated-forecasts",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-09"
+    },
+    "unknowns": {
+      "id": "unknowns",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-10"
+    },
+    "next-experiments": {
+      "id": "next-experiments",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-11"
+    },
+    "human-review-package": {
+      "id": "human-review-package",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "B-OUT-12"
+    }
+  },
+  "metrics": {
+    "status": "NOT_MEASURED",
+    "denominator": 0,
+    "reason": "No authorized pilot executions; no empirical quality claims."
+  },
+  "selection_claim": "No empirical selection; no claim of absolute superiority.",
+  "human_decision_ref": "pilots/scenario-b/human-decision.example.json",
+  "limitations": [
+    "Template only. Required outputs not produced. Pilot execution blocked by unresolved inputs."
+  ]
+}

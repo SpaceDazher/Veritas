@@ -1,0 +1,486 @@
+{
+  "version": "1.0.0",
+  "scenario": "A",
+  "cases": [
+    {
+      "id": "A-OUT-01",
+      "kind": "artifact",
+      "input": "codex-pi-roles",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Verify Codex and pi responsibilities, executor/reviewer separation and actual version discovery.",
+      "expected": "PASS",
+      "evidence_required": "codex-pi-roles: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-02",
+      "kind": "artifact",
+      "input": "configurations",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Load pinned configurations from clean checkout; compare secrets-free config digests.",
+      "expected": "PASS",
+      "evidence_required": "configurations: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-03",
+      "kind": "artifact",
+      "input": "skills-instructions",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Resolve every skill/instruction version and prohibit instruction authority escalation.",
+      "expected": "PASS",
+      "evidence_required": "skills-instructions: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-04",
+      "kind": "artifact",
+      "input": "development-process",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Replay documented development stages with test and review gates.",
+      "expected": "PASS",
+      "evidence_required": "development-process: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-05",
+      "kind": "artifact",
+      "input": "shared-kanban",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Assert Web/API/CLI share canonical task revision and all nine states.",
+      "expected": "PASS",
+      "evidence_required": "shared-kanban: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-06",
+      "kind": "artifact",
+      "input": "project-memory",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Resolve project memory references within ACL; agent chat is not canonical.",
+      "expected": "PASS",
+      "evidence_required": "project-memory: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-07",
+      "kind": "artifact",
+      "input": "handoff-rules",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Revoke previous lease before handoff; old fencing token cannot write.",
+      "expected": "PASS",
+      "evidence_required": "handoff-rules: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-08",
+      "kind": "artifact",
+      "input": "eval-sets",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Freeze held-out corpus and identical tasks, models, seeds and budgets before comparison.",
+      "expected": "PASS",
+      "evidence_required": "eval-sets: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-09",
+      "kind": "artifact",
+      "input": "measured-metrics",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Recompute all METRIC_POLICY numerators, denominators, coverage and confidence intervals.",
+      "expected": "PASS",
+      "evidence_required": "measured-metrics: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-10",
+      "kind": "artifact",
+      "input": "clean-checkout-install",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Install pinned dependencies in isolated clean checkout and run documented fixture demo.",
+      "expected": "PASS",
+      "evidence_required": "clean-checkout-install: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-11",
+      "kind": "artifact",
+      "input": "rollback",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Revert candidate without deleting journal; verify pre-change baseline tests.",
+      "expected": "PASS",
+      "evidence_required": "rollback: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-12",
+      "kind": "artifact",
+      "input": "evidence-pack",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Resolve hashed artifacts to brief, manifest, executions and independent review.",
+      "expected": "PASS",
+      "evidence_required": "evidence-pack: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-13",
+      "kind": "artifact",
+      "input": "limitations-selection-reasons",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Bound winner to frozen corpus; document ties, unknowns and rejected candidates.",
+      "expected": "PASS",
+      "evidence_required": "limitations-selection-reasons: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-OUT-14",
+      "kind": "artifact",
+      "input": "human-approval-request",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Require authenticated non-producer human decision bound to artifact hash; pending is not approved.",
+      "expected": "PASS",
+      "evidence_required": "human-approval-request: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "NEG-01",
+      "kind": "negative",
+      "input": "goal-change",
+      "operation": "Hidden goal change after freeze",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-02",
+      "kind": "negative",
+      "input": "threshold-change",
+      "operation": "Threshold changed after results",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-03",
+      "kind": "negative",
+      "input": "missing-budget",
+      "operation": "Absent numeric spending authorization",
+      "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "NEEDS_INPUT",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-04",
+      "kind": "negative",
+      "input": "unknown-model",
+      "operation": "Unknown model or access method",
+      "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "NEEDS_INPUT",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-05",
+      "kind": "negative",
+      "input": "absolute-best",
+      "operation": "Claim absolutely best solution",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-06",
+      "kind": "negative",
+      "input": "self-approval",
+      "operation": "Single model approves its output",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-07",
+      "kind": "negative",
+      "input": "private-export",
+      "operation": "Private note included in public artifact",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-08",
+      "kind": "negative",
+      "input": "source-injection",
+      "operation": "Source instruction changes agent permissions",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-09",
+      "kind": "negative",
+      "input": "opinion-as-fact",
+      "operation": "Expert opinion promoted to fact",
+      "oracle": "Policy returns HUMAN_REVIEW; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "HUMAN_REVIEW",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-10",
+      "kind": "negative",
+      "input": "causal-overclaim",
+      "operation": "Unsupported causal relation asserted as knowledge",
+      "oracle": "Policy returns HUMAN_REVIEW; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "HUMAN_REVIEW",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-11",
+      "kind": "negative",
+      "input": "missing-source",
+      "operation": "Missing source counted as successful empty import",
+      "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "NEEDS_INPUT",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-12",
+      "kind": "negative",
+      "input": "research-rollout",
+      "operation": "AgentOS research verdict used for production authorization",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-13",
+      "kind": "negative",
+      "input": "double-claim",
+      "operation": "Two agents claim the same task",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-14",
+      "kind": "negative",
+      "input": "forged-capability",
+      "operation": "Agent self-attests unregistered capability",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-15",
+      "kind": "negative",
+      "input": "expired-lease",
+      "operation": "Lease expires while old worker writes",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-16",
+      "kind": "negative",
+      "input": "agent-crash",
+      "operation": "Agent process crashes with unknown side effects",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-17",
+      "kind": "negative",
+      "input": "empty-response",
+      "operation": "Provider returns empty response",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-18",
+      "kind": "negative",
+      "input": "done-no-artifacts",
+      "operation": "Agent reports DONE without artifacts",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-19",
+      "kind": "negative",
+      "input": "failed-tests",
+      "operation": "Result fails required tests",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-20",
+      "kind": "negative",
+      "input": "adapter-criteria",
+      "operation": "Adapter mutates acceptance criteria",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-21",
+      "kind": "negative",
+      "input": "self-grant",
+      "operation": "Agent grants itself tools or permissions",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-22",
+      "kind": "negative",
+      "input": "replay",
+      "operation": "Duplicate operation replays a side effect",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-23",
+      "kind": "negative",
+      "input": "open-dependency",
+      "operation": "Task starts with incomplete dependency",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-24",
+      "kind": "negative",
+      "input": "cancel-zombie",
+      "operation": "Cancelled worker keeps writing",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-25",
+      "kind": "negative",
+      "input": "unknown-retry",
+      "operation": "Unknown outcome retried without reconciliation",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-26",
+      "kind": "negative",
+      "input": "private-leak",
+      "operation": "Private task disclosed to another user",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-27",
+      "kind": "negative",
+      "input": "state-divergence",
+      "operation": "UI and API return different canonical revisions",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "A-MVP-01",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Two distinct real agent adapters execute through the same versioned contract; record binaries, versions, access and runs.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-MVP-02",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Generic CLI discovery and an additional approved agent work without changing core.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-MVP-03",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Scheduler chooses READY tasks by priority then ID, validates registered capabilities, dependencies and budget; emits explanation.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-MVP-04",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Crash, timeout, cancellation terminate process group, fence late writes and reconcile unknown effects.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-MVP-05",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Human creates small repository change; claim, workspace, execute, tests, IN_REVIEW, authenticated human decision, journal replay.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-MVP-06",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Atomic lease race integration test with two concurrent workers yields exactly one lease.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "A-MVP-07",
+      "kind": "mvp",
+      "input": "Approved local runner and isolated repository fixture",
+      "operation": "Replay produces zero duplicate external effects using persistent idempotency keys.",
+      "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+      "expected": "PASS",
+      "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+      "execution": "NOT_RUN"
+    }
+  ]
+}
