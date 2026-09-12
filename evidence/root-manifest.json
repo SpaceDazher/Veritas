@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "c79bce14d133849310af606be7e9e119ab5df051",
-  "sourceTree": "bdf43909b1df81ac51b860636e31bc690118e684",
-  "trackedFileCount": 103,
-  "manifestFileCount": 100,
-  "payloadManifestSha256": "c9f9566c38ec2b61e191812ca179fb72079b9819b5d026c645221a7902f9c6c6",
-  "fileManifestSha256": "6ed3fff433c8418a9620e5141053ee3d633abb8f8544bfc4fdc7adfffe0c5265",
+  "sourceCommit": "b02c81b151b7245ff648cf49efd43ab11c2a4ccc",
+  "sourceTree": "0692ccaceea5ef97553a3afd8b8d2cfbf5070332",
+  "trackedFileCount": 107,
+  "manifestFileCount": 104,
+  "payloadManifestSha256": "4746786b97243b4dd1878b71a28345ecfc5fa9f6529121b0aef52f4cc4f8a2c2",
+  "fileManifestSha256": "9d80d35921166aa8e29a917ad56152085a835158e269aaafcf06b56a5a2c8f78",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -140,6 +140,11 @@
       "bytes": 1995
     },
     {
+      "path": "docs/decisions/S2-002-TEST-REVIEW-LOG.md",
+      "sha256": "676bcc8b43b77d9482537e96133d14185e3754df3ec195aa1d3667364cc8812a",
+      "bytes": 1976
+    },
+    {
       "path": "docs/product/AUTONOMY_POLICY.md",
       "sha256": "797d499d902a637593d019e3bef9e71264ab26b11c4d1f5c992fa33a2cec6383",
       "bytes": 2361
@@ -221,8 +226,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "609df1d6757c8edca24a751c1f8b677efd552958c6d3850ac795cb60a9dbddf9",
-      "bytes": 3865
+      "sha256": "5369cb1e3bcb71140e98e34ad9f90c7934331c642b8f810f43a04fd91cfad706",
+      "bytes": 4027
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -500,6 +505,16 @@
       "bytes": 5766
     },
     {
+      "path": "src/lib/identity/policy-engine.mjs",
+      "sha256": "403c3a13f7a84fbf58ba9510412ce5bafd7f86bc7c84f8206d300b542e69d199",
+      "bytes": 11903
+    },
+    {
+      "path": "src/lib/identity/principals.mjs",
+      "sha256": "eeeeb9741f6d4db8bb63975472b13701fb4e84dd2c1d951b189cab1befc923fb",
+      "bytes": 18598
+    },
+    {
       "path": "tasks/S2-002_IDENTITY_SANDBOX.md",
       "sha256": "55614422445a380bbc6c3a704e3b3cc9feefceb8d9a8eb3059bf0e4e838aa0fe",
       "bytes": 14652
@@ -508,6 +523,11 @@
       "path": "tests/identity/contracts.schemas.test.mjs",
       "sha256": "a3547a9d7c01b3b84be2b6fe108b79616a10a689b5fb9a233a7f5ce3423f9795",
       "bytes": 17856
+    },
+    {
+      "path": "tests/identity/policy-engine.test.mjs",
+      "sha256": "1e4e1dff0486dfce59274441384af6620c32b042fd938871e32753de059fdd60",
+      "bytes": 22521
     },
     {
       "path": "tsconfig.json",
