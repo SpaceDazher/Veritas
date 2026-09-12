@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "d2ba0b7018e5fc1564666a6e0c674c50dbeb883b",
-  "sourceTree": "e2f8497a65e752361d670dda485a212b40587f9a",
-  "exitCode": 1,
-  "passed": false,
+  "sourceCommit": "3e00de3c99e3e3d1721ac66c5724cc0500f00118",
+  "sourceTree": "64e87c0bcc0107124b4f4ec6c598d8122024136a",
+  "exitCode": 0,
+  "passed": true,
   "commands": [
     {
       "id": "archive",
@@ -70,9 +70,8 @@
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "scripts/smoke.mjs',\r\n      sha256: '1ff69e499a5308014cc04789273c32b872085a4b3326dc921753b2d47b7ca490',\r\n      bytes: 553\r\n    },\r\n    {\r\n      path: 'scripts/synthetic-smoke.mjs',\r\n      sha256: '6a5d4a52759881f30b267ac61ec5d65898e9b94a21a0a77ffd008eecef7751b5',\r\n      bytes: 1250\r\n    },\r\n    {\r\n      path: 'scripts/validate-contracts.mjs',\r\n      sha256: 'fcf0dbde3bc29d631ef85adfa8246ddea46fb5c88b31250679b1f8962c3dbc81',\r\n      bytes: 9423\r\n    },\r\n    {\r\n      path: 'scripts/verify-clean-checkout.mjs',\r\n      sha256: 'cabb8d3376caca22a7f12a704e7fea1f853f7a75537cadf20145e1811460c7fb',\r\n      bytes: 6194\r\n    },\r\n    {\r\n      path: 'scripts/verify-pilot-binding.mjs',\r\n      sha256: '24dc8a3d1fea67b9306b514f350eb63885d558eb5faae7805d7105774ca97c47',\r\n      bytes: 3237\r\n    },\r\n    {\r\n      path: 'scripts/verify-s2-002.mjs',\r\n      sha256: '1fe0f4e812278e3918c2be3e3e3874d0a8234276f3a3f0e1d091252a15caceed',\r\n      bytes: 8495\r\n    },\r\n    {\r\n      path: 'scripts/verify.mjs',\r\n      sha256: '6b8c2cfd7779c868f8d4b026dde62299ffaaeffb9258bcff431ffe052783b3ba',\r\n      bytes: 10009\r\n    },\r\n    ... 26 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "database-workspace-smoke",
