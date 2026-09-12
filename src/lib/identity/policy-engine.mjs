@@ -19,7 +19,7 @@ import {
 } from './principals.mjs';
 import { assertValidContract } from './contract-registry.mjs';
 
-export const POLICY_VERSION = 's2-002-policy-v1';
+export const POLICY_VERSION = 's2-002-policy-v2';
 
 const ADAPTERS = new Set(['web', 'api', 'cli']);
 const ID_PATTERNS = {
@@ -27,6 +27,26 @@ const ID_PATTERNS = {
   workspaceId: /^ws-[a-z0-9][a-z0-9-]{0,62}$/,
 };
 const OWNER_ROLE = 'rol-workspace-owner';
+
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+// Canonical-argument validation: required arguments must be present and no
+// argument outside the capability's declared canonical set may be smuggled
+// in. Returns an array of reason codes (empty = valid).
+function canonicalArgumentViolations(request, capability) {
+  if (!isPlainObject(request.args)) return ['CANONICAL_ARGUMENTS_MISSING'];
+  const declared = capability.canonical_arguments;
+  const names = new Set(declared.map((argument) => argument.name));
+  if (declared.some((argument) => argument.required && !(argument.name in request.args))) {
+    return ['CANONICAL_ARGUMENTS_MISSING'];
+  }
+  if (Object.keys(request.args).some((key) => !names.has(key))) {
+    return ['ARGUMENT_NOT_CANONICAL'];
+  }
+  return [];
+}
 
 const principalIndex = new Map(PRINCIPALS.map((p) => [p.principal_id, p]));
 const workspaceIndex = new Map(WORKSPACES.map((w) => [w.workspace_id, w]));
@@ -149,7 +169,12 @@ export function createPolicyEngine({ now } = {}) {
   }
 
   function checkLease(request, capability, access) {
-    if (!capability.constraints.requires_lease) return { ok: true };
+    if (!capability.constraints.requires_lease) {
+      // A presented lease on a lease-free capability is a protocol violation:
+      // fail closed instead of silently ignoring authority artifacts.
+      if (request.lease) return { ok: false, reasonCodes: ['LEASE_NOT_REQUIRED'] };
+      return { ok: true };
+    }
     if (access.via === 'ACL' && access.ownerMaintenance) {
       return { ok: true, waived: true };
     }
@@ -166,8 +191,27 @@ export function createPolicyEngine({ now } = {}) {
     if (Date.parse(lease.expires_at) <= Date.parse(decidedAt)) {
       return { ok: false, reasonCodes: ['LEASE_EXPIRED'] };
     }
+    // Exact binding: the lease is valid only for the capability, principal,
+    // workspace and grant it was issued for.
     const knownGrant = grantIndex.get(lease.grant_id);
     if (!knownGrant) return { ok: false, reasonCodes: ['LEASE_GRANT_UNKNOWN'] };
+    if (knownGrant.capability_id !== capability.capability_id) {
+      return { ok: false, reasonCodes: ['LEASE_CAPABILITY_MISMATCH'] };
+    }
+    if (knownGrant.principal_id !== request.principalId) {
+      return { ok: false, reasonCodes: ['LEASE_GRANT_PRINCIPAL_MISMATCH'] };
+    }
+    if (knownGrant.resource_scope.workspace_id !== request.workspaceId) {
+      return { ok: false, reasonCodes: ['LEASE_GRANT_WORKSPACE_MISMATCH'] };
+    }
+    if (revokedGrants.has(knownGrant.grant_id)
+      || knownGrant.status !== 'active'
+      || Date.parse(knownGrant.expires_at) <= Date.parse(decidedAt)) {
+      return { ok: false, reasonCodes: ['LEASE_GRANT_INVALID'] };
+    }
+    if (access.via === 'GRANT' && access.grant.grant_id !== lease.grant_id) {
+      return { ok: false, reasonCodes: ['LEASE_GRANT_MISMATCH'] };
+    }
     const taskKey = `${request.workspaceId}/${lease.task_ref.task_id}`;
     const max = fencingMax.get(taskKey) ?? 0;
     if (presented.fencingToken < max) {
@@ -212,6 +256,37 @@ export function createPolicyEngine({ now } = {}) {
     return { ok: true, profile };
   }
 
+  // Recipients of inter-agent messages must themselves be able to access
+  // the workspace the message lives in; otherwise the message is an
+  // exfiltration channel across tenants.
+  function recipientHasWorkspaceAccess(recipientId, workspaceId) {
+    const ws = workspaceIndex.get(workspaceId);
+    if (ws.acl.some((entry) => entry.principal_id === recipientId)) return true;
+    for (const g of GRANTS) {
+      if (g.principal_id !== recipientId) continue;
+      if (g.resource_scope.workspace_id !== workspaceId) continue;
+      if (revokedGrants.has(g.grant_id)) continue;
+      if (g.status !== 'active' || Date.parse(g.expires_at) <= Date.parse(decidedAt)) continue;
+      return true;
+    }
+    return false;
+  }
+
+  function checkRecipient(request, capability) {
+    if (request.action !== 'message.send') return { ok: true };
+    const recipient = request.args?.to_principal;
+    if (typeof recipient !== 'string' || !ID_PATTERNS.principalId.test(recipient)) {
+      return { ok: false, reasonCodes: ['UNKNOWN_RECIPIENT'] };
+    }
+    if (!principalIndex.has(recipient)) {
+      return { ok: false, reasonCodes: ['UNKNOWN_RECIPIENT'] };
+    }
+    if (!recipientHasWorkspaceAccess(recipient, request.workspaceId)) {
+      return { ok: false, reasonCodes: ['RECIPIENT_OUT_OF_SCOPE'] };
+    }
+    return { ok: true };
+  }
+
   function authorize(request) {
     const meta = { request, wellFormed: false };
     const fail = (decision, reasonCodes) => ({
@@ -235,6 +310,11 @@ export function createPolicyEngine({ now } = {}) {
     const capability = capabilityIndex.get(request.action);
     if (!capability) return fail('DENY', ['UNKNOWN_ACTION']);
     meta.capabilityId = capability.capability_id;
+    if (request.resource.type !== capability.resource_type) {
+      return fail('DENY', ['RESOURCE_TYPE_MISMATCH']);
+    }
+    const argumentViolations = canonicalArgumentViolations(request, capability);
+    if (argumentViolations.length > 0) return fail('DENY', argumentViolations);
 
     const principalRecord = principalIndex.get(request.principalId);
     if (!principalRecord) return fail('DENY', ['UNKNOWN_PRINCIPAL']);
@@ -247,6 +327,9 @@ export function createPolicyEngine({ now } = {}) {
 
     const approval = checkApprovalRules(request, principalRecord);
     if (!approval.ok) return fail('DENY', approval.reasonCodes);
+
+    const recipient = checkRecipient(request, capability);
+    if (!recipient.ok) return fail('DENY', recipient.reasonCodes);
 
     const sandbox = checkSandbox(request, capability);
     if (!sandbox.ok) return fail(sandbox.decision, sandbox.reasonCodes);

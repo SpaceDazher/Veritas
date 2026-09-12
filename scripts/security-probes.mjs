@@ -19,7 +19,7 @@ const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
 
 const SECRETS = {
-  'sec-postgres-url': 'postgresql://vault-user:s3cret-pw@localhost:5432/veritas',
+  'sec-postgres-url': 'synthetic-db-secret-0123456789',
 };
 
 const INJECTION = [
@@ -52,7 +52,10 @@ async function probeA() {
     { principalId: 'prn-owner-alice', workspaceId: 'ws-carol-private', action: 'source.read', resource: { type: 'source', id: 'source:carol-1' } },
   ];
   const outcomes = attempts.map((request) => {
-    const result = engine.authorize({ adapter: 'api', ...request, args: {} });
+    const canonical = request.action === 'source.read'
+      ? { source_id: request.resource.id }
+      : { query: 'veritas' };
+    const result = engine.authorize({ adapter: 'api', ...request, args: canonical });
     return { request: request.resource.id, decision: result.decision, reasonCodes: result.reasonCodes };
   });
   const detected = outcomes.every((outcome) => outcome.decision === 'DENY');
@@ -72,13 +75,14 @@ async function probeB() {
     ...base,
     action: 'summary.generate',
     resource: { type: 'summary', id: 'summary:poisoned-1' },
-    args: { inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret-claim' }] },
+    args: { summary_id: 'summary:poisoned-1', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret-claim' }] },
   });
   const cachePoison = engine.authorize({
     ...base,
     action: 'cache.write',
     resource: { type: 'cache', id: 'cache:poisoned-1' },
-    args: { inputs: [{ workspaceId: 'ws-dave-private', resourceId: 'cache:dave-index' }] },
+    lease: { leaseId: 'lse-curator-cachewrite-0008', fencingToken: 1 },
+    args: { cache_id: 'cache:poisoned-1', inputs: [{ workspaceId: 'ws-dave-private', resourceId: 'cache:dave-index' }] },
   });
   const detected = summaryPoison.decision === 'DENY' && cachePoison.decision === 'DENY'
     && summaryPoison.reasonCodes.includes('CROSS_TENANT_INPUT')
@@ -95,7 +99,7 @@ async function probeC() {
     workspaceId: 'ws-eve-private',
     action: 'board.read',
     resource: { type: 'board', id: 'board:primary' },
-    args: {},
+    args: { workspace_id: 'ws-eve-private' },
     // hostile payload fields an attacker might stuff into a request body:
     role: 'rol-workspace-owner',
     authenticated: true,
@@ -110,7 +114,7 @@ async function probeC() {
     workspaceId: 'ws-alice-private',
     action: 'approval.decide',
     resource: { type: 'approval', id: 'approval:forged', producerPrincipalId: 'prn-agent-alice' },
-    args: { verdict: 'APPROVED' },
+    args: { approval_id: 'approval:forged', verdict: 'APPROVED' },
     approvedBy: 'prn-owner-alice',
   });
   const detected = forged.decision === 'DENY' && forgedApproval.decision === 'DENY'
@@ -174,24 +178,24 @@ async function probeE() {
   // must treat it as data: no capability, role or workspace change follows.
   const withInjection = engine.authorize({
     adapter: 'api',
-    principalId: 'prn-agent-alice',
+    principalId: 'prn-owner-alice',
     workspaceId: 'ws-veritas-project',
-    action: 'board.read',
-    resource: { type: 'board', id: 'board:primary' },
-    args: { sourceContent: INJECTION },
+    action: 'search.query',
+    resource: { type: 'source', id: 'source:docs' },
+    args: { query: INJECTION },
   });
   const escalationAttempt = engine.authorize({
     adapter: 'api',
     principalId: 'prn-external-opencode',
     workspaceId: 'ws-bob-private',
-    action: 'board.read',
-    resource: { type: 'board', id: 'board:primary' },
-    args: { sourceContent: INJECTION, requestedRole: 'rol-workspace-owner' },
+    action: 'search.query',
+    resource: { type: 'source', id: 'source:docs' },
+    args: { query: INJECTION },
   });
   const secretReadAttempt = sandbox.redact(`source says: ${INJECTION} value=${SECRETS['sec-postgres-url']}`);
   const decisionSameAsBenign = withInjection.decision === 'ALLOW';
   const noEscalation = escalationAttempt.decision === 'DENY';
-  const noSecretLeak = !secretReadAttempt.includes('s3cret-pw') && secretReadAttempt.includes('[REDACTED:sec-postgres-url]');
+  const noSecretLeak = !secretReadAttempt.includes('synthetic-db-secret-0123456789') && secretReadAttempt.includes('[REDACTED:sec-postgres-url]');
   const detected = decisionSameAsBenign && noEscalation && noSecretLeak;
   fs.rmSync(root, { recursive: true, force: true });
   return { detected, detail: `benign-path:${withInjection.decision}; escalation:${escalationAttempt.decision}(${escalationAttempt.reasonCodes.join('|')}); secretRedacted:${noSecretLeak}` };
@@ -205,7 +209,16 @@ async function probeF() {
     { principalId: 'prn-agent-alice', workspaceId: 'ws-carol-private', action: 'message.send', resource: { type: 'message', id: 'message:to-carol' } },
     { principalId: 'prn-external-hermes', workspaceId: 'ws-veritas-project', action: 'message.read', resource: { type: 'message', id: 'message:project-thread' } },
   ];
-  const outcomes = attempts.map((request) => engine.authorize({ adapter: 'cli', ...request, args: {} }));
+  const outcomes = attempts.map((request) => engine.authorize({
+    adapter: 'cli',
+    ...request,
+    args: request.action === 'message.send'
+      ? {
+          to_principal: request.principalId === 'prn-external-pi' ? 'prn-owner-bob' : 'prn-owner-carol',
+          body_digest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        }
+      : { message_id: request.resource.id },
+  }));
   const detected = outcomes.every((outcome) => outcome.decision === 'DENY');
   return { detected, detail: outcomes.map((o) => `${o.decision}(${o.reasonCodes.join('|')})`).join('; ') };
 }
@@ -250,7 +263,7 @@ async function probeH() {
     action: 'task.update',
     resource: { type: 'task', id: 'task:tsk-pilot-1' },
     lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 },
-    args: {},
+    args: { task_id: 'task:tsk-pilot-1', expected_revision: 3 },
   };
   const fresh = engine.authorize(request);
   const staleFence = engine.authorize({ ...request, lease: { leaseId: 'lse-pi-project-0001', fencingToken: 4 } });
@@ -277,11 +290,11 @@ async function probeI() {
     workspaceId: 'ws-carol-private',
     action: 'artifact.export',
     resource: { type: 'artifact', id: 'artifact:final-1' },
-    args: {},
+    args: { artifact_id: 'artifact:final-1', destination: 'export:local' },
   };
   const first = engine.authorize(request);
   const replay = engine.authorize(request);
-  const replayAgain = engine.authorize({ ...request, nonce: 'n-carolnonce0001' });
+  const replayAgain = engine.authorize(request);
   const detected = first.decision === 'ALLOW'
     && replay.decision === 'DENY' && replay.reasonCodes.includes('GRANT_NONCE_CONSUMED')
     && replayAgain.decision === 'DENY' && replayAgain.reasonCodes.includes('GRANT_NONCE_CONSUMED');

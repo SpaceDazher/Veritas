@@ -2,7 +2,28 @@
 
 Ticket: `tasks/S2-002_IDENTITY_SANDBOX.md` — identity, agent rights and the
 local sandbox gate. Branch: `codex/s2-002-identity-sandbox`.
-Verdict: **PASS_WITH_LIMITS**; live code execution remains **BLOCKED_SANDBOX**.
+Verdict: **PASS_WITH_LIMITS** (after one corrective round; see §8). Live code
+execution remains **BLOCKED_SANDBOX**.
+
+## 0. Corrective round — response to the independent REVISE review
+
+An independent review (best-of-3 verifier) returned REVISE with five P0 and
+two P1 findings. All seven were reproduced and fixed:
+
+| Finding | Fix |
+|---|---|
+| P0 comparator fail-open (`NaN > 0`, empty runs, no oracle check) | `compareRuns` rewritten fail-closed: empty/missing/NaN counters are violations; every observation must satisfy its frozen expected verdict; trialCount consistency enforced; new tests pin it |
+| P0 canonical arguments / resource type unvalidated | engine enforces `CANONICAL_ARGUMENTS_MISSING`, `ARGUMENT_NOT_CANONICAL`, `RESOURCE_TYPE_MISMATCH`; corpus, probes and tests carry canonical args |
+| P0 lease usable across capabilities | exact lease binding: capability, grant identity, principal, workspace, validity; `LEASE_NOT_REQUIRED` when a lease is presented without need; registry gained correctly bound claim.write/cache.write grants + leases; the corpus cell that had recorded the flaw as `ALLOW` was corrected |
+| P0 cross-tenant message.send allowed | recipient must hold workspace access (ACL or live grant): `RECIPIENT_OUT_OF_SCOPE`, `UNKNOWN_RECIPIENT`; corpus gained cross-tenant recipient cells |
+| P0 flaky red suite (survivor counting races) | sandbox liveness now consults the child's observed exit (`exitSeen`) before `OpenProcess`, descendant enumeration retries, bounded tree-settle before counting; sandbox suite green across repeated runs |
+| P1 clean-checkout claimed PASS without evidence | honest correction: the previous run had actually failed (`tar` drive-letter bug, npm spawn bug). Both fixed (`--relative-path tar extraction`, `npm.cmd` via cmd.exe, git-inventory fallbacks, synthetic placeholder for the build-time DB variable) and a real PASS is now recorded in `evidence/clean-checkout.json` |
+| P1 dependencies S1-007/S1-008/S1-010 unbound | `evidence/s2-002-dependency-binding.json` records them honestly as `DEPENDENCY_EVIDENCE_MISSING` (no ticket body or evidence exists in any reachable repository); per the ticket's own rule this caps the verdict at PASS_WITH_LIMITS |
+
+Policy version bumped to `s2-002-policy-v2` (semantics changed).
+Frozen-manifest scope now covers the whole S2-002 implementation, oracle
+suites, corpus runner, comparator and security docs.
+
 
 ## 1. Verdict summary
 

@@ -49,6 +49,33 @@ existed and reconciled while it still failed:
 Both mutations are mechanical harness corrections made while the suite was
 still RED; no oracle was weakened and no failing behaviour was masked.
 
-## Entry 3 — pending
+## Entry 3 — corrective round after independent REVISE review
+
+Scope: an external review returned verdict REVISE with P0 findings. The
+corrective round reproduced every finding, then fixed the production code.
+Test-suite mutations in this round:
+
+1. `tests/identity/policy-engine.test.mjs`: the `req()` fixture helper now
+   fills canonical arguments per action (the engine gained canonical
+   argument/resource-type enforcement, so bare `args: {}` fixtures stopped
+   reflecting legitimate requests). Twelve new tests pin the fixes:
+   canonical arguments present/absent/non-canonical, resource-type
+   mismatch, exact lease binding (capability, grant, principal,
+   not-required), message recipient scoping. One ownership test now uses
+   per-action resource types (resource-type enforcement made the shared
+   `task`-typed resource wrong for `board.read`).
+2. `tests/identity/replay-runs.test.mjs`: five new comparator tests pin the
+   fail-closed behaviour (empty runs, NaN/missing counters, frozen-oracle
+   mismatch identical in both runs, sandbox match flag, trialCount
+   consistency). One test id fixed from `acl/...|...` to `acl/.../...` to
+   match the runner's actual trial-id format.
+3. No oracle was weakened. The corpus runner's `cap/curator/claim.write`
+   expectation was CORRECTED: the review found the old cell recorded a
+   lease/capability mismatch as `ALLOW`; the registry now carries a
+   dedicated claim.write grant + lease, and a second negative trial pins
+   `LEASE_CAPABILITY_MISMATCH`. New positive/negative message-recipient
+   cells and a wrong-grant-lease cell were added.
+
+## Entry 4 — pending
 
 No further entries yet.

@@ -2,10 +2,11 @@
   "schemaVersion": 1,
   "role": "run A vs run B comparison",
   "comparison": {
-    "comparedTrials": 280,
+    "comparedTrials": 283,
     "mismatchedDecisions": 0,
     "mismatches": [],
     "counterViolations": [],
+    "expectedOracleViolations": [],
     "ok": true
   },
   "hardCounterLimits": {

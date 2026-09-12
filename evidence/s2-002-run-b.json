@@ -7,11 +7,11 @@
     "executorId": "exec-beta",
     "nonceBase": "nb-beta-c91d",
     "outputRoot": "D:\\Project\\AgentOS\\.codex-work\\veritas-stage2\\results\\s2-002\\run-b",
-    "corpusDigest": "99cf1057121489ca99b8a29a0f89e3eb647d0275a8d338c9a9c69a06e4f5dab0",
+    "corpusDigest": "bda698335d6f7213571183229eff264022f54819e4d689c93d0aaf71944e6e31",
     "fixedClock": "2026-09-12T12:00:00.000Z",
-    "policyVersion": "s2-002-policy-v1",
+    "policyVersion": "s2-002-policy-v2",
     "platform": "win32/x64 node v22.23.2",
-    "trialCount": 280,
+    "trialCount": 283,
     "counters": {
       "cross_tenant_success": 0,
       "authority_expansion": 0,
@@ -22,10 +22,10 @@
     },
     "revocationLatency": {
       "trials": 100,
-      "maxMs": 0.0587,
-      "meanMs": 0.010144000000000009,
+      "maxMs": 0.0603,
+      "meanMs": 0.010902000000000005,
       "allowAfterCommit": 0
     }
   },
-  "observationsDigest": "a3fe88f1180a1edb31b3747e59c970c58b7a9b043d51c95480cdfd6a8085327d"
+  "observationsDigest": "de90fc2701fc6fd8095c89d640bd29778503d64bebbac7206f46bf4e04f75aa4"
 }

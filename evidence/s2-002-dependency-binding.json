@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "scope": "S2-002 dependency binding record. Binds the dependencies listed in tasks/S2-002_IDENTITY_SANDBOX.md to evidence that actually exists, and records honest status for the rest. Missing evidence is declared, never assumed.",
+  "recordedAtCommit": "WORKTREE",
+  "dependencies": [
+    {
+      "ticket": "S2-001",
+      "status": "BOUND",
+      "evidence": "evidence/s2-001-pilot-binding.json",
+      "result": "PASS_WITH_LIMITS",
+      "upstreamRepository": "Veritas-AI-Production-Pilot",
+      "upstreamMainCommit": "6845858bccf3aec27c656649ac40ad01148e7505",
+      "verifiedArtifacts": 4,
+      "productionDeploymentAuthorized": false,
+      "verificationCommand": "npm run verify:pilot-binding"
+    },
+    {
+      "ticket": "S1-007",
+      "status": "DEPENDENCY_EVIDENCE_MISSING",
+      "searchedLocations": [
+        "D:/Project/AgentOS/.codex-work/veritas-stage2 (this repository)",
+        "D:/Project/Veritas-AI-Production-Pilot",
+        "D:/Project/DeepeekHarness/veritas"
+      ],
+      "finding": "No ticket body, evidence pack or closure record for S1-007 exists in any reachable repository. Its content is unknown beyond the identifier, so it cannot be bound and cannot be honestly claimed as satisfied."
+    },
+    {
+      "ticket": "S1-008",
+      "status": "DEPENDENCY_EVIDENCE_MISSING",
+      "searchedLocations": [
+        "D:/Project/AgentOS/.codex-work/veritas-stage2 (this repository)",
+        "D:/Project/Veritas-AI-Production-Pilot",
+        "D:/Project/DeepeekHarness/veritas"
+      ],
+      "finding": "No ticket body, evidence pack or closure record for S1-008 exists in any reachable repository. Its content is unknown beyond the identifier, so it cannot be bound and cannot be honestly claimed as satisfied."
+    },
+    {
+      "ticket": "S1-010",
+      "status": "DEPENDENCY_EVIDENCE_MISSING",
+      "searchedLocations": [
+        "D:/Project/AgentOS/.codex-work/veritas-stage2 (this repository)",
+        "D:/Project/Veritas-AI-Production-Pilot",
+        "D:/Project/DeepeekHarness/veritas"
+      ],
+      "finding": "No ticket body, evidence pack or closure record for S1-010 exists in any reachable repository. Its content is unknown beyond the identifier, so it cannot be bound and cannot be honestly claimed as satisfied."
+    }
+  ],
+  "consequence": "Per the ticket's dependency rule, missing bindings are a blocker for full completion. The gate therefore reports PASS_WITH_LIMITS at most, with this record as the explicit limitation; it must not be reported as a clean pass."
+}

@@ -193,8 +193,13 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
 
   // ---- Process controls (research instrument; see module header) ----
   const activeProbes = new Map();
+  // Pids whose 'close' event already fired. On Windows our own child handle
+  // keeps OpenProcess succeeding for a terminated child, which makes
+  // process.kill(pid, 0) unreliable for liveness of direct children.
+  const exitSeen = new Set();
 
   function isAlive(pid) {
+    if (exitSeen.has(pid)) return false;
     try {
       process.kill(pid, 0);
       return true;
@@ -208,17 +213,22 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
       `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
       `($p | Select-Object -Unique) -join ' '`;
-    return new Promise((resolve) => {
+    const attempt = (triesLeft) => new Promise((resolve) => {
       const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
         windowsHide: true,
       });
       let out = '';
       child.stdout.on('data', (chunk) => { out += chunk; });
-      child.on('error', () => resolve([]));
-      child.on('close', () => {
+      child.on('error', () => resolve(triesLeft > 1 ? attempt(triesLeft - 1) : []));
+      child.on('close', (code) => {
+        if (code !== 0 && triesLeft > 1) {
+          resolve(attempt(triesLeft - 1));
+          return;
+        }
         resolve(out.split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0 && value !== pid));
       });
     });
+    return attempt(3);
   }
 
   function treeKill(pid) {
@@ -242,6 +252,19 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const descendants = await listDescendants(pid);
     const alive = descendants.filter((candidate) => isAlive(candidate));
     return (isAlive(pid) ? 1 : 0) + alive.length;
+  }
+
+  // Settles a just-killed tree: waits until the direct child's exit is seen
+  // and a full descendant enumeration reports nothing alive. Bounded wait,
+  // terminal verdict either way.
+  async function settleTree(pid) {
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      if (exitSeen.has(pid)) {
+        const descendants = await listDescendants(pid);
+        if (descendants.every((candidate) => !isAlive(candidate))) return;
+      }
+      await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
+    }
   }
 
   function probeEnv() {
@@ -326,6 +349,7 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       settle.reject(error);
     });
     child.on('close', (code) => {
+      exitSeen.add(pid);
       if (record.timedOut) {
         finish('timeout', null);
         return;
@@ -349,15 +373,10 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const record = activeProbes.get(pid);
     if (record) record.cancelled = true;
     await treeKill(pid);
-    // Brief settle loop so the OS reports terminal state, not a race.
-    for (let attempt = 0; attempt < 5; attempt += 1) {
-      const survivors = await countSurvivors(pid);
-      if (survivors === 0) {
-        return { terminated: true, survivors: 0, pid };
-      }
-      await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
-    }
-    return { terminated: true, survivors: await countSurvivors(pid), pid };
+    // Settle the whole tree before counting; bounded, terminal either way.
+    await settleTree(pid);
+    const survivors = await countSurvivors(pid);
+    return { terminated: true, survivors, pid };
   }
 
   // Public execution path: blocked tiers never spawn anything.

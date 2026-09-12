@@ -17,7 +17,7 @@ const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
 
 const SECRETS = {
-  'sec-postgres-url': 'postgresql://vault-user:s3cret-pw@localhost:5432/veritas',
+  'sec-postgres-url': 'synthetic-db-secret-0123456789',
   'sec-token-a': 'tok_super_secret_value_0123456789',
 };
 
@@ -202,7 +202,7 @@ describe('S2-002 sandbox: environment and secrets', () => {
     const sandbox = makeSandbox(SANDBOX_NO_EXEC, [root]);
     const line = `connecting with ${SECRETS['sec-postgres-url']} and ${SECRETS['sec-token-a']}`;
     const redacted = sandbox.redact(line);
-    assert.ok(!redacted.includes('s3cret-pw'));
+    assert.ok(!redacted.includes('synthetic-db-secret-0123456789'));
     assert.ok(!redacted.includes('tok_super_secret_value'));
     assert.ok(redacted.includes('[REDACTED:sec-postgres-url]'));
     assert.ok(redacted.includes('[REDACTED:sec-token-a]'));

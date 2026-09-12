@@ -20,6 +20,26 @@ const NOW = '2026-09-12T12:00:00.000Z';
 
 const ADAPTERS = ['web', 'api', 'cli'];
 
+// Canonical argument builders per action (mirror of the capability
+// contracts). Fixture-side only: the engine validates independently.
+const CANONICAL = {
+  'board.read': (r) => ({ workspace_id: r.workspaceId }),
+  'task.create': () => ({ title: 'Synthetic task' }),
+  'task.update': (r) => ({ task_id: r.resource.id, expected_revision: 3 }),
+  'approval.decide': () => ({ approval_id: 'approval:x', verdict: 'APPROVED' }),
+  'message.send': () => ({ to_principal: 'prn-agent-alice', body_digest: `sha256:${'5'.repeat(64)}` }),
+  'source.read': () => ({ source_id: 'source:x' }),
+  'search.query': () => ({ query: 'veritas' }),
+  'cache.read': () => ({ cache_id: 'cache:x' }),
+  'summary.generate': (r) => ({ summary_id: r.resource.id, inputs: [{ workspaceId: r.workspaceId, resourceId: 'claim:c1' }] }),
+  'claim.write': () => ({ claim_id: 'claim:x', provenance: 'synthetic' }),
+  'tool.execute': () => ({ tool_id: 'tool:x', canonical_args: {} }),
+  'tool.discover': (r) => ({ workspace_id: r.workspaceId }),
+  'artifact.export': () => ({ artifact_id: 'artifact:x', destination: 'export:local' }),
+  'artifact.read': () => ({ artifact_id: 'artifact:x' }),
+  'task.cancel': () => ({ task_id: 'task:x' }),
+};
+
 describe('S2-002 authority registry (subjects model)', () => {
   test('exposes exactly 20 deterministic principals', () => {
     assert.equal(PRINCIPALS.length, 20);
@@ -85,7 +105,7 @@ function makeEngine() {
 }
 
 function req(overrides = {}) {
-  return {
+  const request = {
     adapter: 'api',
     principalId: 'prn-owner-alice',
     action: 'board.read',
@@ -94,7 +114,149 @@ function req(overrides = {}) {
     args: {},
     ...overrides,
   };
+  const canonical = CANONICAL[request.action]?.(request) ?? {};
+  request.args = { ...canonical, ...(request.args ?? {}) };
+  return request;
 }
+describe('S2-002 policy engine: canonical arguments and resource type', () => {
+  test('missing required canonical arguments are denied', () => {
+    const engine = makeEngine();
+    const result = engine.authorize({ ...req(), args: {} }); // board.read needs workspace_id
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('CANONICAL_ARGUMENTS_MISSING'));
+  });
+
+  test('arguments outside the canonical set are denied', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      args: { workspace_id: 'ws-alice-private', escalate: 'true' },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('ARGUMENT_NOT_CANONICAL'));
+  });
+
+  test('resource type must match the capability contract', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      resource: { type: 'secret', id: 'board:primary' },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('RESOURCE_TYPE_MISMATCH'));
+  });
+
+  test('artifact.export without canonical arguments is denied even with a grant', () => {
+    const engine = makeEngine();
+    // Raw request (bypassing the fixture helper) with empty args.
+    const result = engine.authorize({
+      adapter: 'api',
+      principalId: 'prn-agent-carol',
+      workspaceId: 'ws-carol-private',
+      action: 'artifact.export',
+      resource: { type: 'artifact', id: 'artifact:final-1' },
+      args: {},
+    });
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('CANONICAL_ARGUMENTS_MISSING'));
+  });
+});
+
+describe('S2-002 policy engine: exact lease binding', () => {
+  test('a lease bound to one capability cannot authorize another', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-platform-curator',
+      workspaceId: 'ws-veritas-project',
+      action: 'claim.write',
+      resource: { type: 'claim', id: 'claim:c1' },
+      lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, // bound to summary.generate
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('LEASE_CAPABILITY_MISMATCH'));
+  });
+
+  test('a lease bound to a foreign grant cannot ride on unrelated access', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-external-pi',
+      workspaceId: 'ws-veritas-project',
+      action: 'task.update',
+      resource: { type: 'task', id: 'task:tsk-pilot-1' },
+      lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, // curator lease
+    }));
+    assert.equal(result.decision, 'DENY');
+    // The lease belongs to another principal entirely; ownership is checked
+    // before the grant binding chain.
+    assert.ok(result.reasonCodes.includes('LEASE_OWNER_MISMATCH'), result.reasonCodes.join(','));
+  });
+
+  test('a same-capability lease linked to a different grant is rejected', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-external-pi',
+      workspaceId: 'ws-veritas-project',
+      action: 'task.update',
+      resource: { type: 'task', id: 'task:tsk-pilot-1' },
+      lease: { leaseId: 'lse-pi-project-0007', fencingToken: 3 }, // linked to grant 0016, access came via grant 0004
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('LEASE_GRANT_MISMATCH'), result.reasonCodes.join(','));
+  });
+
+  test('a presented lease for a capability that needs none is denied', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('LEASE_NOT_REQUIRED'));
+  });
+
+  test('the correctly bound lease still authorizes its own capability', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-external-pi',
+      workspaceId: 'ws-veritas-project',
+      action: 'task.update',
+      resource: { type: 'task', id: 'task:tsk-pilot-1' },
+      lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 },
+    }));
+    assert.equal(result.decision, 'ALLOW', result.reasonCodes.join(','));
+  });
+});
+
+describe('S2-002 policy engine: message recipient scoping', () => {
+  test('message to a recipient without workspace access is denied', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      action: 'message.send',
+      resource: { type: 'message', id: 'message:m1' },
+      args: { to_principal: 'prn-owner-bob', body_digest: `sha256:${'5'.repeat(64)}` },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('RECIPIENT_OUT_OF_SCOPE'));
+  });
+
+  test('message to a recipient with a grant in the workspace is allowed', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      action: 'message.send',
+      resource: { type: 'message', id: 'message:m2' },
+      args: { to_principal: 'prn-agent-alice', body_digest: `sha256:${'5'.repeat(64)}` },
+    }));
+    assert.equal(result.decision, 'ALLOW', result.reasonCodes.join(','));
+  });
+
+  test('unknown recipients are denied', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      action: 'message.send',
+      resource: { type: 'message', id: 'message:m3' },
+      args: { to_principal: 'prn-ghost', body_digest: `sha256:${'5'.repeat(64)}` },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('UNKNOWN_RECIPIENT'));
+  });
+});
 
 describe('S2-002 policy engine: default deny', () => {
   test('unknown principal, action or workspace is denied, never error-implicit-allow', () => {
@@ -142,11 +304,14 @@ describe('S2-002 policy engine: default deny', () => {
 describe('S2-002 policy engine: ownership and delegation', () => {
   test('human owner has full access inside the owned private workspace', () => {
     const engine = makeEngine();
-    for (const action of ['board.read', 'task.create', 'task.update', 'approval.decide']) {
-      const result = engine.authorize(req({
-        action,
-        resource: { type: 'task', id: 'task:1', producerPrincipalId: 'prn-agent-alice' },
-      }));
+    const cases = [
+      { action: 'board.read', resource: { type: 'board', id: 'board:primary' } },
+      { action: 'task.create', resource: { type: 'task', id: 'task:1' } },
+      { action: 'task.update', resource: { type: 'task', id: 'task:1' } },
+      { action: 'approval.decide', resource: { type: 'approval', id: 'approval:1', producerPrincipalId: 'prn-agent-alice' } },
+    ];
+    for (const { action, resource } of cases) {
+      const result = engine.authorize(req({ action, resource }));
       assert.equal(result.decision, 'ALLOW', `${action} for owner: ${result.reasonCodes}`);
     }
   });

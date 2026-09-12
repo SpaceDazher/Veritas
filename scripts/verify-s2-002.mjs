@@ -30,8 +30,44 @@ const REVOCATION_MIN_TRIALS = 100;
 const REVOCATION_MAX_MS = 5000;
 
 export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
-  const decisionsA = new Map(observationsA.map((o) => [o.trialId, o.decision]));
-  const decisionsB = new Map(observationsB.map((o) => [o.trialId, o.decision]));
+  const counterViolations = [];
+  const expectedOracleViolations = [];
+
+  // Fail-closed structural checks: empty or truncated runs are violations,
+  // never silently-passing comparisons.
+  const runs = [
+    ['run-a', summaryA, observationsA],
+    ['run-b', summaryB, observationsB],
+  ];
+  for (const [label, summary, observations] of runs) {
+    if (!Array.isArray(observations) || observations.length === 0) {
+      counterViolations.push(`${label}/emptyObservations`);
+      continue;
+    }
+    if (!summary || typeof summary !== 'object') {
+      counterViolations.push(`${label}/missingSummary`);
+      continue;
+    }
+    if (Number.isFinite(summary.trialCount) && summary.trialCount !== observations.length) {
+      counterViolations.push(`${label}/trialCount=${summary.trialCount}/observations=${observations.length}`);
+    }
+    if (!Number.isFinite(summary.trialCount) || summary.trialCount === 0) {
+      counterViolations.push(`${label}/trialCount=${summary.trialCount}`);
+    }
+    // Frozen-oracle check: every observation must agree with its recorded
+    // expectation — this catches wrong behaviour identical in BOTH runs.
+    for (const observation of observations) {
+      const oracleOk = observation.kind === 'sandbox'
+        ? observation.match === true
+        : observation.decision === observation.expected;
+      if (!oracleOk) {
+        expectedOracleViolations.push({ run: label, trialId: observation.trialId, expected: observation.expected, decision: observation.decision });
+      }
+    }
+  }
+
+  const decisionsA = new Map((observationsA ?? []).map((o) => [o.trialId, o.decision]));
+  const decisionsB = new Map((observationsB ?? []).map((o) => [o.trialId, o.decision]));
   const keys = new Set([...decisionsA.keys(), ...decisionsB.keys()]);
   let mismatchedDecisions = 0;
   const mismatches = [];
@@ -48,33 +84,44 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
       mismatches.push({ trialId: key, runA: a, runB: b });
     }
   }
-  const counterViolations = [];
-  for (const [summary, label] of [[summaryA, 'run-a'], [summaryB, 'run-b']]) {
-    for (const [counter, limit] of Object.entries(COUNTER_LIMITS)) {
-      if ((summary.counters?.[counter] ?? Number.NaN) > limit) {
-        counterViolations.push(`${label}/${counter}=${summary.counters[counter]}`);
+
+  const counterLimitEntries = Object.entries(COUNTER_LIMITS);
+  for (const [label, summary] of runs) {
+    const counters = summary?.counters;
+    if (!counters || typeof counters !== 'object') {
+      counterViolations.push(`${label}/missingCounters`);
+      continue;
+    }
+    for (const [counter, limit] of counterLimitEntries) {
+      const value = counters[counter];
+      // Fail closed: a missing or non-finite counter is a violation, never
+      // an implicit pass (NaN comparisons are always false).
+      if (typeof value !== 'number' || !Number.isFinite(value) || value > limit) {
+        counterViolations.push(`${label}/${counter}=${String(value)}`);
       }
     }
     const stats = summary.revocationLatency ?? {};
-    if ((stats.trials ?? 0) < REVOCATION_MIN_TRIALS) {
-      counterViolations.push(`${label}/revocationTrials=${stats.trials ?? 0}`);
+    if (!Number.isFinite(stats.trials) || stats.trials < REVOCATION_MIN_TRIALS) {
+      counterViolations.push(`${label}/revocationTrials=${String(stats.trials)}`);
     }
-    if ((stats.maxMs ?? Number.POSITIVE_INFINITY) > REVOCATION_MAX_MS) {
-      counterViolations.push(`${label}/revocationMaxMs=${stats.maxMs}`);
+    if (!Number.isFinite(stats.maxMs) || stats.maxMs > REVOCATION_MAX_MS) {
+      counterViolations.push(`${label}/revocationMaxMs=${String(stats.maxMs)}`);
     }
-    if ((stats.allowAfterCommit ?? 1) !== 0) {
-      counterViolations.push(`${label}/allowAfterCommit=${stats.allowAfterCommit}`);
+    if (stats.allowAfterCommit !== 0) {
+      counterViolations.push(`${label}/allowAfterCommit=${String(stats.allowAfterCommit)}`);
     }
-    if (summary.corpusDigest !== summaryA.corpusDigest) {
+    if (summary.corpusDigest !== summaryA?.corpusDigest || summary.corpusDigest !== summaryB?.corpusDigest) {
       counterViolations.push(`${label}/corpusDigestDrift`);
     }
   }
+
   return {
     comparedTrials: keys.size,
     mismatchedDecisions,
     mismatches,
     counterViolations,
-    ok: mismatchedDecisions === 0 && counterViolations.length === 0,
+    expectedOracleViolations,
+    ok: mismatchedDecisions === 0 && counterViolations.length === 0 && expectedOracleViolations.length === 0,
   };
 }
 

@@ -1,87 +1,79 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "7fac2a9fb51f7f02fa85f3083b129a6eb52ac32a",
-  "sourceTree": "c1fa52f6fb52778ddbda4c4e4d5146f84f698adc",
+  "sourceCommit": "690d97197db11db9ac82fb276a210beeab1cf426",
+  "sourceTree": "f7d0890bdc00487ee773fd595c54e6335719384d",
   "exitCode": 1,
   "passed": false,
   "commands": [
     {
       "id": "archive",
       "command": "git archive HEAD",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "Command failed: tar -xf C:\\Users\\Daniil\\AppData\\Local\\Temp\\veritas-clean-checkout-RqH1xC\\source.tar -C C:\\Users\\Daniil\\AppData\\Local\\Temp\\veritas-clean-checkout-RqH1xC\\checkout\ntar: Cannot connect to C: resolve failed\n"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "npm-ci",
-      "command": "npm-ci",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "npm.cmd ci",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "contracts",
-      "command": "contracts",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "node scripts/validate-contracts.mjs",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "synthetic-smoke",
-      "command": "synthetic-smoke",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "node scripts/synthetic-smoke.mjs",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "inventory",
-      "command": "inventory",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "node scripts/check-inventory.mjs",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "public-artifacts",
-      "command": "public-artifacts",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "node scripts/check-public-artifacts.mjs",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "es(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\r\n+   },\r\n+   {\r\n+     path: 'scripts/security-probes.mjs',\r\n+     pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\r\n+   },\r\n+   {\r\n+     path: 'tests/identity/sandbox.test.mjs',\r\n+     pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\r\n+   }\r\n+ ]\r\n- []\r\n\r\n    at file:///C:/Users/Daniil/AppData/Local/Temp/veritas-clean-checkout-giItAJ/checkout/scripts/check-public-artifacts.mjs:42:8\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  generatedMessage: false,\r\n  code: 'ERR_ASSERTION',\r\n  actual: [\r\n    {\r\n      path: 'scripts/s2-002-run.mjs',\r\n      pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\r\n    },\r\n    {\r\n      path: 'scripts/security-probes.mjs',\r\n      pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\r\n    },\r\n    {\r\n      path: 'tests/identity/sandbox.test.mjs',\r\n      pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\r\n    }\r\n  ],\r\n  expected: [],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "typecheck",
-      "command": "typecheck",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "npm.cmd run typecheck",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "build",
-      "command": "build",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "npm.cmd run build",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "runtime-audit",
-      "command": "runtime-audit",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "npm.cmd audit --omit=dev --json",
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "tooling-audit",
-      "command": "tooling-audit",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "command": "npm.cmd audit --json",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "  \"via\": [\n        {\n          \"source\": 1102341,\n          \"name\": \"esbuild\",\n          \"dependency\": \"esbuild\",\n          \"title\": \"esbuild enables any website to send any requests to the development server and read the response\",\n          \"url\": \"https://github.com/advisories/GHSA-67mh-4wv8-2f99\",\n          \"severity\": \"moderate\",\n          \"cwe\": [\n            \"CWE-346\"\n          ],\n          \"cvss\": {\n            \"score\": 5.3,\n            \"vectorString\": \"CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N\"\n          },\n          \"range\": \"<=0.24.2\"\n        }\n      ],\n      \"effects\": [\n        \"@esbuild-kit/core-utils\"\n      ],\n      \"range\": \"<=0.24.2\",\n      \"nodes\": [\n        \"node_modules/@esbuild-kit/core-utils/node_modules/esbuild\"\n      ],\n      \"fixAvailable\": {\n        \"name\": \"drizzle-kit\",\n        \"version\": \"0.18.1\",\n        \"isSemVerMajor\": true\n      }\n    }\n  },\n  \"metadata\": {\n    \"vulnerabilities\": {\n      \"info\": 0,\n      \"low\": 0,\n      \"moderate\": 4,\n      \"high\": 0,\n      \"critical\": 0,\n      \"total\": 4\n    },\n    \"dependencies\": {\n      \"prod\": 38,\n      \"dev\": 481,\n      \"optional\": 170,\n      \"peer\": 0,\n      \"peerOptional\": 0,\n      \"total\": 557\n    }\n  }\n}"
     },
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": null,
-      "status": "NOT_RUN_SANDBOX",
-      "reason": "clean archive prerequisite was blocked by the sandbox"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "/synthetic-smoke.mjs',\r\n      sha256: '6a5d4a52759881f30b267ac61ec5d65898e9b94a21a0a77ffd008eecef7751b5',\r\n      bytes: 1250\r\n    },\r\n    {\r\n      path: 'scripts/validate-contracts.mjs',\r\n      sha256: 'cf9f8215557431d7c50cb8305cfdb2ca3411652a901c520573256a5a21e5069c',\r\n      bytes: 9045\r\n    },\r\n    {\r\n      path: 'scripts/verify-clean-checkout.mjs',\r\n      sha256: 'd3a4db4a9e209226aafd4fa5cdfae2e9fb3b3fb9401a5b4aa68d238c8ffe6795',\r\n      bytes: 4440\r\n    },\r\n    {\r\n      path: 'scripts/verify-pilot-binding.mjs',\r\n      sha256: '24dc8a3d1fea67b9306b514f350eb63885d558eb5faae7805d7105774ca97c47',\r\n      bytes: 3237\r\n    },\r\n    {\r\n      path: 'scripts/verify-s2-002.mjs',\r\n      sha256: 'd63b4a212767b6b5f8ba42a7be47f01f74104c1ec15b30382d8e5febee727698',\r\n      bytes: 6445\r\n    },\r\n    {\r\n      path: 'scripts/verify.mjs',\r\n      sha256: '6b8c2cfd7779c868f8d4b026dde62299ffaaeffb9258bcff431ffe052783b3ba',\r\n      bytes: 10009\r\n    },\r\n    {\r\n      path: 'scripts/veritas-cli.mjs',\r\n      sha256: '962bbfa219f9e38b485d7f5d0ae928a555d3b38ff9994189ec5908cf2c5fc4d9',\r\n      bytes: 1129\r\n    },\r\n    ... 25 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "database-workspace-smoke",

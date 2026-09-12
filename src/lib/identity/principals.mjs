@@ -206,6 +206,9 @@ export const GRANTS = Object.freeze([
   grant('grt-dave-agent-create-0012', 'prn-owner-dave', 'prn-agent-dave', 'cap-task.create', 'ws-dave-private', 'task', ['task:new-dave'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_D } }),
   grant('grt-alice-curator-lease-0013', 'prn-owner-alice', 'prn-platform-curator', 'cap-summary.generate', 'ws-veritas-project', 'summary', ['summary:board-weekly', 'summary:poisoned'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_A } }),
   grant('grt-bob-experimenter-lease-0014', 'prn-owner-bob', 'prn-platform-experimenter', 'cap-tool.execute', 'ws-veritas-project', 'tool', ['tool:runner'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_B } }),
+  grant('grt-alice-curator-claimwrite-0015', 'prn-owner-alice', 'prn-platform-curator', 'cap-claim.write', 'ws-veritas-project', 'claim', ['claim:curation-1', 'claim:c1'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_C } }),
+  grant('grt-alice-pi-project-update-0016', 'prn-owner-alice', 'prn-external-pi', 'cap-task.update', 'ws-veritas-project', 'task', ['task:tsk-pilot-3'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_D } }),
+  grant('grt-alice-curator-cachewrite-0017', 'prn-owner-alice', 'prn-platform-curator', 'cap-cache.write', 'ws-veritas-project', 'cache', ['cache:poisoned-1', 'cache:project-index'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_A } }),
 ]);
 
 const lease = (lease_id, workspace_id, owner, grant_id, task_id, run_id, fencing_token, issued_at, expires_at, state = 'active') => ({
@@ -227,6 +230,9 @@ export const LEASES = Object.freeze([
   lease('lse-pi-project-0002-expired', 'ws-veritas-project', 'prn-external-pi', 'grt-alice-pi-project-update-0004', 'tsk-pilot-2', 'run-0001', 3, '2026-09-01T00:00:00.000Z', LEASE_EXPIRED_AT),
   lease('lse-curator-0004', 'ws-veritas-project', 'prn-platform-curator', 'grt-alice-curator-lease-0013', 'tsk-curation-0001', 'run-0001', 2, LEASE_ISSUED, LEASE_EXPIRY),
   lease('lse-experimenter-0005', 'ws-veritas-project', 'prn-platform-experimenter', 'grt-bob-experimenter-lease-0014', 'tool-run-0001', 'run-0001', 1, LEASE_ISSUED, LEASE_EXPIRY),
+  lease('lse-curator-claimwrite-0006', 'ws-veritas-project', 'prn-platform-curator', 'grt-alice-curator-claimwrite-0015', 'tsk-curation-0002', 'run-0001', 1, LEASE_ISSUED, LEASE_EXPIRY),
+  lease('lse-pi-project-0007', 'ws-veritas-project', 'prn-external-pi', 'grt-alice-pi-project-update-0016', 'tsk-pilot-3', 'run-0001', 3, LEASE_ISSUED, LEASE_EXPIRY),
+  lease('lse-curator-cachewrite-0008', 'ws-veritas-project', 'prn-platform-curator', 'grt-alice-curator-cachewrite-0017', 'tsk-curation-0003', 'run-0001', 1, LEASE_ISSUED, LEASE_EXPIRY),
 ]);
 
 export const SANDBOX_PROFILES = Object.freeze([

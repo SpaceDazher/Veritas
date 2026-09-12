@@ -15,7 +15,7 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { PRINCIPALS, WORKSPACES } from '../src/lib/identity/principals.mjs';
-import { createPolicyEngine } from '../src/lib/identity/policy-engine.mjs';
+import { createPolicyEngine, POLICY_VERSION } from '../src/lib/identity/policy-engine.mjs';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
 import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
 
@@ -46,34 +46,37 @@ const BOARD_READ_ALLOW = new Set([
 
 // Expected decision per explicit capability/derived/nonce trial.
 const CAPABILITY_TRIALS = [
-  { trialId: 'cap/alice/task.create/own', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'task.create', resource: { type: 'task', id: 'task:new-alice' }, expected: 'ALLOW' },
-  { trialId: 'cap/alice/task.update/own-lease-waiver', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'task.update', resource: { type: 'task', id: 'task:1' }, expected: 'ALLOW' },
-  { trialId: 'cap/alice/approval.decide/agent-produced', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'approval.decide', resource: { type: 'approval', id: 'approval:agent-output', producerPrincipalId: 'prn-agent-alice' }, expected: 'ALLOW' },
-  { trialId: 'cap/alice/approval.decide/self-produced', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'approval.decide', resource: { type: 'approval', id: 'approval:self', producerPrincipalId: 'prn-owner-alice' }, expected: 'DENY', crossTenant: false },
-  { trialId: 'cap/alice/message.send/own', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'message.send', resource: { type: 'message', id: 'message:local' }, expected: 'ALLOW' },
-  { trialId: 'cap/agent-alice/message.send/ungranted', principalId: 'prn-agent-alice', workspaceId: 'ws-alice-private', action: 'message.send', resource: { type: 'message', id: 'message:local' }, expected: 'DENY' },
-  { trialId: 'cap/pi/task.update/project-lease', principalId: 'prn-external-pi', workspaceId: 'ws-veritas-project', action: 'task.update', resource: { type: 'task', id: 'task:tsk-pilot-1' }, lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 }, expected: 'ALLOW' },
-  { trialId: 'cap/codex/task.create/project-grant', principalId: 'prn-external-codex', workspaceId: 'ws-veritas-project', action: 'task.create', resource: { type: 'task', id: 'task:new-codex' }, expected: 'ALLOW' },
-  { trialId: 'cap/curator/claim.write/project-lease', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'claim.write', resource: { type: 'claim', id: 'claim:curation-1' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, expected: 'ALLOW' },
-  { trialId: 'cap/analyst/summary.generate/no-lease', principalId: 'prn-platform-analyst', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:analyst-1' }, expected: 'DENY' },
-  { trialId: 'cap/experimenter/tool.execute/blocked-tier', principalId: 'prn-platform-experimenter', workspaceId: 'ws-veritas-project', action: 'tool.execute', resource: { type: 'tool', id: 'tool:runner' }, lease: { leaseId: 'lse-experimenter-0005', fencingToken: 1 }, expected: 'BLOCKED_SANDBOX' },
-  { trialId: 'cap/experimenter/tool.discover/read', principalId: 'prn-platform-experimenter', workspaceId: 'ws-veritas-project', action: 'tool.discover', resource: { type: 'tool', id: 'tool:runner' }, expected: 'ALLOW' },
-  { trialId: 'cap/operator/task.cancel/project', principalId: 'prn-platform-operator', workspaceId: 'ws-veritas-project', action: 'task.cancel', resource: { type: 'task', id: 'task:tsk-pilot-1' }, expected: 'ALLOW' },
-  { trialId: 'cap/verifier/artifact.read/project', principalId: 'prn-platform-verifier', workspaceId: 'ws-veritas-project', action: 'artifact.read', resource: { type: 'artifact', id: 'artifact:1' }, expected: 'ALLOW' },
-  { trialId: 'cap/collector/source.read/shared', principalId: 'prn-platform-collector', workspaceId: 'ws-shared-library', action: 'source.read', resource: { type: 'source', id: 'source:library-1' }, expected: 'ALLOW' },
-  { trialId: 'cap/collector/board.read/shared-ungranted', principalId: 'prn-platform-collector', workspaceId: 'ws-shared-library', action: 'board.read', resource: { type: 'board', id: 'board:primary' }, expected: 'DENY' },
-  { trialId: 'cap/agent-dave/task.create/grant', principalId: 'prn-agent-dave', workspaceId: 'ws-dave-private', action: 'task.create', resource: { type: 'task', id: 'task:new-dave' }, expected: 'ALLOW' },
-  { trialId: 'cap/hermes/search.query/expired-grant', principalId: 'prn-external-hermes', workspaceId: 'ws-veritas-project', action: 'search.query', resource: { type: 'source', id: 'source:docs' }, expected: 'DENY', crossTenant: false },
-  { trialId: 'cap/pi/source.read/bob-private-cross-tenant', principalId: 'prn-external-pi', workspaceId: 'ws-bob-private', action: 'source.read', resource: { type: 'source', id: 'source:bob-notes-1' }, expected: 'DENY', crossTenant: true },
-  { trialId: 'cap/alice/cache.read/bob-private-cross-tenant', principalId: 'prn-owner-alice', workspaceId: 'ws-bob-private', action: 'cache.read', resource: { type: 'cache', id: 'cache:bob-index' }, expected: 'DENY', crossTenant: true },
+  { trialId: 'cap/alice/task.create/own', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'task.create', resource: { type: 'task', id: 'task:new-alice' }, args: { title: 'Synthetic task' }, expected: 'ALLOW' },
+  { trialId: 'cap/alice/task.update/own-lease-waiver', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'task.update', resource: { type: 'task', id: 'task:1' }, args: { task_id: 'task:1', expected_revision: 3 }, expected: 'ALLOW' },
+  { trialId: 'cap/alice/approval.decide/agent-produced', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'approval.decide', resource: { type: 'approval', id: 'approval:agent-output', producerPrincipalId: 'prn-agent-alice' }, args: { approval_id: 'approval:agent-output', verdict: 'APPROVED' }, expected: 'ALLOW' },
+  { trialId: 'cap/alice/approval.decide/self-produced', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'approval.decide', resource: { type: 'approval', id: 'approval:self', producerPrincipalId: 'prn-owner-alice' }, args: { approval_id: 'approval:self', verdict: 'APPROVED' }, expected: 'DENY', crossTenant: false },
+  { trialId: 'cap/alice/message.send/own', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'message.send', resource: { type: 'message', id: 'message:local' }, args: { to_principal: 'prn-agent-alice', body_digest: 'sha256:5555555555555555555555555555555555555555555555555555555555555555' }, expected: 'ALLOW' },
+  { trialId: 'cap/alice/message.send/cross-tenant-recipient', principalId: 'prn-owner-alice', workspaceId: 'ws-alice-private', action: 'message.send', resource: { type: 'message', id: 'message:cross' }, args: { to_principal: 'prn-owner-bob', body_digest: 'sha256:6666666666666666666666666666666666666666666666666666666666666666' }, expected: 'DENY', crossTenant: true },
+  { trialId: 'cap/agent-alice/message.send/ungranted', principalId: 'prn-agent-alice', workspaceId: 'ws-alice-private', action: 'message.send', resource: { type: 'message', id: 'message:local' }, args: { to_principal: 'prn-owner-alice', body_digest: 'sha256:7777777777777777777777777777777777777777777777777777777777777777' }, expected: 'DENY' },
+  { trialId: 'cap/pi/task.update/project-lease', principalId: 'prn-external-pi', workspaceId: 'ws-veritas-project', action: 'task.update', resource: { type: 'task', id: 'task:tsk-pilot-1' }, lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 }, args: { task_id: 'task:tsk-pilot-1', expected_revision: 3 }, expected: 'ALLOW' },
+  { trialId: 'cap/pi/task.update/wrong-grant-lease', principalId: 'prn-external-pi', workspaceId: 'ws-veritas-project', action: 'task.update', resource: { type: 'task', id: 'task:tsk-pilot-1' }, lease: { leaseId: 'lse-pi-project-0007', fencingToken: 3 }, args: { task_id: 'task:tsk-pilot-1', expected_revision: 3 }, expected: 'DENY' },
+  { trialId: 'cap/codex/task.create/project-grant', principalId: 'prn-external-codex', workspaceId: 'ws-veritas-project', action: 'task.create', resource: { type: 'task', id: 'task:new-codex' }, args: { title: 'Codex synthetic task' }, expected: 'ALLOW' },
+  { trialId: 'cap/curator/claim.write/project-lease', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'claim.write', resource: { type: 'claim', id: 'claim:curation-1' }, lease: { leaseId: 'lse-curator-claimwrite-0006', fencingToken: 1 }, args: { claim_id: 'claim:curation-1', provenance: 'synthetic' }, expected: 'ALLOW' },
+  { trialId: 'cap/curator/claim.write/foreign-capability-lease', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'claim.write', resource: { type: 'claim', id: 'claim:c1' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { claim_id: 'claim:c1', provenance: 'synthetic' }, expected: 'DENY' },
+  { trialId: 'cap/analyst/summary.generate/no-lease', principalId: 'prn-platform-analyst', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:analyst-1' }, args: { summary_id: 'summary:analyst-1', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }] }, expected: 'DENY' },
+  { trialId: 'cap/experimenter/tool.execute/blocked-tier', principalId: 'prn-platform-experimenter', workspaceId: 'ws-veritas-project', action: 'tool.execute', resource: { type: 'tool', id: 'tool:runner' }, lease: { leaseId: 'lse-experimenter-0005', fencingToken: 1 }, args: { tool_id: 'tool:runner', canonical_args: {} }, expected: 'BLOCKED_SANDBOX' },
+  { trialId: 'cap/experimenter/tool.discover/read', principalId: 'prn-platform-experimenter', workspaceId: 'ws-veritas-project', action: 'tool.discover', resource: { type: 'tool', id: 'tool:runner' }, args: { workspace_id: 'ws-veritas-project' }, expected: 'ALLOW' },
+  { trialId: 'cap/operator/task.cancel/project', principalId: 'prn-platform-operator', workspaceId: 'ws-veritas-project', action: 'task.cancel', resource: { type: 'task', id: 'task:tsk-pilot-1' }, args: { task_id: 'task:tsk-pilot-1' }, expected: 'ALLOW' },
+  { trialId: 'cap/verifier/artifact.read/project', principalId: 'prn-platform-verifier', workspaceId: 'ws-veritas-project', action: 'artifact.read', resource: { type: 'artifact', id: 'artifact:1' }, args: { artifact_id: 'artifact:1' }, expected: 'ALLOW' },
+  { trialId: 'cap/collector/source.read/shared', principalId: 'prn-platform-collector', workspaceId: 'ws-shared-library', action: 'source.read', resource: { type: 'source', id: 'source:library-1' }, args: { source_id: 'source:library-1' }, expected: 'ALLOW' },
+  { trialId: 'cap/collector/board.read/shared-ungranted', principalId: 'prn-platform-collector', workspaceId: 'ws-shared-library', action: 'board.read', resource: { type: 'board', id: 'board:primary' }, args: { workspace_id: 'ws-shared-library' }, expected: 'DENY' },
+  { trialId: 'cap/agent-dave/task.create/grant', principalId: 'prn-agent-dave', workspaceId: 'ws-dave-private', action: 'task.create', resource: { type: 'task', id: 'task:new-dave' }, args: { title: 'Dave synthetic task' }, expected: 'ALLOW' },
+  { trialId: 'cap/hermes/search.query/expired-grant', principalId: 'prn-external-hermes', workspaceId: 'ws-veritas-project', action: 'search.query', resource: { type: 'source', id: 'source:docs' }, args: { query: 'veritas' }, expected: 'DENY', crossTenant: false },
+  { trialId: 'cap/pi/source.read/bob-private-cross-tenant', principalId: 'prn-external-pi', workspaceId: 'ws-bob-private', action: 'source.read', resource: { type: 'source', id: 'source:bob-notes-1' }, args: { source_id: 'source:bob-notes-1' }, expected: 'DENY', crossTenant: true },
+  { trialId: 'cap/alice/cache.read/bob-private-cross-tenant', principalId: 'prn-owner-alice', workspaceId: 'ws-bob-private', action: 'cache.read', resource: { type: 'cache', id: 'cache:bob-index' }, args: { cache_id: 'cache:bob-index' }, expected: 'DENY', crossTenant: true },
   // Derived artifacts inherit the strictest ACL of their inputs.
-  { trialId: 'derived/curator/benign-same-ws', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:board-weekly' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }] }, expected: 'ALLOW' },
-  { trialId: 'derived/curator/poison-bob-claim', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:poison-bob' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret' }] }, expected: 'DENY', crossTenant: true },
-  { trialId: 'derived/curator/poison-dave-cache', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'cache.write', resource: { type: 'cache', id: 'cache:poison-dave' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { inputs: [{ workspaceId: 'ws-dave-private', resourceId: 'cache:dave-index' }] }, expected: 'DENY', crossTenant: true },
+  { trialId: 'derived/curator/benign-same-ws', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:board-weekly' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { summary_id: 'summary:board-weekly', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }] }, expected: 'ALLOW' },
+  { trialId: 'derived/curator/poison-bob-claim', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:poison-bob' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { summary_id: 'summary:poison-bob', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret' }] }, expected: 'DENY', crossTenant: true },
+  { trialId: 'derived/curator/poison-dave-cache', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'cache.write', resource: { type: 'cache', id: 'cache:poison-dave' }, lease: { leaseId: 'lse-curator-cachewrite-0008', fencingToken: 1 }, args: { cache_id: 'cache:poison-dave', inputs: [{ workspaceId: 'ws-dave-private', resourceId: 'cache:dave-index' }] }, expected: 'DENY', crossTenant: true },
   // One-time nonce grant: exactly one effect.
-  { trialId: 'nonce/export/first', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, expected: 'ALLOW' },
-  { trialId: 'nonce/export/replay', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, expected: 'DENY' },
-  { trialId: 'nonce/export/replay-with-nonce', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { nonce: 'n-carolnonce0001' }, expected: 'DENY' },
+  { trialId: 'nonce/export/first', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'ALLOW' },
+  { trialId: 'nonce/export/replay', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
+  { trialId: 'nonce/export/replay-with-nonce', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
 ];
 
 function canonicalize(value) {
@@ -123,7 +126,7 @@ function sandboxTrialSet(root) {
     profile: SANDBOX_NO_EXEC,
     workspaceRoots: [root],
     artifactRoot: path.join(root, 'artifacts'),
-    secrets: { 'sec-postgres-url': 'postgresql://vault-user:s3cret-pw@localhost:5432/veritas' },
+    secrets: { 'sec-postgres-url': 'synthetic-db-secret-0123456789' },
     now: NOW,
   });
   const trials = [
@@ -135,7 +138,7 @@ function sandboxTrialSet(root) {
     { id: 'sandbox/net-deny-all', run: () => sandbox.checkNetwork('registry.npmjs.org', 443).allowed ? 'ALLOWED' : 'DENIED', expected: 'DENIED' },
     { id: 'sandbox/net-deny-localhost', run: () => sandbox.checkNetwork('127.0.0.1', 5432).allowed ? 'ALLOWED' : 'DENIED', expected: 'DENIED' },
     { id: 'sandbox/env-allowlist', run: () => { const env = sandbox.buildEnvironment({ NODE_ENV: 'test', AWS_ACCESS_KEY_ID: 'leak' }); return env.AWS_ACCESS_KEY_ID === undefined && env.NODE_ENV === 'test' ? 'FILTERED' : 'LEAK'; }, expected: 'FILTERED' },
-    { id: 'sandbox/secret-redaction', run: () => { const out = sandbox.redact('connect postgresql://vault-user:s3cret-pw@localhost:5432/veritas now'); return out.includes('s3cret-pw') ? 'LEAK' : 'REDACTED'; }, expected: 'REDACTED' },
+    { id: 'sandbox/secret-redaction', run: () => { const out = sandbox.redact('connect synthetic-db-secret-0123456789 now'); return out.includes('synthetic-db-secret-0123456789') ? 'LEAK' : 'REDACTED'; }, expected: 'REDACTED' },
     { id: 'sandbox/output-digest-provenance', run: () => { const rec = sandbox.writeOutput('result.txt', Buffer.from('deterministic')); return rec.sha256.length === 64 && rec.provenance.createdAt === NOW ? 'RECORDED' : 'BROKEN'; }, expected: 'RECORDED' },
     { id: 'sandbox/output-name-escape', run: () => { try { sandbox.writeOutput('../escape.txt', Buffer.from('x')); return 'ALLOWED'; } catch (e) { return e.code; } }, expected: 'PATH_ESCAPE' },
     { id: 'sandbox/no-exec-refuses-execution', run: async () => { const outcome = await sandbox.spawnProcess({ command: 'cmd.exe', args: ['/c', 'echo hi'], timeoutMs: 1000 }); return outcome.status === 'BLOCKED_SANDBOX' ? 'BLOCKED' : 'SPAWNED'; }, expected: 'BLOCKED' },
@@ -184,7 +187,7 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
       workspaceId: trial.workspaceId,
       resource: trial.resource,
       lease: trial.lease,
-      args: trial.args ?? {},
+      args: trial.args ?? { workspace_id: trial.workspaceId },
     });
     record({
       trialId: trial.id,
@@ -227,7 +230,7 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
       workspaceId: 'ws-alice-private',
       action: 'board.read',
       resource: { type: 'board', id: 'board:primary' },
-      args: {},
+      args: { workspace_id: 'ws-alice-private' },
     };
     const before = trialEngine.authorize(grantRequest);
     if (before.decision !== 'ALLOW') throw new Error(`REVOCATION_TRIAL_PRECONDITION_FAILED: ${i}`);
@@ -277,7 +280,7 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     outputRoot,
     corpusDigest,
     fixedClock: NOW,
-    policyVersion: 's2-002-policy-v1',
+    policyVersion: POLICY_VERSION,
     platform: `${process.platform}/${process.arch} node ${process.version}`,
     trialCount: observations.length,
     counters,

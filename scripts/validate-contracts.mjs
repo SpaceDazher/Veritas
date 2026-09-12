@@ -117,6 +117,11 @@ assert.equal(evaluatePolicy({...baseline, requiresSource: true, sourcePresent: t
 const frozenTargets = [
   'contracts', 'pilots', 'docs/product', 'docs/scenarios',
   'src/lib/contract-policy.mjs', 'scripts/policy-probes.mjs', 'scripts/validate-contracts.mjs', 'evidence/probe-registry.json',
+  // S2-002: identity/sandbox implementation, oracle suites, corpus runner,
+  // comparator and security documentation are frozen alongside S2-001 files.
+  'src/lib/identity', 'tests/identity', 'docs/security',
+  'scripts/s2-002-run.mjs', 'scripts/security-probes.mjs', 'scripts/verify-s2-002.mjs',
+  'scripts/verify-clean-checkout.mjs', 'evidence/s2-002-security-probes.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');

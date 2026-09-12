@@ -109,3 +109,53 @@ describe('S2-002 independent replay: corpus runner', () => {
     }
   });
 });
+
+describe('S2-002 comparator is fail-closed', () => {
+  const sumA = RUN_A.summary;
+  const sumB = RUN_B.summary;
+  const obsA = RUN_A.observations;
+  const obsB = RUN_B.observations;
+
+  test('empty runs are violations, never ok', () => {
+    const comparison = compareRuns(sumA, sumB, [], []);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.length > 0, 'empty runs must produce violations');
+  });
+
+  test('missing or NaN counters are violations, never silently passing', () => {
+    const broken = {
+      ...sumA,
+      counters: { ...sumA.counters, authority_expansion: Number.NaN },
+      revocationLatency: { ...sumA.revocationLatency, maxMs: Number.NaN },
+    };
+    const comparison = compareRuns(broken, sumB, obsA, obsB);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.some((v) => v.includes('authority_expansion')), comparison.counterViolations);
+    assert.ok(comparison.counterViolations.some((v) => v.includes('revocationMaxMs')), comparison.counterViolations);
+  });
+
+  test('decisions must match the frozen expected oracle, not just each other', () => {
+    const tampered = obsA.map((o) =>
+      o.trialId === 'acl/prn-agent-eve/ws-eve-private' ? { ...o, decision: 'ALLOW' } : o,
+    );
+    const comparison = compareRuns(sumA, sumB, tampered, obsB);
+    assert.equal(comparison.ok, false, 'an expected-DENY cell allowed in BOTH runs must still fail');
+    assert.ok(comparison.expectedOracleViolations.some((v) => v.run === 'run-a' && v.trialId === 'acl/prn-agent-eve/ws-eve-private'));
+  });
+
+  test('sandbox observations failing their match flag violate the oracle', () => {
+    const tampered = obsA.map((o) =>
+      o.trialId === 'sandbox/fs-traversal' ? { ...o, decision: 'ALLOW', match: false, observed: 'ALLOWED' } : o,
+    );
+    const comparison = compareRuns(sumA, sumB, tampered, obsB);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.expectedOracleViolations.some((v) => v.run === 'run-a' && v.trialId === 'sandbox/fs-traversal'));
+  });
+
+  test('summary trialCount contradicting observations is a violation', () => {
+    const broken = { ...sumA, trialCount: sumA.trialCount + 5 };
+    const comparison = compareRuns(broken, sumB, obsA, obsB);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.some((v) => v.includes('trialCount')));
+  });
+});
