@@ -84,6 +84,13 @@ NEEDS_INPUT; no speculative Codex/pi credentials or provider calls are supplied.
 - `python3 scripts/collect-baseline.py <existing-approved-AgentOS-checkout>` records
   safe dependency hashes. It does not run Stage 1 or fetch private sources.
 
+### Next implementation ticket
+
+S2-002 is specified in
+[`tasks/S2-002_IDENTITY_SANDBOX.md`](tasks/S2-002_IDENTITY_SANDBOX.md). It is the
+identity, authorization and sandbox gate that must pass before Veritas enables
+live agent execution or starts dependent Stage 2 work.
+
 ### Rollback
 
 Stop the local demo, preserve/export its dedicated database if needed, and use
