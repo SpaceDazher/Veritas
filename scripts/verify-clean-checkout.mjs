@@ -69,7 +69,10 @@ try {
     VERITAS_SOURCE_TREE: sourceTree,
     // Synthetic placeholder for the compile-time database variable; no
     // credentials, no connection. Disclosed in the evaluation report.
-    DATABASE_URL: 'postgresql://build-placeholder:build-placeholder@127.0.0.1:5432/build_placeholder',
+    // No user:pass@ pair: the credential-shaped form would trip the
+    // public-artifacts scan; a passwordless URL is enough for compilation
+    // (nothing connects at build time).
+    DATABASE_URL: 'postgresql://build-placeholder@127.0.0.1:5432/build_placeholder',
   };
   const archiveReady = commands.find((command) => command.id === 'archive')?.status === 'PASS';
   if (archiveReady) {
