@@ -45,7 +45,7 @@
     "scripts/s2-002-run.mjs": "24a583b27fcd4cef14ecdddffc56c02dc19b59ca52748904b8aefb107e837e1b",
     "scripts/security-probes.mjs": "1891e16ae5ee44d6e8c1f74b90c4e54858fb65a238617f58dc2d2937e63ac318",
     "scripts/validate-contracts.mjs": "fcf0dbde3bc29d631ef85adfa8246ddea46fb5c88b31250679b1f8962c3dbc81",
-    "scripts/verify-clean-checkout.mjs": "6dfcf4bb70a9a7db4dacec447f70760c79bba2215604f7be6fb176458c9d340b",
+    "scripts/verify-clean-checkout.mjs": "cabb8d3376caca22a7f12a704e7fea1f853f7a75537cadf20145e1811460c7fb",
     "scripts/verify-s2-002.mjs": "1fe0f4e812278e3918c2be3e3e3874d0a8234276f3a3f0e1d091252a15caceed",
     "src/lib/contract-policy.mjs": "29fdd978b0d91509e49ec8137fe50eb5c41a95bb9185907dd957341a25543839",
     "src/lib/identity/contract-registry.mjs": "c56e253c66849e5b043cce9abba5a2d69321c4969c0ddc3fde06d4450ff561cc",

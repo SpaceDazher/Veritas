@@ -67,11 +67,15 @@ try {
     VERITAS_GIT_INVENTORY: git('ls-files'),
     VERITAS_SOURCE_COMMIT: sourceCommit,
     VERITAS_SOURCE_TREE: sourceTree,
-    // Synthetic placeholder for the compile-time database variable; no
-    // credentials, no connection. Disclosed in the evaluation report.
-    // No user:pass@ pair: the credential-shaped form would trip the
-    // public-artifacts scan; a passwordless URL is enough for compilation
-    // (nothing connects at build time).
+    // NOTE: DATABASE_URL is deliberately NOT set here. Its presence changes
+    // synthetic-smoke evidence bytes; the build step receives its own
+    // compile-time placeholder below.
+  };
+  // No user:pass@ pair: the credential-shaped form would trip the
+  // public-artifacts scan; a passwordless URL is enough for compilation
+  // (nothing connects at build time).
+  const buildEnv = {
+    ...npmEnv,
     DATABASE_URL: 'postgresql://build-placeholder@127.0.0.1:5432/build_placeholder',
   };
   const archiveReady = commands.find((command) => command.id === 'archive')?.status === 'PASS';
@@ -82,7 +86,7 @@ try {
     run('inventory', 'node', ['scripts/check-inventory.mjs'], {env: npmEnv});
     run('public-artifacts', 'node', ['scripts/check-public-artifacts.mjs'], {env: npmEnv});
     run('typecheck', NPM, ['run', 'typecheck'], {env: npmEnv});
-    run('build', NPM, ['run', 'build'], {env: npmEnv});
+    run('build', NPM, ['run', 'build'], {env: buildEnv});
     run('runtime-audit', NPM, ['audit', '--omit=dev', '--json'], {env: npmEnv});
     run('tooling-audit', NPM, ['audit', '--json'], {env: npmEnv});
     if (fs.existsSync(path.join(checkoutPath, 'evidence/root-manifest.json'))) {

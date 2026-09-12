@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "479f28edcd4b95bad7603b75414edc717b281736",
-  "sourceTree": "21f53e3b68ad9f1d5dca6b7fa762d2bd54e7f30b",
+  "sourceCommit": "adf78c5a2e906e3dd014cc2de9be8cda44b412e5",
+  "sourceTree": "b89fda41d78b64c93e88902b43f1119a9626e4d8",
   "trackedFileCount": 129,
   "manifestFileCount": 126,
-  "payloadManifestSha256": "38e858b8c32eadb029262d5736df2d7b9ae4c3eb3e855cf451e89edea4a13e46",
-  "fileManifestSha256": "6e85ae904c4fed33015e2b0a401aed26cb61991bf9ad2d1270210adf9a1fbd83",
+  "payloadManifestSha256": "dc45059af31c89c61d280dbc51d9154fd1e3694db6459e4d9d3abcd6f4a58419",
+  "fileManifestSha256": "a8197b8d96765c2f8d9c6687694082c27a876f403e77df2e0e392d32fc8d8382",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -206,8 +206,8 @@
     },
     {
       "path": "evidence/clean-checkout.json",
-      "sha256": "a33efce4c4a4baee679100004e625c9e73b748a61b151541b0b9d055ffe066e3",
-      "bytes": 5885
+      "sha256": "38c28da881ae4556605d4e419e6f373fbdf6bc517410ac25d04c9527977860b3",
+      "bytes": 7328
     },
     {
       "path": "evidence/contract-tests.json",
@@ -251,7 +251,7 @@
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "73269b2987009b2ea82e3dd85b903214e3ec5499c798aed29d43fbf1b379a88b",
+      "sha256": "8700b7251865b5bfe195846a2e414bb5e156ef72368d6adc8bb55cfe754073fd",
       "bytes": 6505
     },
     {
@@ -431,8 +431,8 @@
     },
     {
       "path": "scripts/check-public-artifacts.mjs",
-      "sha256": "35284b4ec87de81f78a6663fd3a4dac9c0b3c0b0b8f0b4c66f5dc6694afd4d8d",
-      "bytes": 2961
+      "sha256": "252f8d0a0ff16fc058a17069c5b2c68d47a2d35ff02cb010c7d9cdb8ad6fca39",
+      "bytes": 3387
     },
     {
       "path": "scripts/cleanup-smoke.ts",
@@ -496,8 +496,8 @@
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
-      "sha256": "d42efe7ab7d7b375aeed160c8c9aa87012be4672fa3c3bd11a0995e070f6cd15",
-      "bytes": 6113
+      "sha256": "cabb8d3376caca22a7f12a704e7fea1f853f7a75537cadf20145e1811460c7fb",
+      "bytes": 6194
     },
     {
       "path": "scripts/verify-pilot-binding.mjs",
