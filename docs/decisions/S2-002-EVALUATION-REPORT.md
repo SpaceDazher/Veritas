@@ -119,6 +119,21 @@ node scripts/verify-clean-checkout.mjs # clean-archive reproduction
 git diff --check && git status --short
 ```
 
+Clean `git archive HEAD` re-verification (after the final commit, using the
+repo's `VERITAS_GIT_INVENTORY` / `VERITAS_SOURCE_COMMIT` / `VERITAS_SOURCE_TREE`
+fallbacks, fresh `node_modules`): `manifest:check` 0, `validate-contracts` 0,
+pilot binding 0, `test:identity` 115/115, `test:sandbox` 18/18, security
+probes exit 0 (10/10), `verify:s2-002` exit 0, typecheck 0, lint 0.
+
+Note on measurement evidence semantics: `verify:s2-002` regenerates
+`evidence/s2-002-run-{a,b}.json` on every execution by design — revocation
+latencies, run durations and temporary output-root paths necessarily vary.
+The committed evidence corresponds to the final acceptance run. A re-run in
+a clean archive leaves all decisions, counters and the comparison verdict
+identical (`ok=true`, mismatch 0); only the timing fields and the observation
+digests derived from them differ, which is why `manifest:check` is evaluated
+on the committed state and re-frozen after each accepted run.
+
 `npm audit --omit=dev` outcome is recorded in the runtime dependency audit;
 no new runtime dependencies were introduced by S2-002 (ajv and Node built-ins
 only).
