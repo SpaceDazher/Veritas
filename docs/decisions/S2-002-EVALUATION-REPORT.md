@@ -93,15 +93,16 @@ J corrupted/missing evidence fail-open.
 
 | Metric | Requirement | Run A | Run B |
 |---|---|---|---|
-| Trials per run | full frozen corpus | 280 | 280 |
+| Trials per run | full frozen corpus | 283 | 283 |
 | Cross-tenant successful reads/writes/messages | 0 | 0 | 0 |
 | Authority expansions | 0 | 0 | 0 |
 | Filesystem/network/secret escapes | 0 | 0 | 0 |
 | Survivors after cancellation | 0 | 0 | 0 |
 | Allow-after-revocation-commit | 0 | 0 | 0 |
 | Missing/censored trials | 0 | 0 | 0 |
-| Revocation decision latency (100 trials) | max ≤ 5000 ms | max 0.0597 ms | max 0.0562 ms |
-| Decision mismatch A vs B | 0 | 0 (280 compared) | — |
+| Revocation decision latency (100 trials) | max ≤ 5000 ms | max ≤ 0.07 ms | max ≤ 0.07 ms |
+| Decision mismatch A vs B | 0 | 0 (283 compared) | — |
+| Frozen-oracle violations (either run) | 0 | 0 | 0 |
 
 Runs differ in executor id, nonce base and output root; the corpus digest
 is identical. Raw observations: `results/s2-002/run-a/observations.json`,
@@ -136,15 +137,18 @@ npm audit --omit=dev           # see evidence/dependency-audit-*.json policy
 npm run manifest:check         # exit 0
 node scripts/validate-contracts.mjs  # exit 0 (incl. S2-001 probes)
 node scripts/verify-pilot-binding.mjs # PASS_WITH_LIMITS
-node scripts/verify-clean-checkout.mjs # clean-archive reproduction
+node scripts/verify-clean-checkout.mjs # real PASS recorded (see §5 note)
 git diff --check && git status --short
 ```
 
-Clean `git archive HEAD` re-verification (after the final commit, using the
-repo's `VERITAS_GIT_INVENTORY` / `VERITAS_SOURCE_COMMIT` / `VERITAS_SOURCE_TREE`
-fallbacks, fresh `node_modules`): `manifest:check` 0, `validate-contracts` 0,
-pilot binding 0, `test:identity` 115/115, `test:sandbox` 18/18, security
-probes exit 0 (10/10), `verify:s2-002` exit 0, typecheck 0, lint 0.
+`npm run verify-clean-checkout` now records a genuine clean-archive PASS in
+`evidence/clean-checkout.json` (all required commands PASS; `tooling-audit`
+is excluded from required by the script and reports one known dev-only
+esbuild advisory; the database smoke is honestly `NOT_RUN` without a
+database). The archive check uses the repo's `VERITAS_GIT_INVENTORY` /
+`VERITAS_SOURCE_COMMIT` / `VERITAS_SOURCE_TREE` fallbacks, fresh
+`node_modules`, and the synthetic passwordless placeholder for the
+compile-time database variable.
 
 Note on measurement evidence semantics: `verify:s2-002` regenerates
 `evidence/s2-002-run-{a,b}.json` on every execution by design — revocation
