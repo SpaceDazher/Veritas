@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test \"tests/**/*.test.mjs\"",
     "test:identity": "node --test \"tests/identity/*.test.mjs\"",
+    "test:security-probes": "node scripts/security-probes.mjs",
     "verify:draft": "node scripts/verify.mjs draft",
     "verify:acceptance": "node scripts/verify.mjs acceptance",
     "verify:pilot-binding": "node scripts/verify-pilot-binding.mjs",

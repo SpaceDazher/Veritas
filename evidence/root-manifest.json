@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "7b0d68e8342134d9d0ab3d4ccb874691f88d4132",
-  "sourceTree": "d2858adc3681cf9f399e0eeb9be4d851bec12a18",
-  "trackedFileCount": 110,
-  "manifestFileCount": 107,
-  "payloadManifestSha256": "976b4a5f8bbfdbe177d26f8c831cf20c510110485beed8fdcb5b382a35e99e28",
-  "fileManifestSha256": "eb585a7da5a0f6d9ef0b1b2a2bb7a091fd7f0eabf87a9ee3a338a631cf5c2e5a",
+  "sourceCommit": "fd33033f0bf16f504a4e3eda37a9d95b599d12e8",
+  "sourceTree": "f564a7561de9781025dc322aab2bd2e074fabe87",
+  "trackedFileCount": 113,
+  "manifestFileCount": 110,
+  "payloadManifestSha256": "a66037e00b38998bd6a47b6366922416740a26e5243df0a7ee52e20abd0409ba",
+  "fileManifestSha256": "0e10bdaf8bbea55af500a99b535c30d5d2413f58fc6820e6e0e3650b7979083a",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -226,8 +226,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "7511f91d345328e603d4fbc0968461bff72e16a5fa21b1964062228648d66f3a",
-      "bytes": 4138
+      "sha256": "74b46a5f58ff9f6d7d887cad24760b93b905c20e44c44643f2856bef82f8ffa5",
+      "bytes": 4255
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -253,6 +253,11 @@
       "path": "evidence/s2-001-pilot-binding.json",
       "sha256": "44673fcd5543de2e8baa71b726864a55c7f41479eeb128581d67e7085d1668b7",
       "bytes": 2483
+    },
+    {
+      "path": "evidence/s2-002-security-probes.json",
+      "sha256": "471aa89a9f65251996d84fdfff9a4bef60614ba2cb20aa58dd072d03e7d3f9b4",
+      "bytes": 2671
     },
     {
       "path": "evidence/synthetic-smoke.json",
@@ -281,8 +286,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "2ad606f7e5df3e761100fe1d8da355f5189b25c82702126b5efdd2049c86cea1",
-      "bytes": 1847
+      "sha256": "fafa06022a1d57c83eaad311e856387869fbc885eefaca111a6acb4e8c03c328",
+      "bytes": 1911
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -398,6 +403,11 @@
       "path": "scripts/policy-probes.mjs",
       "sha256": "2d9ac50670a22a9b978a55a6eeff665934daa3e0c3613bdbc33bbc57d128ad96",
       "bytes": 2820
+    },
+    {
+      "path": "scripts/security-probes.mjs",
+      "sha256": "cb613ee9164a5753fb93f3fdc7d6b5f541dc69e1dec332b8883515ea61d1ad6e",
+      "bytes": 17592
     },
     {
       "path": "scripts/smoke.mjs",
@@ -543,6 +553,11 @@
       "path": "tests/identity/sandbox.test.mjs",
       "sha256": "9ec303272cd8a9be8d70c63b1cb115066df09a1fe9391a10ee116d2b2832726a",
       "bytes": 12991
+    },
+    {
+      "path": "tests/identity/security-probes.test.mjs",
+      "sha256": "b9d980dfa94122db5c52368789e26bbe423314bbeecf1eaa289bcffc30633c9e",
+      "bytes": 2088
     },
     {
       "path": "tsconfig.json",

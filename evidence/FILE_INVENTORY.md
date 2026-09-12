@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 110.
+Generated from `git ls-files`; count: 113.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -54,6 +54,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/public-artifact-check.json`
 - `evidence/root-manifest.json`
 - `evidence/s2-001-pilot-binding.json`
+- `evidence/s2-002-security-probes.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -83,6 +84,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/generate-manifests.mjs`
 - `scripts/git-client.mjs`
 - `scripts/policy-probes.mjs`
+- `scripts/security-probes.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
 - `scripts/validate-contracts.mjs`
@@ -112,4 +114,5 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/policy-engine.test.mjs`
 - `tests/identity/sandbox.test.mjs`
+- `tests/identity/security-probes.test.mjs`
 - `tsconfig.json`
