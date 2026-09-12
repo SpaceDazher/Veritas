@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/sandbox-profile.schema.json",
+  "title": "Veritas Sandbox Profile (S2-002)",
+  "description": "Explicit sandbox tier with mandatory filesystem, network, environment, process and cancellation controls. LOCAL_RESTRICTED and UNTRUSTED_CODE require an OS-control evidence digest; missing evidence means the tier stays blocked.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "profile_id",
+    "tier",
+    "filesystem",
+    "network",
+    "environment",
+    "process",
+    "cancellation"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "profile_id": { "type": "string", "pattern": "^sbx-[a-z0-9][a-z0-9-]{0,62}$" },
+    "tier": { "enum": ["NO_EXEC", "LOCAL_RESTRICTED", "UNTRUSTED_CODE"] },
+    "os_controls_evidence": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "filesystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roots", "deny_link_escape", "deny_traversal"],
+      "properties": {
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1, "maxLength": 4096 }
+        },
+        "deny_link_escape": { "const": true },
+        "deny_traversal": { "const": true }
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "allowlist"],
+      "properties": {
+        "policy": { "enum": ["deny_all", "allowlist"] },
+        "allowlist": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["host", "ports"],
+            "properties": {
+              "host": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{2,253}$", "maxLength": 253 },
+              "ports": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "type": "integer", "minimum": 1, "maximum": 65535 }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "policy": { "const": "deny_all" } }, "required": ["policy"] },
+          "then": { "properties": { "allowlist": { "maxItems": 0 } } }
+        },
+        {
+          "if": { "properties": { "policy": { "const": "allowlist" } }, "required": ["policy"] },
+          "then": { "properties": { "allowlist": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowlist", "secret_handles"],
+      "properties": {
+        "allowlist": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$" }
+        },
+        "secret_handles": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^sec-[a-z0-9][a-z0-9-]{0,62}$" }
+        }
+      }
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_processes", "memory_mb", "timeout_ms"],
+      "properties": {
+        "max_processes": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "memory_mb": { "type": "integer", "minimum": 1, "maximum": 65536 },
+        "timeout_ms": { "type": "integer", "minimum": 1, "maximum": 3600000 },
+        "cpu_time_ms": { "type": "integer", "minimum": 1, "maximum": 3600000 }
+      }
+    },
+    "cancellation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "on_timeout"],
+      "properties": {
+        "mode": { "enum": ["process_tree", "single_process"] },
+        "on_timeout": { "enum": ["kill_tree", "fail_closed"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "single_process" } }, "required": ["mode"] },
+          "then": { "properties": { "on_timeout": { "const": "fail_closed" } } }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "tier": { "enum": ["LOCAL_RESTRICTED", "UNTRUSTED_CODE"] } },
+        "required": ["tier"]
+      },
+      "then": { "required": ["os_controls_evidence"] }
+    }
+  ]
+}

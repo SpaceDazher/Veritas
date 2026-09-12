@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/principal.schema.json",
+  "title": "Veritas Principal (S2-002)",
+  "description": "Human, personal agent, platform agent or external agent identity record. Authentication references are recorded here but never constitute proof of identity; only the server-side policy engine decides authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "principal_id",
+    "display_name",
+    "kind",
+    "tenant",
+    "authenticated_subject",
+    "provider_adapter_identity",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "principal_id": { "$ref": "#/$defs/principalId" },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "kind": { "enum": ["human", "personal_agent", "platform_agent", "external_agent"] },
+    "tenant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_id", "owner_principal_id"],
+      "properties": {
+        "tenant_id": { "type": "string", "pattern": "^tn-[a-z0-9][a-z0-9-]{0,62}$" },
+        "owner_principal_id": { "$ref": "#/$defs/principalId" }
+      }
+    },
+    "authenticated_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_type", "subject_ref"],
+      "properties": {
+        "subject_type": { "enum": ["human_attested", "delegated_token", "service_identity", "unauthenticated"] },
+        "subject_ref": { "type": "string", "minLength": 3, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$" }
+      }
+    },
+    "provider_adapter_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "adapter_id"],
+      "properties": {
+        "provider": { "enum": ["human", "codex", "pi", "opencode", "hermes", "platform"] },
+        "adapter_id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]{0,63}$" },
+        "adapter_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "lifecycle_state": { "enum": ["active", "suspended", "revoked", "retired"] },
+    "delegated_by": { "$ref": "#/$defs/principalId" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "personal_agent" } }, "required": ["kind"] },
+      "then": { "required": ["delegated_by"] },
+      "else": { "not": { "required": ["delegated_by"] } }
+    }
+  ],
+  "$defs": {
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

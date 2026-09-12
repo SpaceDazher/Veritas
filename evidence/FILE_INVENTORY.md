@@ -1,19 +1,27 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 91.
+Generated from `git ls-files`; count: 103.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
 - `.gitattributes`
 - `.gitignore`
 - `contracts/acceptance-cases.schema.json`
+- `contracts/authorization-decision.schema.json`
+- `contracts/capability.schema.json`
+- `contracts/grant.schema.json`
 - `contracts/human-decision.schema.json`
+- `contracts/lease.schema.json`
 - `contracts/needs-input.schema.json`
 - `contracts/pilot-profile.schema.json`
+- `contracts/principal.schema.json`
 - `contracts/research-dossier.schema.json`
+- `contracts/role.schema.json`
+- `contracts/sandbox-profile.schema.json`
 - `contracts/solution-pack.schema.json`
 - `contracts/source-selection-manifest.schema.json`
 - `contracts/task-brief.schema.json`
+- `contracts/workspace.schema.json`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -92,5 +100,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/db/schema.ts`
 - `src/lib/board.ts`
 - `src/lib/contract-policy.mjs`
+- `src/lib/identity/contract-registry.mjs`
+- `src/lib/identity/contracts.fixtures.ts`
+- `src/lib/identity/contracts.ts`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
+- `tests/identity/contracts.schemas.test.mjs`
 - `tsconfig.json`
