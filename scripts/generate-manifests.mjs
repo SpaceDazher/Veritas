@@ -59,7 +59,7 @@ if (process.argv.includes('--write-closure')) {
   assert.equal(committedManifest.fileManifestSha256, fileManifestSha256);
   const record = {
     schemaVersion: 1,
-    branch: 'codex/s2-001-product-contract',
+    branch: git('branch', '--show-current'),
     implementationCommit: sourceCommit,
     implementationTreeSha: sourceTree,
     payloadManifestSha256,
