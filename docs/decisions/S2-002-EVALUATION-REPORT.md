@@ -1,0 +1,159 @@
+# S2-002 — Evaluation Report
+
+Ticket: `tasks/S2-002_IDENTITY_SANDBOX.md` — identity, agent rights and the
+local sandbox gate. Branch: `codex/s2-002-identity-sandbox`.
+Verdict: **PASS_WITH_LIMITS**; live code execution remains **BLOCKED_SANDBOX**.
+
+## 1. Verdict summary
+
+| Requirement (Definition of Done) | Status |
+|---|---|
+| 1. S2-001 dependency binding reproducible from clean checkout | PASS (`evidence/s2-001-pilot-binding.json`, `PASS_WITH_LIMITS`, `productionDeploymentAuthorized=false`, upstream `6845858`) |
+| 2. All schemas and server-side policy paths implemented and versioned | PASS — 8 contracts at `1.0.0`, single engine for Web/API/CLI |
+| 3. ACL matrix covers 20 principals and all listed paths | PASS — 140-cell board.read matrix + capability/derived/nonce cells per run |
+| 4. Hard counters zero in both independent runs | PASS — see §4 |
+| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, max ≤ 0.06 ms (limit 5000 ms) |
+| 6. All adversarial probes detected by production path | PASS — 10/10 DETECTED, 0 ESCAPED |
+| 7. Process-tree cancellation and required OS controls observable | PASS on Windows (survivors = 0); kernel network boundary NOT provable — see limits |
+| 8. Frozen hashes, commit/tree, environment and outputs converge | PASS — manifests re-frozen per commit; `manifest:check` green |
+| 9. Full test/typecheck/lint/build/security set in clean checkout | PASS — see §5; `build` used a synthetic placeholder `DATABASE_URL` (see §5 note) |
+| 10. Documentation honestly separates local proofs from production guarantees | PASS — THREAT-MODEL §5, SANDBOX-PROFILE §3 |
+
+Gate outcome per ticket: identity policy is proven locally; a kernel-level
+sandbox is unavailable on this stack, so `PARTIAL`/`BLOCKED_SANDBOX` is the
+honest outcome and live execution stays forbidden.
+
+## 2. What was built
+
+1. **Contracts (versioned `1.0.0`, fail-closed):** `contracts/{workspace,
+   principal,role,capability,grant,lease,sandbox-profile,
+   authorization-decision}.schema.json` — unknown fields, unknown versions
+   and malformed documents are rejected; semantic cross-field rules (no
+   self-issued grants, no self-delegation, expiry ordering, real UTC
+   timestamps) enforced in `src/lib/identity/contract-registry.mjs`.
+2. **Subjects model:** `src/lib/identity/principals.mjs` — 20 principals
+   (5 humans, 5 personal agents, 4 external Codex/pi/OpenCode/Hermes
+   principals, 6 platform agents) across 7 workspaces (5 private, 1
+   project, 1 shared), 10 roles, 21 capabilities, 14 grants, 4 leases,
+   sandbox profiles. Personal agents act only via explicit human-issued
+   grants; platform agents carry no delegation and cannot self-grant.
+3. **Policy engine:** `src/lib/identity/policy-engine.mjs` — one
+   server-side decision point for Web/API/CLI; default deny; grants pinned
+   to principal+capability+workspace+resource ids; leases with monotonic
+   fencing tokens; one-time nonces; immediate revocation; human-only,
+   producer-blocked approvals; `BLOCKED_SANDBOX` for unproven execution
+   tiers; every decision returns a contract-valid AuthorizationDecision
+   with input digest and audit reference.
+4. **Sandbox adapter:** `src/lib/identity/sandbox.mjs` — filesystem
+   canonicalization (traversal/UNC/device/junction/symlink), deny-by-default
+   network with exact allowlists, environment allowlist, opaque secret
+   handles with redaction, artifact outputs with SHA-256 + provenance,
+   process-tree cancellation with survivor accounting (§ limits in
+   `docs/security/S2-002-SANDBOX-PROFILE.md`).
+5. **Adversarial corpus A–J:** `scripts/security-probes.mjs` — every probe
+   attacks the production modules directly; any ESCAPED is a hard fail.
+6. **Independent replay:** `scripts/s2-002-run.mjs` (frozen corpus runner,
+   280 trials) + `scripts/verify-s2-002.mjs` (two process-separated runs,
+   per-trial decision comparison, hard counters, evidence writing).
+7. **TDD:** all suites written RED-first; post-observation test mutations
+   are recorded in `docs/decisions/S2-002-TEST-REVIEW-LOG.md`.
+
+## 3. Adversarial corpus results (`evidence/s2-002-security-probes.json`)
+
+A cross-tenant retrieval, B private-claim laundering, C payload/env forging,
+D junction/symlink/traversal escape, E prompt injection (authority/secrets),
+F foreign-scope messaging, G process-tree survival, H stale
+grant/lease/fencing after revocation, I nonce/idempotency replay,
+J corrupted/missing evidence fail-open.
+
+**10/10 DETECTED, 0 ESCAPED, 0 SKIPPED (Windows).**
+
+## 4. Independent replay (`evidence/s2-002-comparison.json`)
+
+| Metric | Requirement | Run A | Run B |
+|---|---|---|---|
+| Trials per run | full frozen corpus | 280 | 280 |
+| Cross-tenant successful reads/writes/messages | 0 | 0 | 0 |
+| Authority expansions | 0 | 0 | 0 |
+| Filesystem/network/secret escapes | 0 | 0 | 0 |
+| Survivors after cancellation | 0 | 0 | 0 |
+| Allow-after-revocation-commit | 0 | 0 | 0 |
+| Missing/censored trials | 0 | 0 | 0 |
+| Revocation decision latency (100 trials) | max ≤ 5000 ms | max 0.0597 ms | max 0.0562 ms |
+| Decision mismatch A vs B | 0 | 0 (280 compared) | — |
+
+Runs differ in executor id, nonce base and output root; the corpus digest
+is identical. Raw observations: `results/s2-002/run-a/observations.json`,
+`results/s2-002/run-b/observations.json` (tracked in Git). Integrity digests
+of the evidence files: `evidence/s2-002-comparison-integrity.json`.
+
+Coverage: all 20 principals × all 7 workspaces (board.read matrix) plus
+explicit cells for every capability family (planning, source/search,
+claims/summaries, cache, artifacts/export, messaging, tool
+discovery/execution, approvals/cancellation), derived-artifact inheritance,
+nonce sequencing, sandbox boundary controls and 100 revocation trials —
+per run. Errors/timeouts are not excluded from denominators; every trial
+carries a terminal observation.
+
+## 5. Verification commands (executed)
+
+```
+npm ci
+npm run test:identity          # 106 tests
+npm run test:sandbox           # 18 tests
+npm run test:security-probes   # 10/10 DETECTED, exit 0
+npm run verify:s2-002          # process-separated runs, ok=true, exit 0
+npm run typecheck              # exit 0
+npm run lint                   # exit 0
+npm run build                  # exit 0 — with synthetic placeholder
+                               # DATABASE_URL (no credentials, no DB
+                               # connection at build time; the app requires
+                               # the variable to be present even for
+                               # compilation). Real credentials were not
+                               # supplied, per ticket stop conditions.
+npm audit --omit=dev           # see evidence/dependency-audit-*.json policy
+npm run manifest:check         # exit 0
+node scripts/validate-contracts.mjs  # exit 0 (incl. S2-001 probes)
+node scripts/verify-pilot-binding.mjs # PASS_WITH_LIMITS
+node scripts/verify-clean-checkout.mjs # clean-archive reproduction
+git diff --check && git status --short
+```
+
+`npm audit --omit=dev` outcome is recorded in the runtime dependency audit;
+no new runtime dependencies were introduced by S2-002 (ajv and Node built-ins
+only).
+
+## 6. Limits and out-of-scope guarantees (explicit)
+
+1. **No production authentication / multi-tenancy.** The registry is
+   synthetic fixture data proving policy mechanics; it is not a deployed
+   IdP, and 20 principals are ACL coverage, not concurrent users.
+2. **No kernel sandbox.** `LOCAL_RESTRICTED`/`UNTRUSTED_CODE` execution is
+   blocked (`SBX_NO_KERNEL_NETWORK_BOUNDARY`); live execution stays
+   forbidden until AppContainer/container evidence exists
+   (`docs/security/S2-002-SANDBOX-PROFILE.md` §3).
+3. **In-memory enforcement state.** Nonces, fencing ceilings and
+   revocations are per engine instance; a durable multi-process deployment
+   needs an atomic shared authority store.
+4. **Memory/CPU ceilings** of child processes are recorded, not
+   kernel-enforced, on this stack.
+5. **Secrets.** No real credentials, tokens or private source content were
+   used or committed; build used a synthetic placeholder variable as noted.
+
+## 7. Artifact index
+
+- Contracts: `contracts/*.schema.json` (8 files, `1.0.0`, frozen manifest)
+- Implementation: `src/lib/identity/*` (registry, principals, engine,
+  sandbox, profiles, TS types)
+- Tests: `tests/identity/*.test.mjs` (contracts, policy, sandbox, probes,
+  replay)
+- Probes/corpus: `scripts/security-probes.mjs`, `scripts/s2-002-run.mjs`,
+  `scripts/verify-s2-002.mjs`
+- Evidence: `evidence/s2-001-pilot-binding.json`,
+  `evidence/s2-002-security-probes.json`, `evidence/s2-002-run-{a,b}.json`,
+  `evidence/s2-002-comparison.json`, `evidence/s2-002-comparison-integrity.json`,
+  `evidence/frozen-manifest.json`, `evidence/root-manifest.json`
+- Raw runs: `results/s2-002/run-{a,b}/observations.json`, `summary.json`
+- Reviews: `docs/decisions/S2-002-TEST-REVIEW-LOG.md`
+- Hash binding: all artifacts are hash-bound by `evidence/root-manifest.json`
+  at the recorded implementation commit/tree.

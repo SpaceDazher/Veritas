@@ -23,6 +23,32 @@ Start with [Product Contract](docs/product/PRODUCT_CONTRACT.md),
 [Scenario B](docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md) and
 [Evaluation Report](docs/decisions/S2-001-EVALUATION-REPORT.md).
 
+## S2-002 — Identity, agent rights and the local sandbox gate
+
+**Ticket result: PASS_WITH_LIMITS. Live code execution: BLOCKED_SANDBOX.**
+
+The board now has a server-side authorization gate shared by Web, API and CLI:
+8 fail-closed contracts (workspace, principal, role, capability, grant, lease,
+sandbox profile, authorization decision), a 20-principal subjects model across
+7 workspaces, grants with fencing tokens and one-time nonces, immediate
+revocation, human-only producer-blocked approvals, derived-artifact ACL
+inheritance, and a sandbox adapter with observed filesystem, network, secret,
+process-tree and output controls. All ten adversarial probes (A–J) are detected
+by the production path; two process-separated replay runs (280 trials each)
+show zero hard-counter violations and zero decision mismatches.
+
+Start with [Threat Model](docs/security/S2-002-THREAT-MODEL.md),
+[Sandbox Profile](docs/security/S2-002-SANDBOX-PROFILE.md) and the
+[S2-002 Evaluation Report](docs/decisions/S2-002-EVALUATION-REPORT.md).
+Commands: `npm run test:identity`, `npm run test:sandbox`,
+`npm run test:security-probes`, `npm run verify:s2-002`.
+
+Limits: no production authentication, no kernel-level sandbox —
+`LOCAL_RESTRICTED`/`UNTRUSTED_CODE` execution stays blocked until
+AppContainer/container evidence exists; enforcement state is per-engine
+in-memory. Personal agents act only via explicit human grants; platform agents
+cannot self-grant; producers cannot approve their own results.
+
 ## Additional local contract workspace
 
 Next.js App Router + PostgreSQL via Drizzle. Web Kanban, HTTP API and a generic

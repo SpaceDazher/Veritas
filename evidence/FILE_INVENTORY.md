@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 124.
+Generated from `git ls-files`; count: 127.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -28,6 +28,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/OUT_OF_SCOPE.md`
 - `docs/decisions/S2-001-EVALUATION-REPORT.md`
 - `docs/decisions/S2-001-PILOT-RECONCILIATION.md`
+- `docs/decisions/S2-002-EVALUATION-REPORT.md`
 - `docs/decisions/S2-002-TEST-REVIEW-LOG.md`
 - `docs/product/AUTONOMY_POLICY.md`
 - `docs/product/HUMAN_APPROVAL_POLICY.md`
@@ -36,6 +37,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/product/PRODUCT_CONTRACT.md`
 - `docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md`
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
+- `docs/security/S2-002-SANDBOX-PROFILE.md`
+- `docs/security/S2-002-THREAT-MODEL.md`
 - `drizzle.config.ts`
 - `eslint.config.mjs`
 - `evidence/closure-record.json`

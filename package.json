@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test \"tests/**/*.test.mjs\"",
     "test:identity": "node --test \"tests/identity/*.test.mjs\"",
+    "test:sandbox": "node --test \"tests/identity/sandbox.test.mjs\"",
     "test:security-probes": "node scripts/security-probes.mjs",
     "verify:s2-002": "node scripts/verify-s2-002.mjs",
     "verify:draft": "node scripts/verify.mjs draft",
