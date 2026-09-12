@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/task-brief.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario": {
+      "enum": [
+        "A",
+        "B"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "NEEDS_INPUT",
+        "FROZEN"
+      ]
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "enum": [
+        "personal",
+        "project",
+        "shared"
+      ]
+    },
+    "input_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "output_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "acceptance_cases": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metric_policy_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "change_policy": {
+      "const": "New revision and human reapproval; old evaluations invalidated."
+    },
+    "execution_authorized": {
+      "const": false
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "$ref": "needs-input.schema.json"
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "scenario",
+    "revision",
+    "status",
+    "goal",
+    "project",
+    "scope",
+    "input_refs",
+    "output_ids",
+    "acceptance_cases",
+    "profile_ref",
+    "manifest_ref",
+    "metric_policy_ref",
+    "change_policy",
+    "execution_authorized",
+    "unknowns"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "FROZEN"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unknowns": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "unknowns": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

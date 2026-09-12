@@ -1,0 +1,51 @@
+{
+  "name": "veritas-agent-board",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bounded S2-001 product contract and synthetic Veritas Agent Board workspace",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "verify:draft": "node scripts/verify.mjs draft",
+    "verify:acceptance": "node scripts/verify.mjs acceptance",
+    "verify:clean-checkout": "node scripts/verify-clean-checkout.mjs",
+    "test:policy": "node scripts/policy-probes.mjs",
+    "test:acceptance-gate": "node scripts/acceptance-gate.mjs --test",
+    "inventory:check": "node scripts/check-inventory.mjs",
+    "inventory:write": "node scripts/check-inventory.mjs --write",
+    "manifest:write": "node scripts/generate-manifests.mjs --write",
+    "manifest:closure": "node scripts/generate-manifests.mjs --write-closure",
+    "manifest:check": "node scripts/generate-manifests.mjs --check"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.2",
+    "lucide-react": "^1.44.0",
+    "next": "^16.3.4",
+    "pg": "8.20.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "22.19.15",
+    "@types/pg": "8.18.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "ajv": "^8.20.0",
+    "dotenv": "17.3.1",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "^16.3.4",
+    "postcss": "^8.5.28",
+    "tailwindcss": "4.1.17",
+    "tsx": "^4.23.13",
+    "typescript": "5.9.3"
+  }
+}

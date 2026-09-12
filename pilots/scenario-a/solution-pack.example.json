@@ -1,0 +1,117 @@
+{
+  "version": "1.0.0",
+  "id": "A-OUTPUT-TEMPLATE",
+  "brief_ref": "pilots/scenario-a/task-brief.json",
+  "status": "HUMAN_REVIEW",
+  "execution_status": "NOT_RUN",
+  "artifacts": {
+    "codex-pi-roles": {
+      "id": "codex-pi-roles",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-01"
+    },
+    "configurations": {
+      "id": "configurations",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-02"
+    },
+    "skills-instructions": {
+      "id": "skills-instructions",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-03"
+    },
+    "development-process": {
+      "id": "development-process",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-04"
+    },
+    "shared-kanban": {
+      "id": "shared-kanban",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-05"
+    },
+    "project-memory": {
+      "id": "project-memory",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-06"
+    },
+    "handoff-rules": {
+      "id": "handoff-rules",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-07"
+    },
+    "eval-sets": {
+      "id": "eval-sets",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-08"
+    },
+    "measured-metrics": {
+      "id": "measured-metrics",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-09"
+    },
+    "clean-checkout-install": {
+      "id": "clean-checkout-install",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-10"
+    },
+    "rollback": {
+      "id": "rollback",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-11"
+    },
+    "evidence-pack": {
+      "id": "evidence-pack",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-12"
+    },
+    "limitations-selection-reasons": {
+      "id": "limitations-selection-reasons",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-13"
+    },
+    "human-approval-request": {
+      "id": "human-approval-request",
+      "path": null,
+      "sha256": null,
+      "status": "NOT_RUN",
+      "acceptance_case": "A-OUT-14"
+    }
+  },
+  "metrics": {
+    "status": "NOT_MEASURED",
+    "denominator": 0,
+    "reason": "No authorized pilot executions; no empirical quality claims."
+  },
+  "selection_claim": "No empirical selection; no claim of absolute superiority.",
+  "human_decision_ref": "pilots/scenario-a/human-decision.example.json",
+  "limitations": [
+    "Template only. Required outputs not produced. Pilot execution blocked by unresolved inputs."
+  ]
+}

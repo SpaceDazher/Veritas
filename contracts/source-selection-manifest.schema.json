@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/source-selection-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario": {
+      "enum": [
+        "A",
+        "B"
+      ]
+    },
+    "status": {
+      "const": "NEEDS_INPUT"
+    },
+    "contains_private_content": {
+      "const": false
+    },
+    "import_authorized": {
+      "const": false
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "maxLength": 100
+          },
+          "category": {
+            "enum": [
+              "markdown",
+              "obsidian",
+              "telegram",
+              "youtube",
+              "web",
+              "pdf",
+              "arxiv",
+              "hugging-face",
+              "github",
+              "manual",
+              "official",
+              "expert"
+            ]
+          },
+          "scope": {
+            "enum": [
+              "personal",
+              "project",
+              "shared"
+            ]
+          },
+          "permission": {
+            "enum": [
+              "REFERENCE_ONLY",
+              "NEEDS_INPUT"
+            ]
+          },
+          "selection": {
+            "const": "NOT_IMPORTED"
+          },
+          "safe_reference": {
+            "type": "string",
+            "pattern": "^(redacted:[a-zA-Z0-9_-]+|repo:[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*(?:\\.(?:md|json|txt))?)$"
+          },
+          "freshness": {
+            "$ref": "needs-input.schema.json"
+          },
+          "access": {
+            "$ref": "needs-input.schema.json"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "scope",
+          "permission",
+          "selection",
+          "safe_reference",
+          "freshness",
+          "access"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "scenario",
+    "status",
+    "contains_private_content",
+    "import_authorized",
+    "sources"
+  ]
+}

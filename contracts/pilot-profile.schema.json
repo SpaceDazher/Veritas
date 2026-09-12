@@ -1,0 +1,1256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/pilot-profile.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "NEEDS_INPUT",
+        "READY"
+      ]
+    },
+    "project": {
+      "const": "Veritas Agent Board"
+    },
+    "parallel_jobs": {
+      "const": 1
+    },
+    "parallel_jobs_basis": {
+      "const": "User-approved MVP: one concurrent job; not execution authorization."
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_revision": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "agent_access": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "repository_permissions": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "task_cost": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency"
+                  ]
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "campaign_cost": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency"
+                  ]
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "daily_cost": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "currency"
+                  ]
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "max_duration": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "budget_owner": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "decision_owner": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "source_allowlist": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "research_question": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "freshness_windows": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "quality_thresholds": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        },
+        "independent_reviewer": {
+          "oneOf": [
+            {
+              "$ref": "needs-input.schema.json"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "status": {
+                  "const": "CONFIRMED"
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approval_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "status",
+                "owner",
+                "value",
+                "unit",
+                "approval_ref"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "target_revision",
+        "agent_access",
+        "repository_permissions",
+        "task_cost",
+        "campaign_cost",
+        "daily_cost",
+        "max_duration",
+        "budget_owner",
+        "decision_owner",
+        "source_allowlist",
+        "research_question",
+        "freshness_windows",
+        "quality_thresholds",
+        "independent_reviewer"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "status",
+    "project",
+    "parallel_jobs",
+    "parallel_jobs_basis",
+    "settings"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "READY"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "target_revision": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "agent_access": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "repository_permissions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "task_cost": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      }
+                    },
+                    "required": [
+                      "amount",
+                      "currency"
+                    ]
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "campaign_cost": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      }
+                    },
+                    "required": [
+                      "amount",
+                      "currency"
+                    ]
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "daily_cost": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      }
+                    },
+                    "required": [
+                      "amount",
+                      "currency"
+                    ]
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "max_duration": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "budget_owner": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "decision_owner": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "source_allowlist": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "research_question": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "freshness_windows": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "quality_thresholds": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              },
+              "independent_reviewer": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "const": "CONFIRMED"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "approval_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "status",
+                  "owner",
+                  "value",
+                  "unit",
+                  "approval_ref"
+                ]
+              }
+            },
+            "required": [
+              "target_revision",
+              "agent_access",
+              "repository_permissions",
+              "task_cost",
+              "campaign_cost",
+              "daily_cost",
+              "max_duration",
+              "budget_owner",
+              "decision_owner",
+              "source_allowlist",
+              "research_question",
+              "freshness_windows",
+              "quality_thresholds",
+              "independent_reviewer"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

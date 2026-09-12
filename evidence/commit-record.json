@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "branch": "codex/s2-001-product-contract",
+  "implementationCommit": "03ffb31add0afb59f51b6cc85a42edcfd4d7ebf6",
+  "implementationTreeSha": "abd328e5480bac49b11a46a90a51974687828525",
+  "payloadManifestSha256": "ae4a3ed8aca855ac035f972cc5058f72a777d896e2616c5f9f5bfc7a4fc539bf",
+  "fileManifestSha256": "f55f3407df91427d53e054c3074044687087c8e5baaf770c681ccd578bd837db",
+  "rootManifestFileSha256": "ef6586ee2aa4909923ba94fe65d7368125404ff5e193de9673bba7ee369ce82f",
+  "closureCommit": "Resolved externally with git log -1 -- evidence/closure-record.json; not embedded in this file",
+  "selfHashEmbedded": false,
+  "pushed": false,
+  "mergedToMain": false,
+  "closureRecord": "evidence/closure-record.json"
+}

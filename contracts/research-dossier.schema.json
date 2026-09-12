@@ -1,0 +1,1382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/research-dossier.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "brief_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "HUMAN_REVIEW"
+    },
+    "execution_status": {
+      "enum": [
+        "NOT_RUN",
+        "MEASURED"
+      ]
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source-map": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "claim-register": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "support-contradiction-map": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "expert-lenses": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "timeline": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "evidence-map": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "hypothesis-cards": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "alternative-explanations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "dated-forecasts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "unknowns": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "next-experiments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "human-review-package": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "NOT_RUN",
+                "PRESENT"
+              ]
+            },
+            "acceptance_case": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "path",
+            "sha256",
+            "status",
+            "acceptance_case"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "path": {
+                    "type": "null"
+                  },
+                  "sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "source-map",
+        "claim-register",
+        "support-contradiction-map",
+        "expert-lenses",
+        "timeline",
+        "evidence-map",
+        "hypothesis-cards",
+        "alternative-explanations",
+        "dated-forecasts",
+        "unknowns",
+        "next-experiments",
+        "human-review-package"
+      ]
+    },
+    "metrics": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "const": "NOT_MEASURED"
+            },
+            "denominator": {
+              "type": "integer",
+              "const": 0
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "status",
+            "denominator",
+            "reason"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "const": "MEASURED"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "numerator": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "denominator": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "coverage": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "method_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "limitations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "name",
+                  "numerator",
+                  "denominator",
+                  "coverage",
+                  "unit",
+                  "method_ref",
+                  "evidence_ref",
+                  "limitations"
+                ]
+              },
+              "minItems": 14
+            }
+          },
+          "required": [
+            "status",
+            "records"
+          ]
+        }
+      ]
+    },
+    "selection_claim": {
+      "const": "No empirical selection; no claim of absolute superiority."
+    },
+    "human_decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "brief_ref",
+    "status",
+    "execution_status",
+    "artifacts",
+    "metrics",
+    "selection_claim",
+    "human_decision_ref",
+    "limitations"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution_status": {
+            "const": "MEASURED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "const": "MEASURED"
+              },
+              "records": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "numerator": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "denominator": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "coverage": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "method_ref": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "evidence_ref": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 0
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "numerator",
+                    "denominator",
+                    "coverage",
+                    "unit",
+                    "method_ref",
+                    "evidence_ref",
+                    "limitations"
+                  ]
+                },
+                "minItems": 14
+              }
+            },
+            "required": [
+              "status",
+              "records"
+            ]
+          },
+          "artifacts": {
+            "properties": {
+              "source-map": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "claim-register": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "support-contradiction-map": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "expert-lenses": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "timeline": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "evidence-map": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "hypothesis-cards": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "alternative-explanations": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "dated-forecasts": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "unknowns": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "next-experiments": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              },
+              "human-review-package": {
+                "properties": {
+                  "status": {
+                    "const": "PRESENT"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "metrics": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "const": "NOT_MEASURED"
+              },
+              "denominator": {
+                "type": "integer",
+                "const": 0
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "status",
+              "denominator",
+              "reason"
+            ]
+          },
+          "artifacts": {
+            "properties": {
+              "source-map": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "claim-register": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "support-contradiction-map": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "expert-lenses": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "timeline": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "evidence-map": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "hypothesis-cards": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "alternative-explanations": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "dated-forecasts": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "unknowns": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "next-experiments": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              },
+              "human-review-package": {
+                "properties": {
+                  "status": {
+                    "const": "NOT_RUN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "exitCode": 0,
+  "scope": "Deterministic offline synthetic smoke; no database, browser, adapter, paid model or pilot execution",
+  "policyEntryPoints": [
+    "src/lib/contract-policy.mjs#evaluatePolicy"
+  ],
+  "policyProbesPassed": 34,
+  "policyProbesTotal": 34,
+  "acceptanceVerdict": "BLOCKED",
+  "pilotExecutions": 0,
+  "databaseWorkspaceSmoke": "NOT_RUN_DATABASE_URL_ABSENT",
+  "screenshots": []
+}

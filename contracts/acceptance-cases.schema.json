@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/acceptance-cases.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "scenario": {
+      "enum": [
+        "A",
+        "B"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "artifact",
+              "negative",
+              "mvp"
+            ]
+          },
+          "input": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected": {
+            "enum": [
+              "PASS",
+              "BLOCKED",
+              "NEEDS_INPUT",
+              "HUMAN_REVIEW"
+            ]
+          },
+          "evidence_required": {
+            "type": "string",
+            "minLength": 1
+          },
+          "execution": {
+            "enum": [
+              "CONTRACT_TEST",
+              "NOT_RUN"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "input",
+          "operation",
+          "oracle",
+          "expected",
+          "evidence_required",
+          "execution"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "version",
+    "scenario",
+    "cases"
+  ]
+}

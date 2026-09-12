@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "id": "HD-A-PENDING",
+  "artifact_ref": "pilots/scenario-a/solution-pack.example.json",
+  "artifact_digest": null,
+  "status": "NEEDS_INPUT",
+  "actor_type": "unassigned",
+  "actor_id": null,
+  "producer_id": "s2-001-contract-builder",
+  "decision_scope": "solution",
+  "reason": "No execution evidence or authenticated human approval.",
+  "timestamp": null,
+  "authority": "Requires server-authenticated human identity; JSON is not authorization.",
+  "authority_binding": null,
+  "pending": {
+    "status": "NEEDS_INPUT",
+    "owner": "user",
+    "blocks": [
+      "a.final-approval"
+    ],
+    "reason": "An authenticated non-producer human must review the exact artifact digest."
+  }
+}

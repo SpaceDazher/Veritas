@@ -1,0 +1,246 @@
+{
+  "version": "1.0.0",
+  "scenario": "B",
+  "cases": [
+    {
+      "id": "B-OUT-01",
+      "kind": "artifact",
+      "input": "source-map",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Resolve source provenance, immutable digest, retrieval time, license, ACL and upstream lineage.",
+      "expected": "PASS",
+      "evidence_required": "source-map: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-02",
+      "kind": "artifact",
+      "input": "claim-register",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Each claim has exact span, explicit fact/observation/opinion/hypothesis/forecast type and temporal scope.",
+      "expected": "PASS",
+      "evidence_required": "claim-register: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-03",
+      "kind": "artifact",
+      "input": "support-contradiction-map",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Label support and contradiction edges; count unique upstream families, not URLs.",
+      "expected": "PASS",
+      "evidence_required": "support-contradiction-map: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-04",
+      "kind": "artifact",
+      "input": "expert-lenses",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Include AI, energy, economics, state policy, infrastructure and science lenses; record disagreements.",
+      "expected": "PASS",
+      "evidence_required": "expert-lenses: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-05",
+      "kind": "artifact",
+      "input": "timeline",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Order events by source time and distinguish publication, observation and retrieval time.",
+      "expected": "PASS",
+      "evidence_required": "timeline: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-06",
+      "kind": "artifact",
+      "input": "evidence-map",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Every conclusion links to claim and source spans; missing access is unresolved, not success.",
+      "expected": "PASS",
+      "evidence_required": "evidence-map: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-07",
+      "kind": "artifact",
+      "input": "hypothesis-cards",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Every novel relation has type, basis, alternatives, scope, falsifier and confidence rationale.",
+      "expected": "PASS",
+      "evidence_required": "hypothesis-cards: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-08",
+      "kind": "artifact",
+      "input": "alternative-explanations",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Enumerate confounding, reverse causality, selection effects and common causes.",
+      "expected": "PASS",
+      "evidence_required": "alternative-explanations: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-09",
+      "kind": "artifact",
+      "input": "dated-forecasts",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Each forecast has issue date, target date, resolution criteria and resolving source; none fabricated.",
+      "expected": "PASS",
+      "evidence_required": "dated-forecasts: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-10",
+      "kind": "artifact",
+      "input": "unknowns",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Unknown register has user owner and operation-local blocks.",
+      "expected": "PASS",
+      "evidence_required": "unknowns: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-11",
+      "kind": "artifact",
+      "input": "next-experiments",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Preregister question, hypothesis, design, numeric budget, measurements, verifier and stop rules before launch.",
+      "expected": "PASS",
+      "evidence_required": "next-experiments: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "B-OUT-12",
+      "kind": "artifact",
+      "input": "human-review-package",
+      "operation": "Verify supplied artifact against frozen brief",
+      "oracle": "Present contested conclusions, evidence limits and human decision request without automatic approval.",
+      "expected": "PASS",
+      "evidence_required": "human-review-package: digest + test report + reviewer identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "NEG-01",
+      "kind": "negative",
+      "input": "goal-change",
+      "operation": "Hidden goal change after freeze",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-02",
+      "kind": "negative",
+      "input": "threshold-change",
+      "operation": "Threshold changed after results",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-03",
+      "kind": "negative",
+      "input": "missing-budget",
+      "operation": "Absent numeric spending authorization",
+      "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "NEEDS_INPUT",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-04",
+      "kind": "negative",
+      "input": "unknown-model",
+      "operation": "Unknown model or access method",
+      "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "NEEDS_INPUT",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-05",
+      "kind": "negative",
+      "input": "absolute-best",
+      "operation": "Claim absolutely best solution",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-06",
+      "kind": "negative",
+      "input": "self-approval",
+      "operation": "Single model approves its output",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-07",
+      "kind": "negative",
+      "input": "private-export",
+      "operation": "Private note included in public artifact",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-08",
+      "kind": "negative",
+      "input": "source-injection",
+      "operation": "Source instruction changes agent permissions",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-09",
+      "kind": "negative",
+      "input": "opinion-as-fact",
+      "operation": "Expert opinion promoted to fact",
+      "oracle": "Policy returns HUMAN_REVIEW; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "HUMAN_REVIEW",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-10",
+      "kind": "negative",
+      "input": "causal-overclaim",
+      "operation": "Unsupported causal relation asserted as knowledge",
+      "oracle": "Policy returns HUMAN_REVIEW; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "HUMAN_REVIEW",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-11",
+      "kind": "negative",
+      "input": "missing-source",
+      "operation": "Missing source counted as successful empty import",
+      "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "NEEDS_INPUT",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    },
+    {
+      "id": "NEG-12",
+      "kind": "negative",
+      "input": "research-rollout",
+      "operation": "AgentOS research verdict used for production authorization",
+      "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+      "expected": "BLOCKED",
+      "evidence_required": "evidence/contract-tests.json",
+      "execution": "CONTRACT_TEST"
+    }
+  ]
+}

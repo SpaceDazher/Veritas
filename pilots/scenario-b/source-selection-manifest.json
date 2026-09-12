@@ -1,0 +1,154 @@
+{
+  "version": "1.0.0",
+  "id": "SSM-B-001",
+  "scenario": "B",
+  "status": "NEEDS_INPUT",
+  "contains_private_content": false,
+  "import_authorized": false,
+  "sources": [
+    {
+      "id": "B-SRC-01",
+      "category": "obsidian",
+      "scope": "personal",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:obsidian-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "b.import.obsidian"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    },
+    {
+      "id": "B-SRC-02",
+      "category": "telegram",
+      "scope": "personal",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:telegram-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "b.import.telegram"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    },
+    {
+      "id": "B-SRC-03",
+      "category": "official",
+      "scope": "personal",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:official-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "b.import.official"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    },
+    {
+      "id": "B-SRC-04",
+      "category": "arxiv",
+      "scope": "personal",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:arxiv-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "b.import.arxiv"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    },
+    {
+      "id": "B-SRC-05",
+      "category": "expert",
+      "scope": "personal",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:expert-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "b.import.expert"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    },
+    {
+      "id": "B-SRC-06",
+      "category": "web",
+      "scope": "personal",
+      "permission": "NEEDS_INPUT",
+      "selection": "NOT_IMPORTED",
+      "safe_reference": "redacted:web-selection-pending",
+      "freshness": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "current-claims"
+        ],
+        "reason": "Owner must approve category-specific numeric freshness window."
+      },
+      "access": {
+        "status": "NEEDS_INPUT",
+        "owner": "user",
+        "blocks": [
+          "b.import.web"
+        ],
+        "reason": "Specific safe source identifier and lawful technical access must be approved."
+      }
+    }
+  ]
+}

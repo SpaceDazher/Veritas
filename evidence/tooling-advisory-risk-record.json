@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "observedAudit": "npm audit --json",
+  "observedExitCode": 1,
+  "severitySummary": {"low": 0, "moderate": 4, "high": 0, "critical": 0, "total": 4},
+  "affectedChain": [
+    "drizzle-kit@0.31.10",
+    "@esbuild-kit/esm-loader@2.6.5",
+    "@esbuild-kit/core-utils@3.3.2",
+    "nested esbuild@0.18.20"
+  ],
+  "advisory": "GHSA-67mh-4wv8-2f99",
+  "classification": "development/tooling only",
+  "productionRuntimeAuditExitCode": 0,
+  "productionRuntimeVulnerabilities": 0,
+  "disposition": "No high or critical finding is present. Do not use npm audit fix --force. Keep the runtime gate separate, review a compatible Drizzle Kit upgrade in a future change, and do not claim a zero-advisory full tree.",
+  "limitations": ["The vulnerable path is reached through dev tooling; this record is not a production-readiness claim.", "No disposable database schema-push test was performed."]
+}
