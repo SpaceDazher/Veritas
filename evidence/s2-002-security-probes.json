@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "scope": "Adversarial corpus A-J driven through the production policy path; DETECTED means the production modules rejected the attack.",
-  "policyVersion": "s2-002-policy-v1",
+  "policyVersion": "s2-002-policy-v2",
   "generatedAt": "2026-09-12T12:00:00.000Z",
   "escaped": 0,
   "detected": 10,
@@ -53,7 +53,7 @@
       "id": "H",
       "title": "stale grant/lease/fencing token after revocation",
       "verdict": "DETECTED",
-      "detail": "fresh:ALLOW; staleFence:STALE_FENCING_TOKEN; afterGrantRevoke:GRANT_REVOKED; afterLeaseRevoke:GRANT_REVOKED"
+      "detail": "fresh:ALLOW; staleFence:LEASE_FENCING_TOKEN_MISMATCH; afterGrantRevoke:GRANT_REVOKED; afterLeaseRevoke:LEASE_REVOKED"
     },
     {
       "id": "I",

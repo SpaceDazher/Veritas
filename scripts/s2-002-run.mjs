@@ -71,13 +71,30 @@ const CAPABILITY_TRIALS = [
   { trialId: 'cap/alice/cache.read/bob-private-cross-tenant', principalId: 'prn-owner-alice', workspaceId: 'ws-bob-private', action: 'cache.read', resource: { type: 'cache', id: 'cache:bob-index' }, args: { cache_id: 'cache:bob-index' }, expected: 'DENY', crossTenant: true },
   // Derived artifacts inherit the strictest ACL of their inputs.
   { trialId: 'derived/curator/benign-same-ws', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:board-weekly' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { summary_id: 'summary:board-weekly', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }] }, expected: 'ALLOW' },
-  { trialId: 'derived/curator/poison-bob-claim', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:poison-bob' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { summary_id: 'summary:poison-bob', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret' }] }, expected: 'DENY', crossTenant: true },
-  { trialId: 'derived/curator/poison-dave-cache', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'cache.write', resource: { type: 'cache', id: 'cache:poison-dave' }, lease: { leaseId: 'lse-curator-cachewrite-0008', fencingToken: 1 }, args: { cache_id: 'cache:poison-dave', inputs: [{ workspaceId: 'ws-dave-private', resourceId: 'cache:dave-index' }] }, expected: 'DENY', crossTenant: true },
+  { trialId: 'derived/curator/poison-bob-claim', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'summary.generate', resource: { type: 'summary', id: 'summary:poisoned' }, lease: { leaseId: 'lse-curator-0004', fencingToken: 2 }, args: { summary_id: 'summary:poisoned', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret' }] }, expected: 'DENY', crossTenant: true },
+  { trialId: 'derived/curator/poison-dave-cache', principalId: 'prn-platform-curator', workspaceId: 'ws-veritas-project', action: 'cache.write', resource: { type: 'cache', id: 'cache:poisoned-1' }, lease: { leaseId: 'lse-curator-cachewrite-0008', fencingToken: 1 }, args: { cache_id: 'cache:poisoned-1', inputs: [{ workspaceId: 'ws-dave-private', resourceId: 'cache:dave-index' }] }, expected: 'DENY', crossTenant: true },
   // One-time nonce grant: exactly one effect.
   { trialId: 'nonce/export/first', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'ALLOW' },
   { trialId: 'nonce/export/replay', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
   { trialId: 'nonce/export/replay-with-nonce', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
 ];
+
+const SANDBOX_EXPECTATIONS = Object.freeze([
+  ['sandbox/fs-traversal', 'PATH_ESCAPE'],
+  ['sandbox/fs-absolute-outside', 'ROOT_VIOLATION'],
+  ['sandbox/fs-unc', 'UNC_PATH'],
+  ['sandbox/fs-device', 'DEVICE_PATH'],
+  ['sandbox/fs-inside-ok', 'INSIDE'],
+  ['sandbox/net-deny-all', 'DENIED'],
+  ['sandbox/net-deny-localhost', 'DENIED'],
+  ['sandbox/env-allowlist', 'FILTERED'],
+  ['sandbox/secret-redaction', 'REDACTED'],
+  ['sandbox/output-digest-provenance', 'RECORDED'],
+  ['sandbox/output-name-escape', 'PATH_ESCAPE'],
+  ['sandbox/no-exec-refuses-execution', 'BLOCKED'],
+  ...(IS_WINDOWS ? [['sandbox/fs-junction-escape', 'LINK_ESCAPE']] : []),
+  ['sandbox/cancellation-survivors', 'SURVIVORS_ZERO'],
+]);
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -110,6 +127,25 @@ function buildCorpus() {
     trials.push({ kind: 'capability', ...trial, id: trial.trialId });
   }
   return trials;
+}
+
+// Host-owned oracle used by both the runner and the independent comparator.
+// It fixes the exact trial-id set and verdict for every cell; observations
+// cannot redefine their own exam by carrying a matching expected value.
+export function buildExpectedCorpusOracle() {
+  const entries = [
+    ...buildCorpus().map((trial) => [trial.id, trial.expected]),
+    ...SANDBOX_EXPECTATIONS,
+    ...Array.from({ length: REVOCATION_TRIALS }, (_, index) => [`revocation/${String(index).padStart(3, '0')}`, 'DENY']),
+  ];
+  const ids = entries.map(([trialId]) => trialId);
+  if (new Set(ids).size !== ids.length) throw new Error('DUPLICATE_ORACLE_TRIAL_ID');
+  return Object.freeze({
+    schemaVersion: 1,
+    trialCount: entries.length,
+    digest: digest(entries),
+    expectedByTrialId: Object.freeze(Object.fromEntries(entries)),
+  });
 }
 
 function sandboxTrialSet(root) {
@@ -171,7 +207,8 @@ function sandboxTrialSet(root) {
 export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
   if (!runId || !executorId || !nonceBase || !outputRoot) throw new Error('CORPUS_ARGUMENTS_REQUIRED');
   const corpus = buildCorpus();
-  const corpusDigest = digest(corpus);
+  const oracle = buildExpectedCorpusOracle();
+  const corpusDigest = oracle.digest;
   const engine = createPolicyEngine({ now: NOW });
   const sandboxSet = sandboxTrialSet(fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-corpus-ws-')));
   const observations = [];

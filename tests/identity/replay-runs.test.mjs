@@ -122,6 +122,27 @@ describe('S2-002 comparator is fail-closed', () => {
     assert.ok(comparison.counterViolations.length > 0, 'empty runs must produce violations');
   });
 
+  test('a self-consistent singleton cannot replace the exact frozen corpus', () => {
+    const counters = Object.fromEntries(REQUIRED_COUNTERS.map((name) => [name, 0]));
+    const forgedSummary = {
+      ...sumA,
+      trialCount: 1,
+      corpusDigest: 'forged',
+      counters,
+      revocationLatency: { trials: 100, maxMs: 0, allowAfterCommit: 0 },
+    };
+    const forged = [{
+      trialId: 'only-one-forged-cell',
+      expected: 'ALLOW',
+      decision: 'ALLOW',
+      match: true,
+    }];
+    const comparison = compareRuns(forgedSummary, forgedSummary, forged, forged);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.some((value) => value.includes('missingTrial')),
+      comparison.counterViolations.join(','));
+  });
+
   test('missing or NaN counters are violations, never silently passing', () => {
     const broken = {
       ...sumA,

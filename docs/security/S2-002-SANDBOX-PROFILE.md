@@ -62,9 +62,11 @@ and by both frozen replay runs.
   controls: `cwd` inside the workspace, filtered environment, non-detached
   spawn, hidden window, per-profile `max_processes` (violations rejected
   with `LIMIT_PROCESSES`), `timeout_ms`.
-- Cancellation and timeouts kill the whole tree (`taskkill /T /F` on
-  Windows, process-group kill on POSIX). Survivor counting enumerates
-  descendants (`Get-CimInstance Win32_Process`) and asserts zero. A
+- Cancellation and timeouts capture descendants before termination, use
+  direct `SIGKILL` plus `taskkill /T /F` on Windows (process-group kill on
+  POSIX), and retry addressable survivors. Terminal survivor proof queries
+  the Windows process table rather than relying on `process.kill(pid, 0)`.
+  Query/termination failures remain non-zero (fail-closed). A
   grandchild spawned via `start /b` is reaped; timeout and cancellation
   produce terminal outcomes (`timeout` / `cancelled`), never `success`.
 

@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createPolicyEngine } from '../src/lib/identity/policy-engine.mjs';
+import { createPolicyEngine, POLICY_VERSION } from '../src/lib/identity/policy-engine.mjs';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
 import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
 import { assertValidContract, validateContract } from '../src/lib/identity/contract-registry.mjs';
@@ -74,8 +74,8 @@ async function probeB() {
   const summaryPoison = engine.authorize({
     ...base,
     action: 'summary.generate',
-    resource: { type: 'summary', id: 'summary:poisoned-1' },
-    args: { summary_id: 'summary:poisoned-1', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret-claim' }] },
+    resource: { type: 'summary', id: 'summary:poisoned' },
+    args: { summary_id: 'summary:poisoned', inputs: [{ workspaceId: 'ws-veritas-project', resourceId: 'claim:c1' }, { workspaceId: 'ws-bob-private', resourceId: 'claim:secret-claim' }] },
   });
   const cachePoison = engine.authorize({
     ...base,
@@ -269,12 +269,13 @@ async function probeH() {
   const staleFence = engine.authorize({ ...request, lease: { leaseId: 'lse-pi-project-0001', fencingToken: 4 } });
   engine.revokeGrant('grt-alice-pi-project-update-0004');
   const afterRevocation = engine.authorize(request);
-  engine.revokeLease('lse-pi-project-0001');
-  const afterLeaseRevocation = engine.authorize(request);
+  const leaseEngine = createPolicyEngine({ now: NOW });
+  leaseEngine.revokeLease('lse-pi-project-0001');
+  const afterLeaseRevocation = leaseEngine.authorize(request);
   const detected = fresh.decision === 'ALLOW'
-    && staleFence.decision === 'DENY' && staleFence.reasonCodes.includes('STALE_FENCING_TOKEN')
+    && staleFence.decision === 'DENY' && staleFence.reasonCodes.includes('LEASE_FENCING_TOKEN_MISMATCH')
     && afterRevocation.decision === 'DENY' && afterRevocation.reasonCodes.includes('GRANT_REVOKED')
-    && afterLeaseRevocation.decision === 'DENY' && afterLeaseRevocation.reasonCodes.includes('GRANT_REVOKED');
+    && afterLeaseRevocation.decision === 'DENY' && afterLeaseRevocation.reasonCodes.includes('LEASE_REVOKED');
   return {
     detected,
     detail: `fresh:${fresh.decision}; staleFence:${staleFence.reasonCodes.join('|')}; afterGrantRevoke:${afterRevocation.reasonCodes.join('|')}; afterLeaseRevoke:${afterLeaseRevocation.reasonCodes.join('|')}`,
@@ -383,7 +384,7 @@ export async function runSecurityProbes({ writeReport = true } = {}) {
   const report = {
     schemaVersion: 1,
     scope: 'Adversarial corpus A-J driven through the production policy path; DETECTED means the production modules rejected the attack.',
-    policyVersion: 's2-002-policy-v1',
+    policyVersion: POLICY_VERSION,
     generatedAt: NOW,
     escaped: results.filter((r) => r.verdict === 'ESCAPED').length,
     detected: results.filter((r) => r.verdict === 'DETECTED').length,

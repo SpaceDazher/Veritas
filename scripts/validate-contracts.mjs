@@ -121,7 +121,8 @@ const frozenTargets = [
   // comparator and security documentation are frozen alongside S2-001 files.
   'src/lib/identity', 'tests/identity', 'docs/security',
   'scripts/s2-002-run.mjs', 'scripts/security-probes.mjs', 'scripts/verify-s2-002.mjs',
-  'scripts/verify-clean-checkout.mjs', 'evidence/s2-002-security-probes.json',
+  'scripts/verify-s2-002-dependencies.mjs', 'scripts/verify-clean-checkout.mjs',
+  'evidence/s2-002-dependency-binding.json', 'evidence/s2-002-security-probes.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');

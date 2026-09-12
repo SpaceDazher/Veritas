@@ -26,18 +26,18 @@ const CANONICAL = {
   'board.read': (r) => ({ workspace_id: r.workspaceId }),
   'task.create': () => ({ title: 'Synthetic task' }),
   'task.update': (r) => ({ task_id: r.resource.id, expected_revision: 3 }),
-  'approval.decide': () => ({ approval_id: 'approval:x', verdict: 'APPROVED' }),
+  'approval.decide': (r) => ({ approval_id: r.resource.id, verdict: 'APPROVED' }),
   'message.send': () => ({ to_principal: 'prn-agent-alice', body_digest: `sha256:${'5'.repeat(64)}` }),
-  'source.read': () => ({ source_id: 'source:x' }),
+  'source.read': (r) => ({ source_id: r.resource.id }),
   'search.query': () => ({ query: 'veritas' }),
-  'cache.read': () => ({ cache_id: 'cache:x' }),
+  'cache.read': (r) => ({ cache_id: r.resource.id }),
   'summary.generate': (r) => ({ summary_id: r.resource.id, inputs: [{ workspaceId: r.workspaceId, resourceId: 'claim:c1' }] }),
-  'claim.write': () => ({ claim_id: 'claim:x', provenance: 'synthetic' }),
-  'tool.execute': () => ({ tool_id: 'tool:x', canonical_args: {} }),
+  'claim.write': (r) => ({ claim_id: r.resource.id, provenance: 'synthetic' }),
+  'tool.execute': (r) => ({ tool_id: r.resource.id, canonical_args: {} }),
   'tool.discover': (r) => ({ workspace_id: r.workspaceId }),
-  'artifact.export': () => ({ artifact_id: 'artifact:x', destination: 'export:local' }),
-  'artifact.read': () => ({ artifact_id: 'artifact:x' }),
-  'task.cancel': () => ({ task_id: 'task:x' }),
+  'artifact.export': (r) => ({ artifact_id: r.resource.id, destination: 'export:local' }),
+  'artifact.read': (r) => ({ artifact_id: r.resource.id }),
+  'task.cancel': (r) => ({ task_id: r.resource.id }),
 };
 
 describe('S2-002 authority registry (subjects model)', () => {
@@ -158,6 +158,64 @@ describe('S2-002 policy engine: canonical arguments and resource type', () => {
     assert.equal(result.decision, 'DENY');
     assert.ok(result.reasonCodes.includes('CANONICAL_ARGUMENTS_MISSING'));
   });
+
+  test('resource-bearing canonical arguments must name the authorized resource', () => {
+    const engine = makeEngine();
+    const result = engine.authorize({
+      adapter: 'api',
+      principalId: 'prn-agent-carol',
+      workspaceId: 'ws-carol-private',
+      action: 'artifact.export',
+      resource: { type: 'artifact', id: 'artifact:final-1' },
+      args: { artifact_id: 'artifact:outside-scope', destination: 'export:local' },
+    });
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('CANONICAL_ARGUMENT_VALUE_MISMATCH'));
+  });
+
+  test('workspace_id canonical argument must match the authorized workspace', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      args: { workspace_id: 'ws-bob-private' },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('CANONICAL_ARGUMENT_VALUE_MISMATCH'));
+  });
+
+  test('required canonical arguments reject undefined and invalid scalar types', () => {
+    const engine = makeEngine();
+    const missingValue = engine.authorize(req({
+      action: 'task.create',
+      resource: { type: 'task', id: 'task:new' },
+      args: { title: undefined },
+    }));
+    assert.equal(missingValue.decision, 'DENY');
+    assert.ok(missingValue.reasonCodes.includes('CANONICAL_ARGUMENTS_MISSING'));
+
+    const wrongType = engine.authorize(req({
+      action: 'task.update',
+      resource: { type: 'task', id: 'task:1' },
+      args: { task_id: 'task:1', expected_revision: 'three' },
+    }));
+    assert.equal(wrongType.decision, 'DENY');
+    assert.ok(wrongType.reasonCodes.includes('CANONICAL_ARGUMENT_INVALID'));
+
+    const structuredTitle = engine.authorize(req({
+      action: 'task.create',
+      resource: { type: 'task', id: 'task:new' },
+      args: { title: { injected: 'not text' } },
+    }));
+    assert.equal(structuredTitle.decision, 'DENY');
+    assert.ok(structuredTitle.reasonCodes.includes('CANONICAL_ARGUMENT_INVALID'));
+
+    const invalidVerdict = engine.authorize(req({
+      action: 'approval.decide',
+      resource: { type: 'approval', id: 'approval:bad' },
+      args: { approval_id: 'approval:bad', verdict: 'OWNER_OVERRIDE' },
+    }));
+    assert.equal(invalidVerdict.decision, 'DENY');
+    assert.ok(invalidVerdict.reasonCodes.includes('CANONICAL_ARGUMENT_INVALID'));
+  });
 });
 
 describe('S2-002 policy engine: exact lease binding', () => {
@@ -221,6 +279,34 @@ describe('S2-002 policy engine: exact lease binding', () => {
       lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 },
     }));
     assert.equal(result.decision, 'ALLOW', result.reasonCodes.join(','));
+  });
+
+  test('a caller cannot forge a higher fencing token for an existing lease', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-external-pi',
+      workspaceId: 'ws-veritas-project',
+      action: 'task.update',
+      resource: { type: 'task', id: 'task:tsk-pilot-1' },
+      args: { task_id: 'task:tsk-pilot-1', expected_revision: 3 },
+      lease: { leaseId: 'lse-pi-project-0001', fencingToken: 999999 },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('LEASE_FENCING_TOKEN_MISMATCH'));
+  });
+
+  test('a task lease cannot authorize a different task covered by the same grant', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-external-pi',
+      workspaceId: 'ws-veritas-project',
+      action: 'task.update',
+      resource: { type: 'task', id: 'task:tsk-pilot-2' },
+      args: { task_id: 'task:tsk-pilot-2', expected_revision: 3 },
+      lease: { leaseId: 'lse-pi-project-0001', fencingToken: 5 },
+    }));
+    assert.equal(result.decision, 'DENY');
+    assert.ok(result.reasonCodes.includes('LEASE_TASK_MISMATCH'));
   });
 });
 
@@ -503,7 +589,7 @@ describe('S2-002 policy engine: leases and fencing tokens', () => {
     assert.equal(engine.authorize(fresh).decision, 'ALLOW');
     const stale = engine.authorize({ ...fresh, lease: { leaseId: 'lse-pi-project-0001', fencingToken: 4 } });
     assert.equal(stale.decision, 'DENY');
-    assert.ok(stale.reasonCodes.includes('STALE_FENCING_TOKEN'));
+    assert.ok(stale.reasonCodes.includes('LEASE_FENCING_TOKEN_MISMATCH'));
   });
 
   test('expired or revoked leases are denied', () => {
@@ -728,6 +814,13 @@ describe('S2-002 policy engine: Web/API/CLI parity and decision documents', () =
         resource: { type: 'tool', id: 'tool:runner' },
         lease: { leaseId: 'lse-experimenter-0005', fencingToken: 1 },
       }),
+      req({ args: {} }),
+      req({ resource: { type: 'secret', id: 'board:primary' } }),
+      req({ principalId: 'prn-ghost' }),
+      req({ workspaceId: 'ws-unknown' }),
+      req({ action: 'board.destroy', args: {} }),
+      req({ adapter: 'carrier-pigeon' }),
+      {},
     ];
     for (const request of samples) {
       const result = engine.authorize(request);

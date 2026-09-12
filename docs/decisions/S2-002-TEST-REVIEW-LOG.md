@@ -1,5 +1,21 @@
 # S2-002 — Test Review Log
 
+## Corrective round 2
+
+- Added exact-corpus negative tests after reproducing the singleton-corpus
+  comparator bypass; the oracle remains host-owned and cannot be supplied by
+  run output.
+- Added canonical target/value, lease fencing/task and decision-document
+  regressions before their production fixes.
+- Replaced the timeout test's shell-dependent `cmd/ping` sleeper with an
+  explicit long-lived `process.execPath` fixture after the full parallel suite
+  showed that the shell command can exit early. The assertion is unchanged:
+  the sandbox must terminate it as `timeout` with zero survivors.
+- Identity integration files are executed with Node's test concurrency set to
+  one. They share host-wide Windows process enumeration/termination controls,
+  and the frozen pilot profile itself permits one active runner job; parallel
+  unit scheduling created an invalid workload outside that bounded profile.
+
 Separate review record for any change to tests/oracles after candidate
 results were observed, as required by `tasks/S2-002_IDENTITY_SANDBOX.md`
 (TDD section). Entries are appended chronologically and are never removed.

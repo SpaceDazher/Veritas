@@ -223,7 +223,7 @@ describe('S2-002 sandbox: process tree and cancellation', { skip: !IS_WINDOWS },
     assert.equal(sandbox.isAlive(pid), true);
     const cancel = await sandbox.cancel(pid);
     assert.equal(cancel.terminated, true);
-    assert.equal(cancel.survivors, 0, 'no process may survive cancellation');
+    assert.equal(cancel.survivors, 0, `no process may survive cancellation: ${JSON.stringify(cancel)}`);
     assert.equal(sandbox.isAlive(pid), false);
     const outcome = await done;
     assert.equal(outcome.status, 'cancelled', 'cancel must yield a terminal cancelled outcome');
@@ -235,8 +235,8 @@ describe('S2-002 sandbox: process tree and cancellation', { skip: !IS_WINDOWS },
     const root = makeWorkspace();
     const sandbox = makeSandbox(SANDBOX_LOCAL_RESTRICTED_BLOCKED, [root]);
     const outcome = await sandbox.spawnForControlProbe({
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'ping -n 60 127.0.0.1 >nul'],
+      command: process.execPath,
+      args: ['-e', 'setTimeout(() => {}, 60000)'],
       timeoutMs: 700,
     });
     assert.equal(outcome.status, 'timeout');

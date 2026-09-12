@@ -3,8 +3,8 @@
   "runId": "run-b",
   "executorId": "exec-beta",
   "nonceBase": "nb-beta-c91d",
-  "outputRoot": "D:\\Project\\AgentOS\\.codex-work\\veritas-stage2\\results\\s2-002\\run-b",
-  "corpusDigest": "bda698335d6f7213571183229eff264022f54819e4d689c93d0aaf71944e6e31",
+  "outputRoot": "results/s2-002/run-b",
+  "corpusDigest": "71ad98104711f1374407d7d18ee21b96af29088063075374284d88b3424535b0",
   "fixedClock": "2026-09-12T12:00:00.000Z",
   "policyVersion": "s2-002-policy-v2",
   "platform": "win32/x64 node v22.23.2",
@@ -19,8 +19,8 @@
   },
   "revocationLatency": {
     "trials": 100,
-    "maxMs": 0.0593,
-    "meanMs": 0.011103000000000007,
+    "maxMs": 0.0702,
+    "meanMs": 0.012191999999999988,
     "allowAfterCommit": 0
   }
 }

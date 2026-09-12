@@ -14,6 +14,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { buildExpectedCorpusOracle } from './s2-002-run.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -32,6 +33,8 @@ const REVOCATION_MAX_MS = 5000;
 export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
   const counterViolations = [];
   const expectedOracleViolations = [];
+  const oracle = buildExpectedCorpusOracle();
+  const expectedIds = new Set(Object.keys(oracle.expectedByTrialId));
 
   // Fail-closed structural checks: empty or truncated runs are violations,
   // never silently-passing comparisons.
@@ -54,15 +57,37 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
     if (!Number.isFinite(summary.trialCount) || summary.trialCount === 0) {
       counterViolations.push(`${label}/trialCount=${summary.trialCount}`);
     }
-    // Frozen-oracle check: every observation must agree with its recorded
-    // expectation — this catches wrong behaviour identical in BOTH runs.
+    if (summary.trialCount !== oracle.trialCount) {
+      counterViolations.push(`${label}/trialCount=${summary.trialCount}/oracle=${oracle.trialCount}`);
+    }
+    if (summary.corpusDigest !== oracle.digest) {
+      counterViolations.push(`${label}/corpusDigestNotOracle`);
+    }
+    const seen = new Set();
     for (const observation of observations) {
-      const oracleOk = observation.kind === 'sandbox'
-        ? observation.match === true
-        : observation.decision === observation.expected;
-      if (!oracleOk) {
-        expectedOracleViolations.push({ run: label, trialId: observation.trialId, expected: observation.expected, decision: observation.decision });
+      if (!observation || typeof observation.trialId !== 'string') {
+        expectedOracleViolations.push({ run: label, trialId: null, reason: 'MALFORMED_OBSERVATION' });
+        continue;
       }
+      if (seen.has(observation.trialId)) {
+        expectedOracleViolations.push({ run: label, trialId: observation.trialId, reason: 'DUPLICATE_TRIAL' });
+        continue;
+      }
+      seen.add(observation.trialId);
+      const oracleExpected = oracle.expectedByTrialId[observation.trialId];
+      if (oracleExpected === undefined) {
+        expectedOracleViolations.push({ run: label, trialId: observation.trialId, reason: 'UNKNOWN_TRIAL' });
+        continue;
+      }
+      const oracleOk = observation.expected === oracleExpected
+        && observation.match === true
+        && (observation.kind === 'sandbox' || observation.decision === oracleExpected);
+      if (!oracleOk) {
+        expectedOracleViolations.push({ run: label, trialId: observation.trialId, expected: oracleExpected, decision: observation.decision });
+      }
+    }
+    for (const trialId of expectedIds) {
+      if (!seen.has(trialId)) counterViolations.push(`${label}/missingTrial=${trialId}`);
     }
   }
 
@@ -126,8 +151,9 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
 }
 
 function spawnRun({ runId, executorId, nonceBase }) {
-  const outputRoot = path.join(ROOT, 'results', 's2-002', runId);
-  fs.rmSync(outputRoot, { recursive: true, force: true });
+  const outputRoot = path.join('results', 's2-002', runId).split(path.sep).join('/');
+  const absoluteOutputRoot = path.join(ROOT, ...outputRoot.split('/'));
+  fs.rmSync(absoluteOutputRoot, { recursive: true, force: true });
   const result = spawnSync(process.execPath, [
     path.join(ROOT, 'scripts', 's2-002-run.mjs'),
     '--run-id', runId,
@@ -138,8 +164,8 @@ function spawnRun({ runId, executorId, nonceBase }) {
   if (result.status !== 0) {
     throw new Error(`CORPUS_RUN_PROCESS_FAILED (${runId}): exit ${result.status}: ${result.stderr?.slice(0, 2000)}`);
   }
-  const observations = JSON.parse(fs.readFileSync(path.join(outputRoot, 'observations.json'), 'utf8'));
-  const summary = JSON.parse(fs.readFileSync(path.join(outputRoot, 'summary.json'), 'utf8'));
+  const observations = JSON.parse(fs.readFileSync(path.join(absoluteOutputRoot, 'observations.json'), 'utf8'));
+  const summary = JSON.parse(fs.readFileSync(path.join(absoluteOutputRoot, 'summary.json'), 'utf8'));
   return { summary, observations };
 }
 

@@ -24,6 +24,19 @@ Policy version bumped to `s2-002-policy-v2` (semantics changed).
 Frozen-manifest scope now covers the whole S2-002 implementation, oracle
 suites, corpus runner, comparator and security docs.
 
+The second independent review found seven additional fail-open or
+reproducibility gaps. This corrective round closes them as follows:
+
+| Finding | Resolution |
+|---|---|
+| Comparator accepted a singleton self-consistent corpus | comparator now imports a host-owned exact oracle (all trial IDs, expected outcomes, count and digest); missing, duplicate, unknown or altered cells fail |
+| Canonical arguments were checked by name, not target value | every resource-bearing argument and `workspace_id` must equal the authorized target; required values reject null/undefined and invalid structured/scalar types |
+| Lease omitted exact fencing/task binding | presented token must equal the stored lease token; task requests must match `lease.task_ref`; grant/capability/workspace/resource bindings remain exact |
+| Windows cancellation could leave a process | descendants are captured before kill; direct and tree termination are combined; the OS process table, not `process.kill(pid,0)`, is the terminal survivor oracle; Probe G passes with zero survivors |
+| Clean-checkout omitted S2-002 acceptance commands | archive verifier now runs dependency verification, identity, sandbox, security probes, two-run replay, typecheck, lint, build and runtime audit as required gates |
+| Dependency binding was host-local | all `D:/...` paths were removed; pinned repository/commit/tree, repo-relative paths and pinned raw URLs are verified by `verify:s2-002-dependencies` |
+| Early DENY could return `document: null` | every outcome, including malformed/unknown adapter/principal/workspace/action inputs, carries a contract-valid AuthorizationDecision |
+
 
 ## 1. Verdict summary
 
@@ -33,7 +46,7 @@ suites, corpus runner, comparator and security docs.
 | 2. All schemas and server-side policy paths implemented and versioned | PASS — 8 contracts at `1.0.0`, single engine for Web/API/CLI |
 | 3. ACL matrix covers 20 principals and all listed paths | PASS — 140-cell board.read matrix + capability/derived/nonce cells per run |
 | 4. Hard counters zero in both independent runs | PASS — see §4 |
-| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, max ≤ 0.06 ms (limit 5000 ms) |
+| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, final max 0.0608 ms / 0.0702 ms (limit 5000 ms) |
 | 6. All adversarial probes detected by production path | PASS — 10/10 DETECTED, 0 ESCAPED |
 | 7. Process-tree cancellation and required OS controls observable | PASS on Windows (survivors = 0); kernel network boundary NOT provable — see limits |
 | 8. Frozen hashes, commit/tree, environment and outputs converge | PASS — manifests re-frozen per commit; `manifest:check` green |
@@ -55,7 +68,7 @@ honest outcome and live execution stays forbidden.
 2. **Subjects model:** `src/lib/identity/principals.mjs` — 20 principals
    (5 humans, 5 personal agents, 4 external Codex/pi/OpenCode/Hermes
    principals, 6 platform agents) across 7 workspaces (5 private, 1
-   project, 1 shared), 10 roles, 21 capabilities, 14 grants, 4 leases,
+   project, 1 shared), 10 roles, 21 capabilities, 17 grants, 8 leases,
    sandbox profiles. Personal agents act only via explicit human-issued
    grants; platform agents carry no delegation and cannot self-grant.
 3. **Policy engine:** `src/lib/identity/policy-engine.mjs` — one
@@ -74,7 +87,7 @@ honest outcome and live execution stays forbidden.
 5. **Adversarial corpus A–J:** `scripts/security-probes.mjs` — every probe
    attacks the production modules directly; any ESCAPED is a hard fail.
 6. **Independent replay:** `scripts/s2-002-run.mjs` (frozen corpus runner,
-   280 trials) + `scripts/verify-s2-002.mjs` (two process-separated runs,
+   283 trials) + `scripts/verify-s2-002.mjs` (two process-separated runs,
    per-trial decision comparison, hard counters, evidence writing).
 7. **TDD:** all suites written RED-first; post-observation test mutations
    are recorded in `docs/decisions/S2-002-TEST-REVIEW-LOG.md`.
@@ -100,7 +113,7 @@ J corrupted/missing evidence fail-open.
 | Survivors after cancellation | 0 | 0 | 0 |
 | Allow-after-revocation-commit | 0 | 0 | 0 |
 | Missing/censored trials | 0 | 0 | 0 |
-| Revocation decision latency (100 trials) | max ≤ 5000 ms | max ≤ 0.07 ms | max ≤ 0.07 ms |
+| Revocation decision latency (100 trials) | max ≤ 5000 ms | 0.0608 ms | 0.0702 ms |
 | Decision mismatch A vs B | 0 | 0 (283 compared) | — |
 | Frozen-oracle violations (either run) | 0 | 0 | 0 |
 
@@ -121,7 +134,8 @@ carries a terminal observation.
 
 ```
 npm ci
-npm run test:identity          # 106 tests
+npm run verify:s2-002-dependencies # portable 4/4 dependency binding
+npm run test:identity          # includes exact-oracle and dependency regressions
 npm run test:sandbox           # 18 tests
 npm run test:security-probes   # 10/10 DETECTED, exit 0
 npm run verify:s2-002          # process-separated runs, ok=true, exit 0

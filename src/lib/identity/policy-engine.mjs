@@ -39,11 +39,66 @@ function canonicalArgumentViolations(request, capability) {
   if (!isPlainObject(request.args)) return ['CANONICAL_ARGUMENTS_MISSING'];
   const declared = capability.canonical_arguments;
   const names = new Set(declared.map((argument) => argument.name));
-  if (declared.some((argument) => argument.required && !(argument.name in request.args))) {
+  if (declared.some((argument) => argument.required
+    && (!Object.hasOwn(request.args, argument.name)
+      || request.args[argument.name] === undefined
+      || request.args[argument.name] === null))) {
     return ['CANONICAL_ARGUMENTS_MISSING'];
   }
   if (Object.keys(request.args).some((key) => !names.has(key))) {
     return ['ARGUMENT_NOT_CANONICAL'];
+  }
+
+  // The authorization target and the adapter arguments must describe the
+  // same operation. Checking names alone creates a confused-deputy path in
+  // which policy authorizes one resource while the adapter mutates another.
+  const resourceArgument = {
+    task: 'task_id',
+    source: 'source_id',
+    claim: 'claim_id',
+    summary: 'summary_id',
+    cache: 'cache_id',
+    artifact: 'artifact_id',
+    message: 'message_id',
+    tool: 'tool_id',
+    approval: 'approval_id',
+  }[capability.resource_type];
+  if (resourceArgument && names.has(resourceArgument)
+    && request.args[resourceArgument] !== request.resource.id) {
+    return ['CANONICAL_ARGUMENT_VALUE_MISMATCH'];
+  }
+  if (names.has('workspace_id') && request.args.workspace_id !== request.workspaceId) {
+    return ['CANONICAL_ARGUMENT_VALUE_MISMATCH'];
+  }
+
+  for (const [name, value] of Object.entries(request.args)) {
+    if (value === undefined || value === null) return ['CANONICAL_ARGUMENT_INVALID'];
+    if (['expected_revision', 'revision'].includes(name)
+      && (!Number.isInteger(value) || value < 0)) return ['CANONICAL_ARGUMENT_INVALID'];
+    if (name === 'inputs' && (!Array.isArray(value) || value.some((input) => (
+      !isPlainObject(input)
+      || typeof input.workspaceId !== 'string'
+      || typeof input.resourceId !== 'string'
+      || input.workspaceId.length === 0
+      || input.resourceId.length === 0
+    )))) return ['CANONICAL_ARGUMENT_INVALID'];
+    if (name === 'canonical_args' && !isPlainObject(value)) return ['CANONICAL_ARGUMENT_INVALID'];
+    if (name === 'body_digest' && !/^sha256:[0-9a-f]{64}$/.test(value)) {
+      return ['CANONICAL_ARGUMENT_INVALID'];
+    }
+    if (name === 'to_principal' && !ID_PATTERNS.principalId.test(value)) {
+      return ['CANONICAL_ARGUMENT_INVALID'];
+    }
+    if (name === 'verdict' && !['APPROVED', 'REJECTED'].includes(value)) {
+      return ['CANONICAL_ARGUMENT_INVALID'];
+    }
+    if (['title', 'provenance', 'query', 'destination', 'from_status', 'to_status', 'reason'].includes(name)
+      && (typeof value !== 'string' || value.length === 0)) {
+      return ['CANONICAL_ARGUMENT_INVALID'];
+    }
+    if (name === 'criteria' && (!Array.isArray(value) || value.some((item) => typeof item !== 'string'))) {
+      return ['CANONICAL_ARGUMENT_INVALID'];
+    }
   }
   return [];
 }
@@ -73,7 +128,8 @@ function canonicalize(value) {
 }
 
 function digestOf(request) {
-  return createHash('sha256').update(JSON.stringify(canonicalize(request)), 'utf8').digest('hex');
+  const serialized = JSON.stringify(canonicalize(request ?? null)) ?? 'null';
+  return createHash('sha256').update(serialized, 'utf8').digest('hex');
 }
 
 function sandboxProfileFor(tier) {
@@ -102,8 +158,15 @@ export function createPolicyEngine({ now } = {}) {
   });
 
   function buildDocument(decision, reasonCodes, meta) {
-    if (!meta.wellFormed) return null;
+    const request = isPlainObject(meta.request) ? meta.request : {};
     const inputDigest = digestOf(meta.request);
+    const principalId = ID_PATTERNS.principalId.test(request.principalId ?? '')
+      ? request.principalId : 'prn-unknown';
+    const workspaceId = ID_PATTERNS.workspaceId.test(request.workspaceId ?? '')
+      ? request.workspaceId : 'ws-unknown';
+    const capabilityId = meta.capabilityId
+      ?? capabilityIndex.get(request.action)?.capability_id
+      ?? 'cap-unknown';
     const document = {
       contractVersion: '1.0.0',
       decision,
@@ -111,9 +174,9 @@ export function createPolicyEngine({ now } = {}) {
       policy_version: POLICY_VERSION,
       input_digest: `sha256:${inputDigest}`,
       audit_ref: `aud:${inputDigest.slice(0, 16)}`,
-      principal_id: meta.request.principalId,
-      capability_id: meta.capabilityId,
-      workspace_id: meta.request.workspaceId,
+      principal_id: principalId,
+      capability_id: capabilityId,
+      workspace_id: workspaceId,
       decided_at: decidedAt,
       context: {},
     };
@@ -204,13 +267,29 @@ export function createPolicyEngine({ now } = {}) {
     if (knownGrant.resource_scope.workspace_id !== request.workspaceId) {
       return { ok: false, reasonCodes: ['LEASE_GRANT_WORKSPACE_MISMATCH'] };
     }
+    if (access.via === 'GRANT' && access.grant.grant_id !== lease.grant_id) {
+      return { ok: false, reasonCodes: ['LEASE_GRANT_MISMATCH'] };
+    }
+    if (knownGrant.resource_scope.resource_type !== capability.resource_type
+      || !knownGrant.resource_scope.resource_ids.includes(request.resource.id)) {
+      return { ok: false, reasonCodes: ['LEASE_RESOURCE_MISMATCH'] };
+    }
     if (revokedGrants.has(knownGrant.grant_id)
       || knownGrant.status !== 'active'
       || Date.parse(knownGrant.expires_at) <= Date.parse(decidedAt)) {
       return { ok: false, reasonCodes: ['LEASE_GRANT_INVALID'] };
     }
-    if (access.via === 'GRANT' && access.grant.grant_id !== lease.grant_id) {
-      return { ok: false, reasonCodes: ['LEASE_GRANT_MISMATCH'] };
+    if (!Number.isInteger(presented.fencingToken) || presented.fencingToken < 1) {
+      return { ok: false, reasonCodes: ['LEASE_FENCING_TOKEN_INVALID'] };
+    }
+    if (presented.fencingToken !== lease.fencing_token) {
+      return { ok: false, reasonCodes: ['LEASE_FENCING_TOKEN_MISMATCH'] };
+    }
+    if (capability.resource_type === 'task' && typeof request.args?.task_id === 'string') {
+      const requestedTask = request.args.task_id.replace(/^task:/, '');
+      if (requestedTask !== lease.task_ref.task_id) {
+        return { ok: false, reasonCodes: ['LEASE_TASK_MISMATCH'] };
+      }
     }
     const taskKey = `${request.workspaceId}/${lease.task_ref.task_id}`;
     const max = fencingMax.get(taskKey) ?? 0;
@@ -303,9 +382,11 @@ export function createPolicyEngine({ now } = {}) {
       && typeof request.workspaceId === 'string' && ID_PATTERNS.workspaceId.test(request.workspaceId)
       && typeof request.action === 'string'
       && request.resource !== null && typeof request.resource === 'object'
+      && typeof request.resource.type === 'string'
+      && typeof request.resource.id === 'string' && request.resource.id.length > 0
     );
     if (!shapeOk) {
-      return { decision: 'DENY', reasonCodes: ['MALFORMED_REQUEST'], document: null };
+      return fail('DENY', ['MALFORMED_REQUEST']);
     }
     const capability = capabilityIndex.get(request.action);
     if (!capability) return fail('DENY', ['UNKNOWN_ACTION']);

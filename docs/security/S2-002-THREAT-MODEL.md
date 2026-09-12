@@ -63,8 +63,8 @@ sandbox adapter  ──►  filesystem / network / environment / process tree
 | T4 | Junction/symlink/`..`/UNC/device path escape | canonicalization via deepest existing ancestor + realpath containment; device segments rejected pre-fs | D | DETECTED |
 | T5 | Source prompt injection expanding authority or leaking secrets | injected text treated as inert data; escalation attempts re-evaluated by engine; secret redaction in logs | E | DETECTED |
 | T6 | Inter-agent message crossing scope/tenant | messaging capabilities absent from unauthorised roles; workspace-scoped | F | DETECTED |
-| T7 | Child process surviving cancellation/timeout | tree kill (`taskkill /T /F`, POSIX group kill); survivor count asserted zero | G | DETECTED |
-| T8 | Stale grant/lease/fencing token after revocation | revocation forbids use immediately; fencing token monotonic per task; stale ⇒ `STALE_FENCING_TOKEN` | H | DETECTED |
+| T7 | Child process surviving cancellation/timeout | descendants captured before kill; direct kill + tree kill; OS process-table survivor proof asserted zero | G | DETECTED |
+| T8 | Stale grant/lease/fencing token after revocation | lease binds exact stored fencing token and task; revocation forbids use immediately; mismatch/revocation ⇒ DENY | H | DETECTED |
 | T9 | Nonce/idempotency replay changing effect | one-time grants atomically consume nonce; replay ⇒ `GRANT_NONCE_CONSUMED` | I | DETECTED |
 | T10 | Corrupted/missing policy evidence failing open | registry compiles at import; corrupt clock/profile aborts; tampered decision documents fail contract validation | J | DETECTED |
 

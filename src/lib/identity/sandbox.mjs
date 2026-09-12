@@ -248,23 +248,98 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     });
   }
 
-  async function countSurvivors(pid) {
-    const descendants = await listDescendants(pid);
-    const alive = descendants.filter((candidate) => isAlive(candidate));
-    return (isAlive(pid) ? 1 : 0) + alive.length;
+  function directKill(pid, childHandle = null) {
+    try {
+      if (childHandle?.pid === pid) return childHandle.kill('SIGKILL');
+      process.kill(pid, 'SIGKILL');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Node's process.kill(pid, 0) is not an authoritative liveness probe on
+  // Windows: a recently terminated process can remain open through a handle
+  // long enough to be reported as alive. Query the OS process table for the
+  // terminal cancellation proof instead. Query failures are fail-closed: all
+  // candidates are treated as survivors.
+  function listExistingPids(pids) {
+    const candidates = [...new Set(pids.filter((pid) => Number.isInteger(pid) && pid > 0))];
+    if (candidates.length === 0) return Promise.resolve([]);
+    if (process.platform !== 'win32') {
+      return Promise.resolve(candidates.filter((pid) => isAlive(pid)));
+    }
+    const literal = candidates.join(',');
+    const script = `$ids=@(${literal});` +
+      `Get-CimInstance Win32_Process | Where-Object { $ids -contains [int]$_.ProcessId } | ` +
+      `ForEach-Object ProcessId`;
+    return new Promise((resolve) => {
+      const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+        windowsHide: true,
+      });
+      let out = '';
+      let failed = false;
+      child.stdout.on('data', (chunk) => { out += chunk; });
+      child.on('error', () => {
+        failed = true;
+        resolve(candidates);
+      });
+      child.on('close', (code) => {
+        if (failed) return;
+        if (code !== 0) {
+          resolve(candidates);
+          return;
+        }
+        resolve(out.split(/\s+/).map(Number).filter((value) => candidates.includes(value)));
+      });
+    });
+  }
+
+  async function survivorPids(pid, knownDescendants = []) {
+    const discovered = await listDescendants(pid);
+    const candidates = new Set([pid, ...knownDescendants, ...discovered]);
+    return listExistingPids([...candidates]);
+  }
+
+  async function countSurvivors(pid, knownDescendants = []) {
+    return (await survivorPids(pid, knownDescendants)).length;
   }
 
   // Settles a just-killed tree: waits until the direct child's exit is seen
   // and a full descendant enumeration reports nothing alive. Bounded wait,
   // terminal verdict either way.
-  async function settleTree(pid) {
+  async function settleTree(pid, knownDescendants = []) {
+    const tracked = new Set([pid, ...knownDescendants]);
     for (let attempt = 0; attempt < 20; attempt += 1) {
-      if (exitSeen.has(pid)) {
-        const descendants = await listDescendants(pid);
-        if (descendants.every((candidate) => !isAlive(candidate))) return;
+      for (const descendant of await listDescendants(pid)) tracked.add(descendant);
+      const existing = await listExistingPids([...tracked]);
+      if (existing.length === 0) return;
+      for (const candidate of existing) {
+        directKill(candidate);
+        await treeKill(candidate);
       }
       await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
     }
+  }
+
+  // Capture the process tree before terminating the root. Once the parent
+  // exits Windows may re-parent descendants, making post-kill enumeration
+  // unable to prove that the original tree is gone. Kill deepest candidates
+  // explicitly and retain their PIDs for the terminal survivor check.
+  async function terminateTree(pid, childHandle = null) {
+    const descendants = await listDescendants(pid);
+    // Ask Windows to terminate the tree while the root/parent relation still
+    // exists. Killing the root handle first can re-parent a child that raced
+    // the CIM snapshot and make /T unable to discover it.
+    await treeKill(pid);
+    for (const descendant of [...descendants].reverse()) {
+      directKill(descendant);
+      await treeKill(descendant);
+    }
+    directKill(pid, childHandle);
+    await treeKill(pid);
+    await settleTree(pid, descendants);
+    return descendants;
   }
 
   function probeEnv() {
@@ -319,7 +394,14 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       return { pid: -1, done };
     }
     const pid = child.pid;
-    const record = { child, timeoutTimer: null, cancelled: false, timedOut: false };
+    const record = {
+      child,
+      timeoutTimer: null,
+      cancelled: false,
+      timedOut: false,
+      knownDescendants: [],
+      terminationPromise: null,
+    };
     activeProbes.set(pid, record);
     let stdout = Buffer.alloc(0);
     let stderr = Buffer.alloc(0);
@@ -329,14 +411,18 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const finish = async (status, exitCode) => {
       if (record.timeoutTimer) clearTimeout(record.timeoutTimer);
       activeProbes.delete(pid);
-      const survivors = await countSurvivors(pid);
+      if (record.terminationPromise) {
+        record.knownDescendants = await record.terminationPromise;
+      }
+      const remainingProcessIds = await survivorPids(pid, record.knownDescendants);
       settle.resolve({
         status,
         terminated: status !== 'completed',
         exitCode,
         pid,
         durationMs: Date.now() - started,
-        survivors,
+        survivors: remainingProcessIds.length,
+        remainingProcessIds,
         stdoutDigest: sha256(redact(stdout.toString('utf8'))),
         stderrDigest: sha256(redact(stderr.toString('utf8'))),
         limits: profile.process ?? {},
@@ -364,7 +450,7 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     record.timeoutTimer = setTimeout(() => {
       record.timedOut = true;
       record.cancelled = true;
-      treeKill(pid);
+      record.terminationPromise ??= terminateTree(pid, child);
     }, timeoutMs);
     return { pid, done };
   }
@@ -372,11 +458,12 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   async function cancel(pid) {
     const record = activeProbes.get(pid);
     if (record) record.cancelled = true;
-    await treeKill(pid);
-    // Settle the whole tree before counting; bounded, terminal either way.
-    await settleTree(pid);
-    const survivors = await countSurvivors(pid);
-    return { terminated: true, survivors, pid };
+    const termination = record?.terminationPromise ?? terminateTree(pid, record?.child ?? null);
+    if (record) record.terminationPromise = termination;
+    const descendants = await termination;
+    if (record) record.knownDescendants = descendants;
+    const remainingProcessIds = await survivorPids(pid, descendants);
+    return { terminated: true, survivors: remainingProcessIds.length, remainingProcessIds, pid };
   }
 
   // Public execution path: blocked tiers never spawn anything.
