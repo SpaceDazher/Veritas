@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 127.
+Generated from `git ls-files`; count: 128.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -41,6 +41,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/security/S2-002-THREAT-MODEL.md`
 - `drizzle.config.ts`
 - `eslint.config.mjs`
+- `evidence/clean-checkout.json`
 - `evidence/closure-record.json`
 - `evidence/commit-record.json`
 - `evidence/contract-tests.json`

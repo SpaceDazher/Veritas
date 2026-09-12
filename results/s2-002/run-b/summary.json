@@ -19,8 +19,8 @@
   },
   "revocationLatency": {
     "trials": 100,
-    "maxMs": 0.0562,
-    "meanMs": 0.009717999999999994,
+    "maxMs": 0.0587,
+    "meanMs": 0.010144000000000009,
     "allowAfterCommit": 0
   }
 }

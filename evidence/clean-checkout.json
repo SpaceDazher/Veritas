@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
+  "sourceCommit": "7fac2a9fb51f7f02fa85f3083b129a6eb52ac32a",
+  "sourceTree": "c1fa52f6fb52778ddbda4c4e4d5146f84f698adc",
+  "exitCode": 1,
+  "passed": false,
+  "commands": [
+    {
+      "id": "archive",
+      "command": "git archive HEAD",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "Command failed: tar -xf C:\\Users\\Daniil\\AppData\\Local\\Temp\\veritas-clean-checkout-RqH1xC\\source.tar -C C:\\Users\\Daniil\\AppData\\Local\\Temp\\veritas-clean-checkout-RqH1xC\\checkout\ntar: Cannot connect to C: resolve failed\n"
+    },
+    {
+      "id": "npm-ci",
+      "command": "npm-ci",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "contracts",
+      "command": "contracts",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "synthetic-smoke",
+      "command": "synthetic-smoke",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "inventory",
+      "command": "inventory",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "public-artifacts",
+      "command": "public-artifacts",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "typecheck",
+      "command": "typecheck",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "build",
+      "command": "build",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "runtime-audit",
+      "command": "runtime-audit",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "tooling-audit",
+      "command": "tooling-audit",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "root-manifest",
+      "command": "node scripts/generate-manifests.mjs --check",
+      "exitCode": null,
+      "status": "NOT_RUN_SANDBOX",
+      "reason": "clean archive prerequisite was blocked by the sandbox"
+    },
+    {
+      "id": "database-workspace-smoke",
+      "command": "node scripts/smoke.mjs",
+      "exitCode": null,
+      "status": "NOT_RUN_DATABASE_URL_ABSENT"
+    }
+  ],
+  "databaseWorkspaceSmoke": "NOT_RUN; no dedicated PostgreSQL/server grant was used",
+  "scope": "Independent clean-checkout verification; no shared node_modules and no private source or pilot execution"
+}

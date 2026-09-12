@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "f2ec013323d97c70eb363b62fa045507f45a9a5b",
-  "sourceTree": "63d894daa804ef9d6ed04d7da8f8958f13e7df0f",
-  "trackedFileCount": 127,
-  "manifestFileCount": 124,
-  "payloadManifestSha256": "3b7db3e1e0a5a4e9dcf4af216e233eca2147454afffeeff7be047b0edd47ace9",
-  "fileManifestSha256": "8102ad0fd725a2429196aaaf022672843a8b9f4216a660c6e77e5ef268c784b4",
+  "sourceCommit": "7fac2a9fb51f7f02fa85f3083b129a6eb52ac32a",
+  "sourceTree": "c1fa52f6fb52778ddbda4c4e4d5146f84f698adc",
+  "trackedFileCount": 128,
+  "manifestFileCount": 125,
+  "payloadManifestSha256": "e336fda05342b7d93face1493ee425c7694a8ce61f51a4f039b10e06c2d36b99",
+  "fileManifestSha256": "2ab87ad76efce7abb65d5198e98d68d18ba942cd6df6211bc872953a3ed8413f",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -205,6 +205,11 @@
       "bytes": 365
     },
     {
+      "path": "evidence/clean-checkout.json",
+      "sha256": "f89dc7c19bbee9d686585e86a36ac84820ba5714072b29ecb83cb5137c9bc866",
+      "bytes": 3129
+    },
+    {
       "path": "evidence/contract-tests.json",
       "sha256": "9b8e60757c96bc42f57401e7173a527772967d3f104a68992738369de728dcbd",
       "bytes": 542
@@ -241,8 +246,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "0b9ba1dab7798d1ddb7131358e2ea3556d21524179c4bfe6e29236db28f339a0",
-      "bytes": 4790
+      "sha256": "3b3bd73a2c04580e35b78cb197a84cd046f659a722b2e60039957bc759bdbc7a",
+      "bytes": 4823
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -271,7 +276,7 @@
     },
     {
       "path": "evidence/s2-002-comparison-integrity.json",
-      "sha256": "f6699bd5bb1202b2b4af68e32c3de2fe8f25f4353ed20bbb472de8678581f9e4",
+      "sha256": "b84eab43e15c515e145e0348b9b62dec33b55755b5c683e8a208cc8dc0b2050e",
       "bytes": 394
     },
     {
@@ -281,12 +286,12 @@
     },
     {
       "path": "evidence/s2-002-run-a.json",
-      "sha256": "63b8ace61a5d3d7be52358b4bcd72306717a95d3d2027e8577b8247ed676b4e0",
+      "sha256": "1bf7f232d68347bbd36f5c51a1315229895469bcab7934f36ba3c1711c011ee5",
       "bytes": 1015
     },
     {
       "path": "evidence/s2-002-run-b.json",
-      "sha256": "526b548678e73784c0d38bfc769efa4fb7ff882b7b435d6f331c13a83a33a411",
+      "sha256": "e260bb0eb9cb7421854f07f2e42bb849f0c26b86508908fbfcddce9e49411188",
       "bytes": 1013
     },
     {
@@ -391,22 +396,22 @@
     },
     {
       "path": "results/s2-002/run-a/observations.json",
-      "sha256": "fa906e2359b8c5193984f64ad2653c664f3dc9a4e3af94db30f3a27072d180d9",
-      "bytes": 81319
+      "sha256": "a32871f9f2e35777172e3cdf90e9920cfa27f3d8856fd3bd0a53252155015393",
+      "bytes": 81324
     },
     {
       "path": "results/s2-002/run-a/summary.json",
-      "sha256": "06bbd30d710b152c729ffac944b279251c9fe12b085d2fce1842d40438a282a4",
+      "sha256": "500a3a7491f337f778acdcfb908d30e6e4d1aee00ea39c381ff4d4f8e402c55a",
       "bytes": 796
     },
     {
       "path": "results/s2-002/run-b/observations.json",
-      "sha256": "5714abeea7b53f6ef4d487518b1c58edd3bb49c8e1464dacba576d95ab430a19",
-      "bytes": 81340
+      "sha256": "cc01fd54b84ac7332f6b270a227d3e47a5d9c8221cd0dfb023113cf1a421165e",
+      "bytes": 81316
     },
     {
       "path": "results/s2-002/run-b/summary.json",
-      "sha256": "60e62f00846948582a0966e0e61b85fbcb70988427bd97b1adfb0206638992e4",
+      "sha256": "83a840ae478789b9ff57d6b34551a3d0826c158aa17fa4f816c8b1c7a5f052a2",
       "bytes": 794
     },
     {
