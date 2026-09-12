@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "b7793c05c0e75a38be816d0417a384dddf75e67e",
-  "sourceTree": "365584f5977a65fb86546ec1473c706356a28837",
-  "exitCode": 1,
-  "passed": false,
+  "sourceCommit": "7e7933bfa9d00b2b57ee115b52f80e410d1c7222",
+  "sourceTree": "adb8797819150822c13673e413ec53a603af441e",
+  "exitCode": 0,
+  "passed": true,
   "commands": [
     {
       "id": "archive",
@@ -25,6 +25,12 @@
       "status": "PASS"
     },
     {
+      "id": "root-manifest",
+      "command": "node scripts/generate-manifests.mjs --check",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
       "exitCode": 0,
@@ -39,22 +45,14 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 131,\n  \"listedFiles\": 129,\n  \"missingFromInventory\": [\n    \"scripts/verify-s2-002-dependencies.mjs\",\n    \"tests/identity/dependency-binding.test.mjs\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "public-artifacts",
       "command": "node scripts/check-public-artifacts.mjs",
       "exitCode": 0,
       "status": "PASS"
-    },
-    {
-      "id": "root-manifest",
-      "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "\r\n      sha256: '1ff69e499a5308014cc04789273c32b872085a4b3326dc921753b2d47b7ca490',\r\n      bytes: 553\r\n    },\r\n    {\r\n      path: 'scripts/synthetic-smoke.mjs',\r\n      sha256: '6a5d4a52759881f30b267ac61ec5d65898e9b94a21a0a77ffd008eecef7751b5',\r\n      bytes: 1250\r\n    },\r\n    {\r\n      path: 'scripts/validate-contracts.mjs',\r\n      sha256: '991211b6746ede595bbff82ad64d52adaac1312cc3412f08d23036caf6a8234d',\r\n      bytes: 9510\r\n    },\r\n    {\r\n      path: 'scripts/verify-clean-checkout.mjs',\r\n      sha256: '11280b15c6b4b528adc84663adb190d0c15bc633a2dd822a7122bc1f136a5a8b',\r\n      bytes: 7131\r\n    },\r\n    {\r\n      path: 'scripts/verify-pilot-binding.mjs',\r\n      sha256: '24dc8a3d1fea67b9306b514f350eb63885d558eb5faae7805d7105774ca97c47',\r\n      bytes: 3237\r\n    },\r\n    {\r\n      path: 'scripts/verify-s2-002-dependencies.mjs',\r\n      sha256: 'd218cb2889b41fccd5fabb588458f371835a1ca1979b98061a7a818dbb7b53da',\r\n      bytes: 4135\r\n    },\r\n    {\r\n      path: 'scripts/verify-s2-002.mjs',\r\n      sha256: '528f6de591e786d2afc42712914774de6fe570f020a7bcf1ad51f57229a5249e',\r\n      bytes: 9789\r\n    },\r\n    ... 28 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "identity-tests",
