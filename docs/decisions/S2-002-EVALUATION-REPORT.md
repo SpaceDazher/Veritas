@@ -18,7 +18,7 @@ two P1 findings. All seven were reproduced and fixed:
 | P0 cross-tenant message.send allowed | recipient must hold workspace access (ACL or live grant): `RECIPIENT_OUT_OF_SCOPE`, `UNKNOWN_RECIPIENT`; corpus gained cross-tenant recipient cells |
 | P0 flaky red suite (survivor counting races) | sandbox liveness now consults the child's observed exit (`exitSeen`) before `OpenProcess`, descendant enumeration retries, bounded tree-settle before counting; sandbox suite green across repeated runs |
 | P1 clean-checkout claimed PASS without evidence | honest correction: the previous run had actually failed (`tar` drive-letter bug, npm spawn bug). Both fixed (`--relative-path tar extraction`, `npm.cmd` via cmd.exe, git-inventory fallbacks, synthetic placeholder for the build-time DB variable) and a real PASS is now recorded in `evidence/clean-checkout.json` |
-| P1 dependencies S1-007/S1-008/S1-010 unbound | `evidence/s2-002-dependency-binding.json` records them honestly as `DEPENDENCY_EVIDENCE_MISSING` (no ticket body or evidence exists in any reachable repository); per the ticket's own rule this caps the verdict at PASS_WITH_LIMITS |
+| P1 dependencies S1-007/S1-008/S1-010 unbound | RESOLVED: the Stage-1 tickets live in `AgentOS/research/tickets/stage-1` (head `259d9afe…`). All three are completed gates (`pass_with_limits`) and are now digest-bound in `evidence/s2-002-dependency-binding.json`: S1-007 retrieval/index isolation (chain `4c344ab2…`), S1-008 revocation latency ≤5s (chain `5c43c03d…` — the requirement S2-002 enforces), S1-010 tool-poisoning detection (chain `8442d0de…`, gate verdict PASS) |
 
 Policy version bumped to `s2-002-policy-v2` (semantics changed).
 Frozen-manifest scope now covers the whole S2-002 implementation, oracle
@@ -178,7 +178,11 @@ only).
 4. **Memory/CPU ceilings** of child processes are recorded, not
    kernel-enforced, on this stack.
 5. **Secrets.** No real credentials, tokens or private source content were
-   used or committed; build used a synthetic placeholder variable as noted.
+   used or committed; build and archive checks use a synthetic passwordless
+   placeholder variable as noted.
+6. **Stage-1 dependency gates** (S1-007, S1-008, S1-010) are bound as
+   `pass_with_limits` records of the AgentOS repository at head `259d9afe…`;
+   their own limits carry over as upstream context, not as S2-002 failures.
 
 ## 7. Artifact index
 
