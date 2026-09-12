@@ -1,9 +1,10 @@
 # S2-001 tracked file inventory
 
-Generated from `git ls-files`; count: 82.
+Generated from `git ls-files`; count: 90.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
+- `.gitattributes`
 - `.gitignore`
 - `contracts/acceptance-cases.schema.json`
 - `contracts/human-decision.schema.json`
@@ -18,6 +19,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/OPEN_DECISIONS.md`
 - `docs/decisions/OUT_OF_SCOPE.md`
 - `docs/decisions/S2-001-EVALUATION-REPORT.md`
+- `docs/decisions/S2-001-PILOT-RECONCILIATION.md`
 - `docs/product/AUTONOMY_POLICY.md`
 - `docs/product/HUMAN_APPROVAL_POLICY.md`
 - `docs/product/METRIC_POLICY.md`
@@ -32,12 +34,17 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/contract-tests.json`
 - `evidence/dependency-audit-full.json`
 - `evidence/dependency-audit-runtime.json`
+- `evidence/external/s2-001/acceptance-cases.json`
+- `evidence/external/s2-001/clean-checkout.json`
+- `evidence/external/s2-001/pilot-closure-manifest.json`
+- `evidence/external/s2-001/pilot-run-manifest.json`
 - `evidence/FILE_INVENTORY.md`
 - `evidence/frozen-manifest.json`
 - `evidence/policy-probes.json`
 - `evidence/probe-registry.json`
 - `evidence/public-artifact-check.json`
 - `evidence/root-manifest.json`
+- `evidence/s2-001-pilot-binding.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -71,6 +78,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/synthetic-smoke.mjs`
 - `scripts/validate-contracts.mjs`
 - `scripts/verify-clean-checkout.mjs`
+- `scripts/verify-pilot-binding.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-cli.mjs`
 - `src/app/api/board/route.ts`

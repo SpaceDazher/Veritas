@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked S2-001 payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "03ffb31add0afb59f51b6cc85a42edcfd4d7ebf6",
-  "sourceTree": "abd328e5480bac49b11a46a90a51974687828525",
-  "trackedFileCount": 82,
-  "manifestFileCount": 79,
-  "payloadManifestSha256": "ae4a3ed8aca855ac035f972cc5058f72a777d896e2616c5f9f5bfc7a4fc539bf",
-  "fileManifestSha256": "f55f3407df91427d53e054c3074044687087c8e5baaf770c681ccd578bd837db",
+  "sourceCommit": "a98cce6779cd80a126e598b8004714e3f8242c54",
+  "sourceTree": "c60ccaea4b873e7fc56f679b96507b371dbf482c",
+  "trackedFileCount": 90,
+  "manifestFileCount": 87,
+  "payloadManifestSha256": "515a71f506e9771f5198b0a8048ae46ba0d54d4531dd79bccea35e85c26886f0",
+  "fileManifestSha256": "be0524d832f81abe70b599fa81552f322b7a094b98c73f29bda1383cbc2d8505",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -18,6 +18,11 @@
       "path": ".env.example",
       "sha256": "45f5aff555cf6aa40db7138a8561af10a87c72f02390fd4c4fd000d3b4a5ce40",
       "bytes": 205
+    },
+    {
+      "path": ".gitattributes",
+      "sha256": "927475c5094b9822f9ec3380bf88cacca959bc23b64e16ac1c9c3a0f05d0d7d9",
+      "bytes": 266
     },
     {
       "path": ".gitignore",
@@ -76,8 +81,8 @@
     },
     {
       "path": "docs/decisions/OPEN_DECISIONS.md",
-      "sha256": "eda1e9bdd8175f05e1ebbf0aab6da250ea54aa79e2a06b4350671d6310060ce6",
-      "bytes": 2728
+      "sha256": "09bd740f08a7cb2131444f506d0a05f87340148161c5a1cf67af0497f891e56e",
+      "bytes": 3067
     },
     {
       "path": "docs/decisions/OUT_OF_SCOPE.md",
@@ -86,8 +91,13 @@
     },
     {
       "path": "docs/decisions/S2-001-EVALUATION-REPORT.md",
-      "sha256": "f36e7161fad112b62feefa4f4f6ba18363eae0d2885a96c92e9d4f0aefe4bac1",
-      "bytes": 7817
+      "sha256": "072f76699f5d46fb1ea060e9773f2aeed6f2483bdd9d31a1193710a152a4f761",
+      "bytes": 8095
+    },
+    {
+      "path": "docs/decisions/S2-001-PILOT-RECONCILIATION.md",
+      "sha256": "b7d6bd7d7c3f2626c838ee529b9c323e55126a26faa345babb96a1d3c50265b9",
+      "bytes": 1995
     },
     {
       "path": "docs/product/AUTONOMY_POLICY.md",
@@ -111,8 +121,8 @@
     },
     {
       "path": "docs/product/PRODUCT_CONTRACT.md",
-      "sha256": "91f739617de398d32a2496af2d18ed148f91f5c4a4d8861391d319f5f1dbde16",
-      "bytes": 8278
+      "sha256": "639ee3f0dd76e3bb343ba3001345dd9662fd6fcb50e4222e663f03018bb77d7c",
+      "bytes": 8482
     },
     {
       "path": "docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md",
@@ -150,13 +160,33 @@
       "bytes": 281
     },
     {
+      "path": "evidence/external/s2-001/acceptance-cases.json",
+      "sha256": "828d0b14b9d05742ffcacdd7cb66b1c13d58b90193a7b975be85f5ebcb344fa1",
+      "bytes": 2506
+    },
+    {
+      "path": "evidence/external/s2-001/clean-checkout.json",
+      "sha256": "04ec51750b90127bad07380a993c7ca4474466d5b363b92a6231303d784daad2",
+      "bytes": 721
+    },
+    {
+      "path": "evidence/external/s2-001/pilot-closure-manifest.json",
+      "sha256": "f180871e61d4972bc54b5e0175ba0516f02da4c97121bc00a4df39ad460fc9a0",
+      "bytes": 2028
+    },
+    {
+      "path": "evidence/external/s2-001/pilot-run-manifest.json",
+      "sha256": "3947f2c95f8fc06ed6e01a170c26c6e571ced9f4493cda20ed3aa2050f5d28e1",
+      "bytes": 2044
+    },
+    {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "472b357f6a3df62b45d3cfd3f102817b3a7c36debbccfd771e06cc784f4dcdd8",
-      "bytes": 3010
+      "sha256": "9d00995638e458acf6d89e602812d543682e04f5e7613a7787d3937e9799958a",
+      "bytes": 3365
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "b7106df31529cd0af8ecf1272cc140afaaf64e9ca392e8b81dd397387e06de99",
+      "sha256": "c4717dde308aa8a7d670d585363d35e24aa87af6d5a9a3e70d80c7195bf24ee4",
       "bytes": 3562
     },
     {
@@ -171,8 +201,13 @@
     },
     {
       "path": "evidence/public-artifact-check.json",
-      "sha256": "166d1631512ba1afb20d41075b3f69f74e30edf7066e7d7e84834fe9e096bc8f",
+      "sha256": "b11789b270ae22edbbd649a3a8cfa1e9bbfabb85b64af5ed154b2036c414e80e",
       "bytes": 490
+    },
+    {
+      "path": "evidence/s2-001-pilot-binding.json",
+      "sha256": "44673fcd5543de2e8baa71b726864a55c7f41479eeb128581d67e7085d1668b7",
+      "bytes": 2483
     },
     {
       "path": "evidence/synthetic-smoke.json",
@@ -186,8 +221,8 @@
     },
     {
       "path": "evidence/validation-summary.json",
-      "sha256": "be8e140d9216964fc5c02c5ca97dd899c3a0e1b20e432ebdbf8cf19195cbb00c",
-      "bytes": 3025
+      "sha256": "dfb7988ba8966567ae888b713061b2f9984c330f786406b68c95e8e7fad49098",
+      "bytes": 3275
     },
     {
       "path": "next.config.ts",
@@ -201,8 +236,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "ea482b50706d1d1e3212b7a43ee9313dda8daa135a0d45b5470aa8a1e7cff4c4",
-      "bytes": 1661
+      "sha256": "c14b60d60a2627285df10e3c8f30c9153951a1ef1a8c3cc0f1bbf7a2ff54d8b2",
+      "bytes": 1730
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -266,8 +301,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "1ead19f75507468087dc536a9d8a9a9b2c5dcfb6644d1ff41c94e1556144599d",
-      "bytes": 4923
+      "sha256": "1a33602d7da8ec14f89143bbed98b7995614305a29e7fe6d6aec463b12d96b0e",
+      "bytes": 5635
     },
     {
       "path": "scripts/acceptance-gate.mjs",
@@ -306,7 +341,7 @@
     },
     {
       "path": "scripts/generate-manifests.mjs",
-      "sha256": "ed4612fc62f7f76d6c67a7f3ef735d2fe334228049cf9e330e74cc7dacaf108f",
+      "sha256": "c2aab221abed08097dec7c8e53dc1f093b7cdae064974b53219776489155f6e7",
       "bytes": 4732
     },
     {
@@ -340,9 +375,14 @@
       "bytes": 4440
     },
     {
+      "path": "scripts/verify-pilot-binding.mjs",
+      "sha256": "24dc8a3d1fea67b9306b514f350eb63885d558eb5faae7805d7105774ca97c47",
+      "bytes": 3237
+    },
+    {
       "path": "scripts/verify.mjs",
-      "sha256": "a8e522f36496f6e4abe63fe5e7efb0167f69b759817c765697b0e42164598426",
-      "bytes": 9537
+      "sha256": "6b8c2cfd7779c868f8d4b026dde62299ffaaeffb9258bcff431ffe052783b3ba",
+      "bytes": 10009
     },
     {
       "path": "scripts/veritas-cli.mjs",

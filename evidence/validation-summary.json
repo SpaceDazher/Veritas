@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "mode": "acceptance",
-  "verdict": "BLOCKED",
+  "mode": "draft",
+  "verdict": "PASS_WITH_LIMITS",
   "draftContractVerdict": "PASS_WITH_LIMITS",
   "acceptanceVerdict": "BLOCKED",
   "pilotExecutions": 0,
   "executionAuthorized": false,
-  "sourceCommit": "03ffb31add0afb59f51b6cc85a42edcfd4d7ebf6",
-  "sourceTree": "abd328e5480bac49b11a46a90a51974687828525",
-  "trackedFiles": 79,
+  "sourceCommit": "a98cce6779cd80a126e598b8004714e3f8242c54",
+  "sourceTree": "c60ccaea4b873e7fc56f679b96507b371dbf482c",
+  "trackedFiles": 90,
   "checks": [
     {
       "id": "contracts",
@@ -31,6 +31,12 @@
     {
       "id": "public-artifacts",
       "command": "node scripts/check-public-artifacts.mjs",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "external-pilot-binding",
+      "command": "node scripts/verify-pilot-binding.mjs",
       "exitCode": 0,
       "status": "PASS"
     },
@@ -74,21 +80,20 @@
       "id": "git-diff-check",
       "command": "git diff --check",
       "exitCode": 0,
-      "status": "PASS",
-      "trailingWhitespaceFiles": []
+      "status": "PASS"
     },
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": null,
-      "status": "NOT_RUN",
-      "reason": "root manifest is generated after the implementation commit"
+      "exitCode": 0,
+      "status": "PASS"
     }
   ],
   "limitations": [
-    "pilotExecutions=0; no real Codex/pi or other agent adapter run",
-    "Scenario A/B remain NEEDS_INPUT and execution_authorized=false",
-    "No authenticated human final approval, paid model call, private source import or production rollout",
+    "The local workspace remains synthetic with pilotExecutions=0; the real scenario A run is frozen as separately verified external evidence",
+    "Scenario B remains contract-only and depends on S2-003 through S2-006",
+    "The human approval covers the bounded Solution Blueprint only; no private source import or production rollout is authorized",
+    "Ambiguous external side-effect reconciliation and exact per-call subscription billing remain unproven",
     "Database/browser workspace smoke is not claimed unless a dedicated DATABASE_URL and local server are explicitly available",
     "production build was not completed because the sandbox lacks a valid worker/database environment",
     "npm audit reports dev/tooling advisories; runtime audit remains the release gate"
