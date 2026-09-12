@@ -11,7 +11,7 @@ const listed = [...markdown.matchAll(/^- `([^`]+)`$/gm)].map((match) => match[1]
 const missingFromInventory = gitFiles.filter((file) => !listed.includes(file));
 const missingFromGit = listed.filter((file) => !gitFiles.includes(file));
 const generated = [
-  '# S2-001 tracked file inventory',
+  '# Veritas tracked file inventory',
   '',
   `Generated from \`git ls-files\`; count: ${gitFiles.length}.`,
   'This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.',

@@ -22,7 +22,7 @@ const sourceTree = git('rev-parse', 'HEAD^{tree}');
 const rootManifestPath = path.join(root, 'evidence/root-manifest.json');
 const rootManifest = {
   schemaVersion: 1,
-  scope: 'All tracked S2-001 payload and evidence files; self-referential metadata files are excluded explicitly',
+  scope: 'All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly',
   algorithm: 'SHA-256 raw file bytes',
   sourceCommit,
   sourceTree,
