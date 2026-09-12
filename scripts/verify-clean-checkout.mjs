@@ -82,17 +82,17 @@ try {
   if (archiveReady) {
     run('npm-ci', NPM, ['ci'], {env: npmEnv});
     run('s2-002-dependencies', NPM, ['run', 'verify:s2-002-dependencies'], {env: npmEnv});
-    run('contracts', 'node', ['scripts/validate-contracts.mjs'], {env: npmEnv});
-    run('synthetic-smoke', 'node', ['scripts/synthetic-smoke.mjs'], {env: npmEnv});
-    run('inventory', 'node', ['scripts/check-inventory.mjs'], {env: npmEnv});
-    run('public-artifacts', 'node', ['scripts/check-public-artifacts.mjs'], {env: npmEnv});
-    // Manifest verification must precede measurement commands because the
-    // latter intentionally regenerate evidence inside the isolated checkout.
+    // Verify the immutable archive before any command below intentionally
+    // refreshes tracked evidence files in the disposable checkout.
     if (fs.existsSync(path.join(checkoutPath, 'evidence/root-manifest.json'))) {
       run('root-manifest', 'node', ['scripts/generate-manifests.mjs', '--check'], {env: npmEnv});
     } else {
       commands.push({id: 'root-manifest', command: 'node scripts/generate-manifests.mjs --check', exitCode: null, status: 'NOT_RUN'});
     }
+    run('contracts', 'node', ['scripts/validate-contracts.mjs'], {env: npmEnv});
+    run('synthetic-smoke', 'node', ['scripts/synthetic-smoke.mjs'], {env: npmEnv});
+    run('inventory', 'node', ['scripts/check-inventory.mjs'], {env: npmEnv});
+    run('public-artifacts', 'node', ['scripts/check-public-artifacts.mjs'], {env: npmEnv});
     run('identity-tests', NPM, ['run', 'test:identity'], {env: npmEnv});
     run('sandbox-tests', NPM, ['run', 'test:sandbox'], {env: npmEnv});
     run('security-probes', NPM, ['run', 'test:security-probes'], {env: npmEnv});

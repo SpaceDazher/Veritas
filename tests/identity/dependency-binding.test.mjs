@@ -36,4 +36,13 @@ describe('S2-002 portable dependency gate', () => {
     unpinned.dependencies[1].sourceCommit = 'main';
     assert.equal(verifyDependencyBinding(unpinned, ROOT).ok, false);
   });
+
+  test('clean-checkout verifies the root manifest before evidence-producing commands', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'scripts/verify-clean-checkout.mjs'), 'utf8');
+    const manifest = source.indexOf("run('root-manifest'");
+    assert.ok(manifest >= 0);
+    for (const command of ["run('contracts'", "run('synthetic-smoke'", "run('public-artifacts'"]) {
+      assert.ok(manifest < source.indexOf(command), `${command} must follow root-manifest verification`);
+    }
+  });
 });

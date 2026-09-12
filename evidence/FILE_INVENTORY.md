@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 129.
+Generated from `git ls-files`; count: 131.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -104,6 +104,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/validate-contracts.mjs`
 - `scripts/verify-clean-checkout.mjs`
 - `scripts/verify-pilot-binding.mjs`
+- `scripts/verify-s2-002-dependencies.mjs`
 - `scripts/verify-s2-002.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-cli.mjs`
@@ -127,6 +128,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/identity/sandbox.mjs`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tests/identity/contracts.schemas.test.mjs`
+- `tests/identity/dependency-binding.test.mjs`
 - `tests/identity/policy-engine.test.mjs`
 - `tests/identity/replay-runs.test.mjs`
 - `tests/identity/sandbox.test.mjs`

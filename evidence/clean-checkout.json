@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "3e00de3c99e3e3d1721ac66c5724cc0500f00118",
-  "sourceTree": "64e87c0bcc0107124b4f4ec6c598d8122024136a",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "b7793c05c0e75a38be816d0417a384dddf75e67e",
+  "sourceTree": "365584f5977a65fb86546ec1473c706356a28837",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -15,6 +15,12 @@
     {
       "id": "npm-ci",
       "command": "npm.cmd ci",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-002-dependencies",
+      "command": "npm.cmd run verify:s2-002-dependencies",
       "exitCode": 0,
       "status": "PASS"
     },
@@ -33,8 +39,9 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 131,\n  \"listedFiles\": 129,\n  \"missingFromInventory\": [\n    \"scripts/verify-s2-002-dependencies.mjs\",\n    \"tests/identity/dependency-binding.test.mjs\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
     },
     {
       "id": "public-artifacts",
@@ -43,8 +50,45 @@
       "status": "PASS"
     },
     {
+      "id": "root-manifest",
+      "command": "node scripts/generate-manifests.mjs --check",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "\r\n      sha256: '1ff69e499a5308014cc04789273c32b872085a4b3326dc921753b2d47b7ca490',\r\n      bytes: 553\r\n    },\r\n    {\r\n      path: 'scripts/synthetic-smoke.mjs',\r\n      sha256: '6a5d4a52759881f30b267ac61ec5d65898e9b94a21a0a77ffd008eecef7751b5',\r\n      bytes: 1250\r\n    },\r\n    {\r\n      path: 'scripts/validate-contracts.mjs',\r\n      sha256: '991211b6746ede595bbff82ad64d52adaac1312cc3412f08d23036caf6a8234d',\r\n      bytes: 9510\r\n    },\r\n    {\r\n      path: 'scripts/verify-clean-checkout.mjs',\r\n      sha256: '11280b15c6b4b528adc84663adb190d0c15bc633a2dd822a7122bc1f136a5a8b',\r\n      bytes: 7131\r\n    },\r\n    {\r\n      path: 'scripts/verify-pilot-binding.mjs',\r\n      sha256: '24dc8a3d1fea67b9306b514f350eb63885d558eb5faae7805d7105774ca97c47',\r\n      bytes: 3237\r\n    },\r\n    {\r\n      path: 'scripts/verify-s2-002-dependencies.mjs',\r\n      sha256: 'd218cb2889b41fccd5fabb588458f371835a1ca1979b98061a7a818dbb7b53da',\r\n      bytes: 4135\r\n    },\r\n    {\r\n      path: 'scripts/verify-s2-002.mjs',\r\n      sha256: '528f6de591e786d2afc42712914774de6fe570f020a7bcf1ad51f57229a5249e',\r\n      bytes: 9789\r\n    },\r\n    ... 28 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
+    },
+    {
+      "id": "identity-tests",
+      "command": "npm.cmd run test:identity",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "sandbox-tests",
+      "command": "npm.cmd run test:sandbox",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "security-probes",
+      "command": "npm.cmd run test:security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-002-replay",
+      "command": "npm.cmd run verify:s2-002",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
       "id": "typecheck",
       "command": "npm.cmd run typecheck",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "lint",
+      "command": "npm.cmd run lint",
       "exitCode": 0,
       "status": "PASS"
     },
@@ -66,12 +110,6 @@
       "exitCode": 1,
       "status": "FAIL",
       "reason": "  \"via\": [\n        {\n          \"source\": 1102341,\n          \"name\": \"esbuild\",\n          \"dependency\": \"esbuild\",\n          \"title\": \"esbuild enables any website to send any requests to the development server and read the response\",\n          \"url\": \"https://github.com/advisories/GHSA-67mh-4wv8-2f99\",\n          \"severity\": \"moderate\",\n          \"cwe\": [\n            \"CWE-346\"\n          ],\n          \"cvss\": {\n            \"score\": 5.3,\n            \"vectorString\": \"CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N\"\n          },\n          \"range\": \"<=0.24.2\"\n        }\n      ],\n      \"effects\": [\n        \"@esbuild-kit/core-utils\"\n      ],\n      \"range\": \"<=0.24.2\",\n      \"nodes\": [\n        \"node_modules/@esbuild-kit/core-utils/node_modules/esbuild\"\n      ],\n      \"fixAvailable\": {\n        \"name\": \"drizzle-kit\",\n        \"version\": \"0.18.1\",\n        \"isSemVerMajor\": true\n      }\n    }\n  },\n  \"metadata\": {\n    \"vulnerabilities\": {\n      \"info\": 0,\n      \"low\": 0,\n      \"moderate\": 4,\n      \"high\": 0,\n      \"critical\": 0,\n      \"total\": 4\n    },\n    \"dependencies\": {\n      \"prod\": 38,\n      \"dev\": 481,\n      \"optional\": 170,\n      \"peer\": 0,\n      \"peerOptional\": 0,\n      \"total\": 557\n    }\n  }\n}"
-    },
-    {
-      "id": "root-manifest",
-      "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 0,
-      "status": "PASS"
     },
     {
       "id": "database-workspace-smoke",
