@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 107.
+Generated from `git ls-files`; count: 110.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -106,7 +106,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/identity/contracts.ts`
 - `src/lib/identity/policy-engine.mjs`
 - `src/lib/identity/principals.mjs`
+- `src/lib/identity/sandbox-profiles.mjs`
+- `src/lib/identity/sandbox.mjs`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/policy-engine.test.mjs`
+- `tests/identity/sandbox.test.mjs`
 - `tsconfig.json`

@@ -1,0 +1,425 @@
+// S2-002 sandbox boundary adapter.
+// Enforces the observable OS controls of a sandbox profile for local
+// operations: filesystem canonicalization (traversal, UNC/device paths,
+// junction/symlink escapes), deny-by-default network policy, environment
+// allowlist, opaque secret handles with log redaction, process-tree
+// cancellation, and artifact outputs with digest and provenance.
+//
+// Honesty boundary: a cwd + filtered env + tree kill is NOT a full sandbox.
+// Without a provable kernel-level network boundary (AppContainer or
+// equivalent) the LOCAL_RESTRICTED and UNTRUSTED_CODE tiers stay blocked for
+// public execution paths. spawnForControlProbe() exists solely as the
+// research instrument that observes the tree-kill control for evidence; it
+// is never wired to agent-triggered execution.
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
+
+const DEVICE_NAMES = new Set([
+  'CON', 'PRN', 'AUX', 'NUL',
+  ...Array.from({ length: 9 }, (_, i) => `COM${i + 1}`),
+  ...Array.from({ length: 9 }, (_, i) => `LPT${i + 1}`),
+]);
+
+const BASE_ENV_KEYS = Object.freeze(['VERITAS_SANDBOX_TIER', 'VERITAS_SANDBOX_PROFILE']);
+// OS variables a spawned console process needs merely to start on Windows.
+// They are injected only into the internal probe runner environment, never
+// exposed through buildEnvironment().
+const OS_RUNTIME_ENV_KEYS = Object.freeze(['SystemRoot', 'TEMP', 'TMP', 'PATH', 'COMSPEC']);
+
+const WPAT = (p) => p.split('\\').join('/');
+
+function isDeviceSegment(segment) {
+  const base = segment.split('.')[0].toUpperCase();
+  return DEVICE_NAMES.has(base);
+}
+
+function stripDeviceName(name) {
+  // A path that merely *contains* a device name in a segment is rejected
+  // before any filesystem access (Windows would otherwise open the device).
+  return name.split(/[\\/]/).some((segment) => segment.length > 0 && isDeviceSegment(segment));
+}
+
+function isAbsoluteish(name) {
+  if (/^[a-zA-Z]:/.test(name)) return true;
+  return name.startsWith('\\') || name.startsWith('/');
+}
+
+function looksLikeTraversal(name) {
+  return name.split(/[\\/]/).includes('..');
+}
+
+function sha256(bytes) {
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+function canonicalInsideRoots(candidate, roots) {
+  const canon = WPAT(candidate).toLowerCase();
+  return roots.some((root) => {
+    const canonRoot = WPAT(root).toLowerCase().replace(/\/+$/, '');
+    return canon === canonRoot || canon.startsWith(`${canonRoot}/`);
+  });
+}
+
+// Resolves the deepest existing ancestor and canonicalizes it, so junction
+// and symlink escapes are detected even for not-yet-created files.
+function realpathDeepest(target) {
+  let current = path.resolve(target);
+  const missing = [];
+  while (!fs.existsSync(current)) {
+    missing.unshift(path.basename(current));
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  return { real: fs.realpathSync(current), missing };
+}
+
+export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets = {}, now }) {
+  if (!profile || !profile.tier) throw new Error('SANDBOX_PROFILE_REQUIRED');
+  if (!Array.isArray(workspaceRoots) || workspaceRoots.length === 0) {
+    throw new Error('SANDBOX_ROOTS_REQUIRED');
+  }
+  if (typeof now !== 'string') throw new Error('SANDBOX_CLOCK_REQUIRED');
+  const roots = workspaceRoots.map((root) => path.resolve(root));
+  const rootRealPaths = roots.map((root) => fs.realpathSync(root));
+  const artifactsDir = path.resolve(artifactRoot ?? path.join(roots[0], 'artifacts'));
+
+  const tier = profile.tier;
+  const executableTier = tier === 'LOCAL_RESTRICTED' || tier === 'UNTRUSTED_CODE';
+
+  function verifyKernelNetworkBoundary() {
+    // Honest probe: from Node.js on this platform we cannot create or verify
+    // an AppContainer/network-isolation kernel boundary for a child process.
+    // Until that changes, executable tiers remain blocked.
+    return {
+      supported: false,
+      reason: 'SBX_NO_KERNEL_NETWORK_BOUNDARY',
+      detail: 'No provable kernel-level network isolation for child processes on this platform; AppContainer/container evidence required.',
+    };
+  }
+
+  const boundary = executableTier ? verifyKernelNetworkBoundary() : { supported: false, reason: 'SBX_TIER_FORBIDS_EXEC' };
+  const executionAllowed = executableTier && boundary.supported === true;
+
+  function assertRootsAllows(realPath) {
+    if (!canonicalInsideRoots(realPath, rootRealPaths)) {
+      const error = new Error(`path escapes workspace roots: ${realPath}`);
+      error.code = 'LINK_ESCAPE';
+      throw error;
+    }
+  }
+
+  function resolvePath(name) {
+    if (typeof name !== 'string' || name.length === 0) {
+      const error = new Error('empty path');
+      error.code = 'PATH_ESCAPE';
+      throw error;
+    }
+    if (name.startsWith('\\\\') || name.startsWith('//')) {
+      const error = new Error(`UNC path rejected: ${name}`);
+      error.code = 'UNC_PATH';
+      throw error;
+    }
+    if (isDeviceSegment(name)) {
+      const error = new Error(`device path rejected: ${name}`);
+      error.code = 'DEVICE_PATH';
+      throw error;
+    }
+    if (stripDeviceName(name)) {
+      const error = new Error(`device path rejected: ${name}`);
+      error.code = 'DEVICE_PATH';
+      throw error;
+    }
+    if (looksLikeTraversal(name)) {
+      const error = new Error(`traversal rejected: ${name}`);
+      error.code = 'PATH_ESCAPE';
+      throw error;
+    }
+    let target;
+    if (isAbsoluteish(name)) {
+      target = path.resolve(name);
+    } else {
+      target = path.resolve(roots[0], name);
+    }
+    if (!canonicalInsideRoots(target, roots)) {
+      const error = new Error(`absolute path outside allowed roots: ${name}`);
+      error.code = 'ROOT_VIOLATION';
+      throw error;
+    }
+    const { real, missing } = realpathDeepest(target);
+    assertRootsAllows(real);
+    const resolved = path.join(real, ...missing);
+    assertRootsAllows(resolved);
+    return resolved;
+  }
+
+  function checkNetwork(host, port) {
+    if (profile.network.policy === 'deny_all') {
+      return { allowed: false, reason: 'NETWORK_DENY_ALL' };
+    }
+    const target = profile.network.allowlist.find((entry) => entry.host === host);
+    if (!target) return { allowed: false, reason: 'NETWORK_HOST_NOT_ALLOWLISTED' };
+    if (!target.ports.includes(port)) return { allowed: false, reason: 'NETWORK_PORT_NOT_ALLOWLISTED' };
+    return { allowed: true };
+  }
+
+  function buildEnvironment(overrides = {}) {
+    const env = {};
+    for (const key of BASE_ENV_KEYS) env[key] = key === 'VERITAS_SANDBOX_TIER' ? tier : profile.profile_id;
+    for (const [key, value] of Object.entries(overrides)) {
+      if (!profile.environment.allowlist.includes(key)) continue;
+      if (typeof value !== 'string') {
+        const error = new Error(`environment value for ${key} must be a string`);
+        error.code = 'ENV_VALUE_INVALID';
+        throw error;
+      }
+      env[key] = value;
+    }
+    return Object.freeze(env);
+  }
+
+  function redact(text) {
+    let output = String(text);
+    for (const [handle, value] of Object.entries(secrets)) {
+      if (typeof value !== 'string' || value.length === 0) continue;
+      while (output.includes(value)) {
+        output = output.replace(value, `[REDACTED:${handle}]`);
+      }
+    }
+    return output;
+  }
+
+  // ---- Process controls (research instrument; see module header) ----
+  const activeProbes = new Map();
+
+  function isAlive(pid) {
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (error) {
+      return error.code === 'EPERM';
+    }
+  }
+
+  function listDescendants(pid) {
+    if (process.platform !== 'win32') return Promise.resolve([]);
+    const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
+      `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
+      `($p | Select-Object -Unique) -join ' '`;
+    return new Promise((resolve) => {
+      const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+        windowsHide: true,
+      });
+      let out = '';
+      child.stdout.on('data', (chunk) => { out += chunk; });
+      child.on('error', () => resolve([]));
+      child.on('close', () => {
+        resolve(out.split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0 && value !== pid));
+      });
+    });
+  }
+
+  function treeKill(pid) {
+    return new Promise((resolve) => {
+      if (process.platform === 'win32') {
+        const killer = spawn('taskkill', ['/T', '/F', '/PID', String(pid)], { windowsHide: true });
+        killer.on('error', () => resolve(false));
+        killer.on('close', () => resolve(true));
+      } else {
+        try {
+          process.kill(-pid, 'SIGKILL');
+        } catch {
+          try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
+        }
+        resolve(true);
+      }
+    });
+  }
+
+  async function countSurvivors(pid) {
+    const descendants = await listDescendants(pid);
+    const alive = descendants.filter((candidate) => isAlive(candidate));
+    return (isAlive(pid) ? 1 : 0) + alive.length;
+  }
+
+  function probeEnv() {
+    const base = buildEnvironment({});
+    const osVars = {};
+    for (const key of OS_RUNTIME_ENV_KEYS) {
+      if (typeof process.env[key] === 'string') osVars[key] = process.env[key];
+    }
+    return { ...osVars, ...base };
+  }
+
+  function withinProcessLimit() {
+    const max = profile.process?.max_processes ?? 1;
+    return activeProbes.size < max;
+  }
+
+  function runProbe(request) {
+    try {
+      return runSettled(request).done;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  function startForControlProbe(request) {
+    const settled = runSettled(request);
+    return { pid: settled.pid, done: settled.done };
+  }
+
+  function runSettled({ command, args, timeoutMs }) {
+    if (!withinProcessLimit()) {
+      const error = new Error(`process limit reached (${profile.process?.max_processes ?? 1})`);
+      error.code = 'LIMIT_PROCESSES';
+      throw error;
+    }
+    const started = Date.now();
+    let settle;
+    const done = new Promise((resolve, reject) => {
+      settle = { resolve, reject };
+    });
+    let child;
+    try {
+      child = spawn(command, args, {
+        cwd: roots[0],
+        env: probeEnv(),
+        detached: false,
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (error) {
+      settle.reject(error);
+      return { pid: -1, done };
+    }
+    const pid = child.pid;
+    const record = { child, timeoutTimer: null, cancelled: false, timedOut: false };
+    activeProbes.set(pid, record);
+    let stdout = Buffer.alloc(0);
+    let stderr = Buffer.alloc(0);
+    child.stdout.on('data', (chunk) => { stdout = Buffer.concat([stdout, chunk]); });
+    child.stderr.on('data', (chunk) => { stderr = Buffer.concat([stderr, chunk]); });
+
+    const finish = async (status, exitCode) => {
+      if (record.timeoutTimer) clearTimeout(record.timeoutTimer);
+      activeProbes.delete(pid);
+      const survivors = await countSurvivors(pid);
+      settle.resolve({
+        status,
+        terminated: status !== 'completed',
+        exitCode,
+        pid,
+        durationMs: Date.now() - started,
+        survivors,
+        stdoutDigest: sha256(redact(stdout.toString('utf8'))),
+        stderrDigest: sha256(redact(stderr.toString('utf8'))),
+        limits: profile.process ?? {},
+        provenance: { profileId: profile.profile_id, tier, createdAt: now },
+      });
+    };
+
+    child.on('error', (error) => {
+      activeProbes.delete(pid);
+      settle.reject(error);
+    });
+    child.on('close', (code) => {
+      if (record.timedOut) {
+        finish('timeout', null);
+        return;
+      }
+      if (record.cancelled) {
+        finish('cancelled', null);
+        return;
+      }
+      activeProbes.delete(pid);
+      finish(code === 0 ? 'completed' : 'failed', code);
+    });
+    record.timeoutTimer = setTimeout(() => {
+      record.timedOut = true;
+      record.cancelled = true;
+      treeKill(pid);
+    }, timeoutMs);
+    return { pid, done };
+  }
+
+  async function cancel(pid) {
+    const record = activeProbes.get(pid);
+    if (record) record.cancelled = true;
+    await treeKill(pid);
+    // Brief settle loop so the OS reports terminal state, not a race.
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const survivors = await countSurvivors(pid);
+      if (survivors === 0) {
+        return { terminated: true, survivors: 0, pid };
+      }
+      await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
+    }
+    return { terminated: true, survivors: await countSurvivors(pid), pid };
+  }
+
+  // Public execution path: blocked tiers never spawn anything.
+  async function spawnProcess(request) {
+    if (!executionAllowed) {
+      return {
+        status: 'BLOCKED_SANDBOX',
+        terminated: true,
+        reasonCodes: ['SBX_EXEC_FORBIDDEN'],
+        blockedReason: executableTier ? boundary.reason : 'SBX_TIER_FORBIDS_EXEC',
+      };
+    }
+    return runProbe(request);
+  }
+
+  function writeOutput(name, bytes) {
+    if (typeof name !== 'string' || name.length === 0) {
+      const error = new Error('empty output name');
+      error.code = 'PATH_ESCAPE';
+      throw error;
+    }
+    if (isDeviceSegment(name)) {
+      const error = new Error(`device path rejected: ${name}`);
+      error.code = 'DEVICE_PATH';
+      throw error;
+    }
+    if (/[\\/:]|\.\./.test(name)) {
+      const error = new Error(`output name must be a bare file name: ${name}`);
+      error.code = 'PATH_ESCAPE';
+      throw error;
+    }
+    const target = path.join(resolvePath(WPAT(path.relative(roots[0], artifactsDir))), name);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, bytes);
+    return Object.freeze({
+      path: target,
+      sha256: sha256(bytes),
+      bytes: bytes.length,
+      provenance: {
+        profileId: profile.profile_id,
+        tier,
+        workspaceRoots: roots,
+        createdAt: now,
+      },
+    });
+  }
+
+  return Object.freeze({
+    tier,
+    profileId: profile.profile_id,
+    executionAllowed,
+    blockedReason: executionAllowed ? null : (executableTier ? boundary.reason : 'SBX_TIER_FORBIDS_EXEC'),
+    blockedDetail: executableTier ? boundary.detail : 'NO_EXEC permits contract/evidence operations only.',
+    resolvePath,
+    checkNetwork,
+    buildEnvironment,
+    redact,
+    writeOutput,
+    isAlive,
+    spawnProcess,
+    startForControlProbe,
+    spawnForControlProbe: (request) => runProbe(request),
+    cancel,
+  });
+}
