@@ -1,4 +1,4 @@
-# S2-001 tracked file inventory
+# Veritas tracked file inventory
 
 Generated from `git ls-files`; count: 91.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.

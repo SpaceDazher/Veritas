@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "scope": "All tracked S2-001 payload and evidence files; self-referential metadata files are excluded explicitly",
+  "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "be2ddd03220322c6bdbedbf574a23f8e1d725c14",
-  "sourceTree": "0eff5bdb45707a7324b235417aefc9d6f8785e39",
+  "sourceCommit": "90a6b194d0f3d1d651541748512f8f2627ed9c89",
+  "sourceTree": "5d89bc1976bb2a68c9f70014fde036a7e8617d8e",
   "trackedFileCount": 91,
   "manifestFileCount": 88,
-  "payloadManifestSha256": "2beae34e29ae87b8c5fe4f19baf9df0145f0fd81884f2eb84f6d46a27e56b054",
-  "fileManifestSha256": "2cca47cf84017166f4e2a0db33edfc9b8d32089e12e00863450de3b148a892d6",
+  "payloadManifestSha256": "57b2a34427b409fb775649f62cc6f1e700f3561ecc99a27c7434e2ebb4ff0426",
+  "fileManifestSha256": "e1fe0dd2fe0060c036aebac82c7d360924c07db6ea4bc758ec79aa6f32439e99",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -181,8 +181,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "a2b04ad4f79d5e16b9c7477fd1706d4849a1f4ef6a59668d7763c78a90837414",
-      "bytes": 3402
+      "sha256": "288fd0ba4ab388a0eb392b1fca41d92cb88cd5dcb212bd59fb1fb03b516f5aa8",
+      "bytes": 3403
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -311,8 +311,8 @@
     },
     {
       "path": "scripts/check-inventory.mjs",
-      "sha256": "a7520aa2c30c1c109c9abd3b44fde3c85e9a4d2a55cefac867e106593e42d89f",
-      "bytes": 1611
+      "sha256": "73b7189dd581b66a10d9aac9eff7d09060f8a6621eb69fcd024844d17879dd39",
+      "bytes": 1612
     },
     {
       "path": "scripts/check-public-artifacts.mjs",
@@ -341,8 +341,8 @@
     },
     {
       "path": "scripts/generate-manifests.mjs",
-      "sha256": "c2aab221abed08097dec7c8e53dc1f093b7cdae064974b53219776489155f6e7",
-      "bytes": 4732
+      "sha256": "ef8a33628114c8d85d24fd76826f4789b68cf604da0d05104e0047981af8da13",
+      "bytes": 4733
     },
     {
       "path": "scripts/git-client.mjs",
