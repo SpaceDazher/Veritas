@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 113.
+Generated from `git ls-files`; count: 124.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -54,6 +54,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/public-artifact-check.json`
 - `evidence/root-manifest.json`
 - `evidence/s2-001-pilot-binding.json`
+- `evidence/s2-002-comparison-integrity.json`
+- `evidence/s2-002-comparison.json`
+- `evidence/s2-002-run-a.json`
+- `evidence/s2-002-run-b.json`
 - `evidence/s2-002-security-probes.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
@@ -74,6 +78,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `pilots/scenario-b/task-brief.json`
 - `postcss.config.mjs`
 - `README.md`
+- `results/s2-002/run-a/observations.json`
+- `results/s2-002/run-a/summary.json`
+- `results/s2-002/run-b/observations.json`
+- `results/s2-002/run-b/summary.json`
 - `scripts/acceptance-gate.mjs`
 - `scripts/check-inventory.mjs`
 - `scripts/check-public-artifacts.mjs`
@@ -84,12 +92,14 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/generate-manifests.mjs`
 - `scripts/git-client.mjs`
 - `scripts/policy-probes.mjs`
+- `scripts/s2-002-run.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
 - `scripts/validate-contracts.mjs`
 - `scripts/verify-clean-checkout.mjs`
 - `scripts/verify-pilot-binding.mjs`
+- `scripts/verify-s2-002.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-cli.mjs`
 - `src/app/api/board/route.ts`
@@ -113,6 +123,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/policy-engine.test.mjs`
+- `tests/identity/replay-runs.test.mjs`
 - `tests/identity/sandbox.test.mjs`
 - `tests/identity/security-probes.test.mjs`
 - `tsconfig.json`

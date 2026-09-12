@@ -34,6 +34,21 @@ failure was masked. The failing behavior that motivated each mutation is
 covered by other tests in the same suite (ownership matrix, default deny,
 audit document checks).
 
-## Entry 2 — pending
+## Entry 2 — phase 5 (independent replay), RED→GREEN cycle
+
+Scope: `tests/identity/replay-runs.test.mjs` only, written before the runner
+existed and reconciled while it still failed:
+
+1. `runCorpus` is asynchronous (the corpus contains the live cancellation
+   probe), so the two corpus executions moved to module top-level `await`
+   instead of synchronous calls inside `describe`. No expectation changed.
+2. Import path corrected from `../../../scripts/...` to `../../scripts/...`
+   (test file lives at `tests/identity/`, not `tests/identity/<subdir>`).
+   Import-resolution fix only.
+
+Both mutations are mechanical harness corrections made while the suite was
+still RED; no oracle was weakened and no failing behaviour was masked.
+
+## Entry 3 — pending
 
 No further entries yet.

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "runId": "run-b",
+  "executorId": "exec-beta",
+  "nonceBase": "nb-beta-c91d",
+  "outputRoot": "D:\\Project\\AgentOS\\.codex-work\\veritas-stage2\\results\\s2-002\\run-b",
+  "corpusDigest": "99cf1057121489ca99b8a29a0f89e3eb647d0275a8d338c9a9c69a06e4f5dab0",
+  "fixedClock": "2026-09-12T12:00:00.000Z",
+  "policyVersion": "s2-002-policy-v1",
+  "platform": "win32/x64 node v22.23.2",
+  "trialCount": 280,
+  "counters": {
+    "cross_tenant_success": 0,
+    "authority_expansion": 0,
+    "fs_network_secret_escapes": 0,
+    "survivors_after_cancellation": 0,
+    "allow_after_revocation_commit": 0,
+    "missing_or_censored_trials": 0
+  },
+  "revocationLatency": {
+    "trials": 100,
+    "maxMs": 0.0562,
+    "meanMs": 0.009717999999999994,
+    "allowAfterCommit": 0
+  }
+}

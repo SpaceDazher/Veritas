@@ -1,0 +1,3585 @@
+[
+  {
+    "trialId": "acl/prn-owner-alice/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-alice/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-alice/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-alice/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-alice/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-alice/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-alice/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-bob/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-bob",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-carol/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-carol",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-dave/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-dave",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-owner-eve/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-owner-eve",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-alice/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-bob/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-bob",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-carol/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-dave/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-agent-eve/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-agent-eve",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-codex/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-pi/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-opencode/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-opencode",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-external-hermes/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-collector/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-curator/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-analyst/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-experimenter/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-verifier/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-alice-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-alice-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-bob-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-bob-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-carol-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-carol-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-dave-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-dave-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-eve-private",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-eve-private",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-veritas-project",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-veritas-project",
+    "action": "board.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "acl/prn-platform-operator/ws-shared-library",
+    "kind": "acl_matrix",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/alice/task.create/own",
+    "kind": "capability",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "task.create",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/alice/task.update/own-lease-waiver",
+    "kind": "capability",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "task.update",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH",
+      "LEASE_WAIVED_OWNER"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/alice/approval.decide/agent-produced",
+    "kind": "capability",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "approval.decide",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/alice/approval.decide/self-produced",
+    "kind": "capability",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "approval.decide",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "SELF_APPROVAL"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/alice/message.send/own",
+    "kind": "capability",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "message.send",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/agent-alice/message.send/ungranted",
+    "kind": "capability",
+    "principalId": "prn-agent-alice",
+    "workspaceId": "ws-alice-private",
+    "action": "message.send",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/pi/task.update/project-lease",
+    "kind": "capability",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-veritas-project",
+    "action": "task.update",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID",
+      "LEASE_FRESH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/codex/task.create/project-grant",
+    "kind": "capability",
+    "principalId": "prn-external-codex",
+    "workspaceId": "ws-veritas-project",
+    "action": "task.create",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/curator/claim.write/project-lease",
+    "kind": "capability",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-veritas-project",
+    "action": "claim.write",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH",
+      "LEASE_FRESH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/analyst/summary.generate/no-lease",
+    "kind": "capability",
+    "principalId": "prn-platform-analyst",
+    "workspaceId": "ws-veritas-project",
+    "action": "summary.generate",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "LEASE_REQUIRED"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/experimenter/tool.execute/blocked-tier",
+    "kind": "capability",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-veritas-project",
+    "action": "tool.execute",
+    "expected": "BLOCKED_SANDBOX",
+    "decision": "BLOCKED_SANDBOX",
+    "reasonCodes": [
+      "SBX_NO_OS_EVIDENCE"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/experimenter/tool.discover/read",
+    "kind": "capability",
+    "principalId": "prn-platform-experimenter",
+    "workspaceId": "ws-veritas-project",
+    "action": "tool.discover",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/operator/task.cancel/project",
+    "kind": "capability",
+    "principalId": "prn-platform-operator",
+    "workspaceId": "ws-veritas-project",
+    "action": "task.cancel",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/verifier/artifact.read/project",
+    "kind": "capability",
+    "principalId": "prn-platform-verifier",
+    "workspaceId": "ws-veritas-project",
+    "action": "artifact.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/collector/source.read/shared",
+    "kind": "capability",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-shared-library",
+    "action": "source.read",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/collector/board.read/shared-ungranted",
+    "kind": "capability",
+    "principalId": "prn-platform-collector",
+    "workspaceId": "ws-shared-library",
+    "action": "board.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/agent-dave/task.create/grant",
+    "kind": "capability",
+    "principalId": "prn-agent-dave",
+    "workspaceId": "ws-dave-private",
+    "action": "task.create",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/hermes/search.query/expired-grant",
+    "kind": "capability",
+    "principalId": "prn-external-hermes",
+    "workspaceId": "ws-veritas-project",
+    "action": "search.query",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_EXPIRED"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "cap/pi/source.read/bob-private-cross-tenant",
+    "kind": "capability",
+    "principalId": "prn-external-pi",
+    "workspaceId": "ws-bob-private",
+    "action": "source.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": true,
+    "match": true
+  },
+  {
+    "trialId": "cap/alice/cache.read/bob-private-cross-tenant",
+    "kind": "capability",
+    "principalId": "prn-owner-alice",
+    "workspaceId": "ws-bob-private",
+    "action": "cache.read",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "NO_ACCESS"
+    ],
+    "crossTenant": true,
+    "match": true
+  },
+  {
+    "trialId": "derived/curator/benign-same-ws",
+    "kind": "capability",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-veritas-project",
+    "action": "summary.generate",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "ACL_ROLE_MATCH",
+      "LEASE_FRESH"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "derived/curator/poison-bob-claim",
+    "kind": "capability",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-veritas-project",
+    "action": "summary.generate",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "CROSS_TENANT_INPUT"
+    ],
+    "crossTenant": true,
+    "match": true
+  },
+  {
+    "trialId": "derived/curator/poison-dave-cache",
+    "kind": "capability",
+    "principalId": "prn-platform-curator",
+    "workspaceId": "ws-veritas-project",
+    "action": "cache.write",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "CROSS_TENANT_INPUT"
+    ],
+    "crossTenant": true,
+    "match": true
+  },
+  {
+    "trialId": "nonce/export/first",
+    "kind": "capability",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-carol-private",
+    "action": "artifact.export",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "GRANT_VALID"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "nonce/export/replay",
+    "kind": "capability",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-carol-private",
+    "action": "artifact.export",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_NONCE_CONSUMED"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "nonce/export/replay-with-nonce",
+    "kind": "capability",
+    "principalId": "prn-agent-carol",
+    "workspaceId": "ws-carol-private",
+    "action": "artifact.export",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_NONCE_CONSUMED"
+    ],
+    "crossTenant": false,
+    "match": true
+  },
+  {
+    "trialId": "sandbox/fs-traversal",
+    "kind": "sandbox",
+    "expected": "PATH_ESCAPE",
+    "observed": "PATH_ESCAPE",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/fs-absolute-outside",
+    "kind": "sandbox",
+    "expected": "ROOT_VIOLATION",
+    "observed": "ROOT_VIOLATION",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/fs-unc",
+    "kind": "sandbox",
+    "expected": "UNC_PATH",
+    "observed": "UNC_PATH",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/fs-device",
+    "kind": "sandbox",
+    "expected": "DEVICE_PATH",
+    "observed": "DEVICE_PATH",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/fs-inside-ok",
+    "kind": "sandbox",
+    "expected": "INSIDE",
+    "observed": "INSIDE",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/net-deny-all",
+    "kind": "sandbox",
+    "expected": "DENIED",
+    "observed": "DENIED",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/net-deny-localhost",
+    "kind": "sandbox",
+    "expected": "DENIED",
+    "observed": "DENIED",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/env-allowlist",
+    "kind": "sandbox",
+    "expected": "FILTERED",
+    "observed": "FILTERED",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/secret-redaction",
+    "kind": "sandbox",
+    "expected": "REDACTED",
+    "observed": "REDACTED",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/output-digest-provenance",
+    "kind": "sandbox",
+    "expected": "RECORDED",
+    "observed": "RECORDED",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/output-name-escape",
+    "kind": "sandbox",
+    "expected": "PATH_ESCAPE",
+    "observed": "PATH_ESCAPE",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/no-exec-refuses-execution",
+    "kind": "sandbox",
+    "expected": "BLOCKED",
+    "observed": "BLOCKED",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/fs-junction-escape",
+    "kind": "sandbox",
+    "expected": "LINK_ESCAPE",
+    "observed": "LINK_ESCAPE",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "match": true
+  },
+  {
+    "trialId": "sandbox/cancellation-survivors",
+    "kind": "sandbox",
+    "expected": "SURVIVORS_ZERO",
+    "observed": "SURVIVORS_ZERO",
+    "decision": "ALLOW",
+    "reasonCodes": [
+      "SANDBOX_CONTROL_AS_EXPECTED"
+    ],
+    "survivors": 0,
+    "match": true
+  },
+  {
+    "trialId": "revocation/000",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0597,
+    "match": true
+  },
+  {
+    "trialId": "revocation/001",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0123,
+    "match": true
+  },
+  {
+    "trialId": "revocation/002",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.012,
+    "match": true
+  },
+  {
+    "trialId": "revocation/003",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0099,
+    "match": true
+  },
+  {
+    "trialId": "revocation/004",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0125,
+    "match": true
+  },
+  {
+    "trialId": "revocation/005",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0093,
+    "match": true
+  },
+  {
+    "trialId": "revocation/006",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/007",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0097,
+    "match": true
+  },
+  {
+    "trialId": "revocation/008",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0099,
+    "match": true
+  },
+  {
+    "trialId": "revocation/009",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0105,
+    "match": true
+  },
+  {
+    "trialId": "revocation/010",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0097,
+    "match": true
+  },
+  {
+    "trialId": "revocation/011",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0101,
+    "match": true
+  },
+  {
+    "trialId": "revocation/012",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0095,
+    "match": true
+  },
+  {
+    "trialId": "revocation/013",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/014",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0094,
+    "match": true
+  },
+  {
+    "trialId": "revocation/015",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0098,
+    "match": true
+  },
+  {
+    "trialId": "revocation/016",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0101,
+    "match": true
+  },
+  {
+    "trialId": "revocation/017",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0099,
+    "match": true
+  },
+  {
+    "trialId": "revocation/018",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0112,
+    "match": true
+  },
+  {
+    "trialId": "revocation/019",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.01,
+    "match": true
+  },
+  {
+    "trialId": "revocation/020",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0095,
+    "match": true
+  },
+  {
+    "trialId": "revocation/021",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/022",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/023",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/024",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/025",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/026",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/027",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/028",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/029",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/030",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/031",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0094,
+    "match": true
+  },
+  {
+    "trialId": "revocation/032",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/033",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/034",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/035",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0107,
+    "match": true
+  },
+  {
+    "trialId": "revocation/036",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0094,
+    "match": true
+  },
+  {
+    "trialId": "revocation/037",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/038",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/039",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/040",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/041",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/042",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.014,
+    "match": true
+  },
+  {
+    "trialId": "revocation/043",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/044",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/045",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0116,
+    "match": true
+  },
+  {
+    "trialId": "revocation/046",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/047",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/048",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/049",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/050",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/051",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/052",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/053",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/054",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/055",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/056",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/057",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/058",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/059",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/060",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/061",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/062",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/063",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/064",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/065",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/066",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/067",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/068",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/069",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/070",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0097,
+    "match": true
+  },
+  {
+    "trialId": "revocation/071",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/072",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/073",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/074",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0362,
+    "match": true
+  },
+  {
+    "trialId": "revocation/075",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/076",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/077",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/078",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0095,
+    "match": true
+  },
+  {
+    "trialId": "revocation/079",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/080",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0093,
+    "match": true
+  },
+  {
+    "trialId": "revocation/081",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/082",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/083",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/084",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/085",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0089,
+    "match": true
+  },
+  {
+    "trialId": "revocation/086",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/087",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/088",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/089",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/090",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/091",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/092",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/093",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0099,
+    "match": true
+  },
+  {
+    "trialId": "revocation/094",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/095",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/096",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.009,
+    "match": true
+  },
+  {
+    "trialId": "revocation/097",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  },
+  {
+    "trialId": "revocation/098",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0091,
+    "match": true
+  },
+  {
+    "trialId": "revocation/099",
+    "kind": "revocation_latency",
+    "expected": "DENY",
+    "decision": "DENY",
+    "reasonCodes": [
+      "GRANT_REVOKED"
+    ],
+    "latencyMs": 0.0092,
+    "match": true
+  }
+]
