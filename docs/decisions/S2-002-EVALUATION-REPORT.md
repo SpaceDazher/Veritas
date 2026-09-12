@@ -2,7 +2,7 @@
 
 Ticket: `tasks/S2-002_IDENTITY_SANDBOX.md` — identity, agent rights and the
 local sandbox gate. Branch: `codex/s2-002-identity-sandbox`.
-Verdict: **PASS_WITH_LIMITS** (after one corrective round; see §8). Live code
+Verdict: **PASS_WITH_LIMITS** (after two corrective rounds; see §8). Live code
 execution remains **BLOCKED_SANDBOX**.
 
 ## 0. Corrective round — response to the independent REVISE review
