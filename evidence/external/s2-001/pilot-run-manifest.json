@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "decisionInput": true,
+  "taskId": "S2-001-AI-PRODUCTION-TASK-v2",
+  "status": "IN_REVIEW",
+  "taskRevision": 6,
+  "submissionDigest": "d3b3e32a90a6f26efc0a654d239feed8fe98d1101a949ad6e572ebea4f0a9048",
+  "eventCount": 6,
+  "priorGlobalEventHash": "ebac0d5fd1f2e1a832cd5168bdc02ea22366d7d7d2cf6d8714ac12a28598c7a9",
+  "firstEventHash": "3ede9f2156f7e1740925f04ae97958b3b4f5293760501290271e79341bb3cae5",
+  "lastEventHash": "895e3869324b54c5cc63b645895ad39feaa9ea4ebe078515adf0cfa4e8a5bc64",
+  "chainLinked": true,
+  "agents": {
+    "codex": {
+      "processId": 13288,
+      "provider": "openai-codex",
+      "model": "gpt-5.6-sol",
+      "outputSha256": "4a64bf5e57e8fdfad2d1d3a80525697fb0913ad8061790add2fe0599fe30b738",
+      "artifactSha256": "6c5d57be7bd48853b9b8bba24d1354285bdf5c0c64673a20f4d55101ecffafb1"
+    },
+    "pi": {
+      "processId": 24360,
+      "provider": "zai-coding-cn",
+      "model": "glm-5.3-flash",
+      "reviewVerdict": "PASS_WITH_LIMITS",
+      "outputSha256": "0a0af5fdeea0895b7f18988fd4c5169b38db0a70f5bf28a59b62049f27e5b9a2",
+      "artifactSha256": "ba836a1fcc13b0ef56ec47192d35eadc3ea8bce8b6bd2d551881da6b06cd5f5d"
+    }
+  },
+  "processSeparated": true,
+  "sourceManifestSha256": "82c6d1db52d6b0f78e164cb6d6f9277e9ed7e0611be63504452859a235bc19ba",
+  "environmentDigest": "8361bf276f0bc879e04939c2461658a56ad062723c49e007ac617c0207209850",
+  "migrationSha256": "2c27a51da924e6b3b2f4c7c925ce110f6774a441e508eef1ee4454ad8511d51d",
+  "modelCallsExecuted": 2,
+  "incrementalPaidApiBudgetAuthorizedUsd": 0,
+  "observedIncrementalProviderChargeUsd": null,
+  "productionDeployed": false,
+  "humanDecisionRecorded": false,
+  "rawTranscriptsCommitted": false,
+  "limitations": [
+    "the output is a reviewed blueprint, not a deployed application",
+    "subscription CLIs expose no per-call billing telemetry",
+    "both agent processes ran on the same host"
+  ],
+  "verdict": "AWAITING_HUMAN_DECISION",
+  "pilotRunDigest": "2e7d5dc4b1db49fb96dabc3d2f384285efb742400522814e05148e77bc065aad"
+}

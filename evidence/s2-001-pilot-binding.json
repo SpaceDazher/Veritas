@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "ticketId": "S2-001",
+  "result": "PASS_WITH_LIMITS",
+  "upstream": {
+    "repository": "SpaceDazher/Veritas-AI-Production-Pilot",
+    "pullRequest": "https://github.com/SpaceDazher/Veritas-AI-Production-Pilot/pull/1",
+    "mainCommit": "6845858bccf3aec27c656649ac40ad01148e7505",
+    "treeSha": "b5341a37be08b318f28015cf83afeb106fe4138b"
+  },
+  "artifacts": [
+    {
+      "upstreamPath": "evidence/pilot-closure-manifest.json",
+      "snapshotPath": "evidence/external/s2-001/pilot-closure-manifest.json",
+      "upstreamFileSha256": "e8e1118addb771253460245e096177534c6397a0df307aeb95f0d2cd4effa0cd",
+      "canonicalJsonSha256": "4164ecd2c4bf4af896633cdf823934e6a2d90bc3fe5b6887525c09aae1203953"
+    },
+    {
+      "upstreamPath": "evidence/clean-checkout.json",
+      "snapshotPath": "evidence/external/s2-001/clean-checkout.json",
+      "upstreamFileSha256": "c2ac6517e19c9d898d3843f8fc6855b60cf075d77a59b4c33deb96955375a7e1",
+      "canonicalJsonSha256": "2e72562a0e3e33ddb42ce749fc13409341a430c297e2f03eb7f6657687d41e96"
+    },
+    {
+      "upstreamPath": "pilot/acceptance-cases.json",
+      "snapshotPath": "evidence/external/s2-001/acceptance-cases.json",
+      "upstreamFileSha256": "057b1adebb5db547966c3345584ea854710e7b583093bda0875f24b44405cecc",
+      "canonicalJsonSha256": "cbcd664832a2516b4894d57c49d68b749b66bfc97804e7cd5e1beba69827d1b1"
+    },
+    {
+      "upstreamPath": "evidence/pilot-run-manifest.json",
+      "snapshotPath": "evidence/external/s2-001/pilot-run-manifest.json",
+      "upstreamFileSha256": "4abb5676e22cf10bc101f66995d514b8faa859bed5e1d550566bb7c40b54c96b",
+      "canonicalJsonSha256": "0ad20ab1130c23755170e1b0f2944958ed924be87ef89b28353612e1f7333d23"
+    }
+  ],
+  "scenarioA": {
+    "status": "PASS_WITH_LIMITS",
+    "taskStatus": "DONE",
+    "realAgentProcesses": 2,
+    "cleanArchiveTests": 54,
+    "humanSolutionApproval": true
+  },
+  "scenarioB": {
+    "status": "CONTRACT_ONLY_NOT_EXECUTED",
+    "reason": "Scenario B depends on the Stage 2 ingestion, provenance, synthesis and verifier tickets."
+  },
+  "remainingLimitations": [
+    "ambiguous external side-effect reconciliation was not exercised",
+    "subscription CLIs exposed no per-call billing telemetry",
+    "both real agent processes ran on one host",
+    "no production deployment was authorized or performed"
+  ],
+  "productionDeploymentAuthorized": false,
+  "bindingDigest": "b5e463416eccc79c5107f01acb0e5f75e1005de202f700018cd31ee876e525f7"
+}

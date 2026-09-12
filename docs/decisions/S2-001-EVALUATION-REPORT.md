@@ -1,13 +1,20 @@
 # S2-001 · Evaluation report
 
-## Honest verdict: BLOCKED for complete pilot acceptance
+## Honest latest verdict: PASS_WITH_LIMITS
 
-**PASS_WITH_LIMITS for the delivered draft-contract and local synthetic-workspace
-checks. S2-001 is not declared fully accepted, no issue closure, no production
-readiness.** Scenario A project is approved; concrete execution access, budgets,
-model availability and source selection are not. Scenario B has an approved topic
-but no exact question/documents. Drafts are saved, not silently promoted to frozen
-approved experiments. No paid/provider experiments or real agent runs occurred.
+The original draft-contract and local synthetic-workspace run below correctly ended
+BLOCKED. A later, separate public scenario A pilot supplied the previously missing
+real Codex/pi execution and named human solution decision. Its immutable evidence is
+frozen under `evidence/external/s2-001/` and verified by
+`npm run verify:pilot-binding`; the upstream merge commit is
+`6845858bccf3aec27c656649ac40ad01148e7505`.
+
+S2-001 is therefore closed as PASS_WITH_LIMITS, not production-ready. Scenario B was
+not executed and remains dependent on S2-003 through S2-006. Ambiguous external
+side-effect reconciliation and exact per-call subscription billing remain unproven;
+both agents ran on the same host. No production deployment was authorized or made.
+
+## Historical draft evaluation
 
 Branch: `codex/s2-001-product-contract`. Upstream baseline:
 `57ce8a4a6a607c4a421ee12dc49c6dd854d404b5` (README only). First schema/acceptance

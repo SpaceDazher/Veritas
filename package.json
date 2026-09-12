@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "verify:draft": "node scripts/verify.mjs draft",
     "verify:acceptance": "node scripts/verify.mjs acceptance",
+    "verify:pilot-binding": "node scripts/verify-pilot-binding.mjs",
     "verify:clean-checkout": "node scripts/verify-clean-checkout.mjs",
     "test:policy": "node scripts/policy-probes.mjs",
     "test:acceptance-gate": "node scripts/acceptance-gate.mjs --test",

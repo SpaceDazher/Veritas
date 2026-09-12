@@ -4,10 +4,18 @@ Ad Veritatem · От источников — к знаниям. От гипот
 
 ## S2-001 — Product contract and control scenarios
 
-**Contract drafts delivered; real pilot execution: NEEDS_INPUT / BLOCKED.**
-Approved scenario A project: **Veritas Agent Board**. No approved numeric budgets,
-verified model access, selected private sources or authenticated final decision owner
-have been supplied. No paid experiments or real agent runs are performed.
+**Ticket result: PASS_WITH_LIMITS.** The product contract is published and scenario A
+was executed in the public
+[Veritas-AI-Production-Pilot](https://github.com/SpaceDazher/Veritas-AI-Production-Pilot)
+repository with real Codex and pi processes, PostgreSQL canonical state, a
+digest-bound human solution approval and a clean-archive replay. The upstream result
+is bound here by `evidence/s2-001-pilot-binding.json` to merge commit
+`6845858bccf3aec27c656649ac40ad01148e7505`.
+
+This is not production approval. Scenario B remains a frozen contract and is not
+executed; it depends on the Stage 2 ingestion, provenance, synthesis and verifier
+tickets. The original synthetic workspace evidence remains historical and must not
+be reinterpreted as a real local adapter run.
 
 Start with [Product Contract](docs/product/PRODUCT_CONTRACT.md),
 [Open Decisions](docs/decisions/OPEN_DECISIONS.md),
@@ -60,8 +68,11 @@ NEEDS_INPUT; no speculative Codex/pi credentials or provider calls are supplied.
   adversarial probes). No semantic calibration claim.
 - `npm run verify:draft`: deterministic contract, policy, inventory, public-artifact,
   typecheck, build and audit checks; returns `PASS_WITH_LIMITS` while pilots are blocked.
-- `npm run verify:acceptance`: returns nonzero `BLOCKED` while `pilotExecutions=0`,
-  Scenario A/B are `NEEDS_INPUT`, or `execution_authorized=false`.
+- `npm run verify:pilot-binding`: verifies the frozen external pilot snapshots,
+  upstream commit/tree binding, canonical evidence digests and production boundary.
+- `npm run verify:acceptance`: still returns nonzero `BLOCKED` for this repository's
+  synthetic local workspace. The completed external scenario A pilot is evaluated
+  by `verify:pilot-binding`; it does not turn the demo into a production runner.
 - `node scripts/synthetic-smoke.mjs`: offline synthetic smoke only. Database/browser
   smoke remains `NOT_RUN` unless a dedicated PostgreSQL URL and local server are
   explicitly available; no screenshots or real pilot results are claimed.

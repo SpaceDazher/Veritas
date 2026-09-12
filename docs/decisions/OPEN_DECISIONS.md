@@ -2,6 +2,11 @@
 
 Project A is selected. The following are unresolved; no absence grants permission.
 
+Scenario A execution-specific inputs were resolved in the bounded external pilot and
+are frozen in `evidence/s2-001-pilot-binding.json`. The entries below are preserved as
+the original local-workspace decision record; they still block new executions unless
+a new task supplies its own scoped grants. Scenario B entries remain unresolved.
+
 ## target_revision
 ```yaml
 status: NEEDS_INPUT

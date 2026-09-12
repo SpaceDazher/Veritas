@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS_WITH_LIMITS",
+  "cases": [
+    {"id": "AC-01", "criterion": "Codex and pi expose manifests valid against the same frozen adapter contract", "status": "PASS", "evidence": "evidence/agent-execution-manifest.json"},
+    {"id": "AC-02", "criterion": "The provider-neutral CLI implements every required operation and error", "status": "PASS_WITH_LIMITS", "evidence": "contracts/adapter-contract.json", "limitation": "Unknown external side-effect outcomes were not exercised against a production adapter."},
+    {"id": "AC-03", "criterion": "The runner permits exactly one active job", "status": "PASS", "evidence": "migrations/002_command_path.sql"},
+    {"id": "AC-04", "criterion": "Canonical PostgreSQL state and append-only events replay to the same task state", "status": "PASS", "evidence": "evidence/pilot-closure-manifest.json"},
+    {"id": "AC-05", "criterion": "Every transition enforces expected revision, lease and fencing semantics", "status": "PASS", "evidence": "tests/control-plane.test.mjs"},
+    {"id": "AC-06", "criterion": "Unknown side-effect outcomes require reconciliation and cannot be blindly retried", "status": "NOT_PROVEN", "limitation": "The blueprint specifies reconciliation, but the bounded pilot executed no ambiguous external side effect."},
+    {"id": "AC-07", "criterion": "Agents cannot write DONE or approve their own result", "status": "PASS", "evidence": "evidence/pilot-closure-manifest.json"},
+    {"id": "AC-08", "criterion": "One real task reaches IN_REVIEW with complete artifacts and evidence", "status": "PASS", "evidence": "evidence/pilot-run-manifest.json"},
+    {"id": "AC-09", "criterion": "Observed paid API cost is exactly USD 0", "status": "NOT_PROVEN", "limitation": "Incremental paid API budget was zero, but subscription CLIs exposed no per-call billing telemetry."},
+    {"id": "AC-10", "criterion": "Failure, cancellation and restart preserve safety invariants", "status": "PASS_WITH_LIMITS", "evidence": "evidence/pilot-run-attempt-v1.json", "limitation": "Fail-closed terminalization was observed; cancellation and process restart were not exercised end to end."},
+    {"id": "AC-11", "criterion": "A clean checkout reproduces contract tests and the pilot verdict", "status": "PASS", "evidence": "evidence/clean-checkout.json"},
+    {"id": "AC-12", "criterion": "A named human records the final approve, revise or reject decision", "status": "PASS", "evidence": "evidence/pilot-closure-manifest.json"}
+  ]
+}

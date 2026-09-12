@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "CLEAN_CHECKOUT_REPLAY",
+  "status": "PASS",
+  "repository": "SpaceDazher/Veritas-AI-Production-Pilot",
+  "branch": "codex/s2-001-ai-production-pilot",
+  "commitSha": "cfdf7113b7ef9ac9347647de4a68edef39185b5c",
+  "treeSha": "828202bffed719b6534ac7601ea60a8217db5271",
+  "method": "git archive --format=zip HEAD followed by isolated extraction",
+  "command": "npm test",
+  "exitCode": 0,
+  "testsPassed": 53,
+  "testsFailed": 0,
+  "verdict": "PASS_PILOT_COMPLETE_WITH_LIMITS",
+  "sourceSnapshotHashesVerified": true,
+  "pilotEvidenceHashesVerified": true,
+  "productionDeploymentAuthorized": false,
+  "evidenceDigest": "ef464cea8ee2245475374a9a6e2fc7ffa4e79f62996bbfa86239fc2346722943"
+}

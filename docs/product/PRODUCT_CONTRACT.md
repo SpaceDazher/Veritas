@@ -1,6 +1,6 @@
 # Veritas · Product Contract v1.0.0
 
-Ticket S2-001. Status: DRAFT / NEEDS_INPUT for pilot execution. This is a testable specification, not a production certification. The user approved **Veritas Agent Board** as scenario A's project. No authority to spend, obtain credentials, deploy or import personal data follows from that approval.
+Ticket S2-001. Status: PASS_WITH_LIMITS. This is a testable specification, not a production certification. The user approved **Veritas Agent Board** as scenario A's project and later approved the bounded Solution Blueprint produced by the separate public pilot. The approval is bound to that solution digest only: it grants no production deployment, new spending, credential acquisition or personal-data import authority. Scenario B remains contract-only until its Stage 2 dependencies are implemented.
 
 ## Product boundary
 Veritas owns canonical versioned knowledge, source selection, TaskBrief, policies, experiment registration, evidence, decisions and the human/agent task board. AgentOS is a separate executor connected through `veritas.execution/1.0.0`, not a second canonical database and not an approval authority. Stage 1 research verdicts may be evidence, never permission to execute or deploy.

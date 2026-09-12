@@ -56,6 +56,10 @@ const directPublic = async () => {
   await directImport('./check-public-artifacts.mjs');
   return {exitCode: 0, status: 'PASS'};
 };
+const directPilotBinding = async () => {
+  await directImport('./verify-pilot-binding.mjs');
+  return {exitCode: 0, status: 'PASS'};
+};
 const directTypecheck = () => {
   const config = ts.readConfigFile(path.join(root, 'tsconfig.json'), ts.sys.readFile);
   const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, root);
@@ -117,6 +121,7 @@ checks.push(await run('contracts', 'node', ['scripts/validate-contracts.mjs'], (
 checks.push(await run('synthetic-smoke', 'node', ['scripts/synthetic-smoke.mjs'], () => directSynthetic()));
 checks.push(await run('inventory', 'node', ['scripts/check-inventory.mjs'], () => directInventory()));
 checks.push(await run('public-artifacts', 'node', ['scripts/check-public-artifacts.mjs'], () => directPublic()));
+checks.push(await run('external-pilot-binding', 'node', ['scripts/verify-pilot-binding.mjs'], () => directPilotBinding()));
 checks.push(await run('typecheck', 'npm', ['run', 'typecheck'], directTypecheck));
 checks.push(await run('build', 'npm', ['run', 'build'], () => directBuild()));
 checks.push(await run('runtime-audit', 'npm', ['audit', '--omit=dev', '--json'], () => auditEvidence('runtime-audit', 'evidence/dependency-audit-runtime.json')));
@@ -139,9 +144,10 @@ const acceptanceVerdict = acceptance.verdict;
 const overallVerdict = mode === 'acceptance' ? acceptanceVerdict : draftVerdict;
 const exitCode = mode === 'acceptance' ? (acceptanceVerdict === 'BLOCKED' ? 1 : 0) : (overallVerdict === 'PASS_WITH_LIMITS' ? 0 : 1);
 const limitations = [
-  'pilotExecutions=0; no real Codex/pi or other agent adapter run',
-  'Scenario A/B remain NEEDS_INPUT and execution_authorized=false',
-  'No authenticated human final approval, paid model call, private source import or production rollout',
+  'The local workspace remains synthetic with pilotExecutions=0; the real scenario A run is frozen as separately verified external evidence',
+  'Scenario B remains contract-only and depends on S2-003 through S2-006',
+  'The human approval covers the bounded Solution Blueprint only; no private source import or production rollout is authorized',
+  'Ambiguous external side-effect reconciliation and exact per-call subscription billing remain unproven',
   'Database/browser workspace smoke is not claimed unless a dedicated DATABASE_URL and local server are explicitly available',
 ];
 if (checks.find((check) => check.id === 'build')?.status === 'NOT_RUN_BUILD_ENVIRONMENT') limitations.push('production build was not completed because the sandbox lacks a valid worker/database environment');
