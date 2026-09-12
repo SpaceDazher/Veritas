@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked S2-001 payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "a98cce6779cd80a126e598b8004714e3f8242c54",
-  "sourceTree": "c60ccaea4b873e7fc56f679b96507b371dbf482c",
-  "trackedFileCount": 90,
-  "manifestFileCount": 87,
-  "payloadManifestSha256": "515a71f506e9771f5198b0a8048ae46ba0d54d4531dd79bccea35e85c26886f0",
-  "fileManifestSha256": "be0524d832f81abe70b599fa81552f322b7a094b98c73f29bda1383cbc2d8505",
+  "sourceCommit": "be2ddd03220322c6bdbedbf574a23f8e1d725c14",
+  "sourceTree": "0eff5bdb45707a7324b235417aefc9d6f8785e39",
+  "trackedFileCount": 91,
+  "manifestFileCount": 88,
+  "payloadManifestSha256": "2beae34e29ae87b8c5fe4f19baf9df0145f0fd81884f2eb84f6d46a27e56b054",
+  "fileManifestSha256": "2cca47cf84017166f4e2a0db33edfc9b8d32089e12e00863450de3b148a892d6",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -181,8 +181,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "9d00995638e458acf6d89e602812d543682e04f5e7613a7787d3937e9799958a",
-      "bytes": 3365
+      "sha256": "a2b04ad4f79d5e16b9c7477fd1706d4849a1f4ef6a59668d7763c78a90837414",
+      "bytes": 3402
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -301,8 +301,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "1a33602d7da8ec14f89143bbed98b7995614305a29e7fe6d6aec463b12d96b0e",
-      "bytes": 5635
+      "sha256": "efee843b1744dd6e0f1115407ab67c5b772b09e15d99f1a6c3a217bad1644cdc",
+      "bytes": 5907
     },
     {
       "path": "scripts/acceptance-gate.mjs",
@@ -443,6 +443,11 @@
       "path": "src/lib/contract-policy.mjs",
       "sha256": "29fdd978b0d91509e49ec8137fe50eb5c41a95bb9185907dd957341a25543839",
       "bytes": 21004
+    },
+    {
+      "path": "tasks/S2-002_IDENTITY_SANDBOX.md",
+      "sha256": "55614422445a380bbc6c3a704e3b3cc9feefceb8d9a8eb3059bf0e4e838aa0fe",
+      "bytes": 14652
     },
     {
       "path": "tsconfig.json",
