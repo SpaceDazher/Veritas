@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "fb444fad711dadd699b7ab33832a3fc577e6b54f",
-  "sourceTree": "c38f7036879b4e89b80bb334cb64554ec532c9b2",
+  "sourceCommit": "0ab81740b02e69059d332812927b015715d31d4b",
+  "sourceTree": "7c8c055f6211c8d2a49c39ef6281a1514472fdb5",
   "trackedFileCount": 131,
   "manifestFileCount": 128,
-  "payloadManifestSha256": "47aaff78dd7043d31c9d8f430743a711d351cb6df404d6af51dd9cc0d84965a1",
-  "fileManifestSha256": "4c4ad866d93ee5b2f7c0e547ab18080a04aa7546bfe30fb1cd0ec671e15a6088",
+  "payloadManifestSha256": "f2de6969e12e27e5a4097ad3faba36f77fcf84dd08e2ebd4382386ba7eaa52f7",
+  "fileManifestSha256": "8d90851d7bfc5a9b0fb13a6d95e2f793039c6d4ee85d7a74c31f0a55b4d15743",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -206,8 +206,8 @@
     },
     {
       "path": "evidence/clean-checkout.json",
-      "sha256": "31751c8e9321fb51326882c1f7b6dcb7130b1c7d2423209b9d559f4e72ef900e",
-      "bytes": 5948
+      "sha256": "68c234796ccfa35b31bb536810558baabe1a350585ec58ccb7bd70f98085a79f",
+      "bytes": 4298
     },
     {
       "path": "evidence/contract-tests.json",
