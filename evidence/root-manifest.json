@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "adf78c5a2e906e3dd014cc2de9be8cda44b412e5",
-  "sourceTree": "b89fda41d78b64c93e88902b43f1119a9626e4d8",
+  "sourceCommit": "d2ba0b7018e5fc1564666a6e0c674c50dbeb883b",
+  "sourceTree": "e2f8497a65e752361d670dda485a212b40587f9a",
   "trackedFileCount": 129,
   "manifestFileCount": 126,
-  "payloadManifestSha256": "dc45059af31c89c61d280dbc51d9154fd1e3694db6459e4d9d3abcd6f4a58419",
-  "fileManifestSha256": "a8197b8d96765c2f8d9c6687694082c27a876f403e77df2e0e392d32fc8d8382",
+  "payloadManifestSha256": "3d275114c2d74e01baef01c2aa22cd88b7a0ef074eabb24f24d78c2ad6152279",
+  "fileManifestSha256": "5c8978a6ae5304ef70e168cd926418653f5e3e42751677d06cf3aefb11d95f14",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -206,8 +206,8 @@
     },
     {
       "path": "evidence/clean-checkout.json",
-      "sha256": "38c28da881ae4556605d4e419e6f373fbdf6bc517410ac25d04c9527977860b3",
-      "bytes": 7328
+      "sha256": "515ba5c60b2319ee0931d16fa1966b72714818f597b703ebf03d771387bcab60",
+      "bytes": 4797
     },
     {
       "path": "evidence/contract-tests.json",
@@ -266,8 +266,8 @@
     },
     {
       "path": "evidence/public-artifact-check.json",
-      "sha256": "b11789b270ae22edbbd649a3a8cfa1e9bbfabb85b64af5ed154b2036c414e80e",
-      "bytes": 490
+      "sha256": "e908004bb579208989d05d14258f74a337d4eaad1a7a792528e76150de0dd8d7",
+      "bytes": 370
     },
     {
       "path": "evidence/s2-001-pilot-binding.json",
@@ -431,8 +431,8 @@
     },
     {
       "path": "scripts/check-public-artifacts.mjs",
-      "sha256": "252f8d0a0ff16fc058a17069c5b2c68d47a2d35ff02cb010c7d9cdb8ad6fca39",
-      "bytes": 3387
+      "sha256": "915755272b9736d364e05c84f62084be0b9c7a2d2a7ce63341bed4c099c7df48",
+      "bytes": 3559
     },
     {
       "path": "scripts/cleanup-smoke.ts",

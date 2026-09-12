@@ -61,8 +61,10 @@ assert(environmentIgnored, '.env must remain ignored');
 const result = {
   schemaVersion: 1,
   exitCode: 0,
-  sourceCommit: execGit('rev-parse', 'HEAD'),
-  sourceTree: execGit('rev-parse', 'HEAD^{tree}'),
+  // Deliberately commit-free: embedding sourceCommit/sourceTree here would
+  // make every regeneration differ from the committed evidence by exactly
+  // those fields and break archive-time root-manifest verification. Content
+  // binding is the root manifest's job.
   inventorySource: 'git ls-files -z',
   trackedFiles: trackedFileList.length,
   scannedTextFiles,
