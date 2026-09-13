@@ -10,6 +10,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
 describe('S2-002 PostgreSQL workspace smoke contract', () => {
   test('migrations are ordered, content-addressed and include task/event integrity', () => {
+    const attributes = fs.readFileSync(path.join(ROOT, '.gitattributes'), 'utf8');
+    assert.match(attributes, /^\*\.sql text eol=lf$/m);
     const migrations = discoverMigrations(ROOT);
     assert.ok(migrations.length >= 1);
     assert.deepEqual([...migrations].sort((a, b) => a.name.localeCompare(b.name)), migrations);
