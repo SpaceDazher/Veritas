@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "c4512091101a1238da92483728a97f6de7d8113c",
-  "sourceTree": "f99c8f96750ca4cdac4fbc57a6ff1a0552165d5b",
+  "sourceCommit": "005b50c7c6138552e987edc3d44b76e932caa2e6",
+  "sourceTree": "0682b239426cae0956c0a733a35a2126183974ea",
   "trackedFileCount": 267,
   "manifestFileCount": 264,
-  "payloadManifestSha256": "4311939a7a1d520b3f079ea00d3fb58524841e988970a7479fbf78bde93ff2c9",
-  "fileManifestSha256": "b11d9087ebf5a2211740645c929fefc0548563483dc09eb950d0558b2af25e3f",
+  "payloadManifestSha256": "395259807f80a01dd8d7895f05e48795be3dc284b4ca5be2903e62bb45162a78",
+  "fileManifestSha256": "09ff50bdf082c8e77912ac3a561db38ac913318eb17726ad5480b90254935af5",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -641,8 +641,8 @@
     },
     {
       "path": "evidence/clean-checkout.json",
-      "sha256": "153d47a6700939a2d6dc8ab3c686fddcc772b6d1f7859b2b595a13b265bb2a94",
-      "bytes": 4509
+      "sha256": "ddd7183fd105a52af0c15f0445ec6bdaceb9fe059399415a72057222382fcdfd",
+      "bytes": 5825
     },
     {
       "path": "evidence/contract-tests.json",
@@ -686,13 +686,13 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "9850a58ddae7e58a3093c264885f587c35d06c119a9b0502671e8b488f9ed18f",
-      "bytes": 11289
+      "sha256": "9a86902f333e21bd2b199ee2792052fe9dd2696aa417f3371ec83f409ffae2a1",
+      "bytes": 11334
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "5f5688e3189d4a7fb4c3e86ba91ba3fc2e30b90f70a59c2b2db0d2ea8030d579",
-      "bytes": 22819
+      "sha256": "501967c6c2ddc89bfc728e337bc529dbab3da32ea89e7142bf82f7f7003d6f59",
+      "bytes": 22935
     },
     {
       "path": "evidence/policy-probes.json",
@@ -1041,8 +1041,8 @@
     },
     {
       "path": "scripts/verify-s2-003-dependencies.mjs",
-      "sha256": "77c02691ee1f0b6570c9695cd853c254a47547b6e90c78a513dd7da92e53470b",
-      "bytes": 16509
+      "sha256": "282ed1975f7bea33f08366460cbd2bb28203223cf56a36777204e8dd4a5e1749",
+      "bytes": 16484
     },
     {
       "path": "scripts/verify-s2-003.mjs",
