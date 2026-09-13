@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "scope": "Adversarial corpus A-K driven through the production policy path; DETECTED means the production modules rejected the attack.",
+  "policyVersion": "s2-002-policy-v5",
+  "generatedAt": "2026-09-12T12:00:00.000Z",
+  "escaped": 0,
+  "detected": 11,
+  "skipped": 0,
+  "results": [
+    {
+      "id": "A",
+      "title": "cross-tenant source/search retrieval",
+      "verdict": "DETECTED",
+      "detail": "source:alice-private-1:DENY(NO_ACCESS); source:bob-notes-1:DENY(NO_ACCESS); source:carol-1:DENY(NO_ACCESS)"
+    },
+    {
+      "id": "B",
+      "title": "private claim into shared summary or cache",
+      "verdict": "DETECTED",
+      "detail": "summary:CROSS_TENANT_INPUT; cache:CROSS_TENANT_INPUT"
+    },
+    {
+      "id": "C",
+      "title": "payload/env forging role, principal or approval",
+      "verdict": "DETECTED",
+      "detail": "forge:DENY(NO_ACCESS); approval:DENY(APPROVAL_NOT_HUMAN)"
+    },
+    {
+      "id": "D",
+      "title": "junction/symlink/traversal filesystem escape",
+      "verdict": "DETECTED",
+      "detail": "data/../../outside.txt:PATH_ESCAPE; ..\\..\\outside.txt:PATH_ESCAPE; C:/Windows/win.ini:ROOT_VIOLATION; \\\\server\\share\\file:UNC_PATH; CON:DEVICE_PATH; data/CON:DEVICE_PATH; escape/secret.txt:LINK_ESCAPE; escape:LINK_ESCAPE | ../escape-out.txt:PATH_ESCAPE; sub/dir/../../out.txt:PATH_ESCAPE"
+    },
+    {
+      "id": "E",
+      "title": "source prompt injection requesting authority or secrets",
+      "verdict": "DETECTED",
+      "detail": "benign-path:ALLOW; escalation:DENY(NO_ACCESS); secretRedacted:true"
+    },
+    {
+      "id": "F",
+      "title": "inter-agent message with foreign scope/tenant",
+      "verdict": "DETECTED",
+      "detail": "DENY(NO_ACCESS); DENY(NO_ACCESS); DENY(NO_ACCESS)"
+    },
+    {
+      "id": "G",
+      "title": "child process surviving cancellation/timeout",
+      "verdict": "DETECTED",
+      "detail": "survivors=0; status=cancelled; alive=false"
+    },
+    {
+      "id": "H",
+      "title": "stale grant/lease/fencing token after revocation",
+      "verdict": "DETECTED",
+      "detail": "fresh:ALLOW; staleFence:LEASE_FENCING_TOKEN_MISMATCH; afterGrantRevoke:GRANT_REVOKED; afterLeaseRevoke:LEASE_REVOKED"
+    },
+    {
+      "id": "I",
+      "title": "nonce/idempotency replay changing effect",
+      "verdict": "DETECTED",
+      "detail": "first:ALLOW; replay:GRANT_NONCE_CONSUMED; replayWithNonce:GRANT_NONCE_CONSUMED"
+    },
+    {
+      "id": "J",
+      "title": "corrupted/missing policy evidence failing open",
+      "verdict": "DETECTED",
+      "detail": "clock:REJECTED; doc:REJECTED; tamperedDigest:false; wrongVersion:false; sandbox:REJECTED"
+    },
+    {
+      "id": "K",
+      "title": "untrusted execution evidence substitution or command confusion",
+      "verdict": "DETECTED",
+      "detail": "forged:not_authorized; malformed:not_authorized; executions:0; exact:success; evidenceBound:true; argv:[\"printf\",\"BOUND\"]"
+    }
+  ]
+}

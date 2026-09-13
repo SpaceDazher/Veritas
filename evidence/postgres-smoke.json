@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "exitCode": 0,
+  "databaseEngine": "PostgreSQL",
+  "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+  "serverVersion": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "migrationCount": 1,
+  "migrationDigests": [
+    {
+      "name": "0001_veritas_board.sql",
+      "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+    }
+  ],
+  "tableCount": 3,
+  "taskCount": 1,
+  "eventCount": 1,
+  "transactionCommitted": true,
+  "duplicateOperationRejected": true,
+  "credentialsPersisted": false,
+  "hostPortExposedBeyondLoopback": false,
+  "cleanupVerified": true,
+  "scope": "Ephemeral loopback-only PostgreSQL workspace smoke; tmpfs data and random runtime credentials"
+}

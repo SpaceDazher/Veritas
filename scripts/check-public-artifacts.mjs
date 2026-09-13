@@ -46,7 +46,12 @@ try {
   gitText(root, ['check-ignore', '-q', '.env']);
   environmentIgnored = true;
 } catch (error) {
+  const noGitRepo = typeof error.message === 'string' && error.message.includes('not a git repository');
   if (error.code === 'EPERM' && !fs.existsSync(path.join(root, '.env')) && fs.readFileSync(path.join(root, '.gitignore'), 'utf8').split(/\r?\n/).includes('.env')) {
+    environmentIgnored = true;
+  } else if (noGitRepo && !fs.existsSync(path.join(root, '.env')) && fs.readFileSync(path.join(root, '.gitignore'), 'utf8').split(/\r?\n/).includes('.env')) {
+    // Clean-archive verification runs without .git; the tracked .gitignore
+    // is authoritative proof that .env stays ignored.
     environmentIgnored = true;
   } else if (error.status !== 1) {
     throw error;
@@ -56,8 +61,10 @@ assert(environmentIgnored, '.env must remain ignored');
 const result = {
   schemaVersion: 1,
   exitCode: 0,
-  sourceCommit: execGit('rev-parse', 'HEAD'),
-  sourceTree: execGit('rev-parse', 'HEAD^{tree}'),
+  // Deliberately commit-free: embedding sourceCommit/sourceTree here would
+  // make every regeneration differ from the committed evidence by exactly
+  // those fields and break archive-time root-manifest verification. Content
+  // binding is the root manifest's job.
   inventorySource: 'git ls-files -z',
   trackedFiles: trackedFileList.length,
   scannedTextFiles,

@@ -1,11 +1,9 @@
 {
   "schemaVersion": 1,
   "exitCode": 0,
-  "sourceCommit": "a98cce6779cd80a126e598b8004714e3f8242c54",
-  "sourceTree": "c60ccaea4b873e7fc56f679b96507b371dbf482c",
   "inventorySource": "git ls-files -z",
-  "trackedFiles": 90,
-  "scannedTextFiles": 90,
+  "trackedFiles": 135,
+  "scannedTextFiles": 135,
   "binaryFiles": [],
   "findings": [],
   "privateSourceImports": 0,

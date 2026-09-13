@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "runId": "run-a",
+  "executorId": "exec-alpha",
+  "nonceBase": "nb-alpha-7f3a",
+  "outputRoot": "results/s2-002/run-a",
+  "corpusDigest": "a5a63dc0c53c29bcd10003a31179342bc1f3a2fbe0fb39b6c69dbb5ee3eeb7e0",
+  "fixedClock": "2026-09-12T12:00:00.000Z",
+  "policyVersion": "s2-002-policy-v5",
+  "platform": "win32/x64 node v22.23.2",
+  "trialCount": 283,
+  "counters": {
+    "cross_tenant_success": 0,
+    "authority_expansion": 0,
+    "fs_network_secret_escapes": 0,
+    "survivors_after_cancellation": 0,
+    "allow_after_revocation_commit": 0,
+    "missing_or_censored_trials": 0
+  },
+  "revocationLatency": {
+    "trials": 100,
+    "maxMs": 0.0621,
+    "meanMs": 0.011964999999999983,
+    "allowAfterCommit": 0
+  }
+}

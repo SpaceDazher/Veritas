@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/lease.schema.json",
+  "title": "Veritas Lease (S2-002)",
+  "description": "A fencing-token-bearing lease over one task/run. Stale fencing tokens and leases revoked in state are rejected by the policy engine, never honoured.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "lease_id",
+    "workspace_id",
+    "owner",
+    "grant_id",
+    "task_ref",
+    "fencing_token",
+    "issued_at",
+    "expires_at",
+    "state"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "lease_id": { "$ref": "#/$defs/leaseId" },
+    "workspace_id": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "owner": { "$ref": "#/$defs/principalId" },
+    "grant_id": { "$ref": "#/$defs/grantId" },
+    "task_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "run_id"],
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$" },
+        "run_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$" }
+      }
+    },
+    "fencing_token": { "type": "integer", "minimum": 1 },
+    "issued_at": { "$ref": "#/$defs/utcTimestamp" },
+    "expires_at": { "$ref": "#/$defs/utcTimestamp" },
+    "revoked_at": { "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }] },
+    "state": { "enum": ["active", "expired", "revoked"] }
+  },
+  "$defs": {
+    "leaseId": { "type": "string", "pattern": "^lse-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "grantId": { "type": "string", "pattern": "^grt-[a-z0-9][a-z0-9-]{0,62}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "maxLength": 24
+    }
+  }
+}

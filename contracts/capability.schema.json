@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/capability.schema.json",
+  "title": "Veritas Capability (S2-002)",
+  "description": "An exact action on a resource class with canonical argument names and explicit constraints. Actions are dotted concrete operations; wildcard actions are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "capability_id",
+    "action",
+    "resource_type",
+    "canonical_arguments",
+    "constraints"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "capability_id": { "$ref": "#/$defs/capabilityId" },
+    "action": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$", "maxLength": 128 },
+    "resource_type": {
+      "enum": ["task", "source", "claim", "summary", "cache", "artifact", "message", "tool", "approval", "workspace", "board"]
+    },
+    "canonical_arguments": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "required"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z_][a-z0-9_]{0,63}$" },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires_lease", "requires_approval", "exec_tier", "network", "side_effect"],
+      "properties": {
+        "requires_lease": { "type": "boolean" },
+        "requires_approval": { "type": "boolean" },
+        "exec_tier": { "enum": ["none", "no_exec", "local_restricted", "untrusted_code"] },
+        "network": { "enum": ["none", "allowlisted"] },
+        "side_effect": { "enum": ["read", "write", "terminal"] }
+      }
+    }
+  },
+  "$defs": {
+    "capabilityId": { "type": "string", "pattern": "^cap-[a-z0-9][a-z0-9.-]{0,61}[a-z0-9]$" }
+  }
+}

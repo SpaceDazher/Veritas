@@ -23,6 +23,34 @@ Start with [Product Contract](docs/product/PRODUCT_CONTRACT.md),
 [Scenario B](docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md) and
 [Evaluation Report](docs/decisions/S2-001-EVALUATION-REPORT.md).
 
+## S2-002 — Identity, agent rights and the local sandbox gate
+
+**Ticket result: PASS_WITH_LIMITS. Bounded live execution: ENABLED.**
+
+The board now has a server-side authorization gate shared by Web, API and CLI:
+8 fail-closed contracts (workspace, principal, role, capability, grant, lease,
+sandbox profile, authorization decision), a 20-principal subjects model across
+7 workspaces, grants with fencing tokens and one-time nonces, immediate
+revocation, human-only producer-blocked approvals, derived-artifact ACL
+inheritance, and a sandbox adapter with observed filesystem, network, secret,
+process-tree and output controls. All eleven adversarial probes (A–K) are detected
+by the production path; two process-separated replay runs (280 trials each)
+show zero hard-counter violations and zero decision mismatches.
+
+Start with [Threat Model](docs/security/S2-002-THREAT-MODEL.md),
+[Sandbox Profile](docs/security/S2-002-SANDBOX-PROFILE.md) and the
+[S2-002 Evaluation Report](docs/decisions/S2-002-EVALUATION-REPORT.md).
+Commands: `npm run test:identity`, `npm run test:sandbox`,
+`npm run test:security-probes`, `npm run verify:podman-sandbox`,
+`npm run verify:gvisor-sandbox`, `npm run verify:postgres-smoke`,
+`npm run verify:s2-002`.
+
+Limits: no production authentication; enforcement state is per-engine
+in-memory. `LOCAL_RESTRICTED` is evidence-bound to rootless Podman and
+`UNTRUSTED_CODE` to gVisor's systrap userspace kernel plus Podman auto-userns.
+Personal agents act only via explicit human grants; platform agents
+cannot self-grant; producers cannot approve their own results.
+
 ## Additional local contract workspace
 
 Next.js App Router + PostgreSQL via Drizzle. Web Kanban, HTTP API and a generic
@@ -35,12 +63,16 @@ Do not expose this demo as a private multi-user service or submit private data.
 ### Clean checkout
 
 1. Use Node.js 22+ and npm; run `npm ci` with the committed lockfile.
-2. Provision PostgreSQL separately and set `DATABASE_URL` in an untracked `.env`
-   (see `.env.example`). No credentials are bundled or inferred.
-3. Run `npx drizzle-kit push` against that dedicated local demo database.
+2. For a persistent development database, set `DATABASE_URL` in an untracked
+   `.env` (see `.env.example`), then run `npm run db:migrate`. Migrations are
+   ordered SQL files with stored SHA-256 drift detection; no credentials are
+   bundled or inferred.
+3. Run `npm run verify:postgres-smoke` for the disposable loopback-only
+   PostgreSQL container proof (tmpfs data and random runtime credentials).
 4. Run `node scripts/validate-contracts.mjs` (offline, reads committed fixtures).
 5. Run `npx next typegen`, `npm exec tsc -- --noEmit --pretty false`, and `npm run build`.
-6. For operator use, run `npm run dev` for the local Web demo. The managed sandbox
+6. Run `npm run verify:gvisor-sandbox` to re-observe the UNTRUSTED_CODE runtime.
+   For operator use, run `npm run dev` for the local Web demo. The managed sandbox
    uses its own production lifecycle and `/api/health` healthcheck.
 7. Open the local URL; fixture tasks seed idempotently on the first board read.
 
@@ -73,9 +105,11 @@ NEEDS_INPUT; no speculative Codex/pi credentials or provider calls are supplied.
 - `npm run verify:acceptance`: still returns nonzero `BLOCKED` for this repository's
   synthetic local workspace. The completed external scenario A pilot is evaluated
   by `verify:pilot-binding`; it does not turn the demo into a production runner.
-- `node scripts/synthetic-smoke.mjs`: offline synthetic smoke only. Database/browser
-  smoke remains `NOT_RUN` unless a dedicated PostgreSQL URL and local server are
-  explicitly available; no screenshots or real pilot results are claimed.
+- `node scripts/synthetic-smoke.mjs`: offline synthetic smoke plus validation of
+  tracked real PostgreSQL evidence. `npm run verify:postgres-smoke` re-creates the
+  disposable loopback-only database, applies hash-bound migrations and checks a
+  transaction plus duplicate-operation rejection. Browser smoke and real pilot
+  results are not claimed.
 - `npx tsx scripts/cleanup-smoke.ts`: deletes only task IDs explicitly recorded by
   the smoke run from the dedicated synthetic database. Not a production operation.
 - `scripts/generate-contracts.py` and `scripts/generate-docs.py` reproduce public
@@ -83,6 +117,13 @@ NEEDS_INPUT; no speculative Codex/pi credentials or provider calls are supplied.
   integrity update, **not** experiment freeze or approval. Review changes first.
 - `python3 scripts/collect-baseline.py <existing-approved-AgentOS-checkout>` records
   safe dependency hashes. It does not run Stage 1 or fetch private sources.
+
+### Next implementation ticket
+
+S2-002 is specified in
+[`tasks/S2-002_IDENTITY_SANDBOX.md`](tasks/S2-002_IDENTITY_SANDBOX.md). It is the
+identity, authorization and sandbox gate that must pass before Veritas enables
+live agent execution or starts dependent Stage 2 work.
 
 ### Rollback
 

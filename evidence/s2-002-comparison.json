@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "role": "run A vs run B comparison",
+  "comparison": {
+    "comparedTrials": 283,
+    "mismatchedDecisions": 0,
+    "mismatches": [],
+    "counterViolations": [],
+    "expectedOracleViolations": [],
+    "ok": true
+  },
+  "hardCounterLimits": {
+    "cross_tenant_success": 0,
+    "authority_expansion": 0,
+    "fs_network_secret_escapes": 0,
+    "survivors_after_cancellation": 0,
+    "allow_after_revocation_commit": 0,
+    "missing_or_censored_trials": 0
+  },
+  "revocationRequirements": {
+    "minTrialsPerRun": 100,
+    "maxLatencyMs": 5000
+  }
+}

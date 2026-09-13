@@ -1,25 +1,35 @@
-# S2-001 tracked file inventory
+# Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 90.
+Generated from `git ls-files`; count: 143.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
 - `.gitattributes`
 - `.gitignore`
 - `contracts/acceptance-cases.schema.json`
+- `contracts/authorization-decision.schema.json`
+- `contracts/capability.schema.json`
+- `contracts/grant.schema.json`
 - `contracts/human-decision.schema.json`
+- `contracts/lease.schema.json`
 - `contracts/needs-input.schema.json`
 - `contracts/pilot-profile.schema.json`
+- `contracts/principal.schema.json`
 - `contracts/research-dossier.schema.json`
+- `contracts/role.schema.json`
+- `contracts/sandbox-profile.schema.json`
 - `contracts/solution-pack.schema.json`
 - `contracts/source-selection-manifest.schema.json`
 - `contracts/task-brief.schema.json`
+- `contracts/workspace.schema.json`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
 - `docs/decisions/OUT_OF_SCOPE.md`
 - `docs/decisions/S2-001-EVALUATION-REPORT.md`
 - `docs/decisions/S2-001-PILOT-RECONCILIATION.md`
+- `docs/decisions/S2-002-EVALUATION-REPORT.md`
+- `docs/decisions/S2-002-TEST-REVIEW-LOG.md`
 - `docs/product/AUTONOMY_POLICY.md`
 - `docs/product/HUMAN_APPROVAL_POLICY.md`
 - `docs/product/METRIC_POLICY.md`
@@ -27,8 +37,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/product/PRODUCT_CONTRACT.md`
 - `docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md`
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
-- `drizzle.config.ts`
+- `docs/security/S2-002-SANDBOX-PROFILE.md`
+- `docs/security/S2-002-THREAT-MODEL.md`
 - `eslint.config.mjs`
+- `evidence/clean-checkout.json`
 - `evidence/closure-record.json`
 - `evidence/commit-record.json`
 - `evidence/contract-tests.json`
@@ -41,13 +53,23 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/FILE_INVENTORY.md`
 - `evidence/frozen-manifest.json`
 - `evidence/policy-probes.json`
+- `evidence/postgres-smoke.json`
 - `evidence/probe-registry.json`
 - `evidence/public-artifact-check.json`
 - `evidence/root-manifest.json`
 - `evidence/s2-001-pilot-binding.json`
+- `evidence/s2-002-comparison-integrity.json`
+- `evidence/s2-002-comparison.json`
+- `evidence/s2-002-dependency-binding.json`
+- `evidence/s2-002-gvisor-sandbox.json`
+- `evidence/s2-002-podman-sandbox.json`
+- `evidence/s2-002-run-a.json`
+- `evidence/s2-002-run-b.json`
+- `evidence/s2-002-security-probes.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
+- `migrations/0001_veritas_board.sql`
 - `next.config.ts`
 - `package-lock.json`
 - `package.json`
@@ -64,7 +86,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `pilots/scenario-b/task-brief.json`
 - `postcss.config.mjs`
 - `README.md`
+- `results/s2-002/run-a/observations.json`
+- `results/s2-002/run-a/summary.json`
+- `results/s2-002/run-b/observations.json`
+- `results/s2-002/run-b/summary.json`
 - `scripts/acceptance-gate.mjs`
+- `scripts/apply-migrations.mjs`
 - `scripts/check-inventory.mjs`
 - `scripts/check-public-artifacts.mjs`
 - `scripts/cleanup-smoke.ts`
@@ -74,11 +101,18 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/generate-manifests.mjs`
 - `scripts/git-client.mjs`
 - `scripts/policy-probes.mjs`
+- `scripts/s2-002-run.mjs`
+- `scripts/security-probes.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
 - `scripts/validate-contracts.mjs`
 - `scripts/verify-clean-checkout.mjs`
+- `scripts/verify-gvisor-sandbox.mjs`
 - `scripts/verify-pilot-binding.mjs`
+- `scripts/verify-podman-sandbox.mjs`
+- `scripts/verify-postgres-smoke.mjs`
+- `scripts/verify-s2-002-dependencies.mjs`
+- `scripts/verify-s2-002.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-cli.mjs`
 - `src/app/api/board/route.ts`
@@ -92,4 +126,23 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/db/schema.ts`
 - `src/lib/board.ts`
 - `src/lib/contract-policy.mjs`
+- `src/lib/identity/contract-registry.mjs`
+- `src/lib/identity/contracts.fixtures.ts`
+- `src/lib/identity/contracts.ts`
+- `src/lib/identity/gvisor-sandbox.mjs`
+- `src/lib/identity/podman-sandbox.mjs`
+- `src/lib/identity/policy-engine.mjs`
+- `src/lib/identity/principals.mjs`
+- `src/lib/identity/sandbox-profiles.mjs`
+- `src/lib/identity/sandbox.mjs`
+- `tasks/S2-002_IDENTITY_SANDBOX.md`
+- `tests/database/postgres-smoke.test.mjs`
+- `tests/identity/contracts.schemas.test.mjs`
+- `tests/identity/dependency-binding.test.mjs`
+- `tests/identity/gvisor-sandbox.test.mjs`
+- `tests/identity/podman-sandbox.test.mjs`
+- `tests/identity/policy-engine.test.mjs`
+- `tests/identity/replay-runs.test.mjs`
+- `tests/identity/sandbox.test.mjs`
+- `tests/identity/security-probes.test.mjs`
 - `tsconfig.json`

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
 import {evaluatePolicy, baseline} from '../src/lib/contract-policy.mjs';
 import {runPolicyProbes} from './policy-probes.mjs';
 
@@ -117,6 +118,17 @@ assert.equal(evaluatePolicy({...baseline, requiresSource: true, sourcePresent: t
 const frozenTargets = [
   'contracts', 'pilots', 'docs/product', 'docs/scenarios',
   'src/lib/contract-policy.mjs', 'scripts/policy-probes.mjs', 'scripts/validate-contracts.mjs', 'evidence/probe-registry.json',
+  // S2-002: identity/sandbox implementation, oracle suites, corpus runner,
+  // comparator and security documentation are frozen alongside S2-001 files.
+  'src/lib/identity', 'tests/identity', 'docs/security',
+  'scripts/s2-002-run.mjs', 'scripts/security-probes.mjs', 'scripts/verify-s2-002.mjs',
+  'scripts/verify-s2-002-dependencies.mjs', 'scripts/verify-clean-checkout.mjs',
+  'scripts/verify-podman-sandbox.mjs', 'scripts/verify-gvisor-sandbox.mjs',
+  'scripts/verify-postgres-smoke.mjs', 'scripts/apply-migrations.mjs',
+  'migrations', 'tests/database',
+  'evidence/s2-002-dependency-binding.json', 'evidence/s2-002-security-probes.json',
+  'evidence/s2-002-podman-sandbox.json', 'evidence/s2-002-gvisor-sandbox.json',
+  'evidence/postgres-smoke.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');
@@ -131,7 +143,33 @@ const walk = (target) => {
 };
 const relative = (full) => path.relative(root, full).split(path.sep).join('/');
 const frozenFiles = frozenTargets.flatMap((target) => walk(target)).map(relative).sort();
-const frozenManifest = Object.fromEntries(frozenFiles.map((file) => [file, crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')]));
+const hasGitMetadata = fs.existsSync(path.join(root, '.git'));
+const frozenBytes = (file) => {
+  if (hasGitMetadata) {
+    const tracked = spawnSync('git', ['ls-files', '--error-unmatch', '--', file], {
+      cwd: root,
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+    });
+    const unchanged = tracked.status === 0 && spawnSync('git', ['diff', '--quiet', 'HEAD', '--', file], {
+      cwd: root,
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+    }).status === 0;
+    if (unchanged) {
+      return execFileSync('git', ['show', `HEAD:${file}`], {
+        cwd: root,
+        encoding: null,
+        maxBuffer: 30 * 1024 * 1024,
+        windowsHide: true,
+      });
+    }
+  }
+  return fs.readFileSync(path.join(root, file));
+};
+const frozenManifest = Object.fromEntries(frozenFiles.map((file) => [file, crypto.createHash('sha256').update(frozenBytes(file)).digest('hex')]));
 const frozenPath = 'evidence/frozen-manifest.json';
 if (process.argv.includes('--freeze')) {
   writeJson(frozenPath, {

@@ -1,5 +1,6 @@
 'use client';
 import {useState,useMemo,useEffect,useRef} from 'react';
+import Link from 'next/link';
 import {Activity,ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight,Bell,BookOpen,Box,Check,CheckCheck,ChevronDown,ChevronRight,ChevronsUpDown, Circle,Clock,Code2,Command,Download,Ellipsis,ExternalLink,FileCheck2,FileText,FlaskConical,Folder,GitBranch,HelpCircle,Layers,LayoutDashboard,Link2,List,Loader2,LockKeyhole,MessageSquare,PanelLeftClose,Plus,Search,Settings2,ShieldCheck,SlidersHorizontal,Sparkles,SquareKanban,Terminal,Users,X,Zap} from 'lucide-react';
 type Task={id:string;title:string;description:string;status:string;priority:string;agent:string;category:string;criteria:string[];revision:number;createdAt:string};
 type Event={id:number;taskId:string;action:string;detail:string;revision:number;operationId:string;createdAt:string};
@@ -29,7 +30,7 @@ export default function Workspace({initial,documents,sources}:{initial:Board;doc
  const stats=[{label:'Total tasks',value:board.tasks.length,icon:SquareKanban,sub:'One canonical board',color:'green'},{label:'In progress',value:board.tasks.filter(t=>['RUNNING','CLAIMED'].includes(t.status)).length,icon:Activity,sub:'Synthetic workflow states',color:'amber'},{label:'Awaiting review',value:board.tasks.filter(t=>t.status==='IN_REVIEW').length,icon:FileCheck2,sub:'Human decisions matter',color:'purple'},{label:'Connected agents',value:0,icon:Terminal,sub:'Access needs confirmation',color:'gray'}];
  return <div className="app-shell">
   <aside className={`sidebar ${sidebar?'mobile-open':''}`}>
-   <a className="brand" href="/" aria-label="Veritas home"><span className="brand-mark"><Layers size={22}/></span><span>veritas<span className="brand-dot">.</span></span></a>
+   <Link className="brand" href="/" aria-label="Veritas home"><span className="brand-mark"><Layers size={22}/></span><span>veritas<span className="brand-dot">.</span></span></Link>
    <button className="workspace-switch" onClick={()=>setPanel('Workspace')}><span className="workspace-avatar">V</span><span><strong>Veritas workspace</strong><small>Personal workspace</small></span><ChevronsUpDown size={14}/></button>
    <div className="nav-label">WORKSPACE</div>
    <nav>

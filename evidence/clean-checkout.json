@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
+  "sourceCommit": "3fb628b69eba27dc4eed79c36eeaaf2bacb9be66",
+  "sourceTree": "e8efaa72dad1fc9ee9807a0076a34aa96ae91e2e",
+  "exitCode": 0,
+  "passed": true,
+  "commands": [
+    {
+      "id": "archive",
+      "command": "git archive HEAD",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "npm-ci",
+      "command": "npm.cmd ci",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-002-dependencies",
+      "command": "npm.cmd run verify:s2-002-dependencies",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "root-manifest",
+      "command": "node scripts/generate-manifests.mjs --check",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "contracts",
+      "command": "node scripts/validate-contracts.mjs",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "synthetic-smoke",
+      "command": "node scripts/synthetic-smoke.mjs",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "inventory",
+      "command": "node scripts/check-inventory.mjs",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "public-artifacts",
+      "command": "node scripts/check-public-artifacts.mjs",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "podman-sandbox",
+      "command": "npm.cmd run verify:podman-sandbox",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "gvisor-sandbox",
+      "command": "npm.cmd run verify:gvisor-sandbox",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "postgres-smoke",
+      "command": "npm.cmd run verify:postgres-smoke",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "identity-tests",
+      "command": "npm.cmd run test:identity",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "sandbox-tests",
+      "command": "npm.cmd run test:sandbox",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "security-probes",
+      "command": "npm.cmd run test:security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-002-replay",
+      "command": "npm.cmd run verify:s2-002",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "typecheck",
+      "command": "npm.cmd run typecheck",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "lint",
+      "command": "npm.cmd run lint",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "build",
+      "command": "npm.cmd run build",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "runtime-audit",
+      "command": "npm.cmd audit --omit=dev --json",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "tooling-audit",
+      "command": "npm.cmd audit --json",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ],
+  "databaseWorkspaceSmoke": "PASS; ephemeral loopback-only PostgreSQL container with tmpfs storage",
+  "scope": "Independent clean-checkout verification; no shared node_modules or private source/pilot execution"
+}

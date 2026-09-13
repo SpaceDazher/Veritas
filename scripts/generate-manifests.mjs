@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import {gitText, trackedFiles as listTrackedFiles} from './git-client.mjs';
 
 const root = process.cwd();
@@ -10,8 +11,17 @@ const git = (...args) => gitText(root, args);
 const trackedFiles = listTrackedFiles(root);
 const payloadFiles = trackedFiles.filter((file) => !metadataFiles.includes(file));
 const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
+const hasGitMetadata = fs.existsSync(path.join(root, '.git'));
+const payloadBytes = (file) => hasGitMetadata
+  ? execFileSync('git', ['show', `HEAD:${file}`], {
+      cwd: root,
+      encoding: null,
+      maxBuffer: 30 * 1024 * 1024,
+      windowsHide: true,
+    })
+  : fs.readFileSync(path.join(root, file));
 const fileRecords = payloadFiles.map((file) => {
-  const buffer = fs.readFileSync(path.join(root, file));
+  const buffer = payloadBytes(file);
   return {path: file, sha256: hash(buffer), bytes: buffer.length};
 });
 const canonical = (value) => JSON.stringify(value);
@@ -22,7 +32,7 @@ const sourceTree = git('rev-parse', 'HEAD^{tree}');
 const rootManifestPath = path.join(root, 'evidence/root-manifest.json');
 const rootManifest = {
   schemaVersion: 1,
-  scope: 'All tracked S2-001 payload and evidence files; self-referential metadata files are excluded explicitly',
+  scope: 'All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly',
   algorithm: 'SHA-256 raw file bytes',
   sourceCommit,
   sourceTree,
@@ -60,8 +70,10 @@ if (process.argv.includes('--write-closure')) {
   const record = {
     schemaVersion: 1,
     branch: git('branch', '--show-current'),
-    implementationCommit: sourceCommit,
-    implementationTreeSha: sourceTree,
+    implementationCommit: committedManifest.sourceCommit,
+    implementationTreeSha: committedManifest.sourceTree,
+    manifestCommit: sourceCommit,
+    manifestTreeSha: sourceTree,
     payloadManifestSha256,
     fileManifestSha256,
     rootManifestFileSha256,

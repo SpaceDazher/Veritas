@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "scope": "S2-002 dependency binding record. Binds the dependencies listed in tasks/S2-002_IDENTITY_SANDBOX.md to evidence that actually exists, with digests. Missing evidence would be declared, never assumed.",
+  "dependenciesSource": "https://github.com/SpaceDazher/AgentOS/tree/main/research/tickets/stage-1",
+  "sourceRepository": {
+    "remote": "https://github.com/SpaceDazher/AgentOS.git",
+    "headCommitAtBindingTime": "259d9afe16495aa780f834d0b1b903d5451e158a",
+    "headTreeAtBindingTime": "b8027650de4aeec1d8a5f75fc183cc9f66effc47"
+  },
+  "dependencies": [
+    {
+      "ticket": "S2-001",
+      "status": "BOUND",
+      "evidence": "evidence/s2-001-pilot-binding.json",
+      "result": "PASS_WITH_LIMITS",
+      "upstreamRepository": "Veritas-AI-Production-Pilot",
+      "upstreamMainCommit": "6845858bccf3aec27c656649ac40ad01148e7505",
+      "verifiedArtifacts": 4,
+      "productionDeploymentAuthorized": false,
+      "verificationCommand": "npm run verify:pilot-binding"
+    },
+    {
+      "ticket": "S1-007",
+      "status": "BOUND_PASS_WITH_LIMITS",
+      "title": "QA3 retrieval and index isolation",
+      "sourceCommit": "259d9afe16495aa780f834d0b1b903d5451e158a",
+      "evaluationRecordPath": "research/tickets/stage-1/S1-007/evaluation-record.json",
+      "evaluationRecordUrl": "https://raw.githubusercontent.com/SpaceDazher/AgentOS/259d9afe16495aa780f834d0b1b903d5451e158a/research/tickets/stage-1/S1-007/evaluation-record.json",
+      "evaluationRecordSha256": "69b34ad4e699dc8d167edf456e9899ba5d2e9807dce5b27ed5845ce74bdbc3e3",
+      "evaluationId": "reval_6BH3G062B38G3WHH01M1DDTYW2",
+      "artifactChainHash": "4c344ab2e83b231e4cd14c2f69f9eb95b9b0f374f7fab3bf8651eda682390692",
+      "dependencyGate": "all_proven=true",
+      "relevanceToS2_002": "Retrieval and index isolation is the predecessor of the S2-002 cross-tenant source/search and cache isolation controls (probe A, derived-artifact inheritance)."
+    },
+    {
+      "ticket": "S1-008",
+      "status": "BOUND_PASS_WITH_LIMITS",
+      "title": "revocation latency validation (<=5 seconds)",
+      "sourceCommit": "259d9afe16495aa780f834d0b1b903d5451e158a",
+      "evaluationRecordPath": "research/tickets/stage-1/S1-008/evaluation-record.json",
+      "evaluationRecordUrl": "https://raw.githubusercontent.com/SpaceDazher/AgentOS/259d9afe16495aa780f834d0b1b903d5451e158a/research/tickets/stage-1/S1-008/evaluation-record.json",
+      "evaluationRecordSha256": "b047d1ca4b59fb667b15ea1b592aa42d0dd51af5370038e5a23bd093ad399996",
+      "evaluationId": "reval_85CM5QCKNS02W0HZ01M1FSQ44C",
+      "artifactChainHash": "5c43c03d01058ab0ad17e1dc6ed368a54c386de0b1195a750b88731a8ddc8cd7",
+      "dependencyGate": "overall_ok=true",
+      "relevanceToS2_002": "Established the <=5000 ms revocation decision requirement; S2-002 enforces and measures it (100 trials per replay run, immediate deny after revocation commit)."
+    },
+    {
+      "ticket": "S1-010",
+      "status": "BOUND_PASS_WITH_LIMITS",
+      "title": "tool-poisoning detection evaluation",
+      "sourceCommit": "259d9afe16495aa780f834d0b1b903d5451e158a",
+      "evaluationRecordPath": "research/tickets/stage-1/S1-010/evaluation-record.json",
+      "evaluationRecordUrl": "https://raw.githubusercontent.com/SpaceDazher/AgentOS/259d9afe16495aa780f834d0b1b903d5451e158a/research/tickets/stage-1/S1-010/evaluation-record.json",
+      "evaluationRecordSha256": "3c64aa3a4461f0ec70369968c47f8a437cc97a8702a86be6a2b4302f1af8af71",
+      "evaluationId": "reval_R3Y7MD5STXP6SR3101M1N3F79N",
+      "artifactChainHash": "8442d0dee8992f77f364ca7bfa1383babba4c5fca5beef9eb5ed0315d9010269",
+      "bundleSha256": "74e92032464c67de4bfd740d82bb8085f0505fd401e118ecfefad2ac45e99755",
+      "dependencyGate": "verdict=PASS",
+      "relevanceToS2_002": "Tool-poisoning detection is the predecessor of the S2-002 tool discovery/execution authorization split (cap-tool.discover vs cap-tool.execute, BLOCKED_SANDBOX gate)."
+    }
+  ],
+  "consequence": "All four listed dependencies are now bound to recorded, digest-addressed evidence. The dependency gate no longer caps the verdict; remaining limits are the ones declared in docs/decisions/S2-002-EVALUATION-REPORT.md (no kernel sandbox, no production authentication, in-memory enforcement state)."
+}

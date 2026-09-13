@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "profileId": "sbx-podman-local-restricted-v1",
+  "boundary": "WSL2_ROOTLESS_PODMAN",
+  "distro": "Ubuntu-24.04",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "podmanVersion": "4.9.3",
+  "ociRuntime": "crun",
+  "image": "docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc",
+  "rootless": true,
+  "cgroupVersion": "v2",
+  "cgroupControllers": [
+    "cpu",
+    "memory",
+    "pids"
+  ],
+  "controls": {
+    "uid": 65534,
+    "capEff": "0000000000000000",
+    "rootFsReadOnly": true,
+    "tmpfsWritable": true,
+    "networkInterfaces": [
+      "lo"
+    ],
+    "noNewPrivileges": 1,
+    "seccompMode": 2,
+    "mounts": 0,
+    "injectedEnvironment": 0
+  },
+  "limits": {
+    "pids": 32,
+    "memoryBytes": 134217728,
+    "nanoCpus": 500000000
+  },
+  "authorizedBackendSmoke": {
+    "decision": "ALLOW",
+    "status": "success",
+    "exitCode": 0,
+    "cleanupVerified": true,
+    "stdoutSha256": "67da851fcf0de5b40ae9bf9149896d4ac6d813d94bd9732b50cd56c99d0692b1"
+  },
+  "scope": "LOCAL_RESTRICTED",
+  "untrustedCodeEnabled": false,
+  "limitations": [
+    "AppArmor and SELinux are unavailable inside this WSL2 distribution.",
+    "Only network=none and images already pinned in the local rootless store are supported.",
+    "No host filesystem mount, host environment variable or secret injection is supported."
+  ]
+}
