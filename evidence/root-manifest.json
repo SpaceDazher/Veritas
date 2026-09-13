@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "36e6960170a15d6102b0b2d1812f4a88993e76b0",
-  "sourceTree": "7fd46bc6e64dc08964a66554a8f27652f43369a4",
+  "sourceCommit": "2b75ce6dde5bc74cf7b21322c3d447772df3f8ef",
+  "sourceTree": "05446b15eff320feb7c79e030c2064d74c7fb7cc",
   "trackedFileCount": 266,
   "manifestFileCount": 263,
-  "payloadManifestSha256": "f9ad1c7ca9236674e035469647f574c176616d59c0279d9b8b891d673612c0a3",
-  "fileManifestSha256": "d7c0210b67cd492b3077675bd16453a1806d9163cdb38e7380255950bba984ee",
+  "payloadManifestSha256": "dea9a3a7e34dfb3cfcc9d40544311bff0b466227363c05f62d03983fa83163b8",
+  "fileManifestSha256": "fe86de938b1eb0abd00f9c1818187120ff9d00f98de09e01b1dd744475d7a166",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -641,8 +641,8 @@
     },
     {
       "path": "evidence/clean-checkout.json",
-      "sha256": "af420100224c6dcd68eb65f224a383edbf0008ef1f40abb0cc1ecfb92f4e6284",
-      "bytes": 3199
+      "sha256": "0ccb7e2f75dac3a4f01a10f81554713618d8d788d2621ecea3a29a2adc5ad14d",
+      "bytes": 8890
     },
     {
       "path": "evidence/contract-tests.json",
@@ -686,13 +686,13 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "186397074f7346ef5a66e6d0b4d85cfefc98e623982eefd5fb250bd472bcbc82",
-      "bytes": 5479
+      "sha256": "9850a58ddae7e58a3093c264885f587c35d06c119a9b0502671e8b488f9ed18f",
+      "bytes": 11289
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "2d188bf19180d5429229434225ba9810345e4e89246920e93e81fb696fb966df",
-      "bytes": 8282
+      "sha256": "5f5688e3189d4a7fb4c3e86ba91ba3fc2e30b90f70a59c2b2db0d2ea8030d579",
+      "bytes": 22819
     },
     {
       "path": "evidence/policy-probes.json",
@@ -1001,8 +1001,8 @@
     },
     {
       "path": "scripts/validate-contracts.mjs",
-      "sha256": "d93ef09252468d56286ff997c0570373e5566945903499ca096cf046c2eb24aa",
-      "bytes": 10617
+      "sha256": "15fcc89cd8c387cea4a668e68cb60f1587e81511743673a0025c288afae14bb6",
+      "bytes": 11107
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
@@ -1041,8 +1041,8 @@
     },
     {
       "path": "scripts/verify-s2-003-dependencies.mjs",
-      "sha256": "b7b24b6659516f39e5d22e71bd3aac5df60dbddacfca4a4340d3754e992279d5",
-      "bytes": 15328
+      "sha256": "77c02691ee1f0b6570c9695cd853c254a47547b6e90c78a513dd7da92e53470b",
+      "bytes": 16509
     },
     {
       "path": "scripts/verify-s2-003.mjs",
@@ -1301,8 +1301,8 @@
     },
     {
       "path": "tests/ingestion/dependency-binding.test.mjs",
-      "sha256": "2ea9ede9a0e90cfed6a603c7b71c04c44280e55146d00ff426f91050eb6fccff",
-      "bytes": 6687
+      "sha256": "207944a5b03c7d02dfda71e92346433dd6ffb8871075a5384cf8ea8284ddf616",
+      "bytes": 7016
     },
     {
       "path": "tests/ingestion/export-policy.test.mjs",
