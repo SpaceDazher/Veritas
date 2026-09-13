@@ -3,7 +3,7 @@
   "role": "S2-003 run A vs run B comparison over the frozen corpus",
   "corpus": {
     "caseCount": 74,
-    "corpusSha256": "7eb80b1c21b4c945127ff10a6bf53f50eae26bc2701051b343d058bb453a005d"
+    "corpusSha256": "1e9a88917483b790818971ab4d5cbb29aceaa5821f87295808de5c580c94d30a"
   },
   "runParameters": {
     "run_a": {

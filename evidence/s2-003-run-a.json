@@ -2,19 +2,19 @@
   "contractVersion": "1.0.0",
   "run_id": "s2-003-run-a",
   "executor_id": "exec-s2-003-a",
-  "pid": 26372,
+  "pid": 25308,
   "nonce": "n-8f4dffb1bd7086a4",
   "output_root": "results/s2-003/run-a",
   "frozen_inputs": {
     "connector_contracts_sha256": "8aa61b5f9e40c9a99b3d58056c05b4b375eb0d4c7726883051fa086e3ee73569",
-    "corpus_sha256": "7eb80b1c21b4c945127ff10a6bf53f50eae26bc2701051b343d058bb453a005d",
+    "corpus_sha256": "1e9a88917483b790818971ab4d5cbb29aceaa5821f87295808de5c580c94d30a",
     "policy_sha256": "64f9a905dffa45c0548094af897e554dab50e427422207f72cb143b9a89258d0"
   },
   "started_at": "2026-01-15T08:00:00.000Z",
   "finished_at": null,
   "environment": {
-    "commit": "9b0c39feb35fb278d1edcfc2b1bd9554d8beb1cd",
-    "tree": "f00d37cccf6f957a03f5e07b748b886a572ed2c3",
+    "commit": "ba3b7acffac379b2c746064f62ae489d76fbdc41",
+    "tree": "1b8a532ef86a3106a44e54142ac6817357bdc632",
     "node_version": "22.23.2",
     "platform": "win32-x64"
   },
@@ -242,7 +242,7 @@
       "operation_id": "op-gold-web",
       "case_id": "gold-web",
       "terminal": "COMMITTED",
-      "snapshot_id": "snp-1bc823955605debe",
+      "snapshot_id": "snp-d517391b3122f44b",
       "error_code": null,
       "raw_observation_ref": null
     },
@@ -338,7 +338,7 @@
       "operation_id": "op-malformed-html-garbage",
       "case_id": "malformed-html-garbage",
       "terminal": "COMMITTED",
-      "snapshot_id": "snp-f556accdc206cdd0",
+      "snapshot_id": "snp-bd71bd62bf03e94d",
       "error_code": null,
       "raw_observation_ref": null
     },
@@ -1003,7 +1003,7 @@
         "COMMITTED"
       ],
       "snapshot_ids": [
-        "snp-1bc823955605debe"
+        "snp-d517391b3122f44b"
       ],
       "lineage_created": 0,
       "lineage_automated": 0,
@@ -1153,7 +1153,7 @@
         "COMMITTED"
       ],
       "snapshot_ids": [
-        "snp-f556accdc206cdd0"
+        "snp-bd71bd62bf03e94d"
       ],
       "lineage_created": 0,
       "lineage_automated": 0,
@@ -1915,7 +1915,7 @@
         "COMMITTED"
       ],
       "snapshot_ids": [
-        "snp-1bc823955605debe"
+        "snp-d517391b3122f44b"
       ]
     },
     {
@@ -2029,7 +2029,7 @@
         "COMMITTED"
       ],
       "snapshot_ids": [
-        "snp-f556accdc206cdd0"
+        "snp-bd71bd62bf03e94d"
       ]
     },
     {

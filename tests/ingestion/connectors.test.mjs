@@ -99,7 +99,7 @@ describe('S2-003 web_url connector (injected fetch)', () => {
     status,
     headers: { get: (k) => (k.toLowerCase() === 'content-type' ? contentType : null) },
     url: 'https://example.org/page',
-    arrayBuffer: async () => Buffer.from(body).buffer.slice(Buffer.from(body).byteOffset, Buffer.from(body).byteOffset + Buffer.from(body).byteLength),
+    arrayBuffer: async () => { const buf = Buffer.from(body); return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength); },
   });
 
   test('public HTML snapshot with content-type validation', async () => {

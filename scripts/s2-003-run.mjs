@@ -184,7 +184,7 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
           status: 200,
           headers: { get: (k) => (k.toLowerCase() === 'content-type' ? 'text/html' : null) },
           url: locator,
-          arrayBuffer: async () => Buffer.from(body).buffer.slice(Buffer.from(body).byteOffset, Buffer.from(body).byteOffset + Buffer.from(body).byteLength),
+          arrayBuffer: async () => { const buf = Buffer.from(body); return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength); },
         };
       },
     })],

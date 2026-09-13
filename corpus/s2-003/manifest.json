@@ -105,7 +105,7 @@
   },
   "evaluator": {
     "runner": "scripts/s2-003-run.mjs",
-    "sha256": "1fe59b8eb48709712a5beddb4b9718dfad6b67089f1522c34ce9478791e898d6"
+    "sha256": "b94b022bc9b8d8b8bdd3902c5500efcb35902aaae55eb8328045f521918ac23b"
   },
   "fixturesAreSynthetic": true,
   "privateSourceBytesCommitted": false
