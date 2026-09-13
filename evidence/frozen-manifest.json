@@ -155,7 +155,7 @@
     "scripts/verify-postgres-smoke.mjs": "fe979cbf79b62cf7c290662d1708f35970a48534c569eebd3a8ccca7648af8f5",
     "scripts/verify-s2-002-dependencies.mjs": "d218cb2889b41fccd5fabb588458f371835a1ca1979b98061a7a818dbb7b53da",
     "scripts/verify-s2-002.mjs": "528f6de591e786d2afc42712914774de6fe570f020a7bcf1ad51f57229a5249e",
-    "scripts/verify-s2-003-dependencies.mjs": "282ed1975f7bea33f08366460cbd2bb28203223cf56a36777204e8dd4a5e1749",
+    "scripts/verify-s2-003-dependencies.mjs": "1aebe759028690b761855dbbf9e08a56d0c41694ebf3be6580ec9a272f70831c",
     "scripts/verify-s2-003.mjs": "cb2048911ce36e662cb3b8d35a9645a9cff518d1dd4806b36c5e454cb17d3a12",
     "src/lib/contract-policy.mjs": "29fdd978b0d91509e49ec8137fe50eb5c41a95bb9185907dd957341a25543839",
     "src/lib/identity/contract-registry.mjs": "c56e253c66849e5b043cce9abba5a2d69321c4969c0ddc3fde06d4450ff561cc",
