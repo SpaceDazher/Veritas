@@ -67,7 +67,7 @@
     "src/lib/identity/principals.mjs": "631be55de1d04f508c38af66849c1dea106d42f500fbe67a16454dc60ec2404b",
     "src/lib/identity/sandbox-profiles.mjs": "7d300c7d0d5ae649db7279c99264435eddff12b5b84490e90d5c0c128af93fa0",
     "src/lib/identity/sandbox.mjs": "9e4b648ac1ada3a3e4197f261977f60fff75ea5b4dbd539bfb050912dbbf5611",
-    "tests/database/postgres-smoke.test.mjs": "76879d07109fa76c17b08fd1447a46a179ae948103f198bfb2ffce9ba0fc14d2",
+    "tests/database/postgres-smoke.test.mjs": "feff8a8fa02c5fcef66d1b6b1ca0b8ab00e0d31833bd3e22075db814aeefd20e",
     "tests/identity/contracts.schemas.test.mjs": "a3547a9d7c01b3b84be2b6fe108b79616a10a689b5fb9a233a7f5ce3423f9795",
     "tests/identity/dependency-binding.test.mjs": "34177b937c063235ab8cdd8aad5a9adccce8d78a4159c1266b1d801f33e90693",
     "tests/identity/gvisor-sandbox.test.mjs": "6f6bbee8046f03f11ee01e53e81069eac196a0255999656b33bb20982318fc68",
