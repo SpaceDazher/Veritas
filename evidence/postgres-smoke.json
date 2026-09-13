@@ -5,11 +5,15 @@
   "databaseEngine": "PostgreSQL",
   "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
   "serverVersion": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
-  "migrationCount": 1,
+  "migrationCount": 2,
   "migrationDigests": [
     {
       "name": "0001_veritas_board.sql",
       "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+    },
+    {
+      "name": "0002_source_ingestion.sql",
+      "sha256": "4b5408f3d5b961c91d934745b16d966bf6b66220ed0f3276e073d318668c0cf0"
     }
   ],
   "tableCount": 3,
@@ -17,6 +21,9 @@
   "eventCount": 1,
   "transactionCommitted": true,
   "duplicateOperationRejected": true,
+  "ingestionAppendOnlyRejected": true,
+  "ingestionDuplicateOperationRejected": true,
+  "ingestionTableCount": 8,
   "credentialsPersisted": false,
   "hostPortExposedBeyondLoopback": false,
   "cleanupVerified": true,
