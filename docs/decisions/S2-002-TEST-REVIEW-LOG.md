@@ -92,6 +92,29 @@ Test-suite mutations in this round:
    `LEASE_CAPABILITY_MISMATCH`. New positive/negative message-recipient
    cells and a wrong-grant-lease cell were added.
 
-## Entry 4 — pending
+## Entry 4 — gVisor/PostgreSQL closure round
 
-No further entries yet.
+The remaining environment limitations were reproduced before implementation:
+the new tests failed because no gVisor/PostgreSQL evidence existed and the
+policy returned `UNKNOWN_ACTION` for `tool.execute.untrusted`.
+
+1. `tests/identity/gvisor-sandbox.test.mjs` pins the shell-free host-owned
+   invocation, exact profile/evidence binding, canonical-command authority,
+   content address, runsc/systrap identity, configured read-only rootfs and
+   observed gVisor kernel controls.
+2. `tests/database/postgres-smoke.test.mjs` pins ordered content-addressed SQL
+   migrations and the real transaction/replay/cleanup evidence without DSN or
+   credentials.
+3. `tests/identity/security-probes.test.mjs` extends the frozen adversarial set
+   to Probe K. It rejects substituted gVisor evidence, an injected image field
+   and a separately supplied command while accepting only the policy-digested
+   argv.
+4. Two assertions were corrected while still RED: the WSL argv prefix includes
+   the literal `podman run`, and the clean-checkout required-id sequence now has
+   the newly inserted gVisor/PostgreSQL gates between Podman and sandbox tests.
+   Neither change weakened an outcome oracle.
+
+Observed RED also exposed rootful Podman's single auto-userns range being held
+by the detached inspection container. The verifier now removes that container
+before independent runtime probes, rather than weakening or expanding the
+configured user namespace.

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {evaluatePolicy, baseline} from '../src/lib/contract-policy.mjs';
 import {runPolicyProbes} from './policy-probes.mjs';
 import {readAcceptanceState} from './acceptance-gate.mjs';
+import {verifyPostgresSmokeRecord} from './verify-postgres-smoke.mjs';
 
 const policy = evaluatePolicy(baseline);
 assert.equal(policy.verdict, 'ELIGIBLE_FOR_LOCAL_CHECK');
@@ -11,16 +12,26 @@ assert.equal(probes.passed, probes.total);
 const acceptance = readAcceptanceState();
 assert.equal(acceptance.verdict, 'BLOCKED');
 assert.equal(acceptance.pilotExecutions, 0);
+const postgresEvidence = JSON.parse(fs.readFileSync('evidence/postgres-smoke.json', 'utf8'));
+assert.deepEqual(verifyPostgresSmokeRecord(postgresEvidence), {ok: true, issues: []});
 const report = {
   schemaVersion: 1,
   exitCode: 0,
-  scope: 'Deterministic offline synthetic smoke; no database, browser, adapter, paid model or pilot execution',
+  scope: 'Deterministic offline synthetic smoke plus validation of tracked real PostgreSQL evidence; no browser, adapter, paid model or pilot execution',
   policyEntryPoints: ['src/lib/contract-policy.mjs#evaluatePolicy'],
   policyProbesPassed: probes.passed,
   policyProbesTotal: probes.total,
   acceptanceVerdict: acceptance.verdict,
   pilotExecutions: acceptance.pilotExecutions,
-  databaseWorkspaceSmoke: process.env.DATABASE_URL ? 'NOT_RUN_REQUIRES_LOCAL_SERVER' : 'NOT_RUN_DATABASE_URL_ABSENT',
+  databaseWorkspaceSmoke: 'PASS_TRACKED_EPHEMERAL_POSTGRES',
+  databaseEvidence: {
+    path: 'evidence/postgres-smoke.json',
+    image: postgresEvidence.image,
+    serverVersion: postgresEvidence.serverVersion,
+    migrationCount: postgresEvidence.migrationCount,
+    transactionCommitted: postgresEvidence.transactionCommitted,
+    duplicateOperationRejected: postgresEvidence.duplicateOperationRejected,
+  },
   screenshots: [],
 };
 fs.writeFileSync('evidence/synthetic-smoke.json', JSON.stringify(report, null, 2) + '\n');

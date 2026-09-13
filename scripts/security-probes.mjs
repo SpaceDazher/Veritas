@@ -1,4 +1,4 @@
-// S2-002 adversarial security probes A–J.
+// S2-002 adversarial security probes A–K.
 // Every probe attacks the production-facing policy path — the real policy
 // engine and the real sandbox adapter — exactly as a hostile request would.
 // No guard logic lives here: a probe is DETECTED only when the production
@@ -12,7 +12,15 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createPolicyEngine, POLICY_VERSION } from '../src/lib/identity/policy-engine.mjs';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
-import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
+import {
+  SANDBOX_NO_EXEC,
+  SANDBOX_LOCAL_RESTRICTED_BLOCKED,
+  SANDBOX_UNTRUSTED_CODE_GVISOR,
+} from '../src/lib/identity/sandbox-profiles.mjs';
+import {
+  GVISOR_PROFILE_ID,
+  executeAuthorizedGvisorTool,
+} from '../src/lib/identity/gvisor-sandbox.mjs';
 import { assertValidContract, validateContract } from '../src/lib/identity/contract-registry.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
@@ -362,6 +370,74 @@ async function probeJ() {
   return { detected, detail: `${observations.join('; ')}; tamperedDigest:${tampered.valid}; wrongVersion:${wrongVersion.valid}; ${sandboxMissingRoots}` };
 }
 
+// K: substitute sandbox evidence or confuse a separately supplied command
+// with the exact canonical argv authorized by the policy decision.
+async function probeK() {
+  let forgedExecutions = 0;
+  const forgedEvidence = executeAuthorizedGvisorTool({
+    policyEngine: { authorize: () => ({
+      decision: 'ALLOW',
+      document: { context: {
+        sandbox_profile_id: GVISOR_PROFILE_ID,
+        os_controls_evidence: `sha256:${'f'.repeat(64)}`,
+      } },
+    }) },
+    request: {
+      action: 'tool.execute.untrusted',
+      args: { canonical_args: { argv: ['printf', 'BOUND'], timeout_ms: 4000 } },
+    },
+    jobId: 'probe-k-forged',
+    executeImpl: () => { forgedExecutions += 1; },
+  });
+
+  const engine = createPolicyEngine({ now: NOW });
+  let executed;
+  const exactRequest = {
+    adapter: 'api', principalId: 'prn-platform-experimenter',
+    action: 'tool.execute.untrusted', workspaceId: 'ws-veritas-project',
+    resource: { type: 'tool', id: 'tool:untrusted-runner' },
+    args: {
+      tool_id: 'tool:untrusted-runner',
+      canonical_args: { argv: ['printf', 'BOUND'], timeout_ms: 4000 },
+    },
+    lease: { leaseId: 'lse-experimenter-untrusted-0009', fencingToken: 1 },
+  };
+  const exact = executeAuthorizedGvisorTool({
+    policyEngine: engine,
+    request: exactRequest,
+    command: ['sh', '-c', 'echo CONFUSED'],
+    jobId: 'probe-k-exact',
+    executeImpl: (request) => {
+      executed = request;
+      return { status: 'success', exitCode: 0, cleanupVerified: true };
+    },
+  });
+  const malformed = executeAuthorizedGvisorTool({
+    policyEngine: createPolicyEngine({ now: NOW }),
+    request: {
+      ...exactRequest,
+      args: {
+        ...exactRequest.args,
+        canonical_args: { ...exactRequest.args.canonical_args, image: 'attacker/image:latest' },
+      },
+    },
+    jobId: 'probe-k-malformed',
+    executeImpl: () => { forgedExecutions += 1; },
+  });
+  const evidenceBound = exact.authorization.document?.context?.os_controls_evidence
+    === SANDBOX_UNTRUSTED_CODE_GVISOR.os_controls_evidence;
+  const detected = forgedEvidence.status === 'not_authorized'
+    && malformed.status === 'not_authorized'
+    && forgedExecutions === 0
+    && exact.status === 'success'
+    && evidenceBound
+    && JSON.stringify(executed?.command) === JSON.stringify(['printf', 'BOUND']);
+  return {
+    detected,
+    detail: `forged:${forgedEvidence.status}; malformed:${malformed.status}; executions:${forgedExecutions}; exact:${exact.status}; evidenceBound:${evidenceBound}; argv:${JSON.stringify(executed?.command)}`,
+  };
+}
+
 export async function runSecurityProbes({ writeReport = true } = {}) {
   const probes = [
     ['A', 'cross-tenant source/search retrieval', probeA],
@@ -374,6 +450,7 @@ export async function runSecurityProbes({ writeReport = true } = {}) {
     ['H', 'stale grant/lease/fencing token after revocation', probeH],
     ['I', 'nonce/idempotency replay changing effect', probeI],
     ['J', 'corrupted/missing policy evidence failing open', probeJ],
+    ['K', 'untrusted execution evidence substitution or command confusion', probeK],
   ];
   const results = [];
   for (const [id, title, run] of probes) {
@@ -383,7 +460,7 @@ export async function runSecurityProbes({ writeReport = true } = {}) {
   }
   const report = {
     schemaVersion: 1,
-    scope: 'Adversarial corpus A-J driven through the production policy path; DETECTED means the production modules rejected the attack.',
+    scope: 'Adversarial corpus A-K driven through the production policy path; DETECTED means the production modules rejected the attack.',
     policyVersion: POLICY_VERSION,
     generatedAt: NOW,
     escaped: results.filter((r) => r.verdict === 'ESCAPED').length,
@@ -406,7 +483,7 @@ async function main() {
   for (const result of results) {
     console.log(`${result.verdict.padEnd(8)} ${result.id} ${result.title} — ${result.detail}`);
   }
-  console.log(`\nesaped=${escaped.length} detected=${results.filter((r) => r.verdict === 'DETECTED').length}`);
+  console.log(`\nescaped=${escaped.length} detected=${results.filter((r) => r.verdict === 'DETECTED').length}`);
   process.exit(escaped.length > 0 ? 1 : 0);
 }
 

@@ -1,4 +1,4 @@
-// S2-002 phase 4 — adversarial corpus A–J.
+// S2-002 phase 4 — adversarial corpus A–K.
 // Every probe drives the production-facing policy path (policy engine +
 // sandbox adapter) exactly as a hostile request would hit it. Guards are
 // never re-implemented inside this suite: a probe passes only when the
@@ -18,6 +18,7 @@ const EXPECTED = Object.freeze({
   H: 'stale grant/lease/fencing token after revocation',
   I: 'nonce/idempotency replay changing effect',
   J: 'corrupted/missing policy evidence failing open',
+  K: 'untrusted execution evidence substitution or command confusion',
 });
 
 const PROBE_RESULTS = await runSecurityProbes({ writeReport: false });
@@ -25,7 +26,7 @@ const PROBE_RESULTS = await runSecurityProbes({ writeReport: false });
 describe('S2-002 adversarial corpus (production-facing path)', () => {
   const results = PROBE_RESULTS;
 
-  test('covers exactly probes A through J', () => {
+  test('covers exactly probes A through K', () => {
     assert.deepEqual(results.map((r) => r.id), Object.keys(EXPECTED));
   });
 

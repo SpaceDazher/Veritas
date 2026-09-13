@@ -49,11 +49,13 @@ sandbox adapter  ──►  filesystem / network / environment / process tree
 2. Everything outside the engine's registry is data. JSON fields, prompts,
    environment variables, model output and content hashes are never proof
    of identity or authority.
-3. The fixed Podman execution bridge is the only agent-triggered executable
-   `LOCAL_RESTRICTED` path. It requires a policy `ALLOW` bound to the exact
-   registered profile and evidence digest. `UNTRUSTED_CODE` remains blocked.
+3. Two fixed execution bridges exist: rootless Podman for `LOCAL_RESTRICTED`
+   and rootful Podman behind gVisor's systrap userspace kernel plus auto-userns
+   for `UNTRUSTED_CODE`. Both require a policy `ALLOW` bound to the exact
+   registered profile and content-addressed evidence. Callers cannot choose an
+   image, runtime, mount, network, environment or host launcher option.
 
-## 4. Threats and controls (mapped to adversarial probes A–J)
+## 4. Threats and controls (mapped to adversarial probes A–K)
 
 | ID | Threat | Control | Probe | Result |
 |----|--------|---------|-------|--------|
@@ -67,6 +69,7 @@ sandbox adapter  ──►  filesystem / network / environment / process tree
 | T8 | Stale grant/lease/fencing token after revocation | lease binds exact stored fencing token and task; revocation forbids use immediately; mismatch/revocation ⇒ DENY | H | DETECTED |
 | T9 | Nonce/idempotency replay changing effect | one-time grants atomically consume nonce; replay ⇒ `GRANT_NONCE_CONSUMED` | I | DETECTED |
 | T10 | Corrupted/missing policy evidence failing open | registry compiles at import; corrupt clock/profile aborts; tampered decision documents fail contract validation | J | DETECTED |
+| T11 | gVisor evidence substitution or separate-command confusion | execution requires the exact profile/evidence binding and consumes only policy-authorized canonical argv | K | DETECTED |
 
 Every probe drives the production modules (`policy-engine.mjs`,
 `sandbox.mjs`) — no guard is re-implemented inside tests. Probe outcomes are
@@ -74,10 +77,12 @@ recorded in `evidence/s2-002-security-probes.json`; hard-fail on any ESCAPED.
 
 ## 5. Residual threats (explicitly accepted for this gate)
 
-1. `LOCAL_RESTRICTED` has a measured WSL2/rootless Podman boundary, but no
-   AppArmor/SELinux policy. It accepts only a pinned local image, no network,
-   no host mounts and no injected environment or secrets. `UNTRUSTED_CODE`
-   remains `BLOCKED_SANDBOX`.
+1. WSL2 exposes neither an enabled AppArmor nor SELinux LSM. For
+   `UNTRUSTED_CODE`, that host-kernel limitation is no longer the isolation
+   boundary: gVisor interposes a measured userspace kernel. The bounded profile
+   also uses Podman auto-userns, no network, no host mounts, no injected
+   environment/secrets, read-only rootfs, zero capabilities and cgroup limits.
+   This is a local confinement proof, not a universal hostile-code guarantee.
 2. No production authentication: registry records are synthetic fixtures;
    the engine models server-side authorization, not a deployed identity
    provider (IdP).

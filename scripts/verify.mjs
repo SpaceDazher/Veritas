@@ -148,7 +148,7 @@ const limitations = [
   'Scenario B remains contract-only and depends on S2-003 through S2-006',
   'The human approval covers the bounded Solution Blueprint only; no private source import or production rollout is authorized',
   'Ambiguous external side-effect reconciliation and exact per-call subscription billing remain unproven',
-  'Database/browser workspace smoke is not claimed unless a dedicated DATABASE_URL and local server are explicitly available',
+  'Browser smoke remains out of scope; PostgreSQL workspace behavior is proven by a disposable loopback-only container with tmpfs storage',
 ];
 if (checks.find((check) => check.id === 'build')?.status === 'NOT_RUN_BUILD_ENVIRONMENT') limitations.push('production build was not completed because the sandbox lacks a valid worker/database environment');
 if (checks.find((check) => check.id === 'tooling-audit')?.exitCode !== 0) limitations.push('npm audit reports dev/tooling advisories; runtime audit remains the release gate');

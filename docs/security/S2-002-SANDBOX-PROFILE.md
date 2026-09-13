@@ -11,12 +11,13 @@ refuses to generalize the bounded local profile into an untrusted-code claim.
 |------|---------|------------------|
 | `NO_EXEC` | contract/evidence operations only | execution forbidden (`SBX_TIER_FORBIDS_EXEC`) |
 | `LOCAL_RESTRICTED` | fixed, low-risk commands in a pinned container | **ENABLED** only as `sbx-podman-local-restricted-v1` |
-| `UNTRUSTED_CODE` | hostile code, stronger confinement required | **BLOCKED** (`SBX_NO_OS_EVIDENCE`) |
+| `UNTRUSTED_CODE` | hostile code in the bounded local profile | **ENABLED** only as `sbx-gvisor-untrusted-v1` |
 
-`NO_EXEC` and `sbx-podman-local-restricted-v1` are contract-valid profiles.
-The latter is registered only while its exact evidence content address is
-present in the authorization decision. `UNTRUSTED_CODE` has no registered
-profile and therefore fails closed.
+`NO_EXEC`, `sbx-podman-local-restricted-v1` and
+`sbx-gvisor-untrusted-v1` are contract-valid profiles. Each executable
+profile is registered only while its exact evidence content address is
+present in the authorization decision. Missing or substituted evidence
+therefore fails closed before spawn.
 
 The Podman backend is `src/lib/identity/podman-sandbox.mjs`. Callers may
 provide only a bounded argv vector, job id and timeout. The WSL distribution,
@@ -82,6 +83,15 @@ always attempts exact container cleanup, including after timeout. The real
 authorization-to-execution smoke is recorded in
 `evidence/s2-002-podman-sandbox.json`.
 
+The gVisor backend is `src/lib/identity/gvisor-sandbox.mjs`. It launches a
+host-owned pinned image through `/usr/bin/runsc` in systrap mode, with an
+outer 65,536-ID Podman auto-userns mapping. Observed controls include the
+`4.19.0-gvisor` runtime kernel and gVisor boot marker, UID 65534, zero
+effective capabilities, `no_new_privs`, seccomp, read-only rootfs, no host
+mounts, no environment injection, loopback-only networking, 32 PIDs,
+128 MiB memory and 0.5 CPU. The full record is
+`evidence/s2-002-gvisor-sandbox.json` and is SHA-256-bound to the profile.
+
 ### 2.5 Outputs (enforced)
 
 - Outputs may be written only into the profile-bound artifact root, by bare
@@ -97,11 +107,12 @@ authorization-to-execution smoke is recorded in
 
 ## 3. What this sandbox is NOT (honest boundary statement)
 
-1. This is a WSL2/rootless Podman boundary for `LOCAL_RESTRICTED`, not a
-   proof that arbitrary hostile code is safe. `UNTRUSTED_CODE` stays blocked.
-2. AppArmor and SELinux are unavailable in this WSL2 distribution. Seccomp,
-   namespaces, capability removal and cgroup v2 limits are observed, but a
-   production profile should add an independently reviewed MAC policy.
+1. This is a bounded local confinement proof, not proof that every hostile
+   program or kernel attack is safe. The `UNTRUSTED_CODE` label applies only
+   to the exact pinned gVisor profile and evidence digest.
+2. AppArmor and SELinux are unavailable in this WSL2 distribution. gVisor's
+   userspace kernel is the compensating isolation boundary; deployment on a
+   production host should still receive an independent sandbox review.
 3. The profile deliberately has no network allowlist, host workspace mount,
    environment injection or secret delivery. Workloads requiring those
    features are unsupported rather than silently weakened.

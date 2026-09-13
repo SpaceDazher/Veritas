@@ -20,7 +20,7 @@ import {
 import { assertValidContract } from './contract-registry.mjs';
 import { normalizePodmanCanonicalArgs } from './podman-sandbox.mjs';
 
-export const POLICY_VERSION = 's2-002-policy-v4';
+export const POLICY_VERSION = 's2-002-policy-v5';
 
 const ADAPTERS = new Set(['web', 'api', 'cli']);
 const ID_PATTERNS = {
@@ -85,7 +85,7 @@ function canonicalArgumentViolations(request, capability) {
     )))) return ['CANONICAL_ARGUMENT_INVALID'];
     if (name === 'canonical_args') {
       if (!isPlainObject(value)) return ['CANONICAL_ARGUMENT_INVALID'];
-      if (request.action === 'tool.execute') {
+      if (request.action === 'tool.execute' || request.action === 'tool.execute.untrusted') {
         try {
           normalizePodmanCanonicalArgs(value);
         } catch {

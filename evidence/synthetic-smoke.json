@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "exitCode": 0,
-  "scope": "Deterministic offline synthetic smoke; no database, browser, adapter, paid model or pilot execution",
+  "scope": "Deterministic offline synthetic smoke plus validation of tracked real PostgreSQL evidence; no browser, adapter, paid model or pilot execution",
   "policyEntryPoints": [
     "src/lib/contract-policy.mjs#evaluatePolicy"
   ],
@@ -9,6 +9,14 @@
   "policyProbesTotal": 34,
   "acceptanceVerdict": "BLOCKED",
   "pilotExecutions": 0,
-  "databaseWorkspaceSmoke": "NOT_RUN_DATABASE_URL_ABSENT",
+  "databaseWorkspaceSmoke": "PASS_TRACKED_EPHEMERAL_POSTGRES",
+  "databaseEvidence": {
+    "path": "evidence/postgres-smoke.json",
+    "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+    "serverVersion": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "migrationCount": 1,
+    "transactionCommitted": true,
+    "duplicateOperationRejected": true
+  },
   "screenshots": []
 }

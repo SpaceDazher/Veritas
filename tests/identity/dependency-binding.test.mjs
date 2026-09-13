@@ -49,6 +49,19 @@ describe('S2-002 portable dependency gate', () => {
   test('clean-checkout makes real Podman control verification a required gate', () => {
     const source = fs.readFileSync(path.join(ROOT, 'scripts/verify-clean-checkout.mjs'), 'utf8');
     assert.match(source, /run\('podman-sandbox', NPM, \['run', 'verify:podman-sandbox'\]/);
-    assert.match(source, /'podman-sandbox', 'sandbox-tests'/);
+    assert.match(source, /'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'sandbox-tests'/);
+  });
+
+  test('clean-checkout requires gVisor, PostgreSQL smoke and a clean full dependency audit', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'scripts/verify-clean-checkout.mjs'), 'utf8');
+    assert.match(source, /run\('gvisor-sandbox', NPM, \['run', 'verify:gvisor-sandbox'\]/);
+    assert.match(source, /run\('postgres-smoke', NPM, \['run', 'verify:postgres-smoke'\]/);
+    assert.match(source, /'gvisor-sandbox'/);
+    assert.match(source, /'postgres-smoke'/);
+    assert.match(source, /'tooling-audit'/);
+
+    const packageJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+    assert.equal(packageJson.devDependencies?.['drizzle-kit'], undefined);
+    assert.equal(packageJson.scripts?.['db:migrate'], 'node scripts/apply-migrations.mjs');
   });
 });

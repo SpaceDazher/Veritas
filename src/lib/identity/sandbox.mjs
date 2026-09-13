@@ -7,7 +7,8 @@
 //
 // Honesty boundary: a cwd + filtered env + tree kill is NOT a full sandbox.
 // This Windows child-process adapter is not the executable sandbox: its
-// LOCAL_RESTRICTED and UNTRUSTED_CODE paths stay blocked. Agent-triggered
+// This in-process probe adapter never launches executable tiers. The separate
+// evidence-bound Podman and gVisor bridges own agent-triggered execution.
 // LOCAL_RESTRICTED execution is implemented separately by the evidence-bound
 // rootless Podman bridge in podman-sandbox.mjs. spawnForControlProbe() exists
 // solely as a research instrument for the legacy tree-kill control.

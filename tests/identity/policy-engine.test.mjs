@@ -754,6 +754,24 @@ describe('S2-002 policy engine: sandbox gate', () => {
     }
   });
 
+  test('untrusted execution is authorized only through the evidence-bound gVisor profile', () => {
+    const engine = makeEngine();
+    const result = engine.authorize(req({
+      principalId: 'prn-platform-experimenter',
+      workspaceId: 'ws-veritas-project',
+      action: 'tool.execute.untrusted',
+      resource: { type: 'tool', id: 'tool:untrusted-runner' },
+      lease: { leaseId: 'lse-experimenter-untrusted-0009', fencingToken: 1 },
+      args: {
+        tool_id: 'tool:untrusted-runner',
+        canonical_args: { argv: ['printf', 'SAFE'], timeout_ms: 5000 },
+      },
+    }));
+    assert.equal(result.decision, 'ALLOW', result.reasonCodes?.join(','));
+    assert.equal(result.document.context.sandbox_profile_id, 'sbx-gvisor-untrusted-v1');
+    assert.match(result.document.context.os_controls_evidence, /^sha256:[0-9a-f]{64}$/);
+  });
+
   test('tool discovery stays readable (contract-level operation)', () => {
     const engine = makeEngine();
     const result = engine.authorize(req({

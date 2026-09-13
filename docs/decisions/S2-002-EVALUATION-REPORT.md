@@ -2,9 +2,10 @@
 
 Ticket: `tasks/S2-002_IDENTITY_SANDBOX.md` — identity, agent rights and the
 local sandbox gate. Branch: `codex/s2-002-identity-sandbox`.
-Verdict: **PASS_WITH_LIMITS** (after the Podman corrective round). Bounded
-`LOCAL_RESTRICTED` execution is enabled through one evidence-bound backend;
-`UNTRUSTED_CODE` remains **BLOCKED_SANDBOX**.
+Verdict: **PASS_WITH_LIMITS** (after the gVisor/PostgreSQL corrective round).
+Bounded `LOCAL_RESTRICTED` and `UNTRUSTED_CODE` execution are enabled only
+through their separate evidence-bound backends. The remaining limits are
+production authentication and durable multi-process authority state.
 
 ## 0A. Podman corrective round
 
@@ -16,8 +17,25 @@ The observed boundary is: rootless Podman, cgroup v2, UID 65534, read-only
 rootfs, all capabilities dropped, `no-new-privileges`, seccomp mode 2,
 network namespace with loopback only, no host mounts/injected environment,
 32 PIDs, 128 MiB and 0.5 CPU. The corpus, frozen manifest and clean-checkout
-gate include this profile. AppArmor/SELinux and `UNTRUSTED_CODE` are not
-claimed.
+gate include this profile.
+
+## 0B. gVisor, database and tooling closure round
+
+`sbx-gvisor-untrusted-v1` closes the previously blocked bounded
+`UNTRUSTED_CODE` path. The exact policy/evidence binding routes canonical
+argv to the pinned Alpine image through runsc `release-20260907.0` in
+systrap mode. The evidence observes `4.19.0-gvisor`, its boot marker,
+auto-userns, zero capabilities, read-only rootfs, loopback-only networking,
+no host mounts or environment injection and cgroup limits. Probe K rejects
+evidence substitution and separate-command confusion.
+
+The database limitation is closed by a disposable PostgreSQL 17.11 smoke:
+ordered SQL migrations are SHA-256-bound, one task+event transaction commits,
+a duplicate operation id is rejected, and the loopback-only tmpfs container
+is removed. Random runtime credentials are neither logged nor persisted.
+The unused `drizzle-kit` development dependency and its deprecated esbuild
+loader chain were removed; full and runtime `npm audit` now report zero
+vulnerabilities.
 
 ## 0. Corrective round — response to the independent REVISE review
 
@@ -34,10 +52,11 @@ two P1 findings. All seven were reproduced and fixed:
 | P1 clean-checkout claimed PASS without evidence | honest correction: the previous run had actually failed (`tar` drive-letter bug, npm spawn bug). Both fixed (`--relative-path tar extraction`, `npm.cmd` via cmd.exe, git-inventory fallbacks, synthetic placeholder for the build-time DB variable) and a real PASS is now recorded in `evidence/clean-checkout.json` |
 | P1 dependencies S1-007/S1-008/S1-010 unbound | RESOLVED: the Stage-1 tickets live in `AgentOS/research/tickets/stage-1` (head `259d9afe…`). All three are completed gates (`pass_with_limits`) and are now digest-bound in `evidence/s2-002-dependency-binding.json`: S1-007 retrieval/index isolation (chain `4c344ab2…`), S1-008 revocation latency ≤5s (chain `5c43c03d…` — the requirement S2-002 enforces), S1-010 tool-poisoning detection (chain `8442d0de…`, gate verdict PASS) |
 
-Policy version is `s2-002-policy-v4`; v3 added the exact Podman profile and
-OS-evidence binding, while v4 closes the command confused-deputy path: the
-backend derives argv and timeout only from the policy-digested
-`canonical_args` and ignores any separately supplied command.
+Policy version is `s2-002-policy-v5`; v3 added the exact Podman profile and
+OS-evidence binding, v4 closed the command confused-deputy path, and v5 adds
+the separate gVisor profile/capability. Both backends derive argv and timeout
+only from policy-digested `canonical_args` and ignore any separately supplied
+command.
 Frozen-manifest scope now covers the whole S2-002 implementation, oracle
 suites, corpus runner, comparator and security docs.
 
@@ -64,16 +83,16 @@ reproducibility gaps. This corrective round closes them as follows:
 | 3. ACL matrix covers 20 principals and all listed paths | PASS — 140-cell board.read matrix + capability/derived/nonce cells per run |
 | 4. Hard counters zero in both independent runs | PASS — see §4 |
 | 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, final max 0.0644 ms / 0.0678 ms (limit 5000 ms) |
-| 6. All adversarial probes detected by production path | PASS — 10/10 DETECTED, 0 ESCAPED |
-| 7. Process-tree cancellation and required OS controls observable | PASS for the bounded Podman profile; legacy Windows probe still records survivors = 0 |
+| 6. All adversarial probes detected by production path | PASS — 11/11 DETECTED, 0 ESCAPED |
+| 7. Process-tree cancellation and required OS controls observable | PASS — rootless Podman for local-restricted; gVisor userspace kernel + auto-userns for untrusted; legacy Windows probe records survivors = 0 |
 | 8. Frozen hashes, commit/tree, environment and outputs converge | PASS — manifests re-frozen per commit; `manifest:check` green |
 | 9. Full test/typecheck/lint/build/security set in clean checkout | PASS — see §5; `build` used a synthetic placeholder `DATABASE_URL` (see §5 note) |
 | 10. Documentation honestly separates local proofs from production guarantees | PASS — THREAT-MODEL §5, SANDBOX-PROFILE §3 |
 
-Gate outcome per ticket: identity policy and a bounded `LOCAL_RESTRICTED`
-container path are proven locally. The verdict stays `PASS_WITH_LIMITS`;
-host workspace access, networked workloads, injected secrets and arbitrary
-untrusted code are not authorized.
+Gate outcome per ticket: identity policy and two bounded container paths are
+proven locally. The verdict stays `PASS_WITH_LIMITS`; alternate images,
+host workspace access, networked workloads and injected secrets are not
+authorized, and the fixture registry is not production authentication.
 
 ## 2. What was built
 
@@ -86,7 +105,7 @@ untrusted code are not authorized.
 2. **Subjects model:** `src/lib/identity/principals.mjs` — 20 principals
    (5 humans, 5 personal agents, 4 external Codex/pi/OpenCode/Hermes
    principals, 6 platform agents) across 7 workspaces (5 private, 1
-   project, 1 shared), 10 roles, 21 capabilities, 17 grants, 8 leases,
+   project, 1 shared), 10 roles, 22 capabilities, 17 grants, 8 leases,
    sandbox profiles. Personal agents act only via explicit human-issued
    grants; platform agents carry no delegation and cannot self-grant.
 3. **Policy engine:** `src/lib/identity/policy-engine.mjs` — one
@@ -104,7 +123,7 @@ untrusted code are not authorized.
    `docs/security/S2-002-SANDBOX-PROFILE.md`). The executable bridge
    `src/lib/identity/podman-sandbox.mjs` accepts only bounded argv and routes
    an evidence-bound policy `ALLOW` into the fixed rootless Podman profile.
-5. **Adversarial corpus A–J:** `scripts/security-probes.mjs` — every probe
+5. **Adversarial corpus A–K:** `scripts/security-probes.mjs` — every probe
    attacks the production modules directly; any ESCAPED is a hard fail.
 6. **Independent replay:** `scripts/s2-002-run.mjs` (frozen corpus runner,
    283 trials) + `scripts/verify-s2-002.mjs` (two process-separated runs,
@@ -118,9 +137,10 @@ A cross-tenant retrieval, B private-claim laundering, C payload/env forging,
 D junction/symlink/traversal escape, E prompt injection (authority/secrets),
 F foreign-scope messaging, G process-tree survival, H stale
 grant/lease/fencing after revocation, I nonce/idempotency replay,
-J corrupted/missing evidence fail-open.
+J corrupted/missing evidence fail-open, K gVisor evidence substitution and
+separate-command confusion.
 
-**10/10 DETECTED, 0 ESCAPED, 0 SKIPPED (Windows).**
+**11/11 DETECTED, 0 ESCAPED, 0 SKIPPED (Windows).**
 
 ## 4. Independent replay (`evidence/s2-002-comparison.json`)
 
@@ -157,8 +177,10 @@ npm ci
 npm run verify:s2-002-dependencies # portable 4/4 dependency binding
 npm run test:identity          # includes exact-oracle and dependency regressions
 npm run test:sandbox           # 18 tests
-npm run test:security-probes   # 10/10 DETECTED, exit 0
+npm run test:security-probes   # 11/11 DETECTED, exit 0
 npm run verify:podman-sandbox  # real WSL2/rootless Podman controls + authorized smoke
+npm run verify:gvisor-sandbox  # real runsc/systrap userspace-kernel controls + authorized smoke
+npm run verify:postgres-smoke  # PostgreSQL 17, migrations, transaction and replay rejection
 npm run verify:s2-002          # process-separated runs, ok=true, exit 0
 npm run typecheck              # exit 0
 npm run lint                   # exit 0
@@ -177,10 +199,9 @@ git diff --check && git status --short
 ```
 
 `npm run verify-clean-checkout` now records a genuine clean-archive PASS in
-`evidence/clean-checkout.json` (all required commands PASS; `tooling-audit`
-is excluded from required by the script and reports one known dev-only
-esbuild advisory; the database smoke is honestly `NOT_RUN` without a
-database). The archive check uses the repo's `VERITAS_GIT_INVENTORY` /
+`evidence/clean-checkout.json` (all required commands PASS, including both
+sandbox profiles, the PostgreSQL smoke and full/runtime dependency audits at
+zero vulnerabilities). The archive check uses the repo's `VERITAS_GIT_INVENTORY` /
 `VERITAS_SOURCE_COMMIT` / `VERITAS_SOURCE_TREE` fallbacks, fresh
 `node_modules`, and the synthetic passwordless placeholder for the
 compile-time database variable.
@@ -203,16 +224,18 @@ only).
 1. **No production authentication / multi-tenancy.** The registry is
    synthetic fixture data proving policy mechanics; it is not a deployed
    IdP, and 20 principals are ACL coverage, not concurrent users.
-2. **Bounded sandbox only.** `LOCAL_RESTRICTED` is enabled exclusively through
-   the measured WSL2/rootless Podman profile. `UNTRUSTED_CODE`, host mounts,
-   networked jobs, environment/secret injection and alternate images remain
-   blocked (`docs/security/S2-002-SANDBOX-PROFILE.md` §3).
+2. **Bounded sandbox only.** `LOCAL_RESTRICTED` uses the measured
+   WSL2/rootless Podman profile; `UNTRUSTED_CODE` uses the measured
+   gVisor/systrap userspace-kernel profile plus Podman auto-userns. Host
+   mounts, networked jobs, environment/secret injection and alternate images
+   remain blocked (`docs/security/S2-002-SANDBOX-PROFILE.md` §3).
 3. **In-memory enforcement state.** Nonces, fencing ceilings and
    revocations are per engine instance; a durable multi-process deployment
    needs an atomic shared authority store.
-4. **Confinement limits.** Podman cgroup v2 enforces memory/CPU/PID ceilings,
-   but AppArmor/SELinux is unavailable in this WSL2 distribution. The legacy
-   Windows process probe is evidence only and is not an executable agent path.
+4. **Confinement limits.** Podman cgroup v2 enforces memory/CPU/PID ceilings.
+   AppArmor/SELinux is unavailable in this WSL2 distribution; gVisor's
+   userspace kernel is the compensating boundary for the exact untrusted
+   profile. The legacy Windows process probe is evidence only.
 5. **Secrets.** No real credentials, tokens or private source content were
    used or committed; build and archive checks use a synthetic passwordless
    placeholder variable as noted.
@@ -224,8 +247,10 @@ only).
 
 - Contracts: `contracts/*.schema.json` (8 files, `1.0.0`, frozen manifest)
 - Implementation: `src/lib/identity/*` (registry, principals, engine,
-  sandbox, Podman execution bridge, profiles, TS types)
-- Tests: `tests/identity/*.test.mjs` (contracts, policy, sandbox, probes,
+  sandbox, Podman/gVisor execution bridges, profiles, TS types)
+- Database: `migrations/*.sql`, `scripts/apply-migrations.mjs`,
+  `scripts/verify-postgres-smoke.mjs`
+- Tests: `tests/identity/*.test.mjs`, `tests/database/*.test.mjs` (contracts, policy, sandbox, probes,
   replay)
 - Probes/corpus: `scripts/security-probes.mjs`, `scripts/s2-002-run.mjs`,
   `scripts/verify-s2-002.mjs`
@@ -233,6 +258,7 @@ only).
   `evidence/s2-002-security-probes.json`, `evidence/s2-002-run-{a,b}.json`,
   `evidence/s2-002-comparison.json`, `evidence/s2-002-comparison-integrity.json`,
   `evidence/s2-002-podman-sandbox.json`, `evidence/frozen-manifest.json`,
+  `evidence/s2-002-gvisor-sandbox.json`, `evidence/postgres-smoke.json`,
   `evidence/root-manifest.json`
 - Raw runs: `results/s2-002/run-{a,b}/observations.json`, `summary.json`
 - Reviews: `docs/decisions/S2-002-TEST-REVIEW-LOG.md`

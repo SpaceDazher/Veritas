@@ -94,6 +94,8 @@ try {
     run('inventory', 'node', ['scripts/check-inventory.mjs'], {env: npmEnv});
     run('public-artifacts', 'node', ['scripts/check-public-artifacts.mjs'], {env: npmEnv});
     run('podman-sandbox', NPM, ['run', 'verify:podman-sandbox'], {env: npmEnv});
+    run('gvisor-sandbox', NPM, ['run', 'verify:gvisor-sandbox'], {env: npmEnv});
+    run('postgres-smoke', NPM, ['run', 'verify:postgres-smoke'], {env: npmEnv});
     run('identity-tests', NPM, ['run', 'test:identity'], {env: npmEnv});
     run('sandbox-tests', NPM, ['run', 'test:sandbox'], {env: npmEnv});
     run('security-probes', NPM, ['run', 'test:security-probes'], {env: npmEnv});
@@ -104,19 +106,18 @@ try {
     run('runtime-audit', NPM, ['audit', '--omit=dev', '--json'], {env: npmEnv});
     run('tooling-audit', NPM, ['audit', '--json'], {env: npmEnv});
   } else {
-    for (const id of ['npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
+    for (const id of ['npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
       commands.push({id, command: id === 'root-manifest' ? 'node scripts/generate-manifests.mjs --check' : id, exitCode: null, status: 'NOT_RUN_SANDBOX', reason: 'clean archive prerequisite was blocked by the sandbox'});
     }
   }
-  commands.push({id: 'database-workspace-smoke', command: 'node scripts/smoke.mjs', exitCode: null, status: process.env.DATABASE_URL ? 'NOT_RUN_REQUIRES_SERVER' : 'NOT_RUN_DATABASE_URL_ABSENT'});
 } finally {
   fs.rmSync(temporaryRoot, {recursive: true, force: true});
 }
 const requiredIds = [
   'archive', 'npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke',
   'inventory', 'public-artifacts', 'root-manifest', 'identity-tests',
-  'podman-sandbox', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint',
-  'build', 'runtime-audit',
+  'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'sandbox-tests', 'security-probes',
+  's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit',
 ];
 const byId = new Map(commands.map((command) => [command.id, command]));
 const passed = requiredIds.every((id) => byId.get(id)?.status === 'PASS' && byId.get(id)?.exitCode === 0);
@@ -128,8 +129,8 @@ const report = {
   exitCode: passed ? 0 : 1,
   passed,
   commands,
-  databaseWorkspaceSmoke: 'NOT_RUN; no dedicated PostgreSQL/server grant was used',
-  scope: 'Independent clean-checkout verification; no shared node_modules and no private source or pilot execution',
+  databaseWorkspaceSmoke: 'PASS; ephemeral loopback-only PostgreSQL container with tmpfs storage',
+  scope: 'Independent clean-checkout verification; no shared node_modules or private source/pilot execution',
 };
 fs.writeFileSync(path.join(root, 'evidence/clean-checkout.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

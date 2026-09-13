@@ -235,11 +235,15 @@ npm ci
 npm run test:identity
 npm run test:sandbox
 npm run test:security-probes
+npm run verify:podman-sandbox
+npm run verify:gvisor-sandbox
+npm run verify:postgres-smoke
 npm run verify:s2-002
 npm run typecheck
 npm run lint
 npm run build
 npm audit --omit=dev
+npm audit
 npm run manifest:check
 git diff --check
 git status --short

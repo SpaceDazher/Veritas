@@ -3,6 +3,6 @@
   "vulnerabilities": {},
   "metadata": {
     "vulnerabilities": {"info": 0, "low": 0, "moderate": 0, "high": 0, "critical": 0, "total": 0},
-    "dependencies": {"prod": 38, "dev": 481, "optional": 170, "peer": 0, "peerOptional": 0, "total": 557}
+    "dependencies": {"prod": 38, "dev": 424, "optional": 122, "peer": 0, "peerOptional": 0, "total": 500}
   }
 }

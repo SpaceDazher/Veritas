@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "scope": "Adversarial corpus A-J driven through the production policy path; DETECTED means the production modules rejected the attack.",
-  "policyVersion": "s2-002-policy-v4",
+  "scope": "Adversarial corpus A-K driven through the production policy path; DETECTED means the production modules rejected the attack.",
+  "policyVersion": "s2-002-policy-v5",
   "generatedAt": "2026-09-12T12:00:00.000Z",
   "escaped": 0,
-  "detected": 10,
+  "detected": 11,
   "skipped": 0,
   "results": [
     {
@@ -66,6 +66,12 @@
       "title": "corrupted/missing policy evidence failing open",
       "verdict": "DETECTED",
       "detail": "clock:REJECTED; doc:REJECTED; tamperedDigest:false; wrongVersion:false; sandbox:REJECTED"
+    },
+    {
+      "id": "K",
+      "title": "untrusted execution evidence substitution or command confusion",
+      "verdict": "DETECTED",
+      "detail": "forged:not_authorized; malformed:not_authorized; executions:0; exact:success; evidenceBound:true; argv:[\"printf\",\"BOUND\"]"
     }
   ]
 }

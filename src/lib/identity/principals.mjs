@@ -7,7 +7,10 @@
 //
 // Contract version: 1.0.0. Offline and deterministic by design.
 
-import { SANDBOX_LOCAL_RESTRICTED_PODMAN } from './sandbox-profiles.mjs';
+import {
+  SANDBOX_LOCAL_RESTRICTED_PODMAN,
+  SANDBOX_UNTRUSTED_CODE_GVISOR,
+} from './sandbox-profiles.mjs';
 
 export const CONTRACT_VERSION = '1.0.0';
 
@@ -133,6 +136,7 @@ export const CAPABILITIES = Object.freeze([
   capability('cap-message.read', 'message.read', 'message', ARGS([['message_id', true]]), NO_LEASE),
   capability('cap-tool.discover', 'tool.discover', 'tool', ARGS([['workspace_id', true]]), NO_LEASE),
   capability('cap-tool.execute', 'tool.execute', 'tool', ARGS([['tool_id', true], ['canonical_args', true]]), { requires_lease: true, requires_approval: false, exec_tier: 'local_restricted', network: 'allowlisted', side_effect: 'write' }),
+  capability('cap-tool.execute-untrusted', 'tool.execute.untrusted', 'tool', ARGS([['tool_id', true], ['canonical_args', true]]), { requires_lease: true, requires_approval: false, exec_tier: 'untrusted_code', network: 'none', side_effect: 'write' }),
   capability('cap-approval.decide', 'approval.decide', 'approval', ARGS([['approval_id', true], ['verdict', true]]), { ...NO_LEASE, side_effect: 'terminal' }),
 ]);
 
@@ -167,7 +171,7 @@ export const ROLES = Object.freeze([
     'cap-board.read', 'cap-source.read', 'cap-claim.read', 'cap-summary.read', 'cap-summary.generate', 'cap-cache.read',
   ]),
   role('rol-experimenter', 'Platform Experiment Runner', 'Tool discovery and gated execution', [
-    'cap-board.read', 'cap-tool.discover', 'cap-tool.execute', 'cap-cache.read',
+    'cap-board.read', 'cap-tool.discover', 'cap-tool.execute', 'cap-tool.execute-untrusted', 'cap-cache.read',
   ]),
   role('rol-verifier', 'Platform Verifier', 'Independent evidence verification reads', [
     'cap-board.read', 'cap-artifact.read', 'cap-claim.read', 'cap-summary.read', 'cap-cache.read',
@@ -211,6 +215,7 @@ export const GRANTS = Object.freeze([
   grant('grt-alice-curator-claimwrite-0015', 'prn-owner-alice', 'prn-platform-curator', 'cap-claim.write', 'ws-veritas-project', 'claim', ['claim:curation-1', 'claim:c1'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_C } }),
   grant('grt-alice-pi-project-update-0016', 'prn-owner-alice', 'prn-external-pi', 'cap-task.update', 'ws-veritas-project', 'task', ['task:tsk-pilot-3'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_D } }),
   grant('grt-alice-curator-cachewrite-0017', 'prn-owner-alice', 'prn-platform-curator', 'cap-cache.write', 'ws-veritas-project', 'cache', ['cache:poisoned-1', 'cache:project-index'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_A } }),
+  grant('grt-bob-experimenter-untrusted-0018', 'prn-owner-bob', 'prn-platform-experimenter', 'cap-tool.execute-untrusted', 'ws-veritas-project', 'tool', ['tool:untrusted-runner'], ISSUED, FAR_FUTURE, { auth_ref: { scheme: 'offline_signature_v1', reference: SHA_B } }),
 ]);
 
 const lease = (lease_id, workspace_id, owner, grant_id, task_id, run_id, fencing_token, issued_at, expires_at, state = 'active') => ({
@@ -235,6 +240,7 @@ export const LEASES = Object.freeze([
   lease('lse-curator-claimwrite-0006', 'ws-veritas-project', 'prn-platform-curator', 'grt-alice-curator-claimwrite-0015', 'tsk-curation-0002', 'run-0001', 1, LEASE_ISSUED, LEASE_EXPIRY),
   lease('lse-pi-project-0007', 'ws-veritas-project', 'prn-external-pi', 'grt-alice-pi-project-update-0016', 'tsk-pilot-3', 'run-0001', 3, LEASE_ISSUED, LEASE_EXPIRY),
   lease('lse-curator-cachewrite-0008', 'ws-veritas-project', 'prn-platform-curator', 'grt-alice-curator-cachewrite-0017', 'tsk-curation-0003', 'run-0001', 1, LEASE_ISSUED, LEASE_EXPIRY),
+  lease('lse-experimenter-untrusted-0009', 'ws-veritas-project', 'prn-platform-experimenter', 'grt-bob-experimenter-untrusted-0018', 'tool-run-untrusted-0002', 'run-0001', 1, LEASE_ISSUED, LEASE_EXPIRY),
 ]);
 
 export const SANDBOX_PROFILES = Object.freeze([
@@ -249,4 +255,5 @@ export const SANDBOX_PROFILES = Object.freeze([
     cancellation: { mode: 'process_tree', on_timeout: 'fail_closed' },
   },
   SANDBOX_LOCAL_RESTRICTED_PODMAN,
+  SANDBOX_UNTRUSTED_CODE_GVISOR,
 ]);

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "profileId": "sbx-gvisor-untrusted-v1",
+  "boundary": "WSL2_ROOTFUL_PODMAN_GVISOR_SYSTRAP_AUTO_USERNS",
+  "distro": "Ubuntu-24.04",
+  "hostKernel": "6.18.33.2-microsoft-standard-WSL2",
+  "podmanVersion": "4.9.3",
+  "podmanRootless": false,
+  "image": "docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc",
+  "ociRuntime": "/usr/bin/runsc",
+  "gvisorVersion": "release-20260907.0",
+  "gvisorRuntimeSha256": "3e0df2fa28f6ff5430b004f92573b81b75f442f78c780e0c85fdf6c2d572817a",
+  "gvisorPlatform": "systrap",
+  "runtimeKernel": "4.19.0-gvisor",
+  "gvisorBootMarker": true,
+  "autoUserns": true,
+  "uidMap": "0:200000:65536",
+  "controls": {
+    "uid": 65534,
+    "capEff": "0000000000000000",
+    "rootFsReadOnlyConfigured": true,
+    "rootFsReadOnly": true,
+    "tmpfsWritable": true,
+    "networkInterfaces": [
+      "lo"
+    ],
+    "noNewPrivileges": 1,
+    "seccompMode": 2,
+    "mounts": 0,
+    "injectedEnvironment": 0
+  },
+  "limits": {
+    "pids": 32,
+    "memoryBytes": 134217728,
+    "memorySwapBytes": 134217728,
+    "nanoCpus": 500000000
+  },
+  "authorizedBackendSmoke": {
+    "decision": "ALLOW",
+    "status": "success",
+    "exitCode": 0,
+    "cleanupVerified": true,
+    "stdoutSha256": "436411f4a034b07005af00ac2cf9e0c9a3bbe27b9ad93e6c961cac397e90734c"
+  },
+  "scope": "UNTRUSTED_CODE",
+  "untrustedCodeEnabled": true,
+  "limitations": []
+}
