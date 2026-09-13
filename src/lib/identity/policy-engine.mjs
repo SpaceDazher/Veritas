@@ -19,7 +19,7 @@ import {
 } from './principals.mjs';
 import { assertValidContract } from './contract-registry.mjs';
 
-export const POLICY_VERSION = 's2-002-policy-v2';
+export const POLICY_VERSION = 's2-002-policy-v3';
 
 const ADAPTERS = new Set(['web', 'api', 'cli']);
 const ID_PATTERNS = {
@@ -183,6 +183,8 @@ export function createPolicyEngine({ now } = {}) {
     if (meta.grantId) document.context.grant_id = meta.grantId;
     if (meta.leaseId) document.context.lease_id = meta.leaseId;
     if (meta.fencingToken) document.context.fencing_token = meta.fencingToken;
+    if (meta.sandboxProfileId) document.context.sandbox_profile_id = meta.sandboxProfileId;
+    if (meta.osControlsEvidence) document.context.os_controls_evidence = meta.osControlsEvidence;
     assertValidContract('authorization-decision', document);
     return document;
   }
@@ -414,6 +416,10 @@ export function createPolicyEngine({ now } = {}) {
 
     const sandbox = checkSandbox(request, capability);
     if (!sandbox.ok) return fail(sandbox.decision, sandbox.reasonCodes);
+    if (sandbox.profile) {
+      meta.sandboxProfileId = sandbox.profile.profile_id;
+      meta.osControlsEvidence = sandbox.profile.os_controls_evidence;
+    }
 
     const access = resolveAccess(request, capability);
     if (access.via === 'DENIED') return fail('DENY', access.reasons);

@@ -6,11 +6,11 @@
 // cancellation, and artifact outputs with digest and provenance.
 //
 // Honesty boundary: a cwd + filtered env + tree kill is NOT a full sandbox.
-// Without a provable kernel-level network boundary (AppContainer or
-// equivalent) the LOCAL_RESTRICTED and UNTRUSTED_CODE tiers stay blocked for
-// public execution paths. spawnForControlProbe() exists solely as the
-// research instrument that observes the tree-kill control for evidence; it
-// is never wired to agent-triggered execution.
+// This Windows child-process adapter is not the executable sandbox: its
+// LOCAL_RESTRICTED and UNTRUSTED_CODE paths stay blocked. Agent-triggered
+// LOCAL_RESTRICTED execution is implemented separately by the evidence-bound
+// rootless Podman bridge in podman-sandbox.mjs. spawnForControlProbe() exists
+// solely as a research instrument for the legacy tree-kill control.
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';

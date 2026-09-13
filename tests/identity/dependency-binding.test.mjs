@@ -45,4 +45,10 @@ describe('S2-002 portable dependency gate', () => {
       assert.ok(manifest < source.indexOf(command), `${command} must follow root-manifest verification`);
     }
   });
+
+  test('clean-checkout makes real Podman control verification a required gate', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'scripts/verify-clean-checkout.mjs'), 'utf8');
+    assert.match(source, /run\('podman-sandbox', NPM, \['run', 'verify:podman-sandbox'\]/);
+    assert.match(source, /'podman-sandbox', 'sandbox-tests'/);
+  });
 });

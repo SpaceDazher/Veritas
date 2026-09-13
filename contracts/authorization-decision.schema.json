@@ -40,7 +40,9 @@
       "properties": {
         "grant_id": { "type": "string", "pattern": "^grt-[a-z0-9][a-z0-9-]{0,62}$" },
         "lease_id": { "type": "string", "pattern": "^lse-[a-z0-9][a-z0-9-]{0,62}$" },
-        "fencing_token": { "type": "integer", "minimum": 1 }
+        "fencing_token": { "type": "integer", "minimum": 1 },
+        "sandbox_profile_id": { "type": "string", "pattern": "^sbx-[a-z0-9][a-z0-9-]{0,62}$" },
+        "os_controls_evidence": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
       }
     }
   },

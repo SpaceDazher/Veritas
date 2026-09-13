@@ -3,21 +3,26 @@
 Status: FROZEN for S2-002 evaluation. This document states exactly which
 sandbox controls are implemented, which are observed by tests, and which
 remain blocked because the platform cannot prove them. It deliberately
-refuses to call the current state a full sandbox.
+refuses to generalize the bounded local profile into an untrusted-code claim.
 
 ## 1. Tiers
 
 | Tier | Purpose | Execution status |
 |------|---------|------------------|
 | `NO_EXEC` | contract/evidence operations only | execution forbidden (`SBX_TIER_FORBIDS_EXEC`) |
-| `LOCAL_RESTRICTED` | gated live processes behind proven OS controls | **BLOCKED** (`SBX_NO_KERNEL_NETWORK_BOUNDARY`) |
-| `UNTRUSTED_CODE` | hostile code, kernel/container boundary required | **BLOCKED** (same reason) |
+| `LOCAL_RESTRICTED` | fixed, low-risk commands in a pinned container | **ENABLED** only as `sbx-podman-local-restricted-v1` |
+| `UNTRUSTED_CODE` | hostile code, stronger confinement required | **BLOCKED** (`SBX_NO_OS_EVIDENCE`) |
 
-`NO_EXEC` is a contract-valid profile (`contracts/sandbox-profile.schema.json`,
-`sbx-no-exec-default`). `LOCAL_RESTRICTED`/`UNTRUSTED_CODE` target
-specifications exist in `src/lib/identity/sandbox-profiles.mjs` and carry no
-`os_controls_evidence` by design: the profile contract requires that
-evidence, and we do not possess it.
+`NO_EXEC` and `sbx-podman-local-restricted-v1` are contract-valid profiles.
+The latter is registered only while its exact evidence content address is
+present in the authorization decision. `UNTRUSTED_CODE` has no registered
+profile and therefore fails closed.
+
+The Podman backend is `src/lib/identity/podman-sandbox.mjs`. Callers may
+provide only a bounded argv vector, job id and timeout. The WSL distribution,
+image digest and isolation flags are host-owned constants. Alternate images,
+host mounts, network access, environment/secret injection and shell command
+strings are not request fields.
 
 ## 2. Controls implemented and observed
 
@@ -37,13 +42,13 @@ and by both frozen replay runs.
 - Case-insensitive Windows comparison; back- and forward-slash
   normalization.
 
-### 2.2 Network (deny by default; allowlist exact-match)
+### 2.2 Network (deny by default)
 
 - `deny_all` forbids every destination (checked host+port pairs).
 - Allowlist profiles match exact host and port; empty allowlist under
   `allowlist` policy is rejected by the profile contract itself.
-- Kernel-level enforcement of child-process network access is NOT available
-  on this stack — see §3.
+- The enabled Podman profile uses a separate container network namespace with
+  `--network=none`; observation exposes only loopback (`lo`).
 
 ### 2.3 Environment and secrets (enforced)
 
@@ -70,6 +75,13 @@ and by both frozen replay runs.
   grandchild spawned via `start /b` is reaped; timeout and cancellation
   produce terminal outcomes (`timeout` / `cancelled`), never `success`.
 
+The Podman backend additionally enforces rootless execution, UID 65534,
+read-only rootfs, all capabilities dropped, `no-new-privileges`, seccomp,
+private IPC, 32 PIDs, 128 MiB memory, 0.5 CPU and a 16 MiB noexec tmpfs. It
+always attempts exact container cleanup, including after timeout. The real
+authorization-to-execution smoke is recorded in
+`evidence/s2-002-podman-sandbox.json`.
+
 ### 2.5 Outputs (enforced)
 
 - Outputs may be written only into the profile-bound artifact root, by bare
@@ -85,26 +97,22 @@ and by both frozen replay runs.
 
 ## 3. What this sandbox is NOT (honest boundary statement)
 
-1. No kernel-level network boundary: Node.js on Windows cannot create or
-   verify an AppContainer (or equivalent container/restricted-token
-   isolation) for child processes. A child that ignored our filtered
-   environment could still open sockets. Therefore `LOCAL_RESTRICTED` and
-   `UNTRUSTED_CODE` remain blocked for all agent-triggered execution, and
-   live execution of untrusted code stays forbidden.
-2. `cwd` + filtered env + tree kill is explicitly NOT claimed to be a full
-   sandbox (ticket requirement).
-3. Memory/CPU ceilings are recorded in outcomes and plans but are not
-   kernel-enforced on this stack.
-4. Follow-up required to unblock `LOCAL_RESTRICTED`: AppContainer or
-   container-based isolation with a provable network deny-by-default
-   boundary, its observed evidence digest, and a contract-valid
-   `LOCAL_RESTRICTED` profile — then and only then may execution tier gates
-   open.
+1. This is a WSL2/rootless Podman boundary for `LOCAL_RESTRICTED`, not a
+   proof that arbitrary hostile code is safe. `UNTRUSTED_CODE` stays blocked.
+2. AppArmor and SELinux are unavailable in this WSL2 distribution. Seccomp,
+   namespaces, capability removal and cgroup v2 limits are observed, but a
+   production profile should add an independently reviewed MAC policy.
+3. The profile deliberately has no network allowlist, host workspace mount,
+   environment injection or secret delivery. Workloads requiring those
+   features are unsupported rather than silently weakened.
+4. Only the pinned Alpine digest already present in the rootless image store
+   is accepted; pulling or selecting images is outside the execution request.
 
 ## 4. Engine integration
 
-The policy engine maps capability `exec_tier` to a sandbox tier and returns
-`BLOCKED_SANDBOX` (`SBX_NO_OS_EVIDENCE`) unless a profile of that tier with
-`os_controls_evidence` exists and the adapter re-verifies the kernel
-boundary at runtime. Capability discovery may describe tools; discovery is
-never a substitute for execution-time authorization.
+The policy engine maps capability `exec_tier` to a registered profile and
+binds the profile id and evidence digest into every `ALLOW` decision. The
+execution bridge rejects an `ALLOW` that lacks either exact binding. Runtime
+verification re-observes the controls and compares them to the committed
+record before acceptance. Capability discovery may describe tools; discovery
+is never a substitute for execution-time authorization.

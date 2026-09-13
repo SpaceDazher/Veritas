@@ -714,7 +714,7 @@ describe('S2-002 policy engine: derived artifact ACL inheritance', () => {
 });
 
 describe('S2-002 policy engine: sandbox gate', () => {
-  test('execution capability without proven OS controls is BLOCKED_SANDBOX', () => {
+  test('local execution is authorized only through the registered Podman OS-control profile', () => {
     const engine = makeEngine();
     const result = engine.authorize(req({
       principalId: 'prn-platform-experimenter',
@@ -723,8 +723,11 @@ describe('S2-002 policy engine: sandbox gate', () => {
       resource: { type: 'tool', id: 'tool:runner' },
       lease: { leaseId: 'lse-experimenter-0005', fencingToken: 1 },
     }));
-    assert.equal(result.decision, 'BLOCKED_SANDBOX');
-    assert.ok(result.reasonCodes.includes('SBX_NO_OS_EVIDENCE'));
+    assert.equal(result.decision, 'ALLOW');
+    assert.ok(result.reasonCodes.includes('ACL_ROLE_MATCH'));
+    assert.ok(result.reasonCodes.includes('LEASE_FRESH'));
+    assert.equal(result.document.context.sandbox_profile_id, 'sbx-podman-local-restricted-v1');
+    assert.match(result.document.context.os_controls_evidence, /^sha256:[0-9a-f]{64}$/);
   });
 
   test('tool discovery stays readable (contract-level operation)', () => {

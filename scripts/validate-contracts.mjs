@@ -122,7 +122,9 @@ const frozenTargets = [
   'src/lib/identity', 'tests/identity', 'docs/security',
   'scripts/s2-002-run.mjs', 'scripts/security-probes.mjs', 'scripts/verify-s2-002.mjs',
   'scripts/verify-s2-002-dependencies.mjs', 'scripts/verify-clean-checkout.mjs',
+  'scripts/verify-podman-sandbox.mjs',
   'evidence/s2-002-dependency-binding.json', 'evidence/s2-002-security-probes.json',
+  'evidence/s2-002-podman-sandbox.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');

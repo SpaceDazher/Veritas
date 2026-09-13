@@ -93,6 +93,7 @@ try {
     run('synthetic-smoke', 'node', ['scripts/synthetic-smoke.mjs'], {env: npmEnv});
     run('inventory', 'node', ['scripts/check-inventory.mjs'], {env: npmEnv});
     run('public-artifacts', 'node', ['scripts/check-public-artifacts.mjs'], {env: npmEnv});
+    run('podman-sandbox', NPM, ['run', 'verify:podman-sandbox'], {env: npmEnv});
     run('identity-tests', NPM, ['run', 'test:identity'], {env: npmEnv});
     run('sandbox-tests', NPM, ['run', 'test:sandbox'], {env: npmEnv});
     run('security-probes', NPM, ['run', 'test:security-probes'], {env: npmEnv});
@@ -103,7 +104,7 @@ try {
     run('runtime-audit', NPM, ['audit', '--omit=dev', '--json'], {env: npmEnv});
     run('tooling-audit', NPM, ['audit', '--json'], {env: npmEnv});
   } else {
-    for (const id of ['npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
+    for (const id of ['npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
       commands.push({id, command: id === 'root-manifest' ? 'node scripts/generate-manifests.mjs --check' : id, exitCode: null, status: 'NOT_RUN_SANDBOX', reason: 'clean archive prerequisite was blocked by the sandbox'});
     }
   }
@@ -114,7 +115,7 @@ try {
 const requiredIds = [
   'archive', 'npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke',
   'inventory', 'public-artifacts', 'root-manifest', 'identity-tests',
-  'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint',
+  'podman-sandbox', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint',
   'build', 'runtime-audit',
 ];
 const byId = new Map(commands.map((command) => [command.id, command]));

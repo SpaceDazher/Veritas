@@ -7,9 +7,9 @@
     "executorId": "exec-beta",
     "nonceBase": "nb-beta-c91d",
     "outputRoot": "results/s2-002/run-b",
-    "corpusDigest": "71ad98104711f1374407d7d18ee21b96af29088063075374284d88b3424535b0",
+    "corpusDigest": "a5a63dc0c53c29bcd10003a31179342bc1f3a2fbe0fb39b6c69dbb5ee3eeb7e0",
     "fixedClock": "2026-09-12T12:00:00.000Z",
-    "policyVersion": "s2-002-policy-v2",
+    "policyVersion": "s2-002-policy-v3",
     "platform": "win32/x64 node v22.23.2",
     "trialCount": 283,
     "counters": {
@@ -22,10 +22,10 @@
     },
     "revocationLatency": {
       "trials": 100,
-      "maxMs": 0.0702,
-      "meanMs": 0.012191999999999988,
+      "maxMs": 0.0699,
+      "meanMs": 0.01263700000000002,
       "allowAfterCommit": 0
     }
   },
-  "observationsDigest": "7343836ddc7c2fe20279e148643f65998d11962564fff8a3f7db51d7eb9cf407"
+  "observationsDigest": "525ae1c4a7ca5f57dc045629da4fe635dfadfc06a7402a7bd5c7c13cf072f50a"
 }

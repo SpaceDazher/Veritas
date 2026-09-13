@@ -2145,15 +2145,16 @@
     "match": true
   },
   {
-    "trialId": "cap/experimenter/tool.execute/blocked-tier",
+    "trialId": "cap/experimenter/tool.execute/podman-local-restricted",
     "kind": "capability",
     "principalId": "prn-platform-experimenter",
     "workspaceId": "ws-veritas-project",
     "action": "tool.execute",
-    "expected": "BLOCKED_SANDBOX",
-    "decision": "BLOCKED_SANDBOX",
+    "expected": "ALLOW",
+    "decision": "ALLOW",
     "reasonCodes": [
-      "SBX_NO_OS_EVIDENCE"
+      "ACL_ROLE_MATCH",
+      "LEASE_FRESH"
     ],
     "crossTenant": false,
     "match": true
@@ -2532,7 +2533,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0702,
+    "latencyMs": 0.0699,
     "match": true
   },
   {
@@ -2543,7 +2544,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0148,
+    "latencyMs": 0.0187,
     "match": true
   },
   {
@@ -2554,7 +2555,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0121,
+    "latencyMs": 0.0135,
     "match": true
   },
   {
@@ -2565,7 +2566,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0177,
+    "latencyMs": 0.0121,
     "match": true
   },
   {
@@ -2576,7 +2577,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0163,
+    "latencyMs": 0.0152,
     "match": true
   },
   {
@@ -2587,7 +2588,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.014,
+    "latencyMs": 0.012,
     "match": true
   },
   {
@@ -2598,7 +2599,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0113,
+    "latencyMs": 0.0119,
     "match": true
   },
   {
@@ -2609,7 +2610,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0113,
+    "latencyMs": 0.0119,
     "match": true
   },
   {
@@ -2620,7 +2621,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0118,
+    "latencyMs": 0.0124,
     "match": true
   },
   {
@@ -2631,7 +2632,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0126,
+    "latencyMs": 0.0145,
     "match": true
   },
   {
@@ -2642,7 +2643,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.012,
+    "latencyMs": 0.0119,
     "match": true
   },
   {
@@ -2653,7 +2654,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0116,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -2664,7 +2665,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0116,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -2675,7 +2676,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0114,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -2686,7 +2687,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0113,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -2697,7 +2698,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0114,
+    "latencyMs": 0.0127,
     "match": true
   },
   {
@@ -2708,7 +2709,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0112,
+    "latencyMs": 0.0132,
     "match": true
   },
   {
@@ -2719,7 +2720,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0116,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -2741,7 +2742,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0112,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2752,7 +2753,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0114,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2763,7 +2764,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0112,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2774,7 +2775,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0113,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2785,7 +2786,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0114,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2796,7 +2797,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -2807,7 +2808,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2818,7 +2819,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2829,7 +2830,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -2840,7 +2841,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0111,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -2851,7 +2852,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0124,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2862,7 +2863,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0112,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2873,7 +2874,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2884,7 +2885,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2895,7 +2896,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2906,7 +2907,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2917,7 +2918,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2928,7 +2929,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -2939,7 +2940,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -2950,7 +2951,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.013,
     "match": true
   },
   {
@@ -2961,7 +2962,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0126,
     "match": true
   },
   {
@@ -2972,7 +2973,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0115,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -2983,7 +2984,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0126,
     "match": true
   },
   {
@@ -2994,7 +2995,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3005,7 +3006,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3016,7 +3017,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3027,7 +3028,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3038,7 +3039,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3049,7 +3050,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0111,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3060,7 +3061,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -3071,7 +3072,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0135,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -3082,7 +3083,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3093,7 +3094,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0107,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3104,7 +3105,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -3115,7 +3116,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0141,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -3126,7 +3127,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0112,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3137,7 +3138,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -3148,7 +3149,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0121,
+    "latencyMs": 0.0131,
     "match": true
   },
   {
@@ -3159,7 +3160,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0119,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -3170,7 +3171,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0118,
     "match": true
   },
   {
@@ -3192,7 +3193,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0113,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3203,7 +3204,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3214,7 +3215,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3225,7 +3226,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0137,
     "match": true
   },
   {
@@ -3236,7 +3237,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3247,7 +3248,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3258,7 +3259,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0111,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3269,7 +3270,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3280,7 +3281,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3291,7 +3292,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.012,
     "match": true
   },
   {
@@ -3302,7 +3303,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0289,
+    "latencyMs": 0.0326,
     "match": true
   },
   {
@@ -3313,7 +3314,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3324,7 +3325,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3346,7 +3347,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3357,7 +3358,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0122,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3368,7 +3369,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0113,
+    "latencyMs": 0.0117,
     "match": true
   },
   {
@@ -3379,7 +3380,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0111,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3390,7 +3391,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0111,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3401,7 +3402,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0133,
     "match": true
   },
   {
@@ -3412,7 +3413,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0158,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3423,7 +3424,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3434,7 +3435,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3445,7 +3446,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3456,7 +3457,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0116,
     "match": true
   },
   {
@@ -3467,7 +3468,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3478,7 +3479,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3489,7 +3490,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3500,7 +3501,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3511,7 +3512,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3522,7 +3523,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3533,7 +3534,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0112,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3544,7 +3545,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0115,
     "match": true
   },
   {
@@ -3555,7 +3556,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3566,7 +3567,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0111,
     "match": true
   },
   {
@@ -3577,7 +3578,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0113,
     "match": true
   },
   {
@@ -3588,7 +3589,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0112,
     "match": true
   },
   {
@@ -3599,7 +3600,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0109,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3610,7 +3611,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.011,
+    "latencyMs": 0.0114,
     "match": true
   },
   {
@@ -3621,7 +3622,7 @@
     "reasonCodes": [
       "GRANT_REVOKED"
     ],
-    "latencyMs": 0.0108,
+    "latencyMs": 0.0112,
     "match": true
   }
 ]

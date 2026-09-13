@@ -7,6 +7,8 @@
 //
 // Contract version: 1.0.0. Offline and deterministic by design.
 
+import { SANDBOX_LOCAL_RESTRICTED_PODMAN } from './sandbox-profiles.mjs';
+
 export const CONTRACT_VERSION = '1.0.0';
 
 const SHA_A = `sha256:${'a1'.repeat(32)}`;
@@ -246,4 +248,5 @@ export const SANDBOX_PROFILES = Object.freeze([
     process: { max_processes: 1, memory_mb: 512, timeout_ms: 30000 },
     cancellation: { mode: 'process_tree', on_timeout: 'fail_closed' },
   },
+  SANDBOX_LOCAL_RESTRICTED_PODMAN,
 ]);

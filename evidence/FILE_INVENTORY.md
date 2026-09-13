@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 131.
+Generated from `git ls-files`; count: 135.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -61,6 +61,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-002-comparison-integrity.json`
 - `evidence/s2-002-comparison.json`
 - `evidence/s2-002-dependency-binding.json`
+- `evidence/s2-002-podman-sandbox.json`
 - `evidence/s2-002-run-a.json`
 - `evidence/s2-002-run-b.json`
 - `evidence/s2-002-security-probes.json`
@@ -104,6 +105,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/validate-contracts.mjs`
 - `scripts/verify-clean-checkout.mjs`
 - `scripts/verify-pilot-binding.mjs`
+- `scripts/verify-podman-sandbox.mjs`
 - `scripts/verify-s2-002-dependencies.mjs`
 - `scripts/verify-s2-002.mjs`
 - `scripts/verify.mjs`
@@ -122,6 +124,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/identity/contract-registry.mjs`
 - `src/lib/identity/contracts.fixtures.ts`
 - `src/lib/identity/contracts.ts`
+- `src/lib/identity/podman-sandbox.mjs`
 - `src/lib/identity/policy-engine.mjs`
 - `src/lib/identity/principals.mjs`
 - `src/lib/identity/sandbox-profiles.mjs`
@@ -129,6 +132,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/dependency-binding.test.mjs`
+- `tests/identity/podman-sandbox.test.mjs`
 - `tests/identity/policy-engine.test.mjs`
 - `tests/identity/replay-runs.test.mjs`
 - `tests/identity/sandbox.test.mjs`

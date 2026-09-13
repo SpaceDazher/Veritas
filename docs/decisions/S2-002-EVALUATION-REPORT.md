@@ -2,8 +2,22 @@
 
 Ticket: `tasks/S2-002_IDENTITY_SANDBOX.md` — identity, agent rights and the
 local sandbox gate. Branch: `codex/s2-002-identity-sandbox`.
-Verdict: **PASS_WITH_LIMITS** (after two corrective rounds; see §8). Live code
-execution remains **BLOCKED_SANDBOX**.
+Verdict: **PASS_WITH_LIMITS** (after the Podman corrective round). Bounded
+`LOCAL_RESTRICTED` execution is enabled through one evidence-bound backend;
+`UNTRUSTED_CODE` remains **BLOCKED_SANDBOX**.
+
+## 0A. Podman corrective round
+
+WSL2 was enabled and rootless Podman installed after the original report.
+The registered `sbx-podman-local-restricted-v1` profile is content-addressed
+to `evidence/s2-002-podman-sandbox.json`. A real authorization-to-container
+smoke proves policy `ALLOW`, pinned-image execution and terminal cleanup.
+The observed boundary is: rootless Podman, cgroup v2, UID 65534, read-only
+rootfs, all capabilities dropped, `no-new-privileges`, seccomp mode 2,
+network namespace with loopback only, no host mounts/injected environment,
+32 PIDs, 128 MiB and 0.5 CPU. The corpus, frozen manifest and clean-checkout
+gate include this profile. AppArmor/SELinux and `UNTRUSTED_CODE` are not
+claimed.
 
 ## 0. Corrective round — response to the independent REVISE review
 
@@ -20,7 +34,8 @@ two P1 findings. All seven were reproduced and fixed:
 | P1 clean-checkout claimed PASS without evidence | honest correction: the previous run had actually failed (`tar` drive-letter bug, npm spawn bug). Both fixed (`--relative-path tar extraction`, `npm.cmd` via cmd.exe, git-inventory fallbacks, synthetic placeholder for the build-time DB variable) and a real PASS is now recorded in `evidence/clean-checkout.json` |
 | P1 dependencies S1-007/S1-008/S1-010 unbound | RESOLVED: the Stage-1 tickets live in `AgentOS/research/tickets/stage-1` (head `259d9afe…`). All three are completed gates (`pass_with_limits`) and are now digest-bound in `evidence/s2-002-dependency-binding.json`: S1-007 retrieval/index isolation (chain `4c344ab2…`), S1-008 revocation latency ≤5s (chain `5c43c03d…` — the requirement S2-002 enforces), S1-010 tool-poisoning detection (chain `8442d0de…`, gate verdict PASS) |
 
-Policy version bumped to `s2-002-policy-v2` (semantics changed).
+Policy version is `s2-002-policy-v3`; v3 adds the exact Podman profile and
+OS-evidence binding to every executable `ALLOW` decision.
 Frozen-manifest scope now covers the whole S2-002 implementation, oracle
 suites, corpus runner, comparator and security docs.
 
@@ -46,16 +61,17 @@ reproducibility gaps. This corrective round closes them as follows:
 | 2. All schemas and server-side policy paths implemented and versioned | PASS — 8 contracts at `1.0.0`, single engine for Web/API/CLI |
 | 3. ACL matrix covers 20 principals and all listed paths | PASS — 140-cell board.read matrix + capability/derived/nonce cells per run |
 | 4. Hard counters zero in both independent runs | PASS — see §4 |
-| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, final max 0.0608 ms / 0.0702 ms (limit 5000 ms) |
+| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, final max 0.0704 ms / 0.0699 ms (limit 5000 ms) |
 | 6. All adversarial probes detected by production path | PASS — 10/10 DETECTED, 0 ESCAPED |
-| 7. Process-tree cancellation and required OS controls observable | PASS on Windows (survivors = 0); kernel network boundary NOT provable — see limits |
+| 7. Process-tree cancellation and required OS controls observable | PASS for the bounded Podman profile; legacy Windows probe still records survivors = 0 |
 | 8. Frozen hashes, commit/tree, environment and outputs converge | PASS — manifests re-frozen per commit; `manifest:check` green |
 | 9. Full test/typecheck/lint/build/security set in clean checkout | PASS — see §5; `build` used a synthetic placeholder `DATABASE_URL` (see §5 note) |
 | 10. Documentation honestly separates local proofs from production guarantees | PASS — THREAT-MODEL §5, SANDBOX-PROFILE §3 |
 
-Gate outcome per ticket: identity policy is proven locally; a kernel-level
-sandbox is unavailable on this stack, so `PARTIAL`/`BLOCKED_SANDBOX` is the
-honest outcome and live execution stays forbidden.
+Gate outcome per ticket: identity policy and a bounded `LOCAL_RESTRICTED`
+container path are proven locally. The verdict stays `PASS_WITH_LIMITS`;
+host workspace access, networked workloads, injected secrets and arbitrary
+untrusted code are not authorized.
 
 ## 2. What was built
 
@@ -78,12 +94,14 @@ honest outcome and live execution stays forbidden.
    producer-blocked approvals; `BLOCKED_SANDBOX` for unproven execution
    tiers; every decision returns a contract-valid AuthorizationDecision
    with input digest and audit reference.
-4. **Sandbox adapter:** `src/lib/identity/sandbox.mjs` — filesystem
+4. **Sandbox adapters:** `src/lib/identity/sandbox.mjs` — filesystem
    canonicalization (traversal/UNC/device/junction/symlink), deny-by-default
    network with exact allowlists, environment allowlist, opaque secret
    handles with redaction, artifact outputs with SHA-256 + provenance,
    process-tree cancellation with survivor accounting (§ limits in
-   `docs/security/S2-002-SANDBOX-PROFILE.md`).
+   `docs/security/S2-002-SANDBOX-PROFILE.md`). The executable bridge
+   `src/lib/identity/podman-sandbox.mjs` accepts only bounded argv and routes
+   an evidence-bound policy `ALLOW` into the fixed rootless Podman profile.
 5. **Adversarial corpus A–J:** `scripts/security-probes.mjs` — every probe
    attacks the production modules directly; any ESCAPED is a hard fail.
 6. **Independent replay:** `scripts/s2-002-run.mjs` (frozen corpus runner,
@@ -113,7 +131,7 @@ J corrupted/missing evidence fail-open.
 | Survivors after cancellation | 0 | 0 | 0 |
 | Allow-after-revocation-commit | 0 | 0 | 0 |
 | Missing/censored trials | 0 | 0 | 0 |
-| Revocation decision latency (100 trials) | max ≤ 5000 ms | 0.0608 ms | 0.0702 ms |
+| Revocation decision latency (100 trials) | max ≤ 5000 ms | 0.0704 ms | 0.0699 ms |
 | Decision mismatch A vs B | 0 | 0 (283 compared) | — |
 | Frozen-oracle violations (either run) | 0 | 0 | 0 |
 
@@ -138,6 +156,7 @@ npm run verify:s2-002-dependencies # portable 4/4 dependency binding
 npm run test:identity          # includes exact-oracle and dependency regressions
 npm run test:sandbox           # 18 tests
 npm run test:security-probes   # 10/10 DETECTED, exit 0
+npm run verify:podman-sandbox  # real WSL2/rootless Podman controls + authorized smoke
 npm run verify:s2-002          # process-separated runs, ok=true, exit 0
 npm run typecheck              # exit 0
 npm run lint                   # exit 0
@@ -182,15 +201,16 @@ only).
 1. **No production authentication / multi-tenancy.** The registry is
    synthetic fixture data proving policy mechanics; it is not a deployed
    IdP, and 20 principals are ACL coverage, not concurrent users.
-2. **No kernel sandbox.** `LOCAL_RESTRICTED`/`UNTRUSTED_CODE` execution is
-   blocked (`SBX_NO_KERNEL_NETWORK_BOUNDARY`); live execution stays
-   forbidden until AppContainer/container evidence exists
-   (`docs/security/S2-002-SANDBOX-PROFILE.md` §3).
+2. **Bounded sandbox only.** `LOCAL_RESTRICTED` is enabled exclusively through
+   the measured WSL2/rootless Podman profile. `UNTRUSTED_CODE`, host mounts,
+   networked jobs, environment/secret injection and alternate images remain
+   blocked (`docs/security/S2-002-SANDBOX-PROFILE.md` §3).
 3. **In-memory enforcement state.** Nonces, fencing ceilings and
    revocations are per engine instance; a durable multi-process deployment
    needs an atomic shared authority store.
-4. **Memory/CPU ceilings** of child processes are recorded, not
-   kernel-enforced, on this stack.
+4. **Confinement limits.** Podman cgroup v2 enforces memory/CPU/PID ceilings,
+   but AppArmor/SELinux is unavailable in this WSL2 distribution. The legacy
+   Windows process probe is evidence only and is not an executable agent path.
 5. **Secrets.** No real credentials, tokens or private source content were
    used or committed; build and archive checks use a synthetic passwordless
    placeholder variable as noted.
@@ -202,7 +222,7 @@ only).
 
 - Contracts: `contracts/*.schema.json` (8 files, `1.0.0`, frozen manifest)
 - Implementation: `src/lib/identity/*` (registry, principals, engine,
-  sandbox, profiles, TS types)
+  sandbox, Podman execution bridge, profiles, TS types)
 - Tests: `tests/identity/*.test.mjs` (contracts, policy, sandbox, probes,
   replay)
 - Probes/corpus: `scripts/security-probes.mjs`, `scripts/s2-002-run.mjs`,
@@ -210,7 +230,8 @@ only).
 - Evidence: `evidence/s2-001-pilot-binding.json`,
   `evidence/s2-002-security-probes.json`, `evidence/s2-002-run-{a,b}.json`,
   `evidence/s2-002-comparison.json`, `evidence/s2-002-comparison-integrity.json`,
-  `evidence/frozen-manifest.json`, `evidence/root-manifest.json`
+  `evidence/s2-002-podman-sandbox.json`, `evidence/frozen-manifest.json`,
+  `evidence/root-manifest.json`
 - Raw runs: `results/s2-002/run-{a,b}/observations.json`, `summary.json`
 - Reviews: `docs/decisions/S2-002-TEST-REVIEW-LOG.md`
 - Hash binding: all artifacts are hash-bound by `evidence/root-manifest.json`

@@ -2,16 +2,29 @@
 // SANDBOX_NO_EXEC is a contract-valid profile: contract/evidence operations
 // only, no live processes.
 //
-// SANDBOX_LOCAL_RESTRICTED_BLOCKED deliberately carries NO
-// os_controls_evidence: on the current Windows/Node.js stack we cannot prove
-// a kernel-level network boundary (AppContainer or equivalent) for child
-// processes, so the LOCAL_RESTRICTED tier stays blocked. This object is the
-// reviewed *target specification* of the controls we would run behind that
-// boundary; createSandbox() independently re-verifies the boundary at
-// runtime and refuses execution while it cannot be proven. It is intentionally
-// NOT a valid `sandbox-profile` contract document and must never be
-// registered as one until the kernel boundary evidence exists.
+// SANDBOX_LOCAL_RESTRICTED_PODMAN is the only executable profile. It is bound
+// to measured WSL2/rootless Podman controls and to a fixed host-owned backend.
+// The legacy BLOCKED target remains as a non-registered Windows control probe;
+// UNTRUSTED_CODE remains blocked.
 export const CONTRACT_VERSION = '1.0.0';
+
+// Content address of evidence/s2-002-podman-sandbox.json. The profile is
+// registered only for LOCAL_RESTRICTED; UNTRUSTED_CODE remains blocked.
+export const SANDBOX_LOCAL_RESTRICTED_PODMAN = Object.freeze({
+  contractVersion: CONTRACT_VERSION,
+  profile_id: 'sbx-podman-local-restricted-v1',
+  tier: 'LOCAL_RESTRICTED',
+  os_controls_evidence: 'sha256:5b7a6314edaf2860cc78a2855fd2a82fcd17bee8dc358742404ffc006740bf2c',
+  filesystem: {
+    roots: ['/tmp'],
+    deny_link_escape: true,
+    deny_traversal: true,
+  },
+  network: { policy: 'deny_all', allowlist: [] },
+  environment: { allowlist: [], secret_handles: [] },
+  process: { max_processes: 32, memory_mb: 128, timeout_ms: 30000 },
+  cancellation: { mode: 'process_tree', on_timeout: 'kill_tree' },
+});
 
 export const SANDBOX_NO_EXEC = Object.freeze({
   contractVersion: CONTRACT_VERSION,

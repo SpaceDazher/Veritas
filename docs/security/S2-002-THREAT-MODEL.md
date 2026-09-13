@@ -49,9 +49,9 @@ sandbox adapter  ──►  filesystem / network / environment / process tree
 2. Everything outside the engine's registry is data. JSON fields, prompts,
    environment variables, model output and content hashes are never proof
    of identity or authority.
-3. The sandbox adapter is the only component permitted to create processes,
-   and its executable tiers are blocked while no kernel-level network
-   boundary is provable (see SANDBOX-PROFILE).
+3. The fixed Podman execution bridge is the only agent-triggered executable
+   `LOCAL_RESTRICTED` path. It requires a policy `ALLOW` bound to the exact
+   registered profile and evidence digest. `UNTRUSTED_CODE` remains blocked.
 
 ## 4. Threats and controls (mapped to adversarial probes A–J)
 
@@ -74,17 +74,19 @@ recorded in `evidence/s2-002-security-probes.json`; hard-fail on any ESCAPED.
 
 ## 5. Residual threats (explicitly accepted for this gate)
 
-1. No kernel-level sandbox: `LOCAL_RESTRICTED`/`UNTRUSTED_CODE` execution
-   stays `BLOCKED_SANDBOX`; live code execution is forbidden until
-   AppContainer/container evidence exists.
+1. `LOCAL_RESTRICTED` has a measured WSL2/rootless Podman boundary, but no
+   AppArmor/SELinux policy. It accepts only a pinned local image, no network,
+   no host mounts and no injected environment or secrets. `UNTRUSTED_CODE`
+   remains `BLOCKED_SANDBOX`.
 2. No production authentication: registry records are synthetic fixtures;
    the engine models server-side authorization, not a deployed identity
    provider (IdP).
 3. In-memory enforcement state: nonces, fencing ceilings and revocations
    live per engine instance; a durable multi-process deployment needs an
    atomic shared authority store (follow-up, out of scope here).
-4. Memory/CPU limits of child processes are recorded but not kernel
-   enforced on this stack.
+4. Podman cgroup v2 enforces memory/CPU/PID limits for the enabled profile;
+   the legacy Windows control-probe adapter still does not provide that
+   kernel enforcement and is not an agent-triggered execution path.
 
 ## 6. Failure policy
 
