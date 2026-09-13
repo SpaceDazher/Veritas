@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "3fb628b69eba27dc4eed79c36eeaaf2bacb9be66",
-  "sourceTree": "e8efaa72dad1fc9ee9807a0076a34aa96ae91e2e",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "36e6960170a15d6102b0b2d1812f4a88993e76b0",
+  "sourceTree": "7fd46bc6e64dc08964a66554a8f27652f43369a4",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -25,6 +25,13 @@
       "status": "PASS"
     },
     {
+      "id": "s2-003-dependencies",
+      "command": "npm.cmd run verify:s2-003-dependencies",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "r any of the parent directories): .git\nfatal: not a git repository (or any of the parent directories): .git\n\n\n> veritas-agent-board@0.1.0 verify:s2-003-dependencies\n> node scripts/verify-s2-003-dependencies.mjs\n\n{\n  \"ok\": false,\n  \"checked\": 2,\n  \"issues\": [\n    \"origin/main:unresolvable\",\n    \"s2-002.mergeCommit:unreachable-from-main\",\n    \"s2-002.closureCommit:unreachable-from-main\",\n    \"evidence/closure-record.json:missing-at-closure-commit\",\n    \"evidence/root-manifest.json:missing-at-closure-commit\",\n    \"evidence/frozen-manifest.json:missing-at-closure-commit\",\n    \"evidence/clean-checkout.json:missing-at-closure-commit\",\n    \"evidence/s2-002-comparison.json:missing-at-closure-commit\",\n    \"evidence/s2-002-podman-sandbox.json:missing-at-closure-commit\",\n    \"evidence/s2-002-gvisor-sandbox.json:missing-at-closure-commit\",\n    \"evidence/postgres-smoke.json:missing-at-closure-commit\",\n    \"evidence/policy-probes.json:missing-at-closure-commit\",\n    \"evidence/s2-002-security-probes.json:missing-at-closure-commit\",\n    \"evidence/s2-002-dependency-binding.json:missing-at-closure-commit\",\n    \"cross-binding:s2-002-binding-unreadable-from-git\"\n  ],\n  \"status\": \"BLOCKED_DEPENDENCY\"\n}"
+    },
+    {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
       "exitCode": 0,
@@ -33,8 +40,9 @@
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "identity/sandbox.mjs': '9e4b648ac1ada3a3e4197f261977f60fff75ea5b4dbd539bfb050912dbbf5611',\r\n    'tests/database/postgres-smoke.test.mjs': 'feff8a8fa02c5fcef66d1b6b1ca0b8ab00e0d31833bd3e22075db814aeefd20e',\r\n    'tests/identity/contracts.schemas.test.mjs': 'a3547a9d7c01b3b84be2b6fe108b79616a10a689b5fb9a233a7f5ce3423f9795',\r\n    'tests/identity/dependency-binding.test.mjs': '34177b937c063235ab8cdd8aad5a9adccce8d78a4159c1266b1d801f33e90693',\r\n    'tests/identity/gvisor-sandbox.test.mjs': '6f6bbee8046f03f11ee01e53e81069eac196a0255999656b33bb20982318fc68',\r\n    'tests/identity/podman-sandbox.test.mjs': '26221c132e27c0a7928a7395e643ce8a5f8b88693d9ce6f8f21801913f92b3e3',\r\n    'tests/identity/policy-engine.test.mjs': '40db43f8c6dbf5d565b57aab55ee5310343f0e4ea9a902ddf0ef27a1dcdff342',\r\n    'tests/identity/replay-runs.test.mjs': 'b6bd5cbe2c23aa4896b40c0c1074981c425f65fe18e88c9e955b35e9c71c6fbd',\r\n    'tests/identity/sandbox.test.mjs': 'c2c8dd07a6a6943af30478d8442de4d97012defa85dbda237c8239eccf53fe3c',\r\n    'tests/identity/security-probes.test.mjs': '41f90dbe6d6897b3fd252b71a376c286cf56adf3025db89638510ca111123150'\r\n  },\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "synthetic-smoke",
@@ -45,8 +53,9 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "bes.mjs\",\n    \"scripts/verify-s2-003-dependencies.mjs\",\n    \"scripts/verify-s2-003.mjs\",\n    \"src/lib/ingestion/canonical.mjs\",\n    \"src/lib/ingestion/connectors/base.mjs\",\n    \"src/lib/ingestion/connectors/blocked-connectors.mjs\",\n    \"src/lib/ingestion/connectors/http-snapshot.mjs\",\n    \"src/lib/ingestion/connectors/manual-export.mjs\",\n    \"src/lib/ingestion/connectors/markdown-obsidian.mjs\",\n    \"src/lib/ingestion/contract-registry.mjs\",\n    \"src/lib/ingestion/contracts.d.ts\",\n    \"src/lib/ingestion/dedup.mjs\",\n    \"src/lib/ingestion/export-policy.mjs\",\n    \"src/lib/ingestion/pipeline.mjs\",\n    \"src/lib/ingestion/store.mjs\",\n    \"src/lib/ingestion/time-model.mjs\",\n    \"tests/ingestion/canonical-identity.test.mjs\",\n    \"tests/ingestion/connectors.test.mjs\",\n    \"tests/ingestion/contracts.schemas.test.mjs\",\n    \"tests/ingestion/contracts.types.test.mjs\",\n    \"tests/ingestion/dependency-binding.test.mjs\",\n    \"tests/ingestion/export-policy.test.mjs\",\n    \"tests/ingestion/migrations.test.mjs\",\n    \"tests/ingestion/pipeline.test.mjs\",\n    \"tests/ingestion/time-model.test.mjs\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
     },
     {
       "id": "public-artifacts",
@@ -87,6 +96,25 @@
     {
       "id": "security-probes",
       "command": "npm.cmd run test:security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-003-ingestion-tests",
+      "command": "npm.cmd run test:ingestion",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": " ids are independent of the injected clock\n    ok 1 - content snapshot ids are independent of the injected clock\n      ---\n      duration_ms: 0.8218\n      type: 'test'\n      ...\n    # Subtest: identity changes when content or version changes, not when time changes\n    ok 2 - identity changes when content or version changes, not when time changes\n      ---\n      duration_ms: 0.1557\n      type: 'test'\n      ...\n    # Subtest: the decision clock refuses to read the wall clock\n    ok 3 - the decision clock refuses to read the wall clock\n      ---\n      duration_ms: 0.8524\n      type: 'test'\n      ...\n    # Subtest: timestamps are validated as real UTC instants\n    ok 4 - timestamps are validated as real UTC instants\n      ---\n      duration_ms: 0.2386\n      type: 'test'\n      ...\n    # Subtest: tombstone and lineage ids are content-derived and deterministic\n    ok 5 - tombstone and lineage ids are content-derived and deterministic\n      ---\n      duration_ms: 0.2602\n      type: 'test'\n      ...\n    1..5\nok 16 - S2-003 temporal model\n  ---\n  duration_ms: 3.182\n  type: 'suite'\n  ...\n1..16\n# tests 84\n# suites 16\n# pass 83\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2056.4346"
+    },
+    {
+      "id": "s2-003-security-probes",
+      "command": "npm.cmd run test:s2-003-security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-003-replay",
+      "command": "npm.cmd run verify:s2-003",
       "exitCode": 0,
       "status": "PASS"
     },

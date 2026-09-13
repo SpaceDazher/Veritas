@@ -129,6 +129,14 @@ const frozenTargets = [
   'evidence/s2-002-dependency-binding.json', 'evidence/s2-002-security-probes.json',
   'evidence/s2-002-podman-sandbox.json', 'evidence/s2-002-gvisor-sandbox.json',
   'evidence/postgres-smoke.json',
+  // S2-003: ingestion contracts, connectors, pipeline, corpus and evidence
+  // are frozen alongside earlier ticket files.
+  'src/lib/ingestion', 'tests/ingestion', 'corpus/s2-003', 'docs/ingestion',
+  'scripts/s2-003-run.mjs', 'scripts/s2-003-security-probes.mjs',
+  'scripts/verify-s2-003.mjs', 'scripts/verify-s2-003-dependencies.mjs',
+  'scripts/generate-ingestion-types.mjs',
+  'evidence/s2-003-dependency-binding.json', 'evidence/s2-003-security-probes.json',
+  'evidence/external',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');
