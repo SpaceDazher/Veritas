@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "9621b4959bfc76f9c25114f2bc07c90ee83f4595",
-  "sourceTree": "1123fc3c200ac62b1127b16e34284944ab371999",
+  "sourceCommit": "3fb628b69eba27dc4eed79c36eeaaf2bacb9be66",
+  "sourceTree": "e8efaa72dad1fc9ee9807a0076a34aa96ae91e2e",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -61,6 +61,18 @@
       "status": "PASS"
     },
     {
+      "id": "gvisor-sandbox",
+      "command": "npm.cmd run verify:gvisor-sandbox",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "postgres-smoke",
+      "command": "npm.cmd run verify:postgres-smoke",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
       "id": "identity-tests",
       "command": "npm.cmd run test:identity",
       "exitCode": 0,
@@ -111,17 +123,10 @@
     {
       "id": "tooling-audit",
       "command": "npm.cmd audit --json",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "  \"via\": [\n        {\n          \"source\": 1102341,\n          \"name\": \"esbuild\",\n          \"dependency\": \"esbuild\",\n          \"title\": \"esbuild enables any website to send any requests to the development server and read the response\",\n          \"url\": \"https://github.com/advisories/GHSA-67mh-4wv8-2f99\",\n          \"severity\": \"moderate\",\n          \"cwe\": [\n            \"CWE-346\"\n          ],\n          \"cvss\": {\n            \"score\": 5.3,\n            \"vectorString\": \"CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N\"\n          },\n          \"range\": \"<=0.24.2\"\n        }\n      ],\n      \"effects\": [\n        \"@esbuild-kit/core-utils\"\n      ],\n      \"range\": \"<=0.24.2\",\n      \"nodes\": [\n        \"node_modules/@esbuild-kit/core-utils/node_modules/esbuild\"\n      ],\n      \"fixAvailable\": {\n        \"name\": \"drizzle-kit\",\n        \"version\": \"0.18.1\",\n        \"isSemVerMajor\": true\n      }\n    }\n  },\n  \"metadata\": {\n    \"vulnerabilities\": {\n      \"info\": 0,\n      \"low\": 0,\n      \"moderate\": 4,\n      \"high\": 0,\n      \"critical\": 0,\n      \"total\": 4\n    },\n    \"dependencies\": {\n      \"prod\": 38,\n      \"dev\": 481,\n      \"optional\": 170,\n      \"peer\": 0,\n      \"peerOptional\": 0,\n      \"total\": 557\n    }\n  }\n}"
-    },
-    {
-      "id": "database-workspace-smoke",
-      "command": "node scripts/smoke.mjs",
-      "exitCode": null,
-      "status": "NOT_RUN_DATABASE_URL_ABSENT"
+      "exitCode": 0,
+      "status": "PASS"
     }
   ],
-  "databaseWorkspaceSmoke": "NOT_RUN; no dedicated PostgreSQL/server grant was used",
-  "scope": "Independent clean-checkout verification; no shared node_modules and no private source or pilot execution"
+  "databaseWorkspaceSmoke": "PASS; ephemeral loopback-only PostgreSQL container with tmpfs storage",
+  "scope": "Independent clean-checkout verification; no shared node_modules or private source/pilot execution"
 }
