@@ -82,6 +82,7 @@ try {
   if (archiveReady) {
     run('npm-ci', NPM, ['ci'], {env: npmEnv});
     run('s2-002-dependencies', NPM, ['run', 'verify:s2-002-dependencies'], {env: npmEnv});
+    run('s2-003-dependencies', NPM, ['run', 'verify:s2-003-dependencies'], {env: npmEnv});
     // Verify the immutable archive before any command below intentionally
     // refreshes tracked evidence files in the disposable checkout.
     if (fs.existsSync(path.join(checkoutPath, 'evidence/root-manifest.json'))) {
@@ -99,6 +100,9 @@ try {
     run('identity-tests', NPM, ['run', 'test:identity'], {env: npmEnv});
     run('sandbox-tests', NPM, ['run', 'test:sandbox'], {env: npmEnv});
     run('security-probes', NPM, ['run', 'test:security-probes'], {env: npmEnv});
+    run('s2-003-ingestion-tests', NPM, ['run', 'test:ingestion'], {env: npmEnv});
+    run('s2-003-security-probes', NPM, ['run', 'test:s2-003-security-probes'], {env: npmEnv});
+    run('s2-003-replay', NPM, ['run', 'verify:s2-003'], {env: npmEnv});
     run('s2-002-replay', NPM, ['run', 'verify:s2-002'], {env: npmEnv});
     run('typecheck', NPM, ['run', 'typecheck'], {env: npmEnv});
     run('lint', NPM, ['run', 'lint'], {env: npmEnv});
