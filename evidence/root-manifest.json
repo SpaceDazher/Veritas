@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "39295fb30d43340af5aea9073b46f19de115572b",
-  "sourceTree": "ac1ca37a83a70be5af96a8a098710f653fa0e3fd",
-  "trackedFileCount": 131,
-  "manifestFileCount": 128,
-  "payloadManifestSha256": "645cec1e059f5f0f478c9b632502897058405cd9b92be0e8a0180353c5bf6255",
-  "fileManifestSha256": "d728b0babc2c03715fb0fbd1e664dd373391e048a5da39b702d059e5b24c1038",
+  "sourceCommit": "f1c545fd58c8bc6b986af7df24159b1132c9e077",
+  "sourceTree": "8fb34cedb4884684e385b354eb671ed338ce9705",
+  "trackedFileCount": 135,
+  "manifestFileCount": 132,
+  "payloadManifestSha256": "158c987b9b4f78e99449ca8359d04fa3371ef2b3877372ceabac3c9101cc7490",
+  "fileManifestSha256": "99e964b55c131277f8b248b18decdd7e85a995f223ed3b3ad030eb23fe07154e",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -36,8 +36,8 @@
     },
     {
       "path": "contracts/authorization-decision.schema.json",
-      "sha256": "6e0f404659c7386cd2417551de716288f71b8ed436951cd0fb0cfbdf5e5ed9dd",
-      "bytes": 2170
+      "sha256": "2c544059102538043505e5bad8f51a5b447ff4d9d69d83256299798fe1f5a974",
+      "bytes": 2356
     },
     {
       "path": "contracts/capability.schema.json",
@@ -141,8 +141,8 @@
     },
     {
       "path": "docs/decisions/S2-002-EVALUATION-REPORT.md",
-      "sha256": "e1f57286694e6a263afcd2c99a026adf139847a9e4bb0643c4eb1ac9b95d46db",
-      "bytes": 14798
+      "sha256": "3539dfa05a78b3624889370fe47df294d30fc492122c07048c98f9457fa2aca3",
+      "bytes": 16218
     },
     {
       "path": "docs/decisions/S2-002-TEST-REVIEW-LOG.md",
@@ -186,13 +186,13 @@
     },
     {
       "path": "docs/security/S2-002-SANDBOX-PROFILE.md",
-      "sha256": "639f795d5e6d951dd589c9212d58bdbdcf1192a8706eb535c865ff8bfded2c24",
-      "bytes": 5481
+      "sha256": "1eb2bb1e4cba5600f838cc8c17f605b2b655f3387f4a30897e28308b39af24eb",
+      "bytes": 6088
     },
     {
       "path": "docs/security/S2-002-THREAT-MODEL.md",
-      "sha256": "6b94adfebd87728fad2f91f3bd37259221cab3b3c6d4fe9596c362084c715383",
-      "bytes": 5600
+      "sha256": "ec3fa6a7e19a2702e4a8ba149c5dcf9dc8110f2997b0d36293d3a5c7a94451fb",
+      "bytes": 5831
     },
     {
       "path": "drizzle.config.ts",
@@ -246,13 +246,13 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "2a4aaab8365effa40c3b7eaf4bbc251514c4fa8242b264ddb96381e966706862",
-      "bytes": 4957
+      "sha256": "c580d18ccf12e4018a9e691a511ed7a6743c00412ff7a4210858f9fe78adfcba",
+      "bytes": 5118
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "2a65455bf28ad37feb58c32d7a38852f0459114588b60397b0dc726704b6aeee",
-      "bytes": 6852
+      "sha256": "9505d7811ecb60bf9ca768ccd0eb210720a19d5bd912bbb103b3b0f440f12a62",
+      "bytes": 7297
     },
     {
       "path": "evidence/policy-probes.json",
@@ -266,7 +266,7 @@
     },
     {
       "path": "evidence/public-artifact-check.json",
-      "sha256": "e908004bb579208989d05d14258f74a337d4eaad1a7a792528e76150de0dd8d7",
+      "sha256": "adc737f9aa4d5e824b7c7a89576d573f61c022794739484b7732f6a7a39b0c68",
       "bytes": 370
     },
     {
@@ -276,7 +276,7 @@
     },
     {
       "path": "evidence/s2-002-comparison-integrity.json",
-      "sha256": "423811709347cb8e2e5f0aa7bbd0bc19ed733c1355654897071c1bb97cb40315",
+      "sha256": "b67cead28e2390e0664231befa5d48368a0908fc7ab210db32531974498a3aab",
       "bytes": 394
     },
     {
@@ -290,18 +290,23 @@
       "bytes": 4306
     },
     {
+      "path": "evidence/s2-002-podman-sandbox.json",
+      "sha256": "5b7a6314edaf2860cc78a2855fd2a82fcd17bee8dc358742404ffc006740bf2c",
+      "bytes": 1390
+    },
+    {
       "path": "evidence/s2-002-run-a.json",
-      "sha256": "55a39b5b31325258a6e20c0c2197b8e47cc241aa0e951044c3f52cd08bbd4d2a",
+      "sha256": "e30a545badcb7c54272a83553a11281703b9c5395da93eaa42e1dffa13580e07",
       "bytes": 962
     },
     {
       "path": "evidence/s2-002-run-b.json",
-      "sha256": "dd3a8a8585c44691a55d2811f739a4ac56239d433b58039aecd95306beee44ea",
-      "bytes": 960
+      "sha256": "af91983815513fd0a449cc582327329d0e42b4d5a0b6410e5db6e7d177981fa8",
+      "bytes": 959
     },
     {
       "path": "evidence/s2-002-security-probes.json",
-      "sha256": "f726f4ab4e7e93b52864736f96514b27b27f0bcd5810eeede88eba00e3e81b23",
+      "sha256": "b18db08b8d5dd3176a005d5defc5c7b019d7ecc6759c5187a413613af78b064e",
       "bytes": 2680
     },
     {
@@ -331,8 +336,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "b364d16555edfe197b9d77be9cd08ca8602742d62be18a5667887197d35f5f38",
-      "bytes": 2160
+      "sha256": "7e4b1a2bbd3f8606a5952ad638b09f9d3662d8d0b9e1eb590a52014b0147a55d",
+      "bytes": 2231
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -401,23 +406,23 @@
     },
     {
       "path": "results/s2-002/run-a/observations.json",
-      "sha256": "0e08451842443b5c37c42ea7f8623735bf4c41072c0268bc6b086cd8c9bfff00",
-      "bytes": 82409
+      "sha256": "c209be894b52969217f832cac2942e9c9c65f4243cab646d320ed0b7d0dd5189",
+      "bytes": 82419
     },
     {
       "path": "results/s2-002/run-a/summary.json",
-      "sha256": "feedaf144b0b0a36a60f711d665f7afdc7597de59f76670d581cb3817693051b",
+      "sha256": "6f100ccd9a12a651bfb402403fc2924ae528fb3d33c77f8f695d2e1c0975ec81",
       "bytes": 743
     },
     {
       "path": "results/s2-002/run-b/observations.json",
-      "sha256": "df8f5186b8151fc0856d1fcd949d105a3d5e5aaa40dd2d78043964ec9b138582",
-      "bytes": 82394
+      "sha256": "caa03ff4a5fa87a584d94c24f6b717fef6618fcbc35471750499bcb2195c13ac",
+      "bytes": 82420
     },
     {
       "path": "results/s2-002/run-b/summary.json",
-      "sha256": "83ac365746dfc1ec667e248d33ef38f224687db624fec5ff9a8e5ba9e9c0e45a",
-      "bytes": 741
+      "sha256": "7cbd89bf7440313027d778d8b59fec0cb190415bff370c6cf973aad31bc2ffcb",
+      "bytes": 740
     },
     {
       "path": "scripts/acceptance-gate.mjs",
@@ -471,8 +476,8 @@
     },
     {
       "path": "scripts/s2-002-run.mjs",
-      "sha256": "fe10e13703726cc99e6c9b27994d7430c9feeeb63a74e7702c135ef5d401467d",
-      "bytes": 24365
+      "sha256": "8397d40ee968f2eb06392ef9f39b3d952cd959bbd818a53d108398bcaf069a4c",
+      "bytes": 24366
     },
     {
       "path": "scripts/security-probes.mjs",
@@ -491,18 +496,23 @@
     },
     {
       "path": "scripts/validate-contracts.mjs",
-      "sha256": "991211b6746ede595bbff82ad64d52adaac1312cc3412f08d23036caf6a8234d",
-      "bytes": 9510
+      "sha256": "f480e9687fb3b05743e1489141aa056bc03ba332ebc71a00c35ee8acdfc0be58",
+      "bytes": 9590
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
-      "sha256": "7ad4144142220b5ad9cd907dd21753adbd2b5e5ae69d3403b9144691bfe4ffe2",
-      "bytes": 7121
+      "sha256": "32c88b548c945c6e3fffc27409a2687bb1d583911b5a7562f3aa6f3bf5baba9d",
+      "bytes": 7238
     },
     {
       "path": "scripts/verify-pilot-binding.mjs",
       "sha256": "24dc8a3d1fea67b9306b514f350eb63885d558eb5faae7805d7105774ca97c47",
       "bytes": 3237
+    },
+    {
+      "path": "scripts/verify-podman-sandbox.mjs",
+      "sha256": "6ce76490ea3cb11665ff9e18a42a6aa297bcadbb6d2d5ba1cb7eacf65e016644",
+      "bytes": 6754
     },
     {
       "path": "scripts/verify-s2-002-dependencies.mjs",
@@ -595,24 +605,29 @@
       "bytes": 5766
     },
     {
+      "path": "src/lib/identity/podman-sandbox.mjs",
+      "sha256": "415b88bbef7302e6bd2c6e7e6d0c0ea87581de22a90a434c16b12df50c69f653",
+      "bytes": 8436
+    },
+    {
       "path": "src/lib/identity/policy-engine.mjs",
-      "sha256": "0f7a91f1e320e88f6cc5dc94c942daf090b662c811b217a4ec725af7a6eaec16",
-      "bytes": 19468
+      "sha256": "5ad4f02600a7817db6807dd13b04b4db33d05892d57ef47a9b927f6cc270cdda",
+      "bytes": 19819
     },
     {
       "path": "src/lib/identity/principals.mjs",
-      "sha256": "e0953d8ed848a6049842860925dc493f429aad61612154fb04c7de10fef7c993",
-      "bytes": 19914
+      "sha256": "493f8aafdd78a89d44240cc58112897f37c8916114deffb59c92af97ed2b2770",
+      "bytes": 20024
     },
     {
       "path": "src/lib/identity/sandbox-profiles.mjs",
-      "sha256": "9141d3024cb7efbe40cf560d388891968c936aeb4c2a39ed997cdda273d0b38c",
-      "bytes": 2445
+      "sha256": "f76435014b130d3f28aa340264cad32a6dafeda4d42f1ff01fa0e0989400c97f",
+      "bytes": 2833
     },
     {
       "path": "src/lib/identity/sandbox.mjs",
-      "sha256": "be5ac4e2f35b223eef75190e5fcba5a77bf086290db5f4bc941b0cb82643f22f",
-      "bytes": 19036
+      "sha256": "efd512a7ae823db0e68b92001ff636c49a269cc5f7a37875279eb7353ac4c1ca",
+      "bytes": 19068
     },
     {
       "path": "tasks/S2-002_IDENTITY_SANDBOX.md",
@@ -626,13 +641,18 @@
     },
     {
       "path": "tests/identity/dependency-binding.test.mjs",
-      "sha256": "e4d7776f89cf91aabe11eeed744c5997f2e48f6f5f0d05ae7c3cc4d90653a80b",
-      "bytes": 2218
+      "sha256": "55f740a9d93208347ab50c48a4ca39383842e711a9475b3c63373aba52d2e184",
+      "bytes": 2566
+    },
+    {
+      "path": "tests/identity/podman-sandbox.test.mjs",
+      "sha256": "f6a7c1532efda36d7732f008f5ebc002b934fe4475e18d7ef44d09f22ad08c36",
+      "bytes": 6357
     },
     {
       "path": "tests/identity/policy-engine.test.mjs",
-      "sha256": "12790b9a8de4d9c5283496782649e24fae62bb19ce0b932f8d6c8ad60abc9b23",
-      "bytes": 33692
+      "sha256": "b94ca181637d7acc680c02ba4d793fbb145bfd01ef7477d9231027b274594aac",
+      "bytes": 33939
     },
     {
       "path": "tests/identity/replay-runs.test.mjs",
