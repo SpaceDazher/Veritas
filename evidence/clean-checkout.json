@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "7e7933bfa9d00b2b57ee115b52f80e410d1c7222",
-  "sourceTree": "adb8797819150822c13673e413ec53a603af441e",
+  "sourceCommit": "dda4ac7d1d65c270efe53466d54431f007614db4",
+  "sourceTree": "7c02d4523684c46f9951be12702ba42f1e9d950a",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -51,6 +51,12 @@
     {
       "id": "public-artifacts",
       "command": "node scripts/check-public-artifacts.mjs",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "podman-sandbox",
+      "command": "npm.cmd run verify:podman-sandbox",
       "exitCode": 0,
       "status": "PASS"
     },
