@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "f98849326c40f38c848a0e2da7bd914d81671114",
-  "sourceTree": "146902555bad3740aef8cde0e37387e8e3482e0f",
+  "sourceCommit": "7d82e91172d8b6b43d05820149196364c2280ac5",
+  "sourceTree": "b65a5a421586d4decd725bf4b4109ddfb1f17c9d",
   "trackedFileCount": 143,
   "manifestFileCount": 140,
-  "payloadManifestSha256": "24d24eb2c089862cefce24f7c0a2373d16e2fbe5693653c76ee96659892e5b87",
-  "fileManifestSha256": "d9a2128c4ec77ae0f40ab6714c34cc2fb1477798a168e92ef9bcc1df4a909bf1",
+  "payloadManifestSha256": "0ee3e8ae86c010609606ca3b7d185bbf87cd7b9e4b5f96ee02e50dd758b12708",
+  "fileManifestSha256": "0a06b2b12010423c284be731263bb5b9a9e468f0c933f7624b7d7e502c46ba42",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -246,7 +246,7 @@
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "db7d5d2a58d950530bfdfbf4fce409a6eeaba9c80fd21d2daf059d283d5d7eff",
+      "sha256": "165cd9eab73065352884c97c7e8963b15bdd66a7695f3f9d95f4ebbecd67e287",
       "bytes": 8282
     },
     {
@@ -476,8 +476,8 @@
     },
     {
       "path": "scripts/generate-manifests.mjs",
-      "sha256": "de12b235b69a6373adbabbf026dffc69aaa0710f08c84ea1bb2e9cca37215db6",
-      "bytes": 4836
+      "sha256": "7e5810873418d36394a8e1b743b349a08d44eb612f457ea716552e34fde9122e",
+      "bytes": 5178
     },
     {
       "path": "scripts/git-client.mjs",
@@ -511,8 +511,8 @@
     },
     {
       "path": "scripts/validate-contracts.mjs",
-      "sha256": "16adb7c5e468e3603c06d9eac4e1b2674fe899b317ae4b9882e9cbcc04cff742",
-      "bytes": 9805
+      "sha256": "d93ef09252468d56286ff997c0570373e5566945903499ca096cf046c2eb24aa",
+      "bytes": 10617
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
@@ -536,8 +536,8 @@
     },
     {
       "path": "scripts/verify-postgres-smoke.mjs",
-      "sha256": "14ea39892419b1e29c487d5c107e6cc05c46f8934a821cf0ca046da22cd83658",
-      "bytes": 7940
+      "sha256": "7508731f90daf25a847cc0adfb65453fa6362bf09be176f7a18b1ceb59d74b58",
+      "bytes": 8049
     },
     {
       "path": "scripts/verify-s2-002-dependencies.mjs",
@@ -666,8 +666,8 @@
     },
     {
       "path": "tests/database/postgres-smoke.test.mjs",
-      "sha256": "c2d3008b51b5256db4669a9249079f926c474046246e1b269c65c9fab45e1ddc",
-      "bytes": 1577
+      "sha256": "76879d07109fa76c17b08fd1447a46a179ae948103f198bfb2ffce9ba0fc14d2",
+      "bytes": 1754
     },
     {
       "path": "tests/identity/contracts.schemas.test.mjs",
@@ -676,8 +676,8 @@
     },
     {
       "path": "tests/identity/dependency-binding.test.mjs",
-      "sha256": "8bd27007084ad61f9802c8fe27c895782ac95e3ed3f4e1f9709faca9b9e78c06",
-      "bytes": 3805
+      "sha256": "34177b937c063235ab8cdd8aad5a9adccce8d78a4159c1266b1d801f33e90693",
+      "bytes": 4226
     },
     {
       "path": "tests/identity/gvisor-sandbox.test.mjs",
