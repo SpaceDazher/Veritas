@@ -133,7 +133,7 @@ tests, S2-003 security probes, S2-003 replay, manifests, contracts, typecheck,
 lint, build with a placeholder `DATABASE_URL`, both audits). Green = exit 0;
 the tracked record is `evidence/clean-checkout.json`. Individual acceptance
 commands from §16 are wired as npm scripts and were executed green:
-`npm ci`, `verify:s2-003-dependencies`, `test:ingestion` (79 tests),
+`npm ci`, `verify:s2-003-dependencies`, `test:ingestion` (85 tests),
 `test:s2-003-security-probes`, `verify:s2-003`, `verify:postgres-smoke`,
 `typecheck`, `lint`, `build`, `npm audit --omit=dev` (0 vulnerabilities),
 `npm audit` (0), `verify:clean-checkout`, `manifest:check`, `git diff --check`

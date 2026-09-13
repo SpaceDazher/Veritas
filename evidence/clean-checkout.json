@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "d5c073c9e32322741d19f02a78b21eeb046fc93f",
-  "sourceTree": "608fd378548865c742d35cfa414b57003e70dfb1",
+  "sourceCommit": "e1c01deb236cbe8ce3ea5320f0a7214cb43f7858",
+  "sourceTree": "db1caf92c58e2e32e9845305a628794338c088cc",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -27,9 +27,8 @@
     {
       "id": "s2-003-dependencies",
       "command": "npm.cmd run verify:s2-003-dependencies",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "fatal: not a git repository (or any of the parent directories): .git\n\n\n> veritas-agent-board@0.1.0 verify:s2-003-dependencies\n> node scripts/verify-s2-003-dependencies.mjs\n\n{\n  \"ok\": false,\n  \"checked\": 4,\n  \"issues\": [\n    \"cross-binding:s2-002-binding-unreadable-from-git\"\n  ],\n  \"mode\": \"ARCHIVE_DEGRADED\",\n  \"status\": \"BLOCKED_DEPENDENCY\"\n}"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "root-manifest",
