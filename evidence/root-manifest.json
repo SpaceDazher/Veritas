@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "ba3b7acffac379b2c746064f62ae489d76fbdc41",
-  "sourceTree": "1b8a532ef86a3106a44e54142ac6817357bdc632",
-  "trackedFileCount": 266,
-  "manifestFileCount": 263,
-  "payloadManifestSha256": "dea9a3a7e34dfb3cfcc9d40544311bff0b466227363c05f62d03983fa83163b8",
-  "fileManifestSha256": "fe86de938b1eb0abd00f9c1818187120ff9d00f98de09e01b1dd744475d7a166",
+  "sourceCommit": "c4512091101a1238da92483728a97f6de7d8113c",
+  "sourceTree": "f99c8f96750ca4cdac4fbc57a6ff1a0552165d5b",
+  "trackedFileCount": 267,
+  "manifestFileCount": 264,
+  "payloadManifestSha256": "4311939a7a1d520b3f079ea00d3fb58524841e988970a7479fbf78bde93ff2c9",
+  "fileManifestSha256": "b11d9087ebf5a2211740645c929fefc0548563483dc09eb950d0558b2af25e3f",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -531,7 +531,7 @@
     },
     {
       "path": "corpus/s2-003/manifest.json",
-      "sha256": "7eb80b1c21b4c945127ff10a6bf53f50eae26bc2701051b343d058bb453a005d",
+      "sha256": "1e9a88917483b790818971ab4d5cbb29aceaa5821f87295808de5c580c94d30a",
       "bytes": 8957
     },
     {
@@ -641,8 +641,8 @@
     },
     {
       "path": "evidence/clean-checkout.json",
-      "sha256": "0ccb7e2f75dac3a4f01a10f81554713618d8d788d2621ecea3a29a2adc5ad14d",
-      "bytes": 8890
+      "sha256": "153d47a6700939a2d6dc8ab3c686fddcc772b6d1f7859b2b595a13b265bb2a94",
+      "bytes": 4509
     },
     {
       "path": "evidence/contract-tests.json",
@@ -761,7 +761,7 @@
     },
     {
       "path": "evidence/s2-003-comparison.json",
-      "sha256": "aab282b5e54cddb3dc85a8171eef5bf600b0bf049e0d47f19deee1ae2b41f761",
+      "sha256": "2327f369f4c57ec4a122ac77820f8bf6bd358c372f149d55985ddbe85482de7c",
       "bytes": 1735
     },
     {
@@ -771,12 +771,12 @@
     },
     {
       "path": "evidence/s2-003-run-a.json",
-      "sha256": "d70ac892c2cdcad47010d1d0be1f6d39f6e3376d4946063095561de8bfe01cfa",
+      "sha256": "14c507d375e8d2a889024c9c53f29c3f05359f61747144e80794fddeb623d612",
       "bytes": 57307
     },
     {
       "path": "evidence/s2-003-run-b.json",
-      "sha256": "b72527f027fd098886830cad66b7c80408f790529cbf1e616800428eea682cd0",
+      "sha256": "57cdf5c41cf41908f5a52b935538ec9de286bb494b703b20b33e2a04d358daff",
       "bytes": 57306
     },
     {
@@ -976,8 +976,8 @@
     },
     {
       "path": "scripts/s2-003-run.mjs",
-      "sha256": "1fe59b8eb48709712a5beddb4b9718dfad6b67089f1522c34ce9478791e898d6",
-      "bytes": 20051
+      "sha256": "b94b022bc9b8d8b8bdd3902c5500efcb35902aaae55eb8328045f521918ac23b",
+      "bytes": 20038
     },
     {
       "path": "scripts/s2-003-security-probes.mjs",
@@ -1286,8 +1286,8 @@
     },
     {
       "path": "tests/ingestion/connectors.test.mjs",
-      "sha256": "d05d588ba80c27301dd2c9f60f3c662f629c6850d43589f1e3a644099fcbc103",
-      "bytes": 9322
+      "sha256": "98ca877ea9b5c4ed15a620e8c897a22d2dc3a58ba6fe389dca65019ad316b438",
+      "bytes": 9309
     },
     {
       "path": "tests/ingestion/contracts.schemas.test.mjs",
@@ -1318,6 +1318,11 @@
       "path": "tests/ingestion/pipeline.test.mjs",
       "sha256": "3f87258b9bfd075653dab873798e6dada2759ab62a58e8329aa6260f0f55afd8",
       "bytes": 17885
+    },
+    {
+      "path": "tests/ingestion/run-determinism.test.mjs",
+      "sha256": "305b4d361854146cc93695523a24cf176cfeb8cd400efb6ba8f68b3813077095",
+      "bytes": 1369
     },
     {
       "path": "tests/ingestion/time-model.test.mjs",
