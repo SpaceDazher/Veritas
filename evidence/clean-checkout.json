@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "ba3b7acffac379b2c746064f62ae489d76fbdc41",
-  "sourceTree": "1b8a532ef86a3106a44e54142ac6817357bdc632",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "d8253895bcf9e9dc4a2866e96c6d3eb18908c74a",
+  "sourceTree": "c2cca9a732efd9970665e631c1564e790aa55a24",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -40,8 +40,9 @@
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "probes.test.mjs': '41f90dbe6d6897b3fd252b71a376c286cf56adf3025db89638510ca111123150',\r\n    'tests/ingestion/canonical-identity.test.mjs': '38b23d8898f03f56a95e84f966c69866c73b153335f460f61ab6ae9b7e25c85e',\r\n    'tests/ingestion/connectors.test.mjs': 'd05d588ba80c27301dd2c9f60f3c662f629c6850d43589f1e3a644099fcbc103',\r\n    'tests/ingestion/contracts.schemas.test.mjs': '4dc37056fc63f42423fc484a293c25e546453d34e528f03babebc75eb04b54ce',\r\n    'tests/ingestion/contracts.types.test.mjs': '9b71d048d0da616b754b07cdb985458d7035a3385cefd68020f721753d44ab72',\r\n    'tests/ingestion/dependency-binding.test.mjs': '207944a5b03c7d02dfda71e92346433dd6ffb8871075a5384cf8ea8284ddf616',\r\n    'tests/ingestion/export-policy.test.mjs': '7c0a03e41f82ce3cd15f3982cbb765dd63805426e2b0104aad31d2c68da927d9',\r\n    'tests/ingestion/migrations.test.mjs': '6fd02dcd659e50ce1342a698009f83a40ca9fa7cd25c16a10c3df76898aa4655',\r\n    'tests/ingestion/pipeline.test.mjs': '3f87258b9bfd075653dab873798e6dada2759ab62a58e8329aa6260f0f55afd8',\r\n    'tests/ingestion/time-model.test.mjs': '1fff8aadf42b66507908a0eb994d2dba50aaa08c72bffb010c78b6921458c246'\r\n  },\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "synthetic-smoke",
@@ -52,8 +53,9 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 267,\n  \"listedFiles\": 266,\n  \"missingFromInventory\": [\n    \"tests/ingestion/run-determinism.test.mjs\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
     },
     {
       "id": "public-artifacts",
@@ -112,9 +114,8 @@
     {
       "id": "s2-003-replay",
       "command": "npm.cmd run verify:s2-003",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "> veritas-agent-board@0.1.0 verify:s2-003\n> node scripts/verify-s2-003.mjs\n\n{\n  \"comparedCases\": 74,\n  \"decisionMismatches\": 1,\n  \"counterViolations\": 0,\n  \"oracleViolations\": 0,\n  \"ok\": false\n}"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "s2-002-replay",

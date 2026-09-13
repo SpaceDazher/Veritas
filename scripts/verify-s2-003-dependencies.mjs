@@ -44,6 +44,11 @@ export function verifyDependencyBinding(record, io = {}) {
   const git_ = io.git ?? git;
   const gitBytes_ = io.gitBytes ?? gitBytes;
   const readWorkingTreeFile = io.readWorkingTreeFile ?? ((rel) => fs.readFileSync(path.join(ROOT, rel)));
+  // Archive (git-archive) checkouts carry no .git: byte-level Git verification
+  // is impossible there. archiveMode runs the structural checks that remain
+  // meaningful (binding sanity + tracked-copy digests) and skips every Git
+  // read; the full verification is mandatory in a real working repository.
+  const archiveMode = io.archiveMode === true;
 
   const require = (condition, code) => {
     if (!condition) issues.push(code);
@@ -59,6 +64,9 @@ export function verifyDependencyBinding(record, io = {}) {
   const cross = record.agentosCrossBinding ?? {};
 
   // ---- 1. origin/main contains the S2-002 merge and the closure commit ----
+  if (archiveMode) {
+    checked.push('git:archive-mode-skipped');
+  } else {
   let mainHead = '';
   try {
     mainHead = git_(['rev-parse', 'refs/remotes/origin/main']);
@@ -82,13 +90,10 @@ export function verifyDependencyBinding(record, io = {}) {
       issues.push(`s2-002.${role}Commit:unreachable-from-main`);
     }
   }
+  }
 
   // ---- 2. S2-002 evidence from Git bytes at the closure commit ----
   const closure = s2.closureCommit;
-  const expectedBlobs = s2.evidenceReadFromGitBytes ?? {};
-  if (!isPlainObject(expectedBlobs) || Object.keys(expectedBlobs).length === 0) {
-    issues.push('s2-002.evidenceReadFromGitBytes:empty');
-  }
   const gitFileCache = new Map();
   const readGitFile = (relPath) => {
     if (gitFileCache.has(relPath)) return gitFileCache.get(relPath);
@@ -97,6 +102,13 @@ export function verifyDependencyBinding(record, io = {}) {
     return bytes;
   };
 
+  if (archiveMode) {
+    checked.push('s2-002-evidence:archive-mode-skipped');
+  } else {
+  const expectedBlobs = s2.evidenceReadFromGitBytes ?? {};
+  if (!isPlainObject(expectedBlobs) || Object.keys(expectedBlobs).length === 0) {
+    issues.push('s2-002.evidenceReadFromGitBytes:empty');
+  }
   for (const [relPath, expectedBlob] of Object.entries(expectedBlobs)) {
     if (!GIT_COMMIT.test(expectedBlob ?? '')) {
       issues.push(`${relPath}:unbound-blob-digest`);
@@ -240,6 +252,7 @@ export function verifyDependencyBinding(record, io = {}) {
       }
     }
   }
+  }
 
   // ---- 3. S1-001 pinned to a fixed AgentOS commit with digest-verified evidence ----
   const source = s1.sourceRepository ?? {};
@@ -326,17 +339,12 @@ function main() {
   // binding structure) and reports ARCHIVE_DEGRADED explicitly; the full
   // Git-bytes verification is mandatory in the real working repository.
   const archiveMode = !fs.existsSync(path.join(ROOT, '.git'));
-  if (archiveMode) {
-    const structural = verifyDependencyBinding(
-      { ...record, s2_002: { ...record.s2_002, evidenceReadFromGitBytes: {}, expected: {} } },
-      { git: () => { throw new Error('ARCHIVE_MODE'); }, gitBytes: () => { throw new Error('ARCHIVE_MODE'); }, readWorkingTreeFile: (rel) => fs.readFileSync(path.join(ROOT, rel)), skipGitChecks: true },
-    );
-    const output = { ok: structural.ok, mode: 'ARCHIVE_DEGRADED', checked: structural.checked, issues: structural.issues, status: structural.ok ? 'PASS' : 'BLOCKED_DEPENDENCY' };
-    console.log(JSON.stringify(output, null, 2));
-    process.exit(structural.ok ? 0 : 1);
-  }
-  const result = verifyDependencyBinding(record);
-  const output = { ...result, status: result.ok ? 'PASS' : 'BLOCKED_DEPENDENCY' };
+  const result = verifyDependencyBinding(record, { archiveMode });
+  const output = {
+    ...result,
+    mode: archiveMode ? 'ARCHIVE_DEGRADED' : 'FULL_GIT_BYTES',
+    status: result.ok ? 'PASS' : 'BLOCKED_DEPENDENCY',
+  };
   console.log(JSON.stringify(output, null, 2));
   process.exit(result.ok ? 0 : 1);
 }
