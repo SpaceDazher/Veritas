@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 266.
+Generated from `git ls-files`; count: 267.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -267,5 +267,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/export-policy.test.mjs`
 - `tests/ingestion/migrations.test.mjs`
 - `tests/ingestion/pipeline.test.mjs`
+- `tests/ingestion/run-determinism.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
 - `tsconfig.json`
