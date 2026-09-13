@@ -65,10 +65,12 @@ function observe() {
         action: 'tool.execute',
         workspaceId: 'ws-veritas-project',
         resource: { type: 'tool', id: 'tool:runner' },
-        args: { tool_id: 'tool:runner', canonical_args: {} },
+        args: {
+          tool_id: 'tool:runner',
+          canonical_args: { argv: ['printf', 'VERITAS_SANDBOX_OK'], timeout_ms: 30000 },
+        },
         lease: { leaseId: 'lse-experimenter-0005', fencingToken: 1 },
       },
-      command: ['printf', 'VERITAS_SANDBOX_OK'],
       jobId: 'evidence-authorized-smoke',
     });
     if (authorizedSmoke.status !== 'success'

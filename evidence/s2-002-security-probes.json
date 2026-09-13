@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "scope": "Adversarial corpus A-J driven through the production policy path; DETECTED means the production modules rejected the attack.",
-  "policyVersion": "s2-002-policy-v3",
+  "policyVersion": "s2-002-policy-v4",
   "generatedAt": "2026-09-12T12:00:00.000Z",
   "escaped": 0,
   "detected": 10,

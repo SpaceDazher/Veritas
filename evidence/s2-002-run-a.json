@@ -9,7 +9,7 @@
     "outputRoot": "results/s2-002/run-a",
     "corpusDigest": "a5a63dc0c53c29bcd10003a31179342bc1f3a2fbe0fb39b6c69dbb5ee3eeb7e0",
     "fixedClock": "2026-09-12T12:00:00.000Z",
-    "policyVersion": "s2-002-policy-v3",
+    "policyVersion": "s2-002-policy-v4",
     "platform": "win32/x64 node v22.23.2",
     "trialCount": 283,
     "counters": {
@@ -22,10 +22,10 @@
     },
     "revocationLatency": {
       "trials": 100,
-      "maxMs": 0.0704,
-      "meanMs": 0.012619000000000005,
+      "maxMs": 0.0644,
+      "meanMs": 0.011130999999999993,
       "allowAfterCommit": 0
     }
   },
-  "observationsDigest": "b787d60ea819472cfd4851f792e26f206d3ac00f5bef375ce6e93e53e2a82ae7"
+  "observationsDigest": "984e33cf0a9b80c5552a9f82158b6923d06a61490540ba54ee393d0a3dcbb5d9"
 }

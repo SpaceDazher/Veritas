@@ -20,6 +20,31 @@ function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
 }
 
+export function normalizePodmanCanonicalArgs(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('PODMAN_CANONICAL_ARGS_INVALID');
+  }
+  if (Object.keys(value).some((key) => !['argv', 'timeout_ms'].includes(key))) {
+    throw new Error('PODMAN_CANONICAL_ARGS_INVALID');
+  }
+  const argv = value.argv;
+  if (!Array.isArray(argv) || argv.length === 0 || argv.length > 128
+    || argv.some((argument, index) => (
+      typeof argument !== 'string'
+      || argument.includes('\0')
+      || argument.length > 4096
+      || (index === 0 && argument.length === 0)
+    ))
+    || argv.reduce((total, argument) => total + Buffer.byteLength(argument), 0) > 16 * 1024) {
+    throw new Error('PODMAN_CANONICAL_ARGS_INVALID');
+  }
+  const timeoutMs = value.timeout_ms ?? DEFAULT_TIMEOUT_MS;
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > DEFAULT_TIMEOUT_MS) {
+    throw new Error('PODMAN_CANONICAL_ARGS_INVALID');
+  }
+  return Object.freeze({ command: Object.freeze([...argv]), timeoutMs });
+}
+
 function validateRequest(request) {
   if (!request || typeof request !== 'object' || Array.isArray(request)) {
     throw new TypeError('PODMAN_REQUEST_OBJECT_REQUIRED');
@@ -140,9 +165,7 @@ export function executePodmanCommand(request, { spawnSyncImpl = spawnSync } = {}
 export function executeAuthorizedPodmanTool({
   policyEngine,
   request,
-  command,
   jobId,
-  timeoutMs,
   executeImpl = executePodmanCommand,
 }) {
   if (!policyEngine || typeof policyEngine.authorize !== 'function') {
@@ -163,7 +186,24 @@ export function executeAuthorizedPodmanTool({
       execution: null,
     });
   }
-  const execution = executeImpl({ jobId, command, timeoutMs });
+  let canonical;
+  try {
+    canonical = normalizePodmanCanonicalArgs(request.args?.canonical_args);
+  } catch {
+    return Object.freeze({
+      status: 'not_authorized',
+      summary: 'Execution refused: ALLOW/INVALID_CANONICAL_ARGS.',
+      next_actions: ['Re-authorize an exact canonical argv and timeout before retrying.'],
+      artifacts: [],
+      authorization,
+      execution: null,
+    });
+  }
+  const execution = executeImpl({
+    jobId,
+    command: canonical.command,
+    timeoutMs: canonical.timeoutMs,
+  });
   return Object.freeze({ ...execution, authorization, execution });
 }
 

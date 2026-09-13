@@ -34,8 +34,10 @@ two P1 findings. All seven were reproduced and fixed:
 | P1 clean-checkout claimed PASS without evidence | honest correction: the previous run had actually failed (`tar` drive-letter bug, npm spawn bug). Both fixed (`--relative-path tar extraction`, `npm.cmd` via cmd.exe, git-inventory fallbacks, synthetic placeholder for the build-time DB variable) and a real PASS is now recorded in `evidence/clean-checkout.json` |
 | P1 dependencies S1-007/S1-008/S1-010 unbound | RESOLVED: the Stage-1 tickets live in `AgentOS/research/tickets/stage-1` (head `259d9afe…`). All three are completed gates (`pass_with_limits`) and are now digest-bound in `evidence/s2-002-dependency-binding.json`: S1-007 retrieval/index isolation (chain `4c344ab2…`), S1-008 revocation latency ≤5s (chain `5c43c03d…` — the requirement S2-002 enforces), S1-010 tool-poisoning detection (chain `8442d0de…`, gate verdict PASS) |
 
-Policy version is `s2-002-policy-v3`; v3 adds the exact Podman profile and
-OS-evidence binding to every executable `ALLOW` decision.
+Policy version is `s2-002-policy-v4`; v3 added the exact Podman profile and
+OS-evidence binding, while v4 closes the command confused-deputy path: the
+backend derives argv and timeout only from the policy-digested
+`canonical_args` and ignores any separately supplied command.
 Frozen-manifest scope now covers the whole S2-002 implementation, oracle
 suites, corpus runner, comparator and security docs.
 
@@ -61,7 +63,7 @@ reproducibility gaps. This corrective round closes them as follows:
 | 2. All schemas and server-side policy paths implemented and versioned | PASS — 8 contracts at `1.0.0`, single engine for Web/API/CLI |
 | 3. ACL matrix covers 20 principals and all listed paths | PASS — 140-cell board.read matrix + capability/derived/nonce cells per run |
 | 4. Hard counters zero in both independent runs | PASS — see §4 |
-| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, final max 0.0704 ms / 0.0699 ms (limit 5000 ms) |
+| 5. Revocation latency and trial minimum per run | PASS — 100 trials/run, final max 0.0644 ms / 0.0678 ms (limit 5000 ms) |
 | 6. All adversarial probes detected by production path | PASS — 10/10 DETECTED, 0 ESCAPED |
 | 7. Process-tree cancellation and required OS controls observable | PASS for the bounded Podman profile; legacy Windows probe still records survivors = 0 |
 | 8. Frozen hashes, commit/tree, environment and outputs converge | PASS — manifests re-frozen per commit; `manifest:check` green |
@@ -131,7 +133,7 @@ J corrupted/missing evidence fail-open.
 | Survivors after cancellation | 0 | 0 | 0 |
 | Allow-after-revocation-commit | 0 | 0 | 0 |
 | Missing/censored trials | 0 | 0 | 0 |
-| Revocation decision latency (100 trials) | max ≤ 5000 ms | 0.0704 ms | 0.0699 ms |
+| Revocation decision latency (100 trials) | max ≤ 5000 ms | 0.0644 ms | 0.0678 ms |
 | Decision mismatch A vs B | 0 | 0 (283 compared) | — |
 | Frozen-oracle violations (either run) | 0 | 0 | 0 |
 

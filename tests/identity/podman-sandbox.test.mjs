@@ -86,12 +86,12 @@ describe('S2-002 WSL2/rootless Podman sandbox contract', () => {
     assert.ok(calls[1].argv.includes('rm'));
   });
 
-  test('authorization denial never reaches Podman; allow executes through the fixed runner', () => {
+  test('authorization denial never reaches Podman; allow executes only the authorized canonical argv', () => {
     let executions = 0;
+    let executedRequest = null;
     const denied = executeAuthorizedPodmanTool({
       policyEngine: { authorize: () => ({ decision: 'DENY', reasonCodes: ['NO_ACCESS'] }) },
       request: { action: 'tool.execute' },
-      command: ['id'],
       jobId: 'job-denied',
       executeImpl: () => { executions += 1; },
     });
@@ -109,18 +109,30 @@ describe('S2-002 WSL2/rootless Podman sandbox contract', () => {
           },
         },
       }) },
-      request: { action: 'tool.execute' },
+      request: {
+        action: 'tool.execute',
+        args: { canonical_args: { argv: ['printf', 'AUTHORIZED'], timeout_ms: 3210 } },
+      },
+      // A separate forged command is intentionally ignored by the bridge.
       command: ['id'],
       jobId: 'job-allowed',
-      executeImpl: () => { executions += 1; return { status: 'success', exitCode: 0 }; },
+      executeImpl: (executionRequest) => {
+        executions += 1;
+        executedRequest = executionRequest;
+        return { status: 'success', exitCode: 0 };
+      },
     });
     assert.equal(allowed.status, 'success');
     assert.equal(executions, 1);
+    assert.deepEqual(executedRequest, {
+      jobId: 'job-allowed',
+      command: ['printf', 'AUTHORIZED'],
+      timeoutMs: 3210,
+    });
 
     const unbound = executeAuthorizedPodmanTool({
       policyEngine: { authorize: () => ({ decision: 'ALLOW', reasonCodes: ['FORGED_ALLOW'], document: { context: {} } }) },
       request: { action: 'tool.execute' },
-      command: ['id'],
       jobId: 'job-unbound',
       executeImpl: () => { executions += 1; return { status: 'success' }; },
     });

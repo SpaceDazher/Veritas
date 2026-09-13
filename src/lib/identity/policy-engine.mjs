@@ -18,8 +18,9 @@ import {
   SANDBOX_PROFILES,
 } from './principals.mjs';
 import { assertValidContract } from './contract-registry.mjs';
+import { normalizePodmanCanonicalArgs } from './podman-sandbox.mjs';
 
-export const POLICY_VERSION = 's2-002-policy-v3';
+export const POLICY_VERSION = 's2-002-policy-v4';
 
 const ADAPTERS = new Set(['web', 'api', 'cli']);
 const ID_PATTERNS = {
@@ -82,7 +83,16 @@ function canonicalArgumentViolations(request, capability) {
       || input.workspaceId.length === 0
       || input.resourceId.length === 0
     )))) return ['CANONICAL_ARGUMENT_INVALID'];
-    if (name === 'canonical_args' && !isPlainObject(value)) return ['CANONICAL_ARGUMENT_INVALID'];
+    if (name === 'canonical_args') {
+      if (!isPlainObject(value)) return ['CANONICAL_ARGUMENT_INVALID'];
+      if (request.action === 'tool.execute') {
+        try {
+          normalizePodmanCanonicalArgs(value);
+        } catch {
+          return ['CANONICAL_ARGUMENT_INVALID'];
+        }
+      }
+    }
     if (name === 'body_digest' && !/^sha256:[0-9a-f]{64}$/.test(value)) {
       return ['CANONICAL_ARGUMENT_INVALID'];
     }

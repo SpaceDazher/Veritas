@@ -33,7 +33,10 @@ const CANONICAL = {
   'cache.read': (r) => ({ cache_id: r.resource.id }),
   'summary.generate': (r) => ({ summary_id: r.resource.id, inputs: [{ workspaceId: r.workspaceId, resourceId: 'claim:c1' }] }),
   'claim.write': (r) => ({ claim_id: r.resource.id, provenance: 'synthetic' }),
-  'tool.execute': (r) => ({ tool_id: r.resource.id, canonical_args: {} }),
+  'tool.execute': (r) => ({
+    tool_id: r.resource.id,
+    canonical_args: { argv: ['printf', 'VERITAS'], timeout_ms: 5000 },
+  }),
   'tool.discover': (r) => ({ workspace_id: r.workspaceId }),
   'artifact.export': (r) => ({ artifact_id: r.resource.id, destination: 'export:local' }),
   'artifact.read': (r) => ({ artifact_id: r.resource.id }),
@@ -728,6 +731,27 @@ describe('S2-002 policy engine: sandbox gate', () => {
     assert.ok(result.reasonCodes.includes('LEASE_FRESH'));
     assert.equal(result.document.context.sandbox_profile_id, 'sbx-podman-local-restricted-v1');
     assert.match(result.document.context.os_controls_evidence, /^sha256:[0-9a-f]{64}$/);
+  });
+
+  test('local execution rejects missing or malformed exact command bindings', () => {
+    const engine = makeEngine();
+    const base = {
+      principalId: 'prn-platform-experimenter',
+      workspaceId: 'ws-veritas-project',
+      action: 'tool.execute',
+      resource: { type: 'tool', id: 'tool:runner' },
+      lease: { leaseId: 'lse-experimenter-0005', fencingToken: 1 },
+    };
+    for (const canonical_args of [
+      {},
+      { argv: [] },
+      { argv: ['true'], timeout_ms: 30001 },
+      { argv: ['true'], timeout_ms: 1000, image: 'attacker/image' },
+    ]) {
+      const result = engine.authorize(req({ ...base, args: { canonical_args } }));
+      assert.equal(result.decision, 'DENY');
+      assert.ok(result.reasonCodes.includes('CANONICAL_ARGUMENT_INVALID'));
+    }
   });
 
   test('tool discovery stays readable (contract-level operation)', () => {
