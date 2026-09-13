@@ -64,4 +64,11 @@ describe('S2-002 portable dependency gate', () => {
     assert.equal(packageJson.devDependencies?.['drizzle-kit'], undefined);
     assert.equal(packageJson.scripts?.['db:migrate'], 'node scripts/apply-migrations.mjs');
   });
+
+  test('closure preserves the implementation binding recorded by root manifest', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'scripts/generate-manifests.mjs'), 'utf8');
+    assert.match(source, /implementationCommit: committedManifest\.sourceCommit/);
+    assert.match(source, /implementationTreeSha: committedManifest\.sourceTree/);
+    assert.match(source, /manifestCommit: sourceCommit/);
+  });
 });

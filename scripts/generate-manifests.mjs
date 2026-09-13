@@ -60,8 +60,10 @@ if (process.argv.includes('--write-closure')) {
   const record = {
     schemaVersion: 1,
     branch: git('branch', '--show-current'),
-    implementationCommit: sourceCommit,
-    implementationTreeSha: sourceTree,
+    implementationCommit: committedManifest.sourceCommit,
+    implementationTreeSha: committedManifest.sourceTree,
+    manifestCommit: sourceCommit,
+    manifestTreeSha: sourceTree,
     payloadManifestSha256,
     fileManifestSha256,
     rootManifestFileSha256,
