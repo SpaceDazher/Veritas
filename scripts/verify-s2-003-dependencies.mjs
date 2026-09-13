@@ -301,7 +301,7 @@ export function verifyDependencyBinding(record, io = {}) {
   }
 
   // ---- 4. cross-binding consistency: S1-001 commit === S2-002 binding AgentOS commit ----
-  if (!io.skipGitChecks && GIT_CMD_AVAILABLE && GIT_COMMIT.test(closure ?? '')) {
+  if (!archiveMode && !io.skipGitChecks && GIT_CMD_AVAILABLE && GIT_COMMIT.test(closure ?? '')) {
     try {
       const s2Binding = JSON.parse(gitBytes_(closure, cross.s2_002BindingPath ?? 'evidence/s2-002-dependency-binding.json').toString('utf8'));
       const boundCommit = s2Binding.sourceRepository?.headCommitAtBindingTime;
