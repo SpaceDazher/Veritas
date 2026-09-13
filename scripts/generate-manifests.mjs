@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import {gitText, trackedFiles as listTrackedFiles} from './git-client.mjs';
 
 const root = process.cwd();
@@ -10,8 +11,17 @@ const git = (...args) => gitText(root, args);
 const trackedFiles = listTrackedFiles(root);
 const payloadFiles = trackedFiles.filter((file) => !metadataFiles.includes(file));
 const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
+const hasGitMetadata = fs.existsSync(path.join(root, '.git'));
+const payloadBytes = (file) => hasGitMetadata
+  ? execFileSync('git', ['show', `HEAD:${file}`], {
+      cwd: root,
+      encoding: null,
+      maxBuffer: 30 * 1024 * 1024,
+      windowsHide: true,
+    })
+  : fs.readFileSync(path.join(root, file));
 const fileRecords = payloadFiles.map((file) => {
-  const buffer = fs.readFileSync(path.join(root, file));
+  const buffer = payloadBytes(file);
   return {path: file, sha256: hash(buffer), bytes: buffer.length};
 });
 const canonical = (value) => JSON.stringify(value);

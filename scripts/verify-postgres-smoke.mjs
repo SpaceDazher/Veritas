@@ -72,7 +72,10 @@ export async function runPostgresSmoke({ writeEvidence = true } = {}) {
   const secret = randomBytes(24).toString('hex');
   const user = 'veritas_smoke';
   const database = 'veritas_smoke';
-  const connectionString = `postgresql://${user}:${secret}@127.0.0.1:${port}/${database}`;
+  const connectionUrl = new URL(`postgresql://127.0.0.1:${port}/${database}`);
+  connectionUrl.username = user;
+  connectionUrl.password = secret;
+  const connectionString = connectionUrl.toString();
   cleanupContainer();
   let cleanupVerified = false;
   try {

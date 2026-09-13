@@ -71,4 +71,11 @@ describe('S2-002 portable dependency gate', () => {
     assert.match(source, /implementationTreeSha: committedManifest\.sourceTree/);
     assert.match(source, /manifestCommit: sourceCommit/);
   });
+
+  test('root and frozen manifests use committed Git blob bytes when available', () => {
+    const rootManifest = fs.readFileSync(path.join(ROOT, 'scripts/generate-manifests.mjs'), 'utf8');
+    const validator = fs.readFileSync(path.join(ROOT, 'scripts/validate-contracts.mjs'), 'utf8');
+    assert.match(rootManifest, /\['show', `HEAD:\$\{file\}`\]/);
+    assert.match(validator, /\['show', `HEAD:\$\{file\}`\]/);
+  });
 });

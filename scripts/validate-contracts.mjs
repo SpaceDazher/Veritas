@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
 import {evaluatePolicy, baseline} from '../src/lib/contract-policy.mjs';
 import {runPolicyProbes} from './policy-probes.mjs';
 
@@ -142,7 +143,33 @@ const walk = (target) => {
 };
 const relative = (full) => path.relative(root, full).split(path.sep).join('/');
 const frozenFiles = frozenTargets.flatMap((target) => walk(target)).map(relative).sort();
-const frozenManifest = Object.fromEntries(frozenFiles.map((file) => [file, crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')]));
+const hasGitMetadata = fs.existsSync(path.join(root, '.git'));
+const frozenBytes = (file) => {
+  if (hasGitMetadata) {
+    const tracked = spawnSync('git', ['ls-files', '--error-unmatch', '--', file], {
+      cwd: root,
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+    });
+    const unchanged = tracked.status === 0 && spawnSync('git', ['diff', '--quiet', 'HEAD', '--', file], {
+      cwd: root,
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+    }).status === 0;
+    if (unchanged) {
+      return execFileSync('git', ['show', `HEAD:${file}`], {
+        cwd: root,
+        encoding: null,
+        maxBuffer: 30 * 1024 * 1024,
+        windowsHide: true,
+      });
+    }
+  }
+  return fs.readFileSync(path.join(root, file));
+};
+const frozenManifest = Object.fromEntries(frozenFiles.map((file) => [file, crypto.createHash('sha256').update(frozenBytes(file)).digest('hex')]));
 const frozenPath = 'evidence/frozen-manifest.json';
 if (process.argv.includes('--freeze')) {
   writeJson(frozenPath, {

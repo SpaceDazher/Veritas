@@ -18,6 +18,8 @@ describe('S2-002 PostgreSQL workspace smoke contract', () => {
     assert.match(sql, /CREATE TABLE IF NOT EXISTS veritas_demo_tasks/i);
     assert.match(sql, /CREATE TABLE IF NOT EXISTS veritas_demo_events/i);
     assert.match(sql, /operation_id[^;]+UNIQUE/is);
+    const verifier = fs.readFileSync(path.join(ROOT, 'scripts/verify-postgres-smoke.mjs'), 'utf8');
+    assert.doesNotMatch(verifier, /postgres(?:ql)?:\/\/[^\s/:]+:[^\s@]+@/i);
   });
 
   test('the tracked smoke record proves a real transaction and omits credentials', () => {
