@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/source-proposal.schema.json",
+  "description": "A candidate source proposed for the ingestion queue by a human, agent or connector. A proposal never starts an import by itself; it must traverse PROPOSED/REVIEW_REQUIRED to APPROVED by a human reviewer before a descriptor may be registered.",
+  "title": "Veritas Source Proposal (S2-003)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "proposal_id",
+    "proposer",
+    "candidate_locator",
+    "proposed_source_kind",
+    "reason",
+    "expected_domain",
+    "uncertainty",
+    "status",
+    "created_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "proposal_id": { "type": "string", "pattern": "^prp-[a-z0-9][a-z0-9-]{0,62}$" },
+    "proposer": { "$ref": "#/$defs/principalId" },
+    "candidate_locator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "description": "Credential-free locator candidate; may still be non-canonical."
+    },
+    "proposed_source_kind": { "$ref": "#/$defs/sourceKind" },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2048 },
+    "expected_domain": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["access_uncertain", "license_uncertain"],
+      "properties": {
+        "access_uncertain": { "type": "boolean" },
+        "license_uncertain": { "type": "boolean" },
+        "notes": {
+          "oneOf": [{ "type": "string", "maxLength": 1024 }, { "type": "null" }]
+        }
+      }
+    },
+    "status": { "enum": ["PROPOSED", "REVIEW_REQUIRED", "APPROVED", "REJECTED"] },
+    "reviewed_by": {
+      "oneOf": [{ "$ref": "#/$defs/principalId" }, { "type": "null" }]
+    },
+    "decision_reason": {
+      "oneOf": [{ "type": "string", "maxLength": 2048 }, { "type": "null" }]
+    },
+    "decided_at": {
+      "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }]
+    },
+    "created_at": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "enum": ["APPROVED", "REJECTED"] } } },
+      "then": {
+        "required": ["reviewed_by", "decided_at", "decision_reason"],
+        "properties": {
+          "reviewed_by": { "$ref": "#/$defs/principalId" },
+          "decided_at": { "$ref": "#/$defs/utcTimestamp" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "sourceKind": {
+      "enum": [
+        "markdown_obsidian",
+        "web_url",
+        "pdf",
+        "github",
+        "telegram",
+        "youtube",
+        "arxiv_huggingface",
+        "manual_export"
+      ]
+    }
+  }
+}

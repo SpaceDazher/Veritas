@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/connector-error.schema.json",
+  "description": "Normalized connector failure. The code enum is closed: any outcome outside it is UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED, never a silent success. Diagnostic detail must be redacted: no raw private bytes, no credentials, no unfiltered source text.",
+  "title": "Veritas Connector Error (S2-003)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "error_id",
+    "connector_id",
+    "operation_id",
+    "code",
+    "retryable",
+    "reconciliation_action",
+    "diagnostic",
+    "occurred_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "error_id": { "type": "string", "pattern": "^err-[a-z0-9][a-z0-9-]{0,62}$" },
+    "connector_id": { "$ref": "#/$defs/connectorId" },
+    "source_id": {
+      "oneOf": [{ "$ref": "#/$defs/sourceId" }, { "type": "null" }]
+    },
+    "operation_id": { "type": "string", "pattern": "^op-[a-z0-9][a-z0-9-]{0,62}$" },
+    "code": { "$ref": "#/$defs/connectorErrorCode" },
+    "retryable": { "type": "boolean" },
+    "reconciliation_action": {
+      "enum": ["none", "retry_with_backoff", "probe_source", "manual_review", "reconcile_operation"]
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["redacted_detail"],
+      "properties": {
+        "redacted_detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "description": "Redacted by construction: no raw source bytes, no credentials, no private content."
+        },
+        "redaction_applied": { "const": true },
+        "detail_sha256": {
+          "oneOf": [{ "$ref": "#/$defs/sha256Hex" }, { "type": "null" }]
+        }
+      }
+    },
+    "occurred_at": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "connectorId": { "type": "string", "pattern": "^conn-[a-z0-9][a-z0-9._-]{0,62}$" },
+    "sourceId": { "type": "string", "pattern": "^src-[a-z0-9][a-z0-9-]{0,62}$" },
+    "connectorErrorCode": {
+      "enum": [
+        "BLOCKED_CONNECTOR",
+        "ACCESS_DENIED",
+        "NOT_FOUND",
+        "TOMBSTONED",
+        "RATE_LIMITED",
+        "TIMEOUT",
+        "MALFORMED_CONTENT",
+        "UNSUPPORTED_FORMAT",
+        "LICENSE_UNKNOWN",
+        "RETENTION_BLOCKED",
+        "QUARANTINED",
+        "UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED"
+      ]
+    }
+  }
+}

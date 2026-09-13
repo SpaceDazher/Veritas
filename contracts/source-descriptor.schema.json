@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/source-descriptor.schema.json",
+  "description": "Registered source of record for ingestion. The descriptor is the only place where ACL, license, retention and lifecycle live; snapshots inherit from it and never from content. Content of the source can never modify this descriptor.",
+  "title": "Veritas Source Descriptor (S2-003)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "source_id",
+    "connector_id",
+    "source_kind",
+    "canonical_locator",
+    "display_locator",
+    "owner",
+    "workspace_id",
+    "tenant_id",
+    "classification",
+    "license",
+    "retention",
+    "lifecycle",
+    "registered_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "source_id": { "$ref": "#/$defs/sourceId" },
+    "connector_id": { "$ref": "#/$defs/connectorId" },
+    "source_kind": { "$ref": "#/$defs/sourceKind" },
+    "canonical_locator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "description": "Provider-canonical, credential-free identity of the source. Built by provider-specific canonicalization code; never by the source content."
+    },
+    "display_locator": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 2048,
+      "description": "Human display form (may contain a tracking query or alias); never used for identity or dedup."
+    },
+    "owner": { "$ref": "#/$defs/principalId" },
+    "author": {
+      "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 256 }, { "type": "null" }]
+    },
+    "publisher": {
+      "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 256 }, { "type": "null" }]
+    },
+    "workspace_id": { "$ref": "#/$defs/workspaceId" },
+    "tenant_id": { "$ref": "#/$defs/workspaceId" },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibility"],
+      "properties": {
+        "visibility": { "enum": ["public", "project", "private"] },
+        "allowed_workspace_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/workspaceId" }
+        },
+        "allowed_principal_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/principalId" }
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spdx", "attribution_required"],
+      "properties": {
+        "spdx": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[A-Za-z0-9.+_-]{3,64}$" },
+            { "const": "LICENSE_UNKNOWN" }
+          ]
+        },
+        "attribution_required": { "type": "boolean" }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy"],
+      "properties": {
+        "policy": { "enum": ["keep_forever", "retain_then_delete", "delete_on_source_deletion"] },
+        "retain_until": {
+          "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }]
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": { "enum": ["enabled", "blocked", "tombstoned"] },
+        "reason": {
+          "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 512 }, { "type": "null" }]
+        },
+        "changed_at": {
+          "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }]
+        }
+      }
+    },
+    "registered_at": { "$ref": "#/$defs/utcTimestamp" },
+    "registered_by": { "$ref": "#/$defs/principalId" }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sourceId": { "type": "string", "pattern": "^src-[a-z0-9][a-z0-9-]{0,62}$" },
+    "connectorId": { "type": "string", "pattern": "^conn-[a-z0-9][a-z0-9._-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "sourceKind": {
+      "enum": [
+        "markdown_obsidian",
+        "web_url",
+        "pdf",
+        "github",
+        "telegram",
+        "youtube",
+        "arxiv_huggingface",
+        "manual_export"
+      ]
+    }
+  }
+}

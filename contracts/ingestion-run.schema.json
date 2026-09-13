@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/ingestion-run.schema.json",
+  "description": "One bounded ingestion run: frozen input digests, executor provenance, and exactly one terminal outcome per operation. Wall-clock telemetry (started_at/finished_at) is audit-only and never feeds decisions.",
+  "title": "Veritas Ingestion Run (S2-003)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "run_id",
+    "executor_id",
+    "nonce",
+    "output_root",
+    "frozen_inputs",
+    "environment",
+    "counts",
+    "outcomes"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "run_id": { "$ref": "#/$defs/runId" },
+    "executor_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "pid": { "type": "integer", "minimum": 1 },
+    "nonce": { "type": "string", "pattern": "^n-[A-Za-z0-9_-]{8,64}$" },
+    "output_root": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Portable relative output root; host-absolute paths are rejected."
+    },
+    "frozen_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector_contracts_sha256", "corpus_sha256", "policy_sha256"],
+      "properties": {
+        "connector_contracts_sha256": { "$ref": "#/$defs/sha256Hex" },
+        "corpus_sha256": { "$ref": "#/$defs/sha256Hex" },
+        "policy_sha256": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "started_at": {
+      "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }]
+    },
+    "finished_at": {
+      "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }]
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree"],
+      "properties": {
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "node_version": {
+          "oneOf": [{ "type": "string", "maxLength": 32 }, { "type": "null" }]
+        },
+        "platform": {
+          "oneOf": [{ "type": "string", "maxLength": 64 }, { "type": "null" }]
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "COMMITTED": { "type": "integer", "minimum": 0 },
+        "BLOCKED_CONNECTOR": { "type": "integer", "minimum": 0 },
+        "ACCESS_DENIED": { "type": "integer", "minimum": 0 },
+        "TOMBSTONED": { "type": "integer", "minimum": 0 },
+        "QUARANTINED": { "type": "integer", "minimum": 0 },
+        "FAILED": { "type": "integer", "minimum": 0 },
+        "CANCELLED": { "type": "integer", "minimum": 0 },
+        "RECONCILIATION_REQUIRED": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "outcomes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["operation_id", "terminal"],
+        "properties": {
+          "operation_id": { "type": "string", "pattern": "^op-[a-z0-9][a-z0-9-]{0,62}$" },
+          "case_id": {
+            "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 128 }, { "type": "null" }]
+          },
+          "terminal": {
+            "enum": [
+              "COMMITTED",
+              "BLOCKED_CONNECTOR",
+              "ACCESS_DENIED",
+              "TOMBSTONED",
+              "QUARANTINED",
+              "FAILED",
+              "CANCELLED",
+              "RECONCILIATION_REQUIRED"
+            ]
+          },
+          "snapshot_id": {
+            "oneOf": [{ "$ref": "#/$defs/snapshotId" }, { "type": "null" }]
+          },
+          "error_code": {
+            "oneOf": [{ "$ref": "#/$defs/connectorErrorCode" }, { "type": "null" }]
+          },
+          "raw_observation_ref": {
+            "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 512 }, { "type": "null" }]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "runId": { "type": "string", "pattern": "^run-[a-z0-9][a-z0-9-]{0,62}$" },
+    "snapshotId": { "type": "string", "pattern": "^snp-[a-z0-9][a-z0-9-]{0,62}$" },
+    "connectorErrorCode": {
+      "enum": [
+        "BLOCKED_CONNECTOR",
+        "ACCESS_DENIED",
+        "NOT_FOUND",
+        "TOMBSTONED",
+        "RATE_LIMITED",
+        "TIMEOUT",
+        "MALFORMED_CONTENT",
+        "UNSUPPORTED_FORMAT",
+        "LICENSE_UNKNOWN",
+        "RETENTION_BLOCKED",
+        "QUARANTINED",
+        "UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED"
+      ]
+    }
+  }
+}

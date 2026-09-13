@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/fetch-request.schema.json",
+  "description": "Authorized read request for one exact source version. Carries actor, workspace, grant/lease references and an idempotency key. Raw credentials are structurally impossible: additionalProperties is false and no credential field exists.",
+  "title": "Veritas Fetch Request (S2-003)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "operation_id",
+    "source_id",
+    "connector_id",
+    "version_selector",
+    "actor",
+    "workspace_id",
+    "budget",
+    "requested_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "operation_id": {
+      "type": "string",
+      "pattern": "^op-[a-z0-9][a-z0-9-]{0,62}$",
+      "description": "Idempotency key; unique per workspace scope."
+    },
+    "source_id": { "$ref": "#/$defs/sourceId" },
+    "connector_id": { "$ref": "#/$defs/connectorId" },
+    "version_selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "latest": { "const": true },
+        "snapshot_id": { "$ref": "#/$defs/snapshotId" },
+        "upstream_version": { "type": "string", "minLength": 1, "maxLength": 256 }
+      }
+    },
+    "actor": { "$ref": "#/$defs/principalId" },
+    "workspace_id": { "$ref": "#/$defs/workspaceId" },
+    "grant_id": {
+      "oneOf": [{ "type": "string", "pattern": "^grt-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }]
+    },
+    "lease_id": {
+      "oneOf": [{ "type": "string", "pattern": "^lss-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }]
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_bytes", "time_limit_ms"],
+      "properties": {
+        "max_bytes": { "type": "integer", "minimum": 1 },
+        "max_segments": { "type": "integer", "minimum": 1 },
+        "time_limit_ms": { "type": "integer", "minimum": 1, "maximum": 600000 }
+      }
+    },
+    "requested_at": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sourceId": { "type": "string", "pattern": "^src-[a-z0-9][a-z0-9-]{0,62}$" },
+    "snapshotId": { "type": "string", "pattern": "^snp-[a-z0-9][a-z0-9-]{0,62}$" },
+    "connectorId": { "type": "string", "pattern": "^conn-[a-z0-9][a-z0-9._-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}
