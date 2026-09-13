@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "scope": "S2-003 dependency binding record. Binds source ingestion to the S2-002 merge on origin/main and to digest-verified S1-001 evidence. Every checked value is verified from Git bytes or tracked file bytes by scripts/verify-s2-003-dependencies.mjs; a missing dependency, unreachable commit or digest mismatch is BLOCKED_DEPENDENCY, never a warning.",
+  "s2_002": {
+    "ticket": "S2-002",
+    "title": "Identity, agent rights and the local sandbox gate",
+    "status": "BOUND_PASS_WITH_LIMITS",
+    "mergeCommit": "4b4456a3acbe78371e2afcc75d81da59d2765b53",
+    "mergeSubjectPrefix": "Merge pull request #14",
+    "closureCommit": "f28e45b1ef044f9ab6b6c616c0380ac4f368ff5b",
+    "expected": {
+      "implementationCommit": "37684bdaaeee1074177df3808785c9e016aa5447",
+      "manifestCommit": "e3ceebcdbd0d095b40afca9ab724bf69fa52266c",
+      "rootManifestFileSha256": "7f781f08e32688a4940eacd6ac9ad08615695ab7d080f52273b07a4226bf949c",
+      "payloadManifestSha256": "a3612d3b541ad65428197f425a54d634a3a3f2f12a788a5020aeb6be51116e6e",
+      "fileManifestSha256": "3286f28619c3cd290e425e766e0494b1e1e956311f5c890352742f6b25e7ef3c",
+      "cleanCheckoutPassed": true,
+      "comparisonOk": true,
+      "mismatchedDecisions": 0,
+      "sandboxStatus": "success",
+      "postgresSmokeStatus": "PASS",
+      "securityProbesDetected": 11
+    },
+    "evidenceReadFromGitBytes": {
+      "evidence/closure-record.json": "dbb29b4ad420de974f64cb033bfe7b17fa323ee3",
+      "evidence/root-manifest.json": "1f531f0f5f2243a7729ef1d441999723afb47d43",
+      "evidence/frozen-manifest.json": "9e3ac5f36c802b94eef4be980a1c6e09cad309a5",
+      "evidence/clean-checkout.json": "2b8d1805f8c8570439c91fd7f2dba63aced6d59a",
+      "evidence/s2-002-comparison.json": "4c17aaac9cf1f8c69b984db25ebe787aa204f846",
+      "evidence/s2-002-podman-sandbox.json": "73c0ca950858a0307441d483f3613783d094ce4e",
+      "evidence/s2-002-gvisor-sandbox.json": "fb658cf27673355f0f07f6e3f2109dd39f3d25e0",
+      "evidence/postgres-smoke.json": "a3707a6642b85dd08470752b1ac3e3cc8f03c97f",
+      "evidence/policy-probes.json": "230f333f4aa061e30ec19a22d1b282e469bba6ae",
+      "evidence/s2-002-security-probes.json": "c854d86965bbf63490eecd08f76dd43df67bd39f",
+      "evidence/s2-002-dependency-binding.json": "59ead1178dc8f1d2f1ade6c600ea9e529e6d4488"
+    },
+    "frozenManifestSha256OfGitBytes": "2d188bf19180d5429229434225ba9810345e4e89246920e93e81fb696fb966df",
+    "frozenManifestEntriesVerifiedAgainstGitBlobs": true
+  },
+  "s1_001": {
+    "ticket": "S1-001",
+    "title": "Research platform baseline (product contract provenance)",
+    "status": "BOUND_PASS_WITH_LIMITS",
+    "sourceRepository": {
+      "remote": "https://github.com/SpaceDazher/AgentOS.git",
+      "pinnedCommit": "259d9afe16495aa780f834d0b1b903d5451e158a",
+      "pinnedTree": "b8027650de4aeec1d8a5f75fc183cc9f66effc47"
+    },
+    "evaluationRecordPath": "research/tickets/stage-1/S1-001/evaluation-record.json",
+    "evaluationRecordUrl": "https://raw.githubusercontent.com/SpaceDazher/AgentOS/259d9afe16495aa780f834d0b1b903d5451e158a/research/tickets/stage-1/S1-001/evaluation-record.json",
+    "evaluationRecordSha256": "eaaeab0124408253e49bde44282b4fde9dda975deabdf04c43119ad7e1a963b5",
+    "evaluationRecordBytes": 1727,
+    "trackedCopy": "evidence/external/s1-001/evaluation-record.json",
+    "expected": {
+      "ticket_id": "S1-001",
+      "result": "pass_with_limits",
+      "evaluation_id": "reval_1DG5Q6WEAY6A40A901M0TDDN6N",
+      "artifact_chain_hash": "4f524c48438ee3c748a80bd07a6d03ce00e7f0c9ee5c6d9f0e8c8a0ec17b01e9"
+    },
+    "relevanceToS2_003": "S1-001 fixed the product contract and evidence discipline that the ingestion subsystem inherits: read-only sources, digest-addressed evidence, no narrative-only verification."
+  },
+  "agentosCrossBinding": {
+    "rule": "The pinned AgentOS commit for S1-001 must equal sourceRepository.headCommitAtBindingTime recorded in the S2-002 dependency binding at the S2-002 closure commit.",
+    "expectedAgentosCommit": "259d9afe16495aa780f834d0b1b903d5451e158a",
+    "s2_002BindingPath": "evidence/s2-002-dependency-binding.json"
+  },
+  "consequence": "If every check passes, S2-003 implementation may begin. Any missing file, unreachable commit, digest drift or payload mismatch exits non-zero as BLOCKED_DEPENDENCY before contracts are touched."
+}

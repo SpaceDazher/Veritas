@@ -14,6 +14,7 @@
     "test:sandbox": "node --test \"tests/identity/sandbox.test.mjs\"",
     "test:security-probes": "node scripts/security-probes.mjs",
     "verify:s2-002": "node scripts/verify-s2-002.mjs",
+    "verify:s2-003-dependencies": "node scripts/verify-s2-003-dependencies.mjs",
     "verify:s2-002-dependencies": "node scripts/verify-s2-002-dependencies.mjs",
     "verify:podman-sandbox": "node scripts/verify-podman-sandbox.mjs",
     "verify:gvisor-sandbox": "node scripts/verify-gvisor-sandbox.mjs",

@@ -1,0 +1,34 @@
+{
+  "schema": "agentos.ticket-evaluation-record/v1",
+  "ticket_id": "S1-001",
+  "recorded_at": "2026-08-30T04:05:00Z",
+  "db_root": ".agentos-research/platform-stage-1",
+  "research_revision": 1,
+  "campaign_id": "rcamp_6TATG2AAJY0J9VEF01M0TDDN5X",
+  "goal_id": "goal_DXHSJM6981DBYCTD01M0TDDN5X",
+  "evaluation_id": "reval_1DG5Q6WEAY6A40A901M0TDDN6N",
+  "evaluation_version": 1,
+  "result": "pass_with_limits",
+  "artifact_chain_hash": "4f524c48438ee3c748a80bd07a6d03ce00e7f0c9ee5c6d9f0e8c8a0ec17b01e9",
+  "evidence_pack": {
+    "schema": "agentos.evidence-pack/v3",
+    "path": "research/tickets/stage-1/S1-001/results/evidence/evidence-pack-8baf840d35efaffaaabecbc8b60cf47064322aaedbc4f4950dc93eab74826c7a.json",
+    "canonical_runtime_path": ".agentos-research/platform-stage-1/goals/goal_DXHSJM6981DBYCTD01M0TDDN5X/evidence-pack.json",
+    "sha256": "8baf840d35efaffaaabecbc8b60cf47064322aaedbc4f4950dc93eab74826c7a",
+    "payload_sha256": "1dca56b527531b25aa389051a80227c00843d1454876e7c5e088276da9f7d46d",
+    "chain_fresh": true,
+    "latest_evaluation_valid": true
+  },
+  "wiki_check": {
+    "ok": true,
+    "files": 1545,
+    "links_checked": 4344,
+    "issues": []
+  },
+  "limitations": [
+    "The auditor role is process-separated and adversarial but is not an external human or independently operated model.",
+    "The run verifies the frozen 12-record queue only; it does not verify all 176 historical u records.",
+    "Canonical pages and metadata were reviewed live, but full third-party content was not archived in this repository."
+  ],
+  "note": "research-plan evaluation never sets Goal ACCEPTED (release gate only); record extracted from the live canonical DB and aligned with research_series revision 1"
+}
