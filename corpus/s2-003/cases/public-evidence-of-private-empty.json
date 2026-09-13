@@ -1,0 +1,64 @@
+{
+  "case_id": "public-evidence-of-private-empty",
+  "case_number": 56,
+  "category": "acl_private",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-pubpriv",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/pub-priv",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "private",
+      "allowed_principal_ids": [
+        "prn-corpus-reviewer"
+      ]
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/pub-priv": "synthetic private bytes q9x"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-pub-priv",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/pub-priv"
+    },
+    {
+      "type": "public_evidence_check",
+      "operation_id": "op-pub-priv-2",
+      "workspace_id": "ws-corpus"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "public_view_content_free": true
+  }
+}

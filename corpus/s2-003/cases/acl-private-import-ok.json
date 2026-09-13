@@ -1,0 +1,60 @@
+{
+  "case_id": "acl-private-import-ok",
+  "case_number": 49,
+  "category": "acl_private",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-aclprivate",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/acl-private",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "private",
+      "allowed_principal_ids": [
+        "prn-corpus-reviewer"
+      ]
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/acl-private": "private canary 7f3a synthetic"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-acl-private",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/acl-private"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "visibility": "private",
+    "public_export_denied": true
+  }
+}

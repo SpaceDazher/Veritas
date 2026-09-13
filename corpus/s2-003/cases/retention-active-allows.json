@@ -1,0 +1,55 @@
+{
+  "case_id": "retention-active-allows",
+  "case_number": 54,
+  "category": "acl_private",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-retact",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/ret-active",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "retain_then_delete",
+      "retain_until": "2027-01-01T00:00:00.000Z"
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/ret-active": "within retention window"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-ret-active",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/ret-active"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED"
+  }
+}

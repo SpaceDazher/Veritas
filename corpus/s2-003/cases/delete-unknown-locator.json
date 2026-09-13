@@ -1,0 +1,50 @@
+{
+  "case_id": "delete-unknown-locator",
+  "case_number": 12,
+  "category": "edit_delete",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-delunknown",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/never-existed",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {},
+  "operations": [
+    {
+      "type": "record_deletion",
+      "operation_id": "op-del-unknown",
+      "workspace_id": "ws-corpus",
+      "locator": "case-fixture/never-existed",
+      "reason": "rumor of deletion"
+    }
+  ],
+  "expected": {
+    "terminal": "TOMBSTONED",
+    "allow_tombstone_without_prior": true
+  }
+}

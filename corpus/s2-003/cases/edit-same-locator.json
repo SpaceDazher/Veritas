@@ -1,0 +1,80 @@
+{
+  "case_id": "edit-same-locator",
+  "case_number": 9,
+  "category": "edit_delete",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-editnote",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/edit-v1",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/edit-v1": "original body of the editable note"
+  },
+  "sequence_fixtures": [
+    {
+      "op": "op-edit-1",
+      "exportId": "case-fixture/edit-v1",
+      "text": "original body of the editable note"
+    },
+    {
+      "op": "op-edit-2",
+      "exportId": "case-fixture/edit-v1",
+      "text": "edited body of the editable note, corrected facts"
+    }
+  ],
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-edit-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/edit-v1"
+    },
+    {
+      "type": "ingest",
+      "operation_id": "op-edit-2",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/edit-v1"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "min_versions": 2,
+    "last_version_supersedes": true
+  }
+}

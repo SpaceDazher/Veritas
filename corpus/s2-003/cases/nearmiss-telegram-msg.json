@@ -1,0 +1,104 @@
+{
+  "case_id": "nearmiss-telegram-msg",
+  "case_number": 30,
+  "category": "near_miss_identity",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-nearmisstelegrammsg",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "nearmiss:nearmiss-telegram-msg-a",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "second_descriptor": {
+    "source_id": "src-nearmisstelegrammsgn",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "nearmiss:nearmiss-telegram-msg-b",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "identity_note": {
+    "a": "telegram-fixture:chat-1/msg-10",
+    "b": "telegram-fixture:chat-1/msg-11"
+  },
+  "fixtures": {
+    "case-fixture/nearmiss-telegram-msg-a": "Adjacent messages in the same channel.",
+    "case-fixture/nearmiss-telegram-msg-b": "Adjacent messages in the same channel. (variant copy)"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-nearmiss-telegram-msg-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/nearmiss-telegram-msg-a"
+    },
+    {
+      "type": "ingest",
+      "operation_id": "op-nearmiss-telegram-msg-2",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/nearmiss-telegram-msg-b",
+      "source_id": "src-nearmisstelegrammsgn"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "distinct_canonical_locators": true,
+    "no_auto_merge": true
+  }
+}

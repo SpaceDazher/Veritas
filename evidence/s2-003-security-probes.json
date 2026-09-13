@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "scope": "Adversarial probes A-L driven through the production ingestion path; DETECTED means the production modules rejected, contained or made the attack visible.",
+  "policyVersion": "s2-003-ingestion-v1",
+  "generatedAt": "2026-01-15T08:00:00.000Z",
+  "escaped": 0,
+  "detected": 12,
+  "skipped": 0,
+  "results": [
+    {
+      "id": "A",
+      "title": "deleted source does not remain active/current",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "B",
+      "title": "same-locator edit creates a new immutable version",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "C",
+      "title": "cross-channel duplicates link upstream and are not independent confirmations",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "D",
+      "title": "unavailable media never becomes a successful empty import",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "E",
+      "title": "malformed/OCR-uncertain extraction is visible downstream",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "F",
+      "title": "embedded instructions never expand authority or trigger tools",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "G",
+      "title": "private snapshot/segment never reaches public output",
+      "verdict": "DETECTED",
+      "detail": "out-of-scope export denied; public evidence view is content-free"
+    },
+    {
+      "id": "H",
+      "title": "URL alias collisions never merge distinct provider objects",
+      "verdict": "DETECTED",
+      "detail": "aliases of one object share identity; distinct objects keep distinct identity"
+    },
+    {
+      "id": "I",
+      "title": "clock perturbation never changes identity or verdict",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "J",
+      "title": "crash replay does not duplicate versions or events",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "K",
+      "title": "forged provenance in payload never replaces host-observed metadata",
+      "verdict": "DETECTED",
+      "detail": {}
+    },
+    {
+      "id": "L",
+      "title": "manifest substitution stops the run as QUARANTINED",
+      "verdict": "DETECTED",
+      "detail": "stale/corrupt digest detected: gold-markdown:digest-drift -> run QUARANTINED"
+    }
+  ]
+}

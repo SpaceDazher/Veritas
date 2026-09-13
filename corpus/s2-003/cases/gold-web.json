@@ -1,0 +1,57 @@
+{
+  "case_id": "gold-web",
+  "case_number": 2,
+  "category": "gold_import",
+  "source_kind": "web_url",
+  "descriptor": {
+    "source_id": "src-goldweb",
+    "connector_id": "conn-web-url",
+    "source_kind": "web_url",
+    "canonical_locator": "web_url:corpus/gold-web",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/gold-web": "<html><title>Page 1</title><body>Stable public page text.</body></html>"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-gold-web",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/gold-web"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "min_versions": 1,
+    "provenance_complete": true
+  }
+}

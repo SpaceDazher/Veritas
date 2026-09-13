@@ -17,7 +17,7 @@
 //     normalized error, never COMMITTED.
 import { createHash } from 'node:crypto';
 import { assertValidContract } from './contract-registry.mjs';
-import { canonicalIdentity, CANONICALIZATION_VERSION } from './canonical.mjs';
+import { CANONICALIZATION_VERSION } from './canonical.mjs';
 import { contentSnapshotId, tombstoneSnapshotId } from './time-model.mjs';
 import { normalizeContent, sha256Hex, decideDedup, lineageFromVerdict, makeShingleClassifier } from './dedup.mjs';
 import { connectorError } from './connectors/base.mjs';
@@ -181,7 +181,10 @@ export class IngestionPipeline {
     // FETCHING → SNAPSHOT_STAGED
     const observedAt = this.now();
     const fetchedAt = this.now();
-    const identity = canonicalIdentity(descriptor.source_kind, request.identity ?? { vault_relative_path: request.locator, export_id: request.locator, url: request.locator, ...(request.identity ?? {}) });
+    // Canonical identity is anchored on the registered descriptor (or on a
+    // provider-canonicalized request identity when a connector supplies one).
+    // Source content can never influence it.
+    const identity = { canonical_locator: request.identity?.canonical_locator ?? descriptor.canonical_locator, canonicalization_version: CANONICALIZATION_VERSION };
     const rawSha256 = sha256Hex(fetched.raw);
     const normalizedText = normalizeContent(fetched.raw);
     const normalizedSha256 = sha256Hex(normalizedText);
@@ -328,7 +331,7 @@ export class IngestionPipeline {
       return this.#observe(caseId, { ...begin.record.outcome, replayed: true });
     }
     try {
-      const identity = canonicalIdentity(descriptor.source_kind, request.identity ?? { vault_relative_path: request.locator, export_id: request.locator, url: request.locator });
+      const identity = { canonical_locator: request.identity?.canonical_locator ?? descriptor.canonical_locator, canonicalization_version: CANONICALIZATION_VERSION };
       const prior = this.store.activeSnapshot(identity.canonical_locator);
       const version = (prior.current?.version ?? 0) + 1;
       const at = this.now();

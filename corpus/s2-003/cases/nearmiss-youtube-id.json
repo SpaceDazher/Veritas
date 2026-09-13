@@ -1,0 +1,104 @@
+{
+  "case_id": "nearmiss-youtube-id",
+  "case_number": 29,
+  "category": "near_miss_identity",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-nearmissyoutubeid",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "nearmiss:nearmiss-youtube-id-a",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "second_descriptor": {
+    "source_id": "src-nearmissyoutubeidn",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "nearmiss:nearmiss-youtube-id-b",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "identity_note": {
+    "a": "youtube-fixture:video-1/transcript-v1",
+    "b": "youtube-fixture:video-2/transcript-v1"
+  },
+  "fixtures": {
+    "case-fixture/nearmiss-youtube-id-a": "Transcript of video one vs two.",
+    "case-fixture/nearmiss-youtube-id-b": "Transcript of video one vs two. (variant copy)"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-nearmiss-youtube-id-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/nearmiss-youtube-id-a"
+    },
+    {
+      "type": "ingest",
+      "operation_id": "op-nearmiss-youtube-id-2",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/nearmiss-youtube-id-b",
+      "source_id": "src-nearmissyoutubeidn"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "distinct_canonical_locators": true,
+    "no_auto_merge": true
+  }
+}

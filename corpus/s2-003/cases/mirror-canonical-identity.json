@@ -1,0 +1,100 @@
+{
+  "case_id": "mirror-canonical-identity",
+  "case_number": 23,
+  "category": "mirror_lineage",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-mirrorcanonicalidentity",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/mirror-canonical-identity-up",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "second_descriptor": {
+    "source_id": "src-mirrorcanonicalidentityd",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/mirror-canonical-identity-down",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/mirror-canonical-identity-up": "Mirror page served from a different domain path.",
+    "case-fixture/mirror-canonical-identity-down": "Mirror page served from a different domain path."
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-mirror-canonical-identity-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/mirror-canonical-identity-up"
+    },
+    {
+      "type": "ingest",
+      "operation_id": "op-mirror-canonical-identity-2",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/mirror-canonical-identity-down",
+      "source_id": "src-mirrorcanonicalidentityd"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "lineage_relation": "exact_duplicate",
+    "no_merge": true
+  }
+}

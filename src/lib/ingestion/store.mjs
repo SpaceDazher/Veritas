@@ -130,7 +130,7 @@ export class IngestionStore {
       return existing;
     }
     this.lineage.set(lineage.lineage_id, Object.freeze({ ...lineage }));
-    this.events.push({ type: 'LINEAGE_APPENDED', lineage_id: lineage.lineage_id, relation: lineage.relation, at: lineage.created_at });
+    this.events.push({ type: 'LINEAGE_APPENDED', lineage_id: lineage.lineage_id, relation: lineage.relation, automated: lineage.automated, status: lineage.status, at: lineage.created_at });
     return this.lineage.get(lineage.lineage_id);
   }
 

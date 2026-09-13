@@ -1,0 +1,57 @@
+{
+  "case_id": "cancelled-operation",
+  "case_number": 67,
+  "category": "crash_reconciliation",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-cancel",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/cancel",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/cancel": "content for a cancelled fetch"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-cancel-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/cancel",
+      "simulate": "cancel"
+    }
+  ],
+  "expected": {
+    "terminal": "CANCELLED",
+    "no_snapshot": true
+  }
+}

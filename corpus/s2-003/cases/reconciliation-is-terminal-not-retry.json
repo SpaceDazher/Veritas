@@ -1,0 +1,69 @@
+{
+  "case_id": "reconciliation-is-terminal-not-retry",
+  "case_number": 68,
+  "category": "crash_reconciliation",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-recon",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/recon",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/recon": "content behind an unknown outcome"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-recon-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/recon",
+      "simulate": "unknown_outcome"
+    },
+    {
+      "type": "ingest",
+      "operation_id": "op-recon-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/recon",
+      "force_error": "RATE_LIMITED"
+    }
+  ],
+  "expected": {
+    "terminal": "RECONCILIATION_REQUIRED",
+    "replay_wins": true
+  }
+}

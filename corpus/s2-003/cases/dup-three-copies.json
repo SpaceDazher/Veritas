@@ -1,0 +1,101 @@
+{
+  "case_id": "dup-three-copies",
+  "case_number": 19,
+  "category": "exact_duplicate",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-dupthreecopies",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/dup-three-copies-a",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "second_descriptor": {
+    "source_id": "src-dupthreecopiesb",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/dup-three-copies-b",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/dup-three-copies-a": "Triplicated announcement text for mirror handling.",
+    "case-fixture/dup-three-copies-b": "Triplicated announcement text for mirror handling."
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-dup-three-copies-1",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/dup-three-copies-a"
+    },
+    {
+      "type": "ingest",
+      "operation_id": "op-dup-three-copies-2",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/dup-three-copies-b",
+      "source_id": "src-dupthreecopiesb"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "lineage_relation": "exact_duplicate",
+    "automated": true,
+    "both_snapshots_exist": true
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "case_id": "malformed-empty-file",
+  "case_number": 35,
+  "category": "malformed_partial",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-malformedemptyfile",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/malformed-empty-file",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/malformed-empty-file": ""
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-malformed-empty-file",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/malformed-empty-file"
+    }
+  ],
+  "expected": {
+    "terminal": "FAILED",
+    "no_snapshot": true,
+    "note": "empty payload must fail: silent empty successes are forbidden"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "case_id": "time-boundary-millisecond",
+  "case_number": 73,
+  "category": "timestamps_clock",
+  "source_kind": "manual_export",
+  "descriptor": {
+    "source_id": "src-time5",
+    "connector_id": "conn-manual-export",
+    "source_kind": "manual_export",
+    "canonical_locator": "manual:export/case-fixture/time-5",
+    "display_locator": "case-000",
+    "owner": "prn-corpus-reviewer",
+    "author": "Corpus Author",
+    "publisher": null,
+    "workspace_id": "ws-corpus",
+    "tenant_id": "ws-corpus",
+    "classification": {
+      "visibility": "public"
+    },
+    "license": {
+      "spdx": "CC-BY-4.0",
+      "attribution_required": true
+    },
+    "retention": {
+      "policy": "keep_forever",
+      "retain_until": null
+    },
+    "lifecycle": {
+      "state": "enabled",
+      "reason": null,
+      "changed_at": null
+    },
+    "registered_at": "2026-01-15T08:00:00.000Z",
+    "registered_by": "prn-corpus-reviewer"
+  },
+  "fixtures": {
+    "case-fixture/time-5": "content fetched at a millisecond boundary"
+  },
+  "operations": [
+    {
+      "type": "ingest",
+      "operation_id": "op-time-5",
+      "workspace_id": "ws-corpus",
+      "budget": {
+        "max_bytes": 1000000,
+        "max_segments": 500,
+        "time_limit_ms": 30000
+      },
+      "locator": "case-fixture/time-5"
+    }
+  ],
+  "expected": {
+    "terminal": "COMMITTED",
+    "utc_format": true
+  }
+}
