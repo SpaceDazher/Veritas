@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 271.
+Generated from `git ls-files`; count: 273.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -157,6 +157,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-002-security-probes.json`
 - `evidence/s2-003-comparison.json`
 - `evidence/s2-003-db-comparison.json`
+- `evidence/s2-003-db-run-a.json`
+- `evidence/s2-003-db-run-b.json`
 - `evidence/s2-003-dependency-binding.json`
 - `evidence/s2-003-run-a.json`
 - `evidence/s2-003-run-b.json`
