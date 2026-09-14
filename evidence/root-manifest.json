@@ -2,16 +2,17 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "77224a467947e771ebb3814aba9037039b12c508",
-  "sourceTree": "f5b2b34d62be39817890af4d521f8ec47adade3d",
-  "trackedFileCount": 271,
-  "manifestFileCount": 268,
-  "payloadManifestSha256": "8fc43885974a3a0886a8cc87a1b6237b77098642cd40b41dcad302c2196fd8c6",
-  "fileManifestSha256": "ea723246b6903f8f59946753517d20473dc8eb0499ed0bcd3e3c2442fa36ea37",
+  "sourceCommit": "46911995de072ba18c877b1146d18d0d368ba196",
+  "sourceTree": "9b26656982192eef7bc9a954a7c6141226cc2969",
+  "trackedFileCount": 273,
+  "manifestFileCount": 269,
+  "payloadManifestSha256": "bb57604c5c97d3ff61701ffb60166e9b13ce58fbf3cca5c1cb23dc530ce5b3db",
+  "fileManifestSha256": "1269d9ea860fe50556a2856acb471b3666680fccab71bd0dbab0d807d48ea870",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
-    "evidence/commit-record.json"
+    "evidence/commit-record.json",
+    "evidence/clean-checkout.json"
   ],
   "files": [
     {
@@ -26,8 +27,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "bb205a1f783a7fa9a6c42e241a9e7ef93a4ff0a3eae7ceb911f7e97bf17deb01",
-      "bytes": 85
+      "sha256": "1cdf25dc82811d62363d593cf399c5faa38603b9825548ab7d25018ebc5d579a",
+      "bytes": 101
     },
     {
       "path": "contracts/acceptance-cases.schema.json",
@@ -531,7 +532,7 @@
     },
     {
       "path": "corpus/s2-003/manifest.json",
-      "sha256": "e04bc9153b9e34d887e6883ed70eaafbfb343a00b881c1a68169a5c965d61fd6",
+      "sha256": "f966bb77caf5ee435534bdd2f1097dd8ebc6a747e68d49034f3d2ebf87a35d2e",
       "bytes": 8957
     },
     {
@@ -640,11 +641,6 @@
       "bytes": 365
     },
     {
-      "path": "evidence/clean-checkout.json",
-      "sha256": "010d75aee3fbd39378e812aeb775d2a3e20766a50002b0152cbb5e1fee6e7161",
-      "bytes": 3924
-    },
-    {
       "path": "evidence/contract-tests.json",
       "sha256": "9b8e60757c96bc42f57401e7173a527772967d3f104a68992738369de728dcbd",
       "bytes": 542
@@ -686,12 +682,12 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "5b3ea7b5812de61776d23cadebd1bf37f19bbd6b786d9e741ce0ce0fcd85e61a",
-      "bytes": 11495
+      "sha256": "307c53bc241c89be23994b25b4c96a4d0cf5e45b3b672deb298dc155edffc8dc",
+      "bytes": 11563
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "2aab3df619f35ec407b3c76e824402f3b9f7d1eb842221620036c3d7973ae8d7",
+      "sha256": "3f0745a014ebabec0344560f718956b91a859a0faa4f208cdcd36947e0940741",
       "bytes": 23166
     },
     {
@@ -761,13 +757,23 @@
     },
     {
       "path": "evidence/s2-003-comparison.json",
-      "sha256": "7af0698affa2618359b89db7bd50258ebb33e23481da6e30bf2e1cbba49eda3c",
+      "sha256": "623373dcd42c1a85ca1ceba04e9280026e8ffaaea2bf4c70bb7e53c8499c421c",
       "bytes": 1735
     },
     {
       "path": "evidence/s2-003-db-comparison.json",
-      "sha256": "9a88237f3c21ff0e334daf198954a704e4b9432bb645239dbefe60e26f0692ce",
-      "bytes": 2446
+      "sha256": "40102a61a9c883d106779eb7a706f4f6a85009e123edb89cdad2ee99670fbc77",
+      "bytes": 2598
+    },
+    {
+      "path": "evidence/s2-003-db-run-a.json",
+      "sha256": "cf7564748863b6c2e52093407ff8f796d2c48258d4429ca5aa281afe3fda8230",
+      "bytes": 57272
+    },
+    {
+      "path": "evidence/s2-003-db-run-b.json",
+      "sha256": "7459ca593309254890938812b24f7eae705daf3c41945018d0d11a3ecae45a06",
+      "bytes": 57272
     },
     {
       "path": "evidence/s2-003-dependency-binding.json",
@@ -776,12 +782,12 @@
     },
     {
       "path": "evidence/s2-003-run-a.json",
-      "sha256": "0d025d1735bae56bbf377e4e673137aa9eafc7e357a67dd9eeb41af479f5be33",
-      "bytes": 57242
+      "sha256": "df4d744247f2e725f2ed8bc298c2e76d900a8637b0d96f52b6b1f597ffcc6fe0",
+      "bytes": 57243
     },
     {
       "path": "evidence/s2-003-run-b.json",
-      "sha256": "6af3632ce8c879c5c97476d1d89af277127a32302464b7d93f29571a264cf7fc",
+      "sha256": "9df4294e65cee163a37be1398567d9714d37e8a4e4a7b8963df51abb1d6e1d4a",
       "bytes": 57243
     },
     {
@@ -961,8 +967,8 @@
     },
     {
       "path": "scripts/generate-manifests.mjs",
-      "sha256": "7e5810873418d36394a8e1b743b349a08d44eb612f457ea716552e34fde9122e",
-      "bytes": 5178
+      "sha256": "f387a3fab9c4899075962637db7ea09d2a9e48c74907251e146610c644a3a6f2",
+      "bytes": 5210
     },
     {
       "path": "scripts/git-client.mjs",
@@ -981,13 +987,13 @@
     },
     {
       "path": "scripts/s2-003-db-replay.mjs",
-      "sha256": "e59c3d4ca460fa81f4b649dcd0073a0044223877daa4d73591175b2ea47b5af5",
-      "bytes": 5576
+      "sha256": "276f75d83b99e929a0291c7627056ba9a4438ac81a28007471879e3fd9e26d0d",
+      "bytes": 8023
     },
     {
       "path": "scripts/s2-003-run.mjs",
-      "sha256": "4b970e54ee3b2d693219ac5cc3a1614af7a331abebeda4ce52ee55e02fb44ea0",
-      "bytes": 18620
+      "sha256": "62db0d35fad33089b275e4ba35e11e997f7dd15cc2cf14a1cf2706ca44401acb",
+      "bytes": 18744
     },
     {
       "path": "scripts/s2-003-security-probes.mjs",
@@ -1056,8 +1062,8 @@
     },
     {
       "path": "scripts/verify-s2-003.mjs",
-      "sha256": "cb2048911ce36e662cb3b8d35a9645a9cff518d1dd4806b36c5e454cb17d3a12",
-      "bytes": 11060
+      "sha256": "2926a5415cd4c641d97222f0a69fff12687ae83b894b5f92162f3ec4934bcce8",
+      "bytes": 11450
     },
     {
       "path": "scripts/verify.mjs",
@@ -1186,8 +1192,8 @@
     },
     {
       "path": "src/lib/ingestion/connectors/http-snapshot.mjs",
-      "sha256": "31724011ec392429c99f3483b4a4e71858ca31c185cf843411ffc63d26d8d462",
-      "bytes": 14428
+      "sha256": "5456264167f6ed67fe489772d88639b4a3c4ae3449aaf9b265f5b28b10efcddc",
+      "bytes": 22020
     },
     {
       "path": "src/lib/ingestion/connectors/manual-export.mjs",
@@ -1221,18 +1227,18 @@
     },
     {
       "path": "src/lib/ingestion/pipeline.mjs",
-      "sha256": "1f848bb0b589cf2d684e159882e9fcb0d798875c5e9c7a5ca5e94dc26fd9634b",
-      "bytes": 29562
+      "sha256": "e7c56f88a8347d7036964a65be6772af1471d6ffc0c3f81b3ff068738a490818",
+      "bytes": 30137
     },
     {
       "path": "src/lib/ingestion/postgres-store.mjs",
-      "sha256": "c92a3b23eabb103d981138eec4197007bc829a839e7c14ae382e2a225a94a092",
-      "bytes": 14465
+      "sha256": "dd33bfd5335a878cee738343e4a131cadb84b458a1a1e12c951ca1f4aa05fc87",
+      "bytes": 21487
     },
     {
       "path": "src/lib/ingestion/store.mjs",
-      "sha256": "771342204220e41430ef598c6bf40880b07649c4cb79a849f05c5bb050fa4eb2",
-      "bytes": 10530
+      "sha256": "159826c9883d473582d6e51bbd4489a4bebbd78a12001d52c1545c178c85118f",
+      "bytes": 11481
     },
     {
       "path": "src/lib/ingestion/time-model.mjs",
@@ -1341,8 +1347,8 @@
     },
     {
       "path": "tests/ingestion/security-hardening.test.mjs",
-      "sha256": "0b64ed156938dcd044f3971ae6c692266763b1ccb0ed813fb4e415c329c769a9",
-      "bytes": 16662
+      "sha256": "c55d07ef654a746cd8b45713debdfeb804967ec73310ad62a615d4a005744244",
+      "bytes": 19772
     },
     {
       "path": "tests/ingestion/time-model.test.mjs",
