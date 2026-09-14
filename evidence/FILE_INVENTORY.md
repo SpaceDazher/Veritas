@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 267.
+Generated from `git ls-files`; count: 271.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -156,6 +156,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-002-run-b.json`
 - `evidence/s2-002-security-probes.json`
 - `evidence/s2-003-comparison.json`
+- `evidence/s2-003-db-comparison.json`
 - `evidence/s2-003-dependency-binding.json`
 - `evidence/s2-003-run-a.json`
 - `evidence/s2-003-run-b.json`
@@ -198,6 +199,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/git-client.mjs`
 - `scripts/policy-probes.mjs`
 - `scripts/s2-002-run.mjs`
+- `scripts/s2-003-db-replay.mjs`
 - `scripts/s2-003-run.mjs`
 - `scripts/s2-003-security-probes.mjs`
 - `scripts/security-probes.mjs`
@@ -246,6 +248,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/dedup.mjs`
 - `src/lib/ingestion/export-policy.mjs`
 - `src/lib/ingestion/pipeline.mjs`
+- `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
@@ -268,5 +271,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/migrations.test.mjs`
 - `tests/ingestion/pipeline.test.mjs`
 - `tests/ingestion/run-determinism.test.mjs`
+- `tests/ingestion/security-hardening.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
 - `tsconfig.json`
