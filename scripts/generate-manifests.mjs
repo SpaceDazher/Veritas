@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import {gitText, trackedFiles as listTrackedFiles} from './git-client.mjs';
 
 const root = process.cwd();
-const metadataFiles = ['evidence/root-manifest.json', 'evidence/closure-record.json', 'evidence/commit-record.json'];
+const metadataFiles = ['evidence/root-manifest.json', 'evidence/closure-record.json', 'evidence/commit-record.json', 'evidence/clean-checkout.json'];
 const git = (...args) => gitText(root, args);
 const trackedFiles = listTrackedFiles(root);
 const payloadFiles = trackedFiles.filter((file) => !metadataFiles.includes(file));
