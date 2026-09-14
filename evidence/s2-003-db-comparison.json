@@ -32,13 +32,15 @@
     }
   ],
   "pids": {
-    "run_a": 29340,
-    "run_b": 11308
+    "run_a": 32852,
+    "run_b": 10904
   },
   "executors": {
     "run_a": "exec-db-a",
     "run_b": "exec-db-b"
   },
+  "testedImplementationCommit": "218d5515f60af685b4d93b496a47714bfd740380",
+  "evidenceContainerCommit": "218d5515f60af685b4d93b496a47714bfd740380",
   "integrity": {
     "run_a": {
       "snapshots_total": 81,

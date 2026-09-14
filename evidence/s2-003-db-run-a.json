@@ -2,7 +2,7 @@
   "contractVersion": "1.0.0",
   "run_id": "s2-003-db-run-a",
   "executor_id": "exec-db-a",
-  "pid": 29340,
+  "pid": 32852,
   "nonce": "n-dbareplay000001",
   "output_root": "results/s2-003/db-s2-003-db-run-a",
   "frozen_inputs": {
@@ -13,8 +13,8 @@
   "started_at": "2026-01-15T08:00:00.000Z",
   "finished_at": null,
   "environment": {
-    "commit": "34fe03feb21ce353e07ea14beca180f0db98f48e",
-    "tree": "c47ef0e553fa897ea488a277d1037121f6b61ed0",
+    "commit": "218d5515f60af685b4d93b496a47714bfd740380",
+    "tree": "120bce076fe0e539fd95534e08d9e4267419cd48",
     "node_version": "22.23.2",
     "platform": "win32-x64"
   },
@@ -2391,5 +2391,5 @@
       "snapshot_ids": []
     }
   ],
-  "dbPid": 29340
+  "dbPid": 32852
 }

@@ -348,6 +348,23 @@ export class PostgresIngestionStore {
         payload: { terminal: outcome.terminal },
       });
       await client.query('COMMIT');
+      // Mirror the canonical audit events into the in-memory log that the
+      // run comparator and integrity summaries read from.
+      if (snapshot) {
+        this.events.push({
+          type: snapshot.snapshot_kind === 'tombstone' ? 'SNAPSHOT_TOMBSTONED' : 'SNAPSHOT_COMMITTED',
+          snapshot_id: snapshot.snapshot_id,
+          source_id: snapshot.source_id,
+          version: snapshot.version,
+          at: String(snapshot.fetched_at),
+        });
+      }
+      if (lineage) {
+        this.events.push({ type: 'LINEAGE_APPENDED', lineage_id: lineage.lineage_id, relation: lineage.relation, automated: lineage.automated, status: lineage.status, at: String(lineage.created_at) });
+      }
+      if (descriptorTombstone) {
+        this.events.push({ type: 'DESCRIPTOR_TOMBSTONED', source_id: descriptorTombstone.source_id, reason: descriptorTombstone.reason, at: String(descriptorTombstone.at) });
+      }
       for (const event of events) this.events.push(event);
       this.events.push({ type: 'OPERATION_COMPLETED', operation_id: operationId, terminal: outcome.terminal });
       return { appendResult: snapshot, record: { workspace_id: workspaceId, operation_id: operationId, status: outcome.terminal, outcome } };
