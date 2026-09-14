@@ -4,7 +4,21 @@ Ticket: `tasks/S2-003_SOURCE_INGESTION.md`
 Branch: `codex/s2-003-source-ingestion` (base: `origin/main` at the S2-002
 merge `4b4456a3acbe78371e2afcc75d81da59d2765b53`)
 
-## REVISE round (post-review, 2026-09)
+## REVISE round 2 (post-review, 2026-09)
+
+Second review confirmed the round-1 fixes and raised 5×P1 + 1×P2. All fixed
+and re-evidenced:
+
+| # | Finding | Fix | Evidence |
+| --- | --- | --- | --- |
+| P1-1 | Run A/B and clean-checkout evidence pinned to intermediate commits; `verify:s2-003` dirtied the tree on every run | raw run observations default to `results/s2-003/` (untracked); tracked `evidence/` copies are bound by an explicit `--write` acceptance run at the final HEAD; clean-checkout evidence treated as self-referential metadata (excluded from the payload manifest to break the update cycle) | `evidence/s2-003-run-{a,b}.json` environment.commit equals final HEAD; `evidence/clean-checkout.json` sourceCommit = final HEAD; `git status` clean after acceptance runs |
+| P1-2 | SQL store wrote snapshot/segments/lineage/ledger in separate autocommit statements; `ingestion_event` received no inserts | new `commitIngest` on both stores: BEGIN; guarded INTENT→terminal ledger update; snapshot; segments; lineage; descriptor tombstone; `ingestion_event` rows (SNAPSHOT_COMMITTED/LINEAGE_APPENDED/DESCRIPTOR_TOMBSTONED/OPERATION_COMPLETED); COMMIT — any failure rolls back leaving INTENT for reconciliation. Pipeline commits only through this method | `src/lib/ingestion/postgres-store.mjs#commitIngest`; DB replay passes with per-operation events in the DB |
+| P1-3 | Streaming branch keyed on nonexistent `body.getAsyncIterator`; real fetch fell into unbounded `arrayBuffer()` | bounded reading uses `body.getReader()` (Web streams) with per-chunk budget enforcement and controller abort; the production node transport additionally counts bytes at the socket and destroys the request over budget | hardening test «Web-stream body … aborted over budget» proves the streaming path aborts mid-stream |
+| P1-4 | DNS resolver optional (`null` default) → un-resolved hostnames reached the connector; validated address not bound to the connection (TOCTOU) | resolver is mandatory by default (`node:dns` lookup, all addresses); the production transport is `node:http(s)` with a validating `lookup` hook on the Agent — the connection itself can only use a DNS answer that passed the SSRF check, closing the rebinding window; offline fixture transport (no network) still passes the same URL/resolver checks | hardening tests: default resolver installed and real; forbidden targets rejected; redirect-into-private refused |
+| P1-5 | DB-backed Run A/B executed sequentially in one process (same PID); comparison did not record PIDs | `s2-003-db-replay.mjs` is now a coordinator/child split: each run executes in its own OS process via `--child`; the comparison report records `pids` and `executors` for both runs | `evidence/s2-003-db-comparison.json` `pids: {run_a: <pid-a>, run_b: <pid-b>}` (distinct) |
+| P2-6 | `budget.max_segments` declared but unenforced | pipeline quarantines an operation whose extraction produced more segments than the budget allows | hardening test «extraction amplification … quarantined» |
+
+## REVISE round 1 (post-review, 2026-09)
 
 The first implementation returned PASS_WITH_LIMITS and was sent back for
 revision with 7×P1 + 1×P2 findings. All of them are fixed and re-evidenced:
