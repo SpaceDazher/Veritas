@@ -4,6 +4,37 @@ Ticket: `tasks/S2-003_SOURCE_INGESTION.md`
 Branch: `codex/s2-003-source-ingestion` (base: `origin/main` at the S2-002
 merge `4b4456a3acbe78371e2afcc75d81da59d2765b53`)
 
+## Commit semantics (review round 3)
+
+Evidence explicitly separates two commits and no longer chases HEAD:
+
+- `testedImplementationCommit` — the code the verification runs actually
+  executed (`218d5515f60af685b4d93b496a47714bfd740380`); recorded inside
+  every run artifact (`environment.commit`), asserted identical across Run A
+  and Run B by the comparator, and asserted against DB-backed runs as well.
+- `evidenceContainerCommit` — the commit containing the evidence files
+  themselves (metadata-only deltas after the implementation commit are
+  expected and harmless); recorded in
+  `evidence/s2-003-db-comparison.json`, `evidence/clean-checkout.json` and
+  below.
+
+The functional claims of this report are statements about
+`testedImplementationCommit`, not about the container.
+
+## REVISE round 3 (post-review, 2026-09)
+
+Second review confirmed round-1/2 fixes and raised 3×P1 + 1×P2 + 2
+process findings. All fixed and re-evidenced:
+
+| # | Finding | Fix | Evidence |
+| --- | --- | --- | --- |
+| P1-1a | Normal ingestion still bypassed `commitIngest`: `#execute` appended snapshot/segments in separate autocommit statements; a failure between appends left a partial snapshot with a FAILED ledger entry (review repro reproduced) | `#execute` returns the commit payload; `ingest` writes the ledger terminal and payload through one `commitIngest` (SQL: BEGIN … COMMIT with ROLLBACK); `PostgresIngestionStore.beginOperation` now also persists the canonical `OPERATION_INTENT` row into `ingestion_event` | new hardening test «failure between snapshot and segments appends rolls everything back» (failpoint in `appendSegments`: zero partial snapshots, orphan segments removed, terminal recorded); DB replay green |
+| P1-1b | `ingestion_event` received no rows from the SQL path | ledger INTENT, terminal, snapshot, lineage and descriptor-tombstone events are inserted inside the commit transaction and mirrored into the in-memory audit log the run comparator reads | DB replay: per-case `lineage_created` and integrity counters all live; smoke unchanged |
+| P1-2 | Async SSRF guard had a broken IPv4 regex (`/^d{1,3}(.d{1,3}){3}$/`), so a resolver answering `127.0.0.1` let the injected fetch run | regex restored to `/^\d{1,3}(\.\d{1,3}){3}$/`; new tests prove the async guard rejects `127.0.0.1` **before** the transport is invoked (transport call count = 0) and passes public resolutions | `tests/ingestion/security-hardening.test.mjs` «async SSRF guard correctness» |
+| P1-3 | «Evidence on final HEAD» claim was inaccurate: run evidence was bound to an older commit while later metadata commits moved HEAD | explicit `testedImplementationCommit` vs `evidenceContainerCommit` split (see above) recorded in `s2-003-comparison.json`, `s2-003-db-comparison.json` and `clean-checkout.json`; comparator fails closed when Run A/B implementation commits differ; no more self-referential catch-up evidence commits | `evidence/s2-003-comparison.json`, `evidence/s2-003-db-comparison.json`, `evidence/clean-checkout.json` |
+| P2 | `budget.max_segments` unenforced | enforced pre-validation: extraction over budget → QUARANTINED | hardening test «extraction amplification … quarantined» |
+| — | Clean-checkout wrapper: Windows `EBUSY` on temp-dir cleanup flipped a green verdict to exit 1 | temp cleanup is best-effort; a leftover `%TEMP%` directory never flips the verdict | `evidence/clean-checkout.json` 25/25 PASS, exit 0 |
+
 ## REVISE round 2 (post-review, 2026-09)
 
 Second review confirmed the round-1 fixes and raised 5×P1 + 1×P2. All fixed
