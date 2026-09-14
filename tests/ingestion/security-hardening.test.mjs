@@ -259,6 +259,7 @@ describe('S2-003 REVISE: HTTP SSRF / redirect / budget / timeout', () => {
     const connector = new HttpSnapshotConnector({
       clock: { now: () => NOW },
       fetchFn: async (url) => responses.get(url) ?? { status: 500, headers: { get: () => null } },
+      resolveHostname: () => ['93.184.216.34'],
     });
     const outcome = await connector.fetchVersion({ operation_id: 'op-ssrf-1', locator: 'https://public.example.org/start', budget: { max_bytes: 10000, time_limit_ms: 5000 } });
     assert.equal(outcome.code, 'ACCESS_DENIED');
@@ -275,6 +276,7 @@ describe('S2-003 REVISE: HTTP SSRF / redirect / budget / timeout', () => {
         url: 'https://example.org/big',
         arrayBuffer: async () => Buffer.from(bigBody).buffer.slice(0, Buffer.byteLength(bigBody)),
       }),
+      resolveHostname: () => ['93.184.216.34'],
     });
     const outcome = await connector.fetchVersion({ operation_id: 'op-budget-1', locator: 'https://example.org/big', budget: { max_bytes: 1000, time_limit_ms: 5000 } });
     assert.equal(outcome.code, 'QUARANTINED');
@@ -287,6 +289,7 @@ describe('S2-003 REVISE: HTTP SSRF / redirect / budget / timeout', () => {
       fetchFn: (url, opts) => new Promise((resolve, reject) => {
         opts.signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
       }),
+      resolveHostname: () => ['93.184.216.34'],
     });
     const outcome = await connector.fetchVersion({ operation_id: 'op-timeout-1', locator: 'https://example.org/hang', budget: { max_bytes: 10000, time_limit_ms: 50 } });
     assert.equal(outcome.code, 'TIMEOUT');
@@ -317,5 +320,65 @@ describe('S2-003 REVISE: vault symlink/junction escape', () => {
       fs.rmSync(vault, { recursive: true, force: true });
       fs.rmSync(outside, { recursive: true, force: true });
     }
+  });
+});
+
+describe('S2-003 REVISE-2: streaming budget and mandatory DNS resolver', () => {
+  test('a Web-stream body is read in bounded chunks and aborted over budget (real streaming path)', async () => {
+    const chunk = 'y'.repeat(600);
+    let aborted = false;
+    const streamBody = {
+      getReader: () => {
+        let reads = 0;
+        return {
+          read: async () => {
+            reads += 1;
+            if (reads > 5) return { done: true };
+            if (reads >= 2) aborted = true; // budget must abort before the stream ends
+            return { done: false, value: Buffer.from(chunk) };
+          },
+        };
+      },
+    };
+    const connector = new HttpSnapshotConnector({
+      clock: { now: () => NOW },
+      fetchFn: async () => ({
+        ok: true, status: 200,
+        headers: { get: (k) => (k === 'content-type' ? 'text/html' : null) },
+        url: 'https://example.org/stream',
+        body: streamBody,
+      }),
+      resolveHostname: () => ['93.184.216.34'],
+    });
+    const outcome = await connector.fetchVersion({ operation_id: 'op-stream-1', locator: 'https://example.org/stream', budget: { max_bytes: 1000, time_limit_ms: 5000 } });
+    assert.equal(outcome.code, 'QUARANTINED');
+    assert.match(outcome.diagnostic.redacted_detail, /budget/);
+    assert.equal(aborted, true, 'stream was fully consumed before aborting');
+  });
+
+  test('DNS resolution is mandatory by default (no silent no-resolver connector)', () => {
+    const connector = new HttpSnapshotConnector({ clock: { now: () => NOW }, fetchFn: async () => { throw new Error('must not be reached'); } });
+    assert.equal(typeof connector.resolveHostname, 'function', 'default resolver must be installed');
+    // the default resolver is the real node:dns lookup — not a stub
+    const promise = connector.resolveHostname('dns-unsupported-.invalid');
+    assert.ok(promise instanceof Promise);
+    return promise.then(() => { throw new Error('unexpected resolution'); }, (error) => { assert.ok(error); });
+  });
+});
+
+describe('S2-003 REVISE-2: segment budget enforcement', () => {
+  test('extraction amplification over max_segments is quarantined', async () => {
+    const { store, pipeline } = harness();
+    const connector = pipeline.connectors.get('manual_export');
+    const originalExtract = connector.extract.bind(connector);
+    connector.extract = async (snapshot, fetched) => {
+      const base = await originalExtract(snapshot, fetched);
+      return Array.from({ length: 10 }, (_, i) => ({ ...base[0], ordinal: i, text: `segment ${i}` }));
+    };
+    const outcome = await pipeline.ingest({ request: request('op-seg-1', { budget: { max_bytes: 100000, max_segments: 3, time_limit_ms: 5000 } }) });
+    assert.equal(outcome.terminal, 'FAILED');
+    assert.equal(outcome.error_code, 'QUARANTINED');
+    assert.match(outcome.detail, /exceeding the budget/);
+    assert.equal(store.snapshots.size, 0, 'amplified extraction must not reach storage');
   });
 });

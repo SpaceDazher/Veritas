@@ -176,6 +176,8 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
     ['markdown_obsidian', new MarkdownObsidianConnector({ vaultRoot: markdownRoot, clock })],
     ['web_url', new HttpSnapshotConnector({
       clock,
+      // fixture DNS: corpus URLs resolve to a public documentation address
+      resolveHostname: () => ['93.184.216.34'],
       fetchFn: async (locator) => {
         const body = httpFixtures.get(locator);
         if (body === undefined) throw new Error('ECONNREFUSED corpus fixture missing');

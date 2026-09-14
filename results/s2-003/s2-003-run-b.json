@@ -1,0 +1,2394 @@
+{
+  "contractVersion": "1.0.0",
+  "run_id": "s2-003-run-b",
+  "executor_id": "exec-s2-003-b",
+  "pid": 31440,
+  "nonce": "n-af66410de38ce103",
+  "output_root": "results/s2-003/run-b",
+  "frozen_inputs": {
+    "connector_contracts_sha256": "47f790b9b90e1779239437ca9fe24f283317d5245027d3a0e46ca595ba6d6945",
+    "corpus_sha256": "f966bb77caf5ee435534bdd2f1097dd8ebc6a747e68d49034f3d2ebf87a35d2e",
+    "policy_sha256": "64f9a905dffa45c0548094af897e554dab50e427422207f72cb143b9a89258d0"
+  },
+  "started_at": "2026-03-21T23:59:59.999Z",
+  "finished_at": null,
+  "environment": {
+    "commit": "116ec9f6f3e5a7e0fce0a5038bfdacccda66c06c",
+    "tree": "86ebad3e89bc7297ae3be56cd6faec629400e195",
+    "node_version": "22.23.2",
+    "platform": "win32-x64"
+  },
+  "counts": {
+    "total": 74,
+    "COMMITTED": 55,
+    "BLOCKED_CONNECTOR": 2,
+    "ACCESS_DENIED": 2,
+    "TOMBSTONED": 4,
+    "QUARANTINED": 0,
+    "FAILED": 6,
+    "CANCELLED": 1,
+    "RECONCILIATION_REQUIRED": 4
+  },
+  "outcomes": [
+    {
+      "operation_id": "op-acl-private",
+      "case_id": "acl-private-import-ok",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-673def098660b4a0",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-acl-cross",
+      "case_id": "acl-project-cross-workspace-view",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-1011dcb79bbb0da7",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-acl-proj",
+      "case_id": "acl-project-workspace-match",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-82079182d745c20f",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-benign-mentions-ignore",
+      "case_id": "benign-mentions-ignore",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-75c71c0c0093ff2e",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-cancel-1",
+      "case_id": "cancelled-operation",
+      "terminal": "CANCELLED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-corr-1",
+      "case_id": "correction-after-commit",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-a47382d6e2a8ec7b",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-crash-2",
+      "case_id": "crash-double",
+      "terminal": "RECONCILIATION_REQUIRED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-crash-1",
+      "case_id": "crash-mid-fetch",
+      "terminal": "RECONCILIATION_REQUIRED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-crlf-1",
+      "case_id": "crlf-normalization-edit",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-30d125ca33d34f36",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-del-unknown",
+      "case_id": "delete-unknown-locator",
+      "terminal": "TOMBSTONED",
+      "snapshot_id": "snp-89f4c1a17104453e",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-del-1",
+      "case_id": "delete-upstream",
+      "terminal": "TOMBSTONED",
+      "snapshot_id": "snp-17eca6f6b39fb75d",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-derived-summary-1",
+      "case_id": "derived-summary",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-adfbc06ee1aa3842",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-dup-different-mime-1",
+      "case_id": "dup-different-mime",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-3614eb805fa40c2e",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-dup-normalized-1",
+      "case_id": "dup-normalized",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-260cae3d8cb2e4b8",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-dup-raw-cross-source-1",
+      "case_id": "dup-raw-cross-source",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-036d9cb4ea66f66d",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-dup-refetch-1",
+      "case_id": "dup-refetch",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-d260dadb8b48c8ce",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-dup-three-copies-1",
+      "case_id": "dup-three-copies",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-6281be9f1d122971",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-dup-unicode-1",
+      "case_id": "dup-unicode",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-0b777be129db22f8",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-tomb-1",
+      "case_id": "edit-after-tombstone-stays-blocked",
+      "terminal": "TOMBSTONED",
+      "snapshot_id": "snp-207237d3b816efb1",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-edit-1",
+      "case_id": "edit-same-locator",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-176261b77e46632d",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-arxiv-fixture",
+      "case_id": "gold-arxiv-fixture",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-baa86e40fc860ee3",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-github-fixture",
+      "case_id": "gold-github-fixture",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-1d970261585f87b6",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-manual",
+      "case_id": "gold-manual",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-8d30a9d879a61f28",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-markdown",
+      "case_id": "gold-markdown",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-93037407ebffb747",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-pdf-bytes",
+      "case_id": "gold-pdf-bytes",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-5e9a0ad2b9fb2725",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-telegram-fixture",
+      "case_id": "gold-telegram-fixture",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-965c0410d49e71fb",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-web",
+      "case_id": "gold-web",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-d517391b3122f44b",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-gold-youtube-fixture",
+      "case_id": "gold-youtube-fixture",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-f51f97ecbbfa0354",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-inject-authority-claim",
+      "case_id": "inject-authority-claim",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-75748389fcf86ad6",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-inject-fake-system-prompt",
+      "case_id": "inject-fake-system-prompt",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-e3d58984cfb26c40",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-inject-ignore-previous",
+      "case_id": "inject-ignore-previous",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-ae31664e3ad9e52b",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-inject-split-across-segments",
+      "case_id": "inject-split-across-segments",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-2b711b80353497e4",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-inject-tool-call",
+      "case_id": "inject-tool-call",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-e26bd4cea41a06fc",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-lic-unknown",
+      "case_id": "license-unknown-blocks",
+      "terminal": "FAILED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-blocked",
+      "case_id": "lifecycle-blocked-denied",
+      "terminal": "ACCESS_DENIED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-binary-in-md",
+      "case_id": "malformed-binary-in-md",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-dde6ab42083a6cec",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-broken-frontmatter",
+      "case_id": "malformed-broken-frontmatter",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-af8c9712d3b658c1",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-empty-file",
+      "case_id": "malformed-empty-file",
+      "terminal": "FAILED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-html-garbage",
+      "case_id": "malformed-html-garbage",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-bd71bd62bf03e94d",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-huge-line",
+      "case_id": "malformed-huge-line",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-564aa9639c40cde5",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-invalid-utf8",
+      "case_id": "malformed-invalid-utf8",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-e15eee6c2024cbab",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-json-transcript",
+      "case_id": "malformed-json-transcript",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-ec9b7637feb4a216",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-malformed-null-bytes-pdf",
+      "case_id": "malformed-null-bytes-pdf",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-37f7994a3fdb0e0d",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-mirror-canonical-identity-1",
+      "case_id": "mirror-canonical-identity",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-920a01d7ac433d1e",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-mirror-then-edit-1",
+      "case_id": "mirror-then-edit",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-3769afe25beec7f2",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-nearmiss-arxiv-version-1",
+      "case_id": "nearmiss-arxiv-version",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-edce48bec46f8d84",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-nearmiss-github-blob-1",
+      "case_id": "nearmiss-github-blob",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-b3c69ddb5b3ac775",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-nearmiss-telegram-msg-1",
+      "case_id": "nearmiss-telegram-msg",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-f624fff969ad74b6",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-nearmiss-url-param-1",
+      "case_id": "nearmiss-url-param",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-ffd414e245753990",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-nearmiss-vault-case-1",
+      "case_id": "nearmiss-vault-case",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-3462fa62c9394dd4",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-nearmiss-youtube-id-1",
+      "case_id": "nearmiss-youtube-id",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-f3e0b2eab4a5a1fc",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-pub-priv",
+      "case_id": "public-evidence-of-private-empty",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-7788cf7c5d1a340f",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-quotation-excerpt-1",
+      "case_id": "quotation-excerpt",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-5aa5086a009eec7c",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-recon-1",
+      "case_id": "reconciliation-is-terminal-not-retry",
+      "terminal": "RECONCILIATION_REQUIRED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-recover-3",
+      "case_id": "recovery-commits-once",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-c9e62e994e271298",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-redel-1",
+      "case_id": "reimport-after-delete",
+      "terminal": "TOMBSTONED",
+      "snapshot_id": "snp-bcf182cf5054321b",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-reimp-1",
+      "case_id": "reimport-same-content-new-operation",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-53d0d0c5de2c666e",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-repost-different-title-1",
+      "case_id": "repost-different-title",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-c191e30bc5cd8cac",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-ret-active",
+      "case_id": "retention-active-allows",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-f865bd0453dbce72",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-ret-expired",
+      "case_id": "retention-expired-blocks",
+      "terminal": "FAILED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-time-5",
+      "case_id": "time-boundary-millisecond",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-67006f649daf9182",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-time-2",
+      "case_id": "time-event-vs-observed",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-29ebf679c02daca9",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-time-3",
+      "case_id": "time-future-publication-claim",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-8ba768793f9db674",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-time-4",
+      "case_id": "time-no-claims-null",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-5ad4d8bd591aa99a",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-time-6",
+      "case_id": "time-perturbation-stable-identity",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-56396ac8423dcaab",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-time-1",
+      "case_id": "time-published-claim-preserved",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-45cb314cc086cfba",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-translation-declared-1",
+      "case_id": "translation-declared",
+      "terminal": "COMMITTED",
+      "snapshot_id": "snp-1bd468042bafa73c",
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unavailable-access-denied",
+      "case_id": "unavailable-access-denied",
+      "terminal": "ACCESS_DENIED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unavailable-connector-blocked",
+      "case_id": "unavailable-connector-blocked",
+      "terminal": "BLOCKED_CONNECTOR",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unavailable-not-found",
+      "case_id": "unavailable-not-found",
+      "terminal": "FAILED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unavailable-rate-limited",
+      "case_id": "unavailable-rate-limited",
+      "terminal": "FAILED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unavailable-timeout",
+      "case_id": "unavailable-timeout",
+      "terminal": "FAILED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unavailable-upstream-500",
+      "case_id": "unavailable-upstream-500",
+      "terminal": "BLOCKED_CONNECTOR",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    },
+    {
+      "operation_id": "op-unknown-4a",
+      "case_id": "unknown-then-different-operation-commits",
+      "terminal": "RECONCILIATION_REQUIRED",
+      "snapshot_id": null,
+      "error_code": null,
+      "raw_observation_ref": null
+    }
+  ],
+  "quarantined": false,
+  "integrity": {
+    "snapshots_total": 81,
+    "provenance_complete_pct": 100,
+    "committed_operations": 79,
+    "operations_stuck_intent": 0,
+    "duplicate_committed_snapshots": 0,
+    "committed_without_snapshot": 0,
+    "private_exports_leaked": 0,
+    "authority_expansions": 0,
+    "instruction_flagged_segments": 5
+  },
+  "observations": [
+    {
+      "case_id": "acl-private-import-ok",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-673def098660b4a0"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "acl-project-cross-workspace-view",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-1011dcb79bbb0da7"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "acl-project-workspace-match",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-82079182d745c20f"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "benign-mentions-ignore",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-75c71c0c0093ff2e"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "cancelled-operation",
+      "decision": "CANCELLED",
+      "terminals": [
+        "CANCELLED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "correction-after-commit",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-a47382d6e2a8ec7b",
+        "snp-c7494be50c0192dd"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "crash-double",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "crash-mid-fetch",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "crlf-normalization-edit",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-30d125ca33d34f36"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "delete-unknown-locator",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-89f4c1a17104453e"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "delete-upstream",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "COMMITTED",
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-17eca6f6b39fb75d",
+        "snp-497a12d3fa2179f5"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "derived-summary",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-51f62f714de78998",
+        "snp-adfbc06ee1aa3842"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "dup-different-mime",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3614eb805fa40c2e",
+        "snp-8afb18bb53d336de"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "dup-normalized",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-260cae3d8cb2e4b8",
+        "snp-6e0cba282ab0c428"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "dup-raw-cross-source",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-036d9cb4ea66f66d",
+        "snp-ea03eeabcb367206"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "dup-refetch",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-ae670841ff771db7",
+        "snp-d260dadb8b48c8ce"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "dup-three-copies",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-6281be9f1d122971",
+        "snp-73243d1f1568405a"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "dup-unicode",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-0b777be129db22f8",
+        "snp-366754cc3253b313"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "edit-after-tombstone-stays-blocked",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "COMMITTED",
+        "TOMBSTONED",
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-1a9b15e639e484b2",
+        "snp-207237d3b816efb1"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "edit-same-locator",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-176261b77e46632d",
+        "snp-c45721530ac30086"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-arxiv-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-baa86e40fc860ee3"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-github-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-1d970261585f87b6"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-manual",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-8d30a9d879a61f28"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-markdown",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-93037407ebffb747"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-pdf-bytes",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-5e9a0ad2b9fb2725"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-telegram-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-965c0410d49e71fb"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-web",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-d517391b3122f44b"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "gold-youtube-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-f51f97ecbbfa0354"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "inject-authority-claim",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-75748389fcf86ad6"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "inject-fake-system-prompt",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e3d58984cfb26c40"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "inject-ignore-previous",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-ae31664e3ad9e52b"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "inject-split-across-segments",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-2b711b80353497e4"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "inject-tool-call",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e26bd4cea41a06fc"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "license-unknown-blocks",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "lifecycle-blocked-denied",
+      "decision": "ACCESS_DENIED",
+      "terminals": [
+        "ACCESS_DENIED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-binary-in-md",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-dde6ab42083a6cec"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-broken-frontmatter",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-af8c9712d3b658c1"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-empty-file",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-html-garbage",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-bd71bd62bf03e94d"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-huge-line",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-564aa9639c40cde5"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-invalid-utf8",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e15eee6c2024cbab"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-json-transcript",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-ec9b7637feb4a216"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "malformed-null-bytes-pdf",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-37f7994a3fdb0e0d"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "mirror-canonical-identity",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-920a01d7ac433d1e",
+        "snp-feef04f53b4d0d76"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "mirror-then-edit",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3769afe25beec7f2",
+        "snp-882da1b903d604f9"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "nearmiss-arxiv-version",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-213591a560f7e11d",
+        "snp-edce48bec46f8d84"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "nearmiss-github-blob",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-4106e48ff18ee7c1",
+        "snp-b3c69ddb5b3ac775"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "nearmiss-telegram-msg",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e732672c3c710083",
+        "snp-f624fff969ad74b6"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "nearmiss-url-param",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-daa8826d1620d419",
+        "snp-ffd414e245753990"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "nearmiss-vault-case",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3462fa62c9394dd4",
+        "snp-f8378249a6d22f0c"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "nearmiss-youtube-id",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3b6593471d489b80",
+        "snp-f3e0b2eab4a5a1fc"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "public-evidence-of-private-empty",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-7788cf7c5d1a340f"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": true
+    },
+    {
+      "case_id": "quotation-excerpt",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-5aa5086a009eec7c",
+        "snp-75cf506c4551b372"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "reconciliation-is-terminal-not-retry",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "recovery-commits-once",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-c9e62e994e271298"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "reimport-after-delete",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "TOMBSTONED",
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-bcf182cf5054321b"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "reimport-same-content-new-operation",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-53d0d0c5de2c666e"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "repost-different-title",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-7bab8463cb0d7b0d",
+        "snp-c191e30bc5cd8cac"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "retention-active-allows",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-f865bd0453dbce72"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "retention-expired-blocks",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "time-boundary-millisecond",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-67006f649daf9182"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "time-event-vs-observed",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-29ebf679c02daca9"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "time-future-publication-claim",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-8ba768793f9db674"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "time-no-claims-null",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-5ad4d8bd591aa99a"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "time-perturbation-stable-identity",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-56396ac8423dcaab"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "time-published-claim-preserved",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-45cb314cc086cfba"
+      ],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "translation-declared",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-1bd468042bafa73c",
+        "snp-5b8204b6f0978762"
+      ],
+      "lineage_created": 1,
+      "lineage_automated": 1,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unavailable-access-denied",
+      "decision": "ACCESS_DENIED",
+      "terminals": [
+        "ACCESS_DENIED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unavailable-connector-blocked",
+      "decision": "BLOCKED_CONNECTOR",
+      "terminals": [
+        "BLOCKED_CONNECTOR"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unavailable-not-found",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unavailable-rate-limited",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unavailable-timeout",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unavailable-upstream-500",
+      "decision": "BLOCKED_CONNECTOR",
+      "terminals": [
+        "BLOCKED_CONNECTOR"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    },
+    {
+      "case_id": "unknown-then-different-operation-commits",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": [],
+      "lineage_created": 0,
+      "lineage_automated": 0,
+      "public_view_checked": false
+    }
+  ],
+  "decisions": [
+    {
+      "case_id": "acl-private-import-ok",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-673def098660b4a0"
+      ]
+    },
+    {
+      "case_id": "acl-project-cross-workspace-view",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-1011dcb79bbb0da7"
+      ]
+    },
+    {
+      "case_id": "acl-project-workspace-match",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-82079182d745c20f"
+      ]
+    },
+    {
+      "case_id": "benign-mentions-ignore",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-75c71c0c0093ff2e"
+      ]
+    },
+    {
+      "case_id": "cancelled-operation",
+      "decision": "CANCELLED",
+      "terminals": [
+        "CANCELLED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "correction-after-commit",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-a47382d6e2a8ec7b",
+        "snp-c7494be50c0192dd"
+      ]
+    },
+    {
+      "case_id": "crash-double",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "crash-mid-fetch",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "crlf-normalization-edit",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-30d125ca33d34f36"
+      ]
+    },
+    {
+      "case_id": "delete-unknown-locator",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-89f4c1a17104453e"
+      ]
+    },
+    {
+      "case_id": "delete-upstream",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "COMMITTED",
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-17eca6f6b39fb75d",
+        "snp-497a12d3fa2179f5"
+      ]
+    },
+    {
+      "case_id": "derived-summary",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-51f62f714de78998",
+        "snp-adfbc06ee1aa3842"
+      ]
+    },
+    {
+      "case_id": "dup-different-mime",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3614eb805fa40c2e",
+        "snp-8afb18bb53d336de"
+      ]
+    },
+    {
+      "case_id": "dup-normalized",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-260cae3d8cb2e4b8",
+        "snp-6e0cba282ab0c428"
+      ]
+    },
+    {
+      "case_id": "dup-raw-cross-source",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-036d9cb4ea66f66d",
+        "snp-ea03eeabcb367206"
+      ]
+    },
+    {
+      "case_id": "dup-refetch",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-ae670841ff771db7",
+        "snp-d260dadb8b48c8ce"
+      ]
+    },
+    {
+      "case_id": "dup-three-copies",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-6281be9f1d122971",
+        "snp-73243d1f1568405a"
+      ]
+    },
+    {
+      "case_id": "dup-unicode",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-0b777be129db22f8",
+        "snp-366754cc3253b313"
+      ]
+    },
+    {
+      "case_id": "edit-after-tombstone-stays-blocked",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "COMMITTED",
+        "TOMBSTONED",
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-1a9b15e639e484b2",
+        "snp-207237d3b816efb1"
+      ]
+    },
+    {
+      "case_id": "edit-same-locator",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-176261b77e46632d",
+        "snp-c45721530ac30086"
+      ]
+    },
+    {
+      "case_id": "gold-arxiv-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-baa86e40fc860ee3"
+      ]
+    },
+    {
+      "case_id": "gold-github-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-1d970261585f87b6"
+      ]
+    },
+    {
+      "case_id": "gold-manual",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-8d30a9d879a61f28"
+      ]
+    },
+    {
+      "case_id": "gold-markdown",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-93037407ebffb747"
+      ]
+    },
+    {
+      "case_id": "gold-pdf-bytes",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-5e9a0ad2b9fb2725"
+      ]
+    },
+    {
+      "case_id": "gold-telegram-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-965c0410d49e71fb"
+      ]
+    },
+    {
+      "case_id": "gold-web",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-d517391b3122f44b"
+      ]
+    },
+    {
+      "case_id": "gold-youtube-fixture",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-f51f97ecbbfa0354"
+      ]
+    },
+    {
+      "case_id": "inject-authority-claim",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-75748389fcf86ad6"
+      ]
+    },
+    {
+      "case_id": "inject-fake-system-prompt",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e3d58984cfb26c40"
+      ]
+    },
+    {
+      "case_id": "inject-ignore-previous",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-ae31664e3ad9e52b"
+      ]
+    },
+    {
+      "case_id": "inject-split-across-segments",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-2b711b80353497e4"
+      ]
+    },
+    {
+      "case_id": "inject-tool-call",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e26bd4cea41a06fc"
+      ]
+    },
+    {
+      "case_id": "license-unknown-blocks",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "lifecycle-blocked-denied",
+      "decision": "ACCESS_DENIED",
+      "terminals": [
+        "ACCESS_DENIED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "malformed-binary-in-md",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-dde6ab42083a6cec"
+      ]
+    },
+    {
+      "case_id": "malformed-broken-frontmatter",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-af8c9712d3b658c1"
+      ]
+    },
+    {
+      "case_id": "malformed-empty-file",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "malformed-html-garbage",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-bd71bd62bf03e94d"
+      ]
+    },
+    {
+      "case_id": "malformed-huge-line",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-564aa9639c40cde5"
+      ]
+    },
+    {
+      "case_id": "malformed-invalid-utf8",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e15eee6c2024cbab"
+      ]
+    },
+    {
+      "case_id": "malformed-json-transcript",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-ec9b7637feb4a216"
+      ]
+    },
+    {
+      "case_id": "malformed-null-bytes-pdf",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-37f7994a3fdb0e0d"
+      ]
+    },
+    {
+      "case_id": "mirror-canonical-identity",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-920a01d7ac433d1e",
+        "snp-feef04f53b4d0d76"
+      ]
+    },
+    {
+      "case_id": "mirror-then-edit",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3769afe25beec7f2",
+        "snp-882da1b903d604f9"
+      ]
+    },
+    {
+      "case_id": "nearmiss-arxiv-version",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-213591a560f7e11d",
+        "snp-edce48bec46f8d84"
+      ]
+    },
+    {
+      "case_id": "nearmiss-github-blob",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-4106e48ff18ee7c1",
+        "snp-b3c69ddb5b3ac775"
+      ]
+    },
+    {
+      "case_id": "nearmiss-telegram-msg",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-e732672c3c710083",
+        "snp-f624fff969ad74b6"
+      ]
+    },
+    {
+      "case_id": "nearmiss-url-param",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-daa8826d1620d419",
+        "snp-ffd414e245753990"
+      ]
+    },
+    {
+      "case_id": "nearmiss-vault-case",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3462fa62c9394dd4",
+        "snp-f8378249a6d22f0c"
+      ]
+    },
+    {
+      "case_id": "nearmiss-youtube-id",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-3b6593471d489b80",
+        "snp-f3e0b2eab4a5a1fc"
+      ]
+    },
+    {
+      "case_id": "public-evidence-of-private-empty",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-7788cf7c5d1a340f"
+      ]
+    },
+    {
+      "case_id": "quotation-excerpt",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-5aa5086a009eec7c",
+        "snp-75cf506c4551b372"
+      ]
+    },
+    {
+      "case_id": "reconciliation-is-terminal-not-retry",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "recovery-commits-once",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-c9e62e994e271298"
+      ]
+    },
+    {
+      "case_id": "reimport-after-delete",
+      "decision": "TOMBSTONED",
+      "terminals": [
+        "TOMBSTONED",
+        "TOMBSTONED"
+      ],
+      "snapshot_ids": [
+        "snp-bcf182cf5054321b"
+      ]
+    },
+    {
+      "case_id": "reimport-same-content-new-operation",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-53d0d0c5de2c666e"
+      ]
+    },
+    {
+      "case_id": "repost-different-title",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-7bab8463cb0d7b0d",
+        "snp-c191e30bc5cd8cac"
+      ]
+    },
+    {
+      "case_id": "retention-active-allows",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-f865bd0453dbce72"
+      ]
+    },
+    {
+      "case_id": "retention-expired-blocks",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "time-boundary-millisecond",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-67006f649daf9182"
+      ]
+    },
+    {
+      "case_id": "time-event-vs-observed",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-29ebf679c02daca9"
+      ]
+    },
+    {
+      "case_id": "time-future-publication-claim",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-8ba768793f9db674"
+      ]
+    },
+    {
+      "case_id": "time-no-claims-null",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-5ad4d8bd591aa99a"
+      ]
+    },
+    {
+      "case_id": "time-perturbation-stable-identity",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-56396ac8423dcaab"
+      ]
+    },
+    {
+      "case_id": "time-published-claim-preserved",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-45cb314cc086cfba"
+      ]
+    },
+    {
+      "case_id": "translation-declared",
+      "decision": "COMMITTED",
+      "terminals": [
+        "COMMITTED",
+        "COMMITTED"
+      ],
+      "snapshot_ids": [
+        "snp-1bd468042bafa73c",
+        "snp-5b8204b6f0978762"
+      ]
+    },
+    {
+      "case_id": "unavailable-access-denied",
+      "decision": "ACCESS_DENIED",
+      "terminals": [
+        "ACCESS_DENIED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "unavailable-connector-blocked",
+      "decision": "BLOCKED_CONNECTOR",
+      "terminals": [
+        "BLOCKED_CONNECTOR"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "unavailable-not-found",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "unavailable-rate-limited",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "unavailable-timeout",
+      "decision": "FAILED",
+      "terminals": [
+        "FAILED"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "unavailable-upstream-500",
+      "decision": "BLOCKED_CONNECTOR",
+      "terminals": [
+        "BLOCKED_CONNECTOR"
+      ],
+      "snapshot_ids": []
+    },
+    {
+      "case_id": "unknown-then-different-operation-commits",
+      "decision": "RECONCILIATION_REQUIRED",
+      "terminals": [
+        "RECONCILIATION_REQUIRED",
+        "RECONCILIATION_REQUIRED"
+      ],
+      "snapshot_ids": []
+    }
+  ]
+}

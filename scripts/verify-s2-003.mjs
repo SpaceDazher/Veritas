@@ -178,13 +178,18 @@ export function compareRuns({ runA, runB, oracle }) {
 function main() {
   const nonceA = `n-${createHash('sha256').update('run-a-clock-seed').digest('hex').slice(0, 16)}`;
   const nonceB = `n-${createHash('sha256').update('run-b-clock-seed').digest('hex').slice(0, 16)}`;
+  // Raw run observations live in results/ by default so that developer
+  // reruns never dirty tracked evidence; acceptance reruns pass --write to
+  // bind evidence/s2-003-run-{a,b}.json to the final HEAD.
+  const writeEvidence = process.argv.includes('--write');
+  const outDir = writeEvidence ? 'evidence' : 'results/s2-003';
   const runA = spawnRun({
     runId: 's2-003-run-a',
     executorId: 'exec-s2-003-a',
     nonce: nonceA,
     outputRoot: 'results/s2-003/run-a',
     clock: '2026-01-15T08:00:00.000Z',
-    outFile: 'evidence/s2-003-run-a.json',
+    outFile: `${outDir}/s2-003-run-a.json`,
   });
   const runB = spawnRun({
     runId: 's2-003-run-b',
@@ -192,7 +197,7 @@ function main() {
     nonce: nonceB,
     outputRoot: 'results/s2-003/run-b',
     clock: '2026-03-21T23:59:59.999Z',
-    outFile: 'evidence/s2-003-run-b.json',
+    outFile: `${outDir}/s2-003-run-b.json`,
   });
 
   const oracle = buildOracle();
@@ -221,7 +226,7 @@ function main() {
       identity_mismatches: 0,
     },
   };
-  fs.writeFileSync(path.join(ROOT, 'evidence/s2-003-comparison.json'), `${JSON.stringify(report, null, 2)}\n`);
+  fs.writeFileSync(path.join(ROOT, writeEvidence ? 'evidence/s2-003-comparison.json' : 'results/s2-003/s2-003-comparison.json'), `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({
     comparedCases: comparison.comparedCases,
     decisionMismatches: comparison.decisionMismatches,

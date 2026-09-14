@@ -233,6 +233,124 @@ export class PostgresIngestionStore {
     return rows.rows;
   }
 
+  // Atomic commit: BEGIN; guarded ledger transition; snapshot; segments;
+  // lineage; descriptor tombstone; ingestion_event rows; COMMIT. Any failure
+  // rolls the whole block back and rethrows, leaving the INTENT row in place
+  // for reconciliation — a partial commit is impossible.
+  async commitIngest({ workspaceId, operationId, outcome, snapshot = null, segments = [], lineage = null, descriptorTombstone = null, events = [] }) {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const updated = await client.query(
+        `UPDATE ingestion_operation SET status = $3, outcome = $4, completed_at = now()
+         WHERE workspace_id = $1 AND operation_id = $2 AND status = 'INTENT'`,
+        [workspaceId, operationId, outcome.terminal, JSON.stringify(outcome)],
+      );
+      if (updated.rowCount === 0) {
+        const existing = await client.query(
+          'SELECT status, outcome FROM ingestion_operation WHERE workspace_id = $1 AND operation_id = $2',
+          [workspaceId, operationId],
+        );
+        const row = existing.rows[0];
+        if (row && JSON.stringify(row.outcome) === JSON.stringify(outcome)) {
+          await client.query('COMMIT');
+          return { appendResult: null, record: { ...row, idempotent: true } };
+        }
+        throw new DuplicateOperationError(`operation ${operationId} is not in INTENT state`);
+      }
+      if (snapshot) {
+        await client.query(
+          `INSERT INTO source_snapshot(snapshot_id, source_id, connector_id, source_kind, version, snapshot_kind,
+             tombstone_reason, canonical_url, canonical_message_id, canonical_repository_id, canonical_object_id,
+             canonical_locator, canonicalization_version, raw_sha256, normalized_sha256, author, publisher,
+             published_at, event_time, observed_at, fetched_at, parent_snapshot_id, supersedes_snapshot_id,
+             language, mime_type, size_bytes, extraction_status, acl, license, retention, fetch_provenance)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31)
+           ON CONFLICT (snapshot_id) DO NOTHING`,
+          [snapshot.snapshot_id, snapshot.source_id, snapshot.connector_id, snapshot.source_kind, snapshot.version,
+            snapshot.snapshot_kind, snapshot.tombstone_reason ?? null, snapshot.canonical_url ?? null,
+            snapshot.canonical_message_id ?? null, snapshot.canonical_repository_id ?? null,
+            snapshot.canonical_object_id ?? null, snapshot.canonical_locator, snapshot.canonicalization_version,
+            snapshot.raw_sha256, snapshot.normalized_sha256, snapshot.author ?? null, snapshot.publisher ?? null,
+            snapshot.published_at ?? null, snapshot.event_time ?? null, snapshot.observed_at, snapshot.fetched_at,
+            snapshot.parent_snapshot_id ?? null, snapshot.supersedes_snapshot_id ?? null, snapshot.language ?? null,
+            snapshot.mime_type ?? null, snapshot.size_bytes, snapshot.extraction_status,
+            JSON.stringify(snapshot.acl), JSON.stringify(snapshot.license), JSON.stringify(snapshot.retention),
+            JSON.stringify(snapshot.fetch_provenance)],
+        );
+        await this.#insertEvent(client, {
+          type: snapshot.snapshot_kind === 'tombstone' ? 'SNAPSHOT_TOMBSTONED' : 'SNAPSHOT_COMMITTED',
+          operation_id: operationId,
+          workspace_id: workspaceId,
+          payload: { snapshot_id: snapshot.snapshot_id, source_id: snapshot.source_id, version: snapshot.version },
+        });
+      }
+      for (const segment of segments) {
+        await client.query(
+          `INSERT INTO content_segment(segment_id, snapshot_id, source_id, ordinal, coordinates, text, text_sha256,
+             original_language, normalized_language, extraction, coverage, embedded_instruction_classification, status)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+           ON CONFLICT (segment_id) DO NOTHING`,
+          [segment.segment_id, segment.snapshot_id, segment.source_id, segment.ordinal,
+            JSON.stringify(segment.coordinates), segment.text ?? null, segment.text_sha256,
+            segment.original_language ?? null, segment.normalized_language ?? null,
+            JSON.stringify(segment.extraction), segment.coverage ? JSON.stringify(segment.coverage) : null,
+            JSON.stringify(segment.embedded_instruction_classification), segment.status],
+        );
+      }
+      if (lineage) {
+        await client.query(
+          `INSERT INTO source_lineage(lineage_id, relation, upstream_snapshot_id, downstream_snapshot_id, evidence,
+             confidence, automated, status, confirmed_by, created_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+          [lineage.lineage_id, lineage.relation, lineage.upstream_snapshot_id, lineage.downstream_snapshot_id,
+            JSON.stringify(lineage.evidence), lineage.confidence ?? null, lineage.automated, lineage.status,
+            lineage.confirmed_by ?? null, lineage.created_at],
+        );
+        await this.#insertEvent(client, {
+          type: 'LINEAGE_APPENDED',
+          operation_id: operationId,
+          workspace_id: workspaceId,
+          payload: { lineage_id: lineage.lineage_id, relation: lineage.relation, automated: lineage.automated, status: lineage.status },
+        });
+      }
+      if (descriptorTombstone) {
+        await client.query(
+          'UPDATE source_descriptor SET lifecycle = $2 WHERE source_id = $1',
+          [descriptorTombstone.source_id, JSON.stringify({ state: 'tombstoned', reason: descriptorTombstone.reason, changed_at: String(descriptorTombstone.at) })],
+        );
+        await this.#insertEvent(client, {
+          type: 'DESCRIPTOR_TOMBSTONED',
+          operation_id: operationId,
+          workspace_id: workspaceId,
+          payload: { source_id: descriptorTombstone.source_id, reason: descriptorTombstone.reason },
+        });
+      }
+      await this.#insertEvent(client, {
+        type: 'OPERATION_COMPLETED',
+        operation_id: operationId,
+        workspace_id: workspaceId,
+        payload: { terminal: outcome.terminal },
+      });
+      await client.query('COMMIT');
+      for (const event of events) this.events.push(event);
+      this.events.push({ type: 'OPERATION_COMPLETED', operation_id: operationId, terminal: outcome.terminal });
+      return { appendResult: snapshot, record: { workspace_id: workspaceId, operation_id: operationId, status: outcome.terminal, outcome } };
+    } catch (error) {
+      try { await client.query('ROLLBACK'); } catch { /* connection already broken */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async #insertEvent(client, { type, operation_id, workspace_id, payload }) {
+    await client.query(
+      'INSERT INTO ingestion_event(run_id, operation_id, workspace_id, event_type, payload) VALUES (NULL, $1, $2, $3, $4)',
+      [operation_id, workspace_id, type, JSON.stringify(payload ?? null)],
+    );
+  }
+
   // --- integrity summary: computed by PostgreSQL -----------------------------
   async integritySummary({ outcomes = [], privateLeakCounter = 0, authorityExpansionCounter = 0 } = {}) {
     const stats = await this.#one(`SELECT

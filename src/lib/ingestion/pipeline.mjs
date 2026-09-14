@@ -381,6 +381,12 @@ export class IngestionPipeline {
       };
     });
 
+    // Extraction amplification guard: the segment budget is enforced, not
+    // just the byte budget.
+    if (request.budget.max_segments !== undefined && segments.length > request.budget.max_segments) {
+      return { terminal: 'FAILED', error_code: 'QUARANTINED', snapshot_id: null, detail: `extraction produced ${segments.length} segments, exceeding the budget of ${request.budget.max_segments}` };
+    }
+
     // VALIDATING — full contract validation before anything is committed.
     try {
       assertValidContract('source-snapshot', baseSnapshot);
@@ -522,10 +528,15 @@ export class IngestionPipeline {
         },
       };
       assertValidContract('source-snapshot', tombstone);
-      await this.store.appendSnapshot(tombstone);
-      await this.store.tombstoneDescriptor(descriptor.source_id, reason, at);
       const outcome = { terminal: 'TOMBSTONED', error_code: 'TOMBSTONED', snapshot_id: tombstone.snapshot_id, version };
-      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      await this.store.commitIngest({
+        workspaceId: request.workspace_id,
+        operationId: request.operation_id,
+        outcome,
+        snapshot: tombstone,
+        descriptorTombstone: { source_id: descriptor.source_id, reason, at },
+        events: [{ type: 'SNAPSHOT_TOMBSTONED', snapshot_id: tombstone.snapshot_id, source_id: descriptor.source_id, version }],
+      });
       return this.#observe(caseId, outcome);
     } catch (error) {
       const outcome = { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: String(error?.message ?? error).slice(0, 256) };

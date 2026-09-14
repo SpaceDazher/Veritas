@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "role": "S2-003 DB-backed run A vs run B comparison (PostgreSQL ingestion stores, separate OS processes)",
+  "databaseEngine": "PostgreSQL",
+  "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+  "schemas": [
+    {
+      "schema": "run_a",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        }
+      ]
+    },
+    {
+      "schema": "run_b",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        }
+      ]
+    }
+  ],
+  "pids": {
+    "run_a": 26232,
+    "run_b": 26040
+  },
+  "executors": {
+    "run_a": "exec-db-a",
+    "run_b": "exec-db-b"
+  },
+  "integrity": {
+    "run_a": {
+      "snapshots_total": 81,
+      "provenance_complete_pct": 100,
+      "committed_operations": 79,
+      "operations_stuck_intent": 0,
+      "duplicate_committed_snapshots": 0,
+      "committed_without_snapshot": 0,
+      "private_exports_leaked": 0,
+      "authority_expansions": 0,
+      "instruction_flagged_segments": 5
+    },
+    "run_b": {
+      "snapshots_total": 81,
+      "provenance_complete_pct": 100,
+      "committed_operations": 79,
+      "operations_stuck_intent": 0,
+      "duplicate_committed_snapshots": 0,
+      "committed_without_snapshot": 0,
+      "private_exports_leaked": 0,
+      "authority_expansions": 0,
+      "instruction_flagged_segments": 5
+    }
+  },
+  "counts": {
+    "run_a": {
+      "total": 74,
+      "COMMITTED": 55,
+      "BLOCKED_CONNECTOR": 2,
+      "ACCESS_DENIED": 2,
+      "TOMBSTONED": 4,
+      "QUARANTINED": 0,
+      "FAILED": 6,
+      "CANCELLED": 1,
+      "RECONCILIATION_REQUIRED": 4
+    },
+    "run_b": {
+      "total": 74,
+      "COMMITTED": 55,
+      "BLOCKED_CONNECTOR": 2,
+      "ACCESS_DENIED": 2,
+      "TOMBSTONED": 4,
+      "QUARANTINED": 0,
+      "FAILED": 6,
+      "CANCELLED": 1,
+      "RECONCILIATION_REQUIRED": 4
+    }
+  },
+  "comparison": {
+    "comparedCases": 74,
+    "decisionMismatches": 0,
+    "identityMismatches": 0,
+    "mismatches": [],
+    "counterViolations": [],
+    "oracleViolations": [],
+    "ok": true
+  }
+}

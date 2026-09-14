@@ -2,21 +2,34 @@
 // No cookies, no user credentials, no session state. Security properties:
 //   - scheme allow-list (http/https only);
 //   - SSRF guard: loopback/private/link-local/unique-local literal IPs and
-//     localhost-like hostnames are rejected, and an injectable resolver
-//     re-checks every resolved address before the request;
-//   - redirects are followed MANUALLY: every hop re-passes the same checks
-//     (a public URL must not be able to bounce into private space);
-//   - the response body is read in bounded chunks and aborted once the
-//     request budget is exhausted (no unbounded arrayBuffer before checks);
+//     localhost-like hostnames are rejected; DNS resolution is MANDATORY
+//     (default: node:dns lookup with all addresses) and every resolved
+//     address re-passes the same check;
+//   - DNS TOCTOU: on the production transport the resolved address is the
+//     ONLY address the connection can use — the https/http Agent lookup hook
+//     re-validates every address at connect time, so a rebinding DNS answer
+//     cannot steer the socket elsewhere;
+//   - redirects are followed MANUALLY: every hop re-passes the same checks;
+//   - the response body is read in bounded chunks (getReader when available,
+//     transport-level byte counting otherwise) and aborted once the request
+//     budget is exhausted;
 //   - time_limit_ms is enforced by an AbortController (real timeout).
+import dns from 'node:dns';
+import http from 'node:http';
+import https from 'node:https';
 import { canonicalIdentity } from '../canonical.mjs';
 import { connectorError } from './base.mjs';
 
 export const HTTP_SNAPSHOT_CONNECTOR_ID = 'conn-web-url';
-export const HTTP_SNAPSHOT_CONNECTOR_VERSION = '1.1.0';
+export const HTTP_SNAPSHOT_CONNECTOR_VERSION = '1.2.0';
 
 const ALLOWED_CONTENT_TYPES = new Set(['text/html', 'text/plain', 'application/xhtml+xml', 'text/markdown']);
 const MAX_REDIRECTS = 5;
+
+// Default mandatory resolver: real DNS, every address returned.
+export function defaultResolveHostname(hostname) {
+  return dns.promises.lookup(hostname, { all: true, verbatim: true }).then((rows) => rows.map((r) => r.address));
+}
 
 function isPrivateIPv4(ip) {
   const parts = ip.split('.').map(Number);
@@ -75,11 +88,10 @@ export function assertPublicHttpTarget(rawUrl, { resolveHostname = null } = {}) 
 }
 
 export class HttpSnapshotConnector {
-  constructor({ fetchFn, clock, resolveHostname = null }) {
-    if (typeof fetchFn !== 'function') throw new Error('FETCH_FN_REQUIRED');
-    this.fetchFn = fetchFn;
+  constructor({ fetchFn = null, clock, resolveHostname = defaultResolveHostname }) {
+    this.fetchFn = fetchFn; // injectable offline transport (fixtures/tests); production uses the pinned node transport
     this.clock = clock;
-    this.resolveHostname = resolveHostname;
+    this.resolveHostname = resolveHostname; // mandatory by default: real DNS
     this.id = HTTP_SNAPSHOT_CONNECTOR_ID;
     this.version = HTTP_SNAPSHOT_CONNECTOR_VERSION;
   }
@@ -115,8 +127,6 @@ export class HttpSnapshotConnector {
     };
   }
 
-  // One bounded HTTP fetch of `target` with timeout, manual redirect handling
-  // and budget enforcement. Returns the connector result shape.
   async fetchVersion(request) {
     const timeLimitMs = request.budget?.time_limit_ms ?? this.discoverCapabilities().limits.timeout_ms;
     const maxBytes = request.budget?.max_bytes ?? this.discoverCapabilities().limits.max_bytes;
@@ -126,9 +136,9 @@ export class HttpSnapshotConnector {
     try {
       for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
         // SSRF guard: the original URL and every redirect target must be a
-        // public http(s) address.
+        // public http(s) address; the mandatory resolver re-checks DNS.
         try {
-          assertPublicHttpTarget(currentUrl, { resolveHostname: this.resolveHostname });
+          await assertPublicHttpTargetAsync(currentUrl, { resolveHostname: this.resolveHostname });
         } catch (error) {
           return connectorError('ACCESS_DENIED', {
             operationId: request.operation_id,
@@ -139,12 +149,53 @@ export class HttpSnapshotConnector {
         }
         let response;
         try {
-          response = await this.fetchFn(currentUrl, {
-            method: 'GET',
-            redirect: 'manual',
-            signal: controller.signal,
-            headers: { 'user-agent': 'veritas-ingestion/1.1 (+read-only-snapshot)' },
+          if (this.fetchFn) {
+            // Injectable offline transport (fixtures/tests): same checks, no
+            // network. Budget enforcement still applies to the returned body.
+            response = await this.fetchFn(currentUrl, {
+              method: 'GET',
+              redirect: 'manual',
+              signal: controller.signal,
+              headers: { 'user-agent': 'veritas-ingestion/1.2 (+read-only-snapshot)' },
+            });
+            if (response.status >= 300 && response.status < 400 && response.headers?.get?.('location')) {
+              if (hop === MAX_REDIRECTS) {
+                return connectorError('BLOCKED_CONNECTOR', {
+                  operationId: request.operation_id,
+                  connectorId: this.id,
+                  retryable: false,
+                  reconciliationAction: 'manual_review',
+                  detail: 'redirect chain exceeds the configured hop limit',
+                });
+              }
+              currentUrl = new URL(response.headers.get('location'), currentUrl).toString();
+              continue;
+            }
+            return await this.#consumeInjectedResponse({ response, request, controller, maxBytes, finalUrl: currentUrl });
+          }
+          // Production transport: node http/https with a lookup hook — the
+          // resolved-and-validated address is the only address the socket can
+          // use, which closes the DNS rebinding window (no TOCTOU).
+          response = await boundedNodeRequest(currentUrl, {
+            controller,
+            timeoutMs: timeLimitMs,
+            maxBytes,
+            resolveHostname: this.resolveHostname,
           });
+          if (response.status >= 300 && response.status < 400 && response.headers?.get?.('location')) {
+            if (hop === MAX_REDIRECTS) {
+              return connectorError('BLOCKED_CONNECTOR', {
+                operationId: request.operation_id,
+                connectorId: this.id,
+                retryable: false,
+                reconciliationAction: 'manual_review',
+                detail: 'redirect chain exceeds the configured hop limit',
+              });
+            }
+            currentUrl = new URL(response.headers.get('location'), currentUrl).toString();
+            continue;
+          }
+          return await this.#consumeNodeResponse({ response, request });
         } catch (error) {
           if (controller.signal.aborted) {
             return connectorError('TIMEOUT', {
@@ -162,6 +213,14 @@ export class HttpSnapshotConnector {
               detail: error.message,
             });
           }
+          if (/^SSRF_/.test(error?.message ?? '')) {
+            return connectorError('ACCESS_DENIED', {
+              operationId: request.operation_id,
+              connectorId: this.id,
+              reconciliationAction: 'manual_review',
+              detail: error.message,
+            });
+          }
           return connectorError('BLOCKED_CONNECTOR', {
             operationId: request.operation_id,
             connectorId: this.id,
@@ -170,22 +229,6 @@ export class HttpSnapshotConnector {
             detail: `network failure: ${error?.message ?? 'unknown'}`,
           });
         }
-        // Manual redirect handling: re-validate every hop.
-        if (response.status >= 300 && response.status < 400 && response.headers?.get?.('location')) {
-          if (hop === MAX_REDIRECTS) {
-            return connectorError('BLOCKED_CONNECTOR', {
-              operationId: request.operation_id,
-              connectorId: this.id,
-              retryable: false,
-              reconciliationAction: 'manual_review',
-              detail: 'redirect chain exceeds the configured hop limit',
-            });
-          }
-          const location = response.headers.get('location');
-          currentUrl = new URL(location, currentUrl).toString();
-          continue;
-        }
-        return await this.#consumeResponse({ response, request, controller, maxBytes, finalUrl: currentUrl });
       }
       return connectorError('BLOCKED_CONNECTOR', {
         operationId: request.operation_id,
@@ -197,92 +240,24 @@ export class HttpSnapshotConnector {
     }
   }
 
-  async #consumeResponse({ response, request, controller, maxBytes, finalUrl }) {
-    if (response.status === 401 || response.status === 403) {
-      return connectorError('ACCESS_DENIED', {
-        operationId: request.operation_id,
-        connectorId: this.id,
-        reconciliationAction: 'manual_review',
-        detail: `HTTP ${response.status}`,
-      });
-    }
-    if (response.status === 404 || response.status === 410) {
-      return connectorError(response.status === 410 ? 'TOMBSTONED' : 'NOT_FOUND', {
-        operationId: request.operation_id,
-        connectorId: this.id,
-        reconciliationAction: 'probe_source',
-        detail: `HTTP ${response.status}`,
-      });
-    }
-    if (response.status === 429) {
-      return connectorError('RATE_LIMITED', {
-        operationId: request.operation_id,
-        connectorId: this.id,
-        retryable: true,
-        reconciliationAction: 'retry_with_backoff',
-        detail: 'HTTP 429 rate limited',
-      });
-    }
-    if (!response.ok) {
-      // Closed enum: an upstream 5xx is a connector that cannot currently do
-      // its job — retryable, bounded, never a silent success.
-      return connectorError('BLOCKED_CONNECTOR', {
-        operationId: request.operation_id,
-        connectorId: this.id,
-        retryable: true,
-        reconciliationAction: 'retry_with_backoff',
-        detail: `HTTP ${response.status} from upstream`,
-      });
-    }
+  // Injected-transport body: streaming when the mock provides a Web stream,
+  // buffered otherwise; budget enforced in both cases.
+  async #consumeInjectedResponse({ response, request, controller, maxBytes, finalUrl }) {
     const contentType = String(response.headers?.get?.('content-type') ?? '').split(';')[0].trim().toLowerCase();
-    if (!ALLOWED_CONTENT_TYPES.has(contentType)) {
-      return connectorError('UNSUPPORTED_FORMAT', {
-        operationId: request.operation_id,
-        connectorId: this.id,
-        reconciliationAction: 'manual_review',
-        detail: `content-type ${contentType || '(missing)'} is not an allowed public text type`,
-      });
-    }
-    // Bounded body read: stream chunks while the budget lasts, abort the
-    // request the moment it would be exceeded.
+    const statusFailure = this.#statusFailure(request, response.status, contentType);
+    if (statusFailure) return statusFailure;
     let buffer;
-    if (response.body && typeof response.body.getAsyncIterator === 'function') {
-      const chunks = [];
-      let total = 0;
-      try {
-        for await (const chunk of response.body.getAsyncIterator()) {
-          const part = Buffer.from(chunk);
-          total += part.length;
-          if (total > maxBytes) {
-            controller.abort(new Error('budget exceeded'));
-            return connectorError('QUARANTINED', {
-              operationId: request.operation_id,
-              connectorId: this.id,
-              reconciliationAction: 'manual_review',
-              detail: `payload exceeds the request budget of ${maxBytes} bytes`,
-            });
-          }
-          chunks.push(part);
-        }
-        buffer = Buffer.concat(chunks);
-      } catch (error) {
-        if (controller.signal.aborted) {
-          return connectorError('TIMEOUT', {
-            operationId: request.operation_id,
-            connectorId: this.id,
-            retryable: true,
-            reconciliationAction: 'retry_with_backoff',
-            detail: 'fetch exceeded the configured time limit while reading the body',
-          });
-        }
-        return connectorError('BLOCKED_CONNECTOR', {
+    if (response.body && typeof response.body.getReader === 'function') {
+      const read = await readWebStreamBounded(response.body.getReader(), maxBytes, controller);
+      if (read.exceeded) {
+        return connectorError('QUARANTINED', {
           operationId: request.operation_id,
           connectorId: this.id,
-          retryable: true,
-          reconciliationAction: 'retry_with_backoff',
-          detail: `body read failure: ${error?.message ?? 'unknown'}`,
+          reconciliationAction: 'manual_review',
+          detail: `payload exceeds the request budget of ${maxBytes} bytes`,
         });
       }
+      buffer = read.buffer;
     } else {
       const raw = await response.arrayBuffer();
       buffer = Buffer.from(raw);
@@ -308,6 +283,57 @@ export class HttpSnapshotConnector {
       mime_type: contentType,
       untrusted_metadata: {
         final_url: response.url ?? finalUrl,
+        body_text: buffer.toString('utf8'),
+      },
+    };
+  }
+
+  #statusFailure(request, status, contentType) {
+    if (status === 401 || status === 403) {
+      return connectorError('ACCESS_DENIED', { operationId: request.operation_id, connectorId: this.id, reconciliationAction: 'manual_review', detail: `HTTP ${status}` });
+    }
+    if (status === 404 || status === 410) {
+      return connectorError(status === 410 ? 'TOMBSTONED' : 'NOT_FOUND', { operationId: request.operation_id, connectorId: this.id, reconciliationAction: 'probe_source', detail: `HTTP ${status}` });
+    }
+    if (status === 429) {
+      return connectorError('RATE_LIMITED', { operationId: request.operation_id, connectorId: this.id, retryable: true, reconciliationAction: 'retry_with_backoff', detail: 'HTTP 429 rate limited' });
+    }
+    if (status < 200 || status > 299) {
+      return connectorError('BLOCKED_CONNECTOR', { operationId: request.operation_id, connectorId: this.id, retryable: true, reconciliationAction: 'retry_with_backoff', detail: `HTTP ${status} from upstream` });
+    }
+    if (!ALLOWED_CONTENT_TYPES.has(contentType)) {
+      return connectorError('UNSUPPORTED_FORMAT', { operationId: request.operation_id, connectorId: this.id, reconciliationAction: 'manual_review', detail: `content-type ${contentType || '(missing)'} is not an allowed public text type` });
+    }
+    return null;
+  }
+
+  // Production transport response: bytes were already bounded at the socket.
+  async #consumeNodeResponse({ response, request }) {
+    const contentType = response.contentType;
+    const statusFailure = this.#statusFailure(request, response.status, contentType);
+    if (statusFailure) return statusFailure;
+    if (response.budgetExceeded) {
+      return connectorError('QUARANTINED', {
+        operationId: request.operation_id,
+        connectorId: this.id,
+        reconciliationAction: 'manual_review',
+        detail: `payload exceeds the request budget of ${response.maxBytes} bytes`,
+      });
+    }
+    const buffer = response.bytes;
+    if (!buffer || buffer.length === 0) {
+      return connectorError('MALFORMED_CONTENT', {
+        operationId: request.operation_id,
+        connectorId: this.id,
+        detail: 'upstream returned an empty body',
+      });
+    }
+    return {
+      ok: true,
+      raw: buffer,
+      mime_type: contentType,
+      untrusted_metadata: {
+        final_url: response.url,
         body_text: buffer.toString('utf8'),
       },
     };
@@ -339,8 +365,14 @@ export class HttpSnapshotConnector {
 
   async observeDeletion(sourceId, locator) {
     try {
-      assertPublicHttpTarget(locator, { resolveHostname: this.resolveHostname });
-      const response = await this.fetchFn(locator, { method: 'HEAD', redirect: 'manual' });
+      await assertPublicHttpTargetAsync(locator, { resolveHostname: this.resolveHostname });
+      const response = await boundedNodeRequest(locator, {
+        controller: new AbortController(),
+        timeoutMs: 15000,
+        maxBytes: 1,
+        resolveHostname: this.resolveHostname,
+        method: 'HEAD',
+      });
       if (response.status >= 300 && response.status < 400) return { deleted: false };
       return { deleted: response.status === 404 || response.status === 410 };
     } catch {
@@ -350,6 +382,149 @@ export class HttpSnapshotConnector {
 }
 
 export class UnknownOutcomeBridge extends Error {}
+
+// Async canonical guard: awaits the mandatory resolver and re-checks every
+// returned address against the private-range rules.
+export async function assertPublicHttpTargetAsync(rawUrl, { resolveHostname = null } = {}) {
+  const { url, hostname } = assertPublicHttpTarget(rawUrl, {});
+  if (resolveHostname) {
+    const addresses = await Promise.resolve(resolveHostname(hostname));
+    for (const address of addresses ?? []) {
+      if (/^d{1,3}(.d{1,3}){3}$/.test(address)) {
+        if (isPrivateIPv4(address)) throw new Error(`SSRF_RESOLVED_FORBIDDEN: ${hostname} -> ${address}`);
+      } else if (address.includes(':') && isPrivateIPv6(address)) {
+        throw new Error(`SSRF_RESOLVED_FORBIDDEN: ${hostname} -> ${address}`);
+      }
+    }
+  }
+  return url;
+}
+
+
+// Validating lookup hook: THE single address source for the socket. DNS
+// answers that fail the SSRF check reject the connection itself.
+function validatingLookup(resolveHostname, allowedFamilies) {
+  return (hostname, options, callback) => {
+    Promise.resolve()
+      .then(() => resolveHostname(hostname))
+      .then((addresses) => {
+        const checked = [];
+        for (const address of addresses ?? []) {
+          if (/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
+            if (isPrivateIPv4(address)) {
+              callback(new Error(`SSRF_RESOLVED_FORBIDDEN: ${hostname} -> ${address}`));
+              return;
+            }
+            checked.push({ address, family: 4 });
+          } else if (address.includes(':')) {
+            if (isPrivateIPv6(address)) {
+              callback(new Error(`SSRF_RESOLVED_FORBIDDEN: ${hostname} -> ${address}`));
+              return;
+            }
+            checked.push({ address, family: 6 });
+          }
+        }
+        if (checked.length === 0) {
+          callback(new Error(`SSRF_RESOLVED_EMPTY: ${hostname}`));
+          return;
+        }
+        const pick = checked.find((c) => !options || !options.family || c.family === options.family) ?? checked[0];
+        callback(null, pick.address, pick.family);
+      })
+      .catch((error) => callback(error));
+  };
+}
+
+// Production transport: node http/https with the validating lookup hook,
+// bounded byte counting at the socket and hard timeout.
+function boundedNodeRequest(rawUrl, { controller, timeoutMs, maxBytes, resolveHostname, maxRedirects = MAX_REDIRECTS, method = 'GET' }) {
+  return new Promise((resolve, reject) => {
+    const attempt = (urlText, hops) => {
+      let target;
+      try {
+        target = new URL(urlText);
+      } catch (error) {
+        reject(error);
+        return;
+      }
+      const lookup = validatingLookup(resolveHostname);
+      const transport = target.protocol === 'https:' ? https : http;
+      const agent = new transport.Agent({ keepAlive: false, lookup, maxSockets: 1 });
+      const req = transport.request(target, {
+        method,
+        agent,
+        headers: { 'user-agent': 'veritas-ingestion/1.2 (+read-only-snapshot)', host: target.host },
+        signal: controller.signal,
+      }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          res.resume();
+          if (hops >= maxRedirects) {
+            reject(new Error('redirect chain exceeds the configured hop limit'));
+            return;
+          }
+          attempt(new URL(res.headers.location, target).toString(), hops + 1);
+          return;
+        }
+        const chunks = [];
+        let total = 0;
+        let exceeded = false;
+        res.on('data', (chunk) => {
+          total += chunk.length;
+          if (total > maxBytes) {
+            exceeded = true;
+            req.destroy(new Error('budget exceeded'));
+            return;
+          }
+          chunks.push(chunk);
+        });
+        res.on('end', () => {
+          resolve({
+            status: res.statusCode,
+            contentType: String(res.headers['content-type'] ?? '').split(';')[0].trim().toLowerCase(),
+            headers: { get: (k) => res.headers[String(k).toLowerCase()] ?? null },
+            url: urlText,
+            bytes: exceeded ? null : Buffer.concat(chunks),
+            budgetExceeded: exceeded,
+            maxBytes,
+          });
+        });
+        res.on('error', (error) => {
+          if (controller.signal.aborted) reject(Object.assign(new Error('time limit exceeded'), { name: 'AbortError' }));
+          else reject(error);
+        });
+      });
+      req.on('error', (error) => {
+        if (controller.signal.aborted) reject(Object.assign(new Error('time limit exceeded'), { name: 'AbortError' }));
+        else reject(error);
+      });
+      req.setTimeout(timeoutMs, () => {
+        controller.abort(new Error('time limit exceeded'));
+        req.destroy(new Error('time limit exceeded'));
+      });
+      req.end();
+    };
+    attempt(rawUrl, 0);
+  });
+}
+
+async function readWebStreamBounded(reader, maxBytes, controller) {
+  const chunks = [];
+  let total = 0;
+  let exceeded = false;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const part = Buffer.from(value);
+    total += part.length;
+    if (total > maxBytes) {
+      exceeded = true;
+      controller.abort(new Error('budget exceeded'));
+      break;
+    }
+    chunks.push(part);
+  }
+  return { buffer: Buffer.concat(chunks), exceeded, total };
+}
 
 export function stripHtml(html) {
   return html

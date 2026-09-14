@@ -190,6 +190,20 @@ export class IngestionStore {
     return proposal;
   }
 
+  // Atomic commit: ledger terminal + snapshot + segments + lineage + audit
+  // events land in one critical section. For the in-memory store the
+  // synchronous block IS the transaction; the PostgreSQL store mirrors this
+  // with BEGIN/COMMIT (see PostgresIngestionStore.commitIngest).
+  commitIngest({ workspaceId, operationId, outcome, snapshot = null, segments = [], lineage = null, descriptorTombstone = null, events = [] }) {
+    const appendResult = snapshot ? this.appendSnapshot(snapshot) : null;
+    if (segments.length > 0) this.appendSegments(snapshot.snapshot_id, segments);
+    if (lineage) this.appendLineage(lineage);
+    if (descriptorTombstone) this.tombstoneDescriptor(descriptorTombstone.source_id, descriptorTombstone.reason, descriptorTombstone.at);
+    for (const event of events) this.events.push(event);
+    const record = this.completeOperation(workspaceId, operationId, outcome);
+    return { appendResult, record };
+  }
+
   // Hard-integrity counters (§13). The runner's run-local counters
   // (private leaks, authority expansions) are passed in as extras.
   async integritySummary({ outcomes = [], privateLeakCounter = 0, authorityExpansionCounter = 0 } = {}) {
