@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "role": "S2-003 DB-backed run A vs run B comparison (PostgreSQL ingestion stores)",
+  "role": "S2-003 DB-backed run A vs run B comparison (PostgreSQL ingestion stores, separate OS processes)",
   "databaseEngine": "PostgreSQL",
   "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
   "schemas": [
@@ -31,6 +31,14 @@
       ]
     }
   ],
+  "pids": {
+    "run_a": 29340,
+    "run_b": 11308
+  },
+  "executors": {
+    "run_a": "exec-db-a",
+    "run_b": "exec-db-b"
+  },
   "integrity": {
     "run_a": {
       "snapshots_total": 81,

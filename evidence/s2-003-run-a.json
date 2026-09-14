@@ -2,19 +2,19 @@
   "contractVersion": "1.0.0",
   "run_id": "s2-003-run-a",
   "executor_id": "exec-s2-003-a",
-  "pid": 5932,
+  "pid": 12656,
   "nonce": "n-8f4dffb1bd7086a4",
   "output_root": "results/s2-003/run-a",
   "frozen_inputs": {
     "connector_contracts_sha256": "47f790b9b90e1779239437ca9fe24f283317d5245027d3a0e46ca595ba6d6945",
-    "corpus_sha256": "e04bc9153b9e34d887e6883ed70eaafbfb343a00b881c1a68169a5c965d61fd6",
+    "corpus_sha256": "f966bb77caf5ee435534bdd2f1097dd8ebc6a747e68d49034f3d2ebf87a35d2e",
     "policy_sha256": "64f9a905dffa45c0548094af897e554dab50e427422207f72cb143b9a89258d0"
   },
   "started_at": "2026-01-15T08:00:00.000Z",
   "finished_at": null,
   "environment": {
-    "commit": "c3d667cdc497ada713840343a45786653d17cf33",
-    "tree": "7e9877628e169b969c477adf86e6b96434218563",
+    "commit": "34fe03feb21ce353e07ea14beca180f0db98f48e",
+    "tree": "c47ef0e553fa897ea488a277d1037121f6b61ed0",
     "node_version": "22.23.2",
     "platform": "win32-x64"
   },

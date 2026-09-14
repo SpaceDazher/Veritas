@@ -39,8 +39,13 @@ function cleanupContainer() {
 function parseArgs(argv) {
   const args = { _: [] };
   for (let i = 2; i < argv.length; i += 1) {
-    if (argv[i].startsWith('--')) args[argv[i].slice(2)] = argv[i + 1];
-    else args._.push(argv[i]);
+    if (argv[i].startsWith('--')) {
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith('--')) { args[argv[i].slice(2)] = 'true'; }
+      else { args[argv[i].slice(2)] = next; i += 1; }
+    } else {
+      args._.push(argv[i]);
+    }
   }
   return args;
 }
