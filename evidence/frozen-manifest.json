@@ -149,14 +149,14 @@
     "scripts/s2-003-security-probes.mjs": "c9608ff863db0d7d89403838c40130f8386896b570ea7a8acdb1f6dca832c767",
     "scripts/security-probes.mjs": "4a3e95b1559308e0b90397e7997c866872cbdb03bc1c081d7601766248e729df",
     "scripts/validate-contracts.mjs": "15fcc89cd8c387cea4a668e68cb60f1587e81511743673a0025c288afae14bb6",
-    "scripts/verify-clean-checkout.mjs": "102756a857ef473c707a0d1cc3ebc627c55c472d6240f910361bebc46fe92843",
+    "scripts/verify-clean-checkout.mjs": "44ca5a86a35eda65fbb22f6e656105288d05362327ffd48cae78f4dfae63a72e",
     "scripts/verify-gvisor-sandbox.mjs": "94c7eeb25322ef35b98f1f1ca266af4cd1ae7e0e8ade8acecf96dac444739562",
     "scripts/verify-podman-sandbox.mjs": "e470859403503df02e01fd92e6cbef4a7d30b47858cad067b7ef3e9a7e55319c",
     "scripts/verify-postgres-smoke.mjs": "ec2e707187ca447189c42ebd12d79a453fe89749b1b9939bd7d09896037cec25",
     "scripts/verify-s2-002-dependencies.mjs": "d218cb2889b41fccd5fabb588458f371835a1ca1979b98061a7a818dbb7b53da",
     "scripts/verify-s2-002.mjs": "528f6de591e786d2afc42712914774de6fe570f020a7bcf1ad51f57229a5249e",
     "scripts/verify-s2-003-dependencies.mjs": "1aebe759028690b761855dbbf9e08a56d0c41694ebf3be6580ec9a272f70831c",
-    "scripts/verify-s2-003.mjs": "86bda16bcef176dffa36ca9e870e60a9281b43636310043d17e3ccc7f2e19f02",
+    "scripts/verify-s2-003.mjs": "f099d0271bb8dc59947cf482a355cf848ea75e7ecdceee36389c2032615978af",
     "src/lib/contract-policy.mjs": "29fdd978b0d91509e49ec8137fe50eb5c41a95bb9185907dd957341a25543839",
     "src/lib/identity/contract-registry.mjs": "c56e253c66849e5b043cce9abba5a2d69321c4969c0ddc3fde06d4450ff561cc",
     "src/lib/identity/contracts.fixtures.ts": "282777dd94716cec04558c5007502a783466b3ffd1ba8212952bdb1f70183e2b",
@@ -178,8 +178,8 @@
     "src/lib/ingestion/dedup.mjs": "bda46c8a6ebd6e8fbf2c425b1ee143bf247dffb6f0084a03ead9eb5837b9578b",
     "src/lib/ingestion/export-policy.mjs": "490728847090051dcc2641d551b45a14a0334a1570cd898e296ccb79a102f2a6",
     "src/lib/ingestion/pipeline.mjs": "4afa74a60c3380860144e0695504601ec8703f09cdd2ae373d222efd2c2a4c08",
-    "src/lib/ingestion/postgres-store.mjs": "c85db96722decf3c5785b9d78e7998a8e5bacbd29bba8436a58378db527ff743",
-    "src/lib/ingestion/store.mjs": "ab480b1d6f063be0dc4eb6ccf3843f3f398bb1be883af7e8b54aa3867eb9fb5a",
+    "src/lib/ingestion/postgres-store.mjs": "3ea3656c97a50b2beba75db09df31d2e406a294a3b65e04c7198aa5261678d93",
+    "src/lib/ingestion/store.mjs": "0c05543dc2b7e263b03bb0d31517e6726627a341c77b25495e306e2a5e0f659d",
     "src/lib/ingestion/time-model.mjs": "aaed8a3f667265e517dda45fc3cb0bf9ad1d885efdd26060cce45a4cff6361d2",
     "tests/database/postgres-smoke.test.mjs": "feff8a8fa02c5fcef66d1b6b1ca0b8ab00e0d31833bd3e22075db814aeefd20e",
     "tests/identity/contracts.schemas.test.mjs": "a3547a9d7c01b3b84be2b6fe108b79616a10a689b5fb9a233a7f5ce3423f9795",
@@ -199,7 +199,8 @@
     "tests/ingestion/migrations.test.mjs": "6fd02dcd659e50ce1342a698009f83a40ca9fa7cd25c16a10c3df76898aa4655",
     "tests/ingestion/pipeline.test.mjs": "17b49cf96ebde73867ae9691a31b813b2bed6f939eb4e3fdd077f1c439f85377",
     "tests/ingestion/run-determinism.test.mjs": "305b4d361854146cc93695523a24cf176cfeb8cd400efb6ba8f68b3813077095",
-    "tests/ingestion/security-hardening.test.mjs": "7b96377b5bea81dc4d142406e128e7824e23d890144fb7cfb9851d6bffcc8f88",
-    "tests/ingestion/time-model.test.mjs": "1fff8aadf42b66507908a0eb994d2dba50aaa08c72bffb010c78b6921458c246"
+    "tests/ingestion/security-hardening.test.mjs": "0bf3669e13ddea38090cfbd163a42e8c9d1a5f060914532ade880ad7b30afe04",
+    "tests/ingestion/time-model.test.mjs": "1fff8aadf42b66507908a0eb994d2dba50aaa08c72bffb010c78b6921458c246",
+    "tests/ingestion/transactional-audit.test.mjs": "e4f1589df9a8b1884aeea0946bf61ce7ae3c68a5a45acd962e9f0c70ab575cc7"
   }
 }
