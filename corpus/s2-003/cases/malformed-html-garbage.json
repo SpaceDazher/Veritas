@@ -34,7 +34,7 @@
     "registered_by": "prn-corpus-reviewer"
   },
   "fixtures": {
-    "case-fixture/malformed-html-garbage": "<html><body><div>unclosed"
+    "https://corpus.fixture/malformed-html-garbage": "<html><body><div>unclosed"
   },
   "operations": [
     {
@@ -46,7 +46,7 @@
         "max_segments": 500,
         "time_limit_ms": 30000
       },
-      "locator": "case-fixture/malformed-html-garbage"
+      "locator": "https://corpus.fixture/malformed-html-garbage"
     }
   ],
   "expected": {

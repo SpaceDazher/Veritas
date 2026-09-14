@@ -10,8 +10,12 @@
 //     section (mirrored by a single SQL transaction in migrations/0002).
 import { createHash } from 'node:crypto';
 
-export class SnapshotImmutabilityError extends Error {}
-export class DuplicateOperationError extends Error {}
+export class SnapshotImmutabilityError extends Error {
+  constructor(message) { super(message); this.name = 'SnapshotImmutabilityError'; }
+}
+export class DuplicateOperationError extends Error {
+  constructor(message) { super(message); this.name = 'DuplicateOperationError'; }
+}
 
 function operationKey(workspaceId, operationId) {
   return `${workspaceId}:${operationId}`;
@@ -184,6 +188,40 @@ export class IngestionStore {
     }
     this.proposals.set(proposal.proposal_id, Object.freeze({ ...proposal }));
     return proposal;
+  }
+
+  // Hard-integrity counters (§13). The runner's run-local counters
+  // (private leaks, authority expansions) are passed in as extras.
+  async integritySummary({ outcomes = [], privateLeakCounter = 0, authorityExpansionCounter = 0 } = {}) {
+    const contentSnapshots = [...this.snapshots.values()].filter((s) => s.snapshot_kind === 'content');
+    const provenanceComplete = contentSnapshots.filter((s) => {
+      const p = s.fetch_provenance ?? {};
+      return Boolean(p.operation_id && p.connector_id && p.connector_version && p.fetched_from && p.fetched_at)
+        && Boolean(s.acl?.visibility && s.license?.spdx && s.retention?.policy);
+    }).length;
+    const commitsPerSnapshot = new Map();
+    for (const event of this.events) {
+      if (event.type === 'SNAPSHOT_COMMITTED') {
+        commitsPerSnapshot.set(event.snapshot_id, (commitsPerSnapshot.get(event.snapshot_id) ?? 0) + 1);
+      }
+    }
+    const flaggedSegments = [...this.segments.values()].flat().filter((s) => s.embedded_instruction_classification?.present === true).length;
+    let authorityDrift = authorityExpansionCounter;
+    for (const descriptor of this.descriptors.values()) {
+      if (descriptor.lifecycle?.state === 'tombstoned') continue;
+      if (!descriptor.classification?.visibility) authorityDrift += 1;
+    }
+    return {
+      snapshots_total: this.snapshots.size,
+      provenance_complete_pct: contentSnapshots.length === 0 ? 0 : Math.round((provenanceComplete / contentSnapshots.length) * 100),
+      committed_operations: [...this.operations.values()].filter((o) => o.status === 'COMMITTED').length,
+      operations_stuck_intent: [...this.operations.values()].filter((o) => o.status === 'INTENT').length,
+      duplicate_committed_snapshots: [...commitsPerSnapshot.values()].reduce((sum, n) => sum + (n > 1 ? n - 1 : 0), 0),
+      committed_without_snapshot: outcomes.filter((o) => o.terminal === 'COMMITTED' && !o.snapshot_id).length,
+      private_exports_leaked: privateLeakCounter,
+      authority_expansions: authorityDrift,
+      instruction_flagged_segments: flaggedSegments,
+    };
   }
 
   decideProposal(proposalId, decision, at) {

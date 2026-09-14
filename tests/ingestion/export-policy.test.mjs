@@ -33,14 +33,19 @@ function descriptorFor(overrides = {}) {
   };
 }
 
-function requestFor(operationId) {
+function requestFor(operationId, overrides = {}) {
   return {
+    contractVersion: '1.0.0',
     operation_id: operationId,
     source_id: 'src-private-1',
+    connector_id: 'conn-manual-export',
+    actor: 'prn-corpus-reviewer',
     locator: 'export/private-001',
     workspace_id: 'ws-private',
+    version_selector: { latest: true },
     budget: { max_bytes: 100000, time_limit_ms: 5000 },
     requested_at: NOW,
+    ...overrides,
   };
 }
 
@@ -57,7 +62,7 @@ async function committedPrivateSnapshot() {
     clock: createDecisionClock(NOW),
     now: () => NOW,
   });
-  const outcome = await pipeline.ingest({ request: requestFor('op-priv-1'), descriptor });
+  const outcome = await pipeline.ingest({ request: requestFor('op-priv-1') });
   assert.equal(outcome.terminal, 'COMMITTED');
   return { store, snapshotId: outcome.snapshot_id };
 }
@@ -114,7 +119,6 @@ describe('S2-003 export policy', () => {
     });
     const outcome = await pipeline.ingest({
       request: { ...requestFor('op-pub-1'), source_id: 'src-public-1', locator: 'export/public-001' },
-      descriptor,
     });
     assert.equal(outcome.terminal, 'COMMITTED');
     const publicView = publicEvidenceView({ store, snapshotId: outcome.snapshot_id });

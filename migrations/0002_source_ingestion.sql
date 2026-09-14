@@ -137,26 +137,85 @@ CREATE TABLE IF NOT EXISTS ingestion_operation (
   workspace_id text NOT NULL,
   operation_id text NOT NULL,
   request_hash text NOT NULL CHECK (request_hash ~ '^[0-9a-f]{64}$'),
-  status text NOT NULL CHECK (status IN (
+  status text NOT NULL DEFAULT 'INTENT' CHECK (status IN (
     'INTENT', 'COMMITTED', 'BLOCKED_CONNECTOR', 'ACCESS_DENIED', 'TOMBSTONED',
     'QUARANTINED', 'FAILED', 'CANCELLED', 'RECONCILIATION_REQUIRED')),
   outcome jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   completed_at timestamptz,
-  PRIMARY KEY (workspace_id, operation_id)
+  PRIMARY KEY (workspace_id, operation_id),
+  CHECK ((status = 'INTENT') = (outcome IS NULL AND completed_at IS NULL))
 );
 
 -- Append-only enforcement: payload tables reject UPDATE and DELETE.
+-- Exceptions (controlled, server-side-only transitions):
+--   ingestion_operation: exactly one INTENT -> terminal transition;
+--   source_descriptor: a single lifecycle transition to 'tombstoned'
+--     (deletion of the source), with every other column immutable.
 CREATE OR REPLACE FUNCTION veritas_ingestion_append_only() RETURNS trigger AS $$
 BEGIN
   RAISE EXCEPTION 'APPEND_ONLY_VIOLATION: % % on %', TG_OP, TG_TABLE_NAME, 'append-only';
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS source_descriptor_append_only ON source_descriptor;
-CREATE TRIGGER source_descriptor_append_only
+CREATE OR REPLACE FUNCTION veritas_descriptor_tombstone_transition() RETURNS trigger AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'APPEND_ONLY_VIOLATION: DELETE on source_descriptor';
+  END IF;
+  IF NEW.source_id IS DISTINCT FROM OLD.source_id
+     OR NEW.connector_id IS DISTINCT FROM OLD.connector_id
+     OR NEW.source_kind IS DISTINCT FROM OLD.source_kind
+     OR NEW.canonical_locator IS DISTINCT FROM OLD.canonical_locator
+     OR NEW.display_locator IS DISTINCT FROM OLD.display_locator
+     OR NEW.owner IS DISTINCT FROM OLD.owner
+     OR NEW.author IS DISTINCT FROM OLD.author
+     OR NEW.publisher IS DISTINCT FROM OLD.publisher
+     OR NEW.workspace_id IS DISTINCT FROM OLD.workspace_id
+     OR NEW.tenant_id IS DISTINCT FROM OLD.tenant_id
+     OR NEW.classification IS DISTINCT FROM OLD.classification
+     OR NEW.license IS DISTINCT FROM OLD.license
+     OR NEW.retention IS DISTINCT FROM OLD.retention
+     OR NEW.registered_at IS DISTINCT FROM OLD.registered_at
+     OR NEW.registered_by IS DISTINCT FROM OLD.registered_by THEN
+    RAISE EXCEPTION 'DESCRIPTOR_IMMUTABLE: only the lifecycle may transition to tombstoned';
+  END IF;
+  IF OLD.lifecycle->>'state' = 'tombstoned' THEN
+    RAISE EXCEPTION 'DESCRIPTOR_ALREADY_TOMBSTONED';
+  END IF;
+  IF NEW.lifecycle->>'state' <> 'tombstoned' THEN
+    RAISE EXCEPTION 'DESCRIPTOR_TRANSITION_INVALID: only enabled/blocked -> tombstoned is allowed';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION veritas_ingestion_operation_transition() RETURNS trigger AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'APPEND_ONLY_VIOLATION: DELETE on ingestion_operation';
+  END IF;
+  IF NEW.workspace_id IS DISTINCT FROM OLD.workspace_id
+     OR NEW.operation_id IS DISTINCT FROM OLD.operation_id
+     OR NEW.request_hash IS DISTINCT FROM OLD.request_hash
+     OR NEW.created_at IS DISTINCT FROM OLD.created_at THEN
+    RAISE EXCEPTION 'OPERATION_IDENTITY_IMMUTABLE: identity columns cannot change';
+  END IF;
+  IF OLD.status <> 'INTENT' THEN
+    RAISE EXCEPTION 'OPERATION_ALREADY_TERMINAL: % cannot change after terminal', OLD.status;
+  END IF;
+  IF NEW.status = 'INTENT' THEN
+    RAISE EXCEPTION 'OPERATION_TRANSITION_INVALID: INTENT cannot be modified in place';
+  END IF;
+  NEW.completed_at := now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS source_descriptor_tombstone ON source_descriptor;
+CREATE TRIGGER source_descriptor_tombstone
   BEFORE UPDATE OR DELETE ON source_descriptor
-  FOR EACH ROW EXECUTE FUNCTION veritas_ingestion_append_only();
+  FOR EACH ROW EXECUTE FUNCTION veritas_descriptor_tombstone_transition();
 
 DROP TRIGGER IF EXISTS source_snapshot_append_only ON source_snapshot;
 CREATE TRIGGER source_snapshot_append_only
@@ -178,7 +237,7 @@ CREATE TRIGGER ingestion_event_append_only
   BEFORE UPDATE OR DELETE ON ingestion_event
   FOR EACH ROW EXECUTE FUNCTION veritas_ingestion_append_only();
 
-DROP TRIGGER IF EXISTS ingestion_operation_append_only ON ingestion_operation;
-CREATE TRIGGER ingestion_operation_append_only
+DROP TRIGGER IF EXISTS ingestion_operation_transition ON ingestion_operation;
+CREATE TRIGGER ingestion_operation_transition
   BEFORE UPDATE OR DELETE ON ingestion_operation
-  FOR EACH ROW EXECUTE FUNCTION veritas_ingestion_append_only();
+  FOR EACH ROW EXECUTE FUNCTION veritas_ingestion_operation_transition();

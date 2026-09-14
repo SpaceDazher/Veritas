@@ -34,7 +34,8 @@
     "inventory:write": "node scripts/check-inventory.mjs --write",
     "manifest:write": "node scripts/generate-manifests.mjs --write",
     "manifest:closure": "node scripts/generate-manifests.mjs --write-closure",
-    "manifest:check": "node scripts/generate-manifests.mjs --check"
+    "manifest:check": "node scripts/generate-manifests.mjs --check",
+    "verify:s2-003-db-replay": "node scripts/s2-003-db-replay.mjs"
   },
   "engines": {
     "node": ">=22"

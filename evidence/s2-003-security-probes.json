@@ -11,37 +11,37 @@
       "id": "A",
       "title": "deleted source does not remain active/current",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "current=tombstone; prior snapshot and audit preserved; re-import refused"
     },
     {
       "id": "B",
       "title": "same-locator edit creates a new immutable version",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "v1 unchanged, v2 supersedes v1"
     },
     {
       "id": "C",
       "title": "cross-channel duplicates link upstream and are not independent confirmations",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "mirror bound to upstream as confirmed exact_duplicate; both snapshots physically remain"
     },
     {
       "id": "D",
       "title": "unavailable media never becomes a successful empty import",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "NOT_FOUND -> FAILED terminal, zero snapshots"
     },
     {
       "id": "E",
       "title": "malformed/OCR-uncertain extraction is visible downstream",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "segment status=PARTIAL, flags=[\"LOW_CONFIDENCE\",\"TRUNCATED\"]"
     },
     {
       "id": "F",
       "title": "embedded instructions never expand authority or trigger tools",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "instructions stored as classified data; descriptor policy untouched"
     },
     {
       "id": "G",
@@ -59,19 +59,19 @@
       "id": "I",
       "title": "clock perturbation never changes identity or verdict",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "identity stable across clocks; telemetry differs (2026-01-15T08:00:00.000Z vs 2026-05-05T05:05:05.000Z)"
     },
     {
       "id": "J",
       "title": "crash replay does not duplicate versions or events",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "unknown outcome reconciled; zero duplicate snapshots/events after restart"
     },
     {
       "id": "K",
       "title": "forged provenance in payload never replaces host-observed metadata",
       "verdict": "DETECTED",
-      "detail": {}
+      "detail": "author/time/ACL remain host-observed from the descriptor"
     },
     {
       "id": "L",

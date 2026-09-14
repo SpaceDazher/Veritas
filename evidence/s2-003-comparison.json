@@ -3,7 +3,7 @@
   "role": "S2-003 run A vs run B comparison over the frozen corpus",
   "corpus": {
     "caseCount": 74,
-    "corpusSha256": "1e9a88917483b790818971ab4d5cbb29aceaa5821f87295808de5c580c94d30a"
+    "corpusSha256": "e04bc9153b9e34d887e6883ed70eaafbfb343a00b881c1a68169a5c965d61fd6"
   },
   "runParameters": {
     "run_a": {
@@ -19,7 +19,7 @@
   },
   "integrity": {
     "run_a": {
-      "snapshots_total": 82,
+      "snapshots_total": 81,
       "provenance_complete_pct": 100,
       "committed_operations": 79,
       "operations_stuck_intent": 0,
@@ -30,7 +30,7 @@
       "instruction_flagged_segments": 5
     },
     "run_b": {
-      "snapshots_total": 82,
+      "snapshots_total": 81,
       "provenance_complete_pct": 100,
       "committed_operations": 79,
       "operations_stuck_intent": 0,

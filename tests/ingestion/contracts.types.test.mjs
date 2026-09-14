@@ -15,7 +15,7 @@ const OUT_FILE = path.join(ROOT, 'src/lib/ingestion/contracts.d.ts');
 
 describe('S2-003 generated TypeScript contract types', () => {
   test('the committed declarations match the schemas byte-for-byte', () => {
-    const expected = `${generateTypes()}\n`;
+    const expected = `${generateTypes().replace(/\s+$/, '\n')}`;
     const actual = fs.readFileSync(OUT_FILE, 'utf8');
     assert.equal(actual, expected, 'contracts.d.ts drifted from contracts/*.schema.json; run npm run ingestion:types');
   });

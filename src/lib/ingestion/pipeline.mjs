@@ -7,11 +7,19 @@
 //   QUARANTINED | FAILED | CANCELLED | RECONCILIATION_REQUIRED
 //
 // Hard rules enforced here:
-//   - authorization is server-side, from the descriptor, never from content;
+//   - the request is validated against the fetch-request contract; the
+//     descriptor is always resolved from the canonical store by
+//     request.source_id — a caller-supplied descriptor can never bypass
+//     registered ACL/license/lifecycle (server-side authorization);
+//   - actor, workspace and connector in the request must match the
+//     descriptor; grant_required connectors need a grant verified against
+//     the injected grant ledger (fail-closed when none is configured);
+//   - the idempotency digest binds the FULL request (actor, connector,
+//     grant/lease, budget, claimed metadata, identity, selector): the same
+//     operation id with a different payload is a conflict, not a replay;
+//   - deduplication is tenant- and ACL-scoped: snapshots outside the
+//     requester's scope are invisible to every dedup stage;
 //   - the decision clock is injected: wall-clock never reaches a decision;
-//   - idempotency: a repeated operation replays its recorded terminal without
-//     re-executing; an interrupted operation (crash) is reconciled, and a
-//     reconciled replay never creates a second snapshot or a second event;
 //   - untrusted content can never change policy, ACL, grants or lifecycle;
 //   - an empty successful import is impossible: a fetch without bytes is a
 //     normalized error, never COMMITTED.
@@ -20,7 +28,7 @@ import { assertValidContract } from './contract-registry.mjs';
 import { CANONICALIZATION_VERSION } from './canonical.mjs';
 import { contentSnapshotId, tombstoneSnapshotId } from './time-model.mjs';
 import { normalizeContent, sha256Hex, decideDedup, lineageFromVerdict, makeShingleClassifier } from './dedup.mjs';
-import { connectorError } from './connectors/base.mjs';
+import { viewerCanRead } from './export-policy.mjs';
 
 const INSTRUCTION_PATTERNS = [
   { pattern: /ignore (all )?(previous|prior|above) instructions/i, classification: 'instruction_attempt' },
@@ -41,24 +49,47 @@ function classifyEmbeddedInstructions(text) {
   return { present: false, classification: 'none', confidence: 1, note: null };
 }
 
+// The idempotency digest binds the complete operation arguments. Two calls
+// with the same operation id but different authority, budget, selector or
+// claimed metadata are a conflict and must never replay each other.
 function requestDigest(request) {
   return createHash('sha256').update(JSON.stringify({
     operation_id: request.operation_id,
     source_id: request.source_id,
+    connector_id: request.connector_id ?? null,
     locator: request.locator,
+    identity: request.identity ?? null,
     selector: request.version_selector ?? { latest: true },
     workspace_id: request.workspace_id,
+    actor: request.actor ?? null,
+    grant_id: request.grant_id ?? null,
+    lease_id: request.lease_id ?? null,
+    budget: request.budget ?? null,
+    claimed: request.claimed ?? null,
   })).digest('hex');
 }
 
+function validateGrant(grant, { request, requiredScope, clockNow }) {
+  if (!grant) return 'grant not found in the ledger';
+  if (grant.principal_id !== request.actor) return 'grant principal does not match the request actor';
+  if (grant.workspace_id !== request.workspace_id) return 'grant workspace does not match the request workspace';
+  if (grant.scope !== requiredScope) return `grant scope ${grant.scope} does not cover ${requiredScope}`;
+  if (grant.expires_at && String(grant.expires_at) <= String(clockNow)) return 'grant expired';
+  return null;
+}
+
 export class IngestionPipeline {
-  constructor({ store, connectors, clock, now, classifier = null }) {
+  constructor({ store, connectors, clock, now, classifier = null, grants = null }) {
     this.store = store;
     this.connectors = connectors; // Map<source_kind, connector>
     this.clock = clock; // injected decision clock
     // `now` is the only host-time source and it is audit-only.
     this.now = now; // () => utcTimestamp, for observed_at/fetched_at telemetry
     this.classifier = classifier ?? makeShingleClassifier();
+    // Optional grant ledger: Map<grant_id, {principal_id, workspace_id,
+    // scope, expires_at}>. grant_required connectors fail closed when no
+    // ledger is configured.
+    this.grants = grants;
     this.observations = [];
   }
 
@@ -76,14 +107,40 @@ export class IngestionPipeline {
     return decision;
   }
 
-  async ingest({ request, descriptor, caseId = null }) {
+  // Canonical server-side descriptor resolution: the caller can never inject
+  // a substitute descriptor that would bypass registered ACL/lifecycle.
+  async #descriptorFor(request) {
+    const descriptor = await this.store.getDescriptor(request.source_id);
+    if (!descriptor) return null;
+    if (request.connector_id !== undefined && request.connector_id !== null && request.connector_id !== descriptor.connector_id) {
+      return { __mismatch__: 'connector_id does not match the registered descriptor' };
+    }
+    return descriptor;
+  }
+
+  async ingest({ request, caseId = null }) {
+    // QUEUED: request-shape validation before any authorization decision.
+    const shape = validateContract('fetch-request', request);
+    if (!shape.valid) {
+      const outcome = { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: `invalid fetch-request: ${shape.errors.map((e) => e.message).join('; ').slice(0, 200)}` };
+      // No ledger entry: the operation id of a malformed request is not owned.
+      return this.#observe(caseId, outcome);
+    }
     const digest = requestDigest(request);
-    const begin = this.store.beginOperation(request.workspace_id, request.operation_id, digest);
+    let begin;
+    try {
+      begin = await this.store.beginOperation(request.workspace_id, request.operation_id, digest);
+    } catch (error) {
+      if (error?.name === 'DuplicateOperationError') {
+        return this.#observe(caseId, { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: 'operation id reused with a different request payload' });
+      }
+      throw error;
+    }
     if (begin.replay) {
       const record = begin.record;
       if (record.status === 'INTENT') {
         // A previous attempt crashed before terminal: reconcile, never blind-retry.
-        return this.#reconcile({ request, descriptor, caseId });
+        return this.#reconcile({ request, caseId });
       }
       const outcome = { ...record.outcome, replayed: true };
       if (outcome.terminal === 'RECONCILIATION_REQUIRED') {
@@ -94,36 +151,55 @@ export class IngestionPipeline {
       return this.#observe(caseId, outcome);
     }
     try {
-      const outcome = await this.#execute({ request, descriptor });
-      this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      const outcome = await this.#execute({ request });
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
       return this.#observe(caseId, outcome);
     } catch (error) {
       if (error?.name === 'UnknownOutcomeError') {
         const outcome = { terminal: 'RECONCILIATION_REQUIRED', error_code: 'UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED', snapshot_id: null };
-        this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+        await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
         return this.#observe(caseId, outcome);
       }
       const outcome = { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: String(error?.message ?? error).slice(0, 256) };
-      this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
       return this.#observe(caseId, outcome);
     }
   }
 
   // Reconciliation of an unknown outcome: ask the connector what actually
   // happened, then finish the operation exactly once.
-  async #reconcile({ request, descriptor, caseId }) {
-    const connector = this.#connectorFor(descriptor.source_kind);
-    const probe = await connector.reconcile(request.operation_id);
-    const outcome = probe?.known
-      ? { terminal: 'RECONCILIATION_REQUIRED', error_code: 'UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED', snapshot_id: probe.snapshot_id ?? null, reconciled: true, duplicate_prevented: true }
-      : { terminal: 'RECONCILIATION_REQUIRED', error_code: 'UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED', snapshot_id: null, reconciled: true, duplicate_prevented: true };
-    this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+  async #reconcile({ request, caseId }) {
+    const descriptor = await this.#descriptorFor(request);
+    const outcome = { terminal: 'RECONCILIATION_REQUIRED', error_code: 'UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED', snapshot_id: null, reconciled: true, duplicate_prevented: true };
+    if (descriptor && !descriptor.__mismatch__) {
+      const connector = this.#connectorFor(descriptor.source_kind);
+      await connector.reconcile(request.operation_id);
+    }
+    await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
     return this.#observe(caseId, outcome);
   }
 
-  async #execute({ request, descriptor }) {
-    // QUEUED → AUTHORIZED: server-side checks against the descriptor only.
+  // AUTHORIZATION: everything is decided from the registered descriptor and
+  // the validated request; nothing is taken from source content.
+  #authorize({ request, descriptor }) {
+    if (descriptor?.__mismatch__) {
+      return { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: descriptor.__mismatch__ };
+    }
     if (!descriptor) return { terminal: 'FAILED', error_code: 'NOT_FOUND', snapshot_id: null, detail: 'descriptor not registered' };
+    // The request must stay inside the descriptor's workspace scope.
+    const workspaceAllowed = request.workspace_id === descriptor.workspace_id
+      || (descriptor.classification.allowed_workspace_ids ?? []).includes(request.workspace_id);
+    if (!workspaceAllowed) {
+      return { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: 'request workspace is outside the descriptor scope' };
+    }
+    // Private sources are readable only by explicitly allowed principals
+    // (or the owning workspace, which the check above already covers).
+    if (descriptor.classification.visibility === 'private') {
+      const principalAllowed = (descriptor.classification.allowed_principal_ids ?? []).includes(request.actor);
+      if (!principalAllowed && request.workspace_id !== descriptor.workspace_id) {
+        return { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: 'actor is not allowed on this private source' };
+      }
+    }
     if (descriptor.lifecycle?.state === 'tombstoned') {
       return { terminal: 'TOMBSTONED', error_code: 'TOMBSTONED', snapshot_id: null };
     }
@@ -135,8 +211,18 @@ export class IngestionPipeline {
     if (capabilities.auth_mode === 'blocked_without_credential') {
       return { terminal: 'BLOCKED_CONNECTOR', error_code: 'BLOCKED_CONNECTOR', snapshot_id: null };
     }
-    if (capabilities.auth_mode === 'grant_required' && !request.grant_id) {
-      return { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: 'connector requires a verified grant' };
+    if (capabilities.auth_mode === 'grant_required') {
+      if (!this.grants) {
+        return { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: 'connector requires a verified grant and no grant ledger is configured' };
+      }
+      const grantProblem = validateGrant(this.grants.get(request.grant_id), {
+        request,
+        requiredScope: capabilities.required_grant_scope ?? connector.requiredGrantScope,
+        clockNow: this.clock.now(),
+      });
+      if (grantProblem) {
+        return { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: `grant rejected: ${grantProblem}` };
+      }
     }
     if (descriptor.license?.spdx === 'LICENSE_UNKNOWN') {
       return { terminal: 'FAILED', error_code: 'LICENSE_UNKNOWN', snapshot_id: null, detail: 'license must be determined before ingestion' };
@@ -151,14 +237,24 @@ export class IngestionPipeline {
     if (request.budget.max_bytes <= 0 || request.budget.time_limit_ms <= 0) {
       return { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: 'invalid budget' };
     }
+    return null; // authorized
+  }
+
+  async #execute({ request }) {
+    // QUEUED → AUTHORIZED: server-side checks against the registered
+    // descriptor only.
+    const descriptor = await this.#descriptorFor(request);
+    const denied = this.#authorize({ request, descriptor });
+    if (denied) return denied;
 
     // AUTHORIZED → FETCHING
-    const fetched = await connector.fetchVersion({
+    const fetched = await this.#connectorFor(descriptor.source_kind).fetchVersion({
       operation_id: request.operation_id,
       locator: request.locator,
       identity: request.identity ?? null,
       version_selector: request.version_selector ?? { latest: true },
       signal: request.signal,
+      budget: request.budget,
     });
     if (!fetched || fetched.ok !== true) {
       const code = fetched?.code ?? 'BLOCKED_CONNECTOR';
@@ -166,7 +262,7 @@ export class IngestionPipeline {
       const outcome = { terminal, error_code: code, snapshot_id: null };
       if (fetched) {
         const observedAt = this.now();
-        this.store.events.push({ type: 'CONNECTOR_ERROR', operation_id: request.operation_id, code, at: observedAt });
+        this.store.events?.push({ type: 'CONNECTOR_ERROR', operation_id: request.operation_id, code, at: observedAt });
       }
       return outcome;
     }
@@ -189,7 +285,7 @@ export class IngestionPipeline {
     const normalizedText = normalizeContent(fetched.raw);
     const normalizedSha256 = sha256Hex(normalizedText);
 
-    const prior = this.store.activeSnapshot(identity.canonical_locator);
+    const prior = await this.store.activeSnapshot(identity.canonical_locator);
     const version = prior.current ? prior.current.version + 1 : 1;
     const snapshotId = contentSnapshotId({
       canonical_locator: identity.canonical_locator,
@@ -239,7 +335,7 @@ export class IngestionPipeline {
       fetch_provenance: {
         operation_id: request.operation_id,
         connector_id: descriptor.connector_id,
-        connector_version: connector.version,
+        connector_version: connectorVersionOf(this, descriptor),
         fetched_from: request.locator.slice(0, 2048),
         fetched_at: fetchedAt,
         grant_id: request.grant_id ?? null,
@@ -248,9 +344,14 @@ export class IngestionPipeline {
     };
 
     // EXTRACTING
-    const extracted = await connector.extract(baseSnapshot, fetched);
+    const extracted = await this.#connectorFor(descriptor.source_kind).extract(baseSnapshot, fetched);
     const segments = extracted.map((segment, index) => {
-      const text = typeof segment.text === 'string' ? segment.text : null;
+      let text = typeof segment.text === 'string' ? segment.text : null;
+      let nulSanitized = false;
+      if (text !== null && text.includes(' ')) {
+        text = text.replace(/ /g, '�');
+        nulSanitized = true;
+      }
       const classification = classifyEmbeddedInstructions(text ?? '');
       return {
         contractVersion: '1.0.0',
@@ -269,7 +370,9 @@ export class IngestionPipeline {
           extractor_version: segment.extraction.extractor_version,
           config_sha256: segment.extraction.config_sha256 ?? null,
           confidence: segment.extraction.confidence,
-          uncertainty_flags: segment.extraction.uncertainty_flags ?? [],
+          uncertainty_flags: nulSanitized && !(segment.extraction.uncertainty_flags ?? []).includes('UNDECODABLE_BYTES')
+            ? [...(segment.extraction.uncertainty_flags ?? []), 'UNDECODABLE_BYTES']
+            : (segment.extraction.uncertainty_flags ?? []),
           missing_ranges: segment.extraction.missing_ranges ?? [],
         },
         ...(segment.coverage ? { coverage: segment.coverage } : {}),
@@ -290,9 +393,16 @@ export class IngestionPipeline {
       return { terminal: 'QUARANTINED', error_code: 'QUARANTINED', snapshot_id: null, detail: 'ACL drift' };
     }
 
-    // COMMITTED — append-only writes in one critical section.
-    const dedup = decideDedup({
+    // COMMITTED — append-only writes in one critical section. Dedup is
+    // tenant/ACL-scoped: snapshots outside this descriptor's scope do not
+    // exist for the decision.
+    const dedup = await decideDedup({
       store: this.store,
+      viewer: {
+        tenant_id: descriptor.tenant_id,
+        workspace_id: descriptor.workspace_id,
+        principal_id: request.actor,
+      },
       candidate: {
         raw_sha256: rawSha256,
         normalized_sha256: normalizedSha256,
@@ -304,19 +414,20 @@ export class IngestionPipeline {
     });
 
     if (dedup.verdict === 'EXACT_DUPLICATE_RAW' || dedup.verdict === 'EXACT_DUPLICATE_NORMALIZED' || dedup.verdict === 'SAME_IDENTITY_SAME_VERSION') {
-      // Idempotent re-import or cross-channel duplicate: no new snapshot row.
+      // Idempotent re-import or in-scope cross-channel duplicate: no new
+      // snapshot row.
       if (dedup.upstream.canonical_locator === identity.canonical_locator) {
         const outcome = { terminal: 'COMMITTED', snapshot_id: dedup.upstream.snapshot_id, version: dedup.upstream.version, dedup: dedup.verdict, duplicate_of: dedup.upstream.snapshot_id };
         return outcome;
       }
     }
 
-    this.store.appendSnapshot(baseSnapshot);
-    this.store.appendSegments(snapshotId, segments);
+    await this.store.appendSnapshot(baseSnapshot);
+    await this.store.appendSegments(snapshotId, segments);
 
     if (dedup.upstream && dedup.upstream.canonical_locator !== identity.canonical_locator) {
       const lineage = lineageFromVerdict({ result: dedup, upstreamSnapshot: dedup.upstream, downstreamSnapshot: baseSnapshot, createdAt: observedAt });
-      if (lineage) this.store.appendLineage(lineage);
+      if (lineage) await this.store.appendLineage(lineage);
     }
 
     return { terminal: 'COMMITTED', snapshot_id: snapshotId, version, dedup: dedup.verdict, lineage: dedup.upstream && dedup.upstream.canonical_locator !== identity.canonical_locator };
@@ -324,15 +435,46 @@ export class IngestionPipeline {
 
   // Deleted-source handling: observeDeletion creates a tombstone version.
   // Prior snapshots and audit remain; the current pointer moves atomically.
-  async recordDeletion({ request, descriptor, reason, caseId = null }) {
+  async recordDeletion({ request, reason, caseId = null }) {
+    const shape = validateDeletionRequest(request);
+    if (!shape.valid) {
+      return this.#observe(caseId, { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: `invalid deletion request: ${shape.errors.join('; ').slice(0, 200)}` });
+    }
     const digest = requestDigest(request);
-    const begin = this.store.beginOperation(request.workspace_id, request.operation_id, digest);
+    let begin;
+    try {
+      begin = await this.store.beginOperation(request.workspace_id, request.operation_id, digest);
+    } catch (error) {
+      if (error?.name === 'DuplicateOperationError') {
+        return this.#observe(caseId, { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: 'operation id reused with a different request payload' });
+      }
+      throw error;
+    }
     if (begin.replay && begin.record.status !== 'INTENT') {
       return this.#observe(caseId, { ...begin.record.outcome, replayed: true });
     }
+    const descriptor = await this.#descriptorFor(request);
+    if (!descriptor || descriptor.__mismatch__) {
+      const outcome = { terminal: 'FAILED', error_code: 'NOT_FOUND', snapshot_id: null, detail: 'descriptor not registered' };
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      return this.#observe(caseId, outcome);
+    }
+    if (request.workspace_id !== descriptor.workspace_id && !(descriptor.classification.allowed_workspace_ids ?? []).includes(request.workspace_id)) {
+      const outcome = { terminal: 'ACCESS_DENIED', error_code: 'ACCESS_DENIED', snapshot_id: null, detail: 'deletion request outside the descriptor scope' };
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      return this.#observe(caseId, outcome);
+    }
+    if (descriptor.lifecycle?.state === 'tombstoned') {
+      // Idempotent re-observation of a deletion: the source is already
+      // tombstoned; return the current tombstone without a new append.
+      const current = await this.store.activeSnapshot(descriptor.canonical_locator);
+      const outcome = { terminal: 'TOMBSTONED', error_code: 'TOMBSTONED', snapshot_id: current.current?.snapshot_id ?? null, idempotent: true };
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      return this.#observe(caseId, outcome);
+    }
     try {
       const identity = { canonical_locator: request.identity?.canonical_locator ?? descriptor.canonical_locator, canonicalization_version: CANONICALIZATION_VERSION };
-      const prior = this.store.activeSnapshot(identity.canonical_locator);
+      const prior = await this.store.activeSnapshot(identity.canonical_locator);
       const version = (prior.current?.version ?? 0) + 1;
       const at = this.now();
       const tombstone = {
@@ -380,16 +522,37 @@ export class IngestionPipeline {
         },
       };
       assertValidContract('source-snapshot', tombstone);
-      this.store.appendSnapshot(tombstone);
-      this.store.tombstoneDescriptor(descriptor.source_id, reason, at);
+      await this.store.appendSnapshot(tombstone);
+      await this.store.tombstoneDescriptor(descriptor.source_id, reason, at);
       const outcome = { terminal: 'TOMBSTONED', error_code: 'TOMBSTONED', snapshot_id: tombstone.snapshot_id, version };
-      this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
       return this.#observe(caseId, outcome);
     } catch (error) {
       const outcome = { terminal: 'FAILED', error_code: 'MALFORMED_CONTENT', snapshot_id: null, detail: String(error?.message ?? error).slice(0, 256) };
-      this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
+      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
       return this.#observe(caseId, outcome);
     }
+  }
+}
+
+// Deletion requests reuse the fetch-request contract for identity/budget
+// fields; they carry no version selector.
+function validateDeletionRequest(request) {
+  const errors = [];
+  if (typeof request?.operation_id !== 'string' || !/^op-[a-z0-9][a-z0-9-]{0,62}$/.test(request.operation_id)) errors.push('operation_id');
+  if (typeof request?.source_id !== 'string' || !/^src-[a-z0-9][a-z0-9-]{0,62}$/.test(request.source_id)) errors.push('source_id');
+  if (typeof request?.workspace_id !== 'string' || !/^ws-[a-z0-9][a-z0-9-]{0,62}$/.test(request.workspace_id)) errors.push('workspace_id');
+  if (typeof request?.actor !== 'string' || !/^prn-[a-z0-9][a-z0-9-]{0,62}$/.test(request.actor)) errors.push('actor');
+  return { valid: errors.length === 0, errors };
+}
+
+function validateContract(name, data) {
+  try {
+    assertValidContract(name, data);
+    return { valid: true, errors: [] };
+  } catch (error) {
+    const messages = String(error?.message ?? error).replace(/^CONTRACT_INVALID [^:]+:\s*/, '');
+    return { valid: false, errors: [{ message: messages }] };
   }
 }
 

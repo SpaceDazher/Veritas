@@ -13,7 +13,7 @@ export const POSTGRES_IMAGE = 'docker.io/library/postgres@sha256:18cfe3ef5e68155
 const DISTRO = 'Ubuntu-24.04';
 const CONTAINER = 'veritas-postgres-smoke';
 
-function wsl(argv, { expected = 0, timeout = 30000 } = {}) {
+export function wsl(argv, { expected = 0, timeout = 30000 } = {}) {
   const result = spawnSync('wsl.exe', ['-d', DISTRO, '--', ...argv], {
     encoding: 'utf8', shell: false, timeout, windowsHide: true, maxBuffer: 1024 * 1024,
   });
@@ -28,7 +28,7 @@ function cleanupContainer() {
   ], { encoding: 'utf8', shell: false, timeout: 10000, windowsHide: true });
 }
 
-async function freePort() {
+export async function freePort() {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
     server.unref();
@@ -40,7 +40,7 @@ async function freePort() {
   });
 }
 
-async function waitForPostgres(connectionString) {
+export async function waitForPostgres(connectionString) {
   for (let attempt = 0; attempt < 60; attempt += 1) {
     const pool = new Pool({ connectionString, max: 1, connectionTimeoutMillis: 1000 });
     try {
@@ -66,10 +66,12 @@ export function verifyPostgresSmokeRecord(record) {
   if (record?.credentialsPersisted !== false || record?.hostPortExposedBeyondLoopback !== false) issues.push('secretsOrNetwork');
   if (record?.migrationCount >= 2) {
     // S2-003: the ingestion migration must be present, digest-bound and prove
-    // append-only enforcement plus per-workspace operation idempotency.
+    // the INTENT->terminal ledger transition, append-only enforcement and
+    // per-workspace operation idempotency.
     const ingestion = record?.migrationDigests?.find((m) => m.name === '0002_source_ingestion.sql');
     if (!ingestion || !/^[0-9a-f]{64}$/.test(ingestion.sha256 ?? '')) issues.push('ingestionMigration');
     if (record?.ingestionAppendOnlyRejected !== true) issues.push('ingestionAppendOnly');
+    if (record?.ingestionTransitionEnforced !== true) issues.push('ingestionTransition');
     if (record?.ingestionDuplicateOperationRejected !== true) issues.push('ingestionIdempotency');
     if (record?.ingestionTableCount !== 8) issues.push('ingestionTables');
   }
@@ -139,6 +141,7 @@ export async function runPostgresSmoke({ writeEvidence = true } = {}) {
       // S2-003 ingestion smoke: descriptor -> snapshot -> idempotency ledger,
       // then append-only enforcement and duplicate-operation rejection.
       let ingestionAppendOnlyRejected = false;
+      let ingestionTransitionEnforced = false;
       let ingestionDuplicateOperationRejected = false;
       let ingestionTableCount = 0;
       {
@@ -164,10 +167,21 @@ export async function runPostgresSmoke({ writeEvidence = true } = {}) {
              '{"spdx":"CC-BY-4.0","attribution_required":true}','{"policy":"keep_forever"}',
              '{"operation_id":"op-smoke-1","connector_id":"conn-manual-export","connector_version":"1.0.0","fetched_from":"smoke","fetched_at":"2026-01-01T00:00:00.000Z","content_type_validated":true}')`,
         );
+        // The ledger lifecycle: insert as INTENT, transition once to a
+        // terminal status; the server-side trigger rejects any further change.
         await pool.query(
-          `INSERT INTO ingestion_operation(workspace_id, operation_id, request_hash, status, outcome)
-           VALUES ('ws-smoke','op-smoke-1', repeat('a',64),'COMMITTED','{"terminal":"COMMITTED"}')`,
+          "INSERT INTO ingestion_operation(workspace_id, operation_id, request_hash) VALUES ('ws-smoke','op-smoke-1', repeat('a',64))",
         );
+        await pool.query(
+          "UPDATE ingestion_operation SET status = 'COMMITTED', outcome = '{\"terminal\":\"COMMITTED\"}'::jsonb WHERE workspace_id = 'ws-smoke' AND operation_id = 'op-smoke-1'",
+        );
+        try {
+          await pool.query(
+            "UPDATE ingestion_operation SET status = 'FAILED' WHERE workspace_id = 'ws-smoke' AND operation_id = 'op-smoke-1'",
+          );
+        } catch (error) {
+          ingestionTransitionEnforced = /OPERATION_ALREADY_TERMINAL/.test(String(error?.message ?? ''));
+        }
         try {
           await pool.query("UPDATE source_snapshot SET size_bytes = 99 WHERE snapshot_id = 'snp-smoke0000000001'");
         } catch (error) {
@@ -175,7 +189,7 @@ export async function runPostgresSmoke({ writeEvidence = true } = {}) {
         }
         try {
           await pool.query(
-            "INSERT INTO ingestion_operation(workspace_id, operation_id, request_hash, status) VALUES ('ws-smoke','op-smoke-1', repeat('b',64),'COMMITTED')",
+            "INSERT INTO ingestion_operation(workspace_id, operation_id, request_hash) VALUES ('ws-smoke','op-smoke-1', repeat('b',64))",
           );
         } catch (error) {
           ingestionDuplicateOperationRejected = error?.code === '23505';
@@ -193,7 +207,7 @@ export async function runPostgresSmoke({ writeEvidence = true } = {}) {
         migrationCount: migration.migrations.length, migrationDigests: migration.migrations,
         tableCount: counts.rows[0].tables, taskCount: counts.rows[0].tasks, eventCount: counts.rows[0].events,
         transactionCommitted: true, duplicateOperationRejected,
-        ingestionAppendOnlyRejected, ingestionDuplicateOperationRejected, ingestionTableCount,
+        ingestionAppendOnlyRejected, ingestionTransitionEnforced, ingestionDuplicateOperationRejected, ingestionTableCount,
         credentialsPersisted: false, hostPortExposedBeyondLoopback: false,
         cleanupVerified: false,
         scope: 'Ephemeral loopback-only PostgreSQL workspace smoke; tmpfs data and random runtime credentials',

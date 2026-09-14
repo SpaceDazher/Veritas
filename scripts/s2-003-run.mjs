@@ -29,7 +29,7 @@ import {
 import { connectorError, UnknownOutcomeError } from '../src/lib/ingestion/connectors/base.mjs';
 import { createDecisionClock } from '../src/lib/ingestion/time-model.mjs';
 import { contractDigests } from '../src/lib/ingestion/contract-registry.mjs';
-import { publicEvidenceView } from '../src/lib/ingestion/export-policy.mjs';
+import { publicEvidenceView, publicEvidenceViewAsync } from '../src/lib/ingestion/export-policy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sha256Hex = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -121,7 +121,7 @@ function gitHead() {
   }
 }
 
-export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow = DEFAULT_CLOCK, manifestPath = 'corpus/s2-003/manifest.json' } = {}) {
+export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow = DEFAULT_CLOCK, manifestPath = 'corpus/s2-003/manifest.json', store: injectedStore = null } = {}) {
   const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, manifestPath), 'utf8'));
   const frozen = verifyFrozenManifest({
     manifest,
@@ -141,7 +141,7 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
     };
   }
 
-  const store = new IngestionStore();
+  const store = injectedStore ?? new IngestionStore();
   const clock = createDecisionClock(clockNow);
   let privateLeakCounter = 0;
   let authorityExpansionCounter = 0;
@@ -221,8 +221,8 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
     const forced = forcedByKey.get(kind);
     const pipeline = pipelineByKind.get(kind);
 
-    store.registerDescriptor(testCase.descriptor);
-    if (testCase.second_descriptor) store.registerDescriptor(testCase.second_descriptor);
+    await store.registerDescriptor(testCase.descriptor);
+    if (testCase.second_descriptor) await store.registerDescriptor(testCase.second_descriptor);
 
     // Register fixtures for this case.
     for (const [fixtureId, payload] of Object.entries(testCase.fixtures ?? {})) {
@@ -271,14 +271,17 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
       if (operation.type === 'record_deletion') {
         const outcome = await pipeline.recordDeletion({
           request: {
+            contractVersion: '1.0.0',
             operation_id: operation.operation_id,
             source_id: testCase.descriptor.source_id,
+            connector_id: testCase.descriptor.connector_id,
+            actor: 'prn-corpus-reviewer',
             locator: operation.locator,
             workspace_id: operation.workspace_id ?? 'ws-corpus',
             budget: { max_bytes: 1000000, time_limit_ms: 30000 },
             requested_at: clockNow,
           },
-          descriptor: store.getDescriptor(testCase.descriptor.source_id),
+          descriptor: await store.getDescriptor(testCase.descriptor.source_id),
           reason: operation.reason,
           caseId,
         });
@@ -289,19 +292,26 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
       }
 
       if (operation.type === 'public_evidence_check') {
-        const view = publicEvidenceView({ store, snapshotId: lastSnapshotId });
-        const contentFree = view.content_included === false && view.segments.length === 0;
-        if (!contentFree) privateLeakCounter += 1;
-        terminals.push(contentFree ? 'COMMITTED' : 'FAILED');
+        try {
+          const view = await publicEvidenceViewAsync({ store, snapshotId: lastSnapshotId });
+          const contentFree = view.content_included === false && view.segments.length === 0;
+          if (!contentFree) privateLeakCounter += 1;
+          terminals.push(contentFree ? 'COMMITTED' : 'FAILED');
+        } catch (error) {
+          terminals.push('FAILED');
+        }
         continue;
       }
 
       const effectiveOperationId = replayKeyByOp.get(operation.operation_id) ?? operation.operation_id;
-      const descriptorForOp = store.getDescriptor(operation.source_id ?? testCase.descriptor.source_id) ?? testCase.descriptor;
+      const descriptorForOp = (await store.getDescriptor(operation.source_id ?? testCase.descriptor.source_id)) ?? testCase.descriptor;
       const outcome = await pipeline.ingest({
         request: {
+          contractVersion: '1.0.0',
           operation_id: effectiveOperationId,
           source_id: descriptorForOp.source_id,
+          connector_id: descriptorForOp.connector_id,
+          actor: 'prn-corpus-reviewer',
           locator: operation.locator,
           workspace_id: operation.workspace_id ?? 'ws-corpus',
           version_selector: { latest: true },
@@ -310,7 +320,6 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
           requested_at: clockNow,
           claimed: operation.claimed ?? null,
         },
-        descriptor: descriptorForOp,
         caseId,
       });
       if (process.env.VERITAS_DEBUG_DUMP && caseId === 'gold-web') { const snp2 = outcome.snapshot_id ? store.getSnapshot(outcome.snapshot_id) : null; console.error('DUMP ' + JSON.stringify({ outcome, snap: snp2 && { id: snp2.snapshot_id, raw: String(snp2.raw_sha256).slice(0, 16), v: snp2.version } })); }
@@ -341,31 +350,9 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
 
   fs.rmSync(markdownRoot, { recursive: true, force: true });
 
-  // Hard integrity counters (§13). Computed from the store itself, not from
-  // narrative claims.
-  const contentSnapshots = [...store.snapshots.values()].filter((s) => s.snapshot_kind === 'content');
-  const provenanceComplete = contentSnapshots.filter((s) => {
-    const p = s.fetch_provenance ?? {};
-    return Boolean(p.operation_id && p.connector_id && p.connector_version && p.fetched_from && p.fetched_at)
-      && Boolean(s.acl?.visibility && s.license?.spdx && s.retention?.policy);
-  }).length;
-  const commitEvents = store.events.filter((e) => e.type === 'SNAPSHOT_COMMITTED');
-  const commitsPerSnapshot = new Map();
-  for (const event of commitEvents) {
-    commitsPerSnapshot.set(event.snapshot_id, (commitsPerSnapshot.get(event.snapshot_id) ?? 0) + 1);
-  }
-  const flaggedSegments = [...store.segments.values()].flat().filter((s) => s.embedded_instruction_classification?.present === true).length;
-  const integrity = {
-    snapshots_total: store.snapshots.size,
-    provenance_complete_pct: contentSnapshots.length === 0 ? 0 : Math.round((provenanceComplete / contentSnapshots.length) * 100),
-    committed_operations: [...store.operations.values()].filter((o) => o.status === 'COMMITTED').length,
-    operations_stuck_intent: [...store.operations.values()].filter((o) => o.status === 'INTENT').length,
-    duplicate_committed_snapshots: [...commitsPerSnapshot.values()].reduce((sum, n) => sum + (n > 1 ? n - 1 : 0), 0),
-    committed_without_snapshot: outcomes.filter((o) => o.terminal === 'COMMITTED' && !o.snapshot_id).length,
-    private_exports_leaked: privateLeakCounter,
-    authority_expansions: authorityExpansionCounter,
-    instruction_flagged_segments: flaggedSegments,
-  };
+  // Hard integrity counters (§13), computed by the store itself — in-memory
+  // or PostgreSQL-backed — never from narrative claims.
+  const integrity = await store.integritySummary({ outcomes, privateLeakCounter, authorityExpansionCounter });
 
   const counts = {
     total: outcomes.length,
@@ -380,13 +367,6 @@ export async function runCorpus({ runId, executorId, nonce, outputRoot, clockNow
   };
 
   const head = gitHead();
-  // Descriptors are configuration: an ingestion run may only tombstone them,
-  // never re-scope their classification. Any drift counts as an authority
-  // expansion driven by content.
-  for (const descriptor of [...store.descriptors.values()]) {
-    if (descriptor.lifecycle?.state === 'tombstoned') continue;
-    if (!descriptor.classification?.visibility) authorityExpansionCounter += 1;
-  }
   const run = {
     contractVersion: '1.0.0',
     run_id: runId,

@@ -81,7 +81,7 @@ const GOLD = [
   ['gold-manual', 'manual_export', 'export/gold-manual', 'Manually exported note with two paragraphs.\n\nSecond paragraph.', {}],
 ];
 for (const [id, kind, locator, text, overrides] of GOLD) {
-  const exportId = locator.startsWith('export/') || locator === 'note.md' ? fixture(locator, text) : fixture(`case-fixture/${id}`, text);
+  const exportId = locator.startsWith('export/') || locator === 'note.md' || locator.startsWith('https://') ? fixture(locator, text) : fixture(`case-fixture/${id}`, text);
   addCase(id, 'gold_import', kind, {
     descriptor: descriptor({
       source_id: `src-${id.replace(/-/g, '')}`,
@@ -265,7 +265,9 @@ for (const [id, text] of DUP_BODIES) {
     const isEmpty = text === '';
     const fx = kind === 'markdown_obsidian'
       ? fixture(`note-${id}.md`, text)
-      : fixture(`case-fixture/${id}`, text);
+      : kind === 'web_url'
+        ? fixture(`https://corpus.fixture/${id}`, text)
+        : fixture(`case-fixture/${id}`, text);
     addCase(id, 'malformed_partial', kind, {
       descriptor: descriptor({ source_id: `src-${id.replace(/-/g, '')}`, source_kind: kind, canonical_locator: kind === 'markdown_obsidian' ? `obsidian:note-${id}.md` : `manual:export/case-fixture/${id}` }),
       fixtures: { [fx]: text },

@@ -18,7 +18,7 @@
   },
   "caseSha256": {
     "gold-markdown": "26def443280efe3d640eccd7e2a2932ef8ffab132a6b007ef9e182ad110eb144",
-    "gold-web": "d34c5c9daa25f7bd1a07d496616c015512bcb2890d1f49b17ad0a82f52cad031",
+    "gold-web": "3437ef399f8eceeb5aca302f07791a316613f1edd042decb7b342aad75bb8f19",
     "gold-pdf-bytes": "8b97160ca627152008262d24525a270179ed87804b313510124f72b7aab5ae98",
     "gold-github-fixture": "a6e5d1ff739776a5505d56eb2d33b0e5296dae43f78134129265ba488c30ff95",
     "gold-telegram-fixture": "4ae9360734f0b6c58f8bc3c3edac53eac5a695c18987dcf1c5b2eefff8ea11cf",
@@ -56,7 +56,7 @@
     "malformed-broken-frontmatter": "dffde84422ef5bfd7161045ec81a92c3961b4133b8c398b41455d974f53e45ad",
     "malformed-invalid-utf8": "bc5465fd91390d9bd7d4e784d3fa516d7b10e42c6592088f48feef7baf44cc7b",
     "malformed-huge-line": "0e2d64aa6cb50102caa4148d759aa860108687f7e380a6e36c1338ed7b519b80",
-    "malformed-html-garbage": "514a886c551f9444eab260da7e896f8860b65784637955649561cac1864e2290",
+    "malformed-html-garbage": "64752e6610ca1e83860c4f260853ef13c4cd79c80448e9fef9c80955683a9ccd",
     "malformed-json-transcript": "5f325f202370fe7ed50e4cf598434137d587b33ad640651530d931db8d7ddb78",
     "malformed-null-bytes-pdf": "e827636f199dd048c6fcb7a966f97b6959efcc323cfac631c472c8afde36b22c",
     "unavailable-not-found": "564c8583a649b3083e2dfebcd102d18d4dfe8e53956aa751d397ac7559f563a0",
@@ -96,7 +96,7 @@
     "connector-contract.schema.json": "8535b35b6e4c708f198551285a0acc94efccd6bb9702d6e26ff575523981fd17",
     "connector-error.schema.json": "d10cafb7f940b3b301484e3d2df9b844b875c386a4d92587f8f7180f96a19de2",
     "content-segment.schema.json": "b6f8aac5e538315147c8ea1c0e265c75a0995d30accc4de46b7c714e85e2706e",
-    "fetch-request.schema.json": "cf23ed91d18857e18fc33dbcb71aff799f1700b0073badc6a3b8db798903227d",
+    "fetch-request.schema.json": "e1c219a7226a01666793536f2b8e3684350c945acd0e814954cbf66e88c4816e",
     "ingestion-run.schema.json": "37704c2f362361b9f053debb16a1fc46287377d106e0ebdd02d567f3f58e1bae",
     "source-descriptor.schema.json": "74bf15ee4c9ff2999779edf596272713456004251dc599ede1ca446b24d8fc2d",
     "source-lineage.schema.json": "f85e099dde96885bdaa97e07ae3adc835003ca7cf82326777eb8b8741b64e3f5",
@@ -105,7 +105,7 @@
   },
   "evaluator": {
     "runner": "scripts/s2-003-run.mjs",
-    "sha256": "b94b022bc9b8d8b8bdd3902c5500efcb35902aaae55eb8328045f521918ac23b"
+    "sha256": "4b970e54ee3b2d693219ac5cc3a1614af7a331abebeda4ce52ee55e02fb44ea0"
   },
   "fixturesAreSynthetic": true,
   "privateSourceBytesCommitted": false

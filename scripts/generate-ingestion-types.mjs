@@ -117,7 +117,7 @@ export function generateTypes() {
 }
 
 function main() {
-  const output = `${generateTypes()}\n`;
+  const output = `${generateTypes().replace(/\s+$/, '\n')}`;
   if (process.argv.includes('--write')) {
     fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
     fs.writeFileSync(OUT_FILE, output);

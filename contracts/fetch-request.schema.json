@@ -10,8 +10,9 @@
     "operation_id",
     "source_id",
     "connector_id",
-    "version_selector",
     "actor",
+    "locator",
+    "version_selector",
     "workspace_id",
     "budget",
     "requested_at"
@@ -35,6 +36,42 @@
       }
     },
     "actor": { "$ref": "#/$defs/principalId" },
+    "locator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "description": "Connector-facing locator of the version to fetch (vault-relative path, export id, URL, provider identity string)."
+    },
+    "claimed": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Caller-forwarded source claims; stored as claims only and never endorsed.",
+          "properties": {
+            "published_at": { "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }] },
+            "event_time": { "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }] },
+            "language": {
+              "oneOf": [{ "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$" }, { "type": "null" }]
+            }
+          }
+        }
+      ]
+    },
+    "identity": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Optional provider-canonical identity overrides resolved by the connector.",
+          "properties": {
+            "canonical_locator": { "type": "string", "minLength": 1, "maxLength": 2048 }
+          }
+        }
+      ]
+    },
     "workspace_id": { "$ref": "#/$defs/workspaceId" },
     "grant_id": {
       "oneOf": [{ "type": "string", "pattern": "^grt-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }]

@@ -90,6 +90,15 @@ export interface FetchRequest {
     upstream_version?: string;
   };
   actor: FetchRequestPrincipalId;
+  locator: string;
+  claimed?: null | {
+    published_at?: FetchRequestUtcTimestamp | null;
+    event_time?: FetchRequestUtcTimestamp | null;
+    language?: string | null;
+  };
+  identity?: null | {
+    canonical_locator?: string;
+  };
   workspace_id: FetchRequestWorkspaceId;
   grant_id?: string | null;
   lease_id?: string | null;
@@ -344,4 +353,3 @@ export type ConnectorErrorSha256Hex = string;
 export type ConnectorErrorConnectorId = string;
 export type ConnectorErrorSourceId = string;
 export type ConnectorErrorConnectorErrorCode = "BLOCKED_CONNECTOR" | "ACCESS_DENIED" | "NOT_FOUND" | "TOMBSTONED" | "RATE_LIMITED" | "TIMEOUT" | "MALFORMED_CONTENT" | "UNSUPPORTED_FORMAT" | "LICENSE_UNKNOWN" | "RETENTION_BLOCKED" | "QUARANTINED" | "UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED";
-

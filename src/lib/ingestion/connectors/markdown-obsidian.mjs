@@ -19,7 +19,8 @@ const ALLOWED_EXTENSIONS = new Set(['.md', '.markdown', '.mdx', '.txt']);
 export class MarkdownObsidianConnector {
   constructor({ vaultRoot, clock }) {
     if (typeof vaultRoot !== 'string' || vaultRoot.length === 0) throw new Error('VAULT_ROOT_REQUIRED');
-    this.vaultRoot = path.resolve(vaultRoot);
+    this.vaultRoot = fs.realpathSync(path.resolve(vaultRoot));
+    this.realVaultRoot = this.vaultRoot;
     this.clock = clock;
     this.id = MARKDOWN_OBSIDIAN_CONNECTOR_ID;
     this.version = MARKDOWN_OBSIDIAN_CONNECTOR_VERSION;
@@ -47,19 +48,34 @@ export class MarkdownObsidianConnector {
   }
 
   // Vault-relative path only; traversal outside the root is rejected.
-  #safeResolve(vaultRelativePath) {
+  // #safeResolveInfo returns { absolute, realpath } or null when missing.
+  // Both the lexical path AND the realpath (symlink/junction target) must
+  // stay inside the vault: readFileSync follows links, so the lexical check
+  // alone is not enough.
+  #safeResolveInfo(vaultRelativePath) {
     const normalized = String(vaultRelativePath).replace(/\\/g, '/');
     if (normalized.split('/').includes('..')) throw new Error('VAULT_PATH_TRAVERSAL');
     const absolute = path.resolve(this.vaultRoot, normalized);
     if (!absolute.startsWith(this.vaultRoot + path.sep) && absolute !== this.vaultRoot) {
       throw new Error('VAULT_PATH_ESCAPE');
     }
-    return absolute;
+    let realpath = null;
+    try {
+      realpath = fs.realpathSync(absolute);
+    } catch (error) {
+      if (error?.code === 'ENOENT') return { absolute, realpath: null };
+      throw error;
+    }
+    const realRoot = this.realVaultRoot;
+    if (realpath !== realRoot && !realpath.startsWith(realRoot + path.sep)) {
+      throw new Error('VAULT_PATH_SYMLINK_ESCAPE');
+    }
+    return { absolute, realpath };
   }
 
   async resolveDescriptor(request) {
-    const absolute = this.#safeResolve(request.locator);
-    const relative = path.relative(this.vaultRoot, absolute).split(path.sep).join('/');
+    const info = this.#safeResolveInfo(request.locator);
+    const relative = path.relative(this.vaultRoot, info.absolute).split(path.sep).join('/');
     const identity = canonicalIdentity('markdown_obsidian', { vault_relative_path: relative });
     return {
       source_kind: 'markdown_obsidian',
@@ -72,7 +88,16 @@ export class MarkdownObsidianConnector {
   // Returns raw bytes + metadata, or a normalized connector error.
   async fetchVersion(request) {
     try {
-      const absolute = this.#safeResolve(request.locator);
+      const info = this.#safeResolveInfo(request.locator);
+      if (info.realpath === null) {
+        return connectorError('NOT_FOUND', {
+          operationId: request.operation_id,
+          connectorId: this.id,
+          reconciliationAction: 'probe_source',
+          detail: `vault entry ${request.locator} does not exist`,
+        });
+      }
+      const absolute = info.absolute;
       const extension = path.extname(absolute).toLowerCase();
       if (!ALLOWED_EXTENSIONS.has(extension)) {
         return connectorError('UNSUPPORTED_FORMAT', {
@@ -144,8 +169,8 @@ export class MarkdownObsidianConnector {
 
   async observeDeletion(sourceId, locator) {
     try {
-      const absolute = this.#safeResolve(locator);
-      return { deleted: !fs.existsSync(absolute) };
+      const info = this.#safeResolveInfo(locator);
+      return { deleted: info.realpath === null };
     } catch {
       return { deleted: false };
     }

@@ -13,7 +13,7 @@
     },
     {
       "name": "0002_source_ingestion.sql",
-      "sha256": "4b5408f3d5b961c91d934745b16d966bf6b66220ed0f3276e073d318668c0cf0"
+      "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
     }
   ],
   "tableCount": 3,
@@ -22,6 +22,7 @@
   "transactionCommitted": true,
   "duplicateOperationRejected": true,
   "ingestionAppendOnlyRejected": true,
+  "ingestionTransitionEnforced": true,
   "ingestionDuplicateOperationRejected": true,
   "ingestionTableCount": 8,
   "credentialsPersisted": false,

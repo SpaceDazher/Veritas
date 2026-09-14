@@ -103,6 +103,7 @@ try {
     run('s2-003-ingestion-tests', NPM, ['run', 'test:ingestion'], {env: npmEnv});
     run('s2-003-security-probes', NPM, ['run', 'test:s2-003-security-probes'], {env: npmEnv});
     run('s2-003-replay', NPM, ['run', 'verify:s2-003'], {env: npmEnv});
+    run('s2-003-db-replay', NPM, ['run', 'verify:s2-003-db-replay'], {env: npmEnv});
     run('s2-002-replay', NPM, ['run', 'verify:s2-002'], {env: npmEnv});
     run('typecheck', NPM, ['run', 'typecheck'], {env: npmEnv});
     run('lint', NPM, ['run', 'lint'], {env: npmEnv});

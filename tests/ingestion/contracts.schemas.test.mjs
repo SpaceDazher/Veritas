@@ -62,6 +62,7 @@ export const fixtures = {
     connector_id: 'conn-manual-export',
     version_selector: { latest: true },
     actor: 'prn-human-reviewer',
+    locator: 'export/note-001',
     workspace_id: 'ws-ingestion',
     grant_id: null,
     lease_id: null,

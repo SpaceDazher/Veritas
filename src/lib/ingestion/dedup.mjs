@@ -9,6 +9,7 @@
 // deletes, merges or supersedes snapshots.
 import { createHash } from 'node:crypto';
 import { lineageId } from './time-model.mjs';
+import { viewerCanRead } from './export-policy.mjs';
 
 export const DEDUP_VERDICTS = Object.freeze({
   EXACT_DUPLICATE_RAW: 'EXACT_DUPLICATE_RAW',
@@ -39,8 +40,22 @@ export function sha256Hex(bytesOrText) {
 // Staged decision for a candidate against all known snapshots of the store.
 // Comparison order matters and is stable: exact raw, then exact normalized,
 // then canonical identity, then the advisory classifier.
-export function decideDedup({ store, candidate, classifier }) {
-  const all = [...store.snapshots.values()].filter((s) => s.snapshot_kind === 'content');
+//
+// Dedup is strictly tenant/ACL-scoped: `viewer` (tenant, workspace,
+// principal of the requesting descriptor) determines which existing
+// snapshots are even visible. Snapshots from another tenant or outside the
+// viewer's ACL are excluded from every stage — cross-tenant duplicates can
+// never return someone else's snapshot id and never create cross-tenant
+// lineage.
+export async function decideDedup({ store, viewer, candidate, classifier }) {
+  if (!viewer || typeof viewer.tenant_id !== 'string') {
+    throw new Error('DEDUP_SCOPE_REQUIRED: viewer.tenant_id is mandatory');
+  }
+  const all = (typeof store.allSnapshots === 'function'
+    ? await store.allSnapshots()
+    : [...store.snapshots.values()])
+    .filter((s) => s.snapshot_kind === 'content')
+    .filter((s) => s.acl?.tenant_id === viewer.tenant_id && viewerCanRead(s, viewer));
 
   for (const existing of all) {
     if (existing.raw_sha256 === candidate.raw_sha256) {
