@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "4075e27a3496dca6375c4452b86ad26f16ccec1a",
-  "sourceTree": "4965a0edfb635c5f029f2cb7bb3df119e59cdeb5",
-  "trackedFileCount": 273,
-  "manifestFileCount": 269,
-  "payloadManifestSha256": "4399ea654f9f89615f657b23fa2effc3486ec5ba6f987daacece0fe9e5729ae4",
-  "fileManifestSha256": "d2f02cc06652cec305f0812ff66f66ec0f0ad2263892eb1b19bf9a7739fd2947",
+  "sourceCommit": "9c3fc723fb80dea8c042d72d7b89d8bfb155a95f",
+  "sourceTree": "ad0b3279ae3559681f58a8a49e7c7e8ae8dde0cb",
+  "trackedFileCount": 274,
+  "manifestFileCount": 270,
+  "payloadManifestSha256": "0431af9abd85e23145f53643a88e29b34c829c2b34d18fa06bc009c81bc7c26b",
+  "fileManifestSha256": "2783fe39d77974b6b9db591d1848f0d2838c8e95c09bfe99f7bc469b0a637434",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -536,6 +536,11 @@
       "bytes": 8957
     },
     {
+      "path": "dbg16.tmp.mjs",
+      "sha256": "456dd96686fa2e31179841f46f41948c5a5c8a28137a35787e5ba6cb4cd20e55",
+      "bytes": 3541
+    },
+    {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
       "sha256": "fd48bbfc30673e51c880f8f105ad9300a39be9e94d9244237af771f506452b34",
       "bytes": 3980
@@ -682,12 +687,12 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "307c53bc241c89be23994b25b4c96a4d0cf5e45b3b672deb298dc155edffc8dc",
-      "bytes": 11563
+      "sha256": "b85c84db30f4095fc89ead6d2781cb848d8e33742cb57a3ae0156e8b339543a4",
+      "bytes": 11581
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "3f0745a014ebabec0344560f718956b91a859a0faa4f208cdcd36947e0940741",
+      "sha256": "fcb6bfdb891bcf47419336111f7e466eab1f7321e5ab675669d7b8ee28b9effd",
       "bytes": 23166
     },
     {
@@ -757,22 +762,22 @@
     },
     {
       "path": "evidence/s2-003-comparison.json",
-      "sha256": "623373dcd42c1a85ca1ceba04e9280026e8ffaaea2bf4c70bb7e53c8499c421c",
-      "bytes": 1735
+      "sha256": "3f53737224802459cf651d231741d6bc21d2717a9108328d22b46bd24aef372b",
+      "bytes": 1884
     },
     {
       "path": "evidence/s2-003-db-comparison.json",
-      "sha256": "40102a61a9c883d106779eb7a706f4f6a85009e123edb89cdad2ee99670fbc77",
-      "bytes": 2598
+      "sha256": "92255110ed64ce7fb2063af019f7cfa7f9fd2d0238d74041922560976073fdbc",
+      "bytes": 2747
     },
     {
       "path": "evidence/s2-003-db-run-a.json",
-      "sha256": "cf7564748863b6c2e52093407ff8f796d2c48258d4429ca5aa281afe3fda8230",
+      "sha256": "436ab8fe42468dbc924fd0959a67f7793210b04d97ab984d786bcf0e137e90b2",
       "bytes": 57272
     },
     {
       "path": "evidence/s2-003-db-run-b.json",
-      "sha256": "7459ca593309254890938812b24f7eae705daf3c41945018d0d11a3ecae45a06",
+      "sha256": "7d057994808bc3aefaf0a4fe6aed1350129618b1cd26e8c4b8a70d4fb733e15d",
       "bytes": 57272
     },
     {
@@ -782,12 +787,12 @@
     },
     {
       "path": "evidence/s2-003-run-a.json",
-      "sha256": "df4d744247f2e725f2ed8bc298c2e76d900a8637b0d96f52b6b1f597ffcc6fe0",
+      "sha256": "3ace8e2fdd44a7297d5cb83ea01b1a261aae407cd2264dc2c1ba00306f9bfd18",
       "bytes": 57243
     },
     {
       "path": "evidence/s2-003-run-b.json",
-      "sha256": "9df4294e65cee163a37be1398567d9714d37e8a4e4a7b8963df51abb1d6e1d4a",
+      "sha256": "828bb956597686203c76303a7830c32d546a1b8da6dddb295ac2fcb14b65521a",
       "bytes": 57243
     },
     {
@@ -987,8 +992,8 @@
     },
     {
       "path": "scripts/s2-003-db-replay.mjs",
-      "sha256": "276f75d83b99e929a0291c7627056ba9a4438ac81a28007471879e3fd9e26d0d",
-      "bytes": 8023
+      "sha256": "82d6d93361a856f3703f3b046f29ca4a629f2bf297f67d828ed858f5344279e8",
+      "bytes": 8707
     },
     {
       "path": "scripts/s2-003-run.mjs",
@@ -1022,8 +1027,8 @@
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
-      "sha256": "b98ed15f9e644d1b372292caf2482794eaecf0f83a85e6970609e3d52af8f284",
-      "bytes": 7996
+      "sha256": "102756a857ef473c707a0d1cc3ebc627c55c472d6240f910361bebc46fe92843",
+      "bytes": 8397
     },
     {
       "path": "scripts/verify-gvisor-sandbox.mjs",
@@ -1062,8 +1067,8 @@
     },
     {
       "path": "scripts/verify-s2-003.mjs",
-      "sha256": "2926a5415cd4c641d97222f0a69fff12687ae83b894b5f92162f3ec4934bcce8",
-      "bytes": 11450
+      "sha256": "86bda16bcef176dffa36ca9e870e60a9281b43636310043d17e3ccc7f2e19f02",
+      "bytes": 12443
     },
     {
       "path": "scripts/verify.mjs",
@@ -1192,8 +1197,8 @@
     },
     {
       "path": "src/lib/ingestion/connectors/http-snapshot.mjs",
-      "sha256": "5456264167f6ed67fe489772d88639b4a3c4ae3449aaf9b265f5b28b10efcddc",
-      "bytes": 22020
+      "sha256": "01741d24431f358aa92b7bb86afd6fa4de5f5fccf59b069597bed9a30a942ebe",
+      "bytes": 22023
     },
     {
       "path": "src/lib/ingestion/connectors/manual-export.mjs",
@@ -1227,18 +1232,18 @@
     },
     {
       "path": "src/lib/ingestion/pipeline.mjs",
-      "sha256": "e7c56f88a8347d7036964a65be6772af1471d6ffc0c3f81b3ff068738a490818",
-      "bytes": 30137
+      "sha256": "4afa74a60c3380860144e0695504601ec8703f09cdd2ae373d222efd2c2a4c08",
+      "bytes": 30767
     },
     {
       "path": "src/lib/ingestion/postgres-store.mjs",
-      "sha256": "dd33bfd5335a878cee738343e4a131cadb84b458a1a1e12c951ca1f4aa05fc87",
-      "bytes": 21487
+      "sha256": "c85db96722decf3c5785b9d78e7998a8e5bacbd29bba8436a58378db527ff743",
+      "bytes": 23213
     },
     {
       "path": "src/lib/ingestion/store.mjs",
-      "sha256": "159826c9883d473582d6e51bbd4489a4bebbd78a12001d52c1545c178c85118f",
-      "bytes": 11481
+      "sha256": "ab480b1d6f063be0dc4eb6ccf3843f3f398bb1be883af7e8b54aa3867eb9fb5a",
+      "bytes": 12562
     },
     {
       "path": "src/lib/ingestion/time-model.mjs",
@@ -1347,8 +1352,8 @@
     },
     {
       "path": "tests/ingestion/security-hardening.test.mjs",
-      "sha256": "c55d07ef654a746cd8b45713debdfeb804967ec73310ad62a615d4a005744244",
-      "bytes": 19772
+      "sha256": "7b96377b5bea81dc4d142406e128e7824e23d890144fb7cfb9851d6bffcc8f88",
+      "bytes": 23624
     },
     {
       "path": "tests/ingestion/time-model.test.mjs",
