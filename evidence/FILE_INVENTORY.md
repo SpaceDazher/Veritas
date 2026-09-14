@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 273.
+Generated from `git ls-files`; count: 274.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -107,6 +107,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-003/cases/unavailable-upstream-500.json`
 - `corpus/s2-003/cases/unknown-then-different-operation-commits.json`
 - `corpus/s2-003/manifest.json`
+- `dbg16.tmp.mjs`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
