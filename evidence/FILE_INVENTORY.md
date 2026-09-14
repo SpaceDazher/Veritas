@@ -107,7 +107,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-003/cases/unavailable-upstream-500.json`
 - `corpus/s2-003/cases/unknown-then-different-operation-commits.json`
 - `corpus/s2-003/manifest.json`
-- `dbg16.tmp.mjs`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -276,4 +275,5 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/run-determinism.test.mjs`
 - `tests/ingestion/security-hardening.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
+- `tests/ingestion/transactional-audit.test.mjs`
 - `tsconfig.json`

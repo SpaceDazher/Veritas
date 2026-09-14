@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "46a2c9708b91a1996115a2cf6a3d8008bfb3f002",
+  "testedImplementationCommit": "90781c723192528258c471e1a0423625170f4d16",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "46a2c9708b91a1996115a2cf6a3d8008bfb3f002",
-  "sourceTree": "c3e8418dde80b964bf41ed7a4dc107e765bee80e",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "90781c723192528258c471e1a0423625170f4d16",
+  "sourceTree": "cf5a8c94143a1a5ee7d2a8838c61ec3bc78cc4db",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -35,14 +35,16 @@
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "{\r\n      path: 'corpus/s2-003/cases/time-published-claim-preserved.json',\r\n      sha256: '290a149668fbeb86a939924cdc1f1f36a5fd3d84aba7d3ce2e583a3704ff0242',\r\n      bytes: 1520\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/translation-declared.json',\r\n      sha256: '1a21ee67cd09631d774028f595acdce6a6761050cd13f3ab055812d83413c423',\r\n      bytes: 2838\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/unavailable-access-denied.json',\r\n      sha256: 'c60c35ef6126d26a2205e714da8d9bfd810466c8d9b897b687eaeb0bf301f472',\r\n      bytes: 1506\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/unavailable-connector-blocked.json',\r\n      sha256: '2d948041bcbd3f0109b9f8a5d3b14aede319570bb6cbcb12c43a71c23ce8449a',\r\n      bytes: 1542\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/unavailable-not-found.json',\r\n      sha256: '564c8583a649b3083e2dfebcd102d18d4dfe8e53956aa751d397ac7559f563a0',\r\n      bytes: 1467\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/unavailable-rate-limited.json',\r\n      sha256: '997473bf2080c84298ef85baee12acd9b7adeeb89d6f89f1b43cfbb61e50626c',\r\n      bytes: 1491\r\n    },\r\n    ... 170 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "s.test.mjs': '98ca877ea9b5c4ed15a620e8c897a22d2dc3a58ba6fe389dca65019ad316b438',\r\n    'tests/ingestion/contracts.schemas.test.mjs': '3f5caca544417d69dbcad6c21837fd2fbeaaf22fa907a22778b4f7bce1696a11',\r\n    'tests/ingestion/contracts.types.test.mjs': '0850f5320a80ea7258887f2001e138174c527d35cdf7b79e48185e9f8a52d0aa',\r\n    'tests/ingestion/dependency-binding.test.mjs': '207944a5b03c7d02dfda71e92346433dd6ffb8871075a5384cf8ea8284ddf616',\r\n    'tests/ingestion/export-policy.test.mjs': 'a5d92c73295d2f4dbfe32d26115a0af9a6dc89a05e0d2372cf90ee6cee0483cd',\r\n    'tests/ingestion/migrations.test.mjs': '6fd02dcd659e50ce1342a698009f83a40ca9fa7cd25c16a10c3df76898aa4655',\r\n    'tests/ingestion/pipeline.test.mjs': '17b49cf96ebde73867ae9691a31b813b2bed6f939eb4e3fdd077f1c439f85377',\r\n    'tests/ingestion/run-determinism.test.mjs': '305b4d361854146cc93695523a24cf176cfeb8cd400efb6ba8f68b3813077095',\r\n    'tests/ingestion/security-hardening.test.mjs': '7b96377b5bea81dc4d142406e128e7824e23d890144fb7cfb9851d6bffcc8f88',\r\n    'tests/ingestion/time-model.test.mjs': '1fff8aadf42b66507908a0eb994d2dba50aaa08c72bffb010c78b6921458c246'\r\n  },\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "synthetic-smoke",
@@ -53,8 +55,9 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 274,\n  \"listedFiles\": 274,\n  \"missingFromInventory\": [\n    \"tests/ingestion/transactional-audit.test.mjs\"\n  ],\n  \"missingFromGit\": [\n    \"dbg16.tmp.mjs\"\n  ],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
     },
     {
       "id": "public-artifacts",

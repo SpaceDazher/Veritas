@@ -17,7 +17,7 @@
       "nonce": "n-af66410de38ce103"
     }
   },
-  "testedImplementationCommit": "218d5515f60af685b4d93b496a47714bfd740380",
+  "testedImplementationCommit": "90781c723192528258c471e1a0423625170f4d16",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-003-comparison.json",
   "integrity": {
     "run_a": {

@@ -34,6 +34,24 @@ process findings. All fixed and re-evidenced:
 | P2 | `budget.max_segments` unenforced | enforced pre-validation: extraction over budget → QUARANTINED | hardening test «extraction amplification … quarantined» |
 | — | Clean-checkout wrapper: Windows `EBUSY` on temp-dir cleanup flipped a green verdict to exit 1 | temp cleanup is best-effort; a leftover `%TEMP%` directory never flips the verdict | `evidence/clean-checkout.json` 25/25 PASS, exit 0 |
 
+## REVISE round 4 — transactional audit and honest evidence binding
+
+- PostgreSQL `beginOperation` now commits the ledger `INTENT` and its
+  `OPERATION_INTENT` event on one acquired client and one transaction.
+- PostgreSQL `completeOperation` now commits every non-payload terminal and
+  its `OPERATION_COMPLETED` event atomically; the in-memory mirror is updated
+  only after `COMMIT` succeeds.
+- The in-memory `commitIngest` restores all touched maps, the operation
+  ledger and the complete audit log on failure. Tombstone rollback can no
+  longer retain a false `SNAPSHOT_TOMBSTONED`/`DESCRIPTOR_TOMBSTONED` event.
+- Evidence embeds only the tested implementation commit. The future commit
+  containing an evidence file is resolved externally from Git history.
+- `dbg16.tmp.mjs` and the `DBG outcome` test output were removed.
+
+Regression coverage is in
+`tests/ingestion/transactional-audit.test.mjs` and the tombstone failpoint in
+`tests/ingestion/security-hardening.test.mjs`.
+
 ## REVISE round 2 (post-review, 2026-09)
 
 Second review confirmed the round-1 fixes and raised 5×P1 + 1×P2. All fixed
@@ -205,7 +223,7 @@ tests, S2-003 security probes, S2-003 replay, manifests, contracts, typecheck,
 lint, build with a placeholder `DATABASE_URL`, both audits). Green = exit 0;
 the tracked record is `evidence/clean-checkout.json`. Individual acceptance
 commands from §16 are wired as npm scripts and were executed green:
-`npm ci`, `verify:s2-003-dependencies`, `test:ingestion` (85 tests),
+`npm ci`, `verify:s2-003-dependencies`, `test:ingestion` (112 tests),
 `test:s2-003-security-probes`, `verify:s2-003`, `verify:postgres-smoke`,
 `typecheck`, `lint`, `build`, `npm audit --omit=dev` (0 vulnerabilities),
 `npm audit` (0), `verify:clean-checkout`, `manifest:check`, `git diff --check`
