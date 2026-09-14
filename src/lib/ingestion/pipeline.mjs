@@ -152,8 +152,19 @@ export class IngestionPipeline {
     }
     try {
       const outcome = await this.#execute({ request });
-      await this.store.completeOperation(request.workspace_id, request.operation_id, outcome);
-      return this.#observe(caseId, outcome);
+      const { __commit, ...publicOutcome } = outcome;
+      if (__commit) {
+        // Atomic terminal + payload commit (SQL: one BEGIN/COMMIT).
+        await this.store.commitIngest({
+          workspaceId: request.workspace_id,
+          operationId: request.operation_id,
+          outcome: publicOutcome,
+          ...__commit,
+        });
+      } else {
+        await this.store.completeOperation(request.workspace_id, request.operation_id, publicOutcome);
+      }
+      return this.#observe(caseId, publicOutcome);
     } catch (error) {
       if (error?.name === 'UnknownOutcomeError') {
         const outcome = { terminal: 'RECONCILIATION_REQUIRED', error_code: 'UNKNOWN_OUTCOME_RECONCILIATION_REQUIRED', snapshot_id: null };
@@ -436,17 +447,14 @@ export class IngestionPipeline {
     const lineageRecord = dedup.upstream && dedup.upstream.canonical_locator !== identity.canonical_locator
       ? lineageFromVerdict({ result: dedup, upstreamSnapshot: dedup.upstream, downstreamSnapshot: baseSnapshot, createdAt: observedAt })
       : null;
-    const outcome = { terminal: 'COMMITTED', snapshot_id: snapshotId, version, dedup: dedup.verdict, lineage: Boolean(lineageRecord) };
-    await this.store.commitIngest({
-      workspaceId: request.workspace_id,
-      operationId: request.operation_id,
-      outcome,
-      snapshot: baseSnapshot,
-      segments,
-      lineage: lineageRecord,
-    });
-
-    return outcome;
+    return {
+      terminal: 'COMMITTED',
+      snapshot_id: snapshotId,
+      version,
+      dedup: dedup.verdict,
+      lineage: Boolean(lineageRecord),
+      __commit: { snapshot: baseSnapshot, segments, lineage: lineageRecord },
+    };
   }
 
   // Deleted-source handling: observeDeletion creates a tombstone version.
@@ -539,6 +547,8 @@ export class IngestionPipeline {
       };
       assertValidContract('source-snapshot', tombstone);
       const outcome = { terminal: 'TOMBSTONED', error_code: 'TOMBSTONED', snapshot_id: tombstone.snapshot_id, version };
+      // Atomic: tombstone snapshot + descriptor lifecycle + ledger terminal
+      // + audit events in one transaction.
       await this.store.commitIngest({
         workspaceId: request.workspace_id,
         operationId: request.operation_id,

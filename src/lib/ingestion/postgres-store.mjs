@@ -15,6 +15,16 @@ export class DuplicateOperationError extends Error {
 
 const UNIQUE_VIOLATION = '23505';
 
+// Deterministic JSON comparison: PostgreSQL jsonb normalizes object key
+// order, so stringified comparisons of stored vs new outcomes are unstable.
+function canonicalJson(value) {
+  if (Array.isArray(value)) return '[' + value.map(canonicalJson).join(',') + ']';
+  if (value && typeof value === 'object') {
+    return '{' + Object.keys(value).sort().map((k) => JSON.stringify(k) + ':' + canonicalJson(value[k])).join(',') + '}';
+  }
+  return JSON.stringify(value ?? null);
+}
+
 export class PostgresIngestionStore {
   constructor(pool) {
     this.pool = pool;
@@ -207,7 +217,7 @@ export class PostgresIngestionStore {
       'SELECT status, outcome FROM ingestion_operation WHERE workspace_id = $1 AND operation_id = $2',
       [workspaceId, operationId],
     );
-    if (existing && JSON.stringify(existing.outcome) === JSON.stringify(outcome)) {
+    if (existing && canonicalJson(existing.outcome) === canonicalJson(outcome)) {
       return { workspace_id: workspaceId, operation_id: operationId, status: existing.status, outcome: existing.outcome };
     }
     throw new DuplicateOperationError(`operation ${operationId} already completed with a different outcome`);
