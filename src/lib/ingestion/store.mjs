@@ -195,41 +195,46 @@ export class IngestionStore {
   // synchronous block IS the transaction; the PostgreSQL store mirrors this
   // with BEGIN/COMMIT (see PostgresIngestionStore.commitIngest).
   commitIngest({ workspaceId, operationId, outcome, snapshot = null, segments = [], lineage = null, descriptorTombstone = null, events = [] }) {
-    // Undo journal: on any failure every partial append is reversed, exactly
-    // like the SQL ROLLBACK in PostgresIngestionStore.commitIngest.
-    const undo = [];
+    // Snapshot every mutable collection touched by the transaction. Restoring
+    // the collections (including the audit log and ledger) is the in-memory
+    // equivalent of PostgreSQL ROLLBACK and cannot depend on event ordering.
+    const before = {
+      snapshots: new Map(this.snapshots),
+      versionChain: new Map([...this.versionChain].map(([key, value]) => [key, [...value]])),
+      segments: new Map(this.segments),
+      lineage: new Map(this.lineage),
+      descriptors: new Map(this.descriptors),
+      operations: new Map([...this.operations].map(([key, value]) => [key, { ...value }])),
+      events: [...this.events],
+    };
+    const restore = (target, source) => {
+      target.clear();
+      for (const [key, value] of source) target.set(key, value);
+    };
     try {
       if (snapshot) {
         this.appendSnapshot(snapshot);
-        undo.push(() => {
-          this.snapshots.delete(snapshot.snapshot_id);
-          const chain = this.versionChain.get(snapshot.canonical_locator) ?? [];
-          const idx = chain.indexOf(snapshot.snapshot_id);
-          if (idx >= 0) chain.splice(idx, 1);
-          this.events.pop(); // SNAPSHOT_COMMITTED / TOMBSTONED event
-        });
       }
       if (segments.length > 0) {
         this.appendSegments(snapshot.snapshot_id, segments);
-        undo.push(() => this.segments.delete(snapshot.snapshot_id));
       }
       if (lineage) {
         this.appendLineage(lineage);
-        undo.push(() => {
-          this.lineage.delete(lineage.lineage_id);
-          this.events.pop(); // LINEAGE_APPENDED event
-        });
       }
       if (descriptorTombstone) {
-        const previous = this.descriptors.get(descriptorTombstone.source_id);
         this.tombstoneDescriptor(descriptorTombstone.source_id, descriptorTombstone.reason, descriptorTombstone.at);
-        undo.push(() => this.descriptors.set(descriptorTombstone.source_id, previous));
       }
       for (const event of events) this.events.push(event);
       const record = this.completeOperation(workspaceId, operationId, outcome);
       return { appendResult: snapshot, record };
     } catch (error) {
-      for (const rollback of undo.reverse()) rollback();
+      restore(this.snapshots, before.snapshots);
+      restore(this.versionChain, before.versionChain);
+      restore(this.segments, before.segments);
+      restore(this.lineage, before.lineage);
+      restore(this.descriptors, before.descriptors);
+      restore(this.operations, before.operations);
+      this.events.splice(0, this.events.length, ...before.events);
       throw error;
     }
   }

@@ -177,50 +177,85 @@ export class PostgresIngestionStore {
 
   // --- idempotency ledger (server-enforced INTENT -> terminal) ---------------
   async beginOperation(workspaceId, operationId, requestDigest) {
-    const inserted = await this.pool.query(
-      `INSERT INTO ingestion_operation(workspace_id, operation_id, request_hash)
-       VALUES ($1,$2,$3)
-       ON CONFLICT (workspace_id, operation_id) DO NOTHING
-       RETURNING status, outcome`,
-      [workspaceId, operationId, requestDigest],
-    );
-    if (inserted.rows.length > 0) {
-      // The INTENT row and its audit event are canonical, not memory-only.
-      await this.pool.query(
-        'INSERT INTO ingestion_event(operation_id, workspace_id, event_type, payload) VALUES ($1, $2, $3, $4)',
-        [operationId, workspaceId, 'OPERATION_INTENT', JSON.stringify({ request_hash: requestDigest })],
+    const client = await this.pool.connect();
+    let mirrorIntent = false;
+    try {
+      await client.query('BEGIN');
+      const inserted = await client.query(
+        `INSERT INTO ingestion_operation(workspace_id, operation_id, request_hash)
+         VALUES ($1,$2,$3)
+         ON CONFLICT (workspace_id, operation_id) DO NOTHING
+         RETURNING status, outcome`,
+        [workspaceId, operationId, requestDigest],
       );
-      this.events.push({ type: 'OPERATION_INTENT', operation_id: operationId, workspace_id: workspaceId });
-      return { replay: false, record: { workspace_id: workspaceId, operation_id: operationId, request_digest: requestDigest, status: 'INTENT', outcome: null } };
+      if (inserted.rows.length > 0) {
+        await this.#insertEvent(client, {
+          type: 'OPERATION_INTENT',
+          operation_id: operationId,
+          workspace_id: workspaceId,
+          payload: { request_hash: requestDigest },
+        });
+        await client.query('COMMIT');
+        mirrorIntent = true;
+        return { replay: false, record: { workspace_id: workspaceId, operation_id: operationId, request_digest: requestDigest, status: 'INTENT', outcome: null } };
+      }
+      const selected = await client.query(
+        'SELECT request_hash, status, outcome FROM ingestion_operation WHERE workspace_id = $1 AND operation_id = $2',
+        [workspaceId, operationId],
+      );
+      const existing = selected.rows[0] ?? null;
+      if (!existing || existing.request_hash !== requestDigest) {
+        throw new DuplicateOperationError(`operation ${operationId} reused with a different request payload`);
+      }
+      await client.query('COMMIT');
+      return { replay: true, record: { workspace_id: workspaceId, operation_id: operationId, request_digest: requestDigest, status: existing.status, outcome: existing.outcome } };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+      if (mirrorIntent) this.events.push({ type: 'OPERATION_INTENT', operation_id: operationId, workspace_id: workspaceId });
     }
-    const existing = await this.#one(
-      'SELECT request_hash, status, outcome FROM ingestion_operation WHERE workspace_id = $1 AND operation_id = $2',
-      [workspaceId, operationId],
-    );
-    if (existing.request_hash !== requestDigest) {
-      throw new DuplicateOperationError(`operation ${operationId} reused with a different request payload`);
-    }
-    return { replay: true, record: { workspace_id: workspaceId, operation_id: operationId, request_digest: requestDigest, status: existing.status, outcome: existing.outcome } };
   }
 
   async completeOperation(workspaceId, operationId, outcome) {
-    const updated = await this.pool.query(
-      `UPDATE ingestion_operation SET status = $3, outcome = $4
-       WHERE workspace_id = $1 AND operation_id = $2 AND status = 'INTENT'`,
-      [workspaceId, operationId, outcome.terminal, JSON.stringify(outcome)],
-    );
-    if (updated.rowCount > 0) {
-      this.events.push({ type: 'OPERATION_COMPLETED', operation_id: operationId, terminal: outcome.terminal });
-      return { workspace_id: workspaceId, operation_id: operationId, status: outcome.terminal, outcome };
+    const client = await this.pool.connect();
+    let mirrorTerminal = false;
+    try {
+      await client.query('BEGIN');
+      const updated = await client.query(
+        `UPDATE ingestion_operation SET status = $3, outcome = $4
+         WHERE workspace_id = $1 AND operation_id = $2 AND status = 'INTENT'`,
+        [workspaceId, operationId, outcome.terminal, JSON.stringify(outcome)],
+      );
+      if (updated.rowCount > 0) {
+        await this.#insertEvent(client, {
+          type: 'OPERATION_COMPLETED',
+          operation_id: operationId,
+          workspace_id: workspaceId,
+          payload: { terminal: outcome.terminal },
+        });
+        await client.query('COMMIT');
+        mirrorTerminal = true;
+        return { workspace_id: workspaceId, operation_id: operationId, status: outcome.terminal, outcome };
+      }
+      const selected = await client.query(
+        'SELECT status, outcome FROM ingestion_operation WHERE workspace_id = $1 AND operation_id = $2',
+        [workspaceId, operationId],
+      );
+      const existing = selected.rows[0] ?? null;
+      if (existing && canonicalJson(existing.outcome) === canonicalJson(outcome)) {
+        await client.query('COMMIT');
+        return { workspace_id: workspaceId, operation_id: operationId, status: existing.status, outcome: existing.outcome };
+      }
+      throw new DuplicateOperationError(`operation ${operationId} already completed with a different outcome`);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+      if (mirrorTerminal) this.events.push({ type: 'OPERATION_COMPLETED', operation_id: operationId, terminal: outcome.terminal });
     }
-    const existing = await this.#one(
-      'SELECT status, outcome FROM ingestion_operation WHERE workspace_id = $1 AND operation_id = $2',
-      [workspaceId, operationId],
-    );
-    if (existing && canonicalJson(existing.outcome) === canonicalJson(outcome)) {
-      return { workspace_id: workspaceId, operation_id: operationId, status: existing.status, outcome: existing.outcome };
-    }
-    throw new DuplicateOperationError(`operation ${operationId} already completed with a different outcome`);
   }
 
   async getOperation(workspaceId, operationId) {

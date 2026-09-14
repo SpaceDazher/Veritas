@@ -419,7 +419,6 @@ describe('S2-003 REVISE-3: atomic commitIngest (review round 2 finding 1)', () =
     const ok = await pipeline.ingest({ request: request('op-atomic-1') });
     assert.equal(ok.terminal, 'COMMITTED');
     const sizeAfterOk = store.snapshots.size;
-    const eventsAfterOk = store.events.length;
 
     // Second: the connector succeeds but the store fails while appending
     // segments (the exact repro from the review: failure between snapshot
@@ -432,11 +431,43 @@ describe('S2-003 REVISE-3: atomic commitIngest (review round 2 finding 1)', () =
     store.appendSegments = () => { throw new Error('disk full between snapshot and segments'); };
     const outcome = await pipeline.ingest({ request: request('op-atomic-2') });
     store.appendSegments = originalAppendSegments;
-    console.error('DBG outcome:', JSON.stringify(outcome), '| segments patched, size:', store.snapshots.size);
     assert.equal(outcome.terminal, 'FAILED');
     assert.equal(store.snapshots.size, sizeAfterOk, 'partial snapshot survived the failed commit');
     const ledger = store.getOperation('ws-hard', 'op-atomic-2');
     assert.equal(ledger?.status, 'FAILED', 'the failed operation must own exactly one recorded terminal');
     assert.equal(store.segments.has(outcome.snapshot_id ?? 'none'), false, 'orphan segments must not survive');
+  });
+
+  test('a failed tombstone commit restores descriptor, snapshots and audit events', async () => {
+    const { store, pipeline, descriptor: source } = harness();
+    const committed = await pipeline.ingest({ request: request('op-tombstone-base') });
+    assert.equal(committed.terminal, 'COMMITTED');
+    const snapshotsBefore = store.snapshots.size;
+    const eventsBefore = store.events.length;
+
+    const originalComplete = store.completeOperation.bind(store);
+    let failOnce = true;
+    store.completeOperation = (...args) => {
+      const result = originalComplete(...args);
+      if (failOnce) {
+        failOnce = false;
+        throw new Error('audit sink failed after terminal transition');
+      }
+      return result;
+    };
+
+    const outcome = await pipeline.recordDeletion({
+      request: request('op-tombstone-failure'),
+      reason: 'upstream deletion',
+    });
+    store.completeOperation = originalComplete;
+
+    assert.equal(outcome.terminal, 'FAILED');
+    assert.equal(store.snapshots.size, snapshotsBefore);
+    assert.equal(store.getDescriptor(source.source_id)?.lifecycle?.state, 'enabled');
+    assert.equal(store.activeSnapshot(source.canonical_locator).tombstoned, false);
+    const deltaEvents = store.events.slice(eventsBefore);
+    assert.deepEqual(deltaEvents.map((event) => event.type), ['OPERATION_INTENT', 'OPERATION_COMPLETED']);
+    assert.equal(deltaEvents.some((event) => event.type === 'SNAPSHOT_TOMBSTONED'), false);
   });
 });

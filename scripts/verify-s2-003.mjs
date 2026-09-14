@@ -19,19 +19,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// Explicit commit semantics (review round 3):
-//   testedImplementationCommit — the code the two runs actually executed
-//   (must be identical in both runs; verified by compareRuns);
-//   evidenceContainerCommit — the commit that contains this evidence file.
-// These are intentionally different values and MUST NOT be reconciled by
-// chasing commits after the fact.
-function gitHead() {
-  try {
-    return spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).stdout.trim();
-  } catch {
-    return 'unavailable';
-  }
-}
+// testedImplementationCommit is the code the two runs actually executed.
+// A file cannot embed the future commit that will contain itself; consumers
+// resolve that binding from Git history after the evidence is committed.
 const RUNNER = path.join(ROOT, 'scripts/s2-003-run.mjs');
 const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'corpus/s2-003/manifest.json'), 'utf8'));
 const sha256Hex = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -236,7 +226,7 @@ function main() {
       run_b: { executor: 'exec-s2-003-b', clock: '2026-03-21T23:59:59.999Z', nonce: nonceB },
     },
     testedImplementationCommit: runA.environment?.commit ?? null,
-    evidenceContainerCommit: gitHead(),
+    evidenceContainerResolution: 'Resolve externally with: git log -1 --format=%H -- evidence/s2-003-comparison.json',
     integrity: { run_a: runA.integrity, run_b: runB.integrity },
     comparison,
     hardCounterLimits: {

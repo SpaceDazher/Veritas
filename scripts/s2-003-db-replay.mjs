@@ -137,7 +137,6 @@ async function coordinator(args) {
     if (testedA !== testedB) {
       throw new Error(`IMPLEMENTATION_COMMIT_MISMATCH: ${testedA} vs ${testedB}`);
     }
-    const containerHead = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).stdout?.trim() ?? 'unavailable';
     const comparison = compareRuns({ runA: summaries[0], runB: summaries[1], oracle });
     const report = {
       schemaVersion: 1,
@@ -148,7 +147,7 @@ async function coordinator(args) {
       pids: { run_a: summaries[0].dbPid, run_b: summaries[1].dbPid },
       executors: { run_a: summaries[0].executor_id, run_b: summaries[1].executor_id },
       testedImplementationCommit: testedA,
-      evidenceContainerCommit: containerHead.trim(),
+      evidenceContainerResolution: 'Resolve externally with: git log -1 --format=%H -- evidence/s2-003-db-comparison.json',
       integrity: { run_a: summaries[0].integrity, run_b: summaries[1].integrity },
       counts: { run_a: summaries[0].counts, run_b: summaries[1].counts },
       comparison,

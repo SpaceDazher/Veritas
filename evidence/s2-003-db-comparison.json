@@ -40,7 +40,7 @@
     "run_b": "exec-db-b"
   },
   "testedImplementationCommit": "218d5515f60af685b4d93b496a47714bfd740380",
-  "evidenceContainerCommit": "218d5515f60af685b4d93b496a47714bfd740380",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-003-db-comparison.json",
   "integrity": {
     "run_a": {
       "snapshots_total": 81,

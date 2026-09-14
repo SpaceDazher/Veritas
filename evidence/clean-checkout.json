@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
   "testedImplementationCommit": "46a2c9708b91a1996115a2cf6a3d8008bfb3f002",
-  "evidenceContainerCommit": "46a2c9708b91a1996115a2cf6a3d8008bfb3f002",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
   "sourceCommit": "46a2c9708b91a1996115a2cf6a3d8008bfb3f002",
   "sourceTree": "c3e8418dde80b964bf41ed7a4dc107e765bee80e",
   "exitCode": 0,

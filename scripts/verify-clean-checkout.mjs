@@ -136,12 +136,10 @@ const passed = requiredIds.every((id) => byId.get(id)?.status === 'PASS' && byId
 const report = {
   schemaVersion: 1,
   method: 'git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules',
-  // Explicit commit semantics (review round 3): sourceCommit is the tested
-  // implementation commit (the archived HEAD); evidenceContainerCommit is
-  // the commit that contains this evidence file. They are intentionally
-  // different and are never reconciled by chasing commits.
+  // sourceCommit is the implementation commit tested from the archive. The
+  // future commit containing this report must be resolved externally.
   testedImplementationCommit: sourceCommit,
-  evidenceContainerCommit: gitText(root, ['rev-parse', 'HEAD']) || null,
+  evidenceContainerResolution: 'Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json',
   sourceCommit,
   sourceTree,
   exitCode: passed ? 0 : 1,
