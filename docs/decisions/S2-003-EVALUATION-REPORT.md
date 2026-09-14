@@ -4,6 +4,34 @@ Ticket: `tasks/S2-003_SOURCE_INGESTION.md`
 Branch: `codex/s2-003-source-ingestion` (base: `origin/main` at the S2-002
 merge `4b4456a3acbe78371e2afcc75d81da59d2765b53`)
 
+## REVISE round (post-review, 2026-09)
+
+The first implementation returned PASS_WITH_LIMITS and was sent back for
+revision with 7×P1 + 1×P2 findings. All of them are fixed and re-evidenced:
+
+| # | Finding | Fix | Evidence |
+| --- | --- | --- | --- |
+| P1-1 | 9/12 probes recorded DETECTED without awaiting the async probe bodies (`detail: {}` in evidence) | probes are registered then executed with `await fn()`; the verdict is decided only by the awaited outcome | `evidence/s2-003-security-probes.json` (12/12 DETECTED with real detail strings; the earlier TDZ defect in probe harness was also hidden by this bug and is fixed) |
+| P1-2 | Pipeline trusted the caller-supplied descriptor and any non-empty `grant_id` | `ingest()` validates the request against the fetch-request contract, resolves the descriptor **only** from the canonical store by `request.source_id`, and enforces workspace/actor/connector binding; grant_required connectors verify the grant against an injected ledger (principal, workspace, scope, expiry) and fail closed without one | `tests/ingestion/security-hardening.test.mjs` (substitute connector_id, foreign workspace, unregistered source, malformed request owns no ledger entry, grant matrix) |
+| P1-3 | Idempotency digest excluded actor/connector/grant/lease/budget/claimed | `requestDigest` binds the full request; reuse with a different payload is a `DuplicateOperationError` conflict → FAILED, no second snapshot | hardening tests «same operation id with a different actor/budget» |
+| P1-4 | Dedup scanned all snapshots globally | `decideDedup` requires a viewer (tenant_id mandatory) and filters candidates by tenant + server-side ACL before every stage; cross-tenant duplicates are invisible | hardening test «raw-byte duplicate from another tenant is invisible»; scope-less call is a programming error |
+| P1-5 | HTTP connector: SSRF, auto-redirect, unbounded body, no real timeout | scheme allow-list, loopback/private/link-local/CGNAT/ULA literal-IP and localhost-like hostname rejection, injectable resolver re-checking resolved addresses, manual redirects (≤5 hops, each hop re-validated), chunked body reads aborted at `max_bytes`, AbortController timeout | hardening tests (12 forbidden targets, resolver re-check, redirect-into-private refused, budget quarantine, TIMEOUT) |
+| P1-6 | Vault root escapable via symlink/junction | connector pins `realpathSync(vaultRoot)`; every fetch resolves the realpath and rejects anything outside it (`VAULT_PATH_SYMLINK_ESCAPE`) | hardening test with a real junction pointing outside the vault |
+| P1-7 | SQL ledger could not perform INTENT → terminal (full append-only on the table); replays were memory-only | `ingestion_operation` now enforces exactly one server-side transition (identity columns immutable, terminal final); `source_descriptor` allows the single `lifecycle → tombstoned` transition; new `PostgresIngestionStore` (async interface) and `scripts/s2-003-db-replay.mjs` run Run A and Run B against two separate PostgreSQL schemas | `evidence/s2-003-db-comparison.json` (74/74 cases, 0 mismatches, hard counters zero), `evidence/postgres-smoke.json` (`ingestionTransitionEnforced: true`) |
+| P2-8 | PR-level `git diff --check 4b4456a3..HEAD` exit 2 (blank line at EOF of generated declarations) | generator trims trailing whitespace to a single newline; working tree clean | `git diff --check 4b4456a3..HEAD` → exit 0 |
+
+Review-order note: probes were fixed first; re-running them honestly exposed
+three further probe-side defects (TDZ shadowing, shadowed factory in probe C,
+static telemetry clocks in probe I) which are also fixed — 12/12 DETECTED
+stands on real assertions now.
+
+New/updated artifacts: `src/lib/ingestion/postgres-store.mjs`,
+`scripts/s2-003-db-replay.mjs` (`npm run verify:s2-003-db-replay`),
+`evidence/s2-003-db-comparison.json`, `evidence/s2-003-security-probes.json`,
+`tests/ingestion/security-hardening.test.mjs` (16 tests), updated
+`migrations/0002_source_ingestion.sql`, `evidence/postgres-smoke.json`,
+`evidence/clean-checkout.json` (25/25 commands PASS).
+
 ## Verdict: PASS_WITH_LIMITS
 
 All fifteen Definition-of-Done conditions of §15 are evidenced below. `PASS`
