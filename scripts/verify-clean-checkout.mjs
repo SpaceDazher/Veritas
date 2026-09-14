@@ -116,7 +116,14 @@ try {
     }
   }
 } finally {
-  fs.rmSync(temporaryRoot, {recursive: true, force: true});
+  // Best-effort cleanup: on Windows the directory can be briefly locked by
+  // indexers/shell handlers; a leftover temp directory must never flip the
+  // verdict of an otherwise green verification.
+  try {
+    fs.rmSync(temporaryRoot, {recursive: true, force: true});
+  } catch {
+    // ignore: %TEMP% is cleaned by the OS
+  }
 }
 const requiredIds = [
   'archive', 'npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke',

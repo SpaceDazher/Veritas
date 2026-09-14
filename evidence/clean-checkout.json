@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "sourceCommit": "e1c01deb236cbe8ce3ea5320f0a7214cb43f7858",
-  "sourceTree": "db1caf92c58e2e32e9845305a628794338c088cc",
+  "sourceCommit": "804ee0cbc7719d49b99e6d0c0d4d6456ff84f8da",
+  "sourceTree": "5c0469837ffa99bab0962291530456490c79073c",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -111,6 +111,12 @@
     {
       "id": "s2-003-replay",
       "command": "npm.cmd run verify:s2-003",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-003-db-replay",
+      "command": "npm.cmd run verify:s2-003-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },
