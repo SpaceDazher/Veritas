@@ -129,6 +129,15 @@ async function coordinator(args) {
     }
 
     const oracle = buildOracle();
+    // Commit semantics (review round 3): the runs' environment.commit values
+    // must be identical (same tested implementation); the evidence container
+    // commit is the coordinator's own HEAD and is recorded separately.
+    const testedA = summaries[0].environment?.commit;
+    const testedB = summaries[1].environment?.commit;
+    if (testedA !== testedB) {
+      throw new Error(`IMPLEMENTATION_COMMIT_MISMATCH: ${testedA} vs ${testedB}`);
+    }
+    const containerHead = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).stdout?.trim() ?? 'unavailable';
     const comparison = compareRuns({ runA: summaries[0], runB: summaries[1], oracle });
     const report = {
       schemaVersion: 1,
@@ -138,6 +147,8 @@ async function coordinator(args) {
       schemas: migrations,
       pids: { run_a: summaries[0].dbPid, run_b: summaries[1].dbPid },
       executors: { run_a: summaries[0].executor_id, run_b: summaries[1].executor_id },
+      testedImplementationCommit: testedA,
+      evidenceContainerCommit: containerHead.trim(),
       integrity: { run_a: summaries[0].integrity, run_b: summaries[1].integrity },
       counts: { run_a: summaries[0].counts, run_b: summaries[1].counts },
       comparison,

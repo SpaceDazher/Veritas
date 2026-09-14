@@ -195,13 +195,43 @@ export class IngestionStore {
   // synchronous block IS the transaction; the PostgreSQL store mirrors this
   // with BEGIN/COMMIT (see PostgresIngestionStore.commitIngest).
   commitIngest({ workspaceId, operationId, outcome, snapshot = null, segments = [], lineage = null, descriptorTombstone = null, events = [] }) {
-    const appendResult = snapshot ? this.appendSnapshot(snapshot) : null;
-    if (segments.length > 0) this.appendSegments(snapshot.snapshot_id, segments);
-    if (lineage) this.appendLineage(lineage);
-    if (descriptorTombstone) this.tombstoneDescriptor(descriptorTombstone.source_id, descriptorTombstone.reason, descriptorTombstone.at);
-    for (const event of events) this.events.push(event);
-    const record = this.completeOperation(workspaceId, operationId, outcome);
-    return { appendResult, record };
+    // Undo journal: on any failure every partial append is reversed, exactly
+    // like the SQL ROLLBACK in PostgresIngestionStore.commitIngest.
+    const undo = [];
+    try {
+      if (snapshot) {
+        this.appendSnapshot(snapshot);
+        undo.push(() => {
+          this.snapshots.delete(snapshot.snapshot_id);
+          const chain = this.versionChain.get(snapshot.canonical_locator) ?? [];
+          const idx = chain.indexOf(snapshot.snapshot_id);
+          if (idx >= 0) chain.splice(idx, 1);
+          this.events.pop(); // SNAPSHOT_COMMITTED / TOMBSTONED event
+        });
+      }
+      if (segments.length > 0) {
+        this.appendSegments(snapshot.snapshot_id, segments);
+        undo.push(() => this.segments.delete(snapshot.snapshot_id));
+      }
+      if (lineage) {
+        this.appendLineage(lineage);
+        undo.push(() => {
+          this.lineage.delete(lineage.lineage_id);
+          this.events.pop(); // LINEAGE_APPENDED event
+        });
+      }
+      if (descriptorTombstone) {
+        const previous = this.descriptors.get(descriptorTombstone.source_id);
+        this.tombstoneDescriptor(descriptorTombstone.source_id, descriptorTombstone.reason, descriptorTombstone.at);
+        undo.push(() => this.descriptors.set(descriptorTombstone.source_id, previous));
+      }
+      for (const event of events) this.events.push(event);
+      const record = this.completeOperation(workspaceId, operationId, outcome);
+      return { appendResult: snapshot, record };
+    } catch (error) {
+      for (const rollback of undo.reverse()) rollback();
+      throw error;
+    }
   }
 
   // Hard-integrity counters (§13). The runner's run-local counters

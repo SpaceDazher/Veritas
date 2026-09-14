@@ -175,6 +175,11 @@ export class PostgresIngestionStore {
       [workspaceId, operationId, requestDigest],
     );
     if (inserted.rows.length > 0) {
+      // The INTENT row and its audit event are canonical, not memory-only.
+      await this.pool.query(
+        'INSERT INTO ingestion_event(operation_id, workspace_id, event_type, payload) VALUES ($1, $2, $3, $4)',
+        [operationId, workspaceId, 'OPERATION_INTENT', JSON.stringify({ request_hash: requestDigest })],
+      );
       this.events.push({ type: 'OPERATION_INTENT', operation_id: operationId, workspace_id: workspaceId });
       return { replay: false, record: { workspace_id: workspaceId, operation_id: operationId, request_digest: requestDigest, status: 'INTENT', outcome: null } };
     }

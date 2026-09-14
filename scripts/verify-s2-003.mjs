@@ -18,6 +18,20 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// Explicit commit semantics (review round 3):
+//   testedImplementationCommit — the code the two runs actually executed
+//   (must be identical in both runs; verified by compareRuns);
+//   evidenceContainerCommit — the commit that contains this evidence file.
+// These are intentionally different values and MUST NOT be reconciled by
+// chasing commits after the fact.
+function gitHead() {
+  try {
+    return spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).stdout.trim();
+  } catch {
+    return 'unavailable';
+  }
+}
 const RUNNER = path.join(ROOT, 'scripts/s2-003-run.mjs');
 const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'corpus/s2-003/manifest.json'), 'utf8'));
 const sha256Hex = (bytes) => createHash('sha256').update(bytes).digest('hex');
@@ -134,6 +148,14 @@ export function compareRuns({ runA, runB, oracle }) {
     }
   }
 
+  // Both runs must have executed against the SAME implementation commit;
+  // a comparison across different code is meaningless.
+  const commitA = runA.environment?.commit;
+  const commitB = runB.environment?.commit;
+  if (commitA !== commitB) {
+    counterViolations.push(`implementation-commit-mismatch: ${commitA} vs ${commitB}`);
+  }
+
   // Cross-run: every decision, every terminal sequence and every content
   // identity must match between the two runs.
   const decisionsA = new Map((runA.observations ?? []).map((o) => [o.case_id, o]));
@@ -213,6 +235,8 @@ function main() {
       run_a: { executor: 'exec-s2-003-a', clock: '2026-01-15T08:00:00.000Z', nonce: nonceA },
       run_b: { executor: 'exec-s2-003-b', clock: '2026-03-21T23:59:59.999Z', nonce: nonceB },
     },
+    testedImplementationCommit: runA.environment?.commit ?? null,
+    evidenceContainerCommit: gitHead(),
     integrity: { run_a: runA.integrity, run_b: runB.integrity },
     comparison,
     hardCounterLimits: {

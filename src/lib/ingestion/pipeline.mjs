@@ -348,8 +348,8 @@ export class IngestionPipeline {
     const segments = extracted.map((segment, index) => {
       let text = typeof segment.text === 'string' ? segment.text : null;
       let nulSanitized = false;
-      if (text !== null && text.includes(' ')) {
-        text = text.replace(/ /g, '�');
+      if (text !== null && text.includes('\u0000')) {
+        text = text.replace(/\u0000/g, '\uFFFD');
         nulSanitized = true;
       }
       const classification = classifyEmbeddedInstructions(text ?? '');
@@ -428,15 +428,25 @@ export class IngestionPipeline {
       }
     }
 
-    await this.store.appendSnapshot(baseSnapshot);
-    await this.store.appendSegments(snapshotId, segments);
+    // Atomic commit through the store: ledger terminal + snapshot + segments
+    // + lineage + audit events in ONE transaction (SQL BEGIN/COMMIT) or one
+    // critical section (memory). A failure mid-commit rolls everything back
+    // and leaves the INTENT row for reconciliation — a partial snapshot
+    // without segments can never be observed.
+    const lineageRecord = dedup.upstream && dedup.upstream.canonical_locator !== identity.canonical_locator
+      ? lineageFromVerdict({ result: dedup, upstreamSnapshot: dedup.upstream, downstreamSnapshot: baseSnapshot, createdAt: observedAt })
+      : null;
+    const outcome = { terminal: 'COMMITTED', snapshot_id: snapshotId, version, dedup: dedup.verdict, lineage: Boolean(lineageRecord) };
+    await this.store.commitIngest({
+      workspaceId: request.workspace_id,
+      operationId: request.operation_id,
+      outcome,
+      snapshot: baseSnapshot,
+      segments,
+      lineage: lineageRecord,
+    });
 
-    if (dedup.upstream && dedup.upstream.canonical_locator !== identity.canonical_locator) {
-      const lineage = lineageFromVerdict({ result: dedup, upstreamSnapshot: dedup.upstream, downstreamSnapshot: baseSnapshot, createdAt: observedAt });
-      if (lineage) await this.store.appendLineage(lineage);
-    }
-
-    return { terminal: 'COMMITTED', snapshot_id: snapshotId, version, dedup: dedup.verdict, lineage: dedup.upstream && dedup.upstream.canonical_locator !== identity.canonical_locator };
+    return outcome;
   }
 
   // Deleted-source handling: observeDeletion creates a tombstone version.
@@ -535,7 +545,6 @@ export class IngestionPipeline {
         outcome,
         snapshot: tombstone,
         descriptorTombstone: { source_id: descriptor.source_id, reason, at },
-        events: [{ type: 'SNAPSHOT_TOMBSTONED', snapshot_id: tombstone.snapshot_id, source_id: descriptor.source_id, version }],
       });
       return this.#observe(caseId, outcome);
     } catch (error) {

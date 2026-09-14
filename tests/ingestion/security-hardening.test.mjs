@@ -382,3 +382,61 @@ describe('S2-003 REVISE-2: segment budget enforcement', () => {
     assert.equal(store.snapshots.size, 0, 'amplified extraction must not reach storage');
   });
 });
+
+describe('S2-003 REVISE-3: async SSRF guard correctness', () => {
+  test('the async guard rejects a resolver answer of 127.0.0.1 BEFORE the transport is called', async () => {
+    let transportCalled = 0;
+    const connector = new HttpSnapshotConnector({
+      clock: { now: () => NOW },
+      fetchFn: async () => { transportCalled += 1; return { ok: true, status: 200, headers: { get: () => 'text/html' }, url: 'https://rebind.example.org/x', arrayBuffer: async () => Buffer.from('pwned').buffer.slice(0, 5) }; },
+      resolveHostname: () => ['127.0.0.1'],
+    });
+    const outcome = await connector.fetchVersion({ operation_id: 'op-rebind-1', locator: 'https://rebind.example.org/x', budget: { max_bytes: 10000, time_limit_ms: 5000 } });
+    assert.equal(outcome.code, 'ACCESS_DENIED');
+    assert.match(outcome.diagnostic.redacted_detail, /SSRF_RESOLVED_FORBIDDEN: rebind\.example\.org -> 127\.0\.0\.1/);
+    assert.equal(transportCalled, 0, 'the transport must never run for a forbidden resolution');
+  });
+
+  test('the async guard accepts public resolutions and lets the transport run', async () => {
+    let transportCalled = 0;
+    const connector = new HttpSnapshotConnector({
+      clock: { now: () => NOW },
+      fetchFn: async () => { transportCalled += 1; return { ok: true, status: 200, headers: { get: () => 'text/html' }, url: 'https://ok.example.org/x', arrayBuffer: async () => Buffer.from('fine').buffer.slice(0, 4) }; },
+      resolveHostname: () => ['93.184.216.34'],
+    });
+    const outcome = await connector.fetchVersion({ operation_id: 'op-rebind-2', locator: 'https://ok.example.org/x', budget: { max_bytes: 10000, time_limit_ms: 5000 } });
+    assert.equal(outcome.ok, true);
+    assert.equal(transportCalled, 1);
+  });
+});
+
+describe('S2-003 REVISE-3: atomic commitIngest (review round 2 finding 1)', () => {
+  test('a failure between snapshot and segments appends rolls everything back: no partial snapshot, INTENT preserved', async () => {
+    const { store, pipeline } = harness();
+    const connector = pipeline.connectors.get('manual_export');
+    const originalExtract = connector.extract.bind(connector);
+    // First: a healthy commit so the ledger, store and fixtures are warm.
+    const ok = await pipeline.ingest({ request: request('op-atomic-1') });
+    assert.equal(ok.terminal, 'COMMITTED');
+    const sizeAfterOk = store.snapshots.size;
+    const eventsAfterOk = store.events.length;
+
+    // Second: the connector succeeds but the store fails while appending
+    // segments (the exact repro from the review: failure between snapshot
+    // and segments must leave no partial snapshot).
+    connector.extract = async (snapshot, fetched) => originalExtract(snapshot, fetched);
+    // A different content makes the second operation UNIQUE (not a dedup
+    // replay), so the commit path actually appends.
+    connector.exports.set('export/hard-001', { bytes: Buffer.from('second, different body'), text: 'second, different body', mime_type: 'text/plain' });
+    const originalAppendSegments = store.appendSegments.bind(store);
+    store.appendSegments = () => { throw new Error('disk full between snapshot and segments'); };
+    const outcome = await pipeline.ingest({ request: request('op-atomic-2') });
+    store.appendSegments = originalAppendSegments;
+    console.error('DBG outcome:', JSON.stringify(outcome), '| segments patched, size:', store.snapshots.size);
+    assert.equal(outcome.terminal, 'FAILED');
+    assert.equal(store.snapshots.size, sizeAfterOk, 'partial snapshot survived the failed commit');
+    const ledger = store.getOperation('ws-hard', 'op-atomic-2');
+    assert.equal(ledger?.status, 'FAILED', 'the failed operation must own exactly one recorded terminal');
+    assert.equal(store.segments.has(outcome.snapshot_id ?? 'none'), false, 'orphan segments must not survive');
+  });
+});

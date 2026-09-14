@@ -390,7 +390,7 @@ export async function assertPublicHttpTargetAsync(rawUrl, { resolveHostname = nu
   if (resolveHostname) {
     const addresses = await Promise.resolve(resolveHostname(hostname));
     for (const address of addresses ?? []) {
-      if (/^d{1,3}(.d{1,3}){3}$/.test(address)) {
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(address)) {
         if (isPrivateIPv4(address)) throw new Error(`SSRF_RESOLVED_FORBIDDEN: ${hostname} -> ${address}`);
       } else if (address.includes(':') && isPrivateIPv6(address)) {
         throw new Error(`SSRF_RESOLVED_FORBIDDEN: ${hostname} -> ${address}`);
