@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "303bf260d48071deb6e12d881504c42a1cfe959a",
-  "sourceTree": "616a333fe9bdf8d2189ea5f259a7a0beb8d85dbc",
+  "sourceCommit": "abafc5a11c29717bf489f5ff170370cebc112ce3",
+  "sourceTree": "617523c7dfa0d4de1f200ed12f5dc44e30fcb008",
   "trackedFileCount": 274,
   "manifestFileCount": 270,
-  "payloadManifestSha256": "60e593c819ff5844eac7dcc01a7ee4f60f456d3fb1fa68047a2afe25231cc66d",
-  "fileManifestSha256": "3582419b2ed81a90afae91163a4c73d2e8e3fbd4ca25e5b557098cbcd20c3019",
+  "payloadManifestSha256": "df5c5848ba5a65cb2819a55213cc70e128e7d1759973f8fb8fac553ad1f52b31",
+  "fileManifestSha256": "46cb0c85e1214b8c904efddf40ff4711d277f395815c750e145ba74ffd122be5",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -536,11 +536,6 @@
       "bytes": 8957
     },
     {
-      "path": "dbg16.tmp.mjs",
-      "sha256": "456dd96686fa2e31179841f46f41948c5a5c8a28137a35787e5ba6cb4cd20e55",
-      "bytes": 3541
-    },
-    {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
       "sha256": "fd48bbfc30673e51c880f8f105ad9300a39be9e94d9244237af771f506452b34",
       "bytes": 3980
@@ -582,8 +577,8 @@
     },
     {
       "path": "docs/decisions/S2-003-EVALUATION-REPORT.md",
-      "sha256": "d2f1a7ced3c0ac5ed54b15b01f1b9f1ab5ef7a65519f6c28d7a9caa6d07bb01b",
-      "bytes": 18915
+      "sha256": "870b1b56d5f20be786f352e63de8212a5cb9d2c20a5de6529a424ec8f9d4c05a",
+      "bytes": 19765
     },
     {
       "path": "docs/ingestion/S2-003-CONNECTOR-CONTRACT.md",
@@ -687,8 +682,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "b85c84db30f4095fc89ead6d2781cb848d8e33742cb57a3ae0156e8b339543a4",
-      "bytes": 11581
+      "sha256": "eb7e8ea34719d15603731e0bad1bc0851ed38c81926fc2078866c11eaa259757",
+      "bytes": 11612
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -762,22 +757,22 @@
     },
     {
       "path": "evidence/s2-003-comparison.json",
-      "sha256": "3f53737224802459cf651d231741d6bc21d2717a9108328d22b46bd24aef372b",
-      "bytes": 1884
+      "sha256": "4ff865d82170d6f2965dc1d6f4062709a3135671394eb6ea7dcea8a66a91303d",
+      "bytes": 1930
     },
     {
       "path": "evidence/s2-003-db-comparison.json",
-      "sha256": "92255110ed64ce7fb2063af019f7cfa7f9fd2d0238d74041922560976073fdbc",
-      "bytes": 2747
+      "sha256": "05b7c3bea1898765b3fbb2fa1cc30b2e000cba08922c63d85d943014fe128259",
+      "bytes": 2796
     },
     {
       "path": "evidence/s2-003-db-run-a.json",
-      "sha256": "436ab8fe42468dbc924fd0959a67f7793210b04d97ab984d786bcf0e137e90b2",
+      "sha256": "8ababee791334177ebf68d7ddc7b9bae6125dcff5c66158b71582280f8522cdb",
       "bytes": 57272
     },
     {
       "path": "evidence/s2-003-db-run-b.json",
-      "sha256": "7d057994808bc3aefaf0a4fe6aed1350129618b1cd26e8c4b8a70d4fb733e15d",
+      "sha256": "abd45a640db91a400a8153a3b155fccbd3f508920a5b528a9f75e55612fb5b9a",
       "bytes": 57272
     },
     {
@@ -787,12 +782,12 @@
     },
     {
       "path": "evidence/s2-003-run-a.json",
-      "sha256": "3ace8e2fdd44a7297d5cb83ea01b1a261aae407cd2264dc2c1ba00306f9bfd18",
+      "sha256": "fe5aa60e0cf81f3c820f6e7a1ea661d49c9374d6ddf672f6f8feb9a2b04ef3d8",
       "bytes": 57243
     },
     {
       "path": "evidence/s2-003-run-b.json",
-      "sha256": "828bb956597686203c76303a7830c32d546a1b8da6dddb295ac2fcb14b65521a",
+      "sha256": "7ae83710b28f8fd5baab16e79a4c7458dcbdc634a967155dbed84131f14c87e4",
       "bytes": 57243
     },
     {
@@ -992,8 +987,8 @@
     },
     {
       "path": "scripts/s2-003-db-replay.mjs",
-      "sha256": "82d6d93361a856f3703f3b046f29ca4a629f2bf297f67d828ed858f5344279e8",
-      "bytes": 8707
+      "sha256": "cdd36e4504957b3637d153d7c8d8ff8a84477a6670c07fea19f61e50636a8620",
+      "bytes": 8646
     },
     {
       "path": "scripts/s2-003-run.mjs",
@@ -1027,8 +1022,8 @@
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
-      "sha256": "102756a857ef473c707a0d1cc3ebc627c55c472d6240f910361bebc46fe92843",
-      "bytes": 8397
+      "sha256": "44ca5a86a35eda65fbb22f6e656105288d05362327ffd48cae78f4dfae63a72e",
+      "bytes": 8301
     },
     {
       "path": "scripts/verify-gvisor-sandbox.mjs",
@@ -1067,8 +1062,8 @@
     },
     {
       "path": "scripts/verify-s2-003.mjs",
-      "sha256": "86bda16bcef176dffa36ca9e870e60a9281b43636310043d17e3ccc7f2e19f02",
-      "bytes": 12443
+      "sha256": "f099d0271bb8dc59947cf482a355cf848ea75e7ecdceee36389c2032615978af",
+      "bytes": 12201
     },
     {
       "path": "scripts/verify.mjs",
@@ -1237,13 +1232,13 @@
     },
     {
       "path": "src/lib/ingestion/postgres-store.mjs",
-      "sha256": "c85db96722decf3c5785b9d78e7998a8e5bacbd29bba8436a58378db527ff743",
-      "bytes": 23213
+      "sha256": "3ea3656c97a50b2beba75db09df31d2e406a294a3b65e04c7198aa5261678d93",
+      "bytes": 24237
     },
     {
       "path": "src/lib/ingestion/store.mjs",
-      "sha256": "ab480b1d6f063be0dc4eb6ccf3843f3f398bb1be883af7e8b54aa3867eb9fb5a",
-      "bytes": 12562
+      "sha256": "0c05543dc2b7e263b03bb0d31517e6726627a341c77b25495e306e2a5e0f659d",
+      "bytes": 12758
     },
     {
       "path": "src/lib/ingestion/time-model.mjs",
@@ -1352,13 +1347,18 @@
     },
     {
       "path": "tests/ingestion/security-hardening.test.mjs",
-      "sha256": "7b96377b5bea81dc4d142406e128e7824e23d890144fb7cfb9851d6bffcc8f88",
-      "bytes": 23624
+      "sha256": "0bf3669e13ddea38090cfbd163a42e8c9d1a5f060914532ade880ad7b30afe04",
+      "bytes": 24933
     },
     {
       "path": "tests/ingestion/time-model.test.mjs",
       "sha256": "1fff8aadf42b66507908a0eb994d2dba50aaa08c72bffb010c78b6921458c246",
       "bytes": 2629
+    },
+    {
+      "path": "tests/ingestion/transactional-audit.test.mjs",
+      "sha256": "e4f1589df9a8b1884aeea0946bf61ce7ae3c68a5a45acd962e9f0c70ab575cc7",
+      "bytes": 4360
     },
     {
       "path": "tsconfig.json",
