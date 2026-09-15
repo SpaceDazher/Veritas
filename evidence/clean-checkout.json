@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "e1d0962bf474cb1c74cf7807f3a0467b0efad304",
+  "testedImplementationCommit": "20ea63c589263c928379f48ecb9727f0791e1d9f",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "e1d0962bf474cb1c74cf7807f3a0467b0efad304",
-  "sourceTree": "e1de141872b8be7fb159b311723c384dd20b37b9",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "20ea63c589263c928379f48ecb9727f0791e1d9f",
+  "sourceTree": "e5c29e6e09024ecef8e4a886099acc40e9f6a5c5",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -35,8 +35,9 @@
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "\r\n      path: 'corpus/s2-003/cases/reimport-after-delete.json',\r\n      sha256: '0233250fdf1c5ca92a4a3ee12543fa52db270c2450e8e77dc5392f4791e8c913',\r\n      bytes: 1557\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/reimport-same-content-new-operation.json',\r\n      sha256: '4cbeab8f48707ec74cd5faf5fedf86de3a8672fbe74d0420bfae75fb2fc008bb',\r\n      bytes: 1681\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/repost-different-title.json',\r\n      sha256: 'c3e3d1e937dec87a53e9e3b4160bb3ebacddbfe266b0b541da02cf4ead6a9a9b',\r\n      bytes: 2813\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/retention-active-allows.json',\r\n      sha256: '5d8b9ba52c54dd82132e4984c57e27623987f1cd1346eacbd347cbc09db5aa26',\r\n      bytes: 1383\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/retention-expired-blocks.json',\r\n      sha256: 'e58014308a2aaf706c1250d4c60cebee344870abab2df487178609d35dc6768b',\r\n      bytes: 1448\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/time-boundary-millisecond.json',\r\n      sha256: '0758bc158188632d40226edc159471736d6742e457ebd44ee15fd88db780485f',\r\n      bytes: 1387\r\n    },\r\n    ... 333 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "contracts",
@@ -83,8 +84,9 @@
     {
       "id": "identity-tests",
       "command": "npm.cmd run test:identity",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": ".\n    # Subtest: probe J (corrupted/missing policy evidence failing open) is detected, never escaped\n    ok 11 - probe J (corrupted/missing policy evidence failing open) is detected, never escaped\n      ---\n      duration_ms: 0.1491\n      type: 'test'\n      ...\n    # Subtest: probe K (untrusted execution evidence substitution or command confusion) is detected, never escaped\n    ok 12 - probe K (untrusted execution evidence substitution or command confusion) is detected, never escaped\n      ---\n      duration_ms: 0.0676\n      type: 'test'\n      ...\n    # Subtest: no probe is silently skipped on this platform\n    ok 13 - no probe is silently skipped on this platform\n      ---\n      duration_ms: 0.1773\n      type: 'test'\n      ...\n    1..13\nnot ok 34 - S2-002 adversarial corpus (production-facing path)\n  ---\n  duration_ms: 9.2119\n  type: 'suite'\n  location: 'C:\\\\Users\\\\Daniil\\\\AppData\\\\Local\\\\Temp\\\\veritas-clean-checkout-wO2Z9J\\\\checkout\\\\tests\\\\identity\\\\security-probes.test.mjs:26:1'\n  failureType: 'subtestsFailed'\n  error: '1 subtest failed'\n  code: 'ERR_TEST_FAILURE'\n  ...\n1..34\n# tests 159\n# suites 34\n# pass 158\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 28642.0248"
     },
     {
       "id": "sandbox-tests",
@@ -125,6 +127,36 @@
     {
       "id": "s2-002-replay",
       "command": "npm.cmd run verify:s2-002",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-dependencies",
+      "command": "npm.cmd run verify:s2-004-dependencies",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-claims-tests",
+      "command": "npm.cmd run test:claims",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-security-probes",
+      "command": "npm.cmd run test:s2-004-security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-replay",
+      "command": "npm.cmd run verify:s2-004",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-db-replay",
+      "command": "npm.cmd run verify:s2-004-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },

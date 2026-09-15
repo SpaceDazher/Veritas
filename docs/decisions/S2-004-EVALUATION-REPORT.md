@@ -232,6 +232,10 @@ commit, never the S2-004 record.
 | `npm run verify:clean-checkout` after the reseal | 0 | `passed: true`, all required steps PASS, on a tree identical to HEAD except the record file itself (§14 forbids embedding the container commit; resolve it externally with `git log -1 -- evidence/clean-checkout.json`) |
 | `git diff --check` (`b3fe0ee…HEAD`) | 0 | no whitespace errors; the §13 range check initially reported 12 trailing-whitespace lines in `migrations/0003_claim_graph.sql`, fixed in this pass |
 | `git status --short` | 0 | clean working tree |
+| `npm run manifest:check` at `20ea63c` | 1 | red: root manifest sealed from the pre-edit committed bytes (§9.4, second seal incident) |
+| `npm run verify:clean-checkout` at `20ea63c` (incident record) | 1 | `passed: false`: `root-manifest` FAIL (stale seal, §9.4) and `identity-tests` FAIL (second flake occurrence, §9.4); all five S2-004 stage steps PASS in the same record |
+| `npm run manifest:write` / `manifest:closure` / `manifest:check` after the second re-seal | 0 / 0 / 0 | sealed from the committed bytes of the preceding docs commit, per the two-commit pattern (§9.4) |
+| `npm run verify:clean-checkout` after the second re-seal | 0 | green record committed as the record-only commit on top of the re-seal (§14 forbids embedding the container commit; resolve externally with `git log -1 -- evidence/clean-checkout.json`) |
 
 ### 9.4 Open items before merge
 
@@ -243,16 +247,37 @@ commit, never the S2-004 record.
   `test:s2-004-security-probes`, `verify:s2-004`, `verify:s2-004-db-replay`),
   and — closing a fail-open hole inherited from the S2-003 era — the S2-003
   steps that were missing from `requiredIds` are gating now as well.
+- **broken re-seal at `20ea63c` (second seal incident of this pass)** — the
+  report edit and the re-seal landed in a single commit, but
+  `generate-manifests.mjs` seals digests read via `git show HEAD:` — the
+  *committed* bytes — so the root manifest committed in `20ea63c` was sealed
+  from the pre-edit report (15794 bytes sealed vs 15471 in-tree,
+  `sha256 ddad86e7…` vs `c97448fa…`) and `manifest:check` exits 1 at
+  `20ea63c`. The commit-message claim "manifest:check and inventory:check
+  both exit 0" was copied from `ac5641d` and was false. The red
+  `verify:clean-checkout` run that exposed it is committed as
+  `evidence/clean-checkout.json`: `root-manifest` FAIL (the stale seal),
+  `identity-tests` FAIL (the second flake occurrence below), and — worth
+  noting — all five S2-004 stage steps PASS in that same record. Remediation:
+  the docs commit lands first, the re-seal is regenerated from the committed
+  bytes of that commit in a separate commit (the `e6b9a72` → `b31ee5c`
+  pattern this pass should have followed), and the green record is committed
+  last, touching only the record file.
 - **load-sensitive flakes observed in this pass (root cause unknown, tracked)**
-  — **identity suite**: one clean-checkout attempt observed 158/159 (one
-  identity test failed once), not reproduced on re-run (159/159 locally and
-  in the green record); **sandbox suite**: one extended clean-checkout
-  attempt observed 17/18 (`cancellation kills the whole tree: no survivors`,
-  a Windows process-tree kill race, S2-002 code untouched by S2-004).
-  Neither failure relates to an implementation change; both passed on
-  re-run. A GitHub issue must be filed when the branch is pushed
-  (suggested title: `S2-004: flaky sandbox/identity suites under clean-checkout
-  load (17/18 and 158/159, no reproduction)`) so the flakes cannot silently
+  — **identity suite**: clean-checkout attempts have now observed 158/159
+  **twice** (once in an earlier attempt, once in the incident record above);
+  the failing subtest id is not recoverable because the runner stores only
+  the last 1200 characters of output, but the suite's only live-process
+  probe is probe G (the Windows process-tree kill), which is consistent with
+  the sandbox-suite race below; both attempts passed on re-run (159/159
+  locally and in the green record). **sandbox suite**: one extended
+  clean-checkout attempt observed 17/18 (`cancellation kills the whole tree:
+  no survivors`, a Windows process-tree kill race, S2-002 code untouched by
+  S2-004).
+  Neither failure relates to an implementation change. A GitHub issue must
+  be filed when the branch is pushed (suggested title: `S2-004: flaky
+  sandbox/identity suites under clean-checkout load (sandbox 17/18 once;
+  identity 158/159 twice)`) so the flakes cannot silently
   recur inside a gated run.
 - **archive-safe binding test** — extending the runner exposed a second
   inherited flaw: `tests/claims/dependency-binding.test.mjs` ran the *real*
