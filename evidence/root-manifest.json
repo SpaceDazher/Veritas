@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "0eaea4c077c8797d98059b31fd1c191a4756e9d5",
-  "sourceTree": "e9973b73498acf857ca7396a643f75f60138950b",
+  "sourceCommit": "81f753be77ca6b6d36ea64220741c31673b52167",
+  "sourceTree": "220f98c064573b771df33aae14f4cae2500d727b",
   "trackedFileCount": 437,
   "manifestFileCount": 433,
-  "payloadManifestSha256": "9641cf11421bf26afd83c00e15bf9b751f1760540e5a22a18e54c3a385c40618",
-  "fileManifestSha256": "a397ba406891b847e0a36ee935fa6b803c7a082c1fb8edd97a56ba1b093823d9",
+  "payloadManifestSha256": "d0861556a76b03dcaf9345b35f78bce8e4dee5e8e94a4489f250b6e53a9ff5df",
+  "fileManifestSha256": "d03c7e2169b1f4029ecebbd4413985e9aa151fafee9a7456af42d5958a12863b",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1137,8 +1137,8 @@
     },
     {
       "path": "docs/decisions/S2-004-EVALUATION-REPORT.md",
-      "sha256": "5f4f2318078c46df6164ac0fd67b104a8c4926e0d0b2b2faa864681f4ed3926f",
-      "bytes": 14922
+      "sha256": "c97448fa73778b6d57048f1ebb18d8384cbf1becbce162bdc19f9248404e7997",
+      "bytes": 15471
     },
     {
       "path": "docs/ingestion/S2-003-CONNECTOR-CONTRACT.md",
@@ -1262,7 +1262,7 @@
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "70f2a17bae67bd1c0e9702a8dad87b055fcc77cfbde0afd2a516f7e3df480e0d",
+      "sha256": "9438521375c9110d04e7a1af4dcf4f242e8dd5b79642897d0bdd58f15556ec91",
       "bytes": 38768
     },
     {
@@ -2047,8 +2047,8 @@
     },
     {
       "path": "tests/claims/dependency-binding.test.mjs",
-      "sha256": "2d92b4c131bc82de42bdf052f7c888b0807a51d35f415e29501bde107c6b17a9",
-      "bytes": 9880
+      "sha256": "05f7703f8cd417be2bb3722f399db2232394b329e9641da59685272d21b71f0e",
+      "bytes": 10209
     },
     {
       "path": "tests/claims/extraction.test.mjs",
