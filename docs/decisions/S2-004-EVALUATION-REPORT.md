@@ -216,8 +216,8 @@ commit, never the S2-004 record.
 | `npm run claims:types` | 0 | 10 contracts, generated types byte-identical |
 | `npm run test:claims` | 0 | 108/108 |
 | `npm run test:s2-004-security-probes` | 0 | 12/12 `DETECTED`, 0 undetected |
-| `npm run verify:s2-004` | 0 | `PASS_WITH_LIMITS`, 0 mismatches (recorded in `evidence/s2-004-comparison.json`; not re-run during the reseal pass so frozen run evidence stays untouched) |
-| `npm run verify:s2-004-db-replay` | 0 | 96/96, 0 mismatches (recorded in `evidence/s2-004-db-comparison.json`; not re-run during the reseal pass) |
+| `npm run verify:s2-004` | 0 | `PASS_WITH_LIMITS`, 0 mismatches (recorded in `evidence/s2-004-comparison.json`); additionally re-executed against the archive by the extended clean-checkout runner at every clean checkout (§9.4) |
+| `npm run verify:s2-004-db-replay` | 0 | 96/96, 0 mismatches, identical decisions and graph digests; re-run with `--write` at the post-fix HEAD, so the record pins the updated migration digest and `testedImplementationCommit 54c011f` (the previous record predated the whitespace fix) |
 | `npm test` | 0 | 382/382, 0 fail |
 | `npm run typecheck` | 0 | 0 diagnostics |
 | `npm run lint` | 0 | clean |

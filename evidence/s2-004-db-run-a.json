@@ -6,7 +6,7 @@
   "clock": "2026-01-15T08:00:00.000Z",
   "nonce": "n-dbclaimreplay01",
   "output_root": "results/s2-004/db-s2-004-db-run-a",
-  "testedImplementationCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "testedImplementationCommit": "54c011fd5a81bebf7b3f6c3f4f64af05fe52a207",
   "status": "COMPLETED",
   "caseCount": 96,
   "decisionCounts": {
@@ -2217,5 +2217,5 @@
       }
     }
   ],
-  "dbPid": 15796
+  "dbPid": 14040
 }

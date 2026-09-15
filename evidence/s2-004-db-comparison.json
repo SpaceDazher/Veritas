@@ -17,7 +17,7 @@
         },
         {
           "name": "0003_claim_graph.sql",
-          "sha256": "9ad77fe68926e55da095e5b0b4f244f2728d1a7c2ce63b0490454a593318713e"
+          "sha256": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3"
         },
         {
           "name": "0004_claim_graph_state.sql",
@@ -38,7 +38,7 @@
         },
         {
           "name": "0003_claim_graph.sql",
-          "sha256": "9ad77fe68926e55da095e5b0b4f244f2728d1a7c2ce63b0490454a593318713e"
+          "sha256": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3"
         },
         {
           "name": "0004_claim_graph_state.sql",
@@ -48,14 +48,14 @@
     }
   ],
   "pids": {
-    "run_a": 15796,
-    "run_b": 35240
+    "run_a": 14040,
+    "run_b": 22620
   },
   "executors": {
     "run_a": "exec-db-a",
     "run_b": "exec-db-b"
   },
-  "testedImplementationCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "testedImplementationCommit": "54c011fd5a81bebf7b3f6c3f4f64af05fe52a207",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-004-db-comparison.json",
   "integrity": {
     "run_a": {
