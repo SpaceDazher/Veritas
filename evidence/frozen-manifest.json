@@ -246,7 +246,7 @@
     "evidence/s2-004-security-probes.json": "5e11974cc5dd7e0603052a4073b80846faf28329d68aa6f0da6ec10d8d15b52f",
     "migrations/0001_veritas_board.sql": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898",
     "migrations/0002_source_ingestion.sql": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468",
-    "migrations/0003_claim_graph.sql": "9ad77fe68926e55da095e5b0b4f244f2728d1a7c2ce63b0490454a593318713e",
+    "migrations/0003_claim_graph.sql": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3",
     "migrations/0004_claim_graph_state.sql": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d",
     "pilots/pilot-profile.json": "1e12e3bd2fbc261f3986ccfb451de01970f5b3d36a71809ff27b91aded008f87",
     "pilots/scenario-a/acceptance-cases.json": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",

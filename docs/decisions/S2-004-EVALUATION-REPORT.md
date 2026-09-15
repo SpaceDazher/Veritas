@@ -202,6 +202,10 @@ commit, never the S2-004 record.
 - the reseal does not disturb the dependency gates: the S2-003 gate and the
   S2-004 gate both resolve their pinned blobs at their own closure commits
   (`b3fe0ee…`), never at HEAD.
+- the todo §13 range check `git diff --check b3fe0ee..HEAD` exposed 12
+  trailing-whitespace lines in `migrations/0003_claim_graph.sql` (inherited
+  from the implementation commit and invisible to every other gate); they
+  were removed in this pass, so the range check now exits 0.
 
 ### 9.3 Command log with exit codes (todo §18.8)
 
@@ -226,5 +230,5 @@ commit, never the S2-004 record.
 | `npm run inventory:write` / `npm run inventory:check` | 0 / 0 | tracked-file inventory resealed |
 | `npm run verify:clean-checkout` before the reseal | 1 | `passed: false`, step `contracts` FAIL (§9.1) |
 | `npm run verify:clean-checkout` after the reseal | 0 | `passed: true`, all required steps PASS; the record is `evidence/clean-checkout.json` and its containing commit is resolved externally with `git log -1 -- evidence/clean-checkout.json` |
-| `git diff --check` | 0 | no whitespace errors |
+| `git diff --check` (`b3fe0ee…HEAD`) | 0 | no whitespace errors; the §13 range check initially reported 12 trailing-whitespace lines in `migrations/0003_claim_graph.sql`, fixed in this pass |
 | `git status --short` | 0 | clean working tree |

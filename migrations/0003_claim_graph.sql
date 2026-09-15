@@ -24,7 +24,7 @@ CREATE TABLE claims (
     acl_allowed_principals TEXT[] DEFAULT '{}',
     -- Epistemic classification (never auto-promoted)
     epistemic_type    VARCHAR(32) NOT NULL CHECK (epistemic_type IN (
-        'OBSERVATION', 'FACT_CLAIM', 'EXPERT_OPINION', 
+        'OBSERVATION', 'FACT_CLAIM', 'EXPERT_OPINION',
         'HYPOTHESIS', 'FORECAST', 'ANALOGY', 'MECHANISM_CLAIM'
     )),
     -- Text content (original preserved, normalized separate)
@@ -72,7 +72,7 @@ CREATE TABLE claims (
     -- Primary key is (claim_id, revision)
     PRIMARY KEY (claim_id, revision),
     -- Self-referential foreign key for supersedes
-    FOREIGN KEY (supersedes_claim_id, supersedes_revision) 
+    FOREIGN KEY (supersedes_claim_id, supersedes_revision)
         REFERENCES claims (claim_id, revision) DEFERRABLE INITIALLY DEFERRED
 );
 
@@ -135,7 +135,7 @@ CREATE TABLE claim_edges (
     target_claim_id        VARCHAR(64) NOT NULL,
     target_revision        INTEGER NOT NULL CHECK (target_revision >= 1),
     relation               VARCHAR(32) NOT NULL CHECK (relation IN (
-        'SUPPORTS', 'CONTRADICTS', 'REFINES', 'GENERALIZES', 
+        'SUPPORTS', 'CONTRADICTS', 'REFINES', 'GENERALIZES',
         'SPECIALIZES', 'DEPENDS_ON', 'SUPERSEDES', 'TRANSLATES', 'DUPLICATES_CANDIDATE'
     )),
     direction              VARCHAR(16) NOT NULL CHECK (direction IN ('forward', 'bidirectional')),
@@ -464,16 +464,16 @@ BEGIN
     IF p_relation NOT IN ('DEPENDS_ON', 'DERIVED_FROM') THEN
         RETURN FALSE;
     END IF;
-    
+
     -- Recursive CTE to detect cycles
     WITH RECURSIVE edge_path AS (
         SELECT source_claim_id, source_revision, target_claim_id, target_revision, 1 as depth
         FROM claim_edges
         WHERE relation IN ('DEPENDS_ON', 'DERIVED_FROM')
         AND source_claim_id = p_source_claim_id AND source_revision = p_source_revision
-        
+
         UNION ALL
-        
+
         SELECT ce.source_claim_id, ce.source_revision, ce.target_claim_id, ce.target_revision, ep.depth + 1
         FROM claim_edges ce
         JOIN edge_path ep ON ce.source_claim_id = ep.target_claim_id AND ce.source_revision = ep.target_revision
@@ -484,7 +484,7 @@ BEGIN
     FROM edge_path
     WHERE target_claim_id = p_target_claim_id AND target_revision = p_target_revision
     LIMIT 1;
-    
+
     RETURN has_cycle;
 END;
 $$ LANGUAGE plpgsql;
@@ -498,7 +498,7 @@ BEGIN
         NEW.target_claim_id, NEW.target_revision,
         NEW.relation
     ) THEN
-        RAISE EXCEPTION 'Cycle detected in claim edge: % % -> % %', 
+        RAISE EXCEPTION 'Cycle detected in claim edge: % % -> % %',
             NEW.source_claim_id, NEW.source_revision, NEW.target_claim_id, NEW.target_revision;
     END IF;
     RETURN NEW;
@@ -523,7 +523,7 @@ DECLARE
     v_descendant RECORD;
 BEGIN
     v_event_id := 'inv-' || substr(md5(random()::text || clock_timestamp()::text), 1, 16);
-    
+
     INSERT INTO graph_invalidation_events (
         event_id, trigger_type, trigger_id, trigger_revision,
         affected_descendants, reason_code, reason_description,
@@ -534,7 +534,7 @@ BEGIN
         '[]', p_reason_code, p_reason_desc,
         'bfs', 0, '{}', 'IN_PROGRESS', p_created_by
     );
-    
+
     -- Find and mark affected claims as STALE
     -- This is a simplified version; full implementation would traverse the graph
     FOR v_descendant IN
@@ -552,11 +552,11 @@ BEGIN
             p_created_by, c.workspace_id, c.tenant_id
         );
     END LOOP;
-    
+
     UPDATE graph_invalidation_events
     SET completion_state = 'COMPLETED'
     WHERE event_id = v_event_id;
-    
+
     RETURN v_event_id;
 END;
 $$ LANGUAGE plpgsql;
