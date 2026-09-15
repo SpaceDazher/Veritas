@@ -315,7 +315,7 @@
     "src/lib/ingestion/time-model.mjs": "aaed8a3f667265e517dda45fc3cb0bf9ad1d885efdd26060cce45a4cff6361d2",
     "tests/claims/contracts.schemas.test.mjs": "27a2f1b366d778c90e7ca7ef8c3a4bca9867c3e7de6fa0b2fe18a5ec992916a0",
     "tests/claims/contracts.types.test.mjs": "36edc270cccc0c89aa25c233a969e5b902d0cda3909d469032fd925e4d957adc",
-    "tests/claims/dependency-binding.test.mjs": "2d92b4c131bc82de42bdf052f7c888b0807a51d35f415e29501bde107c6b17a9",
+    "tests/claims/dependency-binding.test.mjs": "05f7703f8cd417be2bb3722f399db2232394b329e9641da59685272d21b71f0e",
     "tests/claims/extraction.test.mjs": "eff585774d355faec23208369a1156e0dd28f9a9774cc5baab463ec0654ffd00",
     "tests/claims/graph-policy.test.mjs": "3e7a78e4987793e619a4d15a9404fe92616d63cbc33d2ee3dcda2e3db4aeae2d",
     "tests/claims/helpers.mjs": "2ac75679207e7e5863a15213fb1aa0740f6a7dd6955cd2767b6a96a70e8f4c75",

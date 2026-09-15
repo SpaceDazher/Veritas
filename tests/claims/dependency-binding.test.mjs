@@ -67,8 +67,17 @@ function makeIo(overrides = {}) {
 }
 
 describe('S2-004 dependency gate', () => {
+  const ARCHIVE = !fs.existsSync(path.join(ROOT, '.git'));
+
   test('the tracked binding record passes the real gate against this repository', () => {
     const result = verifyDependencyBinding(RECORD);
+    if (ARCHIVE) {
+      // git-archive checkouts have no .git: byte-level verification is
+      // impossible there and the gate must fail closed (not silently pass).
+      assert.equal(result.ok, false);
+      assert.ok(result.issues.length > 0);
+      return;
+    }
     assert.deepEqual(result.issues, []);
     assert.equal(result.ok, true);
     assert.ok(result.checked >= 30, `too few checks: ${result.checked}`);

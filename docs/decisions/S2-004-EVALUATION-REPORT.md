@@ -250,6 +250,14 @@ commit, never the S2-004 record.
   (suggested title: `S2-004: flaky identity suite in clean checkout
   (158/159, no reproduction)`) so the flake cannot silently recur inside a
   gated run.
+- **archive-safe binding test** — extending the runner exposed a second
+  inherited flaw: `tests/claims/dependency-binding.test.mjs` ran the *real*
+  gate against the archive's absent `.git` and failed (107/108), while the
+  dedicated `s2-004-dependencies` step passes there by design in
+  `ARCHIVE_DEGRADED` mode. The test now mirrors the S2-003 precedent
+  (`tests/ingestion/dependency-binding.test.mjs`) and asserts fail-closed
+  (`ok: false`, issues non-empty) when no `.git` is present: full repo runs
+  and clean archives both pass 108/108.
 - `npm audit` with dev dependencies is a hard exit-0 requirement of §13;
   today it passes with 0 advisories, but future CVEs in dev-only packages
   outside this branch's control would force a false `REVISE`. An
