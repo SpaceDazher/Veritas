@@ -243,13 +243,17 @@ commit, never the S2-004 record.
   `test:s2-004-security-probes`, `verify:s2-004`, `verify:s2-004-db-replay`),
   and — closing a fail-open hole inherited from the S2-003 era — the S2-003
   steps that were missing from `requiredIds` are gating now as well.
-- **identity-suite flake** — root cause unknown, must be tracked. One
-  clean-checkout attempt observed a single identity-suite failure (158/159)
-  that did not reproduce on re-run (159/159 locally and in the final green
-  record). A GitHub issue must be filed when the branch is pushed
-  (suggested title: `S2-004: flaky identity suite in clean checkout
-  (158/159, no reproduction)`) so the flake cannot silently recur inside a
-  gated run.
+- **load-sensitive flakes observed in this pass (root cause unknown, tracked)**
+  — **identity suite**: one clean-checkout attempt observed 158/159 (one
+  identity test failed once), not reproduced on re-run (159/159 locally and
+  in the green record); **sandbox suite**: one extended clean-checkout
+  attempt observed 17/18 (`cancellation kills the whole tree: no survivors`,
+  a Windows process-tree kill race, S2-002 code untouched by S2-004).
+  Neither failure relates to an implementation change; both passed on
+  re-run. A GitHub issue must be filed when the branch is pushed
+  (suggested title: `S2-004: flaky sandbox/identity suites under clean-checkout
+  load (17/18 and 158/159, no reproduction)`) so the flakes cannot silently
+  recur inside a gated run.
 - **archive-safe binding test** — extending the runner exposed a second
   inherited flaw: `tests/claims/dependency-binding.test.mjs` ran the *real*
   gate against the archive's absent `.git` and failed (107/108), while the
