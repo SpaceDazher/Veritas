@@ -57,6 +57,10 @@ Git bytes or digest-verified tracked copies):
   denominators, exclusions, measurement qualifiers, modality and the
   four-time model; quarantine on ambiguity and horizon-less forecasts;
   embedded instructions keep data inert (`policy_blocked`).
+- Frozen-artifact integrity: the S2-004 artifacts are sealed into the reviewed
+  draft set (`evidence/frozen-manifest.json`, 338 entries) and
+  `frozenTargets` in `scripts/validate-contracts.mjs` was extended to cover
+  them; §9 records the inherited red gate this closed.
 
 ## 3. Frozen corpus (96 cases, todo §10 matrix)
 
@@ -159,3 +163,68 @@ tightens (L).
 - Open items for S2-006: independent gold corpus, blind re-annotation,
   calibrated thresholds for near-duplicate merging and contradiction
   precision/recall on externally authored text.
+
+## 9. Frozen draft artifacts: inherited red gate, reseal and command log
+
+### 9.1 The clean-checkout record committed at `3b6f8af` is red, not green
+
+`evidence/clean-checkout.json` as committed in `3b6f8af` records
+`exitCode: 1`, `passed: false`, with the step `contracts`
+(`node scripts/validate-contracts.mjs`) `FAIL` and the assertion
+`Frozen draft files changed: run an explicit reviewed freeze`. The commit
+subject of `3b6f8af` ("record green independent clean checkout") therefore
+contradicted the record it introduced; the record itself was accurate, and
+re-running that command at that HEAD reproduces the failure.
+
+Root cause: S2-004 added or changed files inside targets frozen by
+S2-001/S2-002/S2-003 — `contracts/` (10 claim graph schemas), `migrations/`
+(`0003_claim_graph.sql`, `0004_claim_graph_state.sql`) and `evidence/external/`
+(3 Stage-1 evaluation records) — and changed two frozen S2-003 files
+(`scripts/verify-s2-003-dependencies.mjs` and
+`tests/ingestion/dependency-binding.test.mjs`, the reachability fix for the
+inherited origin/main defect described in §1) without ever running the
+reviewed freeze. The sealed manifest therefore held 199 entries against 214
+files. The S2-004 dependency gate cannot detect this: it verifies the
+historical blob of `evidence/clean-checkout.json` at the S2-003 closure
+commit, never the S2-004 record.
+
+### 9.2 Remediation applied on this branch (local; not pushed)
+
+- `frozenTargets` extended with the S2-004 artifacts (`src/lib/claims`,
+  `tests/claims`, `corpus/s2-004`, `docs/claims`, the S2-004 runners,
+  `evidence/s2-004-dependency-binding.json`,
+  `evidence/s2-004-security-probes.json`) — the same coverage rule S2-003
+  applied to its ingestion artifacts, so no stage can live outside the gate.
+- reviewed freeze applied: 199 → 338 entries, +139 added, 0 removed, 3 updated
+  digests (`scripts/validate-contracts.mjs`,
+  `scripts/verify-s2-003-dependencies.mjs`,
+  `tests/ingestion/dependency-binding.test.mjs`).
+- the reseal does not disturb the dependency gates: the S2-003 gate and the
+  S2-004 gate both resolve their pinned blobs at their own closure commits
+  (`b3fe0ee…`), never at HEAD.
+
+### 9.3 Command log with exit codes (todo §18.8)
+
+| command | exit code | result |
+|---|---|---|
+| `npm ci` | 0 | clean install |
+| `npm run verify:s2-004-dependencies` | 0 | 33 checks, `FULL_GIT_BYTES`, no issues |
+| `npm run claims:types` | 0 | 10 contracts, generated types byte-identical |
+| `npm run test:claims` | 0 | 108/108 |
+| `npm run test:s2-004-security-probes` | 0 | 12/12 `DETECTED`, 0 undetected |
+| `npm run verify:s2-004` | 0 | `PASS_WITH_LIMITS`, 0 mismatches (recorded in `evidence/s2-004-comparison.json`; not re-run during the reseal pass so frozen run evidence stays untouched) |
+| `npm run verify:s2-004-db-replay` | 0 | 96/96, 0 mismatches (recorded in `evidence/s2-004-db-comparison.json`; not re-run during the reseal pass) |
+| `npm test` | 0 | 382/382, 0 fail |
+| `npm run typecheck` | 0 | 0 diagnostics |
+| `npm run lint` | 0 | clean |
+| `npm run build` | 0 | clean checkout (locally needs `DATABASE_URL`; a dummy DSN is sufficient and the clean-checkout runner sets it) |
+| `npm audit --omit=dev` / `npm audit` | 0 / 0 | 0 vulnerabilities |
+| `node scripts/validate-contracts.mjs` before the reseal | 1 | red: frozen manifest drift (§9.1) |
+| `node scripts/validate-contracts.mjs` after the reseal | 0 | 34/34 policy probes, 11 schema fixtures, 25 mutations rejected |
+| `npm run verify:s2-003-dependencies` | 0 | inherited ingestion gate green after the reseal |
+| `npm run manifest:write` / `npm run manifest:check` | 0 / 0 | root manifest resealed to the reseal commit |
+| `npm run inventory:write` / `npm run inventory:check` | 0 / 0 | tracked-file inventory resealed |
+| `npm run verify:clean-checkout` before the reseal | 1 | `passed: false`, step `contracts` FAIL (§9.1) |
+| `npm run verify:clean-checkout` after the reseal | 0 | `passed: true`, all required steps PASS; the record is `evidence/clean-checkout.json` and its containing commit is resolved externally with `git log -1 -- evidence/clean-checkout.json` |
+| `git diff --check` | 0 | no whitespace errors |
+| `git status --short` | 0 | clean working tree |
