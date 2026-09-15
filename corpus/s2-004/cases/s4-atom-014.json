@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s4-atom-014",
+  "case_number": 14,
+  "category": "atomic_extraction",
+  "severity": "medium",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "tenant_id": "tn-corpus",
+    "operation_actor": "prn-extractor",
+    "segments": [
+      {
+        "segment_id": "seg-cac8f31d4a8d",
+        "snapshot": {
+          "snapshot_id": "snp-1",
+          "published_at": "2026-01-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2026-01-05T09:00:00.000Z",
+          "fetched_at": "2026-01-06T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Water was recorded freezing at 0 degrees Celsius in the experiment.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "lineage": null,
+    "lenses": [],
+    "lens_candidates": [],
+    "review": null,
+    "invalidation": null
+  },
+  "contradiction": null,
+  "translation_check": null,
+  "expected": {
+    "claims": [
+      {
+        "normalized_text": "Water was recorded freezing at 0 degrees Celsius in the experiment.",
+        "epistemic_type": "OBSERVATION",
+        "polarity": "affirmative",
+        "units": "°C",
+        "denominator": null,
+        "value_range": {
+          "min": 0,
+          "max": 0
+        },
+        "population": null,
+        "geography": null,
+        "period": null,
+        "exclusions": [],
+        "qualifiers_includes": [
+          "unit:°C"
+        ],
+        "lifecycle": "PROPOSED",
+        "span_text": "Water was recorded freezing at 0 degrees Celsius in the experiment."
+      }
+    ],
+    "abstentions": []
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "convention": "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md extraction conventions v1.0.0"
+  }
+}

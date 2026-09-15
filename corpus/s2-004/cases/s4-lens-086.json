@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s4-lens-086",
+  "case_number": 86,
+  "category": "expert_lens_isolation",
+  "severity": "medium",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "tenant_id": "tn-corpus",
+    "operation_actor": "prn-extractor",
+    "segments": [],
+    "lineage": null,
+    "lenses": [
+      {
+        "contractVersion": "1.0.0",
+        "lens_id": "len-iso-6",
+        "owner_workspace_id": "ws-corpus",
+        "owner_principal_id": "prn-user-1",
+        "expert_id": "exp-9",
+        "domain": "energy economics",
+        "task_class": "fact_checking",
+        "weight": 0.9,
+        "valid_from": "2026-01-01T00:00:00.000Z",
+        "valid_until": "2027-01-01T00:00:00.000Z",
+        "rationale": "annotator-issued fixture",
+        "issuer": "prn-admin",
+        "revoked_at": null,
+        "revocation_reason": null,
+        "created_at": "2026-01-15T08:00:00.000Z"
+      }
+    ],
+    "lens_candidates": [
+      {
+        "claim_id": "clm-trusted",
+        "base_rank": 1,
+        "expert_id": "exp-1",
+        "epistemic_type": "EXPERT_OPINION",
+        "evidence_family_count": 0,
+        "lifecycle": "PROPOSED",
+        "calibration": "NOT_MEASURED"
+      },
+      {
+        "claim_id": "clm-plain",
+        "base_rank": 1.2,
+        "expert_id": "exp-other",
+        "epistemic_type": "FACT_CLAIM",
+        "evidence_family_count": 4,
+        "lifecycle": "PROPOSED",
+        "calibration": "NOT_MEASURED"
+      }
+    ],
+    "review": null,
+    "invalidation": null
+  },
+  "contradiction": null,
+  "translation_check": null,
+  "expected": {
+    "claims": [],
+    "abstentions": [],
+    "lens": {
+      "expected_top": "clm-plain",
+      "expected_influence": "expert_mismatch",
+      "protected_fields_preserved": true
+    }
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "convention": "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md extraction conventions v1.0.0"
+  }
+}

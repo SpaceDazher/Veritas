@@ -31,7 +31,7 @@ const FORECAST_CUES = [
   'is expected to', 'are expected to', 'is projected to', 'are projected to',
   'is forecast', 'are forecast', 'will reach', 'will grow', 'will rise',
   'will fall', 'will decline', 'will increase', 'will decrease', 'predicts that',
-  'forecast', 'projected to',
+  'predict that', 'predicted that', 'forecasts that', 'forecast that', 'projected to',
 ];
 const HYPOTHESIS_CUES = [
   'hypothes', 'may be caused', 'might be', 'could be explained', 'plausible',
@@ -53,7 +53,7 @@ const OPINION_CUES = [
   'underrated', 'best approach', 'worst approach',
 ];
 const OBSERVATION_CUES = [
-  'observed', 'measured', 'recorded', 'survey found', 'survey of',
+  'observed', 'measured that', 'recorded', 'survey found', 'survey of',
   'samples showed', 'data show', 'data shows', 'study found', 'reported that',
 ];
 const NEGATION_CUES = [
@@ -72,6 +72,11 @@ const UNITS = [
   [/\bUSD\b|\bdollars?\b/i, 'USD'],
   [/\bEUR\b|\beuros?\b/i, 'EUR'],
   [/\bkg\b|\bkilograms?\b/i, 'kg'],
+  [/\bkWh\b|\bkilowatt hours?\b/i, 'kWh'],
+  [/\bgigawatts?\b|\bGW\b/i, 'GW'],
+  [/\bterawatt hours?\b|\bTWh\b/i, 'TWh'],
+  [/\bcubic meters?\b/i, 'cubic meters'],
+  [/\bmillimeters?\b/i, 'millimeters'],
   [/\btonnes?\b|\bmetric tons?\b/i, 'tonnes'],
   [/\bkm\b|\bkilometers?\b|\bkilometres?\b/i, 'km'],
   [/\bmiles?\b/i, 'miles'],
@@ -88,8 +93,8 @@ const UNITS = [
   [/\bhouseholds?\b/i, 'households'],
   [/\bcompanies?\b|\bfirms?\b/i, 'companies'],
   [/\bjobs?\b/i, 'jobs'],
-  [/\bdeaths?\b/i, 'deaths'],
   [/\bcases\b/i, 'cases'],
+  [/\bdeaths?\b/i, 'deaths'],
 ];
 
 const POPULATION_PATTERNS = [
@@ -118,30 +123,48 @@ function matchFirst(text, cues) {
   return null;
 }
 
+// The denominator region ("per 1000 people", "of the 500 patients") must not
+// leak its numbers or group words into the claim's value, unit or population.
+function maskDenominators(text) {
+  return text
+    .replace(/\b(?:per|out of|of)\s+(?:the\s+)?[\d,]+\s+\w+/gi, ' ')
+    .replace(/\bper\s+(?!cent\b)(?!the\b)(?:the\s+)?[a-z]\w*(?:\s+[\d,]+\s+\w+)?/gi, ' ')
+    .replace(/\bof\s+((?:the\s+)?[A-Za-z][\w-]*(?:\s+[\w-]+){0,3}?)(?:,|\s+in\s+|\s+during\s+|\s+between\s+|\s+according\s+|$)/gi, ' ');
+}
+
+// Years are period markers, never claim values: "grew 4% from 2020 to 2024"
+// must not produce value_range {2020,2024}.
+function maskYears(text) {
+  return text.replace(/\b(?:19|20)\d{2}\b/g, ' ');
+}
+
 function extractUnit(text) {
+  const masked = maskDenominators(text);
   for (const [pattern, canonical] of UNITS) {
-    if (pattern.test(text)) return canonical;
+    if (pattern.test(masked)) return canonical;
   }
   return null;
 }
 
 function extractNumbers(text) {
+  const masked = maskYears(maskDenominators(text));
   const numbers = [];
   const re = /(\d+(?:[.,]\d+)?)/g;
   let m;
-  while ((m = re.exec(text)) !== null) {
+  while ((m = re.exec(masked)) !== null) {
     numbers.push(Number.parseFloat(m[1].replace(',', '.')));
   }
   return numbers;
 }
 
 function extractValueRange(text) {
+  const masked = maskYears(maskDenominators(text));
   // "between 3 and 5", "3 to 5", "3-5", "1.5–2.5 percent"
-  let m = text.match(/\bbetween\s+(\d+(?:[.,]\d+)?)\s+and\s+(\d+(?:[.,]\d+)?)/i);
+  let m = masked.match(/\bbetween\s+(\d+(?:[.,]\d+)?)\s+and\s+(\d+(?:[.,]\d+)?)/i);
   if (m) return { min: num(m[1]), max: num(m[2]) };
-  m = text.match(/(\d+(?:[.,]\d+)?)\s*(?:-|–|—|to)\s*(\d+(?:[.,]\d+)?)/i);
+  m = masked.match(/(\d+(?:[.,]\d+)?)\s*(?:-|–|—|to)\s*(\d+(?:[.,]\d+)?)/i);
   if (m) return { min: num(m[1]), max: num(m[2]) };
-  const single = text.match(/(\d+(?:[.,]\d+)?)/);
+  const single = masked.match(/(\d+(?:[.,]\d+)?)/);
   if (single) {
     const v = num(single[1]);
     return { min: v, max: v };
@@ -160,6 +183,9 @@ function extractDenominator(text) {
   if (m) return `out of ${m[1]} ${m[2]}`;
   m = text.match(/\bof\s+(?:the\s+)?([\d,]+)\s+(\w+)/i);
   if (m) return `of ${m[1]} ${m[2]}`;
+  // unit-rate denominator without digits: "42 meteors per hour"
+  m = text.match(/\bper\s+(?!cent\b|the\b)([a-z]\w*)\b/i);
+  if (m) return `per ${m[1].trim()}`;
   // percentage share of a base: "22% of EU electricity" -> "of EU electricity"
   if (/%|percent|per cent/i.test(text)) {
     m = text.match(/\bof\s+((?:the\s+)?[A-Za-z][\w-]*(?:\s+[\w-]+){0,3}?)\s*(?:,|\s+in\s+|\s+during\s+|\s+between\s+|\s+according\s+|$)/);
@@ -179,8 +205,9 @@ function extractExclusions(text) {
 }
 
 function extractPopulation(text) {
+  const masked = maskDenominators(text);
   for (const pattern of POPULATION_PATTERNS) {
-    const m = text.match(pattern);
+    const m = masked.match(pattern);
     if (m) return m[0].trim().replace(/\s+/g, ' ');
   }
   return null;
@@ -214,6 +241,8 @@ function extractPeriod(text) {
   let m = text.match(/\bbetween\s+(\d{4})\s+and\s+(\d{4})\b/i);
   if (m) return { start: `${m[1]}-01-01T00:00:00.000Z`, end: `${m[2]}-12-31T23:59:59.999Z` };
   m = text.match(/\bfrom\s+(\d{4})\s+to\s+(\d{4})\b/i);
+  if (m) return { start: `${m[1]}-01-01T00:00:00.000Z`, end: `${m[2]}-12-31T23:59:59.999Z` };
+  m = text.match(/\b(?:started|began) in (\d{4}) and (?:finished|ended) in (\d{4})\b/i);
   if (m) return { start: `${m[1]}-01-01T00:00:00.000Z`, end: `${m[2]}-12-31T23:59:59.999Z` };
   m = text.match(/\bin\s+(\d{4})\b/i);
   if (m) return { start: `${m[1]}-01-01T00:00:00.000Z`, end: `${m[1]}-12-31T23:59:59.999Z` };
@@ -266,11 +295,15 @@ const VERB_CUES = [
   ' does not expect ', ' does not ', ' caused by ', ' covers ', ' surveyed ', ' accounts ',
   ' supports ', ' support ', ' opposes ', ' contradicts ', ' confirms ', ' denies ',
   ' rejects ', ' suggests ', ' indicates ', ' concludes ',
+  ' spans ', ' argue ', ' argues ', ' froze ', ' counted ', ' measures ',
+  ' claims ', ' says ', ' recommends ', ' hypothesize ', ' doubled ',
+  ' holds ', ' stands at ', ' totaled ', ' missed ', ' ranged ',
+  ' varied ', ' moved ', ' responded ', ' started ', ' decline ', ' enrolled ',
+  ' equaled ', ' handled ', ' fetched ', ' needs ',
 ];
 
-// measurement-basis qualifiers: "measured in nominal USD terms" — losing a
-// nominal/real qualifier changes the meaning of every numeric claim
-const MEASUREMENT_QUALIFIER = /\bmeasured in ([^,.;]+? terms)\b/i;
+// measurement-basis qualifiers: "measured in nominal USD terms", "in real terms"
+const MEASUREMENT_QUALIFIER = /\b(?:measured )?in ((?:nominal|real)[^,.;]*? terms)\b/i;
 
 const ABBREVIATIONS = new Set([
   'dr', 'mr', 'mrs', 'ms', 'prof', 'sr', 'jr', 'st', 'vs', 'etc', 'e.g', 'i.e',
@@ -593,7 +626,7 @@ export async function executeClaimExtraction(request, context) {
   if (result.status === 'FAILED' || result.status === 'QUARANTINED') {
     return { claims: [], edges: [], result };
   }
-  const outcome = context.store.commitExtraction({
+  const outcome = await context.store.commitExtraction({
     request,
     result,
     actor: request.actor,

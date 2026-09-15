@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "role": "S2-004 DB-backed run A vs run B comparison (PostgreSQL claim graph stores, separate OS processes)",
+  "databaseEngine": "PostgreSQL",
+  "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+  "schemas": [
+    {
+      "schema": "run_a",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        },
+        {
+          "name": "0003_claim_graph.sql",
+          "sha256": "9ad77fe68926e55da095e5b0b4f244f2728d1a7c2ce63b0490454a593318713e"
+        },
+        {
+          "name": "0004_claim_graph_state.sql",
+          "sha256": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d"
+        }
+      ]
+    },
+    {
+      "schema": "run_b",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        },
+        {
+          "name": "0003_claim_graph.sql",
+          "sha256": "9ad77fe68926e55da095e5b0b4f244f2728d1a7c2ce63b0490454a593318713e"
+        },
+        {
+          "name": "0004_claim_graph_state.sql",
+          "sha256": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d"
+        }
+      ]
+    }
+  ],
+  "pids": {
+    "run_a": 1572,
+    "run_b": 20852
+  },
+  "executors": {
+    "run_a": "exec-db-a",
+    "run_b": "exec-db-b"
+  },
+  "testedImplementationCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-004-db-comparison.json",
+  "integrity": {
+    "run_a": {
+      "acl_leaks": 0,
+      "authority_expansions": 0,
+      "type_promotions_without_review": 0,
+      "lost_negations": 0,
+      "lost_units": 0,
+      "lost_qualifiers": 0,
+      "stale_survivors": 0,
+      "duplicate_side_effects": 0
+    },
+    "run_b": {
+      "acl_leaks": 0,
+      "authority_expansions": 0,
+      "type_promotions_without_review": 0,
+      "lost_negations": 0,
+      "lost_units": 0,
+      "lost_qualifiers": 0,
+      "stale_survivors": 0,
+      "duplicate_side_effects": 0
+    }
+  },
+  "decisionCounts": {
+    "run_a": {
+      "PASS": 95,
+      "FAIL": 1
+    },
+    "run_b": {
+      "PASS": 95,
+      "FAIL": 1
+    }
+  },
+  "graphDigests": {
+    "run_a": "1e335d9a65eedbbbb22b834c814c176246aff2510812270626164f98c17802a3",
+    "run_b": "1e335d9a65eedbbbb22b834c814c176246aff2510812270626164f98c17802a3"
+  },
+  "comparison": {
+    "ok": true,
+    "issues": [],
+    "comparedCases": 96,
+    "decisionMismatches": 0
+  }
+}

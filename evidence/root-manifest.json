@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "5c683717e31842aa2a4e2fc8ed88548e8b9e6ab2",
-  "sourceTree": "7050b4e4e3a1b80aacb952274a79e2b1d304b9dd",
-  "trackedFileCount": 274,
-  "manifestFileCount": 270,
-  "payloadManifestSha256": "401eb313ef313340f6bf3fc7f8c83e85be22a5673a8b964ba84d15e5411c8df2",
-  "fileManifestSha256": "470dcaf0742a97951b6cac6c7f8e8d70d52964f3f6823359a86a4cf439b005ea",
+  "sourceCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "sourceTree": "c92a98f914383333b44780b22af7c38f8bea3e7b",
+  "trackedFileCount": 306,
+  "manifestFileCount": 302,
+  "payloadManifestSha256": "77503935bbe6aeb2ffe42819459b69caa936dce7640d660de94d6bd2065e560f",
+  "fileManifestSha256": "8131283bbd399c25f58f31a08351808b17876c5fcd19216b00a1353963be3a6c",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -41,9 +41,39 @@
       "bytes": 2356
     },
     {
+      "path": "contracts/calibration-record.schema.json",
+      "sha256": "8c7507ebe2f216a46f4c70f7a43e4713ef84f85ac0c14d97e550f953f1b7408d",
+      "bytes": 4237
+    },
+    {
       "path": "contracts/capability.schema.json",
       "sha256": "b19c9386ec3211b0f47da14345d7af1d39588c8b8136c38b53c0f1b825485d2c",
       "bytes": 1954
+    },
+    {
+      "path": "contracts/claim-edge.schema.json",
+      "sha256": "7e1f39607fdae373bdf8b3b64ad562943d0ea8884fe145154ee4a819a394d327",
+      "bytes": 3166
+    },
+    {
+      "path": "contracts/claim-extraction-request.schema.json",
+      "sha256": "13aaa863fddf3d4beedf6ec1be473503425e44a67a2f7bf0dfcc594ded212c3a",
+      "bytes": 2287
+    },
+    {
+      "path": "contracts/claim-extraction-result.schema.json",
+      "sha256": "5f099395cbd4842a26c85a3119f67a7502af219293b0c1fa918d9b1c1d1777b0",
+      "bytes": 4333
+    },
+    {
+      "path": "contracts/claim-review-decision.schema.json",
+      "sha256": "fb198635ae7f3c135d43243028ac451e8fdcfda546dae13ae0e370310b8c139c",
+      "bytes": 2960
+    },
+    {
+      "path": "contracts/claim.schema.json",
+      "sha256": "b492cc972351d29f22ebc24c2afb2a25f64389f4e36e7f8592a6b6df58fabf23",
+      "bytes": 8727
     },
     {
       "path": "contracts/connector-contract.schema.json",
@@ -61,6 +91,21 @@
       "bytes": 5380
     },
     {
+      "path": "contracts/evidence-edge.schema.json",
+      "sha256": "ab5e93ac657775c09fc49f4fec3c9b441f0488f1c5066010199f084eb6b28b52",
+      "bytes": 3484
+    },
+    {
+      "path": "contracts/expert-lens.schema.json",
+      "sha256": "089cd5b1244a638b4655a22f62dcc1bad4d88f87e34ec8772938d72dece7506a",
+      "bytes": 2670
+    },
+    {
+      "path": "contracts/expert-profile.schema.json",
+      "sha256": "04ee7454030e64ad2ab2e4992a38b0614164cbc4d066cf0ecfdd387e5e4be8e7",
+      "bytes": 3825
+    },
+    {
       "path": "contracts/fetch-request.schema.json",
       "sha256": "e1c219a7226a01666793536f2b8e3684350c945acd0e814954cbf66e88c4816e",
       "bytes": 3959
@@ -69,6 +114,11 @@
       "path": "contracts/grant.schema.json",
       "sha256": "d948c47d1037fbc11e8d73028186fa7d3f2b1216245531777cef2069a5426a8f",
       "bytes": 2763
+    },
+    {
+      "path": "contracts/graph-invalidation-event.schema.json",
+      "sha256": "7d36017db90d247cb203538fd179142b44414855a46d7fb3c5d76be3cc049866",
+      "bytes": 3790
     },
     {
       "path": "contracts/human-decision.schema.json",
@@ -661,6 +711,21 @@
       "bytes": 1727
     },
     {
+      "path": "evidence/external/s1-003/evaluation-record.json",
+      "sha256": "6e9d691094c4cce0072cc35ef23b69402caccfc9d05db16d4fe897e5a5daa3a2",
+      "bytes": 1364
+    },
+    {
+      "path": "evidence/external/s1-011/evaluation-record.json",
+      "sha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+      "bytes": 17897
+    },
+    {
+      "path": "evidence/external/s1-012/evaluation-record.json",
+      "sha256": "d76439e89be4e8c09745d92b691c7e2f3aaec435ee11b37296fb029c252c8501",
+      "bytes": 22310
+    },
+    {
       "path": "evidence/external/s2-001/acceptance-cases.json",
       "sha256": "828d0b14b9d05742ffcacdd7cb66b1c13d58b90193a7b975be85f5ebcb344fa1",
       "bytes": 2506
@@ -796,6 +861,16 @@
       "bytes": 2999
     },
     {
+      "path": "evidence/s2-004-dependency-binding.json",
+      "sha256": "3cba23d92c2f65c57232b84e8d52754e853d25944ad7f17b8809801b36c108da",
+      "bytes": 7012
+    },
+    {
+      "path": "evidence/s2-004-security-probes.json",
+      "sha256": "5e11974cc5dd7e0603052a4073b80846faf28329d68aa6f0da6ec10d8d15b52f",
+      "bytes": 2784
+    },
+    {
       "path": "evidence/synthetic-smoke.json",
       "sha256": "0d44647e94b784c41ff32cdf73afac8ec350c2829e1e333587d3171d4fd0511b",
       "bytes": 873
@@ -832,8 +907,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "f6e33e42eaaf53ef49506166166c16d143dfd81ff635af6f1941955821257a9f",
-      "bytes": 2845
+      "sha256": "3f78222db3ccf8227784983b7956ee1de1a757eedb30d3c960bf138a19b30f90",
+      "bytes": 3114
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -951,6 +1026,11 @@
       "bytes": 1925
     },
     {
+      "path": "scripts/generate-claim-types.mjs",
+      "sha256": "11a4e68c993affb617df3d1bc28e11689f7100ee79c5b0dc882b5951caad4d74",
+      "bytes": 5733
+    },
+    {
       "path": "scripts/generate-contracts.py",
       "sha256": "374dddaaa665c0a2cef282f753a08eb9257497b1cf0ca60f9256f93e11b693b4",
       "bytes": 20417
@@ -999,6 +1079,11 @@
       "path": "scripts/s2-003-security-probes.mjs",
       "sha256": "c9608ff863db0d7d89403838c40130f8386896b570ea7a8acdb1f6dca832c767",
       "bytes": 18420
+    },
+    {
+      "path": "scripts/s2-004-security-probes.mjs",
+      "sha256": "dbf80bbd94c03dc25a40f2c5f153f9e50f338498cbd16b7e0fc694b33394b15d",
+      "bytes": 28498
     },
     {
       "path": "scripts/security-probes.mjs",
@@ -1066,6 +1151,11 @@
       "bytes": 12201
     },
     {
+      "path": "scripts/verify-s2-004-dependencies.mjs",
+      "sha256": "231280bf82a832101b2bb688c142d6304c82fd2036463e0cce3dbe456a2da61c",
+      "bytes": 15386
+    },
+    {
       "path": "scripts/verify.mjs",
       "sha256": "eb4c6975786c78a96695ffe3b9ea6bd500011a2d255eacb2d02a10b01ffe0a14",
       "bytes": 10022
@@ -1124,6 +1214,41 @@
       "path": "src/lib/board.ts",
       "sha256": "af18efd1913252c92115df7d9ee6fce4e466d78b1ebeac3061f60fa612726405",
       "bytes": 4548
+    },
+    {
+      "path": "src/lib/claims/contracts.d.ts",
+      "sha256": "dbfa45e6be6d31bc52a16688e4d453d486d2d81aaaac597b876456a8668aea13",
+      "bytes": 13449
+    },
+    {
+      "path": "src/lib/claims/contradiction.mjs",
+      "sha256": "4a37de2391583173338ac190c5cef8b5c8175b1a322c8f203662a00380c5ce72",
+      "bytes": 7072
+    },
+    {
+      "path": "src/lib/claims/extraction.mjs",
+      "sha256": "79c3577445314bfac55e0eb1cc967bb7d432ed0d9485d8aa0ead983568ad4fb8",
+      "bytes": 23178
+    },
+    {
+      "path": "src/lib/claims/lens.mjs",
+      "sha256": "cf9d9827d784f936b96d1998296aa5ca3d8a951e1005b455744aa6ac0b31c318",
+      "bytes": 3173
+    },
+    {
+      "path": "src/lib/claims/provenance.mjs",
+      "sha256": "a2a1e50f38dbb3d193a8c84404d1d2dcbbe62b21892bcf064a8143cf6b20f8ce",
+      "bytes": 5774
+    },
+    {
+      "path": "src/lib/claims/store.mjs",
+      "sha256": "18d9d7e8801b0ee9d42df9d55541bf1f300768b8548308d4cd5b2cbcc861126b",
+      "bytes": 43697
+    },
+    {
+      "path": "src/lib/claims/validation.mjs",
+      "sha256": "5c1894586223c161d69a1b6b0ccc70c8ca875afac78039f9f3fa7ea52bd0080b",
+      "bytes": 6055
     },
     {
       "path": "src/lib/contract-policy.mjs",
@@ -1254,6 +1379,41 @@
       "path": "tasks/S2-003_SOURCE_INGESTION.md",
       "sha256": "b6592190e624e38b779fae3668e71d514efe50dca3affca93c9cef4d56d5b06c",
       "bytes": 23875
+    },
+    {
+      "path": "tests/claims/contracts.schemas.test.mjs",
+      "sha256": "27a2f1b366d778c90e7ca7ef8c3a4bca9867c3e7de6fa0b2fe18a5ec992916a0",
+      "bytes": 12680
+    },
+    {
+      "path": "tests/claims/contracts.types.test.mjs",
+      "sha256": "36edc270cccc0c89aa25c233a969e5b902d0cda3909d469032fd925e4d957adc",
+      "bytes": 1399
+    },
+    {
+      "path": "tests/claims/dependency-binding.test.mjs",
+      "sha256": "e48f434d2f86b583ea27a32681f937c03053a5d7774dc1d32a4e7001b543ff17",
+      "bytes": 9787
+    },
+    {
+      "path": "tests/claims/extraction.test.mjs",
+      "sha256": "eff585774d355faec23208369a1156e0dd28f9a9774cc5baab463ec0654ffd00",
+      "bytes": 10614
+    },
+    {
+      "path": "tests/claims/graph-policy.test.mjs",
+      "sha256": "3e7a78e4987793e619a4d15a9404fe92616d63cbc33d2ee3dcda2e3db4aeae2d",
+      "bytes": 15868
+    },
+    {
+      "path": "tests/claims/helpers.mjs",
+      "sha256": "2ac75679207e7e5863a15213fb1aa0740f6a7dd6955cd2767b6a96a70e8f4c75",
+      "bytes": 4619
+    },
+    {
+      "path": "tests/claims/store.test.mjs",
+      "sha256": "553d84f07d1da2e8869205631301bcad7f3c4de25a8ce9b2c4c47ef44ff1c632",
+      "bytes": 19680
     },
     {
       "path": "tests/database/postgres-smoke.test.mjs",

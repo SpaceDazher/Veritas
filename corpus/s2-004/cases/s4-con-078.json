@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s4-con-078",
+  "case_number": 78,
+  "category": "contradiction_scope",
+  "severity": "high",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "tenant_id": "tn-corpus",
+    "operation_actor": "prn-extractor",
+    "segments": [
+      {
+        "segment_id": "seg-340e4e235abc",
+        "snapshot": {
+          "snapshot_id": "snp-1",
+          "published_at": "2026-01-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2026-01-05T09:00:00.000Z",
+          "fetched_at": "2026-01-06T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Revenue grew 12% in 2024, except agricultural goods.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-aef5946eb677",
+        "snapshot": {
+          "snapshot_id": "snp-1",
+          "published_at": "2026-01-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2026-01-05T09:00:00.000Z",
+          "fetched_at": "2026-01-06T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Revenue fell 3% in 2024, except agricultural goods.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "lineage": null,
+    "lenses": [],
+    "lens_candidates": [],
+    "review": null,
+    "invalidation": null
+  },
+  "contradiction": {
+    "expected_relation": "CONTRADICTS"
+  },
+  "translation_check": null,
+  "expected": {
+    "claims": [
+      {
+        "normalized_text": "Revenue grew 12% in 2024, except agricultural goods.",
+        "epistemic_type": "FACT_CLAIM",
+        "polarity": "affirmative",
+        "units": "%",
+        "denominator": null,
+        "value_range": {
+          "min": 12,
+          "max": 12
+        },
+        "population": null,
+        "geography": null,
+        "period": {
+          "start": "2024-01-01T00:00:00.000Z",
+          "end": "2024-12-31T23:59:59.999Z"
+        },
+        "exclusions": [
+          "agricultural goods"
+        ],
+        "qualifiers_includes": [
+          "unit:%",
+          "exclusions:1"
+        ],
+        "lifecycle": "PROPOSED",
+        "span_text": "Revenue grew 12% in 2024, except agricultural goods."
+      },
+      {
+        "normalized_text": "Revenue fell 3% in 2024, except agricultural goods.",
+        "epistemic_type": "FACT_CLAIM",
+        "polarity": "affirmative",
+        "units": "%",
+        "denominator": null,
+        "value_range": {
+          "min": 3,
+          "max": 3
+        },
+        "population": null,
+        "geography": null,
+        "period": {
+          "start": "2024-01-01T00:00:00.000Z",
+          "end": "2024-12-31T23:59:59.999Z"
+        },
+        "exclusions": [
+          "agricultural goods"
+        ],
+        "qualifiers_includes": [
+          "unit:%",
+          "exclusions:1"
+        ],
+        "lifecycle": "PROPOSED",
+        "span_text": "Revenue fell 3% in 2024, except agricultural goods."
+      }
+    ],
+    "abstentions": []
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "convention": "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md extraction conventions v1.0.0"
+  }
+}

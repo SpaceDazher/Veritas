@@ -83,10 +83,12 @@ export function verifyDependencyBinding(record, io = {}) {
       issues.push('origin/main:unresolvable');
     }
     if (GIT_COMMIT.test(mainHead)) {
-      require(mainHead === s2.canonicalBase, 'origin/main:not-at-s2-003-canonical-base');
       checked.push('origin/main:head');
     }
-    for (const [role, commit] of [['closure', s2.closureCommit], ['implementation', s2.implementationCommit]]) {
+    // §1: origin/main must CONTAIN the S2-003 merge — the canonical base and
+    // both pinned commits must be reachable ancestors, HEAD equality is not
+    // required (later stages legitimately move origin/main forward).
+    for (const [role, commit] of [['canonicalBase', s2.canonicalBase], ['closure', s2.closureCommit], ['implementation', s2.implementationCommit]]) {
       if (!GIT_COMMIT.test(commit ?? '')) {
         issues.push(`s2-003.${role}Commit:unpinned`);
         continue;

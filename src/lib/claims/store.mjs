@@ -831,7 +831,8 @@ export function createClaimGraphStore({ authorities, clock, segmentResolver, sna
     const affected = [];
     const queue = [];
 
-    if (trigger.type.startsWith('source_snapshot') || trigger.type.startsWith('content_segment')) {
+    if (trigger.type.startsWith('source_snapshot') || trigger.type.startsWith('content_segment')
+      || trigger.type === 'retention_expiry' || trigger.type === 'access_restriction') {
       for (const edge of evidenceEdges.values()) {
         const segmentMatches = edge.segment_id === trigger.id;
         if (segmentMatches) {

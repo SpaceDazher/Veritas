@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 274.
+Generated from `git ls-files`; count: 306.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -8,12 +8,22 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `.gitignore`
 - `contracts/acceptance-cases.schema.json`
 - `contracts/authorization-decision.schema.json`
+- `contracts/calibration-record.schema.json`
 - `contracts/capability.schema.json`
+- `contracts/claim-edge.schema.json`
+- `contracts/claim-extraction-request.schema.json`
+- `contracts/claim-extraction-result.schema.json`
+- `contracts/claim-review-decision.schema.json`
+- `contracts/claim.schema.json`
 - `contracts/connector-contract.schema.json`
 - `contracts/connector-error.schema.json`
 - `contracts/content-segment.schema.json`
+- `contracts/evidence-edge.schema.json`
+- `contracts/expert-lens.schema.json`
+- `contracts/expert-profile.schema.json`
 - `contracts/fetch-request.schema.json`
 - `contracts/grant.schema.json`
+- `contracts/graph-invalidation-event.schema.json`
 - `contracts/human-decision.schema.json`
 - `contracts/ingestion-run.schema.json`
 - `contracts/lease.schema.json`
@@ -135,6 +145,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/dependency-audit-full.json`
 - `evidence/dependency-audit-runtime.json`
 - `evidence/external/s1-001/evaluation-record.json`
+- `evidence/external/s1-003/evaluation-record.json`
+- `evidence/external/s1-011/evaluation-record.json`
+- `evidence/external/s1-012/evaluation-record.json`
 - `evidence/external/s2-001/acceptance-cases.json`
 - `evidence/external/s2-001/clean-checkout.json`
 - `evidence/external/s2-001/pilot-closure-manifest.json`
@@ -163,6 +176,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-003-run-a.json`
 - `evidence/s2-003-run-b.json`
 - `evidence/s2-003-security-probes.json`
+- `evidence/s2-004-dependency-binding.json`
+- `evidence/s2-004-security-probes.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -194,6 +209,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/check-public-artifacts.mjs`
 - `scripts/cleanup-smoke.ts`
 - `scripts/collect-baseline.py`
+- `scripts/generate-claim-types.mjs`
 - `scripts/generate-contracts.py`
 - `scripts/generate-docs.py`
 - `scripts/generate-ingestion-types.mjs`
@@ -204,6 +220,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-003-db-replay.mjs`
 - `scripts/s2-003-run.mjs`
 - `scripts/s2-003-security-probes.mjs`
+- `scripts/s2-004-security-probes.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
@@ -217,6 +234,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-s2-002.mjs`
 - `scripts/verify-s2-003-dependencies.mjs`
 - `scripts/verify-s2-003.mjs`
+- `scripts/verify-s2-004-dependencies.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-cli.mjs`
 - `src/app/api/board/route.ts`
@@ -229,6 +247,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/db/index.ts`
 - `src/db/schema.ts`
 - `src/lib/board.ts`
+- `src/lib/claims/contracts.d.ts`
+- `src/lib/claims/contradiction.mjs`
+- `src/lib/claims/extraction.mjs`
+- `src/lib/claims/lens.mjs`
+- `src/lib/claims/provenance.mjs`
+- `src/lib/claims/store.mjs`
+- `src/lib/claims/validation.mjs`
 - `src/lib/contract-policy.mjs`
 - `src/lib/identity/contract-registry.mjs`
 - `src/lib/identity/contracts.fixtures.ts`
@@ -255,6 +280,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/time-model.mjs`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tasks/S2-003_SOURCE_INGESTION.md`
+- `tests/claims/contracts.schemas.test.mjs`
+- `tests/claims/contracts.types.test.mjs`
+- `tests/claims/dependency-binding.test.mjs`
+- `tests/claims/extraction.test.mjs`
+- `tests/claims/graph-policy.test.mjs`
+- `tests/claims/helpers.mjs`
+- `tests/claims/store.test.mjs`
 - `tests/database/postgres-smoke.test.mjs`
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/dependency-binding.test.mjs`

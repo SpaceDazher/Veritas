@@ -35,12 +35,36 @@ function periodsOverlap(a, b) {
   return { overlap: aStart <= bEnd && bStart <= aEnd, proven: true };
 }
 
-function textsOverlap(a, b) {
-  if (!a || !b) return { overlap: true, proven: false };
-  const na = a.toLowerCase().trim();
-  const nb = b.toLowerCase().trim();
-  if (na === nb) return { overlap: true, proven: true };
-  return { overlap: na.includes(nb) || nb.includes(na), proven: true };
+const FRAME_STOP = new Set([
+  'the', 'a', 'an', 'of', 'in', 'on', 'at', 'to', 'by', 'for', 'and', 'or',
+  'is', 'are', 'was', 'were', 'does', 'do', 'did', 'has', 'have', 'had',
+  'not', 'no', 'never', 'without', 'cannot', 'neither', 'nor', 'fails',
+  'between', 'among', 'from', 'over', 'across', 'within', 'with',
+  // units/quantities never identify a proposition frame
+  'percent', 'usd', 'eur', 'kg', 'kwh', 'gw', 'twh', 'tonne', 'tonnes', 'km',
+  'mile', 'miles', 'meter', 'meters', 'metre', 'metres', 'hour', 'hours',
+  'day', 'days', 'month', 'months', 'year', 'years', 'people', 'patient',
+  'patients', 'respondent', 'respondents', 'student', 'students',
+  'household', 'households', 'company', 'companies', 'firm', 'firms', 'job',
+  'jobs', 'case', 'cases', 'death', 'deaths',
+]);
+
+// quantity-free, function-word-free, lightly stemmed token frame of a phrase
+function frame(text) {
+  return String(text ?? '')
+    .toLowerCase()
+    .replace(/\d+(?:[.,]\d+)?/g, ' ')
+    .split(/[^a-z]+/)
+    .filter((t) => t && !FRAME_STOP.has(t))
+    .map((t) => (t.length > 3 && t.endsWith('s') ? t.slice(0, -1) : t));
+}
+
+function framesOverlap(a, b) {
+  const sa = new Set(a);
+  const sb = new Set(b);
+  if (sa.size === 0 || sb.size === 0) return true; // generic frame
+  for (const t of sa) if (sb.has(t)) return true;
+  return false;
 }
 
 // Compares two claim revisions. Returns:
@@ -48,21 +72,27 @@ function textsOverlap(a, b) {
 //   { relation: 'SCOPE_DIFFERENCE', reason, scope_intersection }
 //   { relation: 'INDEPENDENT', reason }
 export function compareClaims(claimA, claimB) {
-  // the proposition must at least talk about the same subject and object
-  const subject = textsOverlap(claimA.subject, claimB.subject);
-  const object = textsOverlap(claimA.object, claimB.object);
-  if (!subject.overlap || !object.overlap) {
+  // the proposition must at least talk about the same subject
+  const subject = framesOverlap(frame(claimA.subject), frame(claimB.subject));
+  if (!subject) {
     return { relation: 'INDEPENDENT', reason: 'different proposition' };
   }
 
-  const population = textsOverlap(claimA.population, claimB.population);
-  const geography = textsOverlap(claimA.geography, claimB.geography);
+  const population = framesOverlap(frame(claimA.population), frame(claimB.population))
+    ? { overlap: true, proven: Boolean(claimA.population && claimB.population) }
+    : { overlap: false, proven: Boolean(claimA.population && claimB.population) };
+  const geography = framesOverlap(frame(claimA.geography), frame(claimB.geography))
+    ? { overlap: true, proven: Boolean(claimA.geography && claimB.geography) }
+    : { overlap: false, proven: Boolean(claimA.geography && claimB.geography) };
   const period = periodsOverlap(claimA.period, claimB.period);
+  const object = framesOverlap(frame(claimA.object), frame(claimB.object));
   const scope_intersection = {
     population_overlap: population.overlap,
     geography_overlap: geography.overlap,
     period_overlap: period.overlap,
-    units_compatible: claimA.units === claimB.units || Boolean(convertValue(0, claimA.units ?? '', claimB.units ?? '')) && (claimA.units !== null || claimB.units === null),
+    units_compatible: claimA.units === claimB.units
+      || (claimA.units === null || claimB.units === null)
+      || Boolean(convertValue(0, claimA.units ?? '', claimB.units ?? '')),
   };
 
   // scope guard: different populations, geographies or periods without proven
@@ -76,9 +106,13 @@ export function compareClaims(claimA, claimB) {
   if (period.proven && !period.overlap) {
     return { relation: 'SCOPE_DIFFERENCE', reason: 'disjoint periods', scope_intersection };
   }
+  if (!object) {
+    return { relation: 'INDEPENDENT', reason: 'different proposition', scope_intersection };
+  }
 
-  // polarity flip on the same proposition with overlapping scope
-  if (claimA.polarity !== claimB.polarity && textsEquivalent(claimA.normalized_text, claimB.normalized_text, { ignorePolarity: true })) {
+  // polarity flip on the same proposition with overlapping scope:
+  // the polarity-insensitive frames of the full propositions must coincide
+  if (claimA.polarity !== claimB.polarity && polarityInsensitiveFramesOverlap(claimA.normalized_text, claimB.normalized_text)) {
     return { relation: 'CONTRADICTS', basis: 'polarity_flip', scope_intersection };
   }
 
@@ -111,18 +145,11 @@ export function compareClaims(claimA, claimB) {
   return { relation: 'SCOPE_DIFFERENCE', reason: 'no contradiction found', scope_intersection };
 }
 
-function textsEquivalent(a, b, { ignorePolarity = false } = {}) {
-  let na = a.toLowerCase().replace(/\s+/g, ' ').trim();
-  let nb = b.toLowerCase().replace(/\s+/g, ' ').trim();
-  if (ignorePolarity) {
-    for (const cue of ['not ', 'no ', 'never', 'cannot', 'does not', 'do not', "doesn't", "don't"]) {
-      na = na.split(cue).join(' ');
-      nb = nb.split(cue).join(' ');
-    }
-    na = na.replace(/\s+/g, ' ').trim();
-    nb = nb.replace(/\s+/g, ' ').trim();
-  }
-  return na === nb;
+const NEGATION_TOKENS = new Set(['not', 'no', 'never', 'without', 'cannot', 'neither', 'nor', 'fails', 'does', 'do', 'did']);
+
+function polarityInsensitiveFramesOverlap(a, b) {
+  const strip = (text) => frame(text).filter((t) => !NEGATION_TOKENS.has(t));
+  return framesOverlap(strip(a), strip(b));
 }
 
 // Scans a set of claims and returns candidate CONTRADICTS claim edges

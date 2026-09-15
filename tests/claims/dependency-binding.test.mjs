@@ -74,10 +74,11 @@ describe('S2-004 dependency gate', () => {
     assert.ok(result.checked >= 30, `too few checks: ${result.checked}`);
   });
 
-  test('origin/main not at the canonical S2-003 base is BLOCKED_DEPENDENCY', () => {
-    const result = verifyDependencyBinding(RECORD, makeIo({ main: '4b4456a3acbe78371e2afcc75d81da59d2765b53' }));
+  test('origin/main without the canonical S2-003 base in its history is BLOCKED_DEPENDENCY', () => {
+    // a main that does not contain the canonical base at all (different history)
+    const result = verifyDependencyBinding(RECORD, makeIo({ unreachable: RECORD.s2_003.canonicalBase }));
     assert.equal(result.ok, false);
-    assert.ok(result.issues.includes('origin/main:not-at-s2-003-canonical-base'));
+    assert.ok(result.issues.some((i) => i.endsWith('Commit:unreachable-from-main')));
   });
 
   test('unreachable closure or implementation commit fails closed', () => {

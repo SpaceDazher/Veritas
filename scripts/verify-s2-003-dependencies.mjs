@@ -74,8 +74,17 @@ export function verifyDependencyBinding(record, io = {}) {
     issues.push('origin/main:unresolvable');
   }
   if (GIT_COMMIT.test(mainHead)) {
-    require(mainHead === s2.mergeCommit, 'origin/main:not-at-s2-002-merge');
     checked.push('origin/main:head');
+  }
+  // origin/main must CONTAIN the S2-002 merge (reachable ancestor); HEAD
+  // equality is not required because later stages move origin/main forward.
+  if (GIT_COMMIT.test(mainHead) && GIT_COMMIT.test(s2.mergeCommit ?? '')) {
+    try {
+      git_(['merge-base', '--is-ancestor', s2.mergeCommit, 'refs/remotes/origin/main']);
+      checked.push('s2-002.mergeCommit:contained-in-main');
+    } catch {
+      issues.push('s2-002.mergeCommit:unreachable-from-main');
+    }
   }
   for (const [role, commit] of [['merge', s2.mergeCommit], ['closure', s2.closureCommit]]) {
     if (!GIT_COMMIT.test(commit ?? '')) {
