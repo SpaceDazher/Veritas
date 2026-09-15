@@ -137,6 +137,14 @@ const frozenTargets = [
   'scripts/generate-ingestion-types.mjs',
   'evidence/s2-003-dependency-binding.json', 'evidence/s2-003-security-probes.json',
   'evidence/external',
+  // S2-004: claim graph contracts, stores, extraction, corpus, docs, runners and
+  // binding evidence are frozen alongside earlier ticket files. The stage
+  // artifacts added by S2-004 must not stay outside this integrity gate.
+  'src/lib/claims', 'tests/claims', 'corpus/s2-004', 'docs/claims',
+  'scripts/s2-004-run.mjs', 'scripts/s2-004-db-replay.mjs',
+  'scripts/s2-004-security-probes.mjs', 'scripts/verify-s2-004.mjs',
+  'scripts/verify-s2-004-dependencies.mjs', 'scripts/generate-claim-types.mjs',
+  'evidence/s2-004-dependency-binding.json', 'evidence/s2-004-security-probes.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');
