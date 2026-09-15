@@ -229,6 +229,29 @@ commit, never the S2-004 record.
 | `npm run manifest:write` / `npm run manifest:check` | 0 / 0 | root manifest resealed to the reseal commit |
 | `npm run inventory:write` / `npm run inventory:check` | 0 / 0 | tracked-file inventory resealed |
 | `npm run verify:clean-checkout` before the reseal | 1 | `passed: false`, step `contracts` FAIL (§9.1) |
-| `npm run verify:clean-checkout` after the reseal | 0 | `passed: true`, all required steps PASS; the record is `evidence/clean-checkout.json` and its containing commit is resolved externally with `git log -1 -- evidence/clean-checkout.json` |
+| `npm run verify:clean-checkout` after the reseal | 0 | `passed: true`, all required steps PASS, on a tree identical to HEAD except the record file itself (§14 forbids embedding the container commit; resolve it externally with `git log -1 -- evidence/clean-checkout.json`) |
 | `git diff --check` (`b3fe0ee…HEAD`) | 0 | no whitespace errors; the §13 range check initially reported 12 trailing-whitespace lines in `migrations/0003_claim_graph.sql`, fixed in this pass |
 | `git status --short` | 0 | clean working tree |
+
+### 9.4 Open items before merge
+
+- **Clean-checkout coverage of the S2-004 stage** — resolved in this pass.
+  Until now `verify-clean-checkout.mjs` ran only generic steps plus the
+  S2-002/S2-003 stage steps, so a green record certified the generics, not
+  the S2-004 stage. The runner now executes the S2-004 steps against the
+  archive (dependency gate in `ARCHIVE_DEGRADED` mode, `test:claims`,
+  `test:s2-004-security-probes`, `verify:s2-004`, `verify:s2-004-db-replay`),
+  and — closing a fail-open hole inherited from the S2-003 era — the S2-003
+  steps that were missing from `requiredIds` are gating now as well.
+- **identity-suite flake** — root cause unknown, must be tracked. One
+  clean-checkout attempt observed a single identity-suite failure (158/159)
+  that did not reproduce on re-run (159/159 locally and in the final green
+  record). A GitHub issue must be filed when the branch is pushed
+  (suggested title: `S2-004: flaky identity suite in clean checkout
+  (158/159, no reproduction)`) so the flake cannot silently recur inside a
+  gated run.
+- `npm audit` with dev dependencies is a hard exit-0 requirement of §13;
+  today it passes with 0 advisories, but future CVEs in dev-only packages
+  outside this branch's control would force a false `REVISE`. An
+  allowlist/override policy for tooling advisories is a spec-level change
+  proposed for the next stage.

@@ -105,13 +105,22 @@ try {
     run('s2-003-replay', NPM, ['run', 'verify:s2-003'], {env: npmEnv});
     run('s2-003-db-replay', NPM, ['run', 'verify:s2-003-db-replay'], {env: npmEnv});
     run('s2-002-replay', NPM, ['run', 'verify:s2-002'], {env: npmEnv});
+    // S2-004: the stage must be green in the clean checkout too — the
+    // dependency gate (ARCHIVE_DEGRADED mode), the claim suite, the stage
+    // security probes and both replays (memory store and PostgreSQL) all run
+    // against the archive with no .git and no shared node_modules.
+    run('s2-004-dependencies', NPM, ['run', 'verify:s2-004-dependencies'], {env: npmEnv});
+    run('s2-004-claims-tests', NPM, ['run', 'test:claims'], {env: npmEnv});
+    run('s2-004-security-probes', NPM, ['run', 'test:s2-004-security-probes'], {env: npmEnv});
+    run('s2-004-replay', NPM, ['run', 'verify:s2-004'], {env: npmEnv});
+    run('s2-004-db-replay', NPM, ['run', 'verify:s2-004-db-replay'], {env: npmEnv});
     run('typecheck', NPM, ['run', 'typecheck'], {env: npmEnv});
     run('lint', NPM, ['run', 'lint'], {env: npmEnv});
     run('build', NPM, ['run', 'build'], {env: buildEnv});
     run('runtime-audit', NPM, ['audit', '--omit=dev', '--json'], {env: npmEnv});
     run('tooling-audit', NPM, ['audit', '--json'], {env: npmEnv});
   } else {
-    for (const id of ['npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
+    for (const id of ['npm-ci', 's2-002-dependencies', 's2-003-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay', 's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
       commands.push({id, command: id === 'root-manifest' ? 'node scripts/generate-manifests.mjs --check' : id, exitCode: null, status: 'NOT_RUN_SANDBOX', reason: 'clean archive prerequisite was blocked by the sandbox'});
     }
   }
@@ -126,10 +135,12 @@ try {
   }
 }
 const requiredIds = [
-  'archive', 'npm-ci', 's2-002-dependencies', 'contracts', 'synthetic-smoke',
+  'archive', 'npm-ci', 's2-002-dependencies', 's2-003-dependencies', 'contracts', 'synthetic-smoke',
   'inventory', 'public-artifacts', 'root-manifest', 'identity-tests',
   'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'sandbox-tests', 'security-probes',
-  's2-002-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit',
+  's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay',
+  's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay',
+  'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit',
 ];
 const byId = new Map(commands.map((command) => [command.id, command]));
 const passed = requiredIds.every((id) => byId.get(id)?.status === 'PASS' && byId.get(id)?.exitCode === 0);

@@ -271,7 +271,7 @@
     "scripts/s2-004-security-probes.mjs": "dbf80bbd94c03dc25a40f2c5f153f9e50f338498cbd16b7e0fc694b33394b15d",
     "scripts/security-probes.mjs": "4a3e95b1559308e0b90397e7997c866872cbdb03bc1c081d7601766248e729df",
     "scripts/validate-contracts.mjs": "24a2e15f291e3bd76633762d4d1422776e6ca6f62b61f0b7cfd4cd76395b1069",
-    "scripts/verify-clean-checkout.mjs": "44ca5a86a35eda65fbb22f6e656105288d05362327ffd48cae78f4dfae63a72e",
+    "scripts/verify-clean-checkout.mjs": "ac0cf7a30c2f4790fe7c9ab7b08007438a0dc5b0d93dc146de1d1a13a2446c93",
     "scripts/verify-gvisor-sandbox.mjs": "94c7eeb25322ef35b98f1f1ca266af4cd1ae7e0e8ade8acecf96dac444739562",
     "scripts/verify-podman-sandbox.mjs": "e470859403503df02e01fd92e6cbef4a7d30b47858cad067b7ef3e9a7e55319c",
     "scripts/verify-postgres-smoke.mjs": "ec2e707187ca447189c42ebd12d79a453fe89749b1b9939bd7d09896037cec25",
