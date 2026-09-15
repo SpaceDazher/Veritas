@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/expert-lens.schema.json",
+  "description": "User/workspace scoped trust preference. Domain, task class, valid period, rationale, issuer and revocation. Separate ranking weight; no authority or truth field. Lens belongs to specific user/workspace and never leaks to another. Revocation immediately ceases use in new decisions.",
+  "title": "Veritas Expert Lens (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "lens_id",
+    "owner_workspace_id",
+    "owner_principal_id",
+    "expert_id",
+    "domain",
+    "task_class",
+    "weight",
+    "valid_from",
+    "valid_until",
+    "rationale",
+    "issuer",
+    "revoked_at",
+    "created_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "lens_id": { "$ref": "#/$defs/lensId" },
+    "owner_workspace_id": { "$ref": "#/$defs/workspaceId" },
+    "owner_principal_id": { "$ref": "#/$defs/principalId" },
+    "expert_id": { "$ref": "#/$defs/expertId" },
+    "domain": { "type": "string", "maxLength": 256 },
+    "task_class": {
+      "enum": [
+        "fact_checking",
+        "forecasting",
+        "mechanism_analysis",
+        "policy_review",
+        "risk_assessment",
+        "synthesis"
+      ]
+    },
+    "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+    "valid_from": { "$ref": "#/$defs/utcTimestamp" },
+    "valid_until": { "$ref": "#/$defs/utcTimestamp" },
+    "rationale": { "type": "string", "maxLength": 2048 },
+    "issuer": { "$ref": "#/$defs/principalId" },
+    "revoked_at": {
+      "oneOf": [
+        { "$ref": "#/$defs/utcTimestamp" },
+        { "type": "null" }
+      ]
+    },
+    "revocation_reason": {
+      "oneOf": [
+        { "type": "string", "maxLength": 1024 },
+        { "type": "null" }
+      ]
+    },
+    "created_at": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "revoked_at": { "not": { "type": "null" } } } },
+      "then": {
+        "required": ["revocation_reason"],
+        "properties": { "revocation_reason": { "type": "string", "minLength": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "lensId": { "type": "string", "pattern": "^len-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "expertId": { "type": "string", "pattern": "^exp-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/claim-extraction-result.schema.json",
+  "description": "Result of atomic claim extraction. Proposed claims, abstentions, malformed output and audit binding. Claim, evidence edge and audit event written atomically or nothing. Supports idempotent replay; unknown outcome leads to reconciliation not blind retry.",
+  "title": "Veritas Claim Extraction Result (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "request_id",
+    "proposed_claims",
+    "abstentions",
+    "malformed_output",
+    "audit_binding",
+    "status",
+    "completed_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "request_id": { "$ref": "#/$defs/requestId" },
+    "proposed_claims": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/proposedClaim" },
+      "uniqueItems": true
+    },
+    "abstentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["segment_id", "reason"],
+        "properties": {
+          "segment_id": { "$ref": "#/$defs/segmentId" },
+          "reason": {
+            "enum": ["ambiguous", "insufficient_context", "contradictory_signals", "policy_blocked"]
+          }
+        }
+      }
+    },
+    "malformed_output": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["raw_output", "parse_error"],
+        "properties": {
+          "raw_output": { "type": "string" },
+          "parse_error": { "type": "string" }
+        }
+      }
+    },
+    "audit_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_id", "executor_id", "pid", "nonce", "output_root"],
+      "properties": {
+        "operation_id": { "type": "string", "pattern": "^op-[a-z0-9][a-z0-9-]{0,62}$" },
+        "executor_id": { "type": "string", "pattern": "^exec-[a-z0-9][a-z0-9-]{0,62}$" },
+        "pid": { "type": "integer", "minimum": 1 },
+        "nonce": { "type": "string", "pattern": "^n-[a-z0-9][a-z0-9-]{0,62}$" },
+        "output_root": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "status": {
+      "enum": ["COMPLETED", "QUARANTINED", "FAILED", "RECONCILIATION_REQUIRED"]
+    },
+    "reconciliation_reason": {
+      "oneOf": [
+        { "type": "string", "maxLength": 1024 },
+        { "type": "null" }
+      ]
+    },
+    "completed_at": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "RECONCILIATION_REQUIRED" } } },
+      "then": { "required": ["reconciliation_reason"] }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "segmentId": { "type": "string", "pattern": "^seg-[a-z0-9][a-z0-9-]{0,62}$" },
+    "requestId": { "type": "string", "pattern": "^req-[a-z0-9][a-z0-9-]{0,62}$" },
+    "proposedClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "normalized_text", "original_text", "epistemic_type", "source_span", "evidence_digest"],
+      "properties": {
+        "claim_id": { "$ref": "#/$defs/claimId" },
+        "normalized_text": { "type": "string", "minLength": 1, "maxLength": 8192 },
+        "original_text": { "type": "string", "minLength": 1, "maxLength": 8192 },
+        "epistemic_type": {
+          "enum": [
+            "OBSERVATION",
+            "FACT_CLAIM",
+            "EXPERT_OPINION",
+            "HYPOTHESIS",
+            "FORECAST",
+            "ANALOGY",
+            "MECHANISM_CLAIM"
+          ]
+        },
+        "source_span": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["segment_id", "start", "end"],
+          "properties": {
+            "segment_id": { "$ref": "#/$defs/segmentId" },
+            "start": { "type": "integer", "minimum": 0 },
+            "end": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "evidence_digest": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "claimId": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

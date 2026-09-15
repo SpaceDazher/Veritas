@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/graph-invalidation-event.schema.json",
+  "description": "Invalidation event when source/segment/claim revision changed, tombstoned or revoked. Affected descendants, reason, traversal evidence and completion state. Derived ACL equals most restrictive ACL of all inputs. Tombstone/retraction/correction of parent transitively marks dependent outputs STALE until re-review.",
+  "title": "Veritas Graph Invalidation Event (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "event_id",
+    "trigger_type",
+    "trigger_id",
+    "trigger_revision",
+    "affected_descendants",
+    "reason",
+    "traversal_evidence",
+    "completion_state",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "event_id": { "$ref": "#/$defs/eventId" },
+    "trigger_type": {
+      "enum": [
+        "source_snapshot_tombstone",
+        "source_snapshot_correction",
+        "source_snapshot_retraction",
+        "content_segment_tombstone",
+        "content_segment_correction",
+        "claim_tombstone",
+        "claim_correction",
+        "claim_revocation",
+        "access_restriction",
+        "retention_expiry"
+      ]
+    },
+    "trigger_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "trigger_revision": { "type": "integer", "minimum": 1 },
+    "affected_descendants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entity_type", "entity_id", "entity_revision", "new_lifecycle"],
+        "properties": {
+          "entity_type": { "enum": ["claim", "evidence_edge", "claim_edge"] },
+          "entity_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "entity_revision": { "type": "integer", "minimum": 1 },
+          "new_lifecycle": { "enum": ["STALE", "REVOKED", "QUARANTINED"] }
+        }
+      },
+      "uniqueItems": true
+    },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "description"],
+      "properties": {
+        "code": {
+          "enum": [
+            "upstream_tombstoned",
+            "upstream_corrected",
+            "upstream_retracted",
+            "access_revoked",
+            "retention_expired",
+            "manual_invalidation"
+          ]
+        },
+        "description": { "type": "string", "maxLength": 2048 }
+      }
+    },
+    "traversal_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "visited_count", "edges_traversed"],
+      "properties": {
+        "method": { "enum": ["bfs", "dfs", "topological"] },
+        "visited_count": { "type": "integer", "minimum": 0 },
+        "edges_traversed": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 128 }
+        }
+      }
+    },
+    "completion_state": {
+      "enum": ["PENDING", "IN_PROGRESS", "COMPLETED", "FAILED", "PARTIAL"]
+    },
+    "failed_descendants": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 128 }
+    },
+    "created_at": { "$ref": "#/$defs/utcTimestamp" },
+    "created_by": { "$ref": "#/$defs/principalId" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "completion_state": { "enum": ["FAILED", "PARTIAL"] } } },
+      "then": { "required": ["failed_descendants"] }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "eventId": { "type": "string", "pattern": "^inv-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

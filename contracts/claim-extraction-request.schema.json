@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/claim-extraction-request.schema.json",
+  "description": "Request for atomic claim extraction from allowed immutable ContentSegments. Exact input segment hashes, extractor/model/prompt versions, deterministic parameters/seed. All source and model output treated as untrusted data.",
+  "title": "Veritas Claim Extraction Request (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "request_id",
+    "segment_ids",
+    "segment_hashes",
+    "extractor",
+    "extractor_version",
+    "prompt_version",
+    "parameters",
+    "seed",
+    "actor",
+    "workspace_id",
+    "idempotency_key"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "request_id": { "$ref": "#/$defs/requestId" },
+    "segment_ids": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/segmentId" },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "segment_hashes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sha256Hex" },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "extractor": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "extractor_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "prompt_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    },
+    "seed": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        { "type": "null" }
+      ]
+    },
+    "actor": { "$ref": "#/$defs/principalId" },
+    "workspace_id": { "$ref": "#/$defs/workspaceId" },
+    "idempotency_key": { "type": "string", "pattern": "^idem-[a-z0-9][a-z0-9-]{0,62}$" }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "segmentId": { "type": "string", "pattern": "^seg-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "requestId": { "type": "string", "pattern": "^req-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}
