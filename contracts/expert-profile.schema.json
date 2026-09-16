@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/expert-profile.schema.json",
+  "description": "Stable expert identity without secrets. Declared domains, affiliations, conflicts and valid periods. Source-backed credentials as claims, not trusted booleans. All fields versioned with provenance.",
+  "title": "Veritas Expert Profile (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "expert_id",
+    "aliases",
+    "domains",
+    "affiliations",
+    "conflicts",
+    "valid_from",
+    "valid_until",
+    "credentials",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "expert_id": { "$ref": "#/$defs/expertId" },
+    "aliases": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 256 },
+      "uniqueItems": true
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["domain", "valid_from", "valid_until"],
+        "properties": {
+          "domain": { "type": "string", "maxLength": 256 },
+          "valid_from": { "$ref": "#/$defs/utcTimestamp" },
+          "valid_until": { "$ref": "#/$defs/utcTimestamp" },
+          "provenance_claim_id": { "$ref": "#/$defs/claimId" }
+        }
+      },
+      "uniqueItems": true
+    },
+    "affiliations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["organization", "role", "valid_from", "valid_until"],
+        "properties": {
+          "organization": { "type": "string", "maxLength": 512 },
+          "role": { "type": "string", "maxLength": 256 },
+          "valid_from": { "$ref": "#/$defs/utcTimestamp" },
+          "valid_until": { "$ref": "#/$defs/utcTimestamp" },
+          "provenance_claim_id": { "$ref": "#/$defs/claimId" }
+        }
+      },
+      "uniqueItems": true
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "valid_from", "valid_until"],
+        "properties": {
+          "description": { "type": "string", "maxLength": 1024 },
+          "valid_from": { "$ref": "#/$defs/utcTimestamp" },
+          "valid_until": { "$ref": "#/$defs/utcTimestamp" },
+          "provenance_claim_id": { "$ref": "#/$defs/claimId" }
+        }
+      },
+      "uniqueItems": true
+    },
+    "valid_from": { "$ref": "#/$defs/utcTimestamp" },
+    "valid_until": { "$ref": "#/$defs/utcTimestamp" },
+    "credentials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["credential_type", "issuer", "issued_at", "provenance_claim_id"],
+        "properties": {
+          "credential_type": { "type": "string", "maxLength": 256 },
+          "issuer": { "type": "string", "maxLength": 512 },
+          "issued_at": { "$ref": "#/$defs/utcTimestamp" },
+          "expires_at": {
+            "oneOf": [
+              { "$ref": "#/$defs/utcTimestamp" },
+              { "type": "null" }
+            ]
+          },
+          "provenance_claim_id": { "$ref": "#/$defs/claimId" }
+        }
+      },
+      "uniqueItems": true
+    },
+    "created_at": { "$ref": "#/$defs/utcTimestamp" },
+    "created_by": { "$ref": "#/$defs/principalId" }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "expertId": { "type": "string", "pattern": "^exp-[a-z0-9][a-z0-9-]{0,62}$" },
+    "claimId": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-004",
+  "role": "S2-004 run A vs run B comparison, metrics and hard gates over the frozen 96-case corpus",
+  "corpus": {
+    "caseCount": 96
+  },
+  "testedImplementationCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-004-comparison.json",
+  "runParameters": {
+    "run_a": {
+      "executor": "exec-s2-004-a",
+      "clock": "2026-01-15T08:00:00.000Z",
+      "nonce": "n-a-cdf901e3744228f9",
+      "pid": 17704,
+      "output_root": "results/s2-004/run-a"
+    },
+    "run_b": {
+      "executor": "exec-s2-004-b",
+      "clock": "2026-03-21T23:59:59.999Z",
+      "nonce": "n-b-e57ef134def0d8ea",
+      "pid": 13924,
+      "output_root": "results/s2-004/run-b"
+    }
+  },
+  "integrity": {
+    "run_a": {
+      "acl_leaks": 0,
+      "authority_expansions": 0,
+      "type_promotions_without_review": 0,
+      "lost_negations": 0,
+      "lost_units": 0,
+      "lost_qualifiers": 0,
+      "stale_survivors": 0,
+      "duplicate_side_effects": 0
+    },
+    "run_b": {
+      "acl_leaks": 0,
+      "authority_expansions": 0,
+      "type_promotions_without_review": 0,
+      "lost_negations": 0,
+      "lost_units": 0,
+      "lost_qualifiers": 0,
+      "stale_survivors": 0,
+      "duplicate_side_effects": 0
+    }
+  },
+  "comparison": {
+    "ok": true,
+    "issues": [],
+    "comparedCases": 96,
+    "decisionMismatches": 0
+  },
+  "metrics": {
+    "extraction_field_accuracy": {
+      "numerator": 1236,
+      "denominator": 1236,
+      "missing": 0,
+      "coverage": 1236
+    },
+    "extraction_exact_accuracy": {
+      "numerator": 103,
+      "denominator": 103,
+      "missing": 0,
+      "coverage": 103
+    },
+    "span_binding_accuracy": {
+      "numerator": 103,
+      "denominator": 103,
+      "missing": 0,
+      "coverage": 103
+    },
+    "epistemic_type_confusion": {
+      "match": 103
+    },
+    "qualifier_preservation": {
+      "numerator": 88,
+      "denominator": 88,
+      "lost_qualifiers": 0
+    },
+    "negation_preservation": {
+      "numerator": 88,
+      "denominator": 88,
+      "lost_negations": 0
+    },
+    "unit_preservation": {
+      "numerator": 88,
+      "denominator": 88,
+      "lost_units": 0
+    },
+    "contradiction_precision": {
+      "numerator": 0,
+      "denominator": 0,
+      "missing": 12
+    },
+    "contradiction_recall": {
+      "numerator": 0,
+      "denominator": 0,
+      "missing": 12
+    },
+    "upstream_family_collapse_accuracy": {
+      "numerator": 11,
+      "denominator": 12,
+      "missing": 1
+    },
+    "stale_invalidation_recall": {
+      "numerator": 8,
+      "denominator": 8,
+      "missing": 0
+    },
+    "abstention_rate": {
+      "numerator": 4,
+      "denominator": 88,
+      "missing": 0,
+      "note": "share of text cases where the extractor abstained instead of guessing"
+    },
+    "acl_leakage": {
+      "numerator": 0,
+      "denominator": 96
+    },
+    "authority_expansion": {
+      "numerator": 0,
+      "denominator": 96
+    },
+    "type_auto_promotion": {
+      "numerator": 0,
+      "denominator": 96
+    },
+    "stale_survivors": {
+      "numerator": 0,
+      "denominator": 96
+    },
+    "duplicate_side_effects": {
+      "numerator": 0,
+      "denominator": 96
+    }
+  },
+  "hardGates": {
+    "ok": true,
+    "violations": []
+  },
+  "decisionCounts": {
+    "run_a": {
+      "PASS": 96
+    },
+    "run_b": {
+      "PASS": 96
+    }
+  },
+  "verdict": "PASS_WITH_LIMITS",
+  "verdictLimits": [
+    "bounded local implementation: semantic quality is NOT_CALIBRATED (no independent external gold corpus or external replay)",
+    "no live private-source connectors; OCR/ASR fixture-only (S2-003 limits carried)",
+    "near-duplicate merge remains NOT_CALIBRATED; candidate lineage requires human confirmation"
+  ],
+  "wallClockNote": "wall-clock timestamps are telemetry only and never enter decision digests, oracles, seeds or verdict selection"
+}

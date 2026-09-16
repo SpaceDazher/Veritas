@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "scope": "Adversarial probes A-L driven through the production claim graph path; DETECTED means the production modules rejected, contained or made the attack visible.",
+  "policyVersion": "s2-004-claim-graph-v1",
+  "generatedAt": "2026-01-15T08:00:00.000Z",
+  "escaped": 0,
+  "detected": 12,
+  "skipped": 0,
+  "results": [
+    {
+      "id": "A",
+      "title": "ten reprints collapse to one evidence family",
+      "verdict": "DETECTED",
+      "detail": "raw=10 collapsed=1 (+1 independent = 2)"
+    },
+    {
+      "id": "B",
+      "title": "exception/unit/qualifier preservation on qualified growth claim",
+      "verdict": "DETECTED",
+      "detail": "unit=% exclusions=[\"agricultural goods\"] range={\"min\":12,\"max\":12}"
+    },
+    {
+      "id": "C",
+      "title": "import time never becomes forecast/event time",
+      "verdict": "DETECTED",
+      "detail": "horizon=2030-12-31T23:59:59.999Z fetched_at=2026-01-06T09:00:00.000Z"
+    },
+    {
+      "id": "D",
+      "title": "physical metaphor is not auto-promoted to mechanism",
+      "verdict": "DETECTED",
+      "detail": "typed ANALOGY, lifecycle PROPOSED, self-review denied"
+    },
+    {
+      "id": "E",
+      "title": "parent tombstone transitively invalidates and preserves audit",
+      "verdict": "DETECTED",
+      "detail": "stale=3 audit events=4"
+    },
+    {
+      "id": "F",
+      "title": "expert lens changes ranking only, never evidence or status",
+      "verdict": "DETECTED",
+      "detail": "priority raised, evidence=0, lifecycle=PROPOSED, isolated"
+    },
+    {
+      "id": "G",
+      "title": "negation flip in translation is caught and quarantined",
+      "verdict": "DETECTED",
+      "detail": "original clm-9f33d69a365b2670e7e3d2c1 intact, translation quarantined"
+    },
+    {
+      "id": "H",
+      "title": "scope differences are not contradictions",
+      "verdict": "DETECTED",
+      "detail": "period-difference=SCOPE_DIFFERENCE, same-period-disjoint=CONTRADICTS"
+    },
+    {
+      "id": "I",
+      "title": "source-span prompt injection stays inert",
+      "verdict": "DETECTED",
+      "detail": "abstention=policy_blocked, attacker authority absent"
+    },
+    {
+      "id": "J",
+      "title": "idempotency key reuse with different input conflicts",
+      "verdict": "DETECTED",
+      "detail": "conflict=IDEMPOTENCY_CONFLICT, zero extra mutations"
+    },
+    {
+      "id": "K",
+      "title": "forged review and calibration records do not verify",
+      "verdict": "DETECTED",
+      "detail": "digest binding, self-review and calibration authority all enforced"
+    },
+    {
+      "id": "L",
+      "title": "private claims cannot leak into shared aggregates",
+      "verdict": "DETECTED",
+      "detail": "derived=private, aggregate payload leak=0"
+    }
+  ]
+}

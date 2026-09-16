@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/claim-edge.schema.json",
+  "description": "Typed relation between exact claim revisions. Direction, scope intersection, provenance and creation authority. Cycles in DEPENDS_ON/DERIVED_FROM prohibited or detected before commit.",
+  "title": "Veritas Claim Edge (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "edge_id",
+    "source_claim_id",
+    "source_revision",
+    "target_claim_id",
+    "target_revision",
+    "relation",
+    "direction",
+    "scope_intersection",
+    "provenance",
+    "creation_authority",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "edge_id": { "$ref": "#/$defs/edgeId" },
+    "source_claim_id": { "$ref": "#/$defs/claimId" },
+    "source_revision": { "type": "integer", "minimum": 1 },
+    "target_claim_id": { "$ref": "#/$defs/claimId" },
+    "target_revision": { "type": "integer", "minimum": 1 },
+    "relation": {
+      "enum": [
+        "SUPPORTS",
+        "CONTRADICTS",
+        "REFINES",
+        "GENERALIZES",
+        "SPECIALIZES",
+        "DEPENDS_ON",
+        "SUPERSEDES",
+        "TRANSLATES",
+        "DUPLICATES_CANDIDATE"
+      ]
+    },
+    "direction": {
+      "enum": ["forward", "bidirectional"]
+    },
+    "scope_intersection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "population_overlap": { "type": "boolean" },
+        "geography_overlap": { "type": "boolean" },
+        "period_overlap": { "type": "boolean" },
+        "units_compatible": { "type": "boolean" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "extractor", "extractor_version"],
+      "properties": {
+        "method": { "type": "string", "maxLength": 128 },
+        "extractor": { "type": "string", "maxLength": 128 },
+        "extractor_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "config_digest": { "$ref": "#/$defs/sha256Hex" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "creation_authority": { "$ref": "#/$defs/principalId" },
+    "created_at": { "$ref": "#/$defs/utcTimestamp" },
+    "created_by": { "$ref": "#/$defs/principalId" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "relation": { "enum": ["DEPENDS_ON"] } } },
+      "then": {
+        "properties": {
+          "scope_intersection": {
+            "required": ["population_overlap", "geography_overlap", "period_overlap", "units_compatible"]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "claimId": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "edgeId": { "type": "string", "pattern": "^ced-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

@@ -28,6 +28,8 @@ function makeIo(overrides = {}) {
       if (argv.startsWith('merge-base --is-ancestor ')) {
         const commit = argv.split(' ')[2];
         if (overrides.unreachable === commit) throw new Error('not ancestor');
+        // a drifted main (unknown history) contains no pinned commits
+        if (overrides.main && overrides.main !== MERGE) throw new Error('not ancestor');
         return '';
       }
       if (argv.startsWith('rev-parse ')) {
@@ -72,9 +74,11 @@ describe('S2-003 dependency gate', () => {
   });
 
   test('origin/main drift from the S2-002 merge commit fails closed', () => {
+    // a main whose history does not contain the S2-002 merge (drift) must fail
+    // closed: the merge must be a reachable ancestor of origin/main
     const result = verifyDependencyBinding(RECORD, makeIo({ main: '0'.repeat(40) }));
     assert.equal(result.ok, false);
-    assert.ok(result.issues.includes('origin/main:not-at-s2-002-merge'));
+    assert.ok(result.issues.includes('s2-002.mergeCommit:unreachable-from-main'));
   });
 
   test('an unreachable S2-002 commit fails closed, not as a warning', () => {

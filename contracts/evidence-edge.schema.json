@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/evidence-edge.schema.json",
+  "description": "Edge linking a claim revision to an exact ContentSegment/span revision. Relation type, exact offsets/quote digest, entailment status, method, reviewer. Source family/upstream IDs and access/retention state. Cannot re-bind to different span after review without new revision and new decision.",
+  "title": "Veritas Evidence Edge (S2-004)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "edge_id",
+    "claim_id",
+    "claim_revision",
+    "segment_id",
+    "segment_revision",
+    "relation",
+    "span",
+    "quote_digest",
+    "entailment_status",
+    "method",
+    "reviewer",
+    "source_family_id",
+    "upstream_snapshot_ids",
+    "access_state",
+    "retention_state",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "edge_id": { "$ref": "#/$defs/edgeId" },
+    "claim_id": { "$ref": "#/$defs/claimId" },
+    "claim_revision": { "type": "integer", "minimum": 1 },
+    "segment_id": { "$ref": "#/$defs/segmentId" },
+    "segment_revision": { "type": "integer", "minimum": 1 },
+    "relation": {
+      "enum": [
+        "SUPPORTS",
+        "CONTRADICTS",
+        "QUALIFIES",
+        "CONTEXTUALIZES",
+        "DERIVED_FROM"
+      ]
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "quote_digest": { "$ref": "#/$defs/sha256Hex" },
+    "entailment_status": {
+      "enum": [
+        "ENTAILED",
+        "CONTRADICTED",
+        "NEUTRAL",
+        "UNKNOWN"
+      ]
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "maxLength": 128 },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "config_digest": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "reviewer": {
+      "oneOf": [
+        { "$ref": "#/$defs/principalId" },
+        { "type": "null" }
+      ]
+    },
+    "source_family_id": {
+      "type": "string",
+      "pattern": "^fam-[a-z0-9][a-z0-9-]{0,62}$"
+    },
+    "upstream_snapshot_ids": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/snapshotId" },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "access_state": {
+      "enum": ["available", "restricted", "tombstoned", "unknown"]
+    },
+    "retention_state": {
+      "enum": ["active", "expired", "deleted"]
+    },
+    "created_at": { "$ref": "#/$defs/utcTimestamp" },
+    "created_by": { "$ref": "#/$defs/principalId" }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "claimId": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+    "segmentId": { "type": "string", "pattern": "^seg-[a-z0-9][a-z0-9-]{0,62}$" },
+    "snapshotId": { "type": "string", "pattern": "^snp-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "edgeId": { "type": "string", "pattern": "^eed-[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

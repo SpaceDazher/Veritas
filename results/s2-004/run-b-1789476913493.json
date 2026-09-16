@@ -1,0 +1,2221 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-004",
+  "run_id": "run-b",
+  "executor_id": "exec-s2-004-b",
+  "clock": "2026-03-21T23:59:59.999Z",
+  "nonce": "n-b-14223f466a4334c9",
+  "pid": 25464,
+  "output_root": "results/s2-004/run-b",
+  "testedImplementationCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "status": "COMPLETED",
+  "caseCount": 96,
+  "decisionCounts": {
+    "PASS": 86,
+    "FAIL": 10
+  },
+  "integrity": {
+    "acl_leaks": 0,
+    "authority_expansions": 0,
+    "type_promotions_without_review": 0,
+    "lost_negations": 0,
+    "lost_units": 0,
+    "lost_qualifiers": 0,
+    "stale_survivors": 0,
+    "duplicate_side_effects": 0
+  },
+  "graphDigest": "d095fb468e62bdcd3ac09d0545875f1a9fdada7c2c30432f8581fcc94b177f57",
+  "decisions": [
+    {
+      "case_id": "s4-atom-001",
+      "case_number": 1,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-002",
+      "case_number": 2,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-003",
+      "case_number": 3,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-004",
+      "case_number": 4,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-005",
+      "case_number": 5,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-006",
+      "case_number": 6,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-007",
+      "case_number": 7,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-008",
+      "case_number": 8,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 1,
+        "abstentions_actual": 1,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-009",
+      "case_number": 9,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 0,
+        "claims_matched": 0,
+        "abstentions_expected": 1,
+        "abstentions_actual": 1,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-010",
+      "case_number": 10,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 0,
+        "claims_matched": 0,
+        "abstentions_expected": 1,
+        "abstentions_actual": 1,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-011",
+      "case_number": 11,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-012",
+      "case_number": 12,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-013",
+      "case_number": 13,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-014",
+      "case_number": 14,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-015",
+      "case_number": 15,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-016",
+      "case_number": 16,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-017",
+      "case_number": 17,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-018",
+      "case_number": 18,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-019",
+      "case_number": 19,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-020",
+      "case_number": 20,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-021",
+      "case_number": 21,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-022",
+      "case_number": 22,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-023",
+      "case_number": 23,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-atom-024",
+      "case_number": 24,
+      "category": "atomic_extraction",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-069",
+      "case_number": 69,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "SCOPE_DIFFERENCE",
+          "basis": null,
+          "reason": "compatible value ranges",
+          "expected_relation": "CONTRADICTS",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-070",
+      "case_number": 70,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "CONTRADICTS",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-071",
+      "case_number": 71,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "SCOPE_DIFFERENCE",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-072",
+      "case_number": 72,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "SCOPE_DIFFERENCE",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-073",
+      "case_number": 73,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "CONVERTED_COMPARISON",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-074",
+      "case_number": 74,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "INDEPENDENT",
+          "ok": true
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-075",
+      "case_number": 75,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "CONTRADICTS",
+          "basis": "polarity_flip",
+          "reason": null,
+          "expected_relation": "CONTRADICTS",
+          "ok": true
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-076",
+      "case_number": 76,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "COMPATIBLE",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-077",
+      "case_number": 77,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "SCOPE_DIFFERENCE",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-078",
+      "case_number": 78,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "CONTRADICTS",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-079",
+      "case_number": 79,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "CONTRADICTS",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-con-080",
+      "case_number": 80,
+      "category": "contradiction_scope",
+      "severity": "high",
+      "decision": "FAIL",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": {
+          "relation": "INDEPENDENT",
+          "basis": null,
+          "reason": "different proposition",
+          "expected_relation": "CONTRADICTS",
+          "ok": false
+        },
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-inv-089",
+      "case_number": 89,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-090",
+      "case_number": 90,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-091",
+      "case_number": 91,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-092",
+      "case_number": 92,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-093",
+      "case_number": 93,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-094",
+      "case_number": 94,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-095",
+      "case_number": 95,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-inv-096",
+      "case_number": 96,
+      "category": "invalidation_revision_retraction",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": {
+          "stale_descendants": 2,
+          "expected_stale": 1,
+          "audit_preserved": true,
+          "completion": "COMPLETED",
+          "ok": true
+        }
+      }
+    },
+    {
+      "case_id": "s4-lens-081",
+      "case_number": 81,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-trusted",
+          "expected_top": "clm-trusted",
+          "influence": [
+            {
+              "kind": "ranking_only",
+              "lens_id": "len-iso"
+            }
+          ],
+          "expected_influence": "ranking_only",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-082",
+      "case_number": 82,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-plain",
+          "expected_top": "clm-plain",
+          "influence": [],
+          "expected_influence": "none_for_user1",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-083",
+      "case_number": 83,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-plain",
+          "expected_top": "clm-plain",
+          "influence": [],
+          "expected_influence": "revoked_excluded",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-084",
+      "case_number": 84,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-plain",
+          "expected_top": "clm-plain",
+          "influence": [],
+          "expected_influence": "task_class_mismatch",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-085",
+      "case_number": 85,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-plain",
+          "expected_top": "clm-plain",
+          "influence": [],
+          "expected_influence": "expired",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-086",
+      "case_number": 86,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-plain",
+          "expected_top": "clm-plain",
+          "influence": [],
+          "expected_influence": "expert_mismatch",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-087",
+      "case_number": 87,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-trusted",
+          "expected_top": "clm-trusted",
+          "influence": [
+            {
+              "kind": "ranking_only",
+              "lens_id": "len-iso-7"
+            },
+            {
+              "kind": "ranking_only",
+              "lens_id": "len-iso-8"
+            }
+          ],
+          "expected_influence": "ranking_only",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lens-088",
+      "case_number": 88,
+      "category": "expert_lens_isolation",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": null,
+        "claims_matched": null,
+        "abstentions_expected": null,
+        "abstentions_actual": null,
+        "field_false": null,
+        "span_bound": null,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": {
+          "top": "clm-plain",
+          "expected_top": "clm-plain",
+          "influence": [],
+          "expected_influence": "no_lenses",
+          "protected_preserved": true,
+          "ok": true
+        },
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-057",
+      "case_number": 57,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 3,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-058",
+      "case_number": 58,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 2,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 2,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-059",
+      "case_number": 59,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 0,
+          "unknown_lineage_count": 2,
+          "expected_collapsed": 0,
+          "expected_unknown": 2,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-060",
+      "case_number": 60,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 3,
+        "claims_matched": 3,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 3,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-061",
+      "case_number": 61,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": {
+          "relation": "CONTRADICTS",
+          "expected_relation": "CONTRADICTS",
+          "ok": true
+        },
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-062",
+      "case_number": 62,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 4,
+          "collapsed_family_count": 2,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 2,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-063",
+      "case_number": 63,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 2,
+        "claims_matched": 2,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 1,
+          "expected_collapsed": 1,
+          "expected_unknown": 1,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-064",
+      "case_number": 64,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 4,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-065",
+      "case_number": 65,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-066",
+      "case_number": 66,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-067",
+      "case_number": 67,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-lin-068",
+      "case_number": 68,
+      "category": "translation_citation_upstream_lineage",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": {
+          "raw_source_count": 2,
+          "collapsed_family_count": 1,
+          "unknown_lineage_count": 0,
+          "expected_collapsed": 1,
+          "expected_unknown": 0,
+          "ok": true
+        },
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-025",
+      "case_number": 25,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-026",
+      "case_number": 26,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-027",
+      "case_number": 27,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-028",
+      "case_number": 28,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-029",
+      "case_number": 29,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 0,
+        "claims_matched": 0,
+        "abstentions_expected": 1,
+        "abstentions_actual": 1,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-030",
+      "case_number": 30,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-031",
+      "case_number": 31,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-032",
+      "case_number": 32,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-033",
+      "case_number": 33,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-034",
+      "case_number": 34,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-035",
+      "case_number": 35,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-036",
+      "case_number": 36,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-037",
+      "case_number": 37,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-038",
+      "case_number": 38,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-039",
+      "case_number": 39,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-opin-040",
+      "case_number": 40,
+      "category": "opinion_hypothesis_forecast",
+      "severity": "medium",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-041",
+      "case_number": 41,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-042",
+      "case_number": 42,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-043",
+      "case_number": 43,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-044",
+      "case_number": 44,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-045",
+      "case_number": 45,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-046",
+      "case_number": 46,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-047",
+      "case_number": 47,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-048",
+      "case_number": 48,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-049",
+      "case_number": 49,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-050",
+      "case_number": 50,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-051",
+      "case_number": 51,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-052",
+      "case_number": 52,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-053",
+      "case_number": 53,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-054",
+      "case_number": 54,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-055",
+      "case_number": 55,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    },
+    {
+      "case_id": "s4-trap-056",
+      "case_number": 56,
+      "category": "numeric_unit_qualifier_time",
+      "severity": "high",
+      "decision": "PASS",
+      "checks": {
+        "claims_expected": 1,
+        "claims_matched": 1,
+        "abstentions_expected": 0,
+        "abstentions_actual": 0,
+        "field_false": {},
+        "span_bound": true,
+        "lineage": null,
+        "translation": null,
+        "contradiction": null,
+        "lens": null,
+        "invalidation": null
+      }
+    }
+  ]
+}

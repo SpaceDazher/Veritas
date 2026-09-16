@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "42248bc44ba6f3b33fa29a4efb7c9397737d8d3a",
+  "testedImplementationCommit": "e53c105c4ac383ae1c2aa31098d53316626ec9a5",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "42248bc44ba6f3b33fa29a4efb7c9397737d8d3a",
-  "sourceTree": "a55ac87621b5440a819061b714ee883f0cc6549c",
+  "sourceCommit": "e53c105c4ac383ae1c2aa31098d53316626ec9a5",
+  "sourceTree": "72cac4563c031df7c6d61f1a27204f872c86de8a",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -125,6 +125,36 @@
     {
       "id": "s2-002-replay",
       "command": "npm.cmd run verify:s2-002",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-dependencies",
+      "command": "npm.cmd run verify:s2-004-dependencies",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-claims-tests",
+      "command": "npm.cmd run test:claims",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-security-probes",
+      "command": "npm.cmd run test:s2-004-security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-replay",
+      "command": "npm.cmd run verify:s2-004",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-004-db-replay",
+      "command": "npm.cmd run verify:s2-004-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },

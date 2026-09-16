@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "scope": "S2-004 dependency binding record. Binds the claim/provenance graph to the S2-003 canonicalization on origin/main and to digest-verified Stage-1 evidence (S1-003 executable SHACL validation, S1-011 knowledge promotion gate, S1-012 confidence/provenance semantics). Every checked value is verified from Git bytes or tracked file bytes by scripts/verify-s2-004-dependencies.mjs; a missing dependency, unreachable commit or digest mismatch is BLOCKED_DEPENDENCY, never a warning.",
+  "s2_003": {
+    "ticket": "S2-003",
+    "title": "Immutable source snapshots and content segments",
+    "status": "BOUND_PASS_WITH_LIMITS",
+    "canonicalBase": "b3fe0ee1b0320ad349265fc5e33327833418e197",
+    "closureCommit": "b3fe0ee1b0320ad349265fc5e33327833418e197",
+    "closureSubject": "test(S2-003): record green independent clean checkout",
+    "implementationCommit": "5c683717e31842aa2a4e2fc8ed88548e8b9e6ab2",
+    "expected": {
+      "result": "pass_with_limits",
+      "cleanCheckoutPassed": true,
+      "cleanCheckoutExitCode": 0,
+      "comparisonOk": true,
+      "decisionMismatches": 0,
+      "identityMismatches": 0,
+      "comparedCases": 74,
+      "corpusCaseCount": 74,
+      "corpusSha256": "f966bb77caf5ee435534bdd2f1097dd8ebc6a747e68d49034f3d2ebf87a35d2e",
+      "testedImplementationCommit": "90781c723192528258c471e1a0423625170f4d16",
+      "privateExportsLeaked": 0,
+      "authorityExpansions": 0,
+      "contractVersion": "1.0.0"
+    },
+    "evidenceReadFromGitBytes": {
+      "evidence/closure-record.json": "c1ca524fbdd09ed51522c63ecc714802e25eea98",
+      "evidence/root-manifest.json": "dd6e83b1559f96b1f11a6cbe9084d219d8230adc",
+      "evidence/frozen-manifest.json": "1dbcaf61d39100f123c55ba9c76c1b887a735958",
+      "evidence/clean-checkout.json": "1ae5bde5df19885b47d1731f99c1c91d12bd326c",
+      "evidence/s2-003-run-a.json": "a11049e3db30effc234d3ae8abf69335b32cea1e",
+      "evidence/s2-003-run-b.json": "fd4f2f50d1dbcd14af805906ecb86e7f5916624f",
+      "evidence/s2-003-comparison.json": "1000280cafdd380b4df7262a32576cc116a4b01c",
+      "evidence/s2-003-db-run-a.json": "04b5a37f14d334a9f6bf3e50eb0e23bf7617fc19",
+      "evidence/s2-003-db-run-b.json": "4b02f63c78981c411a439e1b375a1ba33af859a3",
+      "evidence/s2-003-db-comparison.json": "e64ee0586b8d00bbfa157f3e85b77c55625514c6",
+      "evidence/s2-003-dependency-binding.json": "e1d1f0aebba96d883c6a9d0e5fcf317605809102",
+      "evidence/s2-003-security-probes.json": "05e2274aa010e8a20662366a7d220d20504dfbde",
+      "corpus/s2-003/manifest.json": "d57210bdd0bb74392edbcbc0014df3dc2768adb3",
+      "docs/decisions/S2-003-EVALUATION-REPORT.md": "44513e829d4697a385edf10d32ff0bb13169a222"
+    },
+    "contractSchemas": {
+      "contracts/source-snapshot.schema.json": "801d398a2bac10bb9e2bfb9c26d9df54a12199cf",
+      "contracts/content-segment.schema.json": "bcd4247d006d76b3fb65105cd5e6cec12b0037d2",
+      "contracts/source-lineage.schema.json": "a401ebb962f03b2ff01bbc99b9b6d8d801e341f2",
+      "contracts/source-descriptor.schema.json": "bf35f7640ebfdbc2823c9d56f1718fbe323f8e84"
+    },
+    "carriedLimits": {
+      "rule": "The following S2-003 limits are inherited by S2-004 and must remain visible in every S2-004 report; they are verified from the evaluation report bytes at the closure commit.",
+      "requiredReportMarkers": [
+        "No live private connectors: github/telegram/youtube/arxiv_huggingface",
+        "OCR/ASR are fixture-level; no production extraction quality is claimed.",
+        "Near-duplicate detection is advisory and `NOT_CALIBRATED`",
+        "candidate lineage requires explicit human confirmation"
+      ],
+      "livePrivateConnectors": "NOT_PROVEN",
+      "ocrAsrQuality": "FIXTURE_ONLY",
+      "nearDuplicateMerge": "NOT_CALIBRATED",
+      "candidateLineage": "REQUIRES_HUMAN_CONFIRMATION"
+    }
+  },
+  "stage1": {
+    "sourceRepository": {
+      "remote": "https://github.com/SpaceDazher/AgentOS.git",
+      "pinnedCommit": "a7940e113492c83a29533d1e93f2724c36a9bbc1",
+      "pinnedTree": "804d6f5dbad8a419f71b5cae343edba434f48e5f"
+    },
+    "bindings": {
+      "s1_003": {
+        "ticket": "S1-003",
+        "title": "Executable SHACL validation",
+        "relevanceToS2_004": "Claim/evidence/claim-edge contracts are validated by executable SHACL-equivalent JSON Schema gates at commit time, not by narrative review.",
+        "recordPath": "research/tickets/stage-1/S1-003/evaluation-record.json",
+        "recordBlob": "f22a0251e8a2db8d507620f0a9759e0cc4103a58",
+        "recordSha256": "6e9d691094c4cce0072cc35ef23b69402caccfc9d05db16d4fe897e5a5daa3a2",
+        "recordBytes": 1364,
+        "trackedCopy": "evidence/external/s1-003/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-003",
+          "result": "pass",
+          "evaluation_id": "reval_KHXH2JAY5JFW8YJM01M0VAVEEM",
+          "artifact_chain_hash": "b9c9e2fbbac5db994e584a24669f0f5475e0f6942fe3d5347fad8592fbf83157"
+        }
+      },
+      "s1_011": {
+        "ticket": "S1-011",
+        "title": "Knowledge promotion gate",
+        "relevanceToS2_004": "Claim lifecycle PROPOSED -> ACCEPTED_BOUNDED is a promotion gated by an authorized reviewer decision; producers can never promote their own claims.",
+        "recordPath": "research/tickets/stage-1/S1-011/evaluation-record.json",
+        "recordBlob": "1d6e52eaca80270790e47400d2a304e1606bf7a5",
+        "recordSha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+        "recordBytes": 17897,
+        "trackedCopy": "evidence/external/s1-011/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-011",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_94X52VCQDV30J84Z01M1MSPWRD",
+          "artifact_chain_hash": "027c456355d30f760dc4fe077c29c619a91db1fd7d26f31f2a6cb9f18210b313"
+        }
+      },
+      "s1_012": {
+        "ticket": "S1-012",
+        "title": "Confidence and provenance semantics",
+        "relevanceToS2_004": "evidence_support, author_confidence, user_expert_trust and measured_calibration stay separate fields; no derived truth score exists anywhere in the graph.",
+        "recordPath": "research/tickets/stage-1/S1-012/evaluation-record.json",
+        "recordBlob": "a8d1d1b25d977553202e53d80afb5233a2a68e73",
+        "recordSha256": "d76439e89be4e8c09745d92b691c7e2f3aaec435ee11b37296fb029c252c8501",
+        "recordBytes": 22310,
+        "trackedCopy": "evidence/external/s1-012/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-012",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_EPR9JR5JWBHXST6301M1NNPB5P",
+          "artifact_chain_hash": "818a25e67a1865d425eebcb754376f06d143aaac9fa7f07aa704804311ffb21c"
+        }
+      }
+    }
+  },
+  "consequence": "If every check passes, S2-004 implementation may begin. Any missing file, unreachable commit, digest drift or payload mismatch exits non-zero as BLOCKED_DEPENDENCY before claim graph code is touched."
+}

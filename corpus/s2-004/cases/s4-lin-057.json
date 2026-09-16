@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s4-lin-057",
+  "case_number": 57,
+  "category": "translation_citation_upstream_lineage",
+  "severity": "high",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "tenant_id": "tn-corpus",
+    "operation_actor": "prn-extractor",
+    "segments": [
+      {
+        "segment_id": "seg-up-main",
+        "snapshot": {
+          "snapshot_id": "snp-up",
+          "published_at": "2026-01-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2026-01-05T09:00:00.000Z",
+          "fetched_at": "2026-01-06T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Solar capacity in Spain reached 14 gigawatts in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-up-syn1",
+        "snapshot": {
+          "snapshot_id": "snp-syn-1",
+          "published_at": "2026-01-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2026-01-05T09:00:00.000Z",
+          "fetched_at": "2026-01-06T09:00:00.000Z",
+          "lineage_type": "syndication",
+          "parent_snapshot_ids": [
+            "snp-up"
+          ]
+        },
+        "text": "Solar capacity in Spain reached 14 gigawatts in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-up-syn2",
+        "snapshot": {
+          "snapshot_id": "snp-syn-2",
+          "published_at": "2026-01-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2026-01-05T09:00:00.000Z",
+          "fetched_at": "2026-01-06T09:00:00.000Z",
+          "lineage_type": "citation",
+          "parent_snapshot_ids": [
+            "snp-up"
+          ]
+        },
+        "text": "Solar capacity in Spain reached 14 gigawatts in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "lineage": {
+      "rule": "collapse by upstream roots; non-original lineage follows its root; unknown never independent",
+      "expected_collapsed_family_count": 1,
+      "expected_unknown_lineage_count": 0
+    },
+    "lenses": [],
+    "lens_candidates": [],
+    "review": null,
+    "invalidation": null
+  },
+  "contradiction": null,
+  "translation_check": null,
+  "expected": {
+    "claims": [
+      {
+        "normalized_text": "Solar capacity in Spain reached 14 gigawatts in 2023.",
+        "epistemic_type": "FACT_CLAIM",
+        "polarity": "affirmative",
+        "units": "GW",
+        "denominator": null,
+        "value_range": {
+          "min": 14,
+          "max": 14
+        },
+        "population": null,
+        "geography": "Spain",
+        "period": {
+          "start": "2023-01-01T00:00:00.000Z",
+          "end": "2023-12-31T23:59:59.999Z"
+        },
+        "exclusions": [],
+        "qualifiers_includes": [
+          "unit:GW"
+        ],
+        "lifecycle": "PROPOSED",
+        "span_text": "Solar capacity in Spain reached 14 gigawatts in 2023."
+      }
+    ],
+    "abstentions": []
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "convention": "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md extraction conventions v1.0.0"
+  }
+}
