@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/evidence-map.schema.json",
+  "description": "EvidenceMap (S2-005): every externally checkable output statement maps to exact claims, evidence edges, spans and snapshots with supports/contradicts/qualifies relations, unavailable-evidence gaps, upstream family collapse and stale status. A citation without entailment is not proof; unavailable or unauthorized sources appear as gaps, never silently omitted.",
+  "title": "Veritas Evidence Map (S2-005)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "map_id",
+    "statement",
+    "entries",
+    "unavailable_evidence",
+    "qualifiers",
+    "stale",
+    "status"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "map_id": { "type": "string", "pattern": "^evm-[a-z0-9][a-z0-9-]{0,62}$" },
+    "statement": {
+      "description": "The checkable output statement this map justifies (or fails to justify).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "claim_revision", "relation", "entailment_status"],
+        "properties": {
+          "claim_id": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+          "claim_revision": { "type": "integer", "minimum": 1 },
+          "relation": { "enum": ["supports", "contradicts", "qualifies"] },
+          "entailment_status": {
+            "description": "ENTAILS requires the cited span to entail the statement under the recorded comparison method; a restatement without entailment is not support.",
+            "enum": ["ENTAILS", "PARTIALLY_ENTAILS", "NOT_ENTAILING"]
+          },
+          "entailment_method": { "type": "string", "maxLength": 128 },
+          "evidence_edge_id": { "oneOf": [{ "type": "string", "pattern": "^ev-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] },
+          "segment_id": { "oneOf": [{ "type": "string", "pattern": "^seg-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] },
+          "span": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["start", "end"],
+                "properties": {
+                  "start": { "type": "integer", "minimum": 0 },
+                  "end": { "type": "integer", "minimum": 0 }
+                }
+              },
+              { "type": "null" }
+            ]
+          },
+          "quote_digest": { "$ref": "#/$defs/sha256Hex" },
+          "source_family_id": { "oneOf": [{ "type": "string", "maxLength": 256 }, { "type": "null" }] },
+          "domain": { "oneOf": [{ "type": "string", "maxLength": 128 }, { "type": "null" }] }
+        }
+      }
+    },
+    "unavailable_evidence": {
+      "description": "Explicit gaps: needed-but-missing or access-denied sources. Never silently dropped.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["what_is_missing", "kind"],
+        "properties": {
+          "what_is_missing": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "kind": { "enum": ["NOT_IN_CORPUS", "ACCESS_DENIED", "AFTER_AS_OF", "REMOVED", "UNKNOWN"] },
+          "required_for": { "type": "string", "maxLength": 512 }
+        }
+      }
+    },
+    "qualifiers": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 256 },
+      "uniqueItems": true
+    },
+    "family_collapse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["families", "collapsed_members"],
+      "properties": {
+        "families": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_family_id", "member_count"],
+            "properties": {
+              "source_family_id": { "oneOf": [{ "type": "string", "maxLength": 256 }, { "type": "null" }] },
+              "member_count": { "type": "integer", "minimum": 1 },
+              "lineage": { "enum": ["ORIGINAL", "DERIVED", "UNKNOWN"] }
+            }
+          }
+        },
+        "collapsed_members": { "type": "integer", "minimum": 0 },
+        "independent_evidence_count": {
+          "description": "Family-collapsed count of independent evidence sources; ten reprints of one upstream count once.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "stale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["is_stale"],
+      "properties": {
+        "is_stale": { "type": "boolean" },
+        "invalidation_event_ids": { "type": "array", "items": { "type": "string", "maxLength": 128 } },
+        "stale_claim_ids": { "type": "array", "items": { "type": "string", "maxLength": 128 } },
+        "recomputed": { "type": "boolean" }
+      }
+    },
+    "status": { "enum": ["FRESH", "STALE", "INCOMPLETE"] },
+    "created_at": { "$ref": "#/$defs/isoDateTime" },
+    "created_by": { "type": "string", "maxLength": 128 }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "isoDateTime": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$" }
+  }
+}

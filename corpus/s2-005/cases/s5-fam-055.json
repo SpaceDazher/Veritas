@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-fam-055",
+  "case_number": 55,
+  "category": "family_collapse",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-sleep-a",
+        "domain": "neuroscience",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-a",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-b",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-b",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "syndication",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Reuters reported that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-c",
+        "domain": "neuroscience",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-c",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "syndication",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Analysts confirmed that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-d",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-d",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "citation",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Agencies noted that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-e",
+        "domain": "neuroscience",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-e",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "citation",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Surveys indicated that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-f",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-f",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "syndication",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Wires carried that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-g",
+        "domain": "neuroscience",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-g",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "citation",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Bulletins stated that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-h",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-h",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "syndication",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Digests repeated that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-i",
+        "domain": "neuroscience",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-i",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "citation",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Papers cited that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-sleep-j",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-sleep-j",
+          "published_at": "2024-06-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-06-01T09:00:00.000Z",
+          "fetched_at": "2024-06-01T09:00:00.000Z",
+          "lineage_type": "citation",
+          "parent_snapshot_ids": [
+            "snp-sleep-a"
+          ]
+        },
+        "text": "Editors relayed that Sleep deprivation decreased memory performance by 21% in lab studies in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "sleep deprivation memory consolidation lab studies impaired",
+      "question_kind": "local",
+      "task_class": "research",
+      "domains": []
+    }
+  },
+  "expected": {
+    "retrieval_status": "COMPLETED",
+    "gold_segment_ids": [
+      "seg-sleep-a"
+    ],
+    "independent_evidence_families": 1,
+    "min_family_excluded": 9,
+    "synthesis_status": "READY_FOR_REVIEW"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

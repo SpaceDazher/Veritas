@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/synthesis-result.schema.json",
+  "description": "SynthesisResult (S2-005): versioned synthesis output — input versions, EvidenceMaps, HypothesisCards, competing explanations, unresolved contradictions, coverage/abstention and an explicit READY_FOR_REVIEW|INCOMPLETE|BLOCKED status with human-readable reasons. Critical contradictions are never hidden; analogies never become facts.",
+  "title": "Veritas Synthesis Result (S2-005)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "result_id",
+    "request_digest",
+    "input_versions",
+    "evidence_maps",
+    "hypothesis_cards",
+    "competing_explanations",
+    "unresolved_contradictions",
+    "coverage",
+    "status",
+    "reasons"
+  ],
+  "properties": {
+    "contractVersion": {
+      "const": "1.0.0"
+    },
+    "result_id": {
+      "type": "string",
+      "pattern": "^syn-[a-z0-9][a-z0-9-]{0,62}$"
+    },
+    "request_digest": {
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "input_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contracts_version",
+        "corpus_version",
+        "index_version",
+        "retrieval_model_version"
+      ],
+      "properties": {
+        "contracts_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "corpus_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "index_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "retrieval_model_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "as_of": {
+          "$ref": "#/$defs/isoDateTime"
+        }
+      }
+    },
+    "evidence_maps": {
+      "type": "array",
+      "items": {
+        "$ref": "https://veritas.local/contracts/evidence-map.schema.json"
+      }
+    },
+    "hypothesis_cards": {
+      "type": "array",
+      "items": {
+        "$ref": "https://veritas.local/contracts/hypothesis-card.schema.json"
+      }
+    },
+    "competing_explanations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "description",
+          "status"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "supporting_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          "card_id": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^hyc-[a-z0-9][a-z0-9-]{0,62}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "LIVE",
+              "WEAKENED",
+              "REFUTED",
+              "UNRESOLVED"
+            ]
+          },
+          "disagreement_conditions": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      }
+    },
+    "unresolved_contradictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claim_a",
+          "claim_b",
+          "relation",
+          "handling"
+        ],
+        "properties": {
+          "claim_a": {
+            "type": "string",
+            "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$"
+          },
+          "claim_b": {
+            "type": "string",
+            "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$"
+          },
+          "relation": {
+            "enum": [
+              "CONTRADICTS",
+              "SCOPE_DIFFERENCE",
+              "INCOMMENSURABLE"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "handling": {
+            "enum": [
+              "BOTH_SHOWN",
+              "DEFERRED_TO_VERIFIER",
+              "ABSTAIN"
+            ]
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "questions_total",
+        "answered",
+        "abstained"
+      ],
+      "properties": {
+        "questions_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "answered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "abstained": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coverage_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "query",
+              "reason"
+            ],
+            "properties": {
+              "query": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "reason": {
+                "enum": [
+                  "NO_ENTAILING_EVIDENCE",
+                  "SOURCE_MISSING",
+                  "ACCESS_DENIED",
+                  "AFTER_AS_OF",
+                  "BUDGET_EXHAUSTED",
+                  "NO_CANDIDATES"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "abstentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "enum": [
+              "NO_ENTAILING_EVIDENCE",
+              "SOURCE_MISSING",
+              "ACCESS_DENIED",
+              "AFTER_AS_OF",
+              "BUDGET_EXHAUSTED",
+              "NO_CANDIDATES"
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "READY_FOR_REVIEW",
+        "INCOMPLETE",
+        "BLOCKED"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "maxLength": 512
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor_id",
+        "pid",
+        "nonce"
+      ],
+      "properties": {
+        "executor_id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "pid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128
+        },
+        "clock": {
+          "$ref": "#/$defs/isoDateTime"
+        }
+      }
+    },
+    "testedImplementationCommit": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 40
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "sha256Hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "isoDateTime": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$"
+    }
+  }
+}

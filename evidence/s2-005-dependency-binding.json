@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "scope": "S2-005 dependency binding record. Binds the cross-domain synthesis task to the canonicalized S2-004 on origin/main (claim/provenance graph schemas, graph revisions, exact evidence spans, server-side ACL, stale propagation) and to digest-verified Stage-1 evidence (S1-007 retrieval and index isolation, S1-009 MCP/A2A delegation and knowledge semantics). Every checked value is verified from Git bytes or tracked file bytes by scripts/verify-s2-005-dependencies.mjs; a missing dependency, unreachable commit, digest mismatch, executable/main contract drift or unpinned consumer input is BLOCKED_DEPENDENCY, never a warning.",
+  "s2_004": {
+    "ticket": "S2-004",
+    "title": "Typed claims and provenance graph",
+    "status": "BOUND_PASS_WITH_LIMITS",
+    "canonicalBase": "7662face2091c1f591af2b586502beb4ea698e5e",
+    "closureCommit": "7662face2091c1f591af2b586502beb4ea698e5e",
+    "closureSubject": "Merge pull request #17 from SpaceDazher/codex/s2-004-claim-provenance-graph",
+    "implementationCommit": "f4122726c2926819066fa96255a9ab8aebea25fa",
+    "expected": {
+      "result": "pass_with_limits",
+      "cleanCheckoutPassed": true,
+      "cleanCheckoutExitCode": 0,
+      "comparisonOk": true,
+      "decisionMismatches": 0,
+      "comparedCases": 96,
+      "corpusCaseCount": 96,
+      "testedImplementationCommit": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+      "comparisonVerdict": "PASS_WITH_LIMITS",
+      "hardGatesOk": true,
+      "aclLeaks": 0,
+      "authorityExpansions": 0,
+      "typePromotionsWithoutReview": 0,
+      "staleSurvivors": 0,
+      "duplicateSideEffects": 0,
+      "dbComparisonOk": true,
+      "dbDecisionMismatches": 0,
+      "contractVersion": "1.0.0"
+    },
+    "evidenceReadFromGitBytes": {
+      "evidence/closure-record.json": "ae5892bc95fc1ddea189c1a4016c99065c1546e6",
+      "evidence/root-manifest.json": "08a789dbc026edf730f811c0aac10059ea7a9894",
+      "evidence/frozen-manifest.json": "54af0f5b5a3f27c452a01617c633f9183c146503",
+      "evidence/clean-checkout.json": "aa6a7958b33b8596c5c26e710671aa791ce2ac63",
+      "evidence/s2-004-run-a.json": "c3feeaea9fc91e711e03f0410a7c1ca32c02bc20",
+      "evidence/s2-004-run-b.json": "13a1d1115979fd282fa0d439f1142f7a3622e3de",
+      "evidence/s2-004-comparison.json": "a7ae4c1194665a484e3f546c277d0f95aab20bde",
+      "evidence/s2-004-db-run-a.json": "0a3a688d3f47be90eadf8363ebdca3485fdaf542",
+      "evidence/s2-004-db-run-b.json": "0af139deec53a16c75c1b5b02979750da31c0f5a",
+      "evidence/s2-004-db-comparison.json": "c89eb52b4ea0fd627245f8d4ae6492c3e6774cca",
+      "evidence/s2-004-dependency-binding.json": "14be7a9ad0479fb14081b02a650d3d314929d8c7",
+      "evidence/s2-004-security-probes.json": "eb9f6d960e0b6a8f3280f31ac517d729a4368651",
+      "corpus/s2-004/manifest.json": "66cb51947ef976a45f26f19da1b28fc610f7e5a1",
+      "corpus/s2-003/manifest.json": "d57210bdd0bb74392edbcbc0014df3dc2768adb3",
+      "docs/decisions/S2-004-EVALUATION-REPORT.md": "8a18bf2aa53e077cc172ae1fd5e808993c9a7a83",
+      "docs/decisions/S2-003-EVALUATION-REPORT.md": "44513e829d4697a385edf10d32ff0bb13169a222",
+      "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md": "4874230604ec22d90101a260d26ef81f92e567fe"
+    },
+    "contractSchemas": {
+      "contracts/claim.schema.json": "df487c3db2c92e5714b8a9cba26aa7197cb7fc94",
+      "contracts/claim-edge.schema.json": "07c83756e2471d88a151855c74ff0f4877c360c8",
+      "contracts/evidence-edge.schema.json": "86eb6b010ee18ddb422172ec0ed22dace7c3f5b1",
+      "contracts/graph-invalidation-event.schema.json": "b391bf66e219a205712469363f0b934f1dbc628a",
+      "contracts/expert-lens.schema.json": "50748056312b46e77fc2b5ffd036236b06d705d2",
+      "contracts/authorization-decision.schema.json": "c8794b22aec2709fd562daace09dbf753f19782d",
+      "contracts/calibration-record.schema.json": "49ed6525790df58be73f43e6d0f6b5c239a996aa"
+    },
+    "carriedLimits": {
+      "rule": "The following S2-004 limits are inherited by S2-005 and must remain visible in every S2-005 report; they are verified from the evaluation report bytes at the closure commit. S2-003 limits are carried inside the S2-004 report and pinned separately.",
+      "requiredReportMarkers": [
+        "Semantic quality is `NOT_CALIBRATED`",
+        "No causality from correlation, analogy or expert authority; a lens is\n  ranking-only.",
+        "Live private connectors remain unproven and OCR/ASR remain fixture-level",
+        "Human approval is not claimed anywhere"
+      ],
+      "semanticQuality": "NOT_CALIBRATED",
+      "causality": "CORRELATION_ANALOGY_AUTHORITY_NEVER_CAUSAL",
+      "lensSemantics": "RANKING_ONLY",
+      "humanApproval": "NOT_CLAIMED"
+    }
+  },
+  "stage1": {
+    "sourceRepository": {
+      "remote": "https://github.com/SpaceDazher/AgentOS.git",
+      "pinnedCommit": "a7940e113492c83a29533d1e93f2724c36a9bbc1",
+      "pinnedTree": "804d6f5dbad8a419f71b5cae343edba434f48e5f"
+    },
+    "bindings": {
+      "s1_007": {
+        "ticket": "S1-007",
+        "title": "QA3 retrieval and index isolation",
+        "relevanceToS2_005": "S2-005 retrieval runs against isolated indexes with frozen corpus and ACL-scoped reads; isolation bindings (index/retrieval separation, no cross-scope bleed) come from verified S1-007 evidence, not narrative.",
+        "recordPath": "research/tickets/stage-1/S1-007/evaluation-record.json",
+        "recordBlob": "0f54e1cade42fa38937d21541de99902e24626b6",
+        "recordSha256": "69b34ad4e699dc8d167edf456e9899ba5d2e9807dce5b27ed5845ce74bdbc3e3",
+        "recordBytes": 6787,
+        "trackedCopy": "evidence/external/s1-007/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-007",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_6BH3G062B38G3WHH01M1DDTYW2",
+          "artifact_chain_hash": "4c344ab2e83b231e4cd14c2f69f9eb95b9b0f374f7fab3bf8651eda682390692"
+        }
+      },
+      "s1_009": {
+        "ticket": "S1-009",
+        "title": "MCP/A2A delegation and knowledge semantics roadmap",
+        "relevanceToS2_005": "S2-005 consumes provider-neutral adapter semantics and unsupported-operation boundaries (delegation grants, budget conservation, canonical envelope) from verified S1-009 evidence; a floating branch link is insufficient.",
+        "recordPath": "research/tickets/stage-1/S1-009/evaluation-record.json",
+        "recordBlob": "e5fa8c0871227041e2dbc98fc3210cc914440d26",
+        "recordSha256": "19ff2fb9fe856e0050364f3554120d7f72ee68776be8a2f5fe19198ee7949175",
+        "recordBytes": 22347,
+        "trackedCopy": "evidence/external/s1-009/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-009",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_KJWPMSJE08BGDVNP01M1JJGE2W",
+          "artifact_chain_hash": "1d1b2debbbb2ac9ff76a65ffe352152c207d7a3ea71073af56a37679b464192b"
+        }
+      }
+    }
+  },
+  "consumerInputs": {
+    "rule": "Every upstream input the S2-005 consumer depends on must be pinned by blob digest in s2_004.evidenceReadFromGitBytes or s2_004.contractSchemas of this record; a consumer input that is not pinned fails the gate.",
+    "inputs": {
+      "frozenCorpusS2_003": ["corpus/s2-003/manifest.json"],
+      "frozenCorpusS2_004": ["corpus/s2-004/manifest.json"],
+      "accessRights": ["contracts/authorization-decision.schema.json"],
+      "timeModel": ["docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md"],
+      "limitationsS2_003": ["docs/decisions/S2-003-EVALUATION-REPORT.md"],
+      "limitationsS2_004": ["docs/decisions/S2-004-EVALUATION-REPORT.md"]
+    }
+  },
+  "consequence": "If every check passes, S2-005 implementation may begin. Any missing file, unreachable commit, digest drift, payload mismatch, executable-contract drift, main drift or unpinned consumer input exits non-zero as BLOCKED_DEPENDENCY before retrieval or synthesis code is touched."
+}

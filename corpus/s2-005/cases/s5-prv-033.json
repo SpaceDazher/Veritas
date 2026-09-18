@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-prv-033",
+  "case_number": 33,
+  "category": "private_forbidden",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-epi-1",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-1",
+          "published_at": "2024-01-10T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-10T09:00:00.000Z",
+          "fetched_at": "2024-01-10T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Air pollution exposure increased asthma incidence by 18% among urban children in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-epi-priv",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-priv",
+          "published_at": "2024-03-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-03-01T09:00:00.000Z",
+          "fetched_at": "2024-03-01T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Unpublished trial data showed 34% mortality reduction in a sealed cohort during 2023.",
+        "acl": {
+          "visibility": "private",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": [
+            "prn-user-2"
+          ]
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "asthma incidence mortality reduction cohort",
+      "question_kind": "local",
+      "task_class": "research",
+      "domains": []
+    }
+  },
+  "expected": {
+    "retrieval_status": "COMPLETED",
+    "zero_private_leak": true,
+    "hits_reference_only": [
+      "seg-epi-1"
+    ],
+    "gold_segment_ids": [
+      "seg-epi-1"
+    ],
+    "synthesis_status": "INCOMPLETE",
+    "private_mixed_query": true
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

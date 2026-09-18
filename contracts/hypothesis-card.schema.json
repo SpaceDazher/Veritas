@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/hypothesis-card.schema.json",
+  "description": "HypothesisCard (S2-005): a typed cross-domain relation — ANALOGY, HYPOTHESIS, OBSERVATION or MECHANISM_CLAIM — never auto-promoted. Correlation, analogical structure, candidate mechanism and causal assertion are kept separate; a causal hypothesis records temporal ordering, mediators, confounders, alternatives and falsifiers. Novelty is scoped to the named frozen corpus and search horizon.",
+  "title": "Veritas Hypothesis Card (S2-005)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "card_id",
+    "card_type",
+    "originating_domains",
+    "nodes",
+    "proposed_relation",
+    "confounders",
+    "alternative_explanations",
+    "scope",
+    "assumptions",
+    "falsifiers",
+    "test_design",
+    "counterevidence",
+    "novelty",
+    "uncertainty",
+    "stale",
+    "status"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "card_id": { "type": "string", "pattern": "^hyc-[a-z0-9][a-z0-9-]{0,62}$" },
+    "card_type": {
+      "enum": ["ANALOGY", "HYPOTHESIS", "OBSERVATION", "MECHANISM_CLAIM"]
+    },
+    "type_promotion": {
+      "description": "Null unless an authorized promotion review happened; producers can never promote their own cards (S1-011 rule).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from_type", "to_type", "reviewed_by", "basis"],
+          "properties": {
+            "from_type": { "enum": ["ANALOGY", "HYPOTHESIS", "OBSERVATION"] },
+            "to_type": { "enum": ["HYPOTHESIS", "MECHANISM_CLAIM"] },
+            "reviewed_by": { "type": "string", "maxLength": 128 },
+            "basis": { "type": "string", "maxLength": 2048 },
+            "review_artifact": { "type": "string", "maxLength": 512 }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "originating_domains": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": { "type": "string", "maxLength": 128 }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "revision", "domain", "role"],
+        "properties": {
+          "claim_id": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+          "revision": { "type": "integer", "minimum": 1 },
+          "domain": { "type": "string", "maxLength": 128 },
+          "role": { "enum": ["source", "target", "mediator", "context"] }
+        }
+      }
+    },
+    "proposed_relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject", "predicate", "object", "relation_strength"],
+      "properties": {
+        "subject": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "predicate": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "object": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "relation_strength": {
+          "description": "Observed structure only: correlation/analogy never recorded as causal_strength.",
+          "enum": ["ANALOGICAL_STRUCTURE", "TEMPORAL_CO-OCCURRENCE", "CORRELATION_EVIDENCE", "MEDIATED_PATHWAY", "EXPERIMENTAL"]
+        },
+        "causal_assertion": {
+          "description": "May only be true for MECHANISM_CLAIM with mediator and temporal ordering evidence; otherwise null.",
+          "oneOf": [{ "type": "boolean" }, { "type": "null" }]
+        }
+      }
+    },
+    "temporal_ordering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["established"],
+      "properties": {
+        "established": { "type": "boolean" },
+        "evidence_claim_ids": { "type": "array", "items": { "type": "string", "maxLength": 128 } },
+        "event_times": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node", "time"],
+            "properties": {
+              "node": { "type": "string", "maxLength": 128 },
+              "time": { "$ref": "#/$defs/isoDateTime" }
+            }
+          }
+        }
+      }
+    },
+    "mediators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "claim_id": { "oneOf": [{ "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] },
+          "evidence_status": { "enum": ["SUPPORTED", "PROPOSED", "NOT_FOUND"] }
+        }
+      }
+    },
+    "confounders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "status"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "status": { "enum": ["IDENTIFIED", "RULED_OUT", "UNRESOLVED"] },
+          "claim_id": { "oneOf": [{ "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] }
+        }
+      }
+    },
+    "alternative_explanations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "claim_id": { "oneOf": [{ "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain_limits"],
+      "properties": {
+        "population": { "oneOf": [{ "type": "string", "maxLength": 512 }, { "type": "null" }] },
+        "geography": { "oneOf": [{ "type": "string", "maxLength": 128 }, { "type": "null" }] },
+        "period": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["start", "end"],
+              "properties": {
+                "start": { "$ref": "#/$defs/isoDateTime" },
+                "end": { "$ref": "#/$defs/isoDateTime" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "units": { "oneOf": [{ "type": "string", "maxLength": 128 }, { "type": "null" }] },
+        "domain_limits": {
+          "description": "Conditions under which the relation is claimed to stop holding.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "maxLength": 512 }
+        }
+      }
+    },
+    "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 512 }, "uniqueItems": true },
+    "falsifiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "observable": { "type": "string", "maxLength": 512 }
+        }
+      }
+    },
+    "test_design": { "type": "string", "minLength": 1, "maxLength": 2048 },
+    "counterevidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "relation"],
+        "properties": {
+          "claim_id": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+          "relation": { "enum": ["contradicts", "weakens", "bounds"] }
+        }
+      }
+    },
+    "novelty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assessment"],
+      "properties": {
+        "assessment": {
+          "enum": ["novel_to_selected_corpus", "similar_prior_found", "NOT_ASSESSED"]
+        },
+        "corpus": { "oneOf": [{ "type": "string", "maxLength": 256 }, { "type": "null" }] },
+        "search_horizon": { "oneOf": [{ "type": "string", "maxLength": 256 }, { "type": "null" }] },
+        "similar_prior_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["claim_id"],
+            "properties": {
+              "claim_id": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+              "similarity": { "enum": ["SAME_RELATION", "SAME_STRUCTURE", "SAME_DOMAIN_PAIR"] }
+            }
+          }
+        }
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_support"],
+      "properties": {
+        "author_confidence": { "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }] },
+        "expert_trust": { "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }] },
+        "measured_calibration": { "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }] },
+        "evidence_support": {
+          "description": "Family-collapsed independent evidence count behind the card; never merged with author confidence or trust (S1-012).",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "stale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["is_stale"],
+      "properties": {
+        "is_stale": { "type": "boolean" },
+        "invalidation_event_ids": { "type": "array", "items": { "type": "string", "maxLength": 128 } },
+        "stale_claim_ids": { "type": "array", "items": { "type": "string", "maxLength": 128 } }
+      }
+    },
+    "status": { "enum": ["FRESH", "STALE"] },
+    "created_at": { "$ref": "#/$defs/isoDateTime" },
+    "created_by": { "type": "string", "maxLength": 128 }
+  },
+  "$defs": {
+    "isoDateTime": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$" }
+  }
+}

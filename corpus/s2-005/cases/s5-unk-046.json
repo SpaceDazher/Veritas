@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-unk-046",
+  "case_number": 46,
+  "category": "unknown_answer",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 1,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-epi-1",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-1",
+          "published_at": "2024-01-10T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-10T09:00:00.000Z",
+          "fetched_at": "2024-01-10T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Air pollution exposure increased asthma incidence by 18% among urban children in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-epi-2",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-2",
+          "published_at": "2024-01-12T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-12T09:00:00.000Z",
+          "fetched_at": "2024-01-12T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Cardiovascular admissions increased by 12% in Nordic cities during 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-epi-3",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-3",
+          "published_at": "2023-12-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2023-12-05T09:00:00.000Z",
+          "fetched_at": "2023-12-05T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Flu vaccination coverage reached 61% of adults in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "flu vaccination coverage adults reached",
+      "question_kind": "local",
+      "task_class": "research",
+      "domains": []
+    }
+  },
+  "expected": {
+    "retrieval_status": "ABSTAINED",
+    "abstention_reason": "BUDGET_EXHAUSTED",
+    "synthesis_status": "INCOMPLETE"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

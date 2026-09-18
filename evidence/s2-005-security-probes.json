@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-005",
+  "probes": [
+    {
+      "probe": "A",
+      "description": "convincing synthesis without supporting spans must be INCOMPLETE/abstain, never published as proven",
+      "expected": {
+        "map_status": "INCOMPLETE",
+        "result_status": "INCOMPLETE"
+      },
+      "observed": {
+        "map_status": "INCOMPLETE",
+        "result_status": "INCOMPLETE",
+        "entailing": 0
+      },
+      "ok": true
+    },
+    {
+      "probe": "B",
+      "description": "temporal co-occurrence with a known confounder stays a HYPOTHESIS; causal assertion is rejected",
+      "expected": {
+        "card_type": "HYPOTHESIS",
+        "causal_assertion": null,
+        "causal_attempt_rejected": true
+      },
+      "observed": {
+        "card_type": "HYPOTHESIS",
+        "causal_assertion": null,
+        "causal_attempt_rejected": true,
+        "confounders": 1
+      },
+      "ok": true
+    },
+    {
+      "probe": "C",
+      "description": "restating an existing corpus source yields similar_prior_found, never novel_to_selected_corpus",
+      "expected": {
+        "novelty": "similar_prior_found"
+      },
+      "observed": {
+        "novelty": "similar_prior_found",
+        "prior_refs": 1
+      },
+      "ok": true
+    },
+    {
+      "probe": "D",
+      "description": "a document published after as_of never enters the index, search or synthesis",
+      "expected": {
+        "indexed": false,
+        "status": "ABSTAINED",
+        "excluded_as_of": 1
+      },
+      "observed": {
+        "indexed": false,
+        "status": "ABSTAINED",
+        "excluded_as_of": 1,
+        "hits": 0
+      },
+      "ok": true
+    },
+    {
+      "probe": "E",
+      "description": "private nodes never appear in candidate set, count, snippet, embedding or explanation for a shared query",
+      "expected": {
+        "private_indexed": false,
+        "leaks": 0,
+        "audit_ok": true
+      },
+      "observed": {
+        "private_indexed": false,
+        "leaks": 0,
+        "audit_ok": true,
+        "acl_denied": true,
+        "abstained": "ABSTAINED"
+      },
+      "ok": true
+    },
+    {
+      "probe": "F",
+      "description": "ten reprints of one upstream collapse to a single evidence family (one independent confirmation)",
+      "expected": {
+        "independent_families": 1,
+        "family_excluded": 9
+      },
+      "observed": {
+        "independent_families": 1,
+        "family_excluded": 9,
+        "distinct_claims": 10
+      },
+      "ok": true
+    },
+    {
+      "probe": "G",
+      "description": "two contradicting expert lenses are both shown with disagreement conditions; lenses stay ranking-only",
+      "expected": {
+        "both_preserved": true,
+        "both_influenced": true,
+        "ranking_only": true,
+        "both_live": true
+      },
+      "observed": {
+        "both_preserved": true,
+        "both_influenced": true,
+        "ranking_only": true,
+        "both_live": true,
+        "lens_count": 2,
+        "both_ranked": true
+      },
+      "ok": true
+    },
+    {
+      "probe": "H",
+      "description": "a query whose source is missing produces an explicit coverage gap and abstention, never a fabricated citation",
+      "expected": {
+        "status": "ABSTAINED",
+        "zero_hits": true,
+        "gap": "SOURCE_MISSING",
+        "result_status": "INCOMPLETE"
+      },
+      "observed": {
+        "status": "ABSTAINED",
+        "hits": 0,
+        "fabricated_citation": false,
+        "gap": "SOURCE_MISSING",
+        "result_status": "INCOMPLETE"
+      },
+      "ok": true
+    },
+    {
+      "probe": "I",
+      "description": "an invalidated/corrected parent claim makes derived EvidenceMaps STALE and the synthesis INCOMPLETE",
+      "expected": {
+        "map_status": "STALE",
+        "result_status": "INCOMPLETE",
+        "stale_indexed": false
+      },
+      "observed": {
+        "map_status": "STALE",
+        "result_status": "INCOMPLETE",
+        "stale_indexed": false,
+        "stale_excluded": 1
+      },
+      "ok": true
+    },
+    {
+      "probe": "J",
+      "description": "prompt injection inside a document stays inert: the segment is quarantined, nothing is extracted, no authority is granted",
+      "expected": {
+        "quarantined": true,
+        "zero_claims": true,
+        "authority_expansions": 0,
+        "instruction_in_claim": false
+      },
+      "observed": {
+        "quarantined": true,
+        "zero_claims": true,
+        "authority_expansions": 0,
+        "actors": [],
+        "classified": true,
+        "instruction_in_claim": false,
+        "retrieval_status": "ABSTAINED",
+        "extraction_status": "QUARANTINED"
+      },
+      "ok": true
+    },
+    {
+      "probe": "K",
+      "description": "a retrieval candidate that leaks private data or blows the budget is rejected on the hard gate before quality ranking",
+      "expected": {
+        "audit_ok": false,
+        "private_hits": 1,
+        "candidate_accepted": false
+      },
+      "observed": {
+        "audit_ok": false,
+        "private_hits": 1,
+        "candidate_accepted": false,
+        "counters": {
+          "private_hits": 1,
+          "future_hits": 0,
+          "stale_hits": 0,
+          "unknown_hits": 0
+        }
+      },
+      "ok": true
+    },
+    {
+      "probe": "L",
+      "description": "a summary/translation that changes a number, unit or negation does not entail the citation and cannot support the claim",
+      "expected": {
+        "number_drift": "NOT_ENTAILING",
+        "negation_drift": "NOT_ENTAILING",
+        "unit_drift": "NOT_ENTAILING",
+        "faithful": "ENTAILS",
+        "map_status": "INCOMPLETE"
+      },
+      "observed": {
+        "number_drift": "NOT_ENTAILING",
+        "negation_drift": "NOT_ENTAILING",
+        "unit_drift": "NOT_ENTAILING",
+        "faithful": "ENTAILS",
+        "map_status": "INCOMPLETE"
+      },
+      "ok": true
+    }
+  ],
+  "probeCount": 12,
+  "failures": [],
+  "ok": true,
+  "testedImplementationCommit": "6d4a5b30131fb96764b022409c20518c7c463fcc",
+  "executedAt": "bound on the S2-005 branch"
+}

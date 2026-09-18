@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-005",
+  "rule": "Frozen acceptance thresholds. Authored by the ticket owner before the first implementation commit; changing any value after the first recorded result requires a new ticket and a full gate restart. Hard gates exit non-zero; soft thresholds are reported with numerator/denominator and strata.",
+  "authored_by": "prn-ticket-owner",
+  "frozen_at": "2026-03-22T00:00:00.000Z",
+  "hard_gates": {
+    "private_leak_rate": 0,
+    "unauthorized_hit_rate": 0,
+    "future_leakage_rate": 0,
+    "provenance_substitution_rate": 0,
+    "causal_overclaim_rate": 0,
+    "fact_from_analogy_rate": 0,
+    "hidden_contradiction_rate": 0,
+    "silent_exclusion_rate": 0,
+    "duplicate_side_effect_rate": 0,
+    "stale_hit_rate": 0,
+    "probes_a_to_l_failures": 0
+  },
+  "soft_thresholds": {
+    "citation_entailment": { "metric": "citation_entailment_rate", "operator": ">=", "value": 0.9 },
+    "contradiction_recall": { "metric": "contradiction_recall", "operator": ">=", "value": 0.7 },
+    "local_recall_at_10": { "metric": "recall@10", "operator": ">=", "value": 0.6, "stratum": "local", "mode": "fusion" },
+    "global_recall_at_10": { "metric": "recall@10", "operator": ">=", "value": 0.4, "stratum": "global", "mode": "fusion" },
+    "abstention_rate": { "metric": "abstention_rate", "operator": "reported_only" },
+    "incomplete_evidence_maps": { "metric": "incomplete_evidence_map_rate", "operator": "reported_only" }
+  },
+  "paired_comparison": {
+    "methods": "exact McNemar for hit/no-hit; paired bootstrap (10000 permutations, 95% CI) for nDCG@10",
+    "minimum_stratum_size": 20,
+    "winner_rule": "positive median difference with CI excluding zero",
+    "below_minimum_stratum": "NOT_MEASURED"
+  },
+  "notes": "Recall/nDCG thresholds are baseline-floor anchors for the frozen synthetic corpus, not production external-validity claims. Hypothesis classification/falsifiability are measured on the labeled set with results reported; no pass/fail threshold is asserted at 1.0.0 because the label set is authored alongside the implementation (NOT_CALIBRATED, inherited limit)."
+}
