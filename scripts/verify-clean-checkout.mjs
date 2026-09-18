@@ -114,13 +114,24 @@ try {
     run('s2-004-security-probes', NPM, ['run', 'test:s2-004-security-probes'], {env: npmEnv});
     run('s2-004-replay', NPM, ['run', 'verify:s2-004'], {env: npmEnv});
     run('s2-004-db-replay', NPM, ['run', 'verify:s2-004-db-replay'], {env: npmEnv});
+    // S2-005: retrieval/synthesis must be green in the clean checkout too —
+    // contract types, both suites, probes and both replays run against the
+    // archive with no .git and no shared node_modules. The S2-005 dependency
+    // gate intentionally fails closed in ARCHIVE_DEGRADED mode and therefore
+    // runs only in the working repository.
+    run('s2-005-types', NPM, ['run', 'synthesis:types'], {env: npmEnv});
+    run('s2-005-retrieval-tests', NPM, ['run', 'test:retrieval'], {env: npmEnv});
+    run('s2-005-synthesis-tests', NPM, ['run', 'test:synthesis'], {env: npmEnv});
+    run('s2-005-security-probes', NPM, ['run', 'test:s2-005-security-probes'], {env: npmEnv});
+    run('s2-005-replay', NPM, ['run', 'verify:s2-005'], {env: npmEnv});
+    run('s2-005-db-replay', NPM, ['run', 'verify:s2-005-db-replay'], {env: npmEnv});
     run('typecheck', NPM, ['run', 'typecheck'], {env: npmEnv});
     run('lint', NPM, ['run', 'lint'], {env: npmEnv});
     run('build', NPM, ['run', 'build'], {env: buildEnv});
     run('runtime-audit', NPM, ['audit', '--omit=dev', '--json'], {env: npmEnv});
     run('tooling-audit', NPM, ['audit', '--json'], {env: npmEnv});
   } else {
-    for (const id of ['npm-ci', 's2-002-dependencies', 's2-003-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay', 's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
+    for (const id of ['npm-ci', 's2-002-dependencies', 's2-003-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay', 's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay', 's2-005-types', 's2-005-retrieval-tests', 's2-005-synthesis-tests', 's2-005-security-probes', 's2-005-replay', 's2-005-db-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
       commands.push({id, command: id === 'root-manifest' ? 'node scripts/generate-manifests.mjs --check' : id, exitCode: null, status: 'NOT_RUN_SANDBOX', reason: 'clean archive prerequisite was blocked by the sandbox'});
     }
   }
@@ -140,6 +151,7 @@ const requiredIds = [
   'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'sandbox-tests', 'security-probes',
   's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay',
   's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay',
+  's2-005-types', 's2-005-retrieval-tests', 's2-005-synthesis-tests', 's2-005-security-probes', 's2-005-replay', 's2-005-db-replay',
   'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit',
 ];
 const byId = new Map(commands.map((command) => [command.id, command]));
