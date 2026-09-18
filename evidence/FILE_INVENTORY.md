@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 534.
+Generated from `git ls-files`; count: 537.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -502,6 +502,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/synthesis/validation.mjs`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tasks/S2-003_SOURCE_INGESTION.md`
+- `tasks/S2-005_CROSS_DOMAIN_SYNTHESIS.md`
 - `tests/claims/contracts.schemas.test.mjs`
 - `tests/claims/contracts.types.test.mjs`
 - `tests/claims/dependency-binding.test.mjs`
@@ -533,7 +534,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/synthesis/contracts.schemas.test.mjs`
 - `tests/synthesis/contracts.types.test.mjs`
 - `tests/synthesis/dependency-binding.test.mjs`
+- `tests/synthesis/freeze-scope.test.mjs`
 - `tests/synthesis/retrieval.test.mjs`
 - `tests/synthesis/security-probes.test.mjs`
 - `tests/synthesis/synthesis.test.mjs`
+- `tests/synthesis/verification-write-mode.test.mjs`
 - `tsconfig.json`
