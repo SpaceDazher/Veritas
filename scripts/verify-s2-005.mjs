@@ -322,14 +322,16 @@ function spawnRun({ runId, executorId, nonce, clock, outputRoot, out }) {
 }
 
 function spawnProbes(write) {
-  // the probe evidence artifact is always bound: it is a deliverable of the
-  // gate, not an optional by-product
-  const child = spawnSync(process.execPath, [PROBES, '--write'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+  // A read-only verification must not mutate tracked evidence. Explicit
+  // --write runs bind the full probe report to the evidence artifact.
+  const child = spawnSync(process.execPath, write ? [PROBES, '--write'] : [PROBES], { cwd: ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
   if (child.status !== 0) {
     return { ok: false, failures: ['probes-exit-nonzero'], stderr: String(child.stderr ?? '').slice(-800) };
   }
   try {
-    return JSON.parse(fs.readFileSync(path.join(ROOT, 'evidence/s2-005-security-probes.json'), 'utf8'));
+    return write
+      ? JSON.parse(fs.readFileSync(path.join(ROOT, 'evidence/s2-005-security-probes.json'), 'utf8'))
+      : JSON.parse(child.stdout);
   } catch {
     return { ok: false, failures: ['probe-evidence-unreadable'] };
   }
