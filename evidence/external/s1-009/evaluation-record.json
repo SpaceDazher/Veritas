@@ -1,0 +1,432 @@
+{
+  "archive_reproducibility": {
+    "required_paths": [
+      "research/tickets/stage-1/S1-009/tracked-packs/ticket/53a3917c03af32c636116d8326ebf46cc71c897d1e4a6953fa4158c9063173e2.json",
+      "research/tickets/stage-1/S1-009/tracked-packs/canonical/53b29ff64626367dff2232047dc075c50b0f0158d5a336112cfb9c69e052b314.json"
+    ],
+    "verification_command": "git archive HEAD -> clean temporary directory; verify both content-addressed paths",
+    "verified": true
+  },
+  "artifact_chain_hash": "1d1b2debbbb2ac9ff76a65ffe352152c207d7a3ea71073af56a37679b464192b",
+  "campaign_id": "rcamp_0SV9HGD5JNEBT99901M1JJGE20",
+  "canonical_db_binding": {
+    "research_evaluation": {
+      "artifact_chain_hash": "1d1b2debbbb2ac9ff76a65ffe352152c207d7a3ea71073af56a37679b464192b",
+      "campaign_id": "rcamp_0SV9HGD5JNEBT99901M1JJGE20",
+      "created_at": "2026-09-03T02:45:29.820Z",
+      "details_json": "{\"audit\":{\"auditor\":\"verifier-B\",\"limitations\":[\"Same-host, process-separated (not external human auditor).\",\"No full third-party content archiving.\",\"No streaming/push binding coverage for MCP/A2A.\",\"SM6/SM8/SM11 remain unsupported under S1-009-FU-01/FU-02 and S1-011; S1-010 remains tool-poisoning only.\"],\"producer\":\"S1-009-research-agent\",\"subject_producer\":\"S1-009-research-agent\",\"verdict\":\"pass_with_limits\"},\"config\":{\"min_source_count\":3,\"min_verified_ratio\":1.0,\"required_artifacts\":[\"research_plan\",\"source_registry\",\"feature_catalog\",\"architecture_models\",\"mental_model\",\"ontology\",\"mathematical_model\",\"synthesis_and_gaps\",\"independent_audit\",\"platform_plan\",\"progress\"]},\"next_actions\":[]}",
+      "evaluation_version": 1,
+      "goal_id": "goal_B87S5W4AVDSXN04J01M1JJGE20",
+      "id": "reval_KJWPMSJE08BGDVNP01M1JJGE2W",
+      "limitations_json": "[\"Same-host, process-separated (not external human auditor).\",\"No full third-party content archiving.\",\"No streaming/push binding coverage for MCP/A2A.\",\"SM6/SM8/SM11 remain unsupported under S1-009-FU-01/FU-02 and S1-011; S1-010 remains tool-poisoning only.\"]",
+      "method": "agentos.research.deterministic.v1",
+      "reasons_json": "[]",
+      "result": "pass_with_limits"
+    },
+    "research_series": {
+      "campaign_id": "rcamp_0SV9HGD5JNEBT99901M1JJGE20",
+      "created_at": "2026-09-03T02:45:29.807Z",
+      "goal_id": "goal_B87S5W4AVDSXN04J01M1JJGE20",
+      "id": "rseries_DETFQ8GK1X6QV3AE01M1JJGE2F",
+      "manifest_sha256": "51ce9ca098e5ef6275faa92fc0dbf48cb1ccb46b15368e59827763162077a375",
+      "research_key": "S1-009",
+      "revision": 11,
+      "supersedes_campaign_id": "rcamp_G2QYA5YCXD0D218E01M1JHJV76",
+      "topic": "S1-009 MCP A2A delegation and knowledge semantics adapter roadmap"
+    }
+  },
+  "db_root": ".agentos-research/platform-stage-1",
+  "decision": {
+    "answer": "Three semantics are ABSENT/UNDERSPECIFIED in both MCP 2026-07-28 and A2A 1.0.0: exact-action delegation grants and child scope (SM6), budget reservation/consumption/aggregation (SM8), and knowledge promotion/challenge/rejection/revocation (SM11). The remaining 12 of 15 capability rows have explicit lossless or lossy-safe mappings. The adapter preserves the provider-neutral hub boundary by enforcing eight hard rules.",
+    "limits": [
+      "Same-host, process-separated (not external human auditor).",
+      "No full third-party content archiving.",
+      "No streaming/push binding coverage for MCP/A2A.",
+      "SM6/SM8/SM11 remain unsupported under S1-009-FU-01/FU-02 and S1-011; S1-010 remains tool-poisoning only."
+    ],
+    "question": "Which delegation/ownership/budget/provenance/knowledge-promotion semantics are absent or insufficiently normative in current MCP/A2A surfaces, and what versioned adapter contract preserves canonical AgentOS hub envelope provider-neutral without changing authorization meaning?",
+    "research_revision": 11,
+    "verdict": "pass_with_limits"
+  },
+  "evaluation_artifacts": {
+    "comparison": {
+      "case_count": 40,
+      "decision_identical": true,
+      "duplicate_or_count_mismatch": false,
+      "envelope_hash_identical": true,
+      "exact_case_set": true,
+      "hash_match": true,
+      "mismatches": [],
+      "process_separation_verified": true,
+      "run_a_executor": "verifier-A",
+      "run_a_invocation_digest": "93ff5d1d33f269ca2925971559f3227bc2b939081963ce95b396f8dfac6852b8",
+      "run_a_nonce": "run-a-nonce",
+      "run_a_output_root": "results/run-a",
+      "run_a_process_provenance": {
+        "branch": "main",
+        "clean": true,
+        "commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "dirty": false,
+        "dirty_files": [],
+        "evaluator_clean": true,
+        "evaluator_commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "evaluator_input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "evaluator_pid": 28880,
+        "evaluator_ppid": 30344,
+        "evaluator_tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466",
+        "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "platform": "win32",
+        "python_version": "3.12.6",
+        "runner_cwd": "D:\\Project\\AgentOS",
+        "runner_pid": 30344,
+        "runner_ppid": 26136,
+        "tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466"
+      },
+      "run_b_executor": "verifier-B",
+      "run_b_invocation_digest": "e95268ef108e39a35abfdf93f8f4243a698dd5032ce655fa3e6f68f56a6348d8",
+      "run_b_nonce": "run-b-nonce",
+      "run_b_output_root": "results/run-b",
+      "run_b_process_provenance": {
+        "branch": "main",
+        "clean": true,
+        "commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "dirty": false,
+        "dirty_files": [],
+        "evaluator_clean": true,
+        "evaluator_commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "evaluator_input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "evaluator_pid": 29668,
+        "evaluator_ppid": 30124,
+        "evaluator_tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466",
+        "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "platform": "win32",
+        "python_version": "3.12.6",
+        "runner_cwd": "D:\\Project\\AgentOS",
+        "runner_pid": 30124,
+        "runner_ppid": 26136,
+        "tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466"
+      },
+      "schema": "agentos.s1-009.comparison/v2",
+      "verdict": "PASS",
+      "verdict_identical": true
+    },
+    "run_a": {
+      "capability_rows_passing": {
+        "coverage_ok": true,
+        "distinct_passing_rows": 12,
+        "distinct_rows": 12,
+        "ids": [
+          "MCP-001",
+          "MCP-006",
+          "MCP-008",
+          "MCP-009",
+          "MCP-011",
+          "A2A-001",
+          "A2A-006",
+          "A2A-007",
+          "A2A-011",
+          "A2A-012",
+          "XPROTO-012",
+          "XPROTO-015",
+          "XPROTO-016"
+        ],
+        "passing": 13,
+        "row_ids": [
+          "SM1",
+          "SM10",
+          "SM12",
+          "SM13",
+          "SM14",
+          "SM15",
+          "SM2",
+          "SM3",
+          "SM4",
+          "SM5",
+          "SM7",
+          "SM9"
+        ],
+        "total": 13
+      },
+      "case_count": 40,
+      "executor_id": "verifier-A",
+      "hashes": {
+        "adapter_contract_sha256": "824698238c5e4a3507a95094e80a58f886f359c27d3f5cb3413fab58ac5860f3",
+        "corpus_sha256": "7a0b64cc551c7e009af81395e7a63f136ec64a977f61716e822140473e7186a2",
+        "envelope_schema_sha256": "c1554636fdb34f1d01b26721c9975befe00b8d637c7107b3e33c58f39cb75b24",
+        "evaluator_sha256": "7be02d7553cb0fe74edde241b013e7d3a4e5c4f3824192c6028569d59174186a",
+        "rubric_sha256": "9df9f2fcbf90a75eba3b60637f9c723883bce96e8c062d82d9afca85d444efe8"
+      },
+      "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+      "invocation_digest": "93ff5d1d33f269ca2925971559f3227bc2b939081963ce95b396f8dfac6852b8",
+      "nonce": "run-a-nonce",
+      "output_root": "results/run-a",
+      "process_provenance": {
+        "branch": "main",
+        "clean": true,
+        "commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "dirty": false,
+        "dirty_files": [],
+        "evaluator_clean": true,
+        "evaluator_commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "evaluator_input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "evaluator_pid": 28880,
+        "evaluator_ppid": 30344,
+        "evaluator_tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466",
+        "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "platform": "win32",
+        "python_version": "3.12.6",
+        "runner_cwd": "D:\\Project\\AgentOS",
+        "runner_pid": 30344,
+        "runner_ppid": 26136,
+        "tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466"
+      },
+      "results_path": "research/tickets/stage-1/S1-009/results/run-a/results.json",
+      "verdict": "PASS",
+      "verdict_counts": {
+        "FAIL": 0,
+        "PASS": 40
+      }
+    },
+    "run_b": {
+      "capability_rows_passing": {
+        "coverage_ok": true,
+        "distinct_passing_rows": 12,
+        "distinct_rows": 12,
+        "ids": [
+          "MCP-001",
+          "MCP-006",
+          "MCP-008",
+          "MCP-009",
+          "MCP-011",
+          "A2A-001",
+          "A2A-006",
+          "A2A-007",
+          "A2A-011",
+          "A2A-012",
+          "XPROTO-012",
+          "XPROTO-015",
+          "XPROTO-016"
+        ],
+        "passing": 13,
+        "row_ids": [
+          "SM1",
+          "SM10",
+          "SM12",
+          "SM13",
+          "SM14",
+          "SM15",
+          "SM2",
+          "SM3",
+          "SM4",
+          "SM5",
+          "SM7",
+          "SM9"
+        ],
+        "total": 13
+      },
+      "case_count": 40,
+      "executor_id": "verifier-B",
+      "hashes": {
+        "adapter_contract_sha256": "824698238c5e4a3507a95094e80a58f886f359c27d3f5cb3413fab58ac5860f3",
+        "corpus_sha256": "7a0b64cc551c7e009af81395e7a63f136ec64a977f61716e822140473e7186a2",
+        "envelope_schema_sha256": "c1554636fdb34f1d01b26721c9975befe00b8d637c7107b3e33c58f39cb75b24",
+        "evaluator_sha256": "7be02d7553cb0fe74edde241b013e7d3a4e5c4f3824192c6028569d59174186a",
+        "rubric_sha256": "9df9f2fcbf90a75eba3b60637f9c723883bce96e8c062d82d9afca85d444efe8"
+      },
+      "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+      "invocation_digest": "e95268ef108e39a35abfdf93f8f4243a698dd5032ce655fa3e6f68f56a6348d8",
+      "nonce": "run-b-nonce",
+      "output_root": "results/run-b",
+      "process_provenance": {
+        "branch": "main",
+        "clean": true,
+        "commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "dirty": false,
+        "dirty_files": [],
+        "evaluator_clean": true,
+        "evaluator_commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+        "evaluator_input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "evaluator_pid": 29668,
+        "evaluator_ppid": 30124,
+        "evaluator_tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466",
+        "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+        "platform": "win32",
+        "python_version": "3.12.6",
+        "runner_cwd": "D:\\Project\\AgentOS",
+        "runner_pid": 30124,
+        "runner_ppid": 26136,
+        "tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466"
+      },
+      "results_path": "research/tickets/stage-1/S1-009/results/run-b/results.json",
+      "verdict": "PASS",
+      "verdict_counts": {
+        "FAIL": 0,
+        "PASS": 40
+      }
+    }
+  },
+  "evaluation_id": "reval_KJWPMSJE08BGDVNP01M1JJGE2W",
+  "evaluation_version": 1,
+  "evidence_pack": {
+    "chain_fresh": true,
+    "file_sha256": "080e147f1781b63b1dab1c0520042df2d26ec47b9fceffaec325e91a3be7997c",
+    "latest_evaluation_valid": true,
+    "path": ".agentos-research/platform-stage-1/goals/goal_B87S5W4AVDSXN04J01M1JJGE20/evidence-pack.json",
+    "payload_sha256": "041faa12cc61b5a7a2e79698a2daf80bfa026be112fcca7e397c550481d089d8",
+    "schema": "agentos.evidence-pack/v3",
+    "sha256": "041faa12cc61b5a7a2e79698a2daf80bfa026be112fcca7e397c550481d089d8"
+  },
+  "goal_id": "goal_B87S5W4AVDSXN04J01M1JJGE20",
+  "limitations": [
+    "Same-host, process-separated (not external human auditor).",
+    "No full third-party content archiving.",
+    "No streaming/push binding coverage for MCP/A2A.",
+    "SM6/SM8/SM11 remain unsupported under S1-009-FU-01/FU-02 and S1-011; S1-010 remains tool-poisoning only."
+  ],
+  "manifest_sha256": "51ce9ca098e5ef6275faa92fc0dbf48cb1ccb46b15368e59827763162077a375",
+  "measurement_provenance": {
+    "clean": true,
+    "commit_sha": "dc87b554f8399b525b8e85c268b842f97e51f1f0",
+    "input_manifest_sha256": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+    "process_separation_verified": true,
+    "tree_sha": "b20b77cd00a49300e32c225812be80d5147c7466"
+  },
+  "note": "All revision IDs, evaluation IDs, chain hashes, and manifest hashes are extracted from the exact latest canonical SQLite rows; tracked packs bind those rows and the clean process-separated measurement.",
+  "recorded_at": "2026-09-03T02:46:03.791084Z",
+  "recorded_corrective_round": "R6-final",
+  "research_key": "S1-009",
+  "research_revision": 11,
+  "research_revision_source": "canonical DB research_series.revision",
+  "research_series_id": "rseries_DETFQ8GK1X6QV3AE01M1JJGE2F",
+  "result": "pass_with_limits",
+  "schema": "agentos.ticket-evaluation-record/v2",
+  "source_snapshots": [
+    {
+      "bytes": 292219,
+      "canonical_uri": "https://modelcontextprotocol.io/specification/2026-07-28",
+      "declared_sha256": "5ac63165cb14d33eca416a1b9f39002b85a0b5548257d7204a691b5f990a5950",
+      "file_sha256": "5ac63165cb14d33eca416a1b9f39002b85a0b5548257d7204a691b5f990a5950",
+      "id": "MCP-2026-07-28-SPEC",
+      "path": "research/tickets/stage-1/S1-009/snapshots/mcp-2026-07-28-spec.html",
+      "tag_commit_release": "release 2026-07-28",
+      "version": "2026-07-28"
+    },
+    {
+      "bytes": 294415,
+      "canonical_uri": "https://modelcontextprotocol.io/specification/2026-07-28/changelog",
+      "declared_sha256": "dfeebae9b2e2e443e945452783b245ac8c7fbb374de9215a78a399a575d3ea13",
+      "file_sha256": "dfeebae9b2e2e443e945452783b245ac8c7fbb374de9215a78a399a575d3ea13",
+      "id": "MCP-2026-07-28-CHANGELOG",
+      "path": "research/tickets/stage-1/S1-009/snapshots/mcp-2026-07-28-changelog.html",
+      "tag_commit_release": "release 2026-07-28",
+      "version": "2026-07-28"
+    },
+    {
+      "bytes": 599272,
+      "canonical_uri": "https://a2a-protocol.org/v1.0.0/specification",
+      "declared_sha256": "f5d15f00006b7e25b8a3a2766b309b661fff36dbd4330933ed61bfc8d435f05b",
+      "file_sha256": "f5d15f00006b7e25b8a3a2766b309b661fff36dbd4330933ed61bfc8d435f05b",
+      "id": "A2A-1.0.0-SPEC",
+      "path": "research/tickets/stage-1/S1-009/snapshots/a2a-1.0.0-spec.html",
+      "tag_commit_release": "v1.0.0",
+      "version": "1.0.0"
+    },
+    {
+      "bytes": 34461,
+      "canonical_uri": "https://github.com/a2aproject/A2A/blob/173695755607e884aa9acf8ce4feed90e32727a1/specification/a2a.proto",
+      "declared_sha256": "4b74c0baa923ae0acb55474e548f1d6e5d3f83b80d757b65f8bf3e99a3c2257f",
+      "file_sha256": "4b74c0baa923ae0acb55474e548f1d6e5d3f83b80d757b65f8bf3e99a3c2257f",
+      "id": "A2A-1.0.0-PROTO",
+      "path": "research/tickets/stage-1/S1-009/snapshots/a2a-1.0.0.proto",
+      "tag_commit_release": "v1.0.0",
+      "version": "1.0.0"
+    },
+    {
+      "bytes": 44211,
+      "canonical_uri": "https://arxiv.org/abs/2504.16736",
+      "declared_sha256": "044a5e6e530927f0212dd6beb688146329063105972ec882732a8abd06593416",
+      "file_sha256": "044a5e6e530927f0212dd6beb688146329063105972ec882732a8abd06593416",
+      "id": "SV2-SURVEY",
+      "path": "research/tickets/stage-1/S1-009/snapshots/sv2-2504.16736.html",
+      "tag_commit_release": "arXiv:2504.16736v3",
+      "version": "v3 (2025-06-21)"
+    },
+    {
+      "bytes": 26583,
+      "canonical_uri": "https://local.agentos.invalid/AgentOS/spec/SPEC.md",
+      "declared_sha256": "e0b091bf38b7f27e22a4d37eb1b3d000b5154cc3ff64736bd4aea99f0ee4ffbc",
+      "file_sha256": "e0b091bf38b7f27e22a4d37eb1b3d000b5154cc3ff64736bd4aea99f0ee4ffbc",
+      "id": "SPEC",
+      "path": "spec/SPEC.md",
+      "tag_commit_release": null,
+      "version": null
+    },
+    {
+      "bytes": 28953,
+      "canonical_uri": "https://local.agentos.invalid/AgentOS/src/agentos/gateway.py",
+      "declared_sha256": "b7702aa77b08928ef42b2aee1c16d1bb6acf3346fdd803c1aada0b51d0146cbd",
+      "file_sha256": "b7702aa77b08928ef42b2aee1c16d1bb6acf3346fdd803c1aada0b51d0146cbd",
+      "id": "GATEWAY",
+      "path": "src/agentos/gateway.py",
+      "tag_commit_release": null,
+      "version": null
+    },
+    {
+      "bytes": 12218,
+      "canonical_uri": "https://local.agentos.invalid/AgentOS/src/agentos/journal.py",
+      "declared_sha256": "67e7d9c0ea229c1787fc3adf51f9ede7103d2d83b11b371e51fafaf2b5cadddb",
+      "file_sha256": "67e7d9c0ea229c1787fc3adf51f9ede7103d2d83b11b371e51fafaf2b5cadddb",
+      "id": "JOURNAL",
+      "path": "src/agentos/journal.py",
+      "tag_commit_release": null,
+      "version": null
+    }
+  ],
+  "supersedes_campaign_id": "rcamp_G2QYA5YCXD0D218E01M1JHJV76",
+  "ticket_id": "S1-009",
+  "tracked_artifact_hashes": {
+    "research/tickets/stage-1/S1-009/S1-009-FU-01-delegation-grant-contract.md": "86ac03149ac5a3a72a985a9a5e22bcb866e10c5e0818c0775621e4a7818d4394",
+    "research/tickets/stage-1/S1-009/S1-009-FU-02-budget-conservation-contract.md": "05665e6a992aa800ed3364e969353bff36e41095e5b3eed38a3250d327f668d0",
+    "research/tickets/stage-1/S1-009/adapter-contract.json": "824698238c5e4a3507a95094e80a58f886f359c27d3f5cb3413fab58ac5860f3",
+    "research/tickets/stage-1/S1-009/bundle.json": "150e5557686df8e1a00cd3da38a4285294f8ab71e660070e1cf25ebea1dce3a6",
+    "research/tickets/stage-1/S1-009/canonical-envelope.schema.json": "c1554636fdb34f1d01b26721c9975befe00b8d637c7107b3e33c58f39cb75b24",
+    "research/tickets/stage-1/S1-009/capability-matrix.json": "88e3015d2a16e0f3230ac0c17070aecf9d0b4a8c88d1e725aafe4f8878fdd266",
+    "research/tickets/stage-1/S1-009/cases.json": "7a0b64cc551c7e009af81395e7a63f136ec64a977f61716e822140473e7186a2",
+    "research/tickets/stage-1/S1-009/corpus-manifest.json": "69cddbe5d7d9127d96a4e9e74cde617b93e944cbb3a6ce209a40862a1cc1345f",
+    "research/tickets/stage-1/S1-009/evaluator.py": "7be02d7553cb0fe74edde241b013e7d3a4e5c4f3824192c6028569d59174186a",
+    "research/tickets/stage-1/S1-009/freeze_manifest.py": "485b0e15e8f24101e1e7c0735e664bf8477df370e45cb6531e0ffebb49949543",
+    "research/tickets/stage-1/S1-009/make_bundle.py": "2b0387ac2bc12393e37f333be65de77b33bc1248ca56acc38dee4b21a91c4c32",
+    "research/tickets/stage-1/S1-009/protocol-snapshot-manifest.json": "223ddaa062148808eb55aae736781e98900395fb3e4b207e35d6549efc637a7c",
+    "research/tickets/stage-1/S1-009/results/ENVIRONMENT.md": "9013e2ae54066233322ae3ef34db19854920e40ef8db4be9ee6905fe49a304b3",
+    "research/tickets/stage-1/S1-009/results/adapter-roadmap.md": "6b85b1f5dd23b5d36372fa5c37ea953937bf5da0f16cf7f36b13302fe8b2cf4e",
+    "research/tickets/stage-1/S1-009/results/comparison.json": "c656a360aa24937f96949c34c14c08e104fb162d780e3f1a00019aabf83530ea",
+    "research/tickets/stage-1/S1-009/results/probes.json": "4953f089fe4635be93afab2361277ad32a128395a3e293e428d4519f64ae0af3",
+    "research/tickets/stage-1/S1-009/results/run-a/results.json": "b6b9eac75ddd2d5d91a63adabd82df874bc28b732f5862aee3542cb2a31119c9",
+    "research/tickets/stage-1/S1-009/results/run-a/summary.json": "08c8c10fa53fe8f871187f4d7a2031906eff14b8c1a9c59963d1b71cb39c838a",
+    "research/tickets/stage-1/S1-009/results/run-b/results.json": "b6b9eac75ddd2d5d91a63adabd82df874bc28b732f5862aee3542cb2a31119c9",
+    "research/tickets/stage-1/S1-009/results/run-b/summary.json": "36468bd4461f64dbcbe496e54d1ef71994ff6e5aa348f9493bc5e0fdc2f40b33",
+    "research/tickets/stage-1/S1-009/results/version-skew.json": "dbfd710291416fde9e0c540661330d0e1e6b60f812a5544e5f9589b01edb2cb0",
+    "research/tickets/stage-1/S1-009/rubric.json": "9df9f2fcbf90a75eba3b60637f9c723883bce96e8c062d82d9afca85d444efe8",
+    "research/tickets/stage-1/S1-009/runner.py": "c9006515a8fd61f4714d8ab033b250c96184b8abb328e3c41e0caa40e6298026",
+    "research/tickets/stage-1/S1-009/semantic-model.json": "1791057e0ec4e9559bd8ebb802555694a82066ac2e4dca1769e2974ae87c8161",
+    "tests/test_s1_009_regressions.py": "b830352ae5e380d37782bb8aa5308de03d6e1b2181b9c3988c0d9714ffef80c1"
+  },
+  "tracked_canonical_pack": {
+    "file_sha256": "53b29ff64626367dff2232047dc075c50b0f0158d5a336112cfb9c69e052b314",
+    "pack_sha256": "d1b286219906b51b40dad06037c0e08396006a5a148013be46641f7f92786998",
+    "path": "research/tickets/stage-1/S1-009/tracked-packs/canonical/53b29ff64626367dff2232047dc075c50b0f0158d5a336112cfb9c69e052b314.json",
+    "payload_sha256": "1fa1b9389dd7084adf1305267534f83ae022951b14f2cda73724b6e048bfd15e"
+  },
+  "tracked_ticket_pack": {
+    "file_sha256": "53a3917c03af32c636116d8326ebf46cc71c897d1e4a6953fa4158c9063173e2",
+    "pack_sha256": "52c0aacd11d11960a647c3ee4b1e74c8987126633c8da6b62e0d9e0068ef0fa6",
+    "path": "research/tickets/stage-1/S1-009/tracked-packs/ticket/53a3917c03af32c636116d8326ebf46cc71c897d1e4a6953fa4158c9063173e2.json",
+    "payload_sha256": "a7f71ce118a3313b00314bef70dff6c763bf17470f3e46840bfc7c2c68319a73"
+  },
+  "wiki_check": {
+    "files": 3200,
+    "issues": [],
+    "links_checked": 8313,
+    "ok": true
+  }
+}

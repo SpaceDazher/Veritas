@@ -1,0 +1,136 @@
+{
+  "schema": "agentos.ticket-evaluation-record/v1",
+  "ticket_id": "S1-007",
+  "recorded_at": "2026-09-01T02:47:55.636Z",
+  "db_root": ".agentos-research/platform-stage-1",
+  "research_revision": 7,
+  "recorded_corrective_round": "R4-final (REVIEW_R3 findings 1-3 closed)",
+  "campaign_id": "rcamp_9AGA2BWAQ70FQQ5401M1DDTYSA",
+  "goal_id": "goal_5FX22ZHCEAW0G2B501M1DDTYSA",
+  "evaluation_id": "reval_6BH3G062B38G3WHH01M1DDTYW2",
+  "evaluation_version": 1,
+  "result": "pass_with_limits",
+  "artifact_chain_hash": "4c344ab2e83b231e4cd14c2f69f9eb95b9b0f374f7fab3bf8651eda682390692",
+  "evidence_pack": {
+    "schema": "agentos.evidence-pack/v3",
+    "path": "research/tickets/stage-1/S1-007/results/evidence/evidence-pack-b4da835f8b41a5ebf2ef622dc998a4cebfa1ed6370e58cbe4f3551c727929217.json",
+    "canonical_runtime_path": "D:/Project/AgentOS/.agentos-research/platform-stage-1/goals/goal_5FX22ZHCEAW0G2B501M1DDTYSA/evidence-pack.json",
+    "sha256": "b4da835f8b41a5ebf2ef622dc998a4cebfa1ed6370e58cbe4f3551c727929217",
+    "payload_sha256": "cd688ed0662183563945d633bc55c5a0058d98b8f441f2f6b9a6991bf77bb590",
+    "chain_fresh": true,
+    "latest_evaluation_valid": true
+  },
+  "raw_observations_archive": {
+    "schema": "agentos.s1-007.raw-observations/v1",
+    "path": "research/tickets/stage-1/S1-007/results/evidence/raw-observations-243ce6a6d35e6b15a1d682d4a05da06d57232e7afaa52a28c0e83c8bfdd77777.json",
+    "sha256": "243ce6a6d35e6b15a1d682d4a05da06d57232e7afaa52a28c0e83c8bfdd77777",
+    "member_count": 172,
+    "note": "byte-exact tracked copies of all run records plus both run manifests and both timing artifacts; the archive sha256 is also bound into the FLOW-11 bundle (source RAW-OBSERVATIONS, claim c8-raw-archive) and therefore into the evidence pack"
+  },
+  "wiki_check": {
+    "ok": true,
+    "files": 2687,
+    "links_checked": 7157,
+    "issues": []
+  },
+  "decision": {
+    "question": "QA3 retrieval/index isolation: per-scope index versus shared index with row-level retrieval filtering (shared-RLS)",
+    "winner": "per_scope",
+    "recommendation": "per-scope index projections bound to the canonical (tenant, workspace, goal) scope with frozen cache/epoch invalidation semantics",
+    "scores_normalized": {
+      "per_scope": 3.8503,
+      "shared_rls": 3.5999
+    },
+    "sensitivity": {
+      "total_perturbations_executed": 222,
+      "oat_perturbations_executed": 22,
+      "random_vectors": 200,
+      "random_seed": 42,
+      "flip_count": 0,
+      "winner_stable": true,
+      "policy": "weights-only perturbation; every scored cell was a measured number, so no unknown-bound swing applies (unknown-bound analysis would activate only if a cell scored NO_DATA)"
+    },
+    "probes": {
+      "A_existence_oracle": {
+        "detected": "FAIL",
+        "expected": "FAIL",
+        "iso": {
+          "ISO1": 0,
+          "ISO2": 2,
+          "ISO3": 0,
+          "ISO4": 0,
+          "ISO5": 0,
+          "ISO6": 0,
+          "ISO7": 0,
+          "ISO8": 0
+        }
+      },
+      "B_stale_cache": {
+        "detected": "FAIL",
+        "expected": "FAIL",
+        "iso": {
+          "ISO1": 0,
+          "ISO2": 0,
+          "ISO3": 1,
+          "ISO4": 1,
+          "ISO5": 0,
+          "ISO6": 0,
+          "ISO7": 0,
+          "ISO8": 0
+        }
+      },
+      "C_postfilter": {
+        "detected": "FAIL",
+        "expected": "FAIL",
+        "iso": {
+          "ISO1": 0,
+          "ISO2": 36,
+          "ISO3": 0,
+          "ISO4": 0,
+          "ISO5": 0,
+          "ISO6": 0,
+          "ISO7": 0,
+          "ISO8": 0
+        }
+      },
+      "D_forged_scope_provenance_loss": {
+        "detected": "FAIL+INCOMPARABLE",
+        "expected": "FAIL+INCOMPARABLE",
+        "iso": {
+          "ISO1": 0,
+          "ISO2": 0,
+          "ISO3": 0,
+          "ISO4": 1,
+          "ISO5": 4,
+          "ISO6": 0,
+          "ISO7": 1,
+          "ISO8": 0
+        }
+      }
+    },
+    "per_variant_evidence": {
+      "D6_blast_radius": "per_scope 4.0 (worst single fault: one misfiled projection entry, 1/3 scopes) vs shared_rls 3.25 (predicate bypass exposes 2/3 scopes + corrupt entry 1/3); cells cite distinct per-variant fault data",
+      "D10_overhead": "directional: the costlier variant scores strictly lower on measured storage bytes and rows scanned",
+      "timing": "statistic, tolerance and verdict recomputed by the evaluator from raw hash-bound paired samples of BOTH executions; producer summaries ignored"
+    },
+    "migration_trigger": "away from per-scope projections only when a documented need for cross-scope ranked federation inside ONE trust boundary coincides with measured evidence that per-scope projection maintenance exceeds a shared predicate layer at equal ISO1-ISO8 compliance; rollback is symmetric (rebuild projections from the canonical object store)",
+    "non_goals": "no production search service/vendor choice, no ranking optimization, no profile-C MLS/TEE rollout (S1-018), no <=5s revocation SLO claim (S1-008), no core AgentOS rewrites",
+    "source": {
+      "path": "research/tickets/stage-1/S1-007/results/sensitivity-analysis.json",
+      "sha256": "c0630e2bb43f98d08f3a2b74ca86cc6251137e87b4bb148a2ee8305a36aacfdb",
+      "pack_claim_id": "rclm_J9CBM4AP3RWM4T2Z01M1DDTYS6"
+    }
+  },
+  "limitations": [
+    "All results are local-model measurements from a deterministic stdlib-only simulation; no production latency, storage or privacy certification is claimed.",
+    "The timing probe is a bounded same-host paired-interleaved wall-clock measurement (200 paired samples x 32 inner repeats x 3 seeds per variant, tolerance max(10% of control median, 2000ns) recomputed by the evaluator from raw samples); it cannot prove absence of all side channels.",
+    "D9 (operational complexity/migration) and D11 (profile compatibility) are inference-type cells derived from the frozen contract, the current implementation and documented profiles.",
+    "Storage overhead uses a declared fixed per-index constant (256 bytes) - a model assumption, not a measurement of a production index engine.",
+    "S1-003 and S1-005 evidence is reused only within its stated limits (see dependency-gate.json).",
+    "Producer and verifier labels are process-separated roles in one local environment, not external human auditors."
+  ],
+  "note": "Revision 7 supersedes revision 6 after fail-closed record derivation, structured archive binding, and canonical timestamp correction.",
+  "executed_at_commit": "0e93364078f95e9053430698614c0cc94e683793",
+  "experiment_commit": "0e93364078f95e9053430698614c0cc94e683793",
+  "record_finalized_from_commit": "4b1b13897ca44a925c532acbb848d8a930351681"
+}

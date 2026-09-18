@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-glo-022",
+  "case_number": 22,
+  "category": "global_cross_domain",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-mob-1",
+        "domain": "urban_mobility",
+        "snapshot": {
+          "snapshot_id": "snp-mob-1",
+          "published_at": "2024-01-15T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-15T09:00:00.000Z",
+          "fetched_at": "2024-01-15T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Bike lane expansion increased cycling trips by 24% in Copenhagen during 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-mar-1",
+        "domain": "marine_ecology",
+        "snapshot": {
+          "snapshot_id": "snp-mar-1",
+          "published_at": "2024-01-20T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-20T09:00:00.000Z",
+          "fetched_at": "2024-01-20T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Kelp restoration increased fish biomass by 31% along Norwegian coasts during 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-rev-2",
+        "domain": "marine_ecology",
+        "snapshot": {
+          "snapshot_id": "snp-rev-2",
+          "published_at": "2024-04-02T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-04-02T09:00:00.000Z",
+          "fetched_at": "2024-04-02T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Prior studies found similar outcomes for bike lane adoption and kelp restoration in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [
+      {
+        "from_segment": "seg-rev-2",
+        "to_segment": "seg-mar-1",
+        "relation": "SUPPORTS"
+      },
+      {
+        "from_segment": "seg-rev-2",
+        "to_segment": "seg-mob-1",
+        "relation": "SUPPORTS"
+      }
+    ],
+    "invalidation": null,
+    "query": {
+      "text": "kelp restoration fish biomass Norwegian coasts bike lane expansion cycling",
+      "question_kind": "global",
+      "task_class": "research",
+      "domains": [
+        "urban_mobility",
+        "marine_ecology"
+      ]
+    }
+  },
+  "expected": {
+    "gold_segment_ids": [
+      "seg-mob-1",
+      "seg-mar-1",
+      "seg-rev-2"
+    ],
+    "gold_primary_segment_ids": [
+      "seg-mob-1",
+      "seg-mar-1",
+      "seg-rev-2"
+    ],
+    "retrieval_status": "COMPLETED",
+    "min_domains_in_hits": 2,
+    "hypothesis_card": {
+      "card_type": "ANALOGY",
+      "novelty": "similar_prior_found",
+      "causal_assertion": null,
+      "relation_subject": "bike lane adoption",
+      "relation_predicate": "kelp restoration outcomes"
+    },
+    "synthesis_status": "READY_FOR_REVIEW"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

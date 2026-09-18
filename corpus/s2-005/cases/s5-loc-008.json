@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-loc-008",
+  "case_number": 8,
+  "category": "local_exact",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-mar-2",
+        "domain": "marine_ecology",
+        "snapshot": {
+          "snapshot_id": "snp-mar-2",
+          "published_at": "2024-01-22T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-22T09:00:00.000Z",
+          "fetched_at": "2024-01-22T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Ocean warming increased early cod spawning by 22% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-epi-2",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-2",
+          "published_at": "2024-01-12T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-12T09:00:00.000Z",
+          "fetched_at": "2024-01-12T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Cardiovascular admissions increased by 12% in Nordic cities during 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-mar-3",
+        "domain": "marine_ecology",
+        "snapshot": {
+          "snapshot_id": "snp-mar-3",
+          "published_at": "2024-01-23T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-23T09:00:00.000Z",
+          "fetched_at": "2024-01-23T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Marine protected areas increased species richness by 14% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [
+      {
+        "from_segment": "seg-mar-2",
+        "to_segment": "seg-epi-2",
+        "relation": "REFINES"
+      }
+    ],
+    "invalidation": null,
+    "query": {
+      "text": "ocean warming cod spawning early increased",
+      "question_kind": "local",
+      "task_class": "research",
+      "domains": []
+    }
+  },
+  "expected": {
+    "gold_segment_ids": [
+      "seg-mar-2"
+    ],
+    "gold_primary_segment_ids": [
+      "seg-mar-2"
+    ],
+    "statement": "Ocean warming increased early cod spawning by 22% in 2023.",
+    "retrieval_status": "COMPLETED",
+    "min_primary_recall": 1,
+    "synthesis_status": "READY_FOR_REVIEW",
+    "entailment": "ENTAILS"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

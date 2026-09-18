@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-glo-015",
+  "case_number": 15,
+  "category": "global_cross_domain",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-lab-3",
+        "domain": "labor_economics",
+        "snapshot": {
+          "snapshot_id": "snp-lab-3",
+          "published_at": "2024-01-28T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-28T09:00:00.000Z",
+          "fetched_at": "2024-01-28T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Automation decreased routine manufacturing jobs by 11% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-mar-2",
+        "domain": "marine_ecology",
+        "snapshot": {
+          "snapshot_id": "snp-mar-2",
+          "published_at": "2024-01-22T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-22T09:00:00.000Z",
+          "fetched_at": "2024-01-22T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Ocean warming increased early cod spawning by 22% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-epi-3",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-3",
+          "published_at": "2023-12-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2023-12-05T09:00:00.000Z",
+          "fetched_at": "2023-12-05T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Flu vaccination coverage reached 61% of adults in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "automation routine manufacturing jobs ocean warming cod spawning increased",
+      "question_kind": "global",
+      "task_class": "research",
+      "domains": [
+        "labor_economics",
+        "marine_ecology"
+      ]
+    }
+  },
+  "expected": {
+    "gold_segment_ids": [
+      "seg-lab-3",
+      "seg-mar-2"
+    ],
+    "gold_primary_segment_ids": [
+      "seg-lab-3",
+      "seg-mar-2"
+    ],
+    "retrieval_status": "COMPLETED",
+    "min_domains_in_hits": 2,
+    "hypothesis_card": {
+      "card_type": "ANALOGY",
+      "novelty": "novel_to_selected_corpus",
+      "causal_assertion": null
+    },
+    "synthesis_status": "READY_FOR_REVIEW"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

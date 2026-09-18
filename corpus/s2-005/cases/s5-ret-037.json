@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-ret-037",
+  "case_number": 37,
+  "category": "retro_forecast",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2024-01-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-epi-1",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-1",
+          "published_at": "2024-01-10T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-10T09:00:00.000Z",
+          "fetched_at": "2024-01-10T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Air pollution exposure increased asthma incidence by 18% among urban children in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-epi-3",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-3",
+          "published_at": "2023-12-05T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2023-12-05T09:00:00.000Z",
+          "fetched_at": "2023-12-05T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Flu vaccination coverage reached 61% of adults in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "flu vaccination coverage asthma air pollution",
+      "question_kind": "local",
+      "task_class": "research",
+      "domains": []
+    }
+  },
+  "expected": {
+    "retrieval_status": "COMPLETED",
+    "future_excluded": true,
+    "hits_reference_only": [
+      "seg-epi-3"
+    ],
+    "gold_segment_ids": [
+      "seg-epi-3"
+    ],
+    "synthesis_status": "READY_FOR_REVIEW"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-con-025",
+  "case_number": 25,
+  "category": "contradiction",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-mob-3",
+        "domain": "urban_mobility",
+        "snapshot": {
+          "snapshot_id": "snp-mob-3",
+          "published_at": "2024-01-18T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-18T09:00:00.000Z",
+          "fetched_at": "2024-01-18T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Metro expansion increased transit ridership by 19% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-mob-3b",
+        "domain": "urban_mobility",
+        "snapshot": {
+          "snapshot_id": "snp-mob-3b",
+          "published_at": "2024-01-19T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-19T09:00:00.000Z",
+          "fetched_at": "2024-01-19T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Metro expansion increased transit ridership by 7% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "metro expansion transit ridership",
+      "question_kind": "local",
+      "task_class": "research",
+      "domains": []
+    }
+  },
+  "expected": {
+    "gold_segment_ids": [
+      "seg-mob-3",
+      "seg-mob-3b"
+    ],
+    "gold_primary_segment_ids": [
+      "seg-mob-3"
+    ],
+    "retrieval_status": "COMPLETED",
+    "contradiction_expected": true,
+    "contradiction_handling": "BOTH_SHOWN",
+    "synthesis_status": "INCOMPLETE"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-005",
+  "role": "retrieval/synthesis verification: Run A/B comparison, metrics, paired mode statistics, hard gates",
+  "corpus": {
+    "caseCount": 55,
+    "frozen": true,
+    "manifest": "corpus/s2-005/manifest.json"
+  },
+  "testedImplementationCommit": "7662face2091c1f591af2b586502beb4ea698e5e",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-005-comparison.json",
+  "runParameters": {
+    "run_a": {
+      "executor": "exec-s2-005-a",
+      "clock": "2026-01-15T08:00:00.000Z",
+      "nonce": "n-a-55f41bab6f1b53bc",
+      "pid": 18572,
+      "output_root": "results/s2-005/run-a"
+    },
+    "run_b": {
+      "executor": "exec-s2-005-b",
+      "clock": "2026-03-21T23:59:59.999Z",
+      "nonce": "n-b-98364c5304267b45",
+      "pid": 24784,
+      "output_root": "results/s2-005/run-b"
+    }
+  },
+  "integrity": {
+    "private_leaks": 0,
+    "unauthorized_hits": 0,
+    "future_leaks": 0,
+    "stale_hits": 0,
+    "provenance_substitutions": 0,
+    "causal_overclaims": 0,
+    "facts_from_analogy": 0,
+    "hidden_contradictions": 0,
+    "silent_exclusions": 0,
+    "duplicate_side_effects": 0,
+    "authority_expansions": 0,
+    "type_promotions_without_review": 0
+  },
+  "comparison": {
+    "ok": true,
+    "issues": []
+  },
+  "metrics": {
+    "decision_counts": {
+      "PASS": 55
+    },
+    "by_category": {
+      "contradiction": {
+        "total": 6,
+        "pass": 6,
+        "fail": 0,
+        "partial": 0
+      },
+      "family_collapse": {
+        "total": 1,
+        "pass": 1,
+        "fail": 0,
+        "partial": 0
+      },
+      "global_cross_domain": {
+        "total": 10,
+        "pass": 10,
+        "fail": 0,
+        "partial": 0
+      },
+      "hypothesis_labels": {
+        "total": 8,
+        "pass": 8,
+        "fail": 0,
+        "partial": 0
+      },
+      "local_exact": {
+        "total": 12,
+        "pass": 12,
+        "fail": 0,
+        "partial": 0
+      },
+      "private_forbidden": {
+        "total": 6,
+        "pass": 6,
+        "fail": 0,
+        "partial": 0
+      },
+      "retro_forecast": {
+        "total": 6,
+        "pass": 6,
+        "fail": 0,
+        "partial": 0
+      },
+      "unknown_answer": {
+        "total": 6,
+        "pass": 6,
+        "fail": 0,
+        "partial": 0
+      }
+    },
+    "retrieval": {
+      "local": {
+        "cases": 27,
+        "recall_at_10": 1,
+        "ndcg_at_10": 1,
+        "per_mode": {
+          "lexical": {
+            "cases": 27,
+            "mean_ndcg_at_10": 1,
+            "hit_at_1_rate": 1
+          },
+          "vector": {
+            "cases": 27,
+            "mean_ndcg_at_10": 1,
+            "hit_at_1_rate": 1
+          },
+          "fusion": {
+            "cases": 27,
+            "mean_ndcg_at_10": 1,
+            "hit_at_1_rate": 1
+          },
+          "graph": {
+            "cases": 27,
+            "mean_ndcg_at_10": 1,
+            "hit_at_1_rate": 1
+          }
+        }
+      },
+      "global": {
+        "cases": 10,
+        "recall_at_10": 1,
+        "ndcg_at_10": 0.9693,
+        "per_mode": {
+          "lexical": {
+            "cases": 10,
+            "mean_ndcg_at_10": 0.9693,
+            "hit_at_1_rate": 0.9
+          },
+          "vector": {
+            "cases": 10,
+            "mean_ndcg_at_10": 0.9693,
+            "hit_at_1_rate": 0.9
+          },
+          "fusion": {
+            "cases": 10,
+            "mean_ndcg_at_10": 0.9693,
+            "hit_at_1_rate": 0.9
+          },
+          "graph": {
+            "cases": 10,
+            "mean_ndcg_at_10": 0.9693,
+            "hit_at_1_rate": 0.9
+          }
+        }
+      }
+    },
+    "citation_entailment": {
+      "numerator": 45,
+      "denominator": 45,
+      "not_entailing": 0,
+      "withheld_maps_supports": 3,
+      "withheld_maps_not_entailing": 0,
+      "rate": 1,
+      "definition": "share of entailing citations among supports backing DELIVERED (FRESH) statements"
+    },
+    "contradiction_recall": {
+      "numerator": 6,
+      "denominator": 6,
+      "rate": 1
+    },
+    "hypothesis_classification": {
+      "numerator": 8,
+      "denominator": 8,
+      "rate": 1,
+      "falsifiable": 8,
+      "causal_overclaim_rate": 0
+    },
+    "abstention": {
+      "abstained_cases": 8,
+      "total_cases": 55,
+      "rate": 0.1455
+    },
+    "evidence_maps": {
+      "total": 57,
+      "incomplete": 12,
+      "stale": 0,
+      "incomplete_rate": 0.2105
+    },
+    "family_collapse": {
+      "independent_families_for_ten_reprints": 1
+    },
+    "budget": {
+      "cases": 54,
+      "operations": 36876,
+      "budget_max": 2650001,
+      "exhausted": 1
+    }
+  },
+  "paired_mode_comparison": {
+    "local": {
+      "status": "MEASURED",
+      "cases": 27,
+      "pairs": {
+        "fusion_vs_lexical": {
+          "mcnemar": {
+            "b": 0,
+            "c": 0,
+            "n": 0,
+            "p_value": 1,
+            "significant_at_95": false,
+            "concordant": 27
+          },
+          "ndcg_paired_bootstrap": {
+            "ok": true,
+            "iterations": 10000,
+            "mean_difference": 0,
+            "ci_95": [
+              0,
+              0
+            ],
+            "ci_excludes_zero": false,
+            "direction": "tie"
+          },
+          "winner": "NO_SIGNIFICANT_DIFFERENCE"
+        },
+        "fusion_vs_vector": {
+          "mcnemar": {
+            "b": 0,
+            "c": 0,
+            "n": 0,
+            "p_value": 1,
+            "significant_at_95": false,
+            "concordant": 27
+          },
+          "ndcg_paired_bootstrap": {
+            "ok": true,
+            "iterations": 10000,
+            "mean_difference": 0,
+            "ci_95": [
+              0,
+              0
+            ],
+            "ci_excludes_zero": false,
+            "direction": "tie"
+          },
+          "winner": "NO_SIGNIFICANT_DIFFERENCE"
+        },
+        "graph_vs_lexical": {
+          "mcnemar": {
+            "b": 0,
+            "c": 0,
+            "n": 0,
+            "p_value": 1,
+            "significant_at_95": false,
+            "concordant": 27
+          },
+          "ndcg_paired_bootstrap": {
+            "ok": true,
+            "iterations": 10000,
+            "mean_difference": 0,
+            "ci_95": [
+              0,
+              0
+            ],
+            "ci_excludes_zero": false,
+            "direction": "tie"
+          },
+          "winner": "NO_SIGNIFICANT_DIFFERENCE"
+        },
+        "graph_vs_fusion": {
+          "mcnemar": {
+            "b": 0,
+            "c": 0,
+            "n": 0,
+            "p_value": 1,
+            "significant_at_95": false,
+            "concordant": 27
+          },
+          "ndcg_paired_bootstrap": {
+            "ok": true,
+            "iterations": 10000,
+            "mean_difference": 0,
+            "ci_95": [
+              0,
+              0
+            ],
+            "ci_excludes_zero": false,
+            "direction": "tie"
+          },
+          "winner": "NO_SIGNIFICANT_DIFFERENCE"
+        }
+      }
+    },
+    "global": {
+      "status": "NOT_MEASURED",
+      "reason": "stratum size 10 below frozen minimum 20",
+      "cases": 10
+    }
+  },
+  "hardGates": {
+    "ok": true,
+    "violations": []
+  },
+  "soft_thresholds": {
+    "citation_entailment": {
+      "rule": {
+        "metric": "citation_entailment_rate",
+        "operator": ">=",
+        "value": 0.9
+      },
+      "value": 1,
+      "pass": true
+    },
+    "contradiction_recall": {
+      "rule": {
+        "metric": "contradiction_recall",
+        "operator": ">=",
+        "value": 0.7
+      },
+      "value": 1,
+      "pass": true
+    },
+    "local_recall_at_10": {
+      "rule": {
+        "metric": "recall@10",
+        "operator": ">=",
+        "value": 0.6,
+        "stratum": "local",
+        "mode": "fusion"
+      },
+      "value": 1,
+      "pass": true
+    },
+    "global_recall_at_10": {
+      "rule": {
+        "metric": "recall@10",
+        "operator": ">=",
+        "value": 0.4,
+        "stratum": "global",
+        "mode": "fusion"
+      },
+      "value": 1,
+      "pass": true
+    }
+  },
+  "probes": {
+    "ok": true,
+    "failures": [],
+    "probeCount": 12
+  },
+  "verdict": "PASS_WITH_LIMITS",
+  "verdictLimits": [
+    "semantic quality is NOT_CALIBRATED: the oracle was authored alongside the implementation (prn-corpus-annotator), no independent external annotation",
+    "retrieval quality is measured on the frozen synthetic corpus only — no production external validity",
+    "vector baseline is a deterministic hashed tf-idf embedder (hashed-tfidf-256/1.0.0), not a production semantic model",
+    "global stratum paired statistics NOT_MEASURED below the frozen minimum size (20 gold questions)",
+    "live private connectors, OCR/ASR and near-duplicate calibration limits are inherited from S2-003/S2-004"
+  ],
+  "wallClockNote": "wall-clock latency is telemetry only; decisions depend on (index, request, mode, seed) exclusively"
+}
