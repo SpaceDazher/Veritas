@@ -229,7 +229,7 @@ async function runCase(doc, runParams, authorities, sharedStore) {
         operationId: `op-inv-${doc.case_id}`,
       });
       staleClaimIds = invalidation.event.affected_descendants.filter((d) => d.entity_type === 'claim' && typeof d.entity_id === 'string').map((d) => d.entity_id);
-      
+
       invalidationEventIds = [invalidation.event.event_id];
       for (const claim of claims) {
         if (staleClaimIds.includes(claim.claim_id)) claim.lifecycle = 'STALE';

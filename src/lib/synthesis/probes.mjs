@@ -373,7 +373,7 @@ export async function probeI() {
     operationId: 'op-probe-i-inv',
   });
   const staleIds = invalidation.event.affected_descendants.filter((d) => d.entity_type === 'claim' && typeof d.entity_id === 'string').map((d) => d.entity_id);
-  
+
   const staleSet = new Set(staleIds);
   for (const claim of claims) if (staleSet.has(claim.claim_id)) claim.lifecycle = 'STALE';
   const index = buildRetrievalIndex({ claims, scope: { workspaceId: 'ws-corpus', principalId: 'prn-user-1' }, asOf: '2025-06-01T00:00:00.000Z' });
