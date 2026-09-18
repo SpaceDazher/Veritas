@@ -4,6 +4,10 @@
 .gitignore text eol=lf
 .env.example text eol=lf
 *.json text eol=lf
+# These two Stage-1 evidence copies are bound to the original raw CRLF bytes.
+# Text normalization changes their SHA-256, so store and check them byte-for-byte.
+evidence/external/s1-007/evaluation-record.json -text -diff
+evidence/external/s1-009/evaluation-record.json -text -diff
 *.md text eol=lf
 *.mjs text eol=lf
 *.py text eol=lf
