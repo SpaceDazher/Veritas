@@ -145,6 +145,13 @@ const frozenTargets = [
   'scripts/s2-004-security-probes.mjs', 'scripts/verify-s2-004.mjs',
   'scripts/verify-s2-004-dependencies.mjs', 'scripts/generate-claim-types.mjs',
   'evidence/s2-004-dependency-binding.json', 'evidence/s2-004-security-probes.json',
+  // S2-005: synthesis contracts, implementation, frozen corpus, verification
+  // entry points, adversarial probes and dependency bindings share this gate.
+  'src/lib/synthesis', 'tests/synthesis', 'corpus/s2-005',
+  'scripts/s2-005-run.mjs', 'scripts/s2-005-db-replay.mjs',
+  'scripts/s2-005-security-probes.mjs', 'scripts/verify-s2-005.mjs',
+  'scripts/verify-s2-005-dependencies.mjs', 'scripts/generate-synthesis-types.mjs',
+  'evidence/s2-005-dependency-binding.json', 'evidence/s2-005-security-probes.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');
@@ -190,7 +197,7 @@ const frozenPath = 'evidence/frozen-manifest.json';
 if (process.argv.includes('--freeze')) {
   writeJson(frozenPath, {
     schemaVersion: 1,
-    scope: 'Draft contract, policy and validator integrity only; not experiment authorization',
+    scope: 'Frozen contracts, policy, implementation, corpus and verifier integrity; not experiment authorization',
     algorithm: 'SHA-256 raw file bytes',
     files: frozenManifest,
   });
