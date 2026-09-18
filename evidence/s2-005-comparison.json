@@ -7,21 +7,21 @@
     "frozen": true,
     "manifest": "corpus/s2-005/manifest.json"
   },
-  "testedImplementationCommit": "7662face2091c1f591af2b586502beb4ea698e5e",
+  "testedImplementationCommit": "21aad724b55ed78e353c9d6df83fb41ed6bbc5a0",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-005-comparison.json",
   "runParameters": {
     "run_a": {
       "executor": "exec-s2-005-a",
       "clock": "2026-01-15T08:00:00.000Z",
       "nonce": "n-a-55f41bab6f1b53bc",
-      "pid": 18572,
+      "pid": 2980,
       "output_root": "results/s2-005/run-a"
     },
     "run_b": {
       "executor": "exec-s2-005-b",
       "clock": "2026-03-21T23:59:59.999Z",
       "nonce": "n-b-98364c5304267b45",
-      "pid": 24784,
+      "pid": 25920,
       "output_root": "results/s2-005/run-b"
     }
   },

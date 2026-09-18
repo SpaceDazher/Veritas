@@ -52,14 +52,14 @@
     }
   ],
   "pids": {
-    "run_a": 5680,
-    "run_b": 23080
+    "run_a": 12728,
+    "run_b": 14960
   },
   "executors": {
     "run_a": "exec-db-a",
     "run_b": "exec-db-b"
   },
-  "testedImplementationCommit": "7662face2091c1f591af2b586502beb4ea698e5e",
+  "testedImplementationCommit": "21aad724b55ed78e353c9d6df83fb41ed6bbc5a0",
   "integrity": {
     "private_leaks": 0,
     "unauthorized_hits": 0,

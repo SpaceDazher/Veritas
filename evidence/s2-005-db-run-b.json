@@ -6,7 +6,7 @@
   "clock": "2026-03-21T23:59:59.999Z",
   "nonce": "n-dbsynthreplay02",
   "output_root": "results/s2-005/db-s2-005-db-run-b",
-  "testedImplementationCommit": "7662face2091c1f591af2b586502beb4ea698e5e",
+  "testedImplementationCommit": "21aad724b55ed78e353c9d6df83fb41ed6bbc5a0",
   "status": "COMPLETED",
   "caseCount": 55,
   "decisionCounts": {
@@ -744,5 +744,5 @@
       "error": "contract retrieval-run rejected payload: /execution must have required property 'pid'"
     }
   ],
-  "dbPid": 23080
+  "dbPid": 14960
 }

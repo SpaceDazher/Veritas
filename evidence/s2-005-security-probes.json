@@ -209,6 +209,6 @@
   "probeCount": 12,
   "failures": [],
   "ok": true,
-  "testedImplementationCommit": "7662face2091c1f591af2b586502beb4ea698e5e",
+  "testedImplementationCommit": "21aad724b55ed78e353c9d6df83fb41ed6bbc5a0",
   "executedAt": "bound on the S2-005 branch"
 }
