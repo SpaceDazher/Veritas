@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 644.
+Generated from `git ls-files`; count: 653.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -430,6 +430,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-006-calibration.json`
 - `evidence/s2-006-comparison.json`
 - `evidence/s2-006-db-comparison.json`
+- `evidence/s2-006-db-crash-a.json`
+- `evidence/s2-006-db-crash-b.json`
 - `evidence/s2-006-db-run-a.json`
 - `evidence/s2-006-db-run-b.json`
 - `evidence/s2-006-dependency-binding.json`
@@ -486,6 +488,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-005/s2-005-db-run-a.json`
 - `results/s2-005/s2-005-db-run-b.json`
 - `results/s2-005/smoke.json`
+- `results/s2-006/s2-006-db-comparison.json`
 - `scripts/acceptance-gate.mjs`
 - `scripts/apply-migrations.mjs`
 - `scripts/check-inventory.mjs`
@@ -640,6 +643,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/verifier/commands.test.mjs`
 - `tests/verifier/comparator.test.mjs`
 - `tests/verifier/contracts.test.mjs`
+- `tests/verifier/db-replay-crash.test.mjs`
+- `tests/verifier/fixtures/canonical/claim.json`
+- `tests/verifier/fixtures/canonical/evidence-map.json`
+- `tests/verifier/fixtures/canonical/hypothesis-card.json`
+- `tests/verifier/fixtures/canonical/README.md`
+- `tests/verifier/fixtures/canonical/synthesis-result.json`
 - `tests/verifier/fixtures/keys.json`
 - `tests/verifier/policy.test.mjs`
 - `tests/verifier/rubric.test.mjs`
