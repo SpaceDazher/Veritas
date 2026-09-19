@@ -949,4 +949,3 @@ describe('S2-006 provider-call authorization (review P1-2)', () => {
     assert.equal(ok.state, 'FINALIZED', 'the exact reservation-bound grant finalizes');
   });
 });
-
