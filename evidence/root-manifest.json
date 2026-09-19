@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "1b9325653e239da3f2d66c7071f16b2f77490e8c",
-  "sourceTree": "5343db0fdf14644952b5a1e4121daf7eebcc606b",
+  "sourceCommit": "13f3aec2423a7c66d22e5681c1ebf7789abae930",
+  "sourceTree": "fd02e772d3cbbf2e7f104c9982e83332c2b2add6",
   "trackedFileCount": 653,
   "manifestFileCount": 648,
-  "payloadManifestSha256": "3c2085349a5c7d9d4f9c1c2e03c61bf446f49f691642e2b155ee7c7cf61d5f84",
-  "fileManifestSha256": "2a33db4bac20ed746464f1a26640a744ea60281dc20a2bcd991fdac20f334198",
+  "payloadManifestSha256": "58f3a582c6e4d8154bceb207eb8cda2e215ce3231464ab7f2816ffc9efcd90ca",
+  "fileManifestSha256": "f9b72b05039b64dad5b11636cee89010c2d356300f521fcee01f19d8988bcf20",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2118,7 +2118,7 @@
     },
     {
       "path": "evidence/s2-006-comparison.json",
-      "sha256": "9979a8c1850f4e07a38ee851fa49757763ddb43690e4e8ce2c0011348f9b04b9",
+      "sha256": "3721b65fb4e68911398f729c60a26967f7e810232821098c96173a85f2e065cc",
       "bytes": 5603
     },
     {
@@ -2153,22 +2153,22 @@
     },
     {
       "path": "evidence/s2-006-run-a.json",
-      "sha256": "41e197b071497a503038b24b1d5f3d65c5947ecc37b7163e96c92f3c34cf481e",
+      "sha256": "76a7892d55feeceaccb9bc983a987d3d2be6c36650a5284c1e10e9efc201eeda",
       "bytes": 12019
     },
     {
       "path": "evidence/s2-006-run-b.json",
-      "sha256": "873b602d6df0c1d4371f7428e515f1d9c73225b6f30238bc4e1efb981d9de10f",
+      "sha256": "9d197c9ec7ecf1ab862cee86c1b20f4db2577d033e930a42d62836f2322eda24",
       "bytes": 12019
     },
     {
       "path": "evidence/s2-006-security-probes.json",
-      "sha256": "8e3fd3a09fe30828e08c0a7fcd55df103330755d123f08637c67fec75cf58075",
+      "sha256": "679c468e219d5889ca9971170dbb5a42a57ad126137d65ff9fce284a1dfdecac",
       "bytes": 20492
     },
     {
       "path": "evidence/s2-006-summary.json",
-      "sha256": "05c4d33c8650c7e7c5add27cb751c2f4c92bd0694e41875a14d3863397f3dda9",
+      "sha256": "b98fe664f850582b09ef3c8c34cf6dea62d42d00584b43b299b60280ab2ecfec",
       "bytes": 5315
     },
     {
