@@ -52,14 +52,14 @@
     }
   ],
   "pids": {
-    "run_a": 12728,
-    "run_b": 14960
+    "run_a": 10220,
+    "run_b": 18920
   },
   "executors": {
     "run_a": "exec-db-a",
     "run_b": "exec-db-b"
   },
-  "testedImplementationCommit": "21aad724b55ed78e353c9d6df83fb41ed6bbc5a0",
+  "testedImplementationCommit": "dd683ceb614e95777cf08c09089454efd48749ef",
   "integrity": {
     "private_leaks": 0,
     "unauthorized_hits": 0,
@@ -68,23 +68,23 @@
     "provenance_substitutions": 0,
     "causal_overclaims": 0,
     "facts_from_analogy": 0,
-    "hidden_contradictions": 6,
+    "hidden_contradictions": 0,
     "silent_exclusions": 0,
     "duplicate_side_effects": 0,
     "authority_expansions": 0,
     "type_promotions_without_review": 0
   },
   "decisionCounts": {
-    "ERROR": 55
+    "PASS": 55
   },
-  "graphDigest": "ef9caba2ed25c07817ae26476bc603c09a20f6d351c916e222943bd5296fe3f7",
+  "graphDigest": "11f71a2a3a448214077e7a3802e963ef6b300cc2e4fe73878a3259855a805b54",
   "comparison": {
     "ok": true,
     "issues": [],
     "comparedCases": 55
   },
   "hardGates": {
-    "ok": false,
+    "ok": true,
     "violations": []
   }
 }

@@ -86,7 +86,7 @@ handed to S2-006 (§8).
   and zero).
 - PostgreSQL replay (`npm run verify:s2-005-db-replay`): two schemas, two
   child processes against `PostgresClaimGraphStore`, identical decisions,
-  digest `ef9caba2…`, 55/55, hard counters zero
+  digest `11f71a2…`, 55/55 PASS, hard counters zero
   (`evidence/s2-005-db-comparison.json`).
 - Results depend only on (index, request, mode, seed); wall-clock latency is
   telemetry and never enters decisions.
@@ -183,9 +183,34 @@ For S2-008 (R&D):
 `npm run test:retrieval` / `npm run test:synthesis` / `npm run
 test:s2-005-security-probes` → green.
 `npm run verify:s2-005` → PASS_WITH_LIMITS.
-`npm run verify:s2-005-db-replay` → ok, digest `ef9caba2…`.
-`npm test`, `npm run typecheck`, `npm run lint`, `npm run build`,
-`npm audit --omit=dev`, `npm run verify:clean-checkout`,
-`npm run manifest:check`, `git diff --check <base>..HEAD` — see the
-acceptance log; any command that could not run is recorded as `NOT_RUN_*`,
-never as PASS.
+`npm run verify:s2-005-db-replay` → 55/55 PASS, digest `11f71a2…`, two
+different child PIDs, all integrity counters zero.
+`npm test` → 463/463 PASS. `npm run typecheck`, `npm run lint`,
+`npm run build`, `npm audit --omit=dev`, `npm audit`,
+`npm run manifest:check`, `git diff --check <base>..HEAD` → exit 0;
+both audits report zero vulnerabilities. `npm run verify:clean-checkout` →
+36/36 required gates PASS from a fresh `git archive` with isolated
+`node_modules`, PostgreSQL and sandbox checks. No command is reported PASS
+when it was not run.
+
+## 10. Corrective closure round
+
+Independent review found and fixed four evidence/gate defects before closure:
+
+1. S2-005 code and schemas were absent from `frozen-manifest.json`; the
+   integrity scope now covers contracts, implementation, corpus, tests,
+   verifier entry points, dependency binding and security probes, with a
+   regression test for coverage.
+2. Read-only `verify:s2-005` rewrote tracked probe evidence; default verify is
+   now non-mutating and `--write` is the only evidence publication path.
+3. DB replay accepted two identically broken runs because it compared only
+   equality. It now requires the exact 55-case set, 55 PASS decisions, every
+   hard counter exactly zero and independent process provenance; deliberately
+   identical ERROR runs are rejected by regression tests.
+4. `PostgresClaimGraphStore` lacked `linkClaims`, and DB runs omitted PID from
+   retrieval provenance. PostgreSQL claim linking now validates authority,
+   schema, idempotency, cycle safety and commits edge + ledger + outbox in one
+   transaction. The final DB replay is 55/55 PASS in both processes.
+
+Canonical evidence was regenerated after these fixes and binds both memory
+and PostgreSQL runs to tested commit `dd683ceb614e95777cf08c09089454efd48749ef`.

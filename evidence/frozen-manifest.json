@@ -311,7 +311,7 @@
     "evidence/s2-004-dependency-binding.json": "3cba23d92c2f65c57232b84e8d52754e853d25944ad7f17b8809801b36c108da",
     "evidence/s2-004-security-probes.json": "5e11974cc5dd7e0603052a4073b80846faf28329d68aa6f0da6ec10d8d15b52f",
     "evidence/s2-005-dependency-binding.json": "cc5092ea484326ad309cbe789031fff56612eea3e2b5e666130f2d994edd1346",
-    "evidence/s2-005-security-probes.json": "9b000fc19f77e6e91eed0fcae56ef30f760c3ea2300dfd2585ae5b0d1faa79a9",
+    "evidence/s2-005-security-probes.json": "91b387fba0dd3697e92b7c1b803d8e81cd88ec0c27ae7bd3b65138c8ebda9f8c",
     "migrations/0001_veritas_board.sql": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898",
     "migrations/0002_source_ingestion.sql": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468",
     "migrations/0003_claim_graph.sql": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3",
