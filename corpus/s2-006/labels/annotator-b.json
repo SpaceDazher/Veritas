@@ -105,8 +105,8 @@
     "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
     "signature": {
       "scheme": "hmac-sha256",
-      "keyRef": "custody://label-custodian/ans-s2006-b-dev (fixture test-only key; real custody never held by candidate or verifier operator)",
-      "digest": "10d0ce6e6b06ec56a21b9976209bf82918a114a1b28e10a9d0b3aa3fe7e0621e",
+      "keyRef": "kms://fixture/s2-006/annotator/prn-annotator-b",
+      "digest": "590883c26a0cf91b354a87a884b14a55274fdef7c0835d5472e924130dc5a46c",
       "verified": true,
       "attestedBy": "prn-annotator-b"
     }
@@ -233,8 +233,8 @@
     "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
     "signature": {
       "scheme": "hmac-sha256",
-      "keyRef": "custody://label-custodian/ans-s2006-b-calibration (fixture test-only key; real custody never held by candidate or verifier operator)",
-      "digest": "81fe2d860d929ef6089cd13a6cafe824da9ef063cf22ed3cc5ab807efb77b14a",
+      "keyRef": "kms://fixture/s2-006/annotator/prn-annotator-b",
+      "digest": "f98171841f8c24b7161f853da19779c4f036c3a1ed9b70d507a310b725f679e9",
       "verified": true,
       "attestedBy": "prn-annotator-b"
     }
@@ -449,8 +449,8 @@
     "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
     "signature": {
       "scheme": "hmac-sha256",
-      "keyRef": "custody://label-custodian/ans-s2006-b-locked (fixture test-only key; real custody never held by candidate or verifier operator)",
-      "digest": "2bd572c7273ee327e4c8503e8f164b59482024ce2ab0effafc9a13828a2fbcf8",
+      "keyRef": "kms://fixture/s2-006/annotator/prn-annotator-b",
+      "digest": "8b307b5f9b23636f4c834ab1dae35bbb714b45b5f90855482f8ae78ef97f65e7",
       "verified": true,
       "attestedBy": "prn-annotator-b"
     }

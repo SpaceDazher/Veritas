@@ -10,7 +10,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { evaluateScenario } from '../../src/lib/verifier/rubric.mjs';
-import { compareRuns } from '../../src/lib/verifier/comparator.mjs';
+import { compareRuns, annotationSetBindingDigest, labelEntryDigest, caseLabelsDigest } from '../../src/lib/verifier/comparator.mjs';
+import { registerKey, sign } from '../../src/lib/verifier/signature.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const CORPUS = path.join(ROOT, 'corpus', 's2-006');
@@ -91,6 +92,83 @@ describe('S2-006 comparator: green path on two identical complete sealed sets', 
     for (const rec of corpus.adjudications) {
       assert.equal(report.checks.consensusGold[rec.caseId], rec.decision);
     }
+  });
+});
+
+describe('S2-006 comparator: principals are data, never code (review P1-4b)', () => {
+  // Relabels the whole fixture corpus under RENAMED annotator principal ids:
+  // entry annotators, label digest bindings, set-level annotatorId, freshly
+  // signed contract envelopes and recomputed manifest label digests. If the
+  // comparator still passes, no hardcoded principal id remains on its path.
+  function relabelCorpus(corpus, rename) {
+    const registry = new Map();
+    for (const newId of Object.values(rename)) {
+      registerKey({ keyRef: `kms://test/relabel/${newId}`, custodian: newId, role: 'annotator', secret: HMAC_KEY, registry });
+    }
+    const renameId = (id) => rename[id] ?? id;
+    const labelSets = {};
+    for (const set of Object.values(corpus.labelSets)) {
+      const s = JSON.parse(JSON.stringify(set));
+      s.annotatorId = renameId(s.annotatorId);
+      for (const l of s.labels) {
+        l.annotatorId = renameId(l.annotatorId);
+        l.labelDigest = labelEntryDigest({ annotationSetId: s.annotationSetId, annotatorId: l.annotatorId, caseId: l.caseId, label: l.label, labeledAt: l.labeledAt });
+      }
+      s.signature = sign(s.annotatorId, `kms://test/relabel/${s.annotatorId}`, annotationSetBindingDigest(s), { registry });
+      labelSets[s.annotationSetId] = s;
+    }
+    const manifest = JSON.parse(JSON.stringify(corpus.manifest));
+    for (const entry of manifest.cases) {
+      const entries = Object.values(labelSets)
+        .flatMap((s) => s.labels.filter((l) => l.caseId === entry.caseId))
+        .sort((a, b) => a.annotatorId.localeCompare(b.annotatorId));
+      entry.labelsSha256 = caseLabelsDigest(entry.caseId, entries);
+    }
+    return { ...corpus, manifest, labelSets };
+  }
+
+  test('a fully relabeled corpus (different principal ids) compares green', () => {
+    const corpus = relabelCorpus(loadCorpus(), {
+      'prn-annotator-a': 'prn-reviewer-x',
+      'prn-annotator-b': 'prn-reviewer-y',
+    });
+    const predictions = rubricPredictions(corpus.cases);
+    const report = compareRuns({
+      ...corpus, annotationHmacKey: HMAC_KEY,
+      runA: { ...runMeta(), predictions },
+      runB: { ...runMeta(), predictions },
+    });
+    assert.equal(report.ok, true, JSON.stringify(report.failures, null, 1));
+    assert.equal(Object.keys(report.checks.consensusGold).length, 45);
+  });
+
+  test('expectedAnnotators pins the required annotator pair and fails closed on a mismatch', () => {
+    const corpus = loadCorpus();
+    const predictions = rubricPredictions(corpus.cases);
+    const report = compareRuns({
+      ...corpus, expectedAnnotators: ['prn-annotator-a', 'prn-annotator-c'], annotationHmacKey: HMAC_KEY,
+      runA: { ...runMeta(), predictions },
+      runB: { ...runMeta(), predictions },
+    });
+    assert.equal(report.ok, false);
+    assert.ok(report.failures.some((f) => f.code === 'annotator_set_mismatch'));
+  });
+
+  test('a single annotator set is not independent labeling: fail closed', () => {
+    const corpus = loadCorpus();
+    // keep only one annotator's sets
+    const single = {};
+    for (const [id, set] of Object.entries(corpus.labelSets)) {
+      if (set.annotatorId === 'prn-annotator-a') single[id] = set;
+    }
+    const predictions = rubricPredictions(corpus.cases);
+    const report = compareRuns({
+      ...corpus, labelSets: single, annotationHmacKey: HMAC_KEY,
+      runA: { ...runMeta(), predictions },
+      runB: { ...runMeta(), predictions },
+    });
+    assert.equal(report.ok, false);
+    assert.ok(report.failures.some((f) => f.code === 'incomplete_case_set' && f.detail.includes('two distinct annotators')));
   });
 });
 

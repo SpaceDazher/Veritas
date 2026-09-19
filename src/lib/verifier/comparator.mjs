@@ -9,7 +9,12 @@
 //   * split membership matches the frozen manifest;
 //   * every case/rubric/label byte digest recomputed and equal to the
 //     manifest;
-//   * annotation-set signatures verified over the exact binding digest;
+//   * annotation-set signatures verified over the exact binding digest by
+//     the shared signature core (contracts/annotation-set.schema.json
+//     envelope: scheme hmac-sha256, keyRef, digest=MAC, verified, attestedBy);
+//   * annotator principals come from the annotation-set data itself
+//     (annotatorId fields) or the expectedAnnotators argument — never from
+//     hardcoded ids (review P1-4b);
 //   * disagreements covered by adjudication records bound to this manifest;
 //   * Run A and Run B predictions identical per case (preregistered exact
 //     rule) with DISTINCT run-manifest digests (executor, pid, nonce, output
@@ -25,22 +30,27 @@ import { canonicalDigest } from './canonical-json.mjs';
 
 export const COMPARATOR_RULE = 'exact';
 
+const SIGNATURE_SCHEME = 'hmac-sha256';
+const SIGNATURE_KEYS = ['scheme', 'keyRef', 'digest', 'verified', 'attestedBy'];
+
 const sha256Bytes = (buf) => createHash('sha256').update(buf).digest('hex');
 
 function fail(failures, code, detail) {
   failures.push({ code, detail });
 }
 
-function verifySetSignature(set, hmacKey, failures) {
-  if (!set?.signature || set.signature.scheme !== 'hmac-sha256') {
-    fail(failures, 'signature_unverifiable', `${set?.annotationSetId}: only verified hmac-sha256 signatures are accepted offline`);
-    return;
-  }
-  if (typeof hmacKey !== 'string' || hmacKey.length === 0) {
-    fail(failures, 'signature_key_unavailable', `${set.annotationSetId}: no HMAC key in custody — failing closed, not trusting the attestation`);
-    return;
-  }
-  const binding = canonicalDigest({
+// Exact per-label binding digest (canonical-json-v1 over the raw label as
+// signed). Single source for comparator verification and corpus tooling.
+export function labelEntryDigest(entry) {
+  const { annotationSetId, annotatorId, caseId, label, labeledAt } = entry ?? {};
+  return canonicalDigest({ annotationSetId, annotatorId, caseId, label, labeledAt });
+}
+
+// Exact set-level binding digest: corpus+split+case+rubric+label bytes the
+// annotation-set signature is taken over (spec §3). Single source for the
+// comparator verification and corpus signing.
+export function annotationSetBindingDigest(set) {
+  return canonicalDigest({
     annotationSetId: set.annotationSetId,
     split: set.split,
     corpusVersion: set.corpusVersion,
@@ -48,8 +58,51 @@ function verifySetSignature(set, hmacKey, failures) {
     rubricDigest: set.rubricDigest,
     labels: [...set.labels].sort((a, b) => a.caseId.localeCompare(b.caseId)),
   });
-  const expected = createHmac('sha256', hmacKey).update(binding, 'utf8').digest('hex');
-  const got = set.signature.digest;
+}
+
+// Exact combined per-case label digest bound by the annotation manifest
+// (labelsSha256): the raw label entries of all independent annotators in
+// ascending annotatorId order.
+export function caseLabelsDigest(caseId, entries) {
+  return canonicalDigest({
+    caseId,
+    labels: entries.map((e) => ({
+      caseId: e.caseId, label: e.label, labelDigest: e.labelDigest, annotatorId: e.annotatorId, labeledAt: e.labeledAt,
+    })),
+  });
+}
+
+function verifySetSignature(set, hmacKey, failures) {
+  const sig = set?.signature;
+  const shapeOk = typeof sig === 'object' && sig !== null
+    && SIGNATURE_KEYS.every((k) => Object.prototype.hasOwnProperty.call(sig, k))
+    && Object.keys(sig).length === SIGNATURE_KEYS.length
+    && sig.scheme === SIGNATURE_SCHEME
+    && sig.verified === true
+    && typeof sig.keyRef === 'string' && sig.keyRef.length > 0
+    && typeof sig.digest === 'string' && sig.digest.length > 0
+    && typeof sig.attestedBy === 'string' && sig.attestedBy.length > 0;
+  if (!shapeOk) {
+    fail(failures, 'signature_unverifiable', `${set?.annotationSetId}: only a verified contract-shaped hmac-sha256 signature block (annotation-set contract) is accepted offline`);
+    return;
+  }
+  if (typeof hmacKey !== 'string' || hmacKey.length === 0) {
+    fail(failures, 'signature_key_unavailable', `${set.annotationSetId}: no HMAC key in custody — failing closed, not trusting the attestation`);
+    return;
+  }
+  // the attesting subject named in the envelope must be the annotator of
+  // record carried by the data (no hardcoded principal ids)
+  if (sig.attestedBy !== set.annotatorId) {
+    fail(failures, 'signature_invalid', `${set.annotationSetId}: signature attested by ${sig.attestedBy}, not the annotator of record ${set.annotatorId}`);
+    return;
+  }
+  const binding = annotationSetBindingDigest(set);
+  // same MAC construction as the shared signature core:
+  // HMAC(secret, scheme || 0x00 || subject || 0x00 || keyRef || 0x00 || bindingDigest)
+  const expected = createHmac('sha256', hmacKey)
+    .update([sig.scheme, sig.attestedBy, sig.keyRef, binding].join('\u0000'), 'utf8')
+    .digest('hex');
+  const got = sig.digest;
   const equal = got.length === expected.length && timingSafeEqual(Buffer.from(got), Buffer.from(expected));
   if (!equal) fail(failures, 'signature_invalid', `${set.annotationSetId}: signature does not verify over the exact binding digest`);
 }
@@ -62,6 +115,8 @@ function verifySetSignature(set, hmacKey, failures) {
 //   adjudications: [record],
 //   thresholdsDigest,
 //   annotationHmacKey,
+//   expectedAnnotators?: [principalId, ...]  // pins the required annotator pair;
+//                                            // defaults to the annotators in the data
 //   runA, runB: {runId, executorId, pid, nonce, outputRoot, implementationDigest,
 //                predictions: {caseId: {verdict, reasonCodes}}, hardCounters?}
 // }
@@ -69,7 +124,7 @@ export function compareRuns(input) {
   const failures = [];
   const {
     manifest, manifestBytes, rubricBytes, cases = [], labelSets = {}, adjudications = [],
-    thresholdsDigest = null, annotationHmacKey = null, runA, runB,
+    thresholdsDigest = null, annotationHmacKey = null, expectedAnnotators = null, runA, runB,
   } = input ?? {};
 
   // ---- frozen bytes
@@ -135,29 +190,42 @@ export function compareRuns(input) {
     }
     return null;
   };
-  for (const c of cases) {
-    const a = labelEntry(c.caseId, 'prn-annotator-a');
-    const b = labelEntry(c.caseId, 'prn-annotator-b');
-    if (!a || !b) {
-      fail(failures, 'incomplete_case_set', `${c.caseId}: missing one of the two independent raw labels`);
-      continue;
+  // Independent annotator principals are DATA (review P1-4b): taken from
+  // the annotation sets' annotatorId fields, or pinned via expectedAnnotators.
+  // No literal principal ids live in this code.
+  const dataAnnotators = [...new Set(Object.values(labelSets)
+    .map((s) => (typeof s?.annotatorId === 'string' && s.annotatorId.length > 0 ? s.annotatorId : null))
+    .filter(Boolean))].sort();
+  let annotators = dataAnnotators;
+  if (Array.isArray(expectedAnnotators)) {
+    annotators = [...new Set(expectedAnnotators)].sort();
+    if (annotators.length !== dataAnnotators.length || annotators.some((a, i) => a !== dataAnnotators[i])) {
+      fail(failures, 'annotator_set_mismatch', `annotation-set annotators [${dataAnnotators.join(',')}] != expectedAnnotators [${annotators.join(',')}]`);
     }
-    for (const { set, entry } of [a, b]) {
-      const digest = canonicalDigest({
-        annotationSetId: set.annotationSetId, annotatorId: entry.annotatorId,
-        caseId: entry.caseId, label: entry.label, labeledAt: entry.labeledAt,
-      });
-      if (digest !== entry.labelDigest) {
+  }
+  if (annotators.length < 2) {
+    fail(failures, 'incomplete_case_set', `independent labeling requires at least two distinct annotators, found ${annotators.length}`);
+  }
+  for (const c of cases) {
+    const found = [];
+    let missing = false;
+    for (const annotatorId of annotators) {
+      const hit = labelEntry(c.caseId, annotatorId);
+      if (!hit) {
+        fail(failures, 'incomplete_case_set', `${c.caseId}: missing raw label from ${annotatorId}`);
+        missing = true;
+        continue;
+      }
+      found.push(hit);
+    }
+    if (missing || found.length < 2) continue;
+    for (const { set, entry } of found) {
+      if (entry.labelDigest !== labelEntryDigest({ annotationSetId: set.annotationSetId, annotatorId: entry.annotatorId, caseId: entry.caseId, label: entry.label, labeledAt: entry.labeledAt })) {
         fail(failures, 'digest_mismatch', `${c.caseId}: label digest binding broken (${set.annotationSetId})`);
       }
     }
     const entry = manifestCases.get(c.caseId);
-    const labelsSha = canonicalDigest({
-      caseId: c.caseId,
-      labels: [a.entry, b.entry].map((e) => ({
-        caseId: e.caseId, label: e.label, labelDigest: e.labelDigest, annotatorId: e.annotatorId, labeledAt: e.labeledAt,
-      })),
-    });
+    const labelsSha = caseLabelsDigest(c.caseId, found.map((f) => f.entry));
     if (entry && labelsSha !== entry.labelsSha256) {
       fail(failures, 'digest_mismatch', `${c.caseId}: combined label bytes != manifest.labelsSha256`);
     }
@@ -166,11 +234,13 @@ export function compareRuns(input) {
   // ---- adjudication coverage of raw disagreements, bound to this manifest
   const consensus = {};
   for (const c of cases) {
-    const a = labelEntry(c.caseId, 'prn-annotator-a');
-    const b = labelEntry(c.caseId, 'prn-annotator-b');
-    if (!a || !b) continue;
-    if (a.entry.label === b.entry.label) {
-      consensus[c.caseId] = a.entry.label;
+    const found = annotators
+      .map((annotatorId) => labelEntry(c.caseId, annotatorId))
+      .filter(Boolean);
+    if (found.length < 2) continue;
+    const votes = found.map((f) => f.entry.label);
+    if (votes.every((v) => v === votes[0])) {
+      consensus[c.caseId] = votes[0];
       continue;
     }
     const rec = adjudications.find((r) => r.caseId === c.caseId);
@@ -178,7 +248,7 @@ export function compareRuns(input) {
       fail(failures, 'adjudication_missing', `${c.caseId}: raw labels disagree with no adjudication record`);
       continue;
     }
-    if (rec.decision !== a.entry.label && rec.decision !== b.entry.label) {
+    if (!votes.includes(rec.decision)) {
       fail(failures, 'adjudication_invalid', `${c.caseId}: adjudicated decision matches neither raw vote`);
     }
     if (rec.versions?.annotationManifestDigest !== manifestSha) {

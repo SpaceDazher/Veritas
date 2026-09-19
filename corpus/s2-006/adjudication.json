@@ -41,7 +41,7 @@
       "principalId": "prn-adjudicator-1",
       "role": "adjudicator",
       "authenticated": true,
-      "attestationDigest": "48906cbed236af3a10b7ca1901fff4922ccbc314fc6226c493e9198a9d4ef455"
+      "attestationDigest": "07c130e2f867991871c59f00a253f0d92b6ce7bc831544e1f9d31ce455c68747"
     },
     "versions": {
       "corpusVersion": "1.0.0",
@@ -97,7 +97,7 @@
       "principalId": "prn-adjudicator-1",
       "role": "adjudicator",
       "authenticated": true,
-      "attestationDigest": "e91dedca1823b167bdcb80c04ebfe1e31906f6195860f7331501339c79c45723"
+      "attestationDigest": "0eb8780566f587235349ef5fe406402987e5c74c863195b4444aeaab4fa7b8b8"
     },
     "versions": {
       "corpusVersion": "1.0.0",
@@ -153,7 +153,7 @@
       "principalId": "prn-adjudicator-1",
       "role": "adjudicator",
       "authenticated": true,
-      "attestationDigest": "c2be3802d07dd579d0a4837ee66bfd56e5d4f84f0158ef5d2de0500b80853456"
+      "attestationDigest": "a2119c24718d5d7010ce93041fce24650c3c98a222393ea9d47434d79c33d0a0"
     },
     "versions": {
       "corpusVersion": "1.0.0",
