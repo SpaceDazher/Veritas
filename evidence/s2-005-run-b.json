@@ -1,0 +1,7575 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-005",
+  "run_id": "run-b",
+  "executor_id": "exec-s2-005-b",
+  "clock": "2026-03-21T23:59:59.999Z",
+  "nonce": "n-b-98364c5304267b45",
+  "pid": 23660,
+  "output_root": "results/s2-005/run-b",
+  "testedImplementationCommit": "dd683ceb614e95777cf08c09089454efd48749ef",
+  "status": "COMPLETED",
+  "caseCount": 55,
+  "decisionCounts": {
+    "PASS": 55
+  },
+  "integrity": {
+    "private_leaks": 0,
+    "unauthorized_hits": 0,
+    "future_leaks": 0,
+    "stale_hits": 0,
+    "provenance_substitutions": 0,
+    "causal_overclaims": 0,
+    "facts_from_analogy": 0,
+    "hidden_contradictions": 0,
+    "silent_exclusions": 0,
+    "duplicate_side_effects": 0,
+    "authority_expansions": 0,
+    "type_promotions_without_review": 0
+  },
+  "graphDigest": "11f71a2a3a448214077e7a3802e963ef6b300cc2e4fe73878a3259855a805b54",
+  "decisions": [
+    {
+      "case_id": "s5-con-023",
+      "case_number": 23,
+      "category": "contradiction",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-surfaced",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-both-shown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-2",
+            "claim_id": "clm-83bf3728a30debea0aa15ffa",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-mob-2b",
+            "claim_id": "clm-c714b466c1b9dd731f0e9de6",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 524,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [
+          {
+            "claim_a": "clm-83bf3728a30debea0aa15ffa",
+            "claim_b": "clm-c714b466c1b9dd731f0e9de6",
+            "relation": "CONTRADICTS",
+            "basis": "disjoint_value_ranges",
+            "handling": "BOTH_SHOWN"
+          }
+        ],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-con-024",
+      "case_number": 24,
+      "category": "contradiction",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-surfaced",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-both-shown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-3b",
+            "claim_id": "clm-21c8bbf3810ff936662d232e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-3",
+            "claim_id": "clm-e7f1e1bea6f1480d1b39bd9d",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 524,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [
+          {
+            "claim_a": "clm-21c8bbf3810ff936662d232e",
+            "claim_b": "clm-e7f1e1bea6f1480d1b39bd9d",
+            "relation": "CONTRADICTS",
+            "basis": "disjoint_value_ranges",
+            "handling": "BOTH_SHOWN"
+          }
+        ],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-con-025",
+      "case_number": 25,
+      "category": "contradiction",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-surfaced",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-both-shown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-3",
+            "claim_id": "clm-6389183189ba266428f7ca10",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-mob-3b",
+            "claim_id": "clm-9d5bb92543ba0acc20eaf293",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 522,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [
+          {
+            "claim_a": "clm-6389183189ba266428f7ca10",
+            "claim_b": "clm-9d5bb92543ba0acc20eaf293",
+            "relation": "CONTRADICTS",
+            "basis": "disjoint_value_ranges",
+            "handling": "BOTH_SHOWN"
+          }
+        ],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-con-026",
+      "case_number": 26,
+      "category": "contradiction",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-surfaced",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-both-shown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-1b",
+            "claim_id": "clm-3ab7ad5ff341d731c4673a79",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-mar-1",
+            "claim_id": "clm-a02e76c3a1e137dd5bbbaf8a",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 526,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [
+          {
+            "claim_a": "clm-3ab7ad5ff341d731c4673a79",
+            "claim_b": "clm-a02e76c3a1e137dd5bbbaf8a",
+            "relation": "CONTRADICTS",
+            "basis": "disjoint_value_ranges",
+            "handling": "BOTH_SHOWN"
+          }
+        ],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-con-027",
+      "case_number": 27,
+      "category": "contradiction",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-surfaced",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-both-shown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-2",
+            "claim_id": "clm-04b6875e18125d585b3c76f0",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-lab-2b",
+            "claim_id": "clm-df4b70720211eb4e5419a8f3",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 524,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [
+          {
+            "claim_a": "clm-04b6875e18125d585b3c76f0",
+            "claim_b": "clm-df4b70720211eb4e5419a8f3",
+            "relation": "CONTRADICTS",
+            "basis": "disjoint_value_ranges",
+            "handling": "BOTH_SHOWN"
+          }
+        ],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-con-028",
+      "case_number": 28,
+      "category": "contradiction",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-surfaced",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "contradiction-both-shown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1b",
+            "claim_id": "clm-960cb6c914b841ae156dc765",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 526,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [
+          {
+            "claim_a": "clm-960cb6c914b841ae156dc765",
+            "claim_b": "clm-ac2467906d3dfb218f138c1e",
+            "relation": "CONTRADICTS",
+            "basis": "disjoint_value_ranges",
+            "handling": "BOTH_SHOWN"
+          }
+        ],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-fam-055",
+      "case_number": 55,
+      "category": "family_collapse",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "family-count",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "family-excluded-at-retrieval",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-sleep-a",
+            "claim_id": "clm-9d9eaa7bf847d50c962de470",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "neuroscience"
+          },
+          {
+            "segment_id": "seg-sleep-j",
+            "claim_id": "clm-0ba413a87661e2012dd77ff0",
+            "rank": 2,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-sleep-c",
+            "claim_id": "clm-2a1980940861481a82d27757",
+            "rank": 3,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "neuroscience"
+          },
+          {
+            "segment_id": "seg-sleep-g",
+            "claim_id": "clm-6463ebb292004426d359ff81",
+            "rank": 4,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "neuroscience"
+          },
+          {
+            "segment_id": "seg-sleep-d",
+            "claim_id": "clm-67ffa8001a6838fa75e45496",
+            "rank": 5,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-sleep-i",
+            "claim_id": "clm-6b02538408d2e6110520190c",
+            "rank": 6,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "neuroscience"
+          },
+          {
+            "segment_id": "seg-sleep-b",
+            "claim_id": "clm-71d896a14e1bd838cc6f74e2",
+            "rank": 7,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-sleep-e",
+            "claim_id": "clm-85636949c84065d730459126",
+            "rank": 8,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "neuroscience"
+          },
+          {
+            "segment_id": "seg-sleep-h",
+            "claim_id": "clm-9fe9e13bae65e33d6476def4",
+            "rank": 9,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-sleep-f",
+            "claim_id": "clm-d0887c53c25d64ec0dde85d8",
+            "rank": 10,
+            "included": false,
+            "reason": "EXCLUDED_FAMILY_COLLAPSED",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 2640,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 10,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-013",
+      "case_number": 13,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-confounders",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 791,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-b7daba2f5181e619",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-014",
+      "case_number": 14,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-confounders",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-1",
+            "claim_id": "clm-ad44636ca6d7a1ddb68366c3",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-3",
+            "claim_id": "clm-6389183189ba266428f7ca10",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 791,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-a236f676a6b6ee4c",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-015",
+      "case_number": 15,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:ANALOGY",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-2",
+            "claim_id": "clm-2b935c9017f6ed407360403b",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 797,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-4a302aa909d67c18",
+            "card_type": "ANALOGY",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-016",
+      "case_number": 16,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:3",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:ANALOGY",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-1",
+            "claim_id": "clm-a02e76c3a1e137dd5bbbaf8a",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-lab-2",
+            "claim_id": "clm-04b6875e18125d585b3c76f0",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 795,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-037934a26d5ac1ff",
+            "card_type": "ANALOGY",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-017",
+      "case_number": 17,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:similar_prior_found",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-rev-1",
+            "claim_id": "clm-2b592b058c03b1a223e46958",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-mob-2",
+            "claim_id": "clm-83bf3728a30debea0aa15ffa",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 0.6934,
+            "hit_at_1": false
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 0.6934,
+            "hit_at_1": false
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 0.6934,
+            "hit_at_1": false
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 0.6934,
+            "hit_at_1": false
+          }
+        },
+        "cost": {
+          "operations": 1059,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-38a363eda66c91a4",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "similar_prior_found"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-018",
+      "case_number": 18,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-confounders",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-4",
+            "claim_id": "clm-e498a9a1ea5d8818dbea931a",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-epi-4",
+            "claim_id": "clm-e45ba93fe34c89f82ee702a5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 788,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-2277f90a24bffa87",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-019",
+      "case_number": 19,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:3",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-5",
+            "claim_id": "clm-6446c50c0ccc782f0b3d0638",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-lab-4",
+            "claim_id": "clm-b712e76b0ffae39bf687d468",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-3",
+            "claim_id": "clm-6389183189ba266428f7ca10",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 798,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-88d572e8b7559c3a",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-020",
+      "case_number": 20,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-5",
+            "claim_id": "clm-88452434059cccafb77e8abe",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-lab-1",
+            "claim_id": "clm-ad44636ca6d7a1ddb68366c3",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 794,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-e6a48059b70cb647",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-021",
+      "case_number": 21,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-5",
+            "claim_id": "clm-6446c50c0ccc782f0b3d0638",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-mar-2",
+            "claim_id": "clm-2b935c9017f6ed407360403b",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 1059,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-f931f677cda14969",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-glo-022",
+      "case_number": 22,
+      "category": "global_cross_domain",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "domains-in-hits:2",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:ANALOGY",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:similar_prior_found",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-1",
+            "claim_id": "clm-a02e76c3a1e137dd5bbbaf8a",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-rev-2",
+            "claim_id": "clm-b809ff91eba24472398715d7",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 801,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          },
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [
+          {
+            "card_id": "hyc-a61ef04d00b51803",
+            "card_type": "ANALOGY",
+            "causal": null,
+            "novelty": "similar_prior_found"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 2,
+          "answered": 2,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-047",
+      "case_number": 47,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:ANALOGY",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-6d4e4715235358ad",
+            "card_type": "ANALOGY",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-048",
+      "case_number": 48,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-6d4e4715235358ad",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-049",
+      "case_number": 49,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:MECHANISM_CLAIM",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-6d4e4715235358ad",
+            "card_type": "MECHANISM_CLAIM",
+            "causal": true,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-050",
+      "case_number": 50,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-6d4e4715235358ad",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-051",
+      "case_number": 51,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:HYPOTHESIS",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-6d4e4715235358ad",
+            "card_type": "HYPOTHESIS",
+            "causal": null,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-052",
+      "case_number": 52,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-rejected",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": true,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-053",
+      "case_number": 53,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:MECHANISM_CLAIM",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:novel_to_selected_corpus",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 4,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1052,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-6d4e4715235358ad",
+            "card_type": "MECHANISM_CLAIM",
+            "causal": true,
+            "novelty": "novel_to_selected_corpus"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-hyp-054",
+      "case_number": 54,
+      "category": "hypothesis_labels",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hypothesis-not-rejected",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-type:ANALOGY",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-causal-assertion",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-novelty:similar_prior_found",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "card-falsifiable",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 1051,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 4,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [],
+        "cards": [
+          {
+            "card_id": "hyc-61f42dbd86676f07",
+            "card_type": "ANALOGY",
+            "causal": null,
+            "novelty": "similar_prior_found"
+          }
+        ],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 0,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-001",
+      "case_number": 1,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 788,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-002",
+      "case_number": 2,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 785,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-003",
+      "case_number": 3,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-3",
+            "claim_id": "clm-e7f1e1bea6f1480d1b39bd9d",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 784,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-004",
+      "case_number": 4,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 788,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-005",
+      "case_number": 5,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-2",
+            "claim_id": "clm-83bf3728a30debea0aa15ffa",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 787,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-006",
+      "case_number": 6,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-3",
+            "claim_id": "clm-6389183189ba266428f7ca10",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          },
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 786,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-007",
+      "case_number": 7,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-1",
+            "claim_id": "clm-a02e76c3a1e137dd5bbbaf8a",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 787,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-008",
+      "case_number": 8,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-2",
+            "claim_id": "clm-2b935c9017f6ed407360403b",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 789,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-009",
+      "case_number": 9,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 788,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-010",
+      "case_number": 10,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-1",
+            "claim_id": "clm-ad44636ca6d7a1ddb68366c3",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 787,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-011",
+      "case_number": 11,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-2",
+            "claim_id": "clm-04b6875e18125d585b3c76f0",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          },
+          {
+            "segment_id": "seg-epi-2",
+            "claim_id": "clm-b925eddc8f5d7b83829b617b",
+            "rank": 3,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 792,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-loc-012",
+      "case_number": 12,
+      "category": "local_exact",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "primary-recall",
+          "ok": true,
+          "hard": false
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-entails",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-3",
+            "claim_id": "clm-635dc7c7bb8b49a8ee0476ce",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          },
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 785,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-prv-029",
+      "case_number": 29,
+      "category": "private_forbidden",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "acl-count-invisible",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "coverage-gap:ACCESS_DENIED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "no included candidates for this query under the requested constraints"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 262,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 1,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "mortality reduction sealed cohort unpublished trial",
+              "reason": "ACCESS_DENIED"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-prv-030",
+      "case_number": 30,
+      "category": "private_forbidden",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "acl-count-invisible",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-reference-only",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mob-1",
+            "claim_id": "clm-99126a0bc5629aa975e989f5",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "urban_mobility"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 264,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 1,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 1
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-prv-031",
+      "case_number": 31,
+      "category": "private_forbidden",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "acl-count-invisible",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-reference-only",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-mar-3",
+            "claim_id": "clm-3bb6a2cba53b3b5922b366da",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "marine_ecology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 262,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 1,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 1
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-prv-032",
+      "case_number": 32,
+      "category": "private_forbidden",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "acl-count-invisible",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "empty-index-for-scope",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "all candidates excluded (access or freeze window)"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": null,
+        "index_entries": 0,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 1,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "mortality reduction sealed cohort",
+              "reason": "ACCESS_DENIED"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-prv-033",
+      "case_number": 33,
+      "category": "private_forbidden",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "acl-count-invisible",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-reference-only",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 262,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 1,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 1
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-prv-034",
+      "case_number": 34,
+      "category": "private_forbidden",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "acl-count-invisible",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "allowed-actor-sees",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "denied-actor-sees",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 264,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 1,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": {
+        "allowed_actor_hits": [
+          "seg-epi-priv",
+          "seg-epi-1"
+        ],
+        "denied_actor_hits": [
+          "seg-epi-1"
+        ]
+      },
+      "error": null
+    },
+    {
+      "case_id": "s5-ret-035",
+      "case_number": 35,
+      "category": "retro_forecast",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "future-excluded",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "coverage-gap:AFTER_AS_OF",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "no included candidates for this query under the requested constraints"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 260,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 1,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "measles cases surged 2026",
+              "reason": "AFTER_AS_OF"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-ret-036",
+      "case_number": 36,
+      "category": "retro_forecast",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-reference-only",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "future-excluded",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-lab-1",
+            "claim_id": "clm-ad44636ca6d7a1ddb68366c3",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "labor_economics"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 264,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 1,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-ret-037",
+      "case_number": 37,
+      "category": "retro_forecast",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-reference-only",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "future-excluded",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-3",
+            "claim_id": "clm-e7f1e1bea6f1480d1b39bd9d",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 263,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 1,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-ret-038",
+      "case_number": 38,
+      "category": "retro_forecast",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-include:seg-epi-future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-future",
+            "claim_id": "clm-53ae8f7af03cee41fc5dd241",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 520,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-ret-039",
+      "case_number": 39,
+      "category": "retro_forecast",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-reference-only",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "future-excluded",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 262,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 1,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 1,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-ret-040",
+      "case_number": 40,
+      "category": "retro_forecast",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "hits-include:seg-epi-6",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "late-fetch-included",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:READY_FOR_REVIEW",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-6",
+            "claim_id": "clm-932de5cd75742e81ab798b24",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          },
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 2,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "vector": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "fusion": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          },
+          "graph": {
+            "recall_at_10": 1,
+            "ndcg_at_10": 1,
+            "hit_at_1": true
+          }
+        },
+        "cost": {
+          "operations": 526,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "READY_FOR_REVIEW",
+        "maps": [
+          {
+            "status": "FRESH",
+            "entailing": 1,
+            "supports_total": 1,
+            "not_entailing": 0,
+            "independent_families": 1,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 1,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-unk-041",
+      "case_number": 41,
+      "category": "unknown_answer",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "zero-hits",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "coverage-gap:SOURCE_MISSING",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "no included candidates for this query under the requested constraints"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 10,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "quantum computing adoption rates in agriculture",
+              "reason": "SOURCE_MISSING"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-unk-042",
+      "case_number": 42,
+      "category": "unknown_answer",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "zero-hits",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "coverage-gap:SOURCE_MISSING",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "no included candidates for this query under the requested constraints"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 8,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "mars colony population projections",
+              "reason": "SOURCE_MISSING"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-unk-043",
+      "case_number": 43,
+      "category": "unknown_answer",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "zero-hits",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "coverage-gap:SOURCE_MISSING",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "no included candidates for this query under the requested constraints"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 10,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "cryptocurrency trading volumes in fishing fleets",
+              "reason": "SOURCE_MISSING"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-unk-044",
+      "case_number": 44,
+      "category": "unknown_answer",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "zero-hits",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "coverage-gap:SOURCE_MISSING",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "NO_CANDIDATES",
+            "detail": "no included candidates for this query under the requested constraints"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 10,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "unemployment rate in Portugal third quarter",
+              "reason": "SOURCE_MISSING"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-unk-045",
+      "case_number": 45,
+      "category": "unknown_answer",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:COMPLETED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "entailment-number-mismatch",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "COMPLETED",
+        "primary_hits": [
+          {
+            "segment_id": "seg-epi-1",
+            "claim_id": "clm-ac2467906d3dfb218f138c1e",
+            "rank": 1,
+            "included": true,
+            "reason": "INCLUDED_RELEVANT",
+            "domain": "epidemiology"
+          }
+        ],
+        "abstentions": [],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 525,
+          "budget_max_operations": 50000,
+          "budget_exhausted": false
+        },
+        "index_entries": 2,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 0,
+          "coverage_gaps": []
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    },
+    {
+      "case_id": "s5-unk-046",
+      "case_number": 46,
+      "category": "unknown_answer",
+      "severity": "normal",
+      "decision": "PASS",
+      "checks": [
+        {
+          "code": "retrieval-status:ABSTAINED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:private",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:future",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:stale",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "leak:unknown",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "abstention-reason:BUDGET_EXHAUSTED",
+          "ok": true,
+          "hard": true
+        },
+        {
+          "code": "synthesis-status:INCOMPLETE",
+          "ok": true,
+          "hard": true
+        }
+      ],
+      "retrieval": {
+        "status": "ABSTAINED",
+        "primary_hits": [],
+        "abstentions": [
+          {
+            "reason": "BUDGET_EXHAUSTED",
+            "detail": "required 784 operations, budget 1"
+          }
+        ],
+        "by_mode": {
+          "lexical": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "vector": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "fusion": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          },
+          "graph": {
+            "recall_at_10": null,
+            "ndcg_at_10": null,
+            "hit_at_1": null
+          }
+        },
+        "cost": {
+          "operations": 784,
+          "budget_max_operations": 1,
+          "budget_exhausted": true
+        },
+        "index_entries": 3,
+        "index_exclusions": {
+          "EXCLUDED_ACL": 0,
+          "EXCLUDED_AS_OF": 0,
+          "EXCLUDED_STALE": 0
+        }
+      },
+      "synthesis": {
+        "status": "INCOMPLETE",
+        "maps": [
+          {
+            "status": "INCOMPLETE",
+            "entailing": 0,
+            "supports_total": 0,
+            "not_entailing": 0,
+            "independent_families": 0,
+            "collapsed_members": 0,
+            "unavailable": 0
+          }
+        ],
+        "cards": [],
+        "contradictions": [],
+        "coverage": {
+          "questions_total": 1,
+          "answered": 0,
+          "abstained": 1,
+          "coverage_gaps": [
+            {
+              "query": "flu vaccination coverage adults reached",
+              "reason": "BUDGET_EXHAUSTED"
+            }
+          ]
+        }
+      },
+      "hypothesis_rejected": false,
+      "actor_split": null,
+      "error": null
+    }
+  ]
+}

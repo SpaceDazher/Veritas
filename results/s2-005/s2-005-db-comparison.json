@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "role": "S2-005 DB-backed run A vs run B comparison (PostgreSQL claim graph stores, separate OS processes)",
+  "databaseEngine": "PostgreSQL",
+  "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+  "schemas": [
+    "run_a",
+    "run_b"
+  ],
+  "migrations": [
+    {
+      "schema": "run_a",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        },
+        {
+          "name": "0003_claim_graph.sql",
+          "sha256": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3"
+        },
+        {
+          "name": "0004_claim_graph_state.sql",
+          "sha256": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d"
+        }
+      ]
+    },
+    {
+      "schema": "run_b",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        },
+        {
+          "name": "0003_claim_graph.sql",
+          "sha256": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3"
+        },
+        {
+          "name": "0004_claim_graph_state.sql",
+          "sha256": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d"
+        }
+      ]
+    }
+  ],
+  "pids": {
+    "run_a": 9936,
+    "run_b": 24256
+  },
+  "executors": {
+    "run_a": "exec-db-a",
+    "run_b": "exec-db-b"
+  },
+  "testedImplementationCommit": "36e001c68b17e00422fda831bed5bcc9a642afae",
+  "integrity": {
+    "private_leaks": 0,
+    "unauthorized_hits": 0,
+    "future_leaks": 0,
+    "stale_hits": 0,
+    "provenance_substitutions": 0,
+    "causal_overclaims": 0,
+    "facts_from_analogy": 0,
+    "hidden_contradictions": 0,
+    "silent_exclusions": 0,
+    "duplicate_side_effects": 0,
+    "authority_expansions": 0,
+    "type_promotions_without_review": 0
+  },
+  "decisionCounts": {
+    "PASS": 55
+  },
+  "graphDigest": "11f71a2a3a448214077e7a3802e963ef6b300cc2e4fe73878a3259855a805b54",
+  "comparison": {
+    "ok": true,
+    "issues": [],
+    "comparedCases": 55
+  },
+  "hardGates": {
+    "ok": true,
+    "violations": []
+  }
+}

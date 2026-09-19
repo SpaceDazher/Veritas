@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "case_id": "s5-glo-018",
+  "case_number": 18,
+  "category": "global_cross_domain",
+  "severity": "normal",
+  "input": {
+    "workspace_id": "ws-corpus",
+    "operation_actor": "prn-extractor",
+    "request_actor": "prn-user-1",
+    "as_of": "2025-06-01T00:00:00.000Z",
+    "primary_mode": "fusion",
+    "allowed_retrieval_modes": [
+      "lexical",
+      "vector",
+      "fusion",
+      "graph"
+    ],
+    "budget": {
+      "max_candidates": 100,
+      "max_operations": 50000,
+      "timeout_ms": 5000
+    },
+    "actors": null,
+    "segments": [
+      {
+        "segment_id": "seg-epi-4",
+        "domain": "epidemiology",
+        "snapshot": {
+          "snapshot_id": "snp-epi-4",
+          "published_at": "2024-02-01T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-02-01T09:00:00.000Z",
+          "fetched_at": "2024-02-01T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Heat wave alerts increased hospital visits by 7% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-mar-4",
+        "domain": "marine_ecology",
+        "snapshot": {
+          "snapshot_id": "snp-mar-4",
+          "published_at": "2024-02-03T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-02-03T09:00:00.000Z",
+          "fetched_at": "2024-02-03T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Heat stress increased coral bleaching by 26% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      },
+      {
+        "segment_id": "seg-lab-1",
+        "domain": "labor_economics",
+        "snapshot": {
+          "snapshot_id": "snp-lab-1",
+          "published_at": "2024-01-25T09:00:00.000Z",
+          "event_time": null,
+          "observed_at": "2024-01-25T09:00:00.000Z",
+          "fetched_at": "2024-01-25T09:00:00.000Z",
+          "lineage_type": "original",
+          "parent_snapshot_ids": []
+        },
+        "text": "Remote work adoption decreased office demand by 16% in 2023.",
+        "acl": {
+          "visibility": "project",
+          "workspace_id": "ws-corpus",
+          "tenant_id": "tn-corpus",
+          "allowed_workspace_ids": [],
+          "allowed_principal_ids": []
+        },
+        "embedded_instruction_classification": {
+          "present": false,
+          "classification": "none",
+          "confidence": 1,
+          "note": null
+        }
+      }
+    ],
+    "claim_edges": [],
+    "invalidation": null,
+    "query": {
+      "text": "heat increased hospital visits coral bleaching",
+      "question_kind": "global",
+      "task_class": "research",
+      "domains": [
+        "epidemiology",
+        "marine_ecology"
+      ]
+    }
+  },
+  "expected": {
+    "gold_segment_ids": [
+      "seg-epi-4",
+      "seg-mar-4"
+    ],
+    "gold_primary_segment_ids": [
+      "seg-epi-4",
+      "seg-mar-4"
+    ],
+    "retrieval_status": "COMPLETED",
+    "min_domains_in_hits": 2,
+    "hypothesis_card": {
+      "card_type": "HYPOTHESIS",
+      "novelty": "novel_to_selected_corpus",
+      "causal_assertion": null,
+      "min_confounders": 1
+    },
+    "synthesis_status": "READY_FOR_REVIEW"
+  },
+  "oracle": {
+    "authored_by": "prn-corpus-annotator",
+    "locked": true
+  }
+}

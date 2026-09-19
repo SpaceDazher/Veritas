@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/retrieval-hit.schema.json",
+  "description": "Immutable retrieval hit (S2-005). Binds a retrieved candidate to the exact claim revision, source span digests, evidence family, ACL snapshot at decision time, score components and an explicit inclusion/exclusion reason. Ten reprints of one upstream collapse to one evidence family.",
+  "title": "Veritas Retrieval Hit (S2-005)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "hit_id",
+    "request_id",
+    "mode",
+    "claim_id",
+    "claim_revision",
+    "segment_id",
+    "segment_revision",
+    "span",
+    "quote_digest",
+    "text_sha256",
+    "source_family_id",
+    "acl",
+    "score",
+    "rank",
+    "included",
+    "reason"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "hit_id": { "$ref": "#/$defs/hitId" },
+    "request_id": { "$ref": "#/$defs/requestId" },
+    "mode": { "enum": ["lexical", "vector", "fusion", "graph"] },
+    "claim_id": { "$ref": "#/$defs/claimId" },
+    "claim_revision": { "type": "integer", "minimum": 1 },
+    "segment_id": { "type": "string", "pattern": "^seg-[a-z0-9][a-z0-9-]{0,62}$" },
+    "segment_revision": { "type": "integer", "minimum": 1 },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "quote_digest": { "$ref": "#/$defs/sha256Hex" },
+    "text_sha256": { "$ref": "#/$defs/sha256Hex" },
+    "source_family_id": {
+      "description": "Evidence family after collapse; identical upstream content shares one family regardless of reprint count.",
+      "oneOf": [{ "type": "string", "maxLength": 256 }, { "type": "null" }]
+    },
+    "acl": {
+      "description": "ACL snapshot at decision time; derived artifacts inherit the most restrictive ACL of all inputs.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibility", "workspace_id", "tenant_id"],
+      "properties": {
+        "visibility": { "enum": ["public", "project", "private"] },
+        "workspace_id": { "$ref": "#/$defs/workspaceId" },
+        "tenant_id": { "type": "string", "maxLength": 128 },
+        "allowed_workspace_ids": { "type": "array", "items": { "$ref": "#/$defs/workspaceId" }, "uniqueItems": true },
+        "allowed_principal_ids": { "type": "array", "items": { "type": "string", "maxLength": 128 }, "uniqueItems": true }
+      }
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "components"],
+      "properties": {
+        "total": { "type": "number" },
+        "components": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "required": ["primary"],
+          "properties": {
+            "primary": { "type": "number" },
+            "lexical": { "type": "number" },
+            "vector": { "type": "number" },
+            "rerank": { "type": "number" },
+            "domain_match": { "type": "number" },
+            "family_diversity": { "type": "number" },
+            "graph_expansion": { "type": "number" }
+          }
+        },
+        "normalized": { "type": "number" }
+      }
+    },
+    "rank": { "type": "integer", "minimum": 1 },
+    "included": { "type": "boolean" },
+    "reason": {
+      "description": "Explicit inclusion/exclusion code; silent exclusion from the denominator is a hard fail.",
+      "enum": [
+        "INCLUDED_RELEVANT",
+        "EXCLUDED_FAMILY_COLLAPSED",
+        "EXCLUDED_STALE",
+        "EXCLUDED_ACL",
+        "EXCLUDED_AS_OF",
+        "EXCLUDED_BUDGET",
+        "EXCLUDED_TIME_WINDOW",
+        "EXCLUDED_SOURCE_POLICY",
+        "EXCLUDED_DUPLICATE"
+      ]
+    }
+  },
+  "$defs": {
+    "hitId": { "type": "string", "pattern": "^hit-[a-z0-9][a-z0-9-]{0,62}$" },
+    "requestId": { "type": "string", "pattern": "^req-[a-z0-9][a-z0-9-]{0,62}$" },
+    "claimId": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

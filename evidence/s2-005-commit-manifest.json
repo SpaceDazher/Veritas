@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-005",
+  "rule": "Distinguishes the tested implementation commit from the evidence-container commit without a self-referential hash (todo §9). The implementation commit is pinned by SHA; the evidence container is the commit that carries this file and the s2-005 evidence artifacts, resolved externally.",
+  "implementationCommit": "dd683ceb614e95777cf08c09089454efd48749ef",
+  "implementationBranch": "codex/s2-005-cross-domain-synthesis",
+  "testedRunDigest": "see evidence/s2-005-comparison.json: runParameters, integrity, metrics",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-005-comparison.json"
+}

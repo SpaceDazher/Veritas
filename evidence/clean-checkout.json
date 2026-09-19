@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "e53c105c4ac383ae1c2aa31098d53316626ec9a5",
+  "testedImplementationCommit": "baa8a19e85b732d007ce9cd3101351879842722f",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "e53c105c4ac383ae1c2aa31098d53316626ec9a5",
-  "sourceTree": "72cac4563c031df7c6d61f1a27204f872c86de8a",
+  "sourceCommit": "baa8a19e85b732d007ce9cd3101351879842722f",
+  "sourceTree": "6661a580638e9f4bcfc52d1d0a111980062c5b57",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -155,6 +155,42 @@
     {
       "id": "s2-004-db-replay",
       "command": "npm.cmd run verify:s2-004-db-replay",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-005-types",
+      "command": "npm.cmd run synthesis:types",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-005-retrieval-tests",
+      "command": "npm.cmd run test:retrieval",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-005-synthesis-tests",
+      "command": "npm.cmd run test:synthesis",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-005-security-probes",
+      "command": "npm.cmd run test:s2-005-security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-005-replay",
+      "command": "npm.cmd run verify:s2-005",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-005-db-replay",
+      "command": "npm.cmd run verify:s2-005-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },

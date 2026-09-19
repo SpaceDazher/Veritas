@@ -182,6 +182,35 @@ export class PostgresClaimGraphStore {
     };
   }
 
+  #claimEdgeRowToEdge(row) {
+    return {
+      contractVersion: row.contract_version,
+      edge_id: row.edge_id,
+      source_claim_id: row.source_claim_id,
+      source_revision: row.source_revision,
+      target_claim_id: row.target_claim_id,
+      target_revision: row.target_revision,
+      relation: row.relation,
+      direction: row.direction,
+      scope_intersection: {
+        population_overlap: row.scope_population_overlap,
+        geography_overlap: row.scope_geography_overlap,
+        period_overlap: row.scope_period_overlap,
+        units_compatible: row.scope_units_compatible,
+      },
+      provenance: {
+        method: row.provenance_method,
+        extractor: row.provenance_extractor,
+        extractor_version: row.provenance_extractor_version,
+        ...(row.provenance_config_digest ? { config_digest: row.provenance_config_digest } : {}),
+        ...(row.provenance_confidence === null ? {} : { confidence: Number(row.provenance_confidence) }),
+      },
+      creation_authority: row.creation_authority,
+      created_at: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
+      created_by: row.created_by,
+    };
+  }
+
   // ---- writes ----------------------------------------------------------------
 
   async #putClaim(client, claim) {
@@ -256,6 +285,81 @@ export class PostgresClaimGraphStore {
         edge.created_at, edge.created_by,
       ],
     );
+  }
+
+  async linkClaims({ edge: input, actor, operationId, idempotencyKey }) {
+    if (!/^op-[a-z0-9][a-z0-9-]{0,62}$/.test(operationId ?? '')) {
+      throw new VeritasError('OPERATION_ID_INVALID', `bad operation id: ${operationId}`);
+    }
+    const source = await this.getClaim(input.source_claim_id, input.source_revision);
+    const target = await this.getClaim(input.target_claim_id, input.target_revision);
+    if (!source) throw new VeritasError('CLAIM_NOT_FOUND', `claim ${input.source_claim_id}@${input.source_revision} not found`);
+    if (!target) throw new VeritasError('CLAIM_NOT_FOUND', `claim ${input.target_claim_id}@${input.target_revision} not found`);
+    if (!this.can(actor, 'producer', source.workspace_id) && !this.can(actor, 'extractor', source.workspace_id)) {
+      throw new VeritasError('AUTHORITY_DENIED', `actor ${actor} has no producer/extractor capability in workspace ${source.workspace_id}`);
+    }
+    if (input.relation === 'SUPERSEDES' && input.source_claim_id !== input.target_claim_id) {
+      throw new VeritasError('SUPERSEDES_SCOPE', 'SUPERSEDES edges must connect revisions of the same claim');
+    }
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const begun = await this.beginOperation(client, {
+        workspaceId: source.workspace_id, operationId, actor, idempotencyKey, input,
+      });
+      if (begun.replay) {
+        const existing = await this.#one(client, 'SELECT * FROM claim_edges WHERE edge_id = $1', [input.edge_id]);
+        await client.query('ROLLBACK');
+        if (!existing) throw new VeritasError('RECONCILIATION_REQUIRED', `committed operation ${operationId} has no edge ${input.edge_id}`);
+        return { edge: this.#claimEdgeRowToEdge(existing), operation_id: operationId, replayed: true };
+      }
+      if (input.relation === 'DEPENDS_ON' || input.relation === 'TRANSLATES') {
+        const cycle = await this.#one(client, `
+          WITH RECURSIVE reachable(claim_id) AS (
+            SELECT $1::varchar
+            UNION
+            SELECT ce.target_claim_id FROM claim_edges ce
+            JOIN reachable r ON ce.source_claim_id = r.claim_id
+            WHERE ce.relation IN ('DEPENDS_ON','TRANSLATES')
+          ) SELECT 1 AS found FROM reachable WHERE claim_id = $2 LIMIT 1`,
+        [input.target_claim_id, input.source_claim_id]);
+        if (cycle) throw new VeritasError('CYCLE_DETECTED', `adding ${input.relation} ${input.source_claim_id} -> ${input.target_claim_id} would create a cycle`);
+      }
+      const edge = { scope_intersection: {}, ...input, created_at: this.clock(), created_by: actor };
+      this.validators.requireValid('claim-edge', edge);
+      await client.query(`INSERT INTO claim_edges (
+        edge_id, contract_version, source_claim_id, source_revision, target_claim_id, target_revision,
+        relation, direction, scope_population_overlap, scope_geography_overlap, scope_period_overlap,
+        scope_units_compatible, provenance_method, provenance_extractor, provenance_extractor_version,
+        provenance_config_digest, provenance_confidence, creation_authority, created_at, created_by
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`, [
+        edge.edge_id, edge.contractVersion, edge.source_claim_id, edge.source_revision,
+        edge.target_claim_id, edge.target_revision, edge.relation, edge.direction,
+        edge.scope_intersection.population_overlap ?? false,
+        edge.scope_intersection.geography_overlap ?? false,
+        edge.scope_intersection.period_overlap ?? false,
+        edge.scope_intersection.units_compatible ?? false,
+        edge.provenance.method, edge.provenance.extractor, edge.provenance.extractor_version,
+        edge.provenance.config_digest ?? null, edge.provenance.confidence ?? null,
+        edge.creation_authority, edge.created_at, edge.created_by,
+      ]);
+      await this.#putOutbox(client, {
+        eventId: deterministicId('aud', operationId, 'CLAIMS_LINKED'), type: 'CLAIMS_LINKED', operationId, actor,
+        payload: { edge_id: edge.edge_id, relation: edge.relation, source: edge.source_claim_id, target: edge.target_claim_id },
+      });
+      await client.query(`INSERT INTO claim_operation_ledger
+        (workspace_id, operation_id, idempotency_key, actor, input_digest, status, outcome_digest)
+        VALUES ($1,$2,$3,$4,$5,'COMMITTED',$6)`, [
+        source.workspace_id, operationId, idempotencyKey ?? null, actor, begun.inputDigest, sha256Hex(edge),
+      ]);
+      await client.query('COMMIT');
+      return { edge, operation_id: operationId, replayed: false };
+    } catch (error) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async #putOutbox(client, { eventId, type, operationId, actor, payload }) {

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/retrieval-run.schema.json",
+  "description": "Retrieval run record (S2-005): full execution provenance — query/input/index/model/seed/config hashes, candidates, selected hits, failures, abstentions, latency/cost and executor identity. Wall-clock latency is telemetry; it never enters decisions, seeds or oracles.",
+  "title": "Veritas Retrieval Run (S2-005)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "run_id",
+    "mode",
+    "request_id",
+    "request_digest",
+    "query_hash",
+    "index_hash",
+    "model",
+    "seed",
+    "config_hash",
+    "candidates_total",
+    "hits",
+    "excluded_count",
+    "failures",
+    "abstentions",
+    "cost",
+    "execution",
+    "status"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "run_id": { "type": "string", "pattern": "^run-[a-z0-9][a-z0-9-]{0,62}$" },
+    "mode": { "enum": ["lexical", "vector", "fusion", "graph"] },
+    "request_id": { "$ref": "#/$defs/requestId" },
+    "request_digest": { "$ref": "#/$defs/sha256Hex" },
+    "query_hash": { "$ref": "#/$defs/sha256Hex" },
+    "index_hash": {
+      "description": "Digest over the frozen index contents (claim ids, revisions, span digests) — proves the index carried no data newer than as_of.",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "model_version"],
+      "properties": {
+        "model_id": { "type": "string", "maxLength": 256 },
+        "model_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "model_digest": { "oneOf": [{ "$ref": "#/$defs/sha256Hex" }, { "type": "null" }] }
+      }
+    },
+    "seed": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+    "config_hash": { "$ref": "#/$defs/sha256Hex" },
+    "as_of": { "$ref": "#/$defs/isoDateTime" },
+    "candidates_total": { "type": "integer", "minimum": 0 },
+    "hits": { "type": "array", "items": { "$ref": "https://veritas.local/contracts/retrieval-hit.schema.json" } },
+    "excluded_count": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 },
+      "propertyNames": { "pattern": "^EXCLUDED_[A-Z_]+$" }
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "detail"],
+        "properties": {
+          "code": { "type": "string", "maxLength": 128 },
+          "detail": { "type": "string", "maxLength": 1024 }
+        }
+      }
+    },
+    "abstentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason"],
+        "properties": {
+          "reason": { "enum": ["NO_CANDIDATES", "BUDGET_EXHAUSTED", "NO_ENTAILING_EVIDENCE", "SOURCE_UNAVAILABLE", "ACCESS_DENIED"] },
+          "detail": { "type": "string", "maxLength": 1024 }
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operations", "budget_max_operations"],
+      "properties": {
+        "operations": { "type": "integer", "minimum": 0 },
+        "budget_max_operations": { "type": "integer", "minimum": 1 },
+        "budget_exhausted": { "type": "boolean" }
+      }
+    },
+    "latency_ms": {
+      "description": "Telemetry only — never an input to decisions, seeds or oracles.",
+      "type": "number",
+      "minimum": 0
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executor_id", "pid", "nonce", "output_root_digest"],
+      "properties": {
+        "executor_id": { "type": "string", "maxLength": 128 },
+        "pid": { "type": "integer", "minimum": 1 },
+        "nonce": { "type": "string", "minLength": 8, "maxLength": 128 },
+        "output_root_digest": { "$ref": "#/$defs/sha256Hex" },
+        "clock": { "description": "Run clock (frozen decision time), distinct from wall clock.", "$ref": "#/$defs/isoDateTime" }
+      }
+    },
+    "status": { "enum": ["COMPLETED", "ABSTAINED", "FAILED"] }
+  },
+  "$defs": {
+    "requestId": { "type": "string", "pattern": "^req-[a-z0-9][a-z0-9-]{0,62}$" },
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "isoDateTime": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$" }
+  }
+}
