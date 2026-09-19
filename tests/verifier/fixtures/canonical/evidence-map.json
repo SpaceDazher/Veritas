@@ -1,0 +1,51 @@
+{
+  "contractVersion": "1.0.0",
+  "map_id": "evm-canonical-001",
+  "statement": "Wind and solar generated 22% of EU electricity in 2024.",
+  "entries": [
+    {
+      "claim_id": "clm-canonical-0001",
+      "claim_revision": 1,
+      "relation": "supports",
+      "entailment_status": "ENTAILS",
+      "entailment_method": "exact-span-entailment-v1",
+      "evidence_edge_id": "ev-canonical-0001",
+      "segment_id": "seg-canonical-0001",
+      "span": {
+        "start": 0,
+        "end": 56
+      },
+      "quote_digest": "e7cef6cdb4f0609dd2e86204b8188ea2a9d5c6ef07d8085f37942975ff43c8c9",
+      "source_family_id": "fam-eu-electricity-2024",
+      "domain": "energy"
+    },
+    {
+      "claim_id": "clm-canonical-0002",
+      "claim_revision": 1,
+      "relation": "qualifies",
+      "entailment_status": "PARTIALLY_ENTAILS",
+      "evidence_edge_id": "ev-canonical-0002",
+      "segment_id": "seg-canonical-0002",
+      "span": null,
+      "quote_digest": "82e0396dbcbe083f40e0d1a7fb3c590dea51909689e1eafe48fc5fa0d4d2a672",
+      "source_family_id": "fam-eu-electricity-2024",
+      "domain": "energy"
+    }
+  ],
+  "unavailable_evidence": [
+    {
+      "what_is_missing": "2025 full-year electricity mix statistics",
+      "kind": "AFTER_AS_OF",
+      "required_for": "trend extrapolation beyond 2024"
+    }
+  ],
+  "qualifiers": [
+    "utility-scale generation only"
+  ],
+  "stale": {
+    "is_stale": false
+  },
+  "status": "FRESH",
+  "created_at": "2026-03-20T00:00:00.000Z",
+  "created_by": "prn-synthesis-1"
+}

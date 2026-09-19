@@ -29,6 +29,7 @@ import {
   missingnessForError,
   reasonCodeForMissingness,
 } from './errors.mjs';
+import { check as policyCheck } from './policy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const CONTRACTS_DIR = path.join(ROOT, 'contracts');
@@ -162,11 +163,73 @@ function normalizeEvidenceLink(raw) {
   return link;
 }
 
+// Canonical evidence-link adapter for the FROZEN S2-005 evidence-map schema
+// (contracts/evidence-map.schema.json): entries carry snake_case
+// claim_id/claim_revision plus optional segment_id/span/quote_digest. They
+// are projected onto the semantic-verification-item evidence-link contract.
+const CLAIM_ID = /^clm-[a-z0-9][a-z0-9-]{0,62}$/;
+
+function canonicalEntryLink(entry, index) {
+  if (!entry || typeof entry !== 'object') throw new NeedsInput(`evidence_map entry ${index} is not an object`);
+  if (typeof entry.claim_id !== 'string' || !CLAIM_ID.test(entry.claim_id)) {
+    throw new NeedsInput(`evidence_map entry ${index} exposes no well-formed canonical claim_id`);
+  }
+  const link = {
+    claimId: entry.claim_id,
+    claimRevision: Number.isInteger(entry.claim_revision) && entry.claim_revision >= 1 ? entry.claim_revision : 1,
+  };
+  if (typeof entry.segment_id === 'string' && entry.segment_id.length > 0) link.segmentId = entry.segment_id;
+  if (entry.span && Number.isInteger(entry.span.start) && Number.isInteger(entry.span.end)) {
+    link.span = { start: entry.span.start, end: entry.span.end };
+  }
+  if (typeof entry.quote_digest === 'string' && entry.quote_digest.length > 0) link.quoteDigest = entry.quote_digest;
+  return link;
+}
+
+function canonicalCardStatement(card) {
+  // Frozen hypothesis-card.schema.json: the atomic checkable proposition is
+  // the proposed_relation triple; nodes[]/counterevidence[] are citations.
+  const relation = card?.proposed_relation;
+  if (
+    !relation || typeof relation !== 'object' ||
+    typeof relation.subject !== 'string' || relation.subject.length === 0 ||
+    typeof relation.predicate !== 'string' || relation.predicate.length === 0 ||
+    typeof relation.object !== 'string' || relation.object.length === 0
+  ) {
+    throw new NeedsInput('hypothesis_card exposes no proposed_relation (subject/predicate/object) triple');
+  }
+  const statement = `${relation.subject} ${relation.predicate} ${relation.object}`;
+  const evidenceLinks = [];
+  for (const node of Array.isArray(card.nodes) ? card.nodes : []) {
+    if (typeof node?.claim_id !== 'string' || !CLAIM_ID.test(node.claim_id)) {
+      throw new NeedsInput(`hypothesis_card node exposes no well-formed canonical claim_id`);
+    }
+    evidenceLinks.push({
+      claimId: node.claim_id,
+      claimRevision: Number.isInteger(node.revision) && node.revision >= 1 ? node.revision : 1,
+    });
+  }
+  for (const counterevidence of Array.isArray(card.counterevidence) ? card.counterevidence : []) {
+    if (typeof counterevidence?.claim_id !== 'string' || !CLAIM_ID.test(counterevidence.claim_id)) {
+      throw new NeedsInput('hypothesis_card counterevidence exposes no well-formed canonical claim_id');
+    }
+    evidenceLinks.push({ claimId: counterevidence.claim_id, claimRevision: 1 });
+  }
+  return { statement, span: readSpan(undefined, statement), evidenceLinks };
+}
+
 // Atomic checkable statements per artifact kind. Pure projection of the
-// payload — no entailment/relation/classification logic from the producer.
+// CANONICAL producer form defined by the frozen contracts (the single source
+// of truth — there is no second internal format, review P1-1):
+//   claim            (S2-004) -> normalized_text/original_text statement
+//   evidence_map     (S2-005) -> the map-level statement + entries[] links
+//   hypothesis_card  (S2-005) -> the proposed_relation triple + node links
+//   synthesis_result (S2-005) -> the embedded evidence_maps[] + hypothesis_cards[]
 function extractStatements(kind, payload) {
   switch (kind) {
     case 'claim': {
+      // Canonical claims carry normalized_text/original_text and NO citations
+      // field; citation checks therefore abstain deterministically (probe E).
       const statement = firstString(payload, ['statement', 'normalized_text', 'original_text']);
       if (statement === null) throw new NeedsInput('claim payload exposes no statement text');
       const citations = Array.isArray(payload.citations)
@@ -175,46 +238,33 @@ function extractStatements(kind, payload) {
       return [{ statement, span: readSpan(payload.span, statement), evidenceLinks: citations.map(normalizeEvidenceLink) }];
     }
     case 'evidence_map': {
+      // entries[].statement was never canonical: the map-level statement is
+      // the single checkable unit and entries[] are its citations.
+      const statement = firstString(payload, ['statement']);
+      if (statement === null) throw new NeedsInput('evidence_map payload exposes no map-level statement text');
       const entries = Array.isArray(payload.entries) ? payload.entries : [];
       if (entries.length === 0) throw new NeedsInput('evidence_map payload exposes no entries');
-      return entries.map((entry, index) => {
-        const statement = firstString(entry, ['statement', 'quote', 'text']);
-        if (statement === null) throw new NeedsInput(`evidence_map entry ${index} exposes no statement text`);
-        return {
-          statement,
-          span: readSpan(entry.span, statement),
-          evidenceLinks: [normalizeEvidenceLink({ claimRevision: 1, ...entry })],
-        };
-      });
+      return [{
+        statement,
+        span: readSpan(payload.span, statement),
+        evidenceLinks: entries.map(canonicalEntryLink),
+      }];
     }
     case 'hypothesis_card': {
-      const criteria = Array.isArray(payload.criteria) ? payload.criteria : [];
-      if (criteria.length === 0) throw new NeedsInput('hypothesis_card payload exposes no criteria');
-      return criteria.map((criterion, index) => {
-        const statement = firstString(criterion, ['statement', 'criterion', 'text']);
-        if (statement === null) throw new NeedsInput(`hypothesis_card criterion ${index} exposes no statement text`);
-        return {
-          statement,
-          span: readSpan(criterion.span, statement),
-          evidenceLinks: criterion.claimId ? [normalizeEvidenceLink({ claimRevision: 1, ...criterion })] : [],
-        };
-      });
+      return [canonicalCardStatement(payload)];
     }
     case 'synthesis_result': {
-      const statements = Array.isArray(payload.statements)
-        ? payload.statements
-        : Array.isArray(payload.claims) ? payload.claims : [];
-      if (statements.length === 0) throw new NeedsInput('synthesis_result payload exposes no statements');
-      return statements.map((entry, index) => {
-        const statement = firstString(entry, ['statement', 'text', 'claim']);
-        if (statement === null) throw new NeedsInput(`synthesis_result statement ${index} exposes no statement text`);
-        const citations = Array.isArray(entry.citations) ? entry.citations : [];
-        return {
-          statement,
-          span: readSpan(entry.span, statement),
-          evidenceLinks: citations.map(normalizeEvidenceLink),
-        };
-      });
+      const statements = [];
+      for (const map of Array.isArray(payload.evidence_maps) ? payload.evidence_maps : []) {
+        statements.push(...extractStatements('evidence_map', map));
+      }
+      for (const card of Array.isArray(payload.hypothesis_cards) ? payload.hypothesis_cards : []) {
+        statements.push(canonicalCardStatement(card));
+      }
+      if (statements.length === 0) {
+        throw new NeedsInput('synthesis_result payload exposes no embedded evidence_maps or hypothesis_cards');
+      }
+      return statements;
     }
     default:
       throw new ContractVersionUnknown(`unsupported artifact kind: ${kind}`);
@@ -494,21 +544,73 @@ export function verifySynthesisResult(request, options) {
   return verifyArtifact(request, options);
 }
 
-// ---- query API (read-only) ---------------------------------------------------
+// ---- query API (read-only, ACL-enforced — spec §10, review P1-3) -----------
 
-export function getVerificationResult(store, { resultId } = {}) {
+// Read authorization over the SAME server-enforced policy matrix as every
+// other surface. `authorities` is the makeVerifierAuthorityRegistry product
+// (Map: principal -> { roles: Set, workspaces: Set }). Missing actor/workspace
+// or missing enforcement is a LOUD typed denial — legacy un-attributed reads
+// must fail, never silently return records (review P1-3).
+function authorizeRead({ actor, workspaceId, authorities, resourceType, resourceRef }) {
+  if (
+    typeof actor !== 'string' || actor.length === 0 ||
+    typeof workspaceId !== 'string' || workspaceId.length === 0
+  ) {
+    throw new AclDenied('read API requires the reading actor and workspace; un-attributed reads are refused loudly, never answered with a global projection');
+  }
+  const entry = authorities instanceof Map ? authorities.get(actor) : null;
+  if (!entry) {
+    throw new AclDenied(`actor ${actor} has no authority registry entry; read denied by default`);
+  }
+  const roles = [...entry.roles];
+  const workspaces = [...entry.workspaces];
+  const allowed = roles.some((role) => policyCheck(
+    actor,
+    role,
+    'read',
+    { type: resourceType, workspaceId, recordId: resourceRef },
+    { workspaces },
+  ).allowed);
+  if (!allowed) {
+    throw new AclDenied(`actor ${actor} holds no read capability over ${resourceType} in workspace ${workspaceId}`);
+  }
+}
+
+export function getVerificationResult(store, { actor, workspaceId, resultId, authorities } = {}) {
   if (!store || typeof store.getRecord !== 'function') {
     throw new NeedsInput('getVerificationResult requires a verifier store with getRecord()');
   }
   if (typeof resultId !== 'string' || resultId.length === 0) throw new NeedsInput('resultId required');
-  return store.getRecord('result', resultId);
+  authorizeRead({ actor, workspaceId, authorities, resourceType: 'verification_result', resourceRef: resultId });
+  // Workspace-scoped selection: a record that exists but lives in another
+  // workspace is an ACL denial, never an empty miss (review P1-3).
+  const record = store.getRecord('result', resultId, { workspaceId });
+  if (record === null) return null;
+  // Derived results inherit the strictest-of-inputs ACL as store-level
+  // metadata (never inside the contract payload): a private inherited ACL is
+  // readable only by the named principals.
+  const recordAcl = typeof store.getRecordAcl === 'function' ? store.getRecordAcl('result', resultId) : null;
+  if (recordAcl && recordAcl.visibility === 'private') {
+    const allowed = Array.isArray(recordAcl.allowedPrincipalIds) ? recordAcl.allowedPrincipalIds : [];
+    if (!allowed.includes(actor)) {
+      throw new AclDenied(`result ${resultId} inherited a private ACL (strictest of its inputs); actor ${actor} is not among the allowed principals`);
+    }
+  }
+  return record;
 }
 
 export function listCalibrationReports(store, filter = {}) {
   if (!store || typeof store.listCalibrationReports !== 'function') {
     throw new NeedsInput('listCalibrationReports requires a verifier store with listCalibrationReports()');
   }
-  return store.listCalibrationReports(filter);
+  const { actor, workspaceId, authorities, corpusVersion } = filter ?? {};
+  authorizeRead({ actor, workspaceId, authorities, resourceType: 'calibration_report', resourceRef: null });
+  // Strictly workspace-scoped listing; the store also fails loudly when the
+  // workspace binding is missing.
+  return store.listCalibrationReports({
+    workspaceId,
+    ...(corpusVersion !== undefined ? { corpusVersion } : {}),
+  });
 }
 
 // ---- static leak audit (read-only, probe G/H/Q) ------------------------------

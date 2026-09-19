@@ -1,0 +1,86 @@
+{
+  "contractVersion": "1.0.0",
+  "card_id": "hyc-canonical-001",
+  "card_type": "HYPOTHESIS",
+  "originating_domains": [
+    "sleep-medicine",
+    "memory-research"
+  ],
+  "nodes": [
+    {
+      "claim_id": "clm-canonical-0101",
+      "revision": 1,
+      "domain": "sleep-medicine",
+      "role": "source"
+    },
+    {
+      "claim_id": "clm-canonical-0102",
+      "revision": 1,
+      "domain": "memory-research",
+      "role": "target"
+    }
+  ],
+  "proposed_relation": {
+    "subject": "Sleep deprivation",
+    "predicate": "reduces",
+    "object": "hippocampal memory consolidation accuracy",
+    "relation_strength": "CORRELATION_EVIDENCE",
+    "causal_assertion": null
+  },
+  "confounders": [
+    {
+      "description": "baseline cognitive ability differences between cohorts",
+      "status": "UNRESOLVED",
+      "claim_id": null
+    }
+  ],
+  "alternative_explanations": [
+    {
+      "description": "attention lapses rather than consolidation deficits",
+      "claim_id": null
+    }
+  ],
+  "scope": {
+    "population": "adults aged 18-40",
+    "geography": null,
+    "period": null,
+    "units": null,
+    "domain_limits": [
+      "adults aged 18-40",
+      "single-night total sleep deprivation"
+    ]
+  },
+  "assumptions": [
+    "hippocampal consolidation effects generalize across task batteries"
+  ],
+  "falsifiers": [
+    {
+      "description": "no consolidation difference under matched attention-load controls",
+      "observable": "matched-control consolidation delta"
+    }
+  ],
+  "test_design": "Randomized within-subject sleep versus wake control with matched attention load and pre-registered consolidation endpoints.",
+  "counterevidence": [
+    {
+      "claim_id": "clm-canonical-0103",
+      "relation": "weakens"
+    }
+  ],
+  "novelty": {
+    "assessment": "NOT_ASSESSED",
+    "corpus": null,
+    "search_horizon": null
+  },
+  "uncertainty": {
+    "author_confidence": null,
+    "expert_trust": null,
+    "measured_calibration": null,
+    "evidence_support": 2
+  },
+  "stale": {
+    "is_stale": false
+  },
+  "status": "FRESH",
+  "created_at": "2026-03-20T00:00:00.000Z",
+  "created_by": "prn-synthesis-1"
+}

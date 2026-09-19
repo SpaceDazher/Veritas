@@ -17,6 +17,7 @@ import {
   PostgresVerifierStore,
 } from '../../src/lib/verifier/store.mjs';
 import {
+  AclDenied,
   IdempotencyConflict,
   NeedsInput,
   ReconciliationRequired,
@@ -170,20 +171,125 @@ describe('S2-006 InMemory verifier store contracts', () => {
     assert.equal(reserved.fencingToken, 1);
 
     await assert.rejects(
-      store.finalizeExternalCall({ callId: 'call-1', fencingToken: 1, responseDigest: HEX_A, settlement: {} }),
+      store.finalizeExternalCall({ callId: 'call-1', fencingToken: 1, actor: 'prn-evaluation-harness', responseDigest: HEX_A, settlement: { amount: 0 } }),
       (error) => error instanceof VerifierError && error.code === 'INVALID_TRANSITION',
       'RESERVED cannot skip ACCEPTED',
     );
-    await store.acceptExternalCall({ callId: 'call-1', fencingToken: 1 });
-    await store.finalizeExternalCall({ callId: 'call-1', fencingToken: 1, responseDigest: HEX_A, settlement: { cost: 0 } });
+    await store.acceptExternalCall({ callId: 'call-1', fencingToken: 1, actor: 'prn-evaluation-harness' });
+    await store.finalizeExternalCall({ callId: 'call-1', fencingToken: 1, actor: 'prn-evaluation-harness', responseDigest: HEX_A, settlement: { amount: 0 } });
     await assert.rejects(
-      store.markExternalCallReconciliation({ callId: 'call-1', fencingToken: 1, reason: 'late regret' }),
+      store.markExternalCallReconciliation({ callId: 'call-1', fencingToken: 1, actor: 'prn-evaluation-harness', reason: 'late regret' }),
       (error) => error instanceof VerifierError && error.code === 'INVALID_TRANSITION',
       'FINALIZED is terminal for reconciliation',
     );
     const call = await store.readExternalCall('call-1');
     assert.equal(call.state, 'FINALIZED');
     assert.equal(call.fencing_token, 1);
+  });
+
+  test('external-call transitions are ownership-bound: a foreign actor mutates nothing', async () => {
+    const store = new InMemoryVerifierStore();
+    await store.beginExternalCall({
+      callId: 'call-owner', workspaceId: 'ws-verifier', actor: 'prn-evaluation-harness',
+      grantRef: 'grt-verifier-1', operationId: 'op-owner', reservation: {},
+    });
+    await assert.rejects(
+      store.acceptExternalCall({ callId: 'call-owner', fencingToken: 1, actor: 'prn-annotator-1' }),
+      AclDenied,
+    );
+    await assert.rejects(
+      store.finalizeExternalCall({ callId: 'call-owner', fencingToken: 1, actor: 'prn-annotator-1', responseDigest: HEX_A, settlement: { amount: 0 } }),
+      AclDenied,
+    );
+    await assert.rejects(
+      store.acceptExternalCall({ callId: 'call-owner', fencingToken: 1 }),
+      NeedsInput,
+      'actor is required for every transition',
+    );
+    await assert.rejects(
+      store.acceptExternalCall({ callId: 'call-owner', fencingToken: 1, actor: 'prn-evaluation-harness', workspaceId: 'ws-other' }),
+      AclDenied,
+      'a workspace binding that differs from the reservation is refused',
+    );
+    const call = await store.readExternalCall('call-owner');
+    assert.equal(call.state, 'RESERVED', 'no mutation from refused transitions');
+  });
+
+  test('records are workspace-scoped: a cross-workspace read is AclDenied, never a silent miss', async () => {
+    const store = new InMemoryVerifierStore();
+    const record = makeResultRecord('sres-ws-a-1');
+    await store.publish({
+      workspaceId: 'ws-a',
+      operationId: 'op-ws-a-1',
+      actor: 'prn-evaluation-harness',
+      operation: 'publishVerificationResult',
+      idempotencyKey: 'idem-ws-a-1',
+      records: [{ kind: 'result', record }],
+      audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: { ws: 'a' } },
+    });
+    assert.equal(store.getRecord('result', 'sres-ws-a-1', { workspaceId: 'ws-a' }), record);
+    assert.throws(
+      () => store.getRecord('result', 'sres-ws-a-1', { workspaceId: 'ws-b' }),
+      AclDenied,
+      'the record EXISTS but in another workspace: AclDenied, not null',
+    );
+    assert.equal(store.getRecord('result', 'sres-missing', { workspaceId: 'ws-a' }), null);
+  });
+
+  test('calibration report listing is strictly workspace-scoped and fails loudly without a workspace', async () => {
+    const store = new InMemoryVerifierStore();
+    const report = {
+      contractVersion: '1.0.0', reportId: 'rep-store-1', corpusVersion: '0.3.0',
+      rubricDigest: HEX_A, thresholdsDigest: HEX_A,
+    };
+    await store.publish({
+      workspaceId: 'ws-a', operationId: 'op-store-12', actor: 'prn-evaluation-harness',
+      operation: 'publishCalibrationReport', idempotencyKey: 'idem-store-12',
+      records: [{ kind: 'calibration_report', record: report }],
+      audit: { type: 'CALIBRATION_REPORT_PUBLISHED', recordKind: 'calibration_report', payload: { reportId: report.reportId } },
+    });
+    await store.publish({
+      workspaceId: 'ws-b', operationId: 'op-store-12b', actor: 'prn-evaluation-harness',
+      operation: 'publishCalibrationReport', idempotencyKey: 'idem-store-12b',
+      records: [{ kind: 'calibration_report', record: { ...report, reportId: 'rep-store-2' } }],
+      audit: { type: 'CALIBRATION_REPORT_PUBLISHED', recordKind: 'calibration_report', payload: { reportId: 'rep-store-2' } },
+    });
+    assert.throws(() => store.listCalibrationReports({}), NeedsInput, 'a workspace is mandatory: no global listing');
+    assert.throws(() => store.listCalibrationReports({ corpusVersion: '0.3.0' }), NeedsInput);
+    assert.deepEqual(store.listCalibrationReports({ workspaceId: 'ws-a' }).map((r) => r.reportId), ['rep-store-1']);
+    assert.deepEqual(store.listCalibrationReports({ workspaceId: 'ws-b', corpusVersion: '0.3.0' }).map((r) => r.reportId), ['rep-store-2']);
+    assert.deepEqual(store.listCalibrationReports({ workspaceId: 'ws-c' }), []);
+  });
+
+  test('inherited ACL metadata lives at store level, outside the contract payload', async () => {
+    const store = new InMemoryVerifierStore();
+    const record = makeResultRecord('sres-acl-1');
+    const acl = { visibility: 'private', allowedPrincipalIds: ['prn-reviewer'], inherited: 'strictest_of_inputs' };
+    await store.publish({
+      workspaceId: 'ws-verifier',
+      operationId: 'op-acl-1',
+      actor: 'prn-evaluation-harness',
+      operation: 'publishVerificationResult',
+      idempotencyKey: 'idem-acl-1',
+      records: [{ kind: 'result', record, acl }],
+      audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: { acl: true } },
+    });
+    assert.deepEqual(store.getRecordAcl('result', 'sres-acl-1'), acl);
+    const stored = store.getRecord('result', 'sres-acl-1');
+    assert.equal(Object.prototype.hasOwnProperty.call(stored, 'acl'), false, 'the payload stays byte-pure');
+    assert.equal(store.getRecordAcl('result', 'sres-missing'), null);
+
+    const plain = makeResultRecord('sres-acl-2');
+    await store.publish({
+      workspaceId: 'ws-verifier',
+      operationId: 'op-acl-2',
+      actor: 'prn-evaluation-harness',
+      operation: 'publishVerificationResult',
+      idempotencyKey: 'idem-acl-2',
+      records: [{ kind: 'result', record: plain }],
+      audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: {} },
+    });
+    assert.equal(store.getRecordAcl('result', 'sres-acl-2'), null, 'no inherited ACL without declared inputs');
   });
 
   test('calibration report listing filters by corpus version', async () => {
@@ -198,8 +304,8 @@ describe('S2-006 InMemory verifier store contracts', () => {
       records: [{ kind: 'calibration_report', record: report }],
       audit: { type: 'CALIBRATION_REPORT_PUBLISHED', recordKind: 'calibration_report', payload: { reportId: report.reportId } },
     });
-    assert.equal(store.listCalibrationReports({ corpusVersion: '9.9.9' }).length, 0);
-    assert.equal(store.listCalibrationReports({ corpusVersion: '0.3.0' }).length, 1);
+    assert.equal(store.listCalibrationReports({ workspaceId: 'ws-verifier', corpusVersion: '9.9.9' }).length, 0);
+    assert.equal(store.listCalibrationReports({ workspaceId: 'ws-verifier', corpusVersion: '0.3.0' }).length, 1);
   });
 
   test('canonical serialization of stored records is stable across reads', async () => {
@@ -317,13 +423,13 @@ describe('S2-006 PostgresVerifierStore (real database when available)', () => {
       });
       assert.notEqual(second.fencingToken, reserved.fencingToken, 'fencing tokens from the sequence are unique');
       await assert.rejects(
-        store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken + 999 }),
+        store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken + 999, actor: 'prn-evaluation-harness' }),
         (error) => error instanceof VerifierError && error.code === 'ACL_DENIED',
       );
-      await store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken });
-      await store.markExternalCallReconciliation({ callId, fencingToken: reserved.fencingToken, reason: 'pg crash simulation' });
+      await store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness' });
+      await store.markExternalCallReconciliation({ callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness', reason: 'pg crash simulation' });
       await assert.rejects(
-        store.finalizeExternalCall({ callId, fencingToken: reserved.fencingToken, responseDigest: HEX_A, settlement: {} }),
+        store.finalizeExternalCall({ callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness', responseDigest: HEX_A, settlement: { amount: 0 } }),
         ReconciliationRequired,
         'reconciled call refuses finalize on the real database too',
       );

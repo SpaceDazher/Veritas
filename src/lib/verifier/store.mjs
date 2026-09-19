@@ -26,6 +26,7 @@ import {
   ReconciliationRequired,
   StoreOutcomeUnknownError,
   VerifierError,
+  VerifierPolicyBlock,
 } from './errors.mjs';
 
 const OPERATION_ID = /^op-[a-z0-9][a-z0-9-]{0,62}$/;
@@ -52,6 +53,13 @@ export function deriveIdempotencyKey({ actor, operation, canonicalArgsDigest }) 
     throw new NeedsInput('idempotency key requires the exact canonicalArgsDigest');
   }
   return canonicalDigest({ actor, operation, canonicalArgsDigest });
+}
+
+export class BudgetExceeded extends VerifierError {
+  constructor(message, detail = undefined) {
+    super('BUDGET_EXCEEDED', message, detail);
+    this.name = 'BudgetExceeded';
+  }
 }
 
 export const RECORD_KINDS = Object.freeze([
@@ -85,6 +93,7 @@ export class InMemoryVerifierStore {
     // store stamps telemetry with a fixed epoch unless a clock is injected.
     this.clock = clock ?? (() => '1970-01-01T00:00:00.000Z');
     this.records = new Map();   // kind -> Map(id -> record)
+    this.recordMeta = new Map(); // kind -> Map(id -> { workspaceId, acl })
     this.ledger = new Map();    // `${workspaceId}\u0000${operationId}` -> entry
     this.idempotency = new Map(); // idempotencyKey -> ledgerKey
     this.outbox = [];
@@ -105,13 +114,18 @@ export class InMemoryVerifierStore {
     return `${workspaceId}\u0000${operationId}`;
   }
 
-  #putRecord(kind, record, workspaceId, written) {
+  #putRecord(kind, record, workspaceId, written, acl = undefined) {
     const id = recordIdOf(kind, record);
     if (typeof id !== 'string' || id.length === 0) throw new NeedsInput(`${kind} record has no id`);
     let byId = this.records.get(kind);
     if (!byId) {
       byId = new Map();
       this.records.set(kind, byId);
+    }
+    let metaById = this.recordMeta.get(kind);
+    if (!metaById) {
+      metaById = new Map();
+      this.recordMeta.set(kind, metaById);
     }
     const existing = byId.get(id);
     if (existing) {
@@ -121,8 +135,14 @@ export class InMemoryVerifierStore {
       return existing;
     }
     byId.set(id, record);
-    written.push(() => byId.delete(id));
-    void workspaceId;
+    // Store-level ACL metadata (review P1-3): the inherited strictest-of-
+    // inputs ACL is persisted OUTSIDE the contract payload, which stays
+    // byte-pure against the frozen schemas.
+    metaById.set(id, { workspaceId, ...(acl ? { acl } : {}) });
+    written.push(() => {
+      byId.delete(id);
+      metaById.delete(id);
+    });
     return record;
   }
 
@@ -177,7 +197,7 @@ export class InMemoryVerifierStore {
 
     const written = [];
     try {
-      for (const { kind, record } of records) this.#putRecord(kind, record, workspaceId, written);
+      for (const { kind, record, acl } of records) this.#putRecord(kind, record, workspaceId, written, acl);
       if (this.fault?.at === 'unknown-commit') {
         // Crash simulation: the commit landed but the outcome is unknown to
         // the caller. Recovery records RECONCILIATION_REQUIRED; no outbox.
@@ -267,9 +287,63 @@ export class InMemoryVerifierStore {
     }
   }
 
-  async acceptExternalCall({ callId, fencingToken }) {
+  // Ownership gate (review P1-2d): every transition carries the acting
+  // principal; a foreign actor gets a typed denial WITHOUT any mutation.
+  #assertCallActor(call, actor) {
+    if (typeof actor !== 'string' || actor.length === 0) {
+      throw new NeedsInput(`external call ${call.call_id} transitions require the acting principal`);
+    }
+    if (call.actor !== actor) {
+      throw new AclDenied(`principal ${actor} does not own external call ${call.call_id} (reserved by ${call.actor})`);
+    }
+  }
+
+  #assertCallWorkspace(call, workspaceId) {
+    if (workspaceId !== undefined && workspaceId !== null && call.workspace_id !== workspaceId) {
+      throw new AclDenied(`external call ${call.call_id} is bound to workspace ${call.workspace_id}, not ${workspaceId}`);
+    }
+  }
+
+  #assertCallGrant(call, grant) {
+    if (grant === undefined || grant === null) return;
+    const binding = call.reservation?.grantBinding;
+    if (!binding) {
+      throw new VerifierError('GRANT_BINDING_MISSING', `external call ${call.call_id} carries no grant binding; finalize cannot accept a grant`);
+    }
+    if (canonicalDigest(grant) !== binding.grantDigest) {
+      throw new VerifierPolicyBlock(`finalize grant differs from the grant bound in the reservation of ${call.call_id}`);
+    }
+  }
+
+  // Settlement charge parsing (review P1-2e): the ONLY trusted charge field
+  // is a non-negative finite numeric `amount`. Anything else is uncertain
+  // billing and escalates to reconciliation — it never silently counts as
+  // zero (which would let attacker-chosen fields like `charge: 999` through).
+  #parseSettlementAmount(call, settlement) {
+    if (!settlement || typeof settlement !== 'object' || Array.isArray(settlement)) return { uncertain: true };
+    const amount = settlement.amount;
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount < 0) return { uncertain: true };
+    return { uncertain: false, amount };
+  }
+
+  #settledTotals(grantRef, operationId) {
+    let task = 0;
+    let campaign = 0;
+    for (const call of this.externalCalls.values()) {
+      if (call.state !== 'FINALIZED' || call.grant_ref !== grantRef) continue;
+      const amount = call.settlement?.amount;
+      if (typeof amount !== 'number' || !Number.isFinite(amount)) continue;
+      campaign += amount;
+      if (call.operation_id === operationId) task += amount;
+    }
+    return { task, campaign };
+  }
+
+  async acceptExternalCall({ callId, fencingToken, actor, workspaceId }) {
     const call = this.#externalCallOrThrow(callId);
     this.#assertFencing(call, fencingToken);
+    this.#assertCallActor(call, actor);
+    this.#assertCallWorkspace(call, workspaceId);
     if (call.state === 'ACCEPTED' || call.state === 'FINALIZED') {
       return { callId, state: call.state, fencingToken, replayed: true };
     }
@@ -281,9 +355,12 @@ export class InMemoryVerifierStore {
     return { callId, state: 'ACCEPTED', fencingToken, replayed: false };
   }
 
-  async finalizeExternalCall({ callId, fencingToken, responseDigest, settlement }) {
+  async finalizeExternalCall({ callId, fencingToken, actor, workspaceId, grant, responseDigest, settlement }) {
     const call = this.#externalCallOrThrow(callId);
     this.#assertFencing(call, fencingToken);
+    this.#assertCallActor(call, actor);
+    this.#assertCallWorkspace(call, workspaceId);
+    this.#assertCallGrant(call, grant);
     if (call.state === 'RECONCILIATION_REQUIRED') {
       throw new ReconciliationRequired(`external call ${callId} is in RECONCILIATION_REQUIRED; reconcile before any result`);
     }
@@ -299,6 +376,34 @@ export class InMemoryVerifierStore {
     if (typeof responseDigest !== 'string' || !HEX64.test(responseDigest)) {
       throw new NeedsInput('finalize requires the exact response digest');
     }
+    const { uncertain, amount } = this.#parseSettlementAmount(call, settlement);
+    if (uncertain) {
+      await this.markExternalCallReconciliation({
+        callId, fencingToken, actor,
+        reason: 'uncertain billing: settlement carries no parseable non-negative numeric `amount`',
+      });
+      throw new ReconciliationRequired(`external call ${callId} settlement amount is uncertain; escalated to reconciliation, never silently counted as zero`);
+    }
+    // Remaining-budget gate over the grant bound at reservation time: task
+    // and campaign scopes accumulate across the grant's finalized calls.
+    const binding = call.reservation?.grantBinding ?? null;
+    if (binding && binding.budget) {
+      const { task, campaign } = this.#settledTotals(call.grant_ref, call.operation_id);
+      if (task + amount > binding.budget.task || campaign + amount > binding.budget.campaign) {
+        await this.markExternalCallReconciliation({
+          callId, fencingToken, actor,
+          reason: `settlement ${amount} exceeds the remaining grant budget (task spent ${task}/${binding.budget.task}, campaign spent ${campaign}/${binding.budget.campaign})`,
+        });
+        throw new BudgetExceeded(`external call ${callId} settlement ${amount} exceeds the remaining budget of grant ${call.grant_ref}`);
+      }
+      if (binding.currency === 'none' && amount > 0) {
+        await this.markExternalCallReconciliation({
+          callId, fencingToken, actor,
+          reason: `no-charge grant settled a positive amount (${amount})`,
+        });
+        throw new BudgetExceeded(`external call ${callId} settled ${amount} under a no-charge (currency none) grant ${call.grant_ref}`);
+      }
+    }
     call.state = 'FINALIZED';
     call.response_digest = responseDigest;
     call.settlement = settlement ?? {};
@@ -306,9 +411,10 @@ export class InMemoryVerifierStore {
     return { callId, state: 'FINALIZED', fencingToken, replayed: false };
   }
 
-  async markExternalCallReconciliation({ callId, fencingToken, reason }) {
+  async markExternalCallReconciliation({ callId, fencingToken, actor, reason }) {
     const call = this.#externalCallOrThrow(callId);
     this.#assertFencing(call, fencingToken);
+    this.#assertCallActor(call, actor);
     if (call.state === 'FINALIZED') {
       throw new VerifierError('INVALID_TRANSITION', `finalized call ${callId} cannot become RECONCILIATION_REQUIRED`);
     }
@@ -323,14 +429,37 @@ export class InMemoryVerifierStore {
 
   // ---- reads ---------------------------------------------------------------
 
-  getRecord(kind, id) {
-    return this.records.get(kind)?.get(id) ?? null;
+  // Workspace-scoped read (review P1-3): with { workspaceId }, a record that
+  // exists but lives in another workspace is a typed AclDenied — never a
+  // silent null. The two-argument form stays the raw persistence primitive
+  // (used by internal tooling, not by the ACL-enforced read API).
+  getRecord(kind, id, { workspaceId } = {}) {
+    const record = this.records.get(kind)?.get(id) ?? null;
+    if (record === null || workspaceId === undefined) return record;
+    const meta = this.recordMeta.get(kind)?.get(id);
+    if (meta && meta.workspaceId !== workspaceId) {
+      throw new AclDenied(`${kind} record ${id} exists but belongs to workspace ${meta.workspaceId}, not ${workspaceId}`);
+    }
+    return record;
   }
 
+  // Store-level ACL metadata accessor (never part of the contract payload).
+  getRecordAcl(kind, id) {
+    return this.recordMeta.get(kind)?.get(id)?.acl ?? null;
+  }
+
+  // Strictly workspace-scoped listing (review P1-3): a missing workspace is
+  // a loud NEEDS_INPUT — a global listing across tenants can never happen.
   listCalibrationReports(filter = {}) {
-    const all = [...(this.records.get('calibration_report')?.values() ?? [])];
-    if (filter.corpusVersion !== undefined) {
-      return all.filter((report) => report.corpusVersion === filter.corpusVersion);
+    if (!filter || typeof filter.workspaceId !== 'string' || filter.workspaceId.length === 0) {
+      throw new NeedsInput('listCalibrationReports requires a workspaceId; un-scoped listing is refused');
+    }
+    const all = [];
+    for (const [id, record] of this.records.get('calibration_report') ?? []) {
+      const meta = this.recordMeta.get('calibration_report')?.get(id);
+      if (meta?.workspaceId !== filter.workspaceId) continue;
+      if (filter.corpusVersion !== undefined && record.corpusVersion !== filter.corpusVersion) continue;
+      all.push(record);
     }
     return all;
   }
@@ -581,14 +710,43 @@ export class PostgresVerifierStore {
   async #callOrThrow(client, callId) {
     const row = await this.#one(
       client,
-      'SELECT call_id, workspace_id, actor, grant_ref, operation_id, state, fencing_token, response_digest, settlement, reconcile_reason FROM verifier_external_call_run WHERE call_id = $1',
+      'SELECT call_id, workspace_id, actor, grant_ref, operation_id, state, fencing_token, reservation, response_digest, settlement, reconcile_reason FROM verifier_external_call_run WHERE call_id = $1',
       [callId],
     );
     if (!row) throw new NeedsInput(`unknown external call: ${callId}`);
     return row;
   }
 
-  async #transition({ callId, fencingToken, fromStates, toState, extraSets = undefined, params = [], eventType = null }) {
+  // Ownership/workspace/grant gates shared with the in-memory implementation
+  // (review P1-2c/d): every transition carries the acting principal; the
+  // reservation freezes the grant binding; a foreign actor mutates nothing.
+  #assertCallActor(call, actor) {
+    if (typeof actor !== 'string' || actor.length === 0) {
+      throw new NeedsInput(`external call ${call.call_id} transitions require the acting principal`);
+    }
+    if (call.actor !== actor) {
+      throw new AclDenied(`principal ${actor} does not own external call ${call.call_id} (reserved by ${call.actor})`);
+    }
+  }
+
+  #assertCallWorkspace(call, workspaceId) {
+    if (workspaceId !== undefined && workspaceId !== null && call.workspace_id !== workspaceId) {
+      throw new AclDenied(`external call ${call.call_id} is bound to workspace ${call.workspace_id}, not ${workspaceId}`);
+    }
+  }
+
+  #assertCallGrant(call, grant) {
+    if (grant === undefined || grant === null) return;
+    const binding = call.reservation?.grantBinding;
+    if (!binding) {
+      throw new VerifierError('GRANT_BINDING_MISSING', `external call ${call.call_id} carries no grant binding; finalize cannot accept a grant`);
+    }
+    if (canonicalDigest(grant) !== binding.grantDigest) {
+      throw new VerifierPolicyBlock(`finalize grant differs from the grant bound in the reservation of ${call.call_id}`);
+    }
+  }
+
+  async #transition({ callId, fencingToken, actor, workspaceId, fromStates, toState, extraSets = undefined, params = [], eventType = null }) {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
@@ -597,6 +755,8 @@ export class PostgresVerifierStore {
         await client.query('ROLLBACK');
         throw new AclDenied(`fencing token ${String(fencingToken)} is stale for call ${callId} (current: ${call.fencing_token})`);
       }
+      this.#assertCallActor(call, actor);
+      this.#assertCallWorkspace(call, workspaceId);
       if (call.state === toState && fromStates.includes(call.state)) {
         await client.query('ROLLBACK');
         return { callId, state: call.state, fencingToken, replayed: true };
@@ -630,11 +790,25 @@ export class PostgresVerifierStore {
     }
   }
 
-  async acceptExternalCall({ callId, fencingToken }) {
-    return this.#transition({ callId, fencingToken, fromStates: ['RESERVED'], toState: 'ACCEPTED', eventType: 'EXTERNAL_CALL_ACCEPTED' });
+  async acceptExternalCall({ callId, fencingToken, actor, workspaceId }) {
+    return this.#transition({ callId, fencingToken, actor, workspaceId, fromStates: ['RESERVED'], toState: 'ACCEPTED', eventType: 'EXTERNAL_CALL_ACCEPTED' });
   }
 
-  async finalizeExternalCall({ callId, fencingToken, responseDigest, settlement }) {
+  async #settledTotals(client, grantRef, operationId) {
+    const campaign = await this.#one(
+      client,
+      "SELECT COALESCE(SUM((settlement->>'amount')::float8), 0) AS total FROM verifier_external_call_run WHERE grant_ref = $1 AND state = 'FINALIZED'",
+      [grantRef],
+    );
+    const task = await this.#one(
+      client,
+      "SELECT COALESCE(SUM((settlement->>'amount')::float8), 0) AS total FROM verifier_external_call_run WHERE grant_ref = $1 AND operation_id = $2 AND state = 'FINALIZED'",
+      [grantRef, operationId],
+    );
+    return { task: Number(task?.total ?? 0), campaign: Number(campaign?.total ?? 0) };
+  }
+
+  async finalizeExternalCall({ callId, fencingToken, actor, workspaceId, grant, responseDigest, settlement }) {
     if (typeof responseDigest !== 'string' || !HEX64.test(responseDigest)) {
       throw new NeedsInput('finalize requires the exact response digest');
     }
@@ -647,6 +821,9 @@ export class PostgresVerifierStore {
         await client.query('ROLLBACK');
         throw new AclDenied(`fencing token ${String(fencingToken)} is stale for call ${callId} (current: ${call.fencing_token})`);
       }
+      this.#assertCallActor(call, actor);
+      this.#assertCallWorkspace(call, workspaceId);
+      this.#assertCallGrant(call, grant);
       if (call.state === 'FINALIZED') {
         await client.query('ROLLBACK');
         if (call.response_digest !== responseDigest || canonicalDigest(call.settlement ?? {}) !== canonicalDigest(settlement ?? {})) {
@@ -661,6 +838,36 @@ export class PostgresVerifierStore {
       if (call.state !== 'ACCEPTED') {
         await client.query('ROLLBACK');
         throw new VerifierError('INVALID_TRANSITION', `external call ${callId} cannot be finalized from state ${call.state}`);
+      }
+      const amount = settlement?.amount;
+      if (!settlement || typeof settlement !== 'object' || Array.isArray(settlement) ||
+          typeof amount !== 'number' || !Number.isFinite(amount) || amount < 0) {
+        await client.query('COMMIT');
+        await this.markExternalCallReconciliation({
+          callId, fencingToken, actor,
+          reason: 'uncertain billing: settlement carries no parseable non-negative numeric `amount`',
+        });
+        throw new ReconciliationRequired(`external call ${callId} settlement amount is uncertain; escalated to reconciliation, never silently counted as zero`);
+      }
+      const binding = call.reservation?.grantBinding ?? null;
+      if (binding && binding.budget) {
+        const { task, campaign } = await this.#settledTotals(client, call.grant_ref, call.operation_id);
+        if (task + amount > binding.budget.task || campaign + amount > binding.budget.campaign) {
+          await client.query('COMMIT');
+          await this.markExternalCallReconciliation({
+            callId, fencingToken, actor,
+            reason: `settlement ${amount} exceeds the remaining grant budget (task spent ${task}/${binding.budget.task}, campaign spent ${campaign}/${binding.budget.campaign})`,
+          });
+          throw new BudgetExceeded(`external call ${callId} settlement ${amount} exceeds the remaining budget of grant ${call.grant_ref}`);
+        }
+        if (binding.currency === 'none' && amount > 0) {
+          await client.query('COMMIT');
+          await this.markExternalCallReconciliation({
+            callId, fencingToken, actor,
+            reason: `no-charge grant settled a positive amount (${amount})`,
+          });
+          throw new BudgetExceeded(`external call ${callId} settled ${amount} under a no-charge (currency none) grant ${call.grant_ref}`);
+        }
       }
       await client.query(
         `UPDATE verifier_external_call_run
@@ -683,7 +890,7 @@ export class PostgresVerifierStore {
     }
   }
 
-  async markExternalCallReconciliation({ callId, fencingToken, reason }) {
+  async markExternalCallReconciliation({ callId, fencingToken, actor, reason }) {
     const reconcileReason = String(reason ?? 'unknown outcome').slice(0, 1024);
     const client = await this.pool.connect();
     try {
@@ -693,6 +900,7 @@ export class PostgresVerifierStore {
         await client.query('ROLLBACK');
         throw new AclDenied(`fencing token ${String(fencingToken)} is stale for call ${callId} (current: ${call.fencing_token})`);
       }
+      this.#assertCallActor(call, actor);
       if (call.state === 'FINALIZED') {
         await client.query('ROLLBACK');
         throw new VerifierError('INVALID_TRANSITION', `finalized call ${callId} cannot become RECONCILIATION_REQUIRED`);
@@ -722,22 +930,43 @@ export class PostgresVerifierStore {
     }
   }
 
-  async getRecord(kind, id) {
+  // Workspace-scoped read (review P1-3): same semantics as the in-memory
+  // implementation — a cross-workspace hit is a typed AclDenied, not null.
+  async getRecord(kind, id, { workspaceId } = {}) {
     const spec = RECORD_SPECS[kind];
     if (!spec) throw new VerifierError('RECORD_KIND_UNKNOWN', `unknown verifier record kind: ${kind}`);
-    const row = await this.#one(this.pool, `SELECT payload FROM ${spec.table} WHERE ${spec.pk} = $1`, [id]);
-    return row ? row.payload : null;
+    const row = await this.#one(this.pool, `SELECT payload, workspace_id FROM ${spec.table} WHERE ${spec.pk} = $1`, [id]);
+    if (!row) return null;
+    if (workspaceId !== undefined && row.workspace_id !== workspaceId) {
+      throw new AclDenied(`${kind} record ${id} exists but belongs to workspace ${row.workspace_id}, not ${workspaceId}`);
+    }
+    return row.payload;
+  }
+
+  // Interface parity with the in-memory store: until a new migration adds an
+  // acl column, PostgreSQL enforces the workspace binding (workspace_id) but
+  // has no place for strictest-of-inputs visibility metadata.
+  async getRecordAcl(kind, id) {
+    void kind;
+    void id;
+    return null;
   }
 
   async listCalibrationReports(filter = {}) {
+    if (!filter || typeof filter.workspaceId !== 'string' || filter.workspaceId.length === 0) {
+      throw new NeedsInput('listCalibrationReports requires a workspaceId; un-scoped listing is refused');
+    }
     if (filter.corpusVersion !== undefined) {
       const res = await this.pool.query(
-        'SELECT payload FROM verifier_calibration_report WHERE payload->>\'corpusVersion\' = $1 ORDER BY report_id',
-        [filter.corpusVersion],
+        'SELECT payload FROM verifier_calibration_report WHERE workspace_id = $1 AND corpus_version = $2 ORDER BY report_id',
+        [filter.workspaceId, filter.corpusVersion],
       );
       return res.rows.map((row) => row.payload);
     }
-    const res = await this.pool.query('SELECT payload FROM verifier_calibration_report ORDER BY report_id');
+    const res = await this.pool.query(
+      'SELECT payload FROM verifier_calibration_report WHERE workspace_id = $1 ORDER BY report_id',
+      [filter.workspaceId],
+    );
     return res.rows.map((row) => row.payload);
   }
 
