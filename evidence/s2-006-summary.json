@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "verification aggregator: dependency gate, contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + probes), DB replay status and §16 verdict",
-  "testedImplementationCommit": "465e04bd4f19a35df71fb0ab5d9fb68cfb0c3bfe",
+  "testedImplementationCommit": "73c124e4776a0eb89925112980d15f5c8535e8aa",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
   "gates": {
     "dependency": {
