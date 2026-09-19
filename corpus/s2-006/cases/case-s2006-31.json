@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-31",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-31",
+    "semanticTemplate": "template-31",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-31",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "9dcc47f447f58432c6c40ed3020836b213bf461ce2c03d5ead2ed4778980d5dc",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "f3b9e86ba74d32ab4da08d5e2e4c34e4449935f9ffd792ae49884718ffac99a3"
+  },
+  "scenario": {
+    "category": "ambiguous",
+    "statement": "The congestion charge reduced delays in Gothenburg in 2023.",
+    "supportingSpans": [
+      {
+        "text": "The congestion charge reduced delays in Stockholm in 2023.",
+        "sourceFamily": "fixture-family-31",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ]
+    }
+  }
+}

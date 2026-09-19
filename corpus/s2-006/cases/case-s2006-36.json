@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-36",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-36",
+    "semanticTemplate": "template-36",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-36",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "49349b6a867cf97031e7f60a2b90dd80cd863d1105725c219cb33d55df8350f0",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "dceeac936829c209eaa7ae39646145945f830c757007aa4a6c64769ba56fb65d"
+  },
+  "scenario": {
+    "category": "future",
+    "statement": "The December 2026 forecast projects a 3% GDP uptick.",
+    "supportingSpans": [
+      {
+        "text": "The December 2026 forecast projects a 3% GDP uptick.",
+        "sourceFamily": "fixture-family-36",
+        "status": "future",
+        "publishedAt": "2026-09-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "future_source"
+      ]
+    }
+  }
+}

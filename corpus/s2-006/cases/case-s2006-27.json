@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-27",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-27",
+    "semanticTemplate": "template-27",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-27",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "c0d2feb74207e4eb7d906c185a0dd397e85eb8da8904ce7e9da5c57e9a5cced8",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "1a9ea70835505c3be41acc814cb8b9aafbd2553489f90f23854314c6784443be"
+  },
+  "scenario": {
+    "category": "negation",
+    "statement": "The speed cameras did not reduce accidents in 2023.",
+    "supportingSpans": [
+      {
+        "text": "The speed cameras reduced accidents in 2023.",
+        "sourceFamily": "fixture-family-27",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "negation_drift"
+      ]
+    }
+  }
+}

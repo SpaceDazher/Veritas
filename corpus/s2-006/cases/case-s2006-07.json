@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-07",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-07",
+    "semanticTemplate": "template-07",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-07",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "6e8647e853ae7ca4616249c8f9c480c314a550563f0bd7596ab946407b0ff2b9",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "5d5430d2433e3fa02086c0d58307a4257e73ae5feee5dded066266d54b7cc543"
+  },
+  "scenario": {
+    "category": "ambiguous",
+    "statement": "Congestion pricing reduced delays in Oslo in 2023.",
+    "supportingSpans": [
+      {
+        "text": "Congestion pricing reduced delays in Stockholm in 2023.",
+        "sourceFamily": "fixture-family-07",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ]
+    }
+  }
+}

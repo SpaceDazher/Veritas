@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-44",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-44",
+    "semanticTemplate": "template-44",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-44",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "b7ff8f05909a78c1e33aac63d59f6e4c8532270b6ee09ba65acea6e63c66541d",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "ea00ba8b5d2d1dbedd56211c4439ddc8578eb00a3569dff80cf578f12406f443"
+  },
+  "scenario": {
+    "category": "novelty",
+    "statement": "Our method is the first worldwide to cut bus dwell times by 20%.",
+    "supportingSpans": [
+      {
+        "text": "A 2024 pilot in Curitiba cut bus dwell times by 20%.",
+        "sourceFamily": "fixture-family-44",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "noveltyClaim": {
+      "scope": "worldwide",
+      "priorArtInSelectedCorpus": true
+    },
+    "expected": {
+      "verdict": "OUT_OF_SCOPE",
+      "reasonCodes": [
+        "out_of_scope"
+      ]
+    }
+  }
+}

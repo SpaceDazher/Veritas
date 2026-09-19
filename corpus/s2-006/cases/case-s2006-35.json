@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-35",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-35",
+    "semanticTemplate": "template-35",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-35",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "fb4b6e69009714dc10780ea7ab0d908ff20d5b6c41eabfa907d4fa93a787ac8e",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "3f742463c137b3ba41e05ade8d731a6703c6a43a9a29886bf11948f3b402e377"
+  },
+  "scenario": {
+    "category": "stale",
+    "statement": "The annual air quality report shows 41 exceedance days as of 2025.",
+    "supportingSpans": [
+      {
+        "text": "The annual air quality report shows 41 exceedance days.",
+        "sourceFamily": "fixture-family-35",
+        "status": "stale",
+        "publishedAt": "2020-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ]
+    }
+  }
+}

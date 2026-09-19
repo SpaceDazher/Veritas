@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-19",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-19",
+    "semanticTemplate": "template-19",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-19",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "0982d54790a9cb6beafa60dc8d9239d9fdeee908876b8f4309f6b28e34deec29",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "b4ec4a715ec2e9d6b144b0be9906d5c4384f49ce8cf8c0c02bd155c1b2b8bfc1"
+  },
+  "scenario": {
+    "category": "causal",
+    "statement": "Remote work causes productivity gains in software teams.",
+    "supportingSpans": [
+      {
+        "text": "Remote work is associated with self-reported productivity gains among software teams in a 2022 survey.",
+        "sourceFamily": "fixture-family-19",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": true,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "causal_overclaim"
+      ]
+    }
+  }
+}

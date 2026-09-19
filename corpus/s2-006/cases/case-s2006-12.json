@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-12",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-12",
+    "semanticTemplate": "template-12",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-12",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "5e7a6d4c35e3ad0b6f4b9827dc8fffb18fe68aec66b3a00038287af2ebc29127",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "47551ddbe34d83a2e9d509d0d33198e1f8770bc9ef95fd019c07f00e284f2a2a"
+  },
+  "scenario": {
+    "category": "contradictory",
+    "statement": "The minimum wage raise reduced employment by 3% in Germany in 2023.",
+    "supportingSpans": [
+      {
+        "text": "The minimum wage raise reduced employment by 3% in Germany in 2023.",
+        "sourceFamily": "fixture-family-12",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [
+      {
+        "text": "The minimum wage raise did not reduce employment in Germany in 2023.",
+        "sourceFamily": "fixture-family-12",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public",
+        "structured": {
+          "subject": "minimum wage raise",
+          "object": "employment",
+          "population": "",
+          "geography": "Germany",
+          "period": {
+            "start": "2023-01-01",
+            "end": "2023-12-31"
+          },
+          "units": "%",
+          "polarity": false,
+          "value_range": null,
+          "normalized_text": "The minimum wage raise did not reduce employment in Germany in 2023."
+        }
+      }
+    ],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "statementStructured": {
+      "subject": "minimum wage raise",
+      "object": "employment",
+      "population": "",
+      "geography": "Germany",
+      "period": {
+        "start": "2023-01-01",
+        "end": "2023-12-31"
+      },
+      "units": "%",
+      "polarity": true,
+      "value_range": null,
+      "normalized_text": "The minimum wage raise reduced employment by 3% in Germany in 2023."
+    },
+    "expected": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": []
+    }
+  }
+}

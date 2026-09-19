@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-11",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-11",
+    "semanticTemplate": "template-11",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-11",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "b86ce76f42fcdb3f99f0cbf6630c6adbeb42842d1a893aee00ea392333bff76c",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "b1301dfaf3f4af373ea60294251cbc52fda66f7984b124af250f20e85a97fd29"
+  },
+  "scenario": {
+    "category": "positive",
+    "statement": "The heat pump subsidy raised heat pump sales by 22% in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The heat pump subsidy raised heat pump sales by 22% in 2024.",
+        "sourceFamily": "fixture-family-11",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

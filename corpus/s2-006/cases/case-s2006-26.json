@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-26",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-26",
+    "semanticTemplate": "template-26",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-26",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "f6f78f01dac35257840c39e4310730e8338a675e332115ef3c4e1b7eab840dec",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "5a915982a215df2ceee9e26fba29a1135a928fe5911dfe4e6905df4b3ab477d3"
+  },
+  "scenario": {
+    "category": "unit",
+    "statement": "The drought lasted 14 months in Kenya in 2022.",
+    "supportingSpans": [
+      {
+        "text": "The drought lasted 14 weeks in Kenya in 2022.",
+        "sourceFamily": "fixture-family-26",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ]
+    }
+  }
+}

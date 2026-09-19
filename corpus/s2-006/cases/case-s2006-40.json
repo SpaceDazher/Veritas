@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-40",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-40",
+    "semanticTemplate": "template-40",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-40",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "3a7986e68dad57dcf2c4318c2418d39d8ab0fae03930e953d262cc80d20991a6",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "5e12ce7d72ff6c559598e434f4c65bca3aea44c6fc4529d925a890e01de1d232"
+  },
+  "scenario": {
+    "category": "causal",
+    "statement": "Night-shift work causes metabolic syndrome in nurses.",
+    "supportingSpans": [
+      {
+        "text": "Night-shift work is associated with higher rates of metabolic syndrome among nurses in a 2021 cohort.",
+        "sourceFamily": "fixture-family-40",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": true,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "causal_overclaim"
+      ]
+    }
+  }
+}

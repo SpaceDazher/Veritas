@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-06",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-06",
+    "semanticTemplate": "template-06",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-06",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "908da8e47880c8b800e2fa2c3643a40bdb569863c9faf5c07d3b3d0af449c2ff",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "13a02bed2ab82f7c59f22ae0fcccfadcc8a4024d27707c4b9b32b57315c807aa"
+  },
+  "scenario": {
+    "category": "modality",
+    "statement": "The reform definitely reduced waiting times in 2023.",
+    "supportingSpans": [
+      {
+        "text": "The reform may have reduced waiting times in 2023.",
+        "sourceFamily": "fixture-family-06",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "modality_drift"
+      ]
+    }
+  }
+}

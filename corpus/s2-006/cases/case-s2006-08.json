@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-08",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-08",
+    "semanticTemplate": "template-08",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-08",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "1ee124d88b095ba784fea1dd3a5a8917264db99572bb738c4aabd8aa72252aa2",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "4c84472e76790f48f9596597e39217b8c04672e70500e8957841779689e59242"
+  },
+  "scenario": {
+    "category": "missing_source",
+    "statement": "The 2024 meta-analysis found a 9% reduction in pipe leaks.",
+    "supportingSpans": [
+      {
+        "text": null,
+        "sourceFamily": "fixture-family-08",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public",
+        "unavailable": true
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "source_unavailable"
+    }
+  }
+}

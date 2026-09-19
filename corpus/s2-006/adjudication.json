@@ -1,0 +1,170 @@
+[
+  {
+    "contractVersion": "1.0.0",
+    "adjudicationId": "adj-s2006-01",
+    "caseId": "case-s2006-05",
+    "annotationSetIds": [
+      "ans-s2006-a-dev",
+      "ans-s2006-b-dev"
+    ],
+    "conflictingLabels": [
+      {
+        "annotationSetId": "ans-s2006-a-dev",
+        "annotatorId": "prn-annotator-a",
+        "label": "INSUFFICIENT_EVIDENCE",
+        "labelDigest": "6e0b37e0a23ef2702958c819f54fdae3d54629823b6777781edcddaab7e7dda7"
+      },
+      {
+        "annotationSetId": "ans-s2006-b-dev",
+        "annotatorId": "prn-annotator-b",
+        "label": "SUPPORTED",
+        "labelDigest": "eefd8ac019201ac842927ba5de044703bb0d2adaaeda98cf6d3db2b961d6e0d6"
+      }
+    ],
+    "retainedRawLabels": [
+      {
+        "annotationSetId": "ans-s2006-a-dev",
+        "annotatorId": "prn-annotator-a",
+        "label": "INSUFFICIENT_EVIDENCE",
+        "labelDigest": "6e0b37e0a23ef2702958c819f54fdae3d54629823b6777781edcddaab7e7dda7"
+      },
+      {
+        "annotationSetId": "ans-s2006-b-dev",
+        "annotatorId": "prn-annotator-b",
+        "label": "SUPPORTED",
+        "labelDigest": "eefd8ac019201ac842927ba5de044703bb0d2adaaeda98cf6d3db2b961d6e0d6"
+      }
+    ],
+    "decision": "INSUFFICIENT_EVIDENCE",
+    "rationale": "Annotator B missed the negation drift: the cited span asserts the opposite polarity of the statement, so the statement is not supported. Both raw votes are retained.",
+    "adjudicatorIdentity": {
+      "principalId": "prn-adjudicator-1",
+      "role": "adjudicator",
+      "authenticated": true,
+      "attestationDigest": "48906cbed236af3a10b7ca1901fff4922ccbc314fc6226c493e9198a9d4ef455"
+    },
+    "versions": {
+      "corpusVersion": "1.0.0",
+      "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+      "annotationManifestDigest": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+      "thresholdsDigest": "863740bcc2c531d800e9b08b42d18e1689187f13bbb2cd9fb2c9afecabb0eff1"
+    },
+    "auditRef": {
+      "auditEntryId": "audit-s2006-adj-01",
+      "auditDigest": "7ea55dc890ad67e82039baac5d674bd960c624318405c24d51a0787a760326a0"
+    },
+    "createdAt": "2026-03-22T00:00:00.000Z"
+  },
+  {
+    "contractVersion": "1.0.0",
+    "adjudicationId": "adj-s2006-02",
+    "caseId": "case-s2006-16",
+    "annotationSetIds": [
+      "ans-s2006-a-calibration",
+      "ans-s2006-b-calibration"
+    ],
+    "conflictingLabels": [
+      {
+        "annotationSetId": "ans-s2006-a-calibration",
+        "annotatorId": "prn-annotator-a",
+        "label": "STALE_INPUT",
+        "labelDigest": "b0dab5fea8a0b600196d819ff519841bd1415bf791ca7b1759e302195d6a78c5"
+      },
+      {
+        "annotationSetId": "ans-s2006-b-calibration",
+        "annotatorId": "prn-annotator-b",
+        "label": "SUPPORTED",
+        "labelDigest": "565fdab8158900b618c2ee4eef2ceabc2288ff5c1e1480cdf66e3c39c5ed6244"
+      }
+    ],
+    "retainedRawLabels": [
+      {
+        "annotationSetId": "ans-s2006-a-calibration",
+        "annotatorId": "prn-annotator-a",
+        "label": "STALE_INPUT",
+        "labelDigest": "b0dab5fea8a0b600196d819ff519841bd1415bf791ca7b1759e302195d6a78c5"
+      },
+      {
+        "annotationSetId": "ans-s2006-b-calibration",
+        "annotatorId": "prn-annotator-b",
+        "label": "SUPPORTED",
+        "labelDigest": "565fdab8158900b618c2ee4eef2ceabc2288ff5c1e1480cdf66e3c39c5ed6244"
+      }
+    ],
+    "decision": "STALE_INPUT",
+    "rationale": "Annotator B ignored the post-as_of publication date: the cited source postdates the as-of boundary, so the dependent verdict is stale input. Both raw votes are retained.",
+    "adjudicatorIdentity": {
+      "principalId": "prn-adjudicator-1",
+      "role": "adjudicator",
+      "authenticated": true,
+      "attestationDigest": "e91dedca1823b167bdcb80c04ebfe1e31906f6195860f7331501339c79c45723"
+    },
+    "versions": {
+      "corpusVersion": "1.0.0",
+      "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+      "annotationManifestDigest": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+      "thresholdsDigest": "863740bcc2c531d800e9b08b42d18e1689187f13bbb2cd9fb2c9afecabb0eff1"
+    },
+    "auditRef": {
+      "auditEntryId": "audit-s2006-adj-02",
+      "auditDigest": "dcfcfae0dc5211be19b72bd247c1ab892e916ccd305bfd7bbb3eda8bd6224d11"
+    },
+    "createdAt": "2026-03-22T00:00:00.000Z"
+  },
+  {
+    "contractVersion": "1.0.0",
+    "adjudicationId": "adj-s2006-03",
+    "caseId": "case-s2006-27",
+    "annotationSetIds": [
+      "ans-s2006-a-locked",
+      "ans-s2006-b-locked"
+    ],
+    "conflictingLabels": [
+      {
+        "annotationSetId": "ans-s2006-a-locked",
+        "annotatorId": "prn-annotator-a",
+        "label": "INSUFFICIENT_EVIDENCE",
+        "labelDigest": "c961e8efab56203c0f091b4032e8a5b18cb2c5e2800d3d2b3ef7e928b9ee6cb4"
+      },
+      {
+        "annotationSetId": "ans-s2006-b-locked",
+        "annotatorId": "prn-annotator-b",
+        "label": "PARTIALLY_SUPPORTED",
+        "labelDigest": "254e3ce4e48667579b2d5544592602e899fd670786b60a15643949b7d656ec8e"
+      }
+    ],
+    "retainedRawLabels": [
+      {
+        "annotationSetId": "ans-s2006-a-locked",
+        "annotatorId": "prn-annotator-a",
+        "label": "INSUFFICIENT_EVIDENCE",
+        "labelDigest": "c961e8efab56203c0f091b4032e8a5b18cb2c5e2800d3d2b3ef7e928b9ee6cb4"
+      },
+      {
+        "annotationSetId": "ans-s2006-b-locked",
+        "annotatorId": "prn-annotator-b",
+        "label": "PARTIALLY_SUPPORTED",
+        "labelDigest": "254e3ce4e48667579b2d5544592602e899fd670786b60a15643949b7d656ec8e"
+      }
+    ],
+    "decision": "INSUFFICIENT_EVIDENCE",
+    "rationale": "Annotator B read the polarity flip as partial support: the cited span contradicts the statement polarity with compatible scope, which yields insufficient evidence with negation drift, not partial support. Both raw votes are retained.",
+    "adjudicatorIdentity": {
+      "principalId": "prn-adjudicator-1",
+      "role": "adjudicator",
+      "authenticated": true,
+      "attestationDigest": "c2be3802d07dd579d0a4837ee66bfd56e5d4f84f0158ef5d2de0500b80853456"
+    },
+    "versions": {
+      "corpusVersion": "1.0.0",
+      "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+      "annotationManifestDigest": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+      "thresholdsDigest": "863740bcc2c531d800e9b08b42d18e1689187f13bbb2cd9fb2c9afecabb0eff1"
+    },
+    "auditRef": {
+      "auditEntryId": "audit-s2006-adj-03",
+      "auditDigest": "0dc08dcf4a2dd3eb3b188245a3839223dff7407c293858697afb0d8613b0f270"
+    },
+    "createdAt": "2026-03-22T00:00:00.000Z"
+  }
+]

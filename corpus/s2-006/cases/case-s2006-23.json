@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-23",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-23",
+    "semanticTemplate": "template-23",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-23",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "46548dcb449e8cc42d251210b3e4123e963e4e9c9a69c2d7af0b7674a3367b1b",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "a4b0c750c712bd35f35ed097149e56fd359a510f75e4f119a4445c7586f6bac3"
+  },
+  "scenario": {
+    "category": "positive",
+    "statement": "The bike lane network increased cycling by 18% in Paris in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The bike lane network increased cycling by 18% in Paris in 2024.",
+        "sourceFamily": "fixture-family-23",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

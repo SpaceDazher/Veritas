@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-25",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-25",
+    "semanticTemplate": "template-25",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-25",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "97e35a263a1acef295f324c2374500ae48ba76e9653c0b9870ea79d82f851e4e",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "5c1537de43309e1f73b1c1c491ade2d634dbe2cd71989a4623ab6c5f041042f8"
+  },
+  "scenario": {
+    "category": "numeric",
+    "statement": "The vaccine reached 85% coverage in Finland in 2023.",
+    "supportingSpans": [
+      {
+        "text": "The vaccine reached 58% coverage in Finland in 2023.",
+        "sourceFamily": "fixture-family-25",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ]
+    }
+  }
+}

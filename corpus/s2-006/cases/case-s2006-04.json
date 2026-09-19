@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-04",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-04",
+    "semanticTemplate": "template-04",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-04",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "6729e2e928c3d49c87aff1a8e43decb469cb6b18da738a581dde98b3b51805a1",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "a880794d304eca4ed1ddf7ff5dffbd1a68da98435496718087c0cf42026e507b"
+  },
+  "scenario": {
+    "category": "unit",
+    "statement": "The training program lasted 12 weeks for 300 adults in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The training program lasted 12 months for 300 adults in 2024.",
+        "sourceFamily": "fixture-family-04",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ]
+    }
+  }
+}

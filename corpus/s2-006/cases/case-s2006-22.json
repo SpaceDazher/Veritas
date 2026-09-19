@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-22",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-22",
+    "semanticTemplate": "template-22",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-22",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "8a7bc8ce9b8048de57f26e7ab72a4dc983f87dfc0c52ea92434fcf2659a378cd",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "998030fdeb9801ad225a9814751c5c41a2a10d638420c42f63b258d75ae12c89"
+  },
+  "scenario": {
+    "category": "abstention",
+    "statement": "The 2026 water tariff reform improved conservation.",
+    "supportingSpans": [],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ]
+    }
+  }
+}

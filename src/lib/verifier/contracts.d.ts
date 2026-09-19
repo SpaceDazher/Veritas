@@ -432,6 +432,10 @@ export interface AnnotationManifest {
     labelsSha256: AnnotationManifestSha256Hex;
   }>;
   frozenAt: AnnotationManifestUtcTimestamp;
+  externalStratum?: {
+    status: "NEEDS_INPUT";
+    reason: string;
+  };
 }
 export type AnnotationManifestSha256Hex = string;
 export type AnnotationManifestUtcTimestamp = string;

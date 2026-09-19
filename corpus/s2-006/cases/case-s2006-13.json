@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-13",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-13",
+    "semanticTemplate": "template-13",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-13",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "e45fd94ba767ddcd6c9befd7988545f9be24fac35fdb73158dd3da8da8c3bb52",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "9cbe8e23c1ba5aae5ce733696d490341b64609b507baab2da88c212ec872877f"
+  },
+  "scenario": {
+    "category": "ambiguous",
+    "statement": "The housing subsidy benefited first-time buyers in Poland in 2023.",
+    "supportingSpans": [
+      {
+        "text": "The housing subsidy benefited first-time buyers in Portugal in 2023.",
+        "sourceFamily": "fixture-family-13",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ]
+    }
+  }
+}

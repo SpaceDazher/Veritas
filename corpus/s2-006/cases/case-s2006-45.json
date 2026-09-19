@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-45",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-45",
+    "semanticTemplate": "template-45",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-45",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "adb7e21ddd12d8072e372458aab0b2ae7dd4bc3d6d6310bb9b9d8a6378bfb9cb",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "272d705fe613af4f6f6e45afb5b111512bf0f97c0bd89c9251dc54c18369bed2"
+  },
+  "scenario": {
+    "category": "novelty",
+    "statement": "The 2025 pilot reported a 30% cut in CO2 on the Vaxholm route.",
+    "supportingSpans": [
+      {
+        "text": "The 2025 pilot reported a 30% cut in CO2 emissions on the Vaxholm ferry route.",
+        "sourceFamily": "fixture-family-45",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "noveltyClaim": {
+      "scope": "selected_corpus",
+      "priorArtInSelectedCorpus": false
+    },
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-05",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-05",
+    "semanticTemplate": "template-05",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-05",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "e7c32a30da79ee0132b074402f524f3eec7d211ae938d91f00c7ff1e77ada9c7",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "17992d263f7679e52a4fcf55006bd7afbb4d2afb9c3b91e918bcfd92c22ed95a"
+  },
+  "scenario": {
+    "category": "negation",
+    "statement": "The subsidy did not increase diesel sales in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The subsidy increased diesel sales in 2024.",
+        "sourceFamily": "fixture-family-05",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "negation_drift"
+      ]
+    }
+  }
+}

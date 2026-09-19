@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-33",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-33",
+    "semanticTemplate": "template-33",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-33",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "b8b61422d9c22d61d03b7c8f622cb7acbf9145fd0e2e5d64ef0e32ef27285393",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "b3e9574a5c7a92655351661c4c31ac2e8130b3549165aa9d19fea72790d0d0eb"
+  },
+  "scenario": {
+    "category": "missing_source",
+    "statement": "The 2025 inspector general report found 12 contract irregularities.",
+    "supportingSpans": [
+      {
+        "text": null,
+        "sourceFamily": "fixture-family-33",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public",
+        "unavailable": true
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "source_unavailable"
+    }
+  }
+}
