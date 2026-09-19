@@ -4,10 +4,12 @@ import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash, createHmac } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { canonicalDigest, canonicalize } from '../../src/lib/verifier/canonical-json.mjs';
+import { annotationSetBindingDigest, labelEntryDigest } from '../../src/lib/verifier/comparator.mjs';
+import { registerKey, verifyDetailed as verifySignatureDetailed } from '../../src/lib/verifier/signature.mjs';
 import {
   evaluateStatement,
   evaluateScenario,
@@ -20,8 +22,22 @@ import {
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const CORPUS = path.join(ROOT, 'corpus', 's2-006');
-const HMAC_KEY = 's2-006-fixture-hmac-key';
 const HEX64 = /^[0-9a-f]{64}$/;
+
+// Fixture custody keys (same material the corpus label sets were signed
+// with): each annotator holds exactly one key, registered under the
+// canonical kms://fixture keyRef. Verification goes through the shared
+// signature.mjs core — never a locally re-implemented MAC formula.
+const FIXTURE_KEY_REGISTRY = new Map();
+for (const annotator of ['prn-annotator-a', 'prn-annotator-b']) {
+  registerKey({
+    keyRef: `kms://fixture/s2-006/annotator/${annotator}`,
+    custodian: annotator,
+    role: 'annotator',
+    secret: 's2-006-fixture-hmac-key',
+    registry: FIXTURE_KEY_REGISTRY,
+  });
+}
 
 function compile(schemaNames) {
   const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -208,23 +224,22 @@ describe('S2-006 frozen label sets and adjudication', () => {
 
   test('raw label digests bind to exact label bytes; set signatures verify over the exact binding digest', () => {
     for (const set of Object.values(labelSets)) {
-      const labels = [...set.labels].sort((x, y) => x.caseId.localeCompare(y.caseId));
-      for (const l of labels) {
-        const digest = canonicalDigest({
-          annotationSetId: set.annotationSetId, annotatorId: l.annotatorId,
-          caseId: l.caseId, label: l.label, labeledAt: l.labeledAt,
-        });
-        assert.equal(l.labelDigest, digest, `${set.annotationSetId}/${l.caseId} label digest broken`);
+      for (const l of set.labels) {
+        // same 5-field binding the comparator enforces (annotationSetId +
+        // annotatorId + caseId + label + labeledAt)
+        assert.equal(l.labelDigest, labelEntryDigest({ annotationSetId: set.annotationSetId, annotatorId: l.annotatorId, caseId: l.caseId, label: l.label, labeledAt: l.labeledAt }), `${set.annotationSetId}/${l.caseId} label digest broken`);
       }
-      const binding = canonicalDigest({
-        annotationSetId: set.annotationSetId, split: set.split,
-        corpusVersion: set.corpusVersion, sourceDigest: set.sourceDigest,
-        rubricDigest: set.rubricDigest, labels,
-      });
-      const expected = createHmac('sha256', HMAC_KEY).update(binding, 'utf8').digest('hex');
-      assert.equal(set.signature.digest, expected, `${set.annotationSetId}: signature does not verify`);
+      const binding = annotationSetBindingDigest(set);
+      // the contract-shaped envelope ({scheme, keyRef, digest, verified,
+      // attestedBy}) is verified by the shared signature core over the exact
+      // binding digest: scheme, verified flag, attested subject = annotator
+      // of record, custody and the constant-time MAC comparison
+      const verdict = verifySignatureDetailed(set.signature, set.annotatorId, binding, { registry: FIXTURE_KEY_REGISTRY });
+      assert.equal(verdict.ok, true, `${set.annotationSetId}: signature does not verify (${verdict.reason})`);
       assert.equal(set.signature.scheme, 'hmac-sha256');
-      assert.match(set.signature.keyRef, /custody:\/\//);
+      assert.equal(set.signature.verified, true);
+      assert.equal(set.signature.attestedBy, set.annotatorId);
+      assert.match(set.signature.keyRef, /^kms:\/\/fixture\/s2-006\/annotator\//);
     }
   });
 

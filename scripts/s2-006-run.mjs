@@ -427,15 +427,25 @@ async function parentMode() {
   }
   written.push(writeEvidence('s2-006-calibration.json', calibrationRecord));
 
-  // 6. adversarial probes A–S (offline; probe S is declared NOT_RUN_DB)
+  // 6. adversarial probes A–S (offline; probe S is honestly NOT_RUN_DB here)
+  // Review P2-6: every probe carries an honest status pass|failed|not_run and
+  // NOT_RUN among the mandatory A–S set is NOT green. Probe S turns green
+  // only through the PostgreSQL crash/restart phase of verify:s2-006-db-replay
+  // (combined by the verify-s2-006 aggregator). A FAILED probe still violates
+  // the run; a NOT_RUN probe leaves the run green but the probes gate
+  // honestly incomplete.
   const probeSuite = await runAllSecurityProbes();
-  const probesOk = probeSuite.totals.failed === 0 && probeSuite.hardCounters.total === 0;
-  if (!probesOk) violations.push('PROBES_A_TO_S');
+  const probeFailures = probeSuite.probes.filter((p) => p.status === 'failed');
+  const probesGreen = probeFailures.length === 0 && probeSuite.hardCounters.total === 0 && probeSuite.totals.not_run === 0;
+  if (probeFailures.length > 0 || probeSuite.hardCounters.total > 0) violations.push('PROBES_A_TO_S');
   const probesRecord = {
     schemaVersion: 1,
     ticket: 'S2-006',
     role: 'adversarial probes A–S over the verifier rubric/policy/signature/command surfaces (spec §12)',
-    ok: probesOk,
+    ok: probesGreen,
+    status: probesGreen ? 'PASS' : (probeFailures.length > 0 ? 'FAIL' : 'INCOMPLETE_NOT_RUN_DB'),
+    statusSemantics: 'each probe carries status pass|failed|not_run; not_run among the mandatory set is never green (review P2-6)',
+    combine: 'probe S resolves to green ONLY via evidence/s2-006-db-comparison.json crashPhase (verify:s2-006-db-replay crash/restart phase)',
     totals: probeSuite.totals,
     hardCounters: probeSuite.hardCounters,
     notRun: probeSuite.notRun,
@@ -459,7 +469,15 @@ async function parentMode() {
       decision: finalDecision.status,
       independence: calibrationRecord.independence.status,
     },
-    probes: { ok: probesOk, total: probeSuite.totals.probes, failed: probeSuite.totals.failed, notRun: probeSuite.notRun },
+    probes: {
+      green: probesGreen,
+      total: probeSuite.totals.probes,
+      pass: probeSuite.totals.pass,
+      failed: probeSuite.totals.failed,
+      not_run: probeSuite.totals.not_run,
+      probeS: probeSuite.probes.find((p) => p.id === 'S')?.status ?? null,
+      combine: 'probe S green ONLY via verify:s2-006-db-replay crash phase',
+    },
   }, null, 2));
   process.exit(ok ? 0 : 1);
 }

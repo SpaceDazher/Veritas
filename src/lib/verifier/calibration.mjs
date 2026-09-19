@@ -15,10 +15,27 @@
 //   * every owner-owned numeric comes from the passed thresholds
 //     preregistration; a null value yields NEEDS_INPUT, never an implicit
 //     default. Abstain-all cannot win: coverage gate.
+//   * threshold AUTHORITY (review P1-5): a non-null `ownerDecisionRef` string
+//     is bookkeeping, never authority. Numerics become effective only through
+//     resolveThresholdDecision(): a canonical immutable HumanDecision
+//     (contracts/human-decision.schema.json) from the authenticated
+//     owner=user, bound to the exact canonical-json digest of the thresholds
+//     document, whose authority_binding.grantRef resolves from the verifier
+//     authority registry as a reviewer-issued, signature-verified grant
+//     (same mechanism as commands.mjs registerProviderGrant). A failed
+//     resolution yields NEEDS_INPUT — never an implicit default.
 //
 // Deterministic: Wilson intervals and the seeded bootstrap use no wall clock
-// and no randomness beyond the explicit seed. Node stdlib only; this module
-// never imports producer semantics (spec §3 module whitelist).
+// and no randomness beyond the explicit seed. Contract validation uses the
+// real JSON Schemas in contracts/ (the §3 whitelist explicitly allows
+// contract validation); this module never imports producer semantics.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import { canonicalDigest } from './canonical-json.mjs';
+import { verifyDetailed as verifySignatureDetailed } from './signature.mjs';
 
 export const METRIC_STATUSES = Object.freeze(['MEASURED', 'NOT_MEASURED', 'NEEDS_INPUT', 'NOT_APPLICABLE']);
 
@@ -434,13 +451,132 @@ export function computeMetrics({ cases, gold, goldReasons = {}, predictions, ann
   };
 }
 
+// ---- threshold-decision authority (review P1-5, spec §8) --------------------
+
+export const THRESHOLDS_ARTIFACT_REF = 'contracts/s2-006-thresholds.json';
+
+// The grant tool scope that certifies threshold authority. A reviewer-issued
+// grant for this tool names exactly one authenticated principal; a borrowed
+// provider/model grant is refused.
+export const THRESHOLD_AUTHORITY_TOOL = 'threshold-authority';
+
+// Producer-side identities can never own the thresholds decision (spec §3:
+// the producer cannot review or authorize its own artifact).
+const FORBIDDEN_AUTHORITY_ROLES = Object.freeze(['candidate', 'producer', 'verifier_operator']);
+
+const CALIBRATION_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+let humanDecisionValidate = null;
+
+// Fail-closed validation against the REAL contracts/human-decision.schema.json
+// (draft 2020-12): the canonical immutable HumanDecision shape — closed
+// properties, APPROVED requires a human actor, exact digest, timestamp and a
+// server_authenticated_human authority binding.
+function requireCanonicalHumanDecision(decision) {
+  if (!humanDecisionValidate) {
+    const ajv = new Ajv2020({ allErrors: true, strict: false });
+    for (const name of ['needs-input', 'human-decision']) {
+      const schema = JSON.parse(fs.readFileSync(path.join(CALIBRATION_ROOT, 'contracts', `${name}.schema.json`), 'utf8'));
+      ajv.addSchema(schema, schema.$id);
+    }
+    humanDecisionValidate = ajv.getSchema('https://veritas.local/contracts/human-decision.schema.json');
+  }
+  const ok = humanDecisionValidate(decision) === true;
+  return {
+    ok,
+    errors: ok ? [] : humanDecisionValidate.errors.map((e) => `${e.instancePath} ${e.message}`).join('; '),
+  };
+}
+
+// Resolves the owner decision that authorizes a thresholds document.
+// Returns { resolved: true, decisionDigest, ownerPrincipal, grantRef } or
+// { resolved: false, reason } — a failed resolution is NEEDS_INPUT, never an
+// implicit default. Every check reuses an existing mechanism: the JSON Schema,
+// canonical-json digests and the signature.mjs MAC core over the authority
+// registry's registered grant (the registerProviderGrant pattern).
+export function resolveThresholdDecision(thresholdsDoc, decision, authorities, { keyRegistry = null } = {}) {
+  const refused = (reason) => ({ resolved: false, reason });
+  if (!thresholdsDoc || typeof thresholdsDoc !== 'object' || Array.isArray(thresholdsDoc)) {
+    return refused('thresholds_document_malformed');
+  }
+  const schema = requireCanonicalHumanDecision(decision);
+  if (!schema.ok) return refused(`decision_not_canonical_human_decision: ${schema.errors}`);
+  if (decision.status !== 'APPROVED') return refused('decision_not_approved');
+  // authenticated owner=user (spec §8: self-appointment by an agent or the
+  // verifier is forbidden)
+  if (decision.actor_type !== 'human' || decision.actor_id !== 'user') {
+    return refused('decision_actor_not_owner_user');
+  }
+  if (decision.decision_scope !== 'research') return refused('decision_scope_not_research');
+  if (decision.artifact_ref !== THRESHOLDS_ARTIFACT_REF) return refused('decision_artifact_ref_mismatch');
+  // exact binding to THIS thresholds document over canonical-json
+  if (decision.artifact_digest !== canonicalDigest(thresholdsDoc)) {
+    return refused('decision_digest_mismatch');
+  }
+  const binding = decision.authority_binding;
+  if (!binding || binding.bindingType !== 'server_authenticated_human') {
+    return refused('authority_binding_missing');
+  }
+  // the certified principal must be a registered authority and never a
+  // producer-side identity
+  const entry = authorities instanceof Map ? authorities.get(binding.principalId) : undefined;
+  const roles = [...(entry?.roles ?? [])];
+  if (!entry || roles.length === 0) return refused('owner_principal_unregistered');
+  if (roles.some((role) => FORBIDDEN_AUTHORITY_ROLES.includes(role))) {
+    return refused('owner_principal_producer_side');
+  }
+  // the authority grant must RESOLVE from the registry (registered by an
+  // issuer with a verified signature — the registerProviderGrant pattern);
+  // schema-valid caller-supplied grants are never trusted
+  const issuedGrants = authorities instanceof Map ? authorities.issuedGrants : null;
+  if (!(issuedGrants instanceof Map)) return refused('authority_registry_without_issued_grants');
+  const registered = issuedGrants.get(binding.grantRef);
+  if (!registered) return refused('authority_grant_unregistered');
+  if (registered.issuer === binding.principalId) return refused('authority_grant_self_issued');
+  if (registered.grant?.authenticatedPrincipal !== binding.principalId) {
+    return refused('authority_grant_principal_mismatch');
+  }
+  if (registered.grant?.tool !== THRESHOLD_AUTHORITY_TOOL) return refused('authority_grant_wrong_tool');
+  const grantDigest = canonicalDigest(registered.grant ?? {});
+  if (registered.grantDigest !== grantDigest) return refused('authority_grant_digest_mismatch');
+  // signature envelope re-checked at use time; without a key registry the
+  // digest/issuer binding above stays binding (same policy as commands.mjs)
+  const sig = registered.signature;
+  if (!sig || typeof sig !== 'object' || Array.isArray(sig)
+    || sig.scheme !== 'hmac-sha256' || sig.verified !== true
+    || sig.attestedBy !== registered.issuer) {
+    return refused('authority_grant_signature_rejected: malformed or unverified envelope');
+  }
+  if (keyRegistry) {
+    const verdict = verifySignatureDetailed(sig, registered.issuer, grantDigest, { registry: keyRegistry });
+    if (!verdict.ok) return refused(`authority_grant_signature_rejected: ${verdict.reason}`);
+  }
+  // expiry against the decision's own deterministic timestamp (never wall clock)
+  if (String(decision.timestamp) > String(registered.grant.expiresAt ?? '')) {
+    return refused('authority_grant_expired_at_decision_time');
+  }
+  return {
+    resolved: true,
+    reason: 'verified',
+    decisionDigest: canonicalDigest(decision),
+    ownerPrincipal: binding.principalId,
+    grantRef: binding.grantRef,
+  };
+}
+
 // ---- lexicographic decision rule (spec §8) ----------------------------------
 
 // thresholds: preregistration document (contracts/s2-006-thresholds.json shape
-// or an owner-authored version with the same fields). Any null owner-owned
-// numeric yields NEEDS_INPUT — never an implicit default.
-export function decideLexicographic({ systems, thresholds, seed = 's2-006-paired-bootstrap', confidenceLevel } = {}) {
+// or an owner-authored version with the same canonical field layout —
+// soft_thresholds nested under `thresholds`). Any null owner-owned numeric
+// yields NEEDS_INPUT — never an implicit default. Owner authority comes ONLY
+// from a resolvable canonical HumanDecision (ownerDecision + authorities);
+// a bare ownerDecisionRef string is bookkeeping, never authority.
+export function decideLexicographic({
+  systems, thresholds, seed = 's2-006-paired-bootstrap', confidenceLevel,
+  ownerDecision = null, authorities = null, keyRegistry = null,
+} = {}) {
   const needsInputReasons = new Set();
+  const needsInputDetails = [];
   const perSystem = {};
   for (const s of systems) perSystem[s.systemId] = { eligible: true, step: 'start', reasons: [] };
 
@@ -457,24 +593,40 @@ export function decideLexicographic({ systems, thresholds, seed = 's2-006-paired
   }
   const afterHard = systems.filter((s) => perSystem[s.systemId].eligible);
   if (afterHard.length === 0) {
-    return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals: [], needsInputReasons: [] };
+    return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals: [], needsInputReasons: [], needsInputDetails: [] };
   }
 
-  // owner-owned numerics: null -> NEEDS_INPUT (no implicit defaults)
+  // owner-owned numerics: null -> NEEDS_INPUT (no implicit defaults). The
+  // soft thresholds are read from the CANONICAL nested document path
+  // (thresholds.soft_thresholds) — a top-level field is not part of the
+  // contract shape and is never consulted (review P1-5b).
   const floor = thresholds?.coverage_floor?.value ?? null;
   const delta = thresholds?.non_inferiority_margin?.delta ?? null;
-  const soft = thresholds?.soft_thresholds ?? {};
+  const soft = thresholds?.thresholds?.soft_thresholds ?? {};
   const tieRule = thresholds?.tie_rule?.rule ?? null;
   const cl = confidenceLevel ?? thresholds?.confidence_level?.value ?? null;
-  if (thresholds?.ownerDecisionRef === null || thresholds?.ownerDecisionRef === undefined) {
+  // Threshold AUTHORITY (review P1-5a): only a resolvable canonical immutable
+  // HumanDecision from the authenticated owner=user counts. A non-null
+  // ownerDecisionRef string is bookkeeping, never authority.
+  if (ownerDecision && authorities) {
+    const resolution = resolveThresholdDecision(thresholds, ownerDecision, authorities, { keyRegistry });
+    if (!resolution.resolved) {
+      needsInputReasons.add('missing_human_decision');
+      needsInputDetails.push(`threshold_decision_not_resolved: ${resolution.reason}`);
+    }
+  } else if (thresholds?.ownerDecisionRef != null) {
     needsInputReasons.add('missing_human_decision');
+    needsInputDetails.push(`ownerDecisionRef ${String(thresholds.ownerDecisionRef)} does not resolve to a verified immutable HumanDecision from authenticated owner=user; authority never comes from a bare reference`);
+  } else {
+    needsInputReasons.add('missing_human_decision');
+    needsInputDetails.push('threshold_decision_missing: an immutable HumanDecision from authenticated owner=user bound to the exact thresholds digest is required before any owner-owned numeric applies');
   }
   if (floor == null || delta == null || cl == null) needsInputReasons.add('missing_thresholds');
   for (const key of Object.keys(soft)) {
     if (soft[key]?.value == null) needsInputReasons.add('missing_thresholds');
   }
   if (needsInputReasons.size > 0) {
-    return { status: 'NEEDS_INPUT', winner: null, perSystem, pairedIntervals: [], needsInputReasons: [...needsInputReasons].sort() };
+    return { status: 'NEEDS_INPUT', winner: null, perSystem, pairedIntervals: [], needsInputReasons: [...needsInputReasons].sort(), needsInputDetails: [...needsInputDetails] };
   }
 
   // step 2a: coverage gate (abstain-all cannot win)
@@ -521,27 +673,27 @@ export function decideLexicographic({ systems, thresholds, seed = 's2-006-paired
   // steps 3-4: full cost, then latency under the frozen tie rule
   const eligible = systems.filter((s) => perSystem[s.systemId].eligible);
   if (eligible.length === 0) {
-    return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals, needsInputReasons: [] };
+    return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals, needsInputReasons: [], needsInputDetails: [] };
   }
   for (const s of eligible) {
     if (s.cost == null) needsInputReasons.add('cost_not_provided');
   }
   if (needsInputReasons.size > 0) {
-    return { status: 'NEEDS_INPUT', winner: null, perSystem, pairedIntervals, needsInputReasons: [...needsInputReasons].sort() };
+    return { status: 'NEEDS_INPUT', winner: null, perSystem, pairedIntervals, needsInputReasons: [...needsInputReasons].sort(), needsInputDetails: [...needsInputDetails] };
   }
   let finalists = [...eligible].sort((a, b) => a.cost - b.cost);
   const bestCost = finalists[0].cost;
   finalists = finalists.filter((s) => s.cost === bestCost);
   if (finalists.length > 1) {
     if (tieRule !== 'latency_asc') {
-      return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals, needsInputReasons: [] };
+      return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals, needsInputReasons: [], needsInputDetails: [] };
     }
     finalists.sort((a, b) => a.latency - b.latency);
     const bestLatency = finalists[0].latency;
     finalists = finalists.filter((s) => s.latency === bestLatency);
   }
   if (finalists.length !== 1) {
-    return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals, needsInputReasons: [] };
+    return { status: 'HUMAN_REVIEW', winner: null, perSystem, pairedIntervals, needsInputReasons: [], needsInputDetails: [] };
   }
-  return { status: 'DECIDED', winner: finalists[0].systemId, perSystem, pairedIntervals, needsInputReasons: [] };
+  return { status: 'DECIDED', winner: finalists[0].systemId, perSystem, pairedIntervals, needsInputReasons: [], needsInputDetails: [] };
 }

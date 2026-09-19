@@ -3,14 +3,24 @@
 // Every probe builds its scenario on the frozen fixture corpus
 // (corpus/s2-006) plus the real production modules — policy.enforce,
 // signature.sign/verify, api.verifyClaim, api.auditVerifierRunForLeaks,
-// comparator.compareRuns, calibration.computeMetrics/decideLexicographic,
-// the immutable store and the command API. No stubs: each probe drives the
-// same code paths the evaluator uses and returns
-//   { id, name, expected, observed, ok, attemptedViolations,
+// comparator.compareRuns, calibration.computeMetrics/decideLexicographic
+// (+ resolveThresholdDecision), the immutable store and the command API.
+// No stubs: each probe drives the same code paths the evaluator uses and
+// returns
+//   { id, name, expected, observed, ok, status, attemptedViolations,
 //     actualViolations, notRun? }
 // where `ok` is the probe's expected outcome (an ATTEMPTED violation that
 // is correctly blocked/detected is ok:true — the actual-violation counters
-// of spec §14 gate 8 stay zero).
+// of spec §14 gate 8 stay zero) and `status` is the HONEST outcome class
+// (review P2-6):
+//   'pass'    — the probe ran and its expectation holds;
+//   'failed'  — the probe ran and an attempted violation was NOT blocked;
+//   'not_run' — a mandatory half of the probe could not run offline. A
+//               not_run probe is NOT green: the aggregate is green only when
+//               every probe has status 'pass'.
+// Probe S delegates its DB half to the PostgreSQL crash/restart phase of
+// scripts/s2-006-db-replay.mjs (passed in as `probeSDbCrashPhase`); without
+// it probe S is NOT_RUN_DB, never silently green.
 //
 // Offline contract: probes A–S run fully offline (Node stdlib, fixture
 // corpus, in-memory store, deterministic rubric). There is no network, no
@@ -35,6 +45,7 @@ import {
   invalidateCalibration,
   publishAdjudication,
   publishVerificationResult,
+  registerProviderGrant,
   reserveExternalCall,
 } from './commands.mjs';
 import {
@@ -66,8 +77,8 @@ const T0 = '2026-03-22T00:00:00.000Z';
 const UNSEAL_AT = '2026-03-23T00:00:00.000Z';
 const WS = 'ws-verifier';
 
-// Shared principals (spec §3 role set). prn-candidate-1 doubles as the
-// producer side for conflict-of-interest probes.
+// Shared principals (spec §3 role set + the authenticated method owner).
+// prn-candidate-1 doubles as the producer side for conflict-of-interest probes.
 const PRINCIPALS = Object.freeze({
   candidate: 'prn-candidate-1',
   custodian: 'prn-label-custodian-1',
@@ -76,6 +87,7 @@ const PRINCIPALS = Object.freeze({
   adjudicator: 'prn-adjudicator-1',
   harness: 'prn-harness-1',
   reviewer: 'prn-reviewer-1',
+  owner: 'prn-method-owner-1',
 });
 
 const AUTHORITIES = () => makeVerifierAuthorityRegistry([
@@ -86,6 +98,7 @@ const AUTHORITIES = () => makeVerifierAuthorityRegistry([
   { principal: PRINCIPALS.adjudicator, roles: ['adjudicator'], workspaces: [WS] },
   { principal: PRINCIPALS.harness, roles: ['evaluation_harness'], workspaces: [WS] },
   { principal: PRINCIPALS.reviewer, roles: ['reviewer'], workspaces: [WS] },
+  { principal: PRINCIPALS.owner, roles: ['method_owner'], workspaces: [WS] },
 ]);
 
 // policy context derived from the same authority registry — one source of
@@ -548,7 +561,9 @@ async function probeI() {
 }
 
 // Probe-only signing registry: the fixture custody keys of
-// tests/verifier/fixtures/keys.json, registered deterministically.
+// tests/verifier/fixtures/keys.json, registered deterministically. The
+// reviewer key exists because provider grants are ISSUED by a reviewer
+// authority (review P1-2): the beneficiary can never sign its own grant.
 let KEYS = null;
 function probeKeys() {
   if (!KEYS) {
@@ -557,8 +572,34 @@ function probeKeys() {
     registerKey({ keyRef: 'kms://test/s2-006/annotator-a', custodian: PRINCIPALS.annotatorA, role: 'annotator', secret: 's2-006-fixture-custody-key-annotator-a', registry: KEYS });
     registerKey({ keyRef: 'kms://test/s2-006/annotator-b', custodian: PRINCIPALS.annotatorB, role: 'annotator', secret: 's2-006-fixture-custody-key-annotator-b', registry: KEYS });
     registerKey({ keyRef: 'kms://test/s2-006/adjudicator-1', custodian: PRINCIPALS.adjudicator, role: 'adjudicator', secret: 's2-006-fixture-custody-key-adjudicator-1', registry: KEYS });
+    registerKey({ keyRef: 'kms://test/s2-006/reviewer-1', custodian: PRINCIPALS.reviewer, role: 'reviewer', secret: 's2-006-fixture-custody-key-reviewer-1', registry: KEYS });
   }
   return KEYS;
+}
+
+// Registers a reviewer-issued provider grant for the evaluation harness (the
+// exact authorization mechanism of commands.mjs registerProviderGrant): the
+// beneficiary never issues its own grant, and the issuer MAC over the exact
+// canonical grant digest is verified at registration AND at every use.
+function issueProviderGrant(authorities, { grantId, registry = probeKeys() } = {}) {
+  const grant = {
+    contractVersion: '1.0.0',
+    grantId,
+    authenticatedPrincipal: PRINCIPALS.harness,
+    tool: 'semantic-provider',
+    workspaceId: WS,
+    modelAccess: { modelId: 'offline-deterministic', modelVersion: '1.0.0', access: 'inference_only' },
+    currency: 'none',
+    timeoutMs: 30000,
+    budget: { task: 1, campaign: 10, day: 5 },
+    noTraining: true,
+    noRetention: true,
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2027-01-01T00:00:00.000Z',
+  };
+  const signature = sign(PRINCIPALS.reviewer, 'kms://test/s2-006/reviewer-1', canonicalDigest(grant), { registry });
+  registerProviderGrant(authorities, { grant, issuer: PRINCIPALS.reviewer, signature, registry });
+  return grant;
 }
 
 // J. Prompt injection inside source/label content is inert: the rubric
@@ -644,16 +685,68 @@ function probeK() {
   ));
   const candidateMetrics = computeMetrics({ cases, gold, goldReasons, predictions: abstainAll, independence: { independent: false, reason: 'evaluator_not_independent' } });
   const baselineMetrics = computeMetrics({ cases, gold, goldReasons, predictions: highCoverage, independence: { independent: false, reason: 'evaluator_not_independent' } });
-  // PROBE-ONLY owner-decided thresholds: real preregistration values belong
-  // to the appointed method owner (spec §8) and stay null in
-  // contracts/s2-006-thresholds.json until that decision exists.
+  // PROBE-ONLY owner-decided thresholds in the canonical document shape: real
+  // preregistration values belong to the appointed method owner (spec §8) and
+  // stay null in contracts/s2-006-thresholds.json until that decision exists.
+  // Authority (review P1-5) comes from a canonical signed HumanDecision from
+  // the authenticated owner=user, bound to the exact canonical digest of this
+  // doc, whose authority grant resolves from the registry (reviewer-issued,
+  // signed) — never from a bare ownerDecisionRef string.
   const probeThresholds = {
+    schemaVersion: 1,
+    ticket: 'S2-006',
+    status: 'AUTHORED_PROBE_ONLY',
+    method_owner: PRINCIPALS.owner,
     ownerDecisionRef: 'hd-probe-k-owner-decision',
+    thresholds: { status: 'AUTHORED_PROBE_ONLY', soft_thresholds: {} },
     coverage_floor: { value: 0.8 },
     non_inferiority_margin: { delta: 0.05 },
     confidence_level: { value: 0.95 },
     tie_rule: { rule: 'latency_asc' },
-    soft_thresholds: {},
+  };
+  const authorities = AUTHORITIES();
+  const grant = {
+    contractVersion: '1.0.0',
+    grantId: 'grt-probe-k-threshold-authority',
+    authenticatedPrincipal: PRINCIPALS.owner,
+    tool: 'threshold-authority',
+    workspaceId: WS,
+    modelAccess: { modelId: 'none', modelVersion: '1.0.0', access: 'inference_only' },
+    currency: 'none',
+    timeoutMs: 30000,
+    budget: { task: 0, campaign: 0, day: 0 },
+    noTraining: true,
+    noRetention: true,
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2027-01-01T00:00:00.000Z',
+  };
+  registerProviderGrant(authorities, {
+    grant,
+    issuer: PRINCIPALS.reviewer,
+    signature: sign(PRINCIPALS.reviewer, 'kms://test/s2-006/reviewer-1', canonicalDigest(grant), { registry: probeKeys() }),
+    registry: probeKeys(),
+  });
+  const ownerDecision = {
+    version: '1.0.0',
+    id: 'hd-probe-k-owner-decision',
+    artifact_ref: 'contracts/s2-006-thresholds.json',
+    artifact_digest: canonicalDigest(probeThresholds),
+    status: 'APPROVED',
+    actor_type: 'human',
+    actor_id: 'user',
+    producer_id: 's2-006-evaluation-harness',
+    decision_scope: 'research',
+    reason: 'Probe-only threshold authoring; the repo preregistration stays NEEDS_INPUT.',
+    timestamp: T0,
+    authority: 'Requires server-authenticated human identity; JSON is not authorization.',
+    authority_binding: {
+      bindingType: 'server_authenticated_human',
+      principalId: PRINCIPALS.owner,
+      scope: 'probe-k coverage gate',
+      grantRef: grant.grantId,
+      expiresAt: '2027-01-01T00:00:00.000Z',
+    },
+    pending: null,
   };
   const decision = decideLexicographic({
     systems: [
@@ -661,6 +754,9 @@ function probeK() {
       { systemId: 'probe-k-high-coverage', isCandidate: false, metrics: baselineMetrics, cost: 10, latency: 10 },
     ],
     thresholds: probeThresholds,
+    ownerDecision,
+    authorities,
+    keyRegistry: probeKeys(),
   });
   const candidate = decision.perSystem['probe-k-abstain-all'];
   const precisionRecord = candidateMetrics.metricsByName.get('precision:SUPPORTED');
@@ -1013,31 +1109,22 @@ async function probeR() {
 }
 
 // S. Crash after REQUEST_ACCEPTED / unknown provider outcome -> fenced
-// reconciliation, no duplicate charge, result or outbox event. Fully offline
-// via the in-memory store; the PostgreSQL two-process replay half is
-// explicitly NOT_RUN offline.
-async function probeS() {
+// reconciliation, no duplicate charge, result or outbox event.
+//
+// The offline half drives the identical state machine on the in-memory store
+// (migration 0005 semantics). The DB half — a REAL two-process crash/restart
+// on PostgreSQL — is delegated to scripts/s2-006-db-replay.mjs: the caller
+// passes its result as `dbCrashPhase` ({ ok, status, ... }). Without a green
+// DB crash phase probe S is NOT_RUN_DB (status 'not_run') — review P2-6: a
+// not-run mandatory probe is never green.
+async function probeS({ dbCrashPhase = null } = {}) {
   const store = new InMemoryVerifierStore({ clock: () => T0 });
   const authorities = AUTHORITIES();
-  const grant = {
-    contractVersion: '1.0.0',
-    grantId: 'grt-probe-s-000001',
-    authenticatedPrincipal: PRINCIPALS.harness,
-    tool: 'semantic-provider',
-    workspaceId: WS,
-    modelAccess: { modelId: 'offline-deterministic', modelVersion: '1.0.0', access: 'inference_only' },
-    currency: 'none',
-    timeoutMs: 30000,
-    budget: { task: 1, campaign: 10, day: 5 },
-    noTraining: true,
-    noRetention: true,
-    issuedAt: '2026-01-01T00:00:00.000Z',
-    expiresAt: '2027-01-01T00:00:00.000Z',
-  };
+  const grant = issueProviderGrant(authorities, { grantId: 'grt-probe-s-000001' });
   const callId = 'call-probe-s-0001';
   const reserved = await reserveExternalCall({
     store, authorities, actor: PRINCIPALS.harness, grant, callId,
-    operationId: 'op-probe-s-reserve-1', reservation: { task: 'probe-s' }, workspaceId: WS, now: T0,
+    operationId: 'op-probe-s-reserve-1', reservation: { task: 'probe-s' }, workspaceId: WS, now: T0, keyRegistry: probeKeys(),
   });
   await acceptExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken });
   // crash: unknown provider outcome after REQUEST_ACCEPTED
@@ -1063,7 +1150,7 @@ async function probeS() {
   // duplicate reservation with the same args replays, never re-charges
   const reservedAgain = await reserveExternalCall({
     store, authorities, actor: PRINCIPALS.harness, grant, callId,
-    operationId: 'op-probe-s-reserve-1', reservation: { task: 'probe-s' }, workspaceId: WS, now: T0,
+    operationId: 'op-probe-s-reserve-1', reservation: { task: 'probe-s' }, workspaceId: WS, now: T0, keyRegistry: probeKeys(),
   });
 
   // publish path: unknown commit outcome escalates, never blind-retries
@@ -1089,35 +1176,49 @@ async function probeS() {
   const publishOutbox = publishStore.listOutbox().filter((e) => e.operation_id === 'op-probe-s-publish-1');
   const ledger = publishStore.listLedger().find((l) => l.operationId === 'op-probe-s-publish-1');
 
-  const ok = reserved.replayed === false
-    && callAfterCrash.state === 'RECONCILIATION_REQUIRED'
-    && staleFencingDenied
-    && reconcileReplay.replayed === true
-    && replayedCall.state === 'RECONCILIATION_REQUIRED'
-    && noDuplicateEvents
-    && reservedAgain.replayed === true
-    && reservedAgain.fencingToken === reserved.fencingToken
-    && escalated
-    && blindRetryRefused
-    && publishOutbox.length === 0
-    && ledger?.status === 'RECONCILIATION_REQUIRED';
-  return { ...outcome('S', 'crash_after_request_accepted_fenced_reconciliation', {
-    state: 'RECONCILIATION_REQUIRED', duplicateEvents: 0, blindRetry: 'refused',
-  }, {
-    callStateAfterCrash: callAfterCrash.state,
-    settlementNull: callAfterCrash.settlement === null,
+  const offlineChecks = {
+    reservationCommitted: reserved.replayed === false,
+    reconciledAfterCrash: callAfterCrash.state === 'RECONCILIATION_REQUIRED',
     staleFencingDenied,
-    reconcileReplay: reconcileReplay.replayed,
+    reconciliationReplayIdempotent: reconcileReplay.replayed === true,
+    reconciledStateStable: replayedCall.state === 'RECONCILIATION_REQUIRED',
     noDuplicateEvents,
-    reservationReplayToken: reservedAgain.fencingToken,
+    reservationReplayIdempotent: reservedAgain.replayed === true && reservedAgain.fencingToken === reserved.fencingToken,
     publishEscalated: escalated,
     publishBlindRetryRefused: blindRetryRefused,
+    noPublishOutbox: publishOutbox.length === 0,
+    publishLedgerReconciliation: ledger?.status === 'RECONCILIATION_REQUIRED',
+  };
+  const offlineOk = Object.values(offlineChecks).every((v) => v === true);
+
+  // Honest status (review P2-6): a real offline defect is 'failed'; without
+  // the DB crash phase the mandatory DB half is 'not_run'; a red DB crash
+  // phase is a real defect too — either way probe S is never silently green.
+  const dbPhase = dbCrashPhase && typeof dbCrashPhase === 'object' ? dbCrashPhase : null;
+  const dbPhaseGreen = dbPhase?.ok === true && dbPhase?.status === 'PASS';
+  const dbPhasePresent = dbPhase !== null;
+  const status = !offlineOk
+    ? 'failed'
+    : (dbPhaseGreen ? 'pass' : (dbPhasePresent ? 'failed' : 'not_run'));
+  const ok = status === 'pass';
+  return { ...outcome('S', 'crash_after_request_accepted_fenced_reconciliation', {
+    state: 'RECONCILIATION_REQUIRED', duplicateEvents: 0, blindRetry: 'refused',
+    dbCrashPhase: status === 'pass' ? 'PASS' : 'NOT_RUN_DB',
+  }, {
+    ...offlineChecks,
+    callStateAfterCrash: callAfterCrash.state,
+    settlementNull: callAfterCrash.settlement === null,
+    reservationReplayToken: reservedAgain.fencingToken,
     publishOutboxEvents: publishOutbox.length,
     publishLedgerStatus: ledger?.status ?? null,
+    dbCrashPhase: dbPhase ? { ok: dbPhase.ok ?? false, status: dbPhase.status ?? null } : 'NOT_RUN_DB',
   }, {
-    actualViolations: ok ? 0 : 1,
-    notRun: ['NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics).'],
-  }), ok };
+    // a NOT_RUN probe detects no violation — only a FAILED probe counts one
+    actualViolations: status === 'failed' ? 1 : 0,
+    ...(status === 'not_run' ? {
+      notRun: ['NOT_RUN_DB: the two-process crash/restart replay on PostgreSQL has not run; run npm run verify:s2-006-db-replay — the offline suite covers the identical state machine on the in-memory store only.'],
+    } : {}),
+  }), ok, status };
 }
 
 // ---- orchestrator ------------------------------------------------------------
@@ -1133,21 +1234,27 @@ const PROBES = {
   M: probeM, N: probeN, O: probeO, P: probeP, Q: probeQ, R: probeR, S: probeS,
 };
 
-export async function runSecurityProbe(id) {
+export async function runSecurityProbe(id, options = {}) {
   const probe = PROBES[id];
   if (!probe) throw new VerifierError('PROBE_UNKNOWN', `unknown security probe: ${String(id)}`);
-  return probe();
+  const result = await probe(options);
+  // Honest outcome class (review P2-6): 'pass' | 'failed' | 'not_run'. A
+  // probe may pin its own status (probe S not_run without the DB phase);
+  // everything else derives from `ok`.
+  return { status: result.ok === true ? 'pass' : 'failed', ...result };
 }
 
-export async function runAllSecurityProbes() {
+export async function runAllSecurityProbes({ probeSDbCrashPhase = null } = {}) {
   const probes = [];
   for (const id of PROBE_IDS) {
-    probes.push(await runSecurityProbe(id));
+    probes.push(await runSecurityProbe(id, id === 'S' ? { dbCrashPhase: probeSDbCrashPhase } : {}));
   }
   const totals = {
     probes: probes.length,
-    ok: probes.filter((p) => p.ok === true).length,
-    failed: probes.filter((p) => p.ok !== true).length,
+    ok: probes.filter((p) => p.status === 'pass').length,
+    pass: probes.filter((p) => p.status === 'pass').length,
+    failed: probes.filter((p) => p.status === 'failed').length,
+    not_run: probes.filter((p) => p.status === 'not_run').length,
     attemptedViolations: probes.reduce((acc, p) => acc + (p.attemptedViolations ?? 0), 0),
     actualViolations: probes.reduce((acc, p) => acc + (p.actualViolations ?? 0), 0),
   };

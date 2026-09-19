@@ -35,11 +35,14 @@ import { randomBytes } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { computeCanonicalArgsDigest, verifyClaim } from '../src/lib/verifier/api.mjs';
+import { AclDenied, VerifierError } from '../src/lib/verifier/errors.mjs';
+import { registerKey, sign } from '../src/lib/verifier/signature.mjs';
 import {
   makeVerifierAuthorityRegistry,
   publishVerificationResult,
   publishCalibrationReport,
   publishAdjudication,
+  registerProviderGrant,
   reserveExternalCall,
   acceptExternalCall,
   finalizeExternalCall,
@@ -199,7 +202,38 @@ function grantFixture() {
 const AUTHORITIES = makeVerifierAuthorityRegistry([
   { principal: ACTOR, roles: ['evaluation_harness'], workspaces: [WORKSPACE] },
   { principal: ADJUDICATOR, roles: ['adjudicator'], workspaces: [WORKSPACE] },
+  { principal: 'prn-reviewer-1', roles: ['reviewer'], workspaces: [WORKSPACE] },
 ]);
+
+// Fixture custody key of the grant ISSUER (review P1-2): the beneficiary —
+// the evaluation harness — can never issue its own grant, so a reviewer
+// signs the exact canonical grant digest and the MAC is verified at
+// registration AND at every use. Test-only fixture material.
+const GRANT_KEY_REF = 'kms://fixture/s2-006/db-replay/grant-issuer';
+const GRANT_ISSUER = 'prn-reviewer-1';
+const GRANT_KEY_REGISTRY = new Map();
+registerKey({
+  keyRef: GRANT_KEY_REF,
+  secret: 's2-006-fixture-db-replay-grant-issuer-key',
+  custodian: GRANT_ISSUER,
+  role: 'reviewer',
+  registry: GRANT_KEY_REGISTRY,
+});
+
+// Registers the reviewer-issued grant once per process (registerProviderGrant
+// verifies the issuer role/workspace, the non-self-issuance and the MAC).
+function registeredGrant() {
+  const grant = grantFixture();
+  registerProviderGrant(AUTHORITIES, {
+    grant,
+    issuer: GRANT_ISSUER,
+    signature: sign(GRANT_ISSUER, GRANT_KEY_REF, canonicalDigest(grant), { registry: GRANT_KEY_REGISTRY }),
+    registry: GRANT_KEY_REGISTRY,
+  });
+  return grant;
+}
+
+const GRANT = registeredGrant();
 
 // ---- child: one deterministic store-replay against one schema ----------------
 
@@ -249,15 +283,16 @@ async function runChild({ schema, runId, executorId, out, databaseUrl }) {
   });
   await record('op-s2006-replay-external-01', 'externalCallReserveAcceptFinalize', async () => {
     const reserved = await reserveExternalCall({
-      store, authorities: AUTHORITIES, actor: ACTOR, grant: grantFixture(),
+      store, authorities: AUTHORITIES, actor: ACTOR, grant: GRANT,
       callId: 'call-s2006-replay-1', operationId: 'op-s2006-replay-external-01',
       reservation: { purpose: 'store-replay fixture; no provider is called' }, workspaceId: WORKSPACE,
+      now: FIXED_CLOCK(), keyRegistry: GRANT_KEY_REGISTRY,
     });
     await acceptExternalCall({ store, actor: ACTOR, callId: reserved.callId, fencingToken: reserved.fencingToken });
     const finalized = await finalizeExternalCall({
       store, actor: ACTOR, callId: reserved.callId, fencingToken: reserved.fencingToken,
       responseDigest: canonicalDigest({ replay: 'fixture-response', abstention: 'INSUFFICIENT_EVIDENCE' }),
-      settlement: { charged: 0, currency: 'none', note: 'zero-budget no-provider fixture' },
+      settlement: { amount: 0, currency: 'none', note: 'zero-budget no-provider fixture' },
       outcome: 'finalized',
     });
     return { replayed: finalized.replayed ?? false, outcomeDigest: canonicalDigest({ state: finalized.state ?? 'FINALIZED', fencingToken: reserved.fencingToken }), fencingToken: reserved.fencingToken };
@@ -303,6 +338,146 @@ async function runChild({ schema, runId, executorId, out, databaseUrl }) {
   };
   fs.writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`);
   process.exit(report.status === 'COMPLETED' ? 0 : 2);
+}
+
+// ---- crash/restart phase (probe S DB half, review P2-6) ----------------------
+// Two SEPARATE OS processes per schema:
+//   crash-first : reserve -> accept -> abrupt death (exit 70) WITHOUT any
+//                 finalize — the provider outcome never lands;
+//   crash-recover: a NEW process/pool reconciles over the persisted fencing
+//                 token and completes EXACTLY ONE settlement; a duplicate
+//                 settlement replays idempotently, a stale fencing token is
+//                 refused, a finalized call cannot be dragged back into
+//                 reconciliation, and no ledger/outbox row is written twice.
+
+const CRASH_CALL = 'call-s2006-crash-1';
+const CRASH_OPERATION = 'op-s2006-crash-external-1';
+const CRASH_RESERVATION = { purpose: 'crash/restart replay: reserved + accepted, then the process dies without finalize' };
+const CRASH_RESPONSE_DIGEST = canonicalDigest({ replay: 'crash-recovery', verdict: 'INSUFFICIENT_EVIDENCE' });
+const CRASH_SETTLEMENT = { amount: 0, currency: 'none', note: 'crash-recovery settlement; fenced, exactly once' };
+
+async function crashFirstChild({ schema, executorId, stateFile, databaseUrl }) {
+  const pg = (await import('pg')).default;
+  const pool = new pg.Pool({ connectionString: databaseUrl, max: 1, options: `-c search_path=${schema}` });
+  const store = new PostgresVerifierStore(pool, { clock: FIXED_CLOCK });
+  const reserved = await reserveExternalCall({
+    store, authorities: AUTHORITIES, actor: ACTOR, grant: GRANT,
+    callId: CRASH_CALL, operationId: CRASH_OPERATION,
+    reservation: CRASH_RESERVATION, workspaceId: WORKSPACE,
+    now: FIXED_CLOCK(), keyRegistry: GRANT_KEY_REGISTRY,
+  });
+  await acceptExternalCall({ store, actor: ACTOR, callId: reserved.callId, fencingToken: reserved.fencingToken, workspaceId: WORKSPACE });
+  fs.writeFileSync(stateFile, `${JSON.stringify({
+    schema,
+    callId: reserved.callId,
+    fencingToken: reserved.fencingToken,
+    crashFirstPid: process.pid,
+    crashFirstExecutor: executorId,
+  }, null, 2)}\n`);
+  await pool.end();
+  // die as designed: no finalize, no settlement — the recovery process must
+  // reconcile over the fencing token
+  process.exit(70);
+}
+
+async function crashRecoverChild({ schema, runId, executorId, stateFile, out, databaseUrl }) {
+  const handoff = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+  const pg = (await import('pg')).default;
+  const pool = new pg.Pool({ connectionString: databaseUrl, max: 1, options: `-c search_path=${schema}` });
+  const store = new PostgresVerifierStore(pool, { clock: FIXED_CLOCK });
+  const checks = {};
+
+  // 1. the crashed process left the call in ACCEPTED (crash after REQUEST_ACCEPTED)
+  const crashed = await store.readExternalCall(handoff.callId);
+  checks.crashedCallObservedInAcceptedState = crashed?.state === 'ACCEPTED' && Number(crashed.fencing_token) === handoff.fencingToken;
+
+  // 2. a stale fencing token can never settle the call
+  let staleRefused = false;
+  try {
+    await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken + 999, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
+  } catch (error) {
+    staleRefused = error instanceof AclDenied;
+  }
+  checks.staleFencingRefused = staleRefused;
+
+  // 3. reconciliation over the fencing token completes EXACTLY ONE settlement
+  const settled = await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
+  checks.exactlyOneSettlement = settled.state === 'FINALIZED' && settled.replayed === false;
+
+  // 4. a duplicate settlement attempt replays WITHOUT a second event
+  const duplicate = await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
+  checks.duplicateFinalizeReplayed = duplicate.replayed === true;
+
+  // 5. a finalized call can never be dragged back into reconciliation
+  let dragBackRefused = false;
+  try {
+    await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, outcome: 'unknown', reason: 'drag-back attempt after FINALIZED' });
+  } catch (error) {
+    dragBackRefused = error instanceof VerifierError && error.code === 'INVALID_TRANSITION';
+  }
+  checks.finalizedCallNotDraggedBack = dragBackRefused;
+
+  // counts over the whole schema: no duplicate ledger/outbox writes, exactly
+  // one settlement row for the crash call
+  const count = async (sql, params = []) => Number((await pool.query(sql, params)).rows[0].n);
+  const counts = {};
+  counts.outboxTotal = await count('SELECT count(*)::int AS n FROM verifier_audit_outbox');
+  counts.ledgerTotal = await count('SELECT count(*)::int AS n FROM verifier_operation_ledger');
+  counts.externalCallRows = await count('SELECT count(*)::int AS n FROM verifier_external_call_run');
+  counts.crashCallEvents = await count('SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE record_id = $1', [handoff.callId]);
+  counts.crashCallFinalizedEvents = await count("SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE record_id = $1 AND event_type = 'EXTERNAL_CALL_FINALIZED'", [handoff.callId]);
+  counts.crashCallSettlements = await count("SELECT count(*)::int AS n FROM verifier_external_call_run WHERE call_id = $1 AND state = 'FINALIZED' AND settlement IS NOT NULL", [handoff.callId]);
+  counts.duplicateOutboxIds = await count('SELECT count(*)::int AS n FROM (SELECT event_id FROM verifier_audit_outbox GROUP BY event_id HAVING count(*) > 1) AS d');
+  const countsExpected = {
+    outboxTotal: 9, // 3 publishes + replay-call RESERVED/ACCEPTED/FINALIZED + crash-call RESERVED/ACCEPTED/FINALIZED
+    ledgerTotal: 3,
+    externalCallRows: 2,
+    crashCallEvents: 3,
+    crashCallFinalizedEvents: 1,
+    crashCallSettlements: 1,
+    duplicateOutboxIds: 0,
+  };
+  const countsOk = Object.entries(countsExpected).every(([k, v]) => counts[k] === v);
+  const report = {
+    schemaVersion: 1,
+    ticket: 'S2-006',
+    role: 'crash/restart replay (probe S DB half): the first process died after REQUEST_ACCEPTED (exit 70, no finalize); this recovery process reconciled over the fencing token and completed exactly one settlement',
+    runId,
+    executorId,
+    schema,
+    recoveryPid: process.pid,
+    crashFirstPid: handoff.crashFirstPid,
+    crashFirstExecutor: handoff.crashFirstExecutor,
+    fencingToken: handoff.fencingToken,
+    checks,
+    counts,
+    countsExpected,
+    status: Object.values(checks).every((v) => v === true) && countsOk ? 'COMPLETED' : 'ERROR',
+    digest: canonicalDigest({ checks, counts, fencingToken: handoff.fencingToken }),
+  };
+  fs.writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`);
+  await pool.end();
+  process.exit(report.status === 'COMPLETED' ? 0 : 2);
+}
+
+// Fail-closed comparison of the two schema crash/restart reports.
+export function crashPhaseIssues(a, b) {
+  const issues = [];
+  for (const [label, r] of [['a', a], ['b', b]]) {
+    if (r.diedAsDesigned !== true) issues.push(`crash-${label}:first-process-exit-${r.crashFirstExitCode}`);
+    if (r.status !== 'COMPLETED') issues.push(`crash-${label}:not-completed`);
+    for (const [check, ok] of Object.entries(r.checks ?? {})) {
+      if (ok !== true) issues.push(`crash-${label}:check-${check}`);
+    }
+    for (const [name, value] of Object.entries(r.counts ?? {})) {
+      if (value !== r.countsExpected?.[name]) issues.push(`crash-${label}:count-${name}`);
+    }
+  }
+  if (a.digest !== b.digest) issues.push('crash:digest-mismatch');
+  if (a.executorId === b.executorId) issues.push('crash:executor-identical');
+  if (a.recoveryPid === b.recoveryPid) issues.push('crash:recovery-pid-identical');
+  if (a.crashFirstPid === b.crashFirstPid) issues.push('crash:first-pid-identical');
+  return issues;
 }
 
 // ---- comparison ---------------------------------------------------------------
@@ -432,10 +607,44 @@ async function coordinator(args) {
 
     const [a, b] = summaries;
     const issues = dbReplayIssues(a, b);
+
+    // ---- third phase: crash/restart (probe S DB half; review P2-6) --------
+    const crashRuns = [];
+    for (const [i, params] of runParams.entries()) {
+      const suffix = i === 0 ? 'a' : 'b';
+      const stateFile = path.join(os.tmpdir(), `s2-006-crash-state-${suffix}-${process.pid}.json`);
+      const recoverOut = path.join(os.tmpdir(), `s2-006-crash-recover-${suffix}-${process.pid}.json`);
+      const first = spawnSync(process.execPath, [
+        path.join(ROOT, 'scripts/s2-006-db-replay.mjs'),
+        '--child', '--crash-first', 'true', '--schema', params.schema,
+        '--run-id', `s2-006-db-crash-${suffix}`, '--executor-id', `exec-db-s2006-dies-${suffix}`,
+        '--state', stateFile,
+      ], { cwd: ROOT, encoding: 'utf8', timeout: 300000, env: { ...process.env, VERITAS_DB_URL: connectionString } });
+      // exit 70 = died as designed (accepted, then killed without finalize)
+      const diedAsDesigned = first.status === 70;
+      if (!diedAsDesigned) {
+        throw new Error(`CRASH_FIRST_NOT_DIED:${params.schema} exit=${first.status} stderr=${String(first.stderr).slice(0, 400)}`);
+      }
+      const recover = spawnSync(process.execPath, [
+        path.join(ROOT, 'scripts/s2-006-db-replay.mjs'),
+        '--child', '--crash-recover', 'true', '--schema', params.schema,
+        '--run-id', `s2-006-db-crash-${suffix}`, '--executor-id', `exec-db-s2006-crash-${suffix}`,
+        '--state', stateFile, '--out', recoverOut,
+      ], { cwd: ROOT, encoding: 'utf8', timeout: 300000, env: { ...process.env, VERITAS_DB_URL: connectionString } });
+      if (recover.status !== 0 && recover.status !== 2) {
+        throw new Error(`CRASH_RECOVER_FAILED:${params.schema} exit=${recover.status} stderr=${String(recover.stderr).slice(0, 600)}`);
+      }
+      crashRuns.push({ ...JSON.parse(fs.readFileSync(recoverOut, 'utf8')), diedAsDesigned, crashFirstExitCode: first.status });
+      fs.unlinkSync(stateFile);
+      fs.unlinkSync(recoverOut);
+    }
+    const [crashA, crashB] = crashRuns;
+    const crashIssues = crashPhaseIssues(crashA, crashB);
+    const allIssues = [...issues, ...crashIssues.map((c) => `crash-phase:${c}`)];
     const report = {
       schemaVersion: 1,
       ticket: 'S2-006',
-      role: 'S2-006 DB-backed verifier store replay A vs B (PostgresVerifierStore, separate OS processes)',
+      role: 'S2-006 DB-backed verifier store replay A vs B (PostgresVerifierStore, separate OS processes) + crash/restart phase (probe S DB half)',
       databaseEngine: 'PostgreSQL',
       databaseSource: external ? 'external DATABASE_URL' : 'ephemeral loopback-only podman container',
       schemas: ['run_a', 'run_b'],
@@ -446,16 +655,29 @@ async function coordinator(args) {
       committedOps: a.committedOps,
       replayedOps: a.replayedOps,
       digests: { run_a: a.digest, run_b: b.digest },
-      comparison: { ok: issues.length === 0, issues },
-      hardGates: { ok: issues.length === 0, violations: issues },
-      status: issues.length === 0 ? 'PASS' : 'FAIL',
-      ok: issues.length === 0,
+      crashPhase: {
+        ok: crashIssues.length === 0,
+        issues: crashIssues,
+        executors: { run_a: crashA.executorId, run_b: crashB.executorId },
+        crashFirstExecutors: { run_a: crashA.crashFirstExecutor, run_b: crashB.crashFirstExecutor },
+        pids: { recovery: { run_a: crashA.recoveryPid, run_b: crashB.recoveryPid }, crash_first: { run_a: crashA.crashFirstPid, run_b: crashB.crashFirstPid } },
+        fencingToken: crashA.fencingToken,
+        digests: { run_a: crashA.digest, run_b: crashB.digest },
+        counts: crashA.counts,
+        scenario: 'process 1: reserve -> accept -> abrupt death (exit 70, no finalize); process 2: fenced reconciliation over the fencing token, exactly one settlement, zero duplicate ledger/outbox writes',
+      },
+      comparison: { ok: allIssues.length === 0, issues: allIssues },
+      hardGates: { ok: allIssues.length === 0, violations: allIssues },
+      status: allIssues.length === 0 ? 'PASS' : 'FAIL',
+      ok: allIssues.length === 0,
     };
     if (writeEvidence) {
       fs.writeFileSync(path.join(ROOT, 'evidence/s2-006-db-run-a.json'), `${JSON.stringify(a, null, 2)}\n`);
       fs.writeFileSync(path.join(ROOT, 'evidence/s2-006-db-run-b.json'), `${JSON.stringify(b, null, 2)}\n`);
+      fs.writeFileSync(path.join(ROOT, 'evidence/s2-006-db-crash-a.json'), `${JSON.stringify(crashA, null, 2)}\n`);
+      fs.writeFileSync(path.join(ROOT, 'evidence/s2-006-db-crash-b.json'), `${JSON.stringify(crashB, null, 2)}\n`);
     }
-    writeReport(report, issues.length === 0 ? 0 : 1);
+    writeReport(report, allIssues.length === 0 ? 0 : 1);
   } catch (error) {
     if (!external && containerStarted) cleanupContainer();
     writeReport({
@@ -479,13 +701,31 @@ if (args.child === 'true') {
     console.error('child mode requires VERITAS_DB_URL');
     process.exit(3);
   }
-  await runChild({
-    schema: args.schema,
-    runId: args['run-id'],
-    executorId: args['executor-id'],
-    out: args.out,
-    databaseUrl,
-  });
+  if (args['crash-first'] === 'true') {
+    await crashFirstChild({
+      schema: args.schema,
+      executorId: args['executor-id'],
+      stateFile: args.state,
+      databaseUrl,
+    });
+  } else if (args['crash-recover'] === 'true') {
+    await crashRecoverChild({
+      schema: args.schema,
+      runId: args['run-id'],
+      executorId: args['executor-id'],
+      stateFile: args.state,
+      out: args.out,
+      databaseUrl,
+    });
+  } else {
+    await runChild({
+      schema: args.schema,
+      runId: args['run-id'],
+      executorId: args['executor-id'],
+      out: args.out,
+      databaseUrl,
+    });
+  }
 } else if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   await coordinator(args);
 }

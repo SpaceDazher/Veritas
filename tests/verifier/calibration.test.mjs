@@ -10,11 +10,19 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evaluateScenario } from '../../src/lib/verifier/rubric.mjs';
 import { ruleBaselineEvaluate, producerBaselineEvaluate } from '../../src/lib/verifier/baselines.mjs';
+import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import {
+  makeVerifierAuthorityRegistry,
+  registerProviderGrant,
+} from '../../src/lib/verifier/commands.mjs';
+import { registerKey, sign } from '../../src/lib/verifier/signature.mjs';
 import {
   computeMetrics,
   decideLexicographic,
   pairedBootstrapInterval,
   oneVsRestConfusion,
+  resolveThresholdDecision,
+  THRESHOLDS_ARTIFACT_REF,
   wilsonInterval,
 } from '../../src/lib/verifier/calibration.mjs';
 
@@ -72,24 +80,123 @@ const rubricMetrics = metricsFor(rubricPredictions);
 const ruleMetrics = metricsFor(rulePredictions);
 const producerMetrics = metricsFor(producerPredictions);
 
-// test-only owner-authored thresholds (the repo preregistration stays null)
-const authorThresholds = ({
-  floor = 0.4, delta = 0.2, cl = 0.9, tie = 'latency_asc',
-  soft, owner = 'a'.repeat(64), costKeys = false,
-} = {}) => ({
-  status: 'AUTHORED_IN_TEST_ONLY',
-  ownerDecisionRef: owner,
-  coverage_floor: { value: floor },
-  non_inferiority_margin: { delta },
-  confidence_level: { value: cl },
-  tie_rule: { rule: tie },
-  soft_thresholds: soft ?? {
-    citation_entailment_f1: { metric: 'citation_entailment_f1', operator: '>=', value: 0.5 },
-    stale_invalidation_recall: { metric: 'stale_invalidation_recall', operator: '>=', value: 0.5 },
-    false_advisory_acceptance_rate: { metric: 'false_advisory_acceptance_rate', operator: '<=', value: 0.2 },
-  },
-  ...(costKeys ? { cost: costKeys } : {}),
+// ---- canonical threshold-decision authority fixtures (review P1-5) --------
+//
+// Real contract shapes ONLY: thresholds use the canonical field layout of
+// contracts/s2-006-thresholds.json (soft_thresholds nested under `thresholds`),
+// the decision validates against contracts/human-decision.schema.json, the
+// authority grant against contracts/semantic-provider-grant.schema.json, and
+// every digest is the canonical-json digest of the actual bytes. No test-only
+// formats, no fake SHA strings.
+const OWNER_PRINCIPAL = 'prn-method-owner-1';
+const GRANT_ISSUER = 'prn-reviewer-1';
+const GRANT_KEY_REF = 'kms://fixture/s2-006/threshold-authority-issuer';
+const KEY_REGISTRY = new Map();
+registerKey({
+  keyRef: GRANT_KEY_REF,
+  secret: 's2-006-fixture-threshold-authority-issuer-key',
+  custodian: GRANT_ISSUER,
+  role: 'reviewer',
+  registry: KEY_REGISTRY,
 });
+
+// Canonical-shape thresholds doc with owner-authored numerics (a new
+// preregistration version; soft_thresholds at the canonical nested path).
+const canonicalThresholds = ({
+  floor = 0.4, delta = 0.2, cl = 0.9, tie = 'latency_asc', soft,
+  ownerDecisionRef = null,
+} = {}) => ({
+  schemaVersion: 1,
+  ticket: 'S2-006',
+  status: 'AUTHORED',
+  method_owner: OWNER_PRINCIPAL,
+  ownerDecisionRef,
+  thresholds: {
+    status: 'AUTHORED',
+    soft_thresholds: soft ?? {
+      citation_entailment_f1: { metric: 'citation_entailment_f1', operator: '>=', value: 0.5 },
+      stale_invalidation_recall: { metric: 'stale_invalidation_recall', operator: '>=', value: 0.5 },
+      false_advisory_acceptance_rate: { metric: 'false_advisory_acceptance_rate', operator: '<=', value: 0.2 },
+    },
+  },
+  confidence_level: { value: cl },
+  non_inferiority_margin: { delta },
+  tie_rule: { rule: tie },
+  coverage_floor: { value: floor },
+});
+
+// Reviewer-issued, signed threshold-authority grant registered in the
+// authority registry (the exact registerProviderGrant mechanism).
+function authorityRegistryWithGrant({ grantId = 'grt-threshold-authority-1', expiresAt = '2027-01-01T00:00:00.000Z', registerGrant = true } = {}) {
+  const authorities = makeVerifierAuthorityRegistry([
+    { principal: OWNER_PRINCIPAL, roles: ['method_owner'], workspaces: ['ws-verifier'] },
+    { principal: GRANT_ISSUER, roles: ['reviewer'], workspaces: ['ws-verifier'] },
+  ]);
+  const grant = {
+    contractVersion: '1.0.0',
+    grantId,
+    authenticatedPrincipal: OWNER_PRINCIPAL,
+    tool: 'threshold-authority',
+    workspaceId: 'ws-verifier',
+    modelAccess: { modelId: 'none', modelVersion: '1.0.0', access: 'inference_only' },
+    currency: 'none',
+    timeoutMs: 30000,
+    budget: { task: 0, campaign: 0, day: 0 },
+    noTraining: true,
+    noRetention: true,
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt,
+  };
+  if (registerGrant) {
+    registerProviderGrant(authorities, {
+      grant,
+      issuer: GRANT_ISSUER,
+      signature: sign(GRANT_ISSUER, GRANT_KEY_REF, canonicalDigest(grant), { registry: KEY_REGISTRY }),
+      registry: KEY_REGISTRY,
+    });
+  }
+  return { authorities, grant };
+}
+
+// Canonical immutable HumanDecision (contracts/human-decision.schema.json)
+// from the authenticated owner=user, bound to the EXACT canonical digest of
+// the thresholds document it authorizes.
+function ownerDecisionFor(thresholdsDoc, {
+  actorId = 'user', grantId = 'grt-threshold-authority-1',
+  timestamp = '2026-03-24T00:00:00.000Z', digest = null,
+} = {}) {
+  return {
+    version: '1.0.0',
+    id: 'hd-s2006-thresholds-authoring-1',
+    artifact_ref: THRESHOLDS_ARTIFACT_REF,
+    artifact_digest: digest ?? canonicalDigest(thresholdsDoc),
+    status: 'APPROVED',
+    actor_type: 'human',
+    actor_id: actorId,
+    producer_id: 's2-006-evaluation-harness',
+    decision_scope: 'research',
+    reason: 'Author the numeric calibration thresholds for S2-006 as a new preregistration version, bound to the exact study+thresholds digest (spec section 8).',
+    timestamp,
+    authority: 'Requires server-authenticated human identity; JSON is not authorization.',
+    authority_binding: {
+      bindingType: 'server_authenticated_human',
+      principalId: OWNER_PRINCIPAL,
+      scope: 's2-006 calibration thresholds (spec section 8)',
+      grantRef: grantId,
+      expiresAt: '2027-01-01T00:00:00.000Z',
+    },
+    pending: null,
+  };
+}
+
+// Full green setup: canonical authored thresholds + a resolvable signed
+// owner decision over them.
+function authoredSetup(opts = {}) {
+  const thresholds = canonicalThresholds(opts);
+  const { authorities } = authorityRegistryWithGrant(opts);
+  const decision = ownerDecisionFor(thresholds, opts);
+  return { thresholds, authorities, decision, keyRegistry: KEY_REGISTRY };
+}
 
 describe('S2-006 raw counts and coverage on the fixture stratum', () => {
   test('denominator, evaluated, missing and abstention counts are exact', () => {
@@ -238,6 +345,58 @@ describe('S2-006 NOT_MEASURED / NOT_APPLICABLE semantics (never 0% or 100%)', ()
   });
 });
 
+describe('S2-006 threshold-decision authority (review P1-5, spec §8)', () => {
+  test('resolveThresholdDecision accepts a canonical signed HumanDecision bound to the exact thresholds digest', () => {
+    const { thresholds, authorities, decision, keyRegistry } = authoredSetup();
+    const resolution = resolveThresholdDecision(thresholds, decision, authorities, { keyRegistry });
+    assert.equal(resolution.resolved, true, resolution.reason);
+    assert.equal(resolution.decisionDigest, canonicalDigest(decision));
+    assert.equal(resolution.ownerPrincipal, 'prn-method-owner-1');
+  });
+
+  test('a decision that is not a canonical HumanDecision is refused (real schema, closed shape)', () => {
+    const { thresholds, authorities, keyRegistry } = authoredSetup();
+    const resolution = resolveThresholdDecision(thresholds, { status: 'APPROVED', actor_id: 'user', improvise: true }, authorities, { keyRegistry });
+    assert.equal(resolution.resolved, false);
+    assert.match(resolution.reason, /^decision_not_canonical_human_decision/);
+  });
+
+  test('a decision bound to a DIFFERENT thresholds digest is refused (exact canonical-json binding)', () => {
+    const { thresholds, authorities, keyRegistry } = authoredSetup();
+    const otherDoc = canonicalThresholds({ floor: 0.9 });
+    const decision = ownerDecisionFor(otherDoc); // digest of the other document
+    const resolution = resolveThresholdDecision(thresholds, decision, authorities, { keyRegistry });
+    assert.equal(resolution.resolved, false);
+    assert.equal(resolution.reason, 'decision_digest_mismatch');
+  });
+
+  test('an authority grant that does not resolve from the registry is refused (never a bare ref)', () => {
+    const { thresholds } = authoredSetup();
+    const { authorities } = authorityRegistryWithGrant({ registerGrant: false });
+    const decision = ownerDecisionFor(thresholds);
+    const resolution = resolveThresholdDecision(thresholds, decision, authorities, { keyRegistry: KEY_REGISTRY });
+    assert.equal(resolution.resolved, false);
+    assert.equal(resolution.reason, 'authority_grant_unregistered');
+  });
+
+  test('a non-owner actor (not the authenticated owner=user) is refused', () => {
+    const { thresholds, authorities, keyRegistry } = authoredSetup();
+    const decision = ownerDecisionFor(thresholds, { actorId: 'prn-annotator-a' });
+    const resolution = resolveThresholdDecision(thresholds, decision, authorities, { keyRegistry });
+    assert.equal(resolution.resolved, false);
+    assert.equal(resolution.reason, 'decision_actor_not_owner_user');
+  });
+
+  test('an expired authority grant is refused at decision time', () => {
+    const thresholds = canonicalThresholds();
+    const { authorities } = authorityRegistryWithGrant({ expiresAt: '2026-01-02T00:00:00.000Z' });
+    const decision = ownerDecisionFor(thresholds, { timestamp: '2026-03-24T00:00:00.000Z' });
+    const resolution = resolveThresholdDecision(thresholds, decision, authorities, { keyRegistry: KEY_REGISTRY });
+    assert.equal(resolution.resolved, false);
+    assert.equal(resolution.reason, 'authority_grant_expired_at_decision_time');
+  });
+});
+
 describe('S2-006 lexicographic decision rule (spec §8)', () => {
   test('un-authored thresholds (repo preregistration) -> NEEDS_INPUT, never implicit defaults', () => {
     const thresholds = JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', 's2-006-thresholds.json'), 'utf8'));
@@ -249,17 +408,63 @@ describe('S2-006 lexicographic decision rule (spec §8)', () => {
     assert.equal(decision.winner, null);
     assert.ok(decision.needsInputReasons.includes('missing_human_decision'));
     assert.ok(decision.needsInputReasons.includes('missing_thresholds'));
+    assert.ok(decision.needsInputDetails.some((d) => d.startsWith('threshold_decision_missing')));
+  });
+
+  test('a non-null ownerDecisionRef is bookkeeping, never authority (review P1-5)', () => {
+    // the historical bug: any non-empty ownerDecisionRef string was treated as
+    // sufficient authority and top-level soft_thresholds were silently read;
+    // now only a resolvable canonical HumanDecision counts, and the canonical
+    // nested document path is the only one consulted.
+    const thresholds = canonicalThresholds({ ownerDecisionRef: 'hd-recorded-but-unresolved' });
+    const decision = decideLexicographic({
+      systems: [{ systemId: 'rubric-candidate', metrics: rubricMetrics, isCandidate: true, cost: 1, latency: 1 }],
+      thresholds,
+    });
+    assert.equal(decision.status, 'NEEDS_INPUT');
+    assert.ok(decision.needsInputReasons.includes('missing_human_decision'));
+    assert.ok(decision.needsInputDetails.some((d) => d.includes('hd-recorded-but-unresolved')));
+  });
+
+  test('green path: canonical authored thresholds + signed owner decision -> DECIDED', () => {
+    const { thresholds, authorities, decision: ownerDecision, keyRegistry } = authoredSetup();
+    const decision = decideLexicographic({
+      systems: [{ systemId: 'rubric-candidate', metrics: rubricMetrics, isCandidate: true, cost: 1, latency: 1 }],
+      thresholds,
+      ownerDecision,
+      authorities,
+      keyRegistry,
+    });
+    assert.equal(decision.status, 'DECIDED');
+    assert.equal(decision.winner, 'rubric-candidate');
+    assert.deepEqual(decision.needsInputReasons, []);
+    assert.deepEqual(decision.needsInputDetails, []);
+  });
+
+  test('NEEDS_INPUT without the signed decision even when every numeric is authored', () => {
+    const { thresholds } = authoredSetup();
+    const decision = decideLexicographic({
+      systems: [{ systemId: 'rubric-candidate', metrics: rubricMetrics, isCandidate: true, cost: 1, latency: 1 }],
+      thresholds,
+    });
+    assert.equal(decision.status, 'NEEDS_INPUT');
+    assert.deepEqual(decision.needsInputReasons, ['missing_human_decision']);
+    assert.deepEqual(decision.winner, null);
   });
 
   test('abstain-all cannot win: the coverage gate rejects it even with high raw precision', () => {
     const abstainPredictions = Object.fromEntries(cases.map((c) => [c.caseId, { verdict: 'INSUFFICIENT_EVIDENCE', reasonCodes: ['missing_citation'], missingnessKind: 'none' }]));
     const abstainMetrics = metricsFor(abstainPredictions);
+    const setup = authoredSetup();
     const decision = decideLexicographic({
       systems: [
         { systemId: 'abstain-all', metrics: abstainMetrics, cost: 0, latency: 0 },
         { systemId: 'rubric-candidate', metrics: rubricMetrics, isCandidate: true, cost: 1, latency: 1 },
       ],
-      thresholds: authorThresholds(),
+      thresholds: setup.thresholds,
+      ownerDecision: setup.decision,
+      authorities: setup.authorities,
+      keyRegistry: setup.keyRegistry,
     });
     assert.equal(decision.perSystem['abstain-all'].eligible, false);
     assert.equal(decision.perSystem['abstain-all'].step, 'coverage_gate');
@@ -282,12 +487,16 @@ describe('S2-006 lexicographic decision rule (spec §8)', () => {
     }
     const mediocreMetrics = metricsFor(mediocre);
 
+    const setup = authoredSetup();
     const decision = decideLexicographic({
       systems: [
         { systemId: 'leaky-perfect', metrics: leakyMetrics, isCandidate: true, cost: 1, latency: 1 },
         { systemId: 'clean-mediocre', metrics: mediocreMetrics, cost: 5, latency: 10 },
       ],
-      thresholds: authorThresholds(),
+      thresholds: setup.thresholds,
+      ownerDecision: setup.decision,
+      authorities: setup.authorities,
+      keyRegistry: setup.keyRegistry,
     });
     assert.equal(decision.perSystem['leaky-perfect'].eligible, false);
     assert.equal(decision.perSystem['leaky-perfect'].step, 'hard_violations');
@@ -296,12 +505,16 @@ describe('S2-006 lexicographic decision rule (spec §8)', () => {
   });
 
   test('cost decides among eligible non-inferior candidates before latency', () => {
+    const setup = authoredSetup();
     const decision = decideLexicographic({
       systems: [
         { systemId: 'rubric-candidate', metrics: rubricMetrics, isCandidate: true, cost: 10, latency: 5 },
         { systemId: 'slower-but-cheap', metrics: rubricMetrics, cost: 2, latency: 99 },
       ],
-      thresholds: authorThresholds(),
+      thresholds: setup.thresholds,
+      ownerDecision: setup.decision,
+      authorities: setup.authorities,
+      keyRegistry: setup.keyRegistry,
     });
     assert.equal(decision.status, 'DECIDED');
     assert.equal(decision.winner, 'slower-but-cheap');
@@ -312,10 +525,24 @@ describe('S2-006 lexicographic decision rule (spec §8)', () => {
       { systemId: 'sys-a', metrics: rubricMetrics, isCandidate: true, cost: 2, latency: latA },
       { systemId: 'sys-b', metrics: rubricMetrics, cost: 2, latency: latB },
     ];
-    const byLatency = decideLexicographic({ systems: systems(10, 5), thresholds: authorThresholds() });
+    const setup = authoredSetup();
+    const byLatency = decideLexicographic({
+      systems: systems(10, 5),
+      thresholds: setup.thresholds,
+      ownerDecision: setup.decision,
+      authorities: setup.authorities,
+      keyRegistry: setup.keyRegistry,
+    });
     assert.equal(byLatency.status, 'DECIDED');
     assert.equal(byLatency.winner, 'sys-b');
-    const noTieRule = decideLexicographic({ systems: systems(10, 5), thresholds: authorThresholds({ tie: null }) });
+    const noTieSetup = authoredSetup({ tie: null });
+    const noTieRule = decideLexicographic({
+      systems: systems(10, 5),
+      thresholds: noTieSetup.thresholds,
+      ownerDecision: noTieSetup.decision,
+      authorities: noTieSetup.authorities,
+      keyRegistry: noTieSetup.keyRegistry,
+    });
     assert.equal(noTieRule.status, 'HUMAN_REVIEW');
     assert.equal(noTieRule.winner, null);
   });
@@ -331,16 +558,23 @@ describe('S2-006 lexicographic decision rule (spec §8)', () => {
       }
     }
     const worseMetrics = metricsFor(worse);
+    const setup = authoredSetup({
+      delta: 0.05, floor: 0.4,
+      soft: {
+        citation_entailment_f1: { metric: 'citation_entailment_f1', operator: '>=', value: 0.3 },
+        stale_invalidation_recall: { metric: 'stale_invalidation_recall', operator: '>=', value: 0.5 },
+        false_advisory_acceptance_rate: { metric: 'false_advisory_acceptance_rate', operator: '<=', value: 0.2 },
+      },
+    });
     const decision = decideLexicographic({
       systems: [
         { systemId: 'rubric-candidate', metrics: rubricMetrics, isCandidate: true, cost: 5, latency: 1 },
         { systemId: 'degraded', metrics: worseMetrics, cost: 1, latency: 1 },
       ],
-      thresholds: authorThresholds({ delta: 0.05, floor: 0.4, soft: {
-        citation_entailment_f1: { metric: 'citation_entailment_f1', operator: '>=', value: 0.3 },
-        stale_invalidation_recall: { metric: 'stale_invalidation_recall', operator: '>=', value: 0.5 },
-        false_advisory_acceptance_rate: { metric: 'false_advisory_acceptance_rate', operator: '<=', value: 0.2 },
-      } }),
+      thresholds: setup.thresholds,
+      ownerDecision: setup.decision,
+      authorities: setup.authorities,
+      keyRegistry: setup.keyRegistry,
     });
     assert.equal(decision.perSystem['rubric-candidate'].eligible, true, JSON.stringify(decision.perSystem));
     assert.equal(decision.pairedIntervals.length, 1);

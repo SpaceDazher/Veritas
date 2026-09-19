@@ -410,23 +410,31 @@ export function verifyDependencyBinding(record, io = {}) {
     pinnedPaths.add(relPath);
   }
 
-  // ---- 8. carried upstream limits, from bytes ------------------------------
+  // ---- 8. owner-input state is RECORDED, never required to be empty (P2-7) --
+  // The gate canonizes the dependency base (§1); whether the method owner has
+  // already authorized thresholds or an external stratum is downstream §16
+  // verdict state (verify-s2-006 deriveVerdict), not a dependency blocker —
+  // a later owner decision must not retroactively break the dependency proof.
+  // The observed state is recorded (deterministically) in
+  // `resolved.ownerInputs` on a green run.
+  let ownerInputs = null;
   try {
     const thresholds = JSON.parse(readWorkingTreeFile('contracts/s2-006-thresholds.json').toString('utf8'));
-    require(thresholds.status === 'NEEDS_INPUT', 'upstream-limits:thresholds-not-needs-input');
-    require(thresholds.method_owner === null, 'upstream-limits:method-owner-already-set');
-    require(thresholds.ownerDecisionRef === null, 'upstream-limits:owner-decision-already-set');
-    checked.push('upstream-limits:thresholds-preregistration');
-  } catch {
-    issues.push('contracts/s2-006-thresholds.json:unreadable');
-  }
-  try {
     const manifest = JSON.parse(readWorkingTreeFile('corpus/s2-006/manifest.json').toString('utf8'));
-    require(manifest.externalStratum?.status === 'NEEDS_INPUT', 'upstream-limits:external-stratum-not-needs-input');
-    require(manifest.externalStratum?.reason === 'evaluator_not_independent', 'upstream-limits:external-stratum-reason-drift');
-    checked.push('upstream-limits:fixture-only-corpus');
+    require(thresholds !== null && typeof thresholds === 'object' && !Array.isArray(thresholds), 'owner-inputs:thresholds-not-object');
+    require(typeof thresholds.status === 'string', 'owner-inputs:thresholds-status-not-string');
+    require(manifest !== null && typeof manifest === 'object' && !Array.isArray(manifest), 'owner-inputs:manifest-not-object');
+    ownerInputs = {
+      thresholdsStatus: thresholds.status,
+      methodOwner: thresholds.method_owner ?? null,
+      ownerDecisionRef: thresholds.ownerDecisionRef ?? null,
+      externalStratumStatus: manifest.externalStratum?.status ?? null,
+      externalStratumReason: manifest.externalStratum?.reason ?? null,
+      note: 'recorded, not required to be empty: owner-input state feeds the §16 verdict derivation, not the dependency gate (review P2-7)',
+    };
+    checked.push('owner-inputs:state-recorded');
   } catch {
-    issues.push('corpus/s2-006/manifest.json:unreadable');
+    issues.push('owner-inputs:unreadable');
   }
 
   // ---- 9. consumer inputs must be pinned ------------------------------------
@@ -451,7 +459,7 @@ export function verifyDependencyBinding(record, io = {}) {
     }
   }
 
-  return { ok: issues.length === 0, checked: checked.length, issues };
+  return { ok: issues.length === 0, checked: checked.length, issues, ownerInputs };
 }
 
 // Deterministic `resolved` section, written ONLY on a green FULL_GIT_BYTES run.
@@ -480,6 +488,7 @@ function resolvedSection(record, result) {
       dependencyGate: 0,
       blockedDependency: null,
     },
+    ownerInputs: result.ownerInputs ?? null,
   };
 }
 
