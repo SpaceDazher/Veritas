@@ -1,0 +1,366 @@
+// S2-006 wave 2A — store contract tests (spec §11).
+// Offline part: InMemoryVerifierStore immutability, atomicity, idempotency
+// ledger/outbox semantics and the external-call state machine, plus static
+// structure checks of migrations/0005_verifier_store.sql.
+// PostgreSQL part: exercised ONLY when a database is reachable; otherwise the
+// tests are skipped with an explicit NOT_RUN_DB marker (spec §11: absence of
+// PostgreSQL is NOT_RUN_DB + NEEDS_INPUT, never a silent pass).
+import { describe, test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { canonicalize, canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { getVerificationResult } from '../../src/lib/verifier/api.mjs';
+import {
+  InMemoryVerifierStore,
+  PostgresVerifierStore,
+} from '../../src/lib/verifier/store.mjs';
+import {
+  IdempotencyConflict,
+  NeedsInput,
+  ReconciliationRequired,
+  VerifierError,
+} from '../../src/lib/verifier/errors.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const HEX_A = 'a'.repeat(64);
+const HEX_B = 'b'.repeat(64);
+
+function makeResultRecord(resultId, status = 'READY_FOR_HUMAN_REVIEW') {
+  return {
+    contractVersion: '1.0.0',
+    resultId,
+    requestRef: 'svr-store-1',
+    inputDigests: { artifactDigest: HEX_A, rubricDigest: HEX_A, corpusManifestDigest: HEX_A, thresholdsDigest: HEX_A },
+    outputDigest: HEX_B,
+    items: [],
+    disagreements: [],
+    criticalFindings: [],
+    abstentions: [],
+    coverage: { denominator: 0, evaluated: 0, missing: 0 },
+    independenceProfileRef: 'ind-unverified',
+    humanDecisionRequired: true,
+    status,
+  };
+}
+
+function publishArgs(store, { operationId, records, idempotencyKey = 'idem-store-1', operation = 'publishVerificationResult' }) {
+  return store.publish({
+    workspaceId: 'ws-verifier',
+    operationId,
+    actor: 'prn-evaluation-harness',
+    operation,
+    idempotencyKey,
+    records,
+    // Constant audit payload: the idempotency digest must bind actor +
+    // operation + records, not the operation id (a retry uses a new id).
+    audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: { probe: 'store-test' } },
+  });
+}
+
+describe('S2-006 InMemory verifier store contracts', () => {
+  test('records are immutable: same id with different content conflicts without mutation', async () => {
+    const store = new InMemoryVerifierStore();
+    const record = makeResultRecord('sres-store-1');
+    await publishArgs(store, { operationId: 'op-store-1', records: [{ kind: 'result', record }] });
+    const mutated = makeResultRecord('sres-store-1', 'INCOMPLETE');
+    await assert.rejects(
+      publishArgs(store, { operationId: 'op-store-2', idempotencyKey: 'idem-store-2', records: [{ kind: 'result', record: mutated }] }),
+      IdempotencyConflict,
+    );
+    assert.deepEqual(store.getRecord('result', 'sres-store-1'), record, 'original immutable record untouched');
+  });
+
+  test('byte-identical republication under a different operation id does not conflict or duplicate', async () => {
+    const store = new InMemoryVerifierStore();
+    const record = makeResultRecord('sres-store-2');
+    await publishArgs(store, { operationId: 'op-store-3', idempotencyKey: 'idem-store-3', records: [{ kind: 'result', record }] });
+    const second = await publishArgs(store, { operationId: 'op-store-4', idempotencyKey: 'idem-store-4', records: [{ kind: 'result', record }] });
+    assert.equal(second.replayed, false, 'a new operation id is a new operation, not a ledger replay');
+    assert.deepEqual(store.getRecord('result', 'sres-store-2'), record, 'record stays byte-identical');
+    assert.equal([...store.records.get('result').values()].length, 1, 'no duplicate record is created');
+  });
+
+  test('a failed multi-record publish rolls back every partial write (atomicity)', async () => {
+    const store = new InMemoryVerifierStore();
+    const good = makeResultRecord('sres-store-good');
+    // First publish a conflicting record, then a batch whose second member collides.
+    await publishArgs(store, { operationId: 'op-store-5', idempotencyKey: 'idem-store-5', records: [{ kind: 'result', record: good }] });
+    const fresh = makeResultRecord('sres-store-fresh');
+    const colliding = makeResultRecord('sres-store-good', 'BLOCKED');
+    await assert.rejects(
+      publishArgs(store, {
+        operationId: 'op-store-6', idempotencyKey: 'idem-store-6',
+        records: [{ kind: 'result', record: fresh }, { kind: 'result', record: colliding }],
+      }),
+      IdempotencyConflict,
+    );
+    assert.equal(store.getRecord('result', 'sres-store-fresh'), null, 'no partial record survives a failed batch');
+    assert.equal(store.listLedger().length, 1);
+    assert.equal(store.listOutbox().length, 1);
+  });
+
+  test('outbox payload digests are canonical and publication order is deterministic', async () => {
+    const build = () => {
+      const store = new InMemoryVerifierStore();
+      const record = makeResultRecord('sres-store-det');
+      store.publish({
+        workspaceId: 'ws-verifier',
+        operationId: 'op-det-1',
+        actor: 'prn-evaluation-harness',
+        operation: 'publishVerificationResult',
+        idempotencyKey: 'idem-det-1',
+        records: [{ kind: 'result', record }],
+        audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: { z: 1, a: 'x' } },
+      }).catch(() => {});
+      return store;
+    };
+    const first = build().listOutbox();
+    const second = build().listOutbox();
+    assert.deepEqual(first, second, 'no wall clock, locale or iteration-order dependence');
+    assert.match(first[0].payload_digest, /^[0-9a-f]{64}$/);
+  });
+
+  test('ledger replays carry the recorded outcome digest; reconciliation rows refuse retries', async () => {
+    const store = new InMemoryVerifierStore();
+    const record = makeResultRecord('sres-store-ledger');
+    const first = await publishArgs(store, { operationId: 'op-store-7', idempotencyKey: 'idem-store-7', records: [{ kind: 'result', record }] });
+    const replay = await publishArgs(store, { operationId: 'op-store-8', idempotencyKey: 'idem-store-8', records: [{ kind: 'result', record }] });
+    assert.equal(replay.outcomeDigest, first.outcomeDigest);
+    assert.match(first.outcomeDigest, /^[0-9a-f]{64}$/);
+
+    store.injectFault({ at: 'unknown-commit', once: true });
+    await assert.rejects(
+      publishArgs(store, { operationId: 'op-store-9', idempotencyKey: 'idem-store-9', records: [{ kind: 'result', record: makeResultRecord('sres-store-unknown') }] }),
+      VerifierError,
+    );
+    // Retry with the SAME idempotency key (a different operation id cannot
+    // bypass the binding): the reconciliation row must refuse re-execution.
+    await assert.rejects(
+      publishArgs(store, { operationId: 'op-store-10', idempotencyKey: 'idem-store-9', records: [{ kind: 'result', record: makeResultRecord('sres-store-unknown') }] }),
+      ReconciliationRequired,
+      'retry against a RECONCILIATION_REQUIRED ledger row escalates, never blindly re-executes',
+    );
+  });
+
+  test('operation ids are validated and unknown record kinds are rejected', async () => {
+    const store = new InMemoryVerifierStore();
+    await assert.rejects(
+      publishArgs(store, { operationId: 'bad id!', records: [{ kind: 'result', record: makeResultRecord('sres-x') }] }),
+      (error) => error instanceof VerifierError && error.code === 'OPERATION_ID_INVALID',
+    );
+    await assert.rejects(
+      store.publish({
+        workspaceId: 'ws-verifier', operationId: 'op-store-11', actor: 'prn-x', operation: 'op',
+        records: [{ kind: 'quantum_state', record: { quantumStateId: 'q-1' } }],
+        audit: { type: 'X', payload: {} },
+      }),
+      (error) => error instanceof VerifierError && error.code === 'RECORD_KIND_UNKNOWN',
+    );
+  });
+
+  test('external call state machine enforces RESERVED -> ACCEPTED -> FINALIZED -> RECONCILIATION_REQUIRED', async () => {
+    const store = new InMemoryVerifierStore();
+    const reserved = await store.beginExternalCall({
+      callId: 'call-1', workspaceId: 'ws-verifier', actor: 'prn-evaluation-harness',
+      grantRef: 'grt-verifier-1', operationId: 'op-call-1', reservation: { items: 2 },
+    });
+    assert.equal(reserved.state, 'RESERVED');
+    assert.equal(reserved.fencingToken, 1);
+
+    await assert.rejects(
+      store.finalizeExternalCall({ callId: 'call-1', fencingToken: 1, responseDigest: HEX_A, settlement: {} }),
+      (error) => error instanceof VerifierError && error.code === 'INVALID_TRANSITION',
+      'RESERVED cannot skip ACCEPTED',
+    );
+    await store.acceptExternalCall({ callId: 'call-1', fencingToken: 1 });
+    await store.finalizeExternalCall({ callId: 'call-1', fencingToken: 1, responseDigest: HEX_A, settlement: { cost: 0 } });
+    await assert.rejects(
+      store.markExternalCallReconciliation({ callId: 'call-1', fencingToken: 1, reason: 'late regret' }),
+      (error) => error instanceof VerifierError && error.code === 'INVALID_TRANSITION',
+      'FINALIZED is terminal for reconciliation',
+    );
+    const call = await store.readExternalCall('call-1');
+    assert.equal(call.state, 'FINALIZED');
+    assert.equal(call.fencing_token, 1);
+  });
+
+  test('calibration report listing filters by corpus version', async () => {
+    const store = new InMemoryVerifierStore();
+    const report = {
+      contractVersion: '1.0.0', reportId: 'rep-store-1', corpusVersion: '0.3.0',
+      rubricDigest: HEX_A, thresholdsDigest: HEX_A,
+    };
+    await store.publish({
+      workspaceId: 'ws-verifier', operationId: 'op-store-12', actor: 'prn-evaluation-harness',
+      operation: 'publishCalibrationReport', idempotencyKey: 'idem-store-12',
+      records: [{ kind: 'calibration_report', record: report }],
+      audit: { type: 'CALIBRATION_REPORT_PUBLISHED', recordKind: 'calibration_report', payload: { reportId: report.reportId } },
+    });
+    assert.equal(store.listCalibrationReports({ corpusVersion: '9.9.9' }).length, 0);
+    assert.equal(store.listCalibrationReports({ corpusVersion: '0.3.0' }).length, 1);
+  });
+
+  test('canonical serialization of stored records is stable across reads', async () => {
+    const store = new InMemoryVerifierStore();
+    const record = makeResultRecord('sres-store-canonical', 'INCOMPLETE');
+    await publishArgs(store, { operationId: 'op-store-13', idempotencyKey: 'idem-store-13', records: [{ kind: 'result', record }] });
+    const readBack = store.getRecord('result', 'sres-store-canonical');
+    assert.equal(canonicalize(readBack), canonicalize(record));
+    assert.equal(canonicalDigest(readBack), canonicalDigest(record));
+  });
+});
+
+describe('S2-006 migrations/0005_verifier_store.sql (static structure)', () => {
+  const sql = fs.readFileSync(path.join(ROOT, 'migrations/0005_verifier_store.sql'), 'utf8');
+
+  test('introduces all verifier tables with immutable payload columns and typed state machines', () => {
+    for (const table of [
+      'verifier_request', 'verifier_result', 'verifier_calibration_report',
+      'verifier_adjudication_record', 'verifier_run',
+      'verifier_invalidation_event', 'verifier_external_call_run',
+      'verifier_operation_ledger', 'verifier_audit_outbox',
+    ]) {
+      assert.match(sql, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`), `missing table ${table}`);
+    }
+    assert.match(sql, /state\s+VARCHAR\(32\) NOT NULL CHECK \(state IN \(\s*'RESERVED', 'ACCEPTED', 'FINALIZED', 'RECONCILIATION_REQUIRED'/);
+    assert.match(sql, /fencing_token\s+BIGINT NOT NULL UNIQUE/);
+    assert.match(sql, /CHECK \(state <> 'FINALIZED' OR \(response_digest IS NOT NULL AND settlement IS NOT NULL\)\)/);
+    assert.match(sql, /CHECK \(state <> 'RECONCILIATION_REQUIRED' OR reconcile_reason IS NOT NULL\)/);
+  });
+
+  test('idempotency key is unique with a typed-conflict-friendly partial index', () => {
+    assert.match(sql, /CREATE UNIQUE INDEX idx_verifier_operation_idem\s+ON verifier_operation_ledger \(workspace_id, idempotency_key\)\s+WHERE idempotency_key IS NOT NULL/);
+    assert.match(sql, /status\s+VARCHAR\(32\) NOT NULL CHECK \(status IN \('COMMITTED', 'RECONCILIATION_REQUIRED'\)\)/);
+  });
+
+  test('frozen migrations 0001-0004 are untouched by this slice', () => {
+    for (const name of ['0001_veritas_board.sql', '0002_source_ingestion.sql', '0003_claim_graph.sql', '0004_claim_graph_state.sql']) {
+      assert.ok(fs.existsSync(path.join(ROOT, 'migrations', name)));
+      assert.doesNotMatch(fs.readFileSync(path.join(ROOT, 'migrations', name), 'utf8'), /verifier_request/);
+    }
+  });
+});
+
+describe('S2-006 PostgresVerifierStore (real database when available)', () => {
+  const connectionString = process.env.DATABASE_URL;
+
+  test('transactional publish, idempotent replay, ledger/outbox uniqueness and fencing on PostgreSQL', async (t) => {
+    if (!connectionString) {
+      t.skip('NOT_RUN_DB: DATABASE_URL is not configured; PostgreSQL store semantics were verified on the in-memory implementation only');
+      return;
+    }
+    let pg;
+    try {
+      pg = await import('pg');
+    } catch {
+      t.skip('NOT_RUN_DB: the pg driver is unavailable');
+      return;
+    }
+    const { applyMigrations } = await import('../../scripts/apply-migrations.mjs');
+    const pool = new pg.default.Pool({ connectionString, max: 1, connectionTimeoutMillis: 4000 });
+    const workspaceId = `ws-vtest-p${process.pid}`;
+    try {
+      await pool.query('SELECT 1');
+    } catch (error) {
+      await pool.end().catch(() => {});
+      t.skip(`NOT_RUN_DB: PostgreSQL is not reachable (${error.code ?? error.message})`);
+      return;
+    }
+    try {
+      await applyMigrations({ connectionString, pool });
+      const store = new PostgresVerifierStore(pool);
+      const record = makeResultRecord(`sres-pg-p${process.pid}`);
+      const args = {
+        records: [{ kind: 'result', record }],
+        audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: { operationId: 'op-pg-1' } },
+      };
+      const first = await store.publish({
+        workspaceId, operationId: `op-pg-1-p${process.pid}`, actor: 'prn-evaluation-harness',
+        operation: 'publishVerificationResult', idempotencyKey: `idem-pg-p${process.pid}`, ...args,
+      });
+      assert.equal(first.replayed, false);
+      const replay = await store.publish({
+        workspaceId, operationId: `op-pg-2-p${process.pid}`, actor: 'prn-evaluation-harness',
+        operation: 'publishVerificationResult', idempotencyKey: `idem-pg-p${process.pid}`, ...args,
+      });
+      assert.equal(replay.replayed, true, 'same idempotency key + same args replays the stored outcome');
+      assert.equal(replay.outcomeDigest, first.outcomeDigest);
+      const ledger = await store.listLedger();
+      assert.equal(ledger.filter((row) => row.workspace_id === workspaceId).length, 1, 'no duplicate ledger writes');
+      const outbox = await store.listOutbox();
+      assert.equal(outbox.filter((row) => row.operation_id === `op-pg-1-p${process.pid}`).length, 1, 'no duplicate outbox writes');
+      assert.deepEqual(await store.getRecord('result', record.resultId), record, 'JSONB roundtrip preserves the immutable record');
+
+      await assert.rejects(
+        store.publish({
+          workspaceId, operationId: `op-pg-3-p${process.pid}`, actor: 'prn-evaluation-harness',
+          operation: 'publishVerificationResult', idempotencyKey: `idem-pg-p${process.pid}`,
+          records: [{ kind: 'result', record: makeResultRecord(record.resultId, 'BLOCKED') }],
+          audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: {} },
+        }),
+        IdempotencyConflict,
+        'idempotency key reuse with different args conflicts without mutation',
+      );
+      assert.equal((await store.getRecord('result', record.resultId)).status, 'READY_FOR_HUMAN_REVIEW');
+
+      // Fenced external-call machine on the real database.
+      const callId = `call-pg-p${process.pid}`;
+      const reserved = await store.beginExternalCall({
+        callId, workspaceId, actor: 'prn-evaluation-harness', grantRef: 'grt-verifier-1',
+        operationId: `op-pg-call-p${process.pid}`, reservation: { items: 1 },
+      });
+      const second = await store.beginExternalCall({
+        callId: `${callId}-b`, workspaceId, actor: 'prn-evaluation-harness', grantRef: 'grt-verifier-1',
+        operationId: `op-pg-call-b-p${process.pid}`, reservation: { items: 1 },
+      });
+      assert.notEqual(second.fencingToken, reserved.fencingToken, 'fencing tokens from the sequence are unique');
+      await assert.rejects(
+        store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken + 999 }),
+        (error) => error instanceof VerifierError && error.code === 'ACL_DENIED',
+      );
+      await store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken });
+      await store.markExternalCallReconciliation({ callId, fencingToken: reserved.fencingToken, reason: 'pg crash simulation' });
+      await assert.rejects(
+        store.finalizeExternalCall({ callId, fencingToken: reserved.fencingToken, responseDigest: HEX_A, settlement: {} }),
+        ReconciliationRequired,
+        'reconciled call refuses finalize on the real database too',
+      );
+      const callRow = await store.readExternalCall(callId);
+      assert.equal(callRow.state, 'RECONCILIATION_REQUIRED');
+      assert.equal(callRow.response_digest, null);
+
+      // Atomicity: a record collision rolls the whole batch back.
+      const fresh = makeResultRecord(`sres-pg-fresh-p${process.pid}`);
+      const colliding = makeResultRecord(record.resultId, 'BLOCKED');
+      await assert.rejects(
+        store.publish({
+          workspaceId, operationId: `op-pg-4-p${process.pid}`, actor: 'prn-evaluation-harness',
+          operation: 'publishVerificationResult', idempotencyKey: `idem-pg-fresh-p${process.pid}`,
+          records: [{ kind: 'result', record: fresh }, { kind: 'result', record: colliding }],
+          audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: {} },
+        }),
+        IdempotencyConflict,
+      );
+      assert.equal(await store.getRecord('result', fresh.resultId), null, 'no partial commit after a failed batch');
+    } finally {
+      for (const table of [
+        'verifier_result', 'verifier_request', 'verifier_calibration_report',
+        'verifier_adjudication_record', 'verifier_run',
+        'verifier_invalidation_event', 'verifier_external_call_run',
+        'verifier_operation_ledger',
+      ]) {
+        await pool.query(`DELETE FROM ${table} WHERE workspace_id = $1`, [workspaceId]).catch(() => {});
+      }
+      await pool.query('DELETE FROM verifier_audit_outbox WHERE operation_id LIKE $1', [`%p${process.pid}`]).catch(() => {});
+      await pool.end().catch(() => {});
+    }
+  });
+});
+
+describe('S2-006 NotRunDb semantics', () => {
+  test('a missing store for a read command is NEEDS_INPUT, never a silent skip', () => {
+    assert.throws(() => getVerificationResult(null, { resultId: 'x' }), NeedsInput);
+  });
+});
