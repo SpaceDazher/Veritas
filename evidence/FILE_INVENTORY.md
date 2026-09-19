@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 537.
+Generated from `git ls-files`; count: 538.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -533,6 +533,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/transactional-audit.test.mjs`
 - `tests/synthesis/contracts.schemas.test.mjs`
 - `tests/synthesis/contracts.types.test.mjs`
+- `tests/synthesis/db-replay-gates.test.mjs`
 - `tests/synthesis/dependency-binding.test.mjs`
 - `tests/synthesis/freeze-scope.test.mjs`
 - `tests/synthesis/retrieval.test.mjs`
