@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "8b6d8883738051e801b48dd8133971385b494dcb",
+  "testedImplementationCommit": "baa8a19e85b732d007ce9cd3101351879842722f",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "8b6d8883738051e801b48dd8133971385b494dcb",
-  "sourceTree": "35a7ede03297c871052b3555d1bf537062ee9dfd",
-  "exitCode": 1,
-  "passed": false,
+  "sourceCommit": "baa8a19e85b732d007ce9cd3101351879842722f",
+  "sourceTree": "6661a580638e9f4bcfc52d1d0a111980062c5b57",
+  "exitCode": 0,
+  "passed": true,
   "commands": [
     {
       "id": "archive",
@@ -41,9 +41,8 @@
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "test.mjs': '3f5caca544417d69dbcad6c21837fd2fbeaaf22fa907a22778b4f7bce1696a11',\r\n    'tests/ingestion/contracts.types.test.mjs': '0850f5320a80ea7258887f2001e138174c527d35cdf7b79e48185e9f8a52d0aa',\r\n    'tests/ingestion/dependency-binding.test.mjs': '3d0f129fc344d49904a9764cfd400962eca23989590169766bfaae715370d857',\r\n    'tests/ingestion/export-policy.test.mjs': 'a5d92c73295d2f4dbfe32d26115a0af9a6dc89a05e0d2372cf90ee6cee0483cd',\r\n    'tests/ingestion/migrations.test.mjs': '6fd02dcd659e50ce1342a698009f83a40ca9fa7cd25c16a10c3df76898aa4655',\r\n    'tests/ingestion/pipeline.test.mjs': '17b49cf96ebde73867ae9691a31b813b2bed6f939eb4e3fdd077f1c439f85377',\r\n    'tests/ingestion/run-determinism.test.mjs': '305b4d361854146cc93695523a24cf176cfeb8cd400efb6ba8f68b3813077095',\r\n    'tests/ingestion/security-hardening.test.mjs': '0bf3669e13ddea38090cfbd163a42e8c9d1a5f060914532ade880ad7b30afe04',\r\n    'tests/ingestion/time-model.test.mjs': '1fff8aadf42b66507908a0eb994d2dba50aaa08c72bffb010c78b6921458c246',\r\n    'tests/ingestion/transactional-audit.test.mjs': 'e4f1589df9a8b1884aeea0946bf61ce7ae3c68a5a45acd962e9f0c70ab575cc7'\r\n  },\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "synthetic-smoke",
@@ -54,9 +53,8 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 534,\n  \"listedFiles\": 533,\n  \"missingFromInventory\": [\n    \"evidence/s2-005-commit-manifest.json\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "public-artifacts",
