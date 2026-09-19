@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "66d595f3673dee803c755e416d6fbec4b4fd95c3",
+  "testedImplementationCommit": "d4875b8549fee37338d742ff30869e1b9ab40a27",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "66d595f3673dee803c755e416d6fbec4b4fd95c3",
-  "sourceTree": "331c76fee3ca88241afe5fc1a6086dd4887b2997",
-  "exitCode": 1,
-  "passed": false,
+  "sourceCommit": "d4875b8549fee37338d742ff30869e1b9ab40a27",
+  "sourceTree": "0967f05b83bb0dcc75b507ae50e302bc75687d8e",
+  "exitCode": 0,
+  "passed": true,
   "commands": [
     {
       "id": "archive",
@@ -41,9 +41,8 @@
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": ".json': 'e32de7940e5f221f26712ec89fd02f057acf9ada38c35e39f16d2199140ed37b',\r\n    'tests/verifier/fixtures/canonical/evidence-map.json': '33c542e31b168780f911343de762990e919567f945d8c2f1b80fc34cab17c61a',\r\n    'tests/verifier/fixtures/canonical/hypothesis-card.json': 'f0d89585245217279f5241d78209e0fbf99fea0edf641b337a24c5f2a2f68aee',\r\n    'tests/verifier/fixtures/canonical/synthesis-result.json': 'eaf4726b802ef43079dacdaa9248317df9455b373b40824fca47bae3a9b407a2',\r\n    'tests/verifier/fixtures/keys.json': 'f7d2fb96339b501d14e0481828a149a53a792f30e72bf0f1f1ffc9aaa4ffb3e5',\r\n    'tests/verifier/policy.test.mjs': '4dcb38f30859a3f9650d6e54300a0fcb257d2561cb759fa1be714f17b833d98c',\r\n    'tests/verifier/rubric.test.mjs': '82be4c27c3b13fa8e2215acd6ff7691ea17291afdc59fb723a7327ba5bd54ef1',\r\n    'tests/verifier/security-probes.test.mjs': '2e867defdcb8e34c2ed7220993ac455eda77cad454d2c89a63ee5a63170492ba',\r\n    'tests/verifier/signature.test.mjs': '7613ab6b84b76a6c7b35c862e74b61715e67005d38cd472ba3bd9e35753c738f',\r\n    'tests/verifier/store.test.mjs': '265639822c8ed202c8a8e09a319851d91e219032e6614e2aac352cd318038f59'\r\n  },\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "synthetic-smoke",
@@ -54,9 +53,8 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 1,
-      "status": "FAIL",
-      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 653,\n  \"listedFiles\": 644,\n  \"missingFromInventory\": [\n    \"evidence/s2-006-db-crash-a.json\",\n    \"evidence/s2-006-db-crash-b.json\",\n    \"results/s2-006/s2-006-db-comparison.json\",\n    \"tests/verifier/db-replay-crash.test.mjs\",\n    \"tests/verifier/fixtures/canonical/claim.json\",\n    \"tests/verifier/fixtures/canonical/evidence-map.json\",\n    \"tests/verifier/fixtures/canonical/hypothesis-card.json\",\n    \"tests/verifier/fixtures/canonical/README.md\",\n    \"tests/verifier/fixtures/canonical/synthesis-result.json\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
+      "exitCode": 0,
+      "status": "PASS"
     },
     {
       "id": "public-artifacts",
