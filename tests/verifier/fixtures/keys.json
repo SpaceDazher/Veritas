@@ -1,0 +1,45 @@
+{
+  "comment": "S2-006 test-only HMAC custody fixtures (spec section 3). These are NOT secrets: production signing keys live in the custody of named subjects (label custodian, annotators, adjudicator) and are never held by the candidate or the verifier operator. The 'forbidden' list documents custody registrations that policy must refuse outright.",
+  "keys": [
+    {
+      "keyRef": "kms://test/s2-006/label-custodian-1",
+      "custodian": "prn-label-custodian-1",
+      "role": "label_custodian",
+      "secret": "s2-006-fixture-custody-key-label-custodian-1"
+    },
+    {
+      "keyRef": "kms://test/s2-006/annotator-a",
+      "custodian": "prn-annotator-a",
+      "role": "annotator",
+      "secret": "s2-006-fixture-custody-key-annotator-a"
+    },
+    {
+      "keyRef": "kms://test/s2-006/annotator-b",
+      "custodian": "prn-annotator-b",
+      "role": "annotator",
+      "secret": "s2-006-fixture-custody-key-annotator-b"
+    },
+    {
+      "keyRef": "kms://test/s2-006/adjudicator-1",
+      "custodian": "prn-adjudicator-1",
+      "role": "adjudicator",
+      "secret": "s2-006-fixture-custody-key-adjudicator-1"
+    }
+  ],
+  "forbidden": [
+    {
+      "keyRef": "kms://test/s2-006/candidate",
+      "custodian": "prn-candidate-1",
+      "role": "candidate",
+      "secret": "s2-006-fixture-forbidden-candidate-key-1",
+      "reason": "candidate/producer custody is self-attestation by construction; registerKey must refuse"
+    },
+    {
+      "keyRef": "kms://test/s2-006/verifier-operator",
+      "custodian": "prn-verifier-operator-1",
+      "role": "verifier_operator",
+      "secret": "s2-006-fixture-forbidden-operator-key-01",
+      "reason": "the verifier operator must never hold label/adjudication signing keys"
+    }
+  ]
+}
