@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "ticket": "S2-006",
-  "role": "S2-006 DB-backed verifier store replay A vs B (PostgresVerifierStore, separate OS processes)",
+  "role": "S2-006 DB-backed verifier store replay A vs B (PostgresVerifierStore, separate OS processes) + crash/restart phase (probe S DB half)",
   "databaseEngine": "PostgreSQL",
   "databaseSource": "ephemeral loopback-only podman container",
   "schemas": [
@@ -61,8 +61,8 @@
     }
   ],
   "pids": {
-    "run_a": 30704,
-    "run_b": 8352
+    "run_a": 23944,
+    "run_b": 1756
   },
   "executors": {
     "run_a": "exec-db-s2006-a",
@@ -80,8 +80,45 @@
   "committedOps": 4,
   "replayedOps": 1,
   "digests": {
-    "run_a": "4e319f27165f223cca7bcb019a039813bb0cf61e6b616c94c822e11e1a0a25a9",
-    "run_b": "4e319f27165f223cca7bcb019a039813bb0cf61e6b616c94c822e11e1a0a25a9"
+    "run_a": "9ba5286c3befe89cb9d8ca532c600db9ec9f42e3a472e7e8b5773b3f197003e5",
+    "run_b": "9ba5286c3befe89cb9d8ca532c600db9ec9f42e3a472e7e8b5773b3f197003e5"
+  },
+  "crashPhase": {
+    "ok": true,
+    "issues": [],
+    "executors": {
+      "run_a": "exec-db-s2006-crash-a",
+      "run_b": "exec-db-s2006-crash-b"
+    },
+    "crashFirstExecutors": {
+      "run_a": "exec-db-s2006-crash-a",
+      "run_b": "exec-db-s2006-crash-b"
+    },
+    "pids": {
+      "recovery": {
+        "run_a": 31732,
+        "run_b": 25728
+      },
+      "crash_first": {
+        "run_a": 14240,
+        "run_b": 31164
+      }
+    },
+    "fencingToken": 2,
+    "digests": {
+      "run_a": "351ea496bacb40bc8c4f197afe9b238508584ce536fc20c5c74e25a6727044ff",
+      "run_b": "351ea496bacb40bc8c4f197afe9b238508584ce536fc20c5c74e25a6727044ff"
+    },
+    "counts": {
+      "outboxTotal": 9,
+      "ledgerTotal": 3,
+      "externalCallRows": 2,
+      "crashCallEvents": 3,
+      "crashCallFinalizedEvents": 1,
+      "crashCallSettlements": 1,
+      "duplicateOutboxIds": 0
+    },
+    "scenario": "process 1: reserve -> accept -> abrupt death (exit 70, no finalize); process 2: fenced reconciliation over the fencing token, exactly one settlement, zero duplicate ledger/outbox writes"
   },
   "comparison": {
     "ok": true,

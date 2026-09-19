@@ -4,7 +4,7 @@
   "role": "deterministic verifier store replay on PostgreSQL (PostgresVerifierStore, migration 0005)",
   "runId": "s2-006-db-run-b",
   "executorId": "exec-db-s2006-b",
-  "pid": 8352,
+  "pid": 1756,
   "databaseEngine": "PostgreSQL",
   "schema": "run_b",
   "ops": [
@@ -66,7 +66,7 @@
     {
       "operation_id": "op-s2006-replay-adjudication-01",
       "status": "COMMITTED",
-      "idempotency_key": "299f6bc574887ded4953fc700112fa829fe7a36b2a4d70e9bc84e702e681cf46"
+      "idempotency_key": "1bc0418ef0f2e9f9ca08042d1b6432942d1e330e56d63366db608bf5229e9472"
     },
     {
       "operation_id": "op-s2006-replay-calibration-01",
@@ -119,5 +119,5 @@
     }
   ],
   "status": "COMPLETED",
-  "digest": "4e319f27165f223cca7bcb019a039813bb0cf61e6b616c94c822e11e1a0a25a9"
+  "digest": "9ba5286c3befe89cb9d8ca532c600db9ec9f42e3a472e7e8b5773b3f197003e5"
 }

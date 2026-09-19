@@ -4,16 +4,67 @@
 
 The deterministic offline layer is fully green (dependency gate, contract
 types, verifier suite, Run A/B with identical sealed predictions and distinct
-run-manifest digests, fail-closed comparator, adversarial probes A–S with zero
-hard counters, two-process PostgreSQL store replay). The honest ceiling is
-still `NEEDS_INPUT` (spec §16): no method owner has authored numeric
-thresholds, the annotators are fixture principals rather than independent
-humans, and the external corpus stratum does not exist. No unconditional PASS
-or production claim is made anywhere.
+run-manifest digests, fail-closed comparator, adversarial probes A–S with
+ehonest per-probe statuses and zero hard counters, two-process PostgreSQL
+store replay with a green crash/restart phase). The honest ceiling is still
+`NEEDS_INPUT` (spec §16): no method owner has authored numeric thresholds via
+an immutable HumanDecision, the annotators are fixture principals rather than
+independent humans, and the external corpus stratum does not exist. The
+verdict is DERIVED by `deriveVerdict()` in `scripts/verify-s2-006.mjs` from
+the actual evidence fields (review P2-7), never a constant, and
+`needsInputPath` in `evidence/s2-006-summary.json` lists exactly which owner
+inputs would advance it. No unconditional PASS or production claim is made
+anywhere.
+
+### Review fix wave B (this branch, P1-5 / P2-6 / P2-7)
+
+- **P1-5 threshold authority**: `resolveThresholdDecision()` (in
+  `src/lib/verifier/calibration.mjs`) accepts ONLY a canonical immutable
+  HumanDecision (`contracts/human-decision.schema.json`) from the
+  authenticated `owner=user`, bound to the exact canonical-json digest of the
+  thresholds document, whose `authority_binding.grantRef` resolves from the
+  authority registry as a reviewer-issued, signature-verified
+  `threshold-authority` grant (the `registerProviderGrant` mechanism). A bare
+  `ownerDecisionRef` string is bookkeeping, never authority; a failed
+  resolution is `NEEDS_INPUT` with a typed reason, never an implicit default.
+  Soft thresholds are read from the canonical nested path
+  (`thresholds.soft_thresholds`); the historical top-level shortcut is gone.
+- **P2-6 probe S honesty + real crash/restart**: every probe now carries an
+  honest `status: pass | failed | not_run`; a `not_run` mandatory probe is
+  never green. Offline, probe S is `NOT_RUN_DB` and the offline evidence run
+  records `INCOMPLETE_NOT_RUN_DB`; it resolves to green ONLY through the new
+  crash/restart phase of the DB replay (two additional OS processes per
+  schema) and only the aggregator combines it. `verify-s2-006-db-replay`
+  gained a fail-closed `crashPhaseIssues` gate: process 1 reserves + accepts
+  and dies abruptly (exit 70, no finalize); a separate recovery process
+  reconciles over the persisted fencing token, completes EXACTLY ONE
+  settlement, a duplicate settlement replays idempotently, a stale fencing
+  token is refused, a finalized call cannot be dragged back into
+  reconciliation, and zero ledger/outbox rows are written twice.
+- **P2-7 derived verdict**: the dependency gate now RECORDS the owner-input
+  state (`resolved.ownerInputs`) instead of requiring emptiness — a later
+  owner decision cannot retroactively break the dependency proof.
+  `deriveVerdict()` computes the §16 precedence (BLOCKED_SAFETY /
+  BLOCKED_AUTHORITY → BLOCKED_DEPENDENCY → NEEDS_INPUT with the concrete
+  missing-input list → HUMAN_REVIEW → REVISE → PASS_WITH_LIMITS) from actual
+  evidence fields. Lower-precedence observations are still appended to the
+  reason list so a higher-precedence verdict never masks a defect.
+- **Carried fix**: the fixture label/adjudication sets re-signed by review
+  wave A2 are re-bound in `evidence/s2-006-dependency-binding.json`
+  (`s2_006FrozenInputsSha256`), which had been left stale by the earlier
+  wave.
+- **Deliberately NOT fixed here**: the PostgreSQL store still persists no
+  store-level `acl` metadata (the P1-3 inherited-ACL residuality gap on
+  Postgres; adding the `acl JSONB` column also requires
+  `src/lib/verifier/store.mjs`, which is outside this wave's file zone), and
+  the uncertain-billing branch of `PostgresVerifierStore.finalizeExternalCall`
+  can deadlock a saturated single-connection pool (the replay avoids it by
+  settling a parseable `amount: 0`). Both are recorded for a follow-up
+  store-focused wave.
 
 ## 1. Dependency proof
 
-`npm run verify:s2-006-dependencies` → **PASS (76 checks, FULL_GIT_BYTES)**,
+`npm run verify:s2-006-dependencies` → **PASS (75 checks, FULL_GIT_BYTES)**,
 binding written to `evidence/s2-006-dependency-binding.json` (`resolved`
 section, deterministic bytes).
 
@@ -166,57 +217,74 @@ reported only together with coverage.
 
 ## 7. Adversarial probes A–S
 
-19/19 green, 19 attempted violations, **0 actual violations**, hard counters
-all zero (`evidence/s2-006-security-probes.json`): topic-overlap ≠ entailment
-(A); number/unit/negation/modality drift reason codes (B); scope difference ≠
-contradiction (C); correlation/analogy never mechanism (D); span-less output →
+19 probes with honest per-probe statuses (`evidence/s2-006-security-probes.json`,
+review P2-6): 18 `pass` offline, probe S `not_run` (NOT_RUN_DB) offline and
+resolved to green ONLY by the green crash/restart phase of the DB replay in
+the aggregator combine; 0 `failed`; 19 attempted violations, **0 actual
+violations**, hard counters all zero (`evidence/s2-006-db-comparison.json`
+`crashPhase.ok = true`): topic-overlap ≠ entailment (A); number/unit/negation/
+modality drift reason codes (B); scope difference ≠ contradiction (C);
+correlation/analogy never mechanism (D); span-less output →
 INSUFFICIENT_EVIDENCE (E); ten reprints → one evidence family (F); zero
 private leak (G); post-`as_of`/locked-label access before unseal blocked (H);
 producer self-review and forged identities rejected (I); prompt injection
-inert, authority counters zero (J); abstain-all fails the coverage gate (K);
-two identically broken runs fail the comparator (L); post-result threshold/
+inert, authority counters zero (J); abstain-all fails the coverage gate — now
+driven through the real signed threshold-authority decision path (K); two
+identically broken runs fail the comparator (L); post-result threshold/
 label change forces a new version (M); stale parent → dependent result STALE,
 calibration not applied (N); prior art outside the selected corpus → not
 `novel_to_selected_corpus`, world novelty refused (O); provider timeout/refusal
 → typed missingness, never a silent denominator exclusion (P); post-unseal
 label access and comparator candidate re-run are hard fails (Q); role reuse,
-self-attestation and forged signature/digest bindings rejected (R); probe S
-(fenced reconciliation after crash/unknown outcome) — state machine covered
-offline on the in-memory store; the two-process crash/restart variant is
-**NOT_RUN_DB** as a DB-gated scenario.
+self-attestation and forged signature/digest bindings rejected (R); probe S —
+fenced reconciliation after crash: state machine exercised offline on the
+in-memory store AND on PostgreSQL by the two-process crash/restart replay
+(see §8).
 
-## 8. PostgreSQL store replay — RUN (not NOT_RUN_DB)
+## 8. PostgreSQL store replay and crash/restart — RUN (not NOT_RUN_DB)
 
 `npm run verify:s2-006-db-replay` → **PASS**
 (`evidence/s2-006-db-comparison.json`, DB runs bound in
-`evidence/s2-006-db-run-{a,b}.json`): ephemeral loopback-only PostgreSQL
+`evidence/s2-006-db-run-{a,b}.json`, crash runs in
+`evidence/s2-006-db-crash-{a,b}.json`): ephemeral loopback-only PostgreSQL
 (pinned image, hardened container), migrations 0001–0005 applied to two
 schemas, two child processes (PIDs distinct, executors `exec-db-s2006-a/b`)
 executing the identical store-operation set through the canonical command API
 on `PostgresVerifierStore`:
 publishVerificationResult → idempotent replay (returns the recorded outcome
 without a second ledger row) → publishCalibrationReport → publishAdjudication
-→ fenced external call RESERVE→ACCEPT→FINALIZE.
+→ fenced external call RESERVE→ACCEPT→FINALIZE (grant issued via
+`registerProviderGrant` with a reviewer signature and re-verified at use).
 
-Immutable-record equality across processes: identical replay digest
-(`4e319f27…`), exactly 1 row per record table, 3 ledger rows, 6 outbox events
+Third phase (review P2-6, probe S DB half): per schema, a first process
+reserves + accepts an external call and **dies abruptly (exit 70) without
+finalize**; a separate recovery process reads the persisted fencing token,
+is refused with a stale token, completes EXACTLY ONE settlement, sees the
+duplicate finalize replay idempotently, and verifies a finalized call cannot
+be dragged back into reconciliation. Fail-closed counts: 9 outbox events (3
+publishes + 2 × RESERVED/ACCEPTED/FINALIZED), 3 ledger rows, 2 external-call
+rows, exactly 1 FINALIZED event and 1 settlement row for the crash call, 0
+duplicate event ids. Identical crash digests across schemas, distinct process
+identities; the phase is gate-checked by `crashPhaseIssues` (regression tests
+in `tests/verifier/db-replay-crash.test.mjs`).
+
+Immutable-record equality across processes: identical replay digest, exactly
+1 row per record table, 3 ledger rows, 6 outbox events in the base replay
 (zero duplicates), identical fencing token. Degenerate all-ERROR distributions
-and any divergence fail closed; hard gates are part of the exit code. Probe
-S's crash/restart scenario remains **NOT_RUN_DB** as declared by the offline
-probe suite.
+and any divergence fail closed; hard gates are part of the exit code.
 
 ## 9. Clean checkout and acceptance command log
 
 | Command | Result |
 |---|---|
-| `npm run verify:s2-006-dependencies` | exit 0 — PASS, 76 checks, FULL_GIT_BYTES |
+| `npm run verify:s2-006-dependencies` | exit 0 — PASS, 75 checks, FULL_GIT_BYTES (owner-input state recorded in `resolved.ownerInputs`) |
 | `npm run verifier:types` | exit 0 — write + drift check, 14 contracts (incl. transitive $ref closure), 22 876 bytes |
-| `npm run test:verifier` | exit 0 — 191 tests: 190 pass, 1 skipped (NOT_RUN_DB guard in `store.test.mjs`), 0 fail |
+| `npm run test:verifier` | exit 0 — 242 tests: 241 pass, 1 skipped (NOT_RUN_DB guard in `store.test.mjs`), 0 fail |
 | `npm run test:s2-006-calibration` | exit 0 — 66 tests, 0 fail |
 | `npm run test:s2-006-security-probes` | exit 0 — 62 tests, 0 fail |
-| `npm run verify:s2-006` | exit 0 — all gates PASS (dependency, types, suite, run, DB replay), verdict NEEDS_INPUT |
-| `npm run verify:s2-006-db-replay` | exit 0 — PASS, two processes, identical digests |
-| `npm test` | exit 0 — 654 tests: 653 pass, 1 skipped (NOT_RUN_DB guard), 0 fail |
+| `npm run verify:s2-006` | exit 0 — all gates PASS (dependency, types, suite, run, DB replay incl. crash phase, probes combined), verdict NEEDS_INPUT derived with the concrete needsInputPath |
+| `npm run verify:s2-006-db-replay` | exit 0 — PASS, two processes + crash/restart phase, identical digests, crashPhase.ok = true |
+| `npm test` | exit 0 — 705 tests: 704 pass, 1 skipped (NOT_RUN_DB guard), 0 fail |
 | `npm run typecheck` | exit 0 |
 | `npm run lint` | exit 0 |
 | `git diff --check d7ce192..HEAD` | exit 0 |
@@ -240,21 +308,23 @@ added to `evidence/frozen-manifest.json` via an explicit reviewed `--freeze`.
 ## 10. Measured vs not measured vs not run vs blocked vs deferred
 
 - **Measured (fixture stratum only):** all §5 metric counts; Run A/B equality;
-  comparator checks; probes A–R; PostgreSQL replay equality; 0 hard-violation
-  counters everywhere.
+  comparator checks; probes A–R; PostgreSQL replay equality AND the
+  crash/restart phase (probe S DB half); 0 hard-violation counters everywhere.
 - **Not measured:** external validity, global paired statistics,
   inter-annotator agreement, independence tier, human time/latency/cost,
   probability calibration (not applicable).
 - **Not run:** provider/model stratum (NOT_RUN_PROVIDER — not declared
   mandatory, does not block); real annotator/adjudicator/method-owner humans
-  (NOT_RUN_HUMAN_INPUTS); probe S crash/restart on PostgreSQL (NOT_RUN_DB,
-  state machine covered offline); audits outside the offline suite (run in
+  (NOT_RUN_HUMAN_INPUTS); audits outside the offline suite (run in
   clean checkout).
 - **Blocked:** nothing. No safety, authority or dependency blocker exists.
 - **Deferred:** externally authored corpus + independent annotation campaign;
-  method-owner HumanDecision authoring thresholds; locked-test unseal
-  protocol with `label_custodian` secret custody; provider calibration
-  stratum.
+  method-owner HumanDecision authoring thresholds (the exact resolution path
+  is derived in `needsInputPath` of `evidence/s2-006-summary.json`);
+  locked-test unseal protocol with `label_custodian` secret custody; provider
+  calibration stratum; store-level ACL persistence on PostgreSQL and the
+  uncertain-billing pool deadlock in `PostgresVerifierStore` (follow-up
+  store-focused wave, see §Fix wave B).
 
 ## 11. Honest limitations
 
@@ -279,7 +349,12 @@ added to `evidence/frozen-manifest.json` via an explicit reviewed `--freeze`.
    bound to the exact study+thresholds digest; author numeric thresholds,
    confidence level, non-inferiority margin, multiplicity family, tie rule,
    coverage floor and the sample-size rationale in a NEW preregistration
-   version.
+   version. The decision must satisfy `resolveThresholdDecision()`: a
+   canonical HumanDecision (`contracts/human-decision.schema.json`) from
+   `owner=user`, `artifact_digest` = canonical-json digest of the thresholds
+   document, and an `authority_binding.grantRef` that resolves from the
+   authority registry as a reviewer-issued, signature-verified
+   `threshold-authority` grant.
 2. **Label custodian + annotators**: commission an externally authored corpus
    with ≥ 20 independently labelled global cross-domain locked-test cases
    (spec §6), real annotator/adjudicator identities, conflict records and

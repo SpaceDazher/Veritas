@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "crash/restart replay (probe S DB half): the first process died after REQUEST_ACCEPTED (exit 70, no finalize); this recovery process reconciled over the fencing token and completed exactly one settlement",
+  "runId": "s2-006-db-crash-a",
+  "executorId": "exec-db-s2006-crash-a",
+  "schema": "run_a",
+  "recoveryPid": 31732,
+  "crashFirstPid": 14240,
+  "crashFirstExecutor": "exec-db-s2006-crash-a",
+  "fencingToken": 2,
+  "checks": {
+    "crashedCallObservedInAcceptedState": true,
+    "staleFencingRefused": true,
+    "exactlyOneSettlement": true,
+    "duplicateFinalizeReplayed": true,
+    "finalizedCallNotDraggedBack": true
+  },
+  "counts": {
+    "outboxTotal": 9,
+    "ledgerTotal": 3,
+    "externalCallRows": 2,
+    "crashCallEvents": 3,
+    "crashCallFinalizedEvents": 1,
+    "crashCallSettlements": 1,
+    "duplicateOutboxIds": 0
+  },
+  "countsExpected": {
+    "outboxTotal": 9,
+    "ledgerTotal": 3,
+    "externalCallRows": 2,
+    "crashCallEvents": 3,
+    "crashCallFinalizedEvents": 1,
+    "crashCallSettlements": 1,
+    "duplicateOutboxIds": 0
+  },
+  "status": "COMPLETED",
+  "digest": "351ea496bacb40bc8c4f197afe9b238508584ce536fc20c5c74e25a6727044ff",
+  "diedAsDesigned": true,
+  "crashFirstExitCode": 70
+}

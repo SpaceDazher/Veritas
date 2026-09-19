@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "ticket": "S2-006",
-  "role": "verification aggregator: dependency gate, contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + probes), DB replay status and §16 verdict",
-  "testedImplementationCommit": "73c124e4776a0eb89925112980d15f5c8535e8aa",
+  "role": "verification aggregator: dependency gate (records owner-input state), contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + honest probe statuses), DB replay status with crash/restart phase and the DERIVED §16 verdict",
+  "testedImplementationCommit": "0668dc3e9f131083b926e473ef23f510b24c43d4",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
   "gates": {
     "dependency": {
       "status": "PASS",
       "exitCode": 0,
-      "checked": 76,
+      "checked": 75,
       "mode": "FULL_GIT_BYTES"
     },
     "types": {
@@ -20,8 +20,8 @@
       "status": "PASS",
       "exitCode": 0,
       "counts": {
-        "tests": 191,
-        "pass": 190,
+        "tests": 242,
+        "pass": 241,
         "fail": 0,
         "skipped": 1
       }
@@ -42,27 +42,51 @@
         "independence": "NOT_MEASURED"
       },
       "probes": {
-        "ok": true,
+        "green": false,
         "total": 19,
+        "pass": 18,
         "failed": 0,
-        "notRun": [
-          "NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics)."
-        ]
+        "not_run": 1,
+        "probeS": "not_run",
+        "combine": "probe S green ONLY via verify:s2-006-db-replay crash phase"
       }
     },
     "dbReplay": {
       "status": "PASS",
       "exitCode": 0,
-      "source": "evidence/s2-006-db-comparison.json from a prior verify:s2-006-db-replay run"
+      "source": "evidence/s2-006-db-comparison.json from a prior verify:s2-006-db-replay run",
+      "crashPhaseOk": true
+    },
+    "probes": {
+      "status": "PASS",
+      "totals": {
+        "probes": 19,
+        "ok": 18,
+        "pass": 18,
+        "failed": 0,
+        "not_run": 1,
+        "attemptedViolations": 19,
+        "actualViolations": 0
+      },
+      "probeS": "RESOLVED_BY_DB_CRASH_PHASE",
+      "source": "evidence/s2-006-db-comparison.json crashPhase"
     }
   },
   "verdict": "NEEDS_INPUT",
+  "verdictDerivation": "spec §16 precedence computed by deriveVerdict() from the actual evidence fields — never a constant; probe S is green ONLY via the DB crash/restart phase (review P2-6/P2-7)",
   "verdictReasons": [
-    "method owner has not authored numeric thresholds: contracts/s2-006-thresholds.json is NEEDS_INPUT with ownerDecisionRef null (no immutable HumanDecision)",
-    "evaluator_not_independent: annotators/adjudicator are fixture principals authored by the same project; inter-annotator agreement is NOT_MEASURED",
-    "external corpus stratum absent: only the 45-case fixture stratum exists, so no external-validity or global paired statistic is measured"
+    "thresholds decision not resolved: contracts/s2-006-thresholds.json is NEEDS_INPUT — an immutable HumanDecision from authenticated owner=user bound to the exact canonical thresholds digest (verified against the authority registry) would advance it",
+    "numeric thresholds not authored: coverage_floor, non_inferiority_margin.delta, confidence_level, tie_rule and every thresholds.soft_thresholds value are null",
+    "annotators not independent: annotators/adjudicator are fixture principals (evaluator_not_independent) — real independent annotators and a separate adjudicator would advance it",
+    "external corpus stratum absent: only the 45-case fixture stratum exists — an externally authored, independently labelled locked_test stratum would advance it"
   ],
-  "verdictCeiling": "NEEDS_INPUT is the honest ceiling: an unconditional PASS or PASS_WITH_LIMITS is forbidden without independent held-out calibration, authored thresholds and PostgreSQL (spec §16).",
+  "needsInputPath": [
+    "thresholds decision not resolved: contracts/s2-006-thresholds.json is NEEDS_INPUT — an immutable HumanDecision from authenticated owner=user bound to the exact canonical thresholds digest (verified against the authority registry) would advance it",
+    "numeric thresholds not authored: coverage_floor, non_inferiority_margin.delta, confidence_level, tie_rule and every thresholds.soft_thresholds value are null",
+    "annotators not independent: annotators/adjudicator are fixture principals (evaluator_not_independent) — real independent annotators and a separate adjudicator would advance it",
+    "external corpus stratum absent: only the 45-case fixture stratum exists — an externally authored, independently labelled locked_test stratum would advance it"
+  ],
+  "verdictCeiling": "NEEDS_INPUT is the honest verdict for the current inputs; needsInputPath lists exactly which owner actions would advance the verdict. An unconditional PASS is forbidden (spec §16).",
   "notRun": [
     "NOT_RUN_PROVIDER: no provider grant/model/runtime was declared mandatory for the first calibration scope; the offline deterministic implementation is fully tested without network or LLM",
     "NOT_RUN_HUMAN_INPUTS: no real independent annotators, adjudicator or method-owner HumanDecision exists"
@@ -73,6 +97,7 @@
     "comparisonEvidence": "evidence/s2-006-comparison.json",
     "probesEvidence": "evidence/s2-006-security-probes.json",
     "dbReplayEvidence": "evidence/s2-006-db-comparison.json",
+    "dbCrashEvidence": "evidence/s2-006-db-crash-{a,b}.json",
     "dependencyBinding": "evidence/s2-006-dependency-binding.json"
   },
   "limitations": [

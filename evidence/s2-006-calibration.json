@@ -774,6 +774,9 @@
     "needsInputReasons": [
       "missing_human_decision",
       "missing_thresholds"
+    ],
+    "needsInputDetails": [
+      "threshold_decision_missing: an immutable HumanDecision from authenticated owner=user bound to the exact thresholds digest is required before any owner-owned numeric applies"
     ]
   },
   "externalStratum": {

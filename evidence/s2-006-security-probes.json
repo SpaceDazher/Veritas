@@ -2,11 +2,16 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "adversarial probes A–S over the verifier rubric/policy/signature/command surfaces (spec §12)",
-  "ok": true,
+  "ok": false,
+  "status": "INCOMPLETE_NOT_RUN_DB",
+  "statusSemantics": "each probe carries status pass|failed|not_run; not_run among the mandatory set is never green (review P2-6)",
+  "combine": "probe S resolves to green ONLY via evidence/s2-006-db-comparison.json crashPhase (verify:s2-006-db-replay crash/restart phase)",
   "totals": {
     "probes": 19,
-    "ok": 19,
+    "ok": 18,
+    "pass": 18,
     "failed": 0,
+    "not_run": 1,
     "attemptedViolations": 19,
     "actualViolations": 0
   },
@@ -19,10 +24,11 @@
     "total": 0
   },
   "notRun": [
-    "NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics)."
+    "NOT_RUN_DB: the two-process crash/restart replay on PostgreSQL has not run; run npm run verify:s2-006-db-replay — the offline suite covers the identical state machine on the in-memory store only."
   ],
   "probes": [
     {
+      "status": "pass",
       "id": "A",
       "name": "topic_overlap_citation_not_supported",
       "expected": {
@@ -56,6 +62,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "B",
       "name": "drift_detected_with_exact_reason_code",
       "expected": {
@@ -153,6 +160,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "C",
       "name": "scope_difference_is_not_contradiction",
       "expected": {
@@ -209,6 +217,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "D",
       "name": "correlation_never_becomes_mechanism",
       "expected": {
@@ -254,6 +263,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "E",
       "name": "persuasive_output_without_spans_abstains",
       "expected": {
@@ -274,6 +284,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "F",
       "name": "ten_paraphrases_are_one_evidence_family",
       "expected": {
@@ -313,6 +324,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "G",
       "name": "private_span_in_shared_report_detected",
       "expected": {
@@ -336,6 +348,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "H",
       "name": "post_as_of_source_and_early_locked_label_access_hard_fail",
       "expected": {
@@ -364,6 +377,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "I",
       "name": "producer_self_review_and_forged_identity_rejected",
       "expected": {
@@ -387,6 +401,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "J",
       "name": "prompt_injection_is_inert",
       "expected": {
@@ -462,6 +477,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "K",
       "name": "abstain_all_fails_coverage_gate",
       "expected": {
@@ -486,6 +502,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "L",
       "name": "two_identically_broken_runs_fail_closed",
       "expected": {
@@ -504,6 +521,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "M",
       "name": "threshold_change_creates_new_version_old_run_invalid",
       "expected": {
@@ -539,6 +557,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "N",
       "name": "stale_revoked_parent_invalidates_dependent_result",
       "expected": {
@@ -565,6 +584,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "O",
       "name": "novelty_is_corpus_bounded_only",
       "expected": {
@@ -598,6 +618,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "P",
       "name": "provider_timeout_and_refusal_are_typed_missingness",
       "expected": {
@@ -632,6 +653,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "Q",
       "name": "post_unseal_candidate_access_and_reinvocation_hard_fail",
       "expected": {
@@ -657,6 +679,7 @@
       "ok": true
     },
     {
+      "status": "pass",
       "id": "R",
       "name": "role_reuse_self_attestation_and_forgery_rejected",
       "expected": {
@@ -681,33 +704,42 @@
       "ok": true
     },
     {
+      "status": "not_run",
       "id": "S",
       "name": "crash_after_request_accepted_fenced_reconciliation",
       "expected": {
         "state": "RECONCILIATION_REQUIRED",
         "duplicateEvents": 0,
-        "blindRetry": "refused"
+        "blindRetry": "refused",
+        "dbCrashPhase": "NOT_RUN_DB"
       },
       "observed": {
-        "callStateAfterCrash": "RECONCILIATION_REQUIRED",
-        "settlementNull": true,
+        "reservationCommitted": true,
+        "reconciledAfterCrash": true,
         "staleFencingDenied": true,
-        "reconcileReplay": true,
+        "reconciliationReplayIdempotent": true,
+        "reconciledStateStable": true,
         "noDuplicateEvents": true,
-        "reservationReplayToken": 1,
+        "reservationReplayIdempotent": true,
         "publishEscalated": true,
         "publishBlindRetryRefused": true,
+        "noPublishOutbox": true,
+        "publishLedgerReconciliation": true,
+        "callStateAfterCrash": "RECONCILIATION_REQUIRED",
+        "settlementNull": true,
+        "reservationReplayToken": 1,
         "publishOutboxEvents": 0,
-        "publishLedgerStatus": "RECONCILIATION_REQUIRED"
+        "publishLedgerStatus": "RECONCILIATION_REQUIRED",
+        "dbCrashPhase": "NOT_RUN_DB"
       },
       "attemptedViolations": 1,
       "actualViolations": 0,
       "notRun": [
-        "NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics)."
+        "NOT_RUN_DB: the two-process crash/restart replay on PostgreSQL has not run; run npm run verify:s2-006-db-replay — the offline suite covers the identical state machine on the in-memory store only."
       ],
-      "ok": true
+      "ok": false
     }
   ],
-  "testedImplementationCommit": "73c124e4776a0eb89925112980d15f5c8535e8aa",
+  "testedImplementationCommit": "0668dc3e9f131083b926e473ef23f510b24c43d4",
   "executedAt": "bound on the S2-006 branch"
 }

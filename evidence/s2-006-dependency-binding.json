@@ -131,10 +131,11 @@
       "contracts/s2-006-thresholds.json": "ddd02c1a87ce68f732f4913c014fddfa80628e1d825259dc16a3c0f4fc37cf19",
       "corpus/s2-006/manifest.json": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
       "corpus/s2-006/rubric-v1.json": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
-      "corpus/s2-006/adjudication.json": "15fa0c7efa0cbab4c0d1b7d1dddd4551e4bf5dc8114aa902cca993019fd57708",
-      "corpus/s2-006/labels/annotator-a.json": "560df75c7e8a0d3adbdc9e58d0b059ecfb5fdcefb90f58a4ab9c949884f9a146",
-      "corpus/s2-006/labels/annotator-b.json": "72c4289c42043d0f5d67a9144f03ba271eac0269e253a5d8e18a8448c0cb6b14"
-    }
+      "corpus/s2-006/adjudication.json": "585dd83cf57b26c5a49f8e51165282761106d0d2b622158128d86ee3332ba623",
+      "corpus/s2-006/labels/annotator-a.json": "359cc364a5fe077acc610081eb81c291b5967846a580e23073381229871acb5b",
+      "corpus/s2-006/labels/annotator-b.json": "2e2dc1077e7c108dc241c3eaf5032ffc08b2e15bfa5459a65bc0131ac80d454d"
+    },
+    "note": "SHA-256 of the S2-006 frozen inputs as authored on this branch (executable consistency check): the working-tree bytes must match these digests. These files are not part of d7ce192 and are therefore not read from Git — they are pinned here and must never change after the first recorded result."
   },
   "upstreamLimits": {
     "rule": "All upstream limitations must be carried into S2-006, never silently dropped (spec §1.6).",
@@ -193,7 +194,7 @@
     "gate": "scripts/verify-s2-006-dependencies.mjs",
     "mode": "FULL_GIT_BYTES",
     "ok": true,
-    "checkedCount": 76,
+    "checkedCount": 75,
     "issueCount": 0,
     "resolvedRefs": {
       "originMain": "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f",
@@ -217,6 +218,14 @@
     "exitCodes": {
       "dependencyGate": 0,
       "blockedDependency": null
+    },
+    "ownerInputs": {
+      "thresholdsStatus": "NEEDS_INPUT",
+      "methodOwner": null,
+      "ownerDecisionRef": null,
+      "externalStratumStatus": "NEEDS_INPUT",
+      "externalStratumReason": "evaluator_not_independent",
+      "note": "recorded, not required to be empty: owner-input state feeds the §16 verdict derivation, not the dependency gate (review P2-7)"
     }
   }
 }
