@@ -195,7 +195,7 @@ async function runCase(doc, runParams, authorities, sharedStore) {
     const source = claims.find((c) => c.segment_id === edgeSpec.from_segment);
     const target = claims.find((c) => c.segment_id === edgeSpec.to_segment);
     if (source && target) {
-      const edge = store.linkClaims({
+      const edge = await store.linkClaims({
         edge: {
           contractVersion: '1.0.0',
           edge_id: `ced-${doc.case_id}-${claimEdges.length + 1}`,
