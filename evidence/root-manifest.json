@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "50af3a9a7ba2edf30f699aa3708db1d50af7f00f",
-  "sourceTree": "2fc99bf293900540dc0d86be242763ca9791c50b",
-  "trackedFileCount": 537,
-  "manifestFileCount": 532,
-  "payloadManifestSha256": "9492e3adf220c947755b138e7871491583065225ec052923af07b7c9f17668e2",
-  "fileManifestSha256": "9074312dd5f96094404e83644574cc65d534c5c60ae45b7497469fa4578518d5",
+  "sourceCommit": "8d14ebee710a91071c351e85d7aecb60452f3b5f",
+  "sourceTree": "cc4deebb987e26dd92a6507b5ea71adecb4268ca",
+  "trackedFileCount": 538,
+  "manifestFileCount": 533,
+  "payloadManifestSha256": "a67cd9444f624c0e6073960feeab0b10e121be4fa1e67570b6e0b2d58d0065dd",
+  "fileManifestSha256": "4f6d7db5752d7e5af4c90b4cef8f627d0ba7471d3d2f6a8b2b89279f2b31f335",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1598,8 +1598,8 @@
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "f467a9fdba698be39acc02295a4d7ba865570c7a1c9cf492abf5b4ab746aeb62",
-      "bytes": 48456
+      "sha256": "7568fb0c32e7a1320ad06a3e41617d1324a6e6ca6563107d34f8a2ae1b84e956",
+      "bytes": 48572
     },
     {
       "path": "evidence/policy-probes.json",
@@ -1823,8 +1823,8 @@
     },
     {
       "path": "next.config.ts",
-      "sha256": "6e85f42d5e48ebc31743872c97ffe3a90e59f0cca4c25e7d192c03ed7e7102a2",
-      "bytes": 203
+      "sha256": "6e05adeabf1bc550afa5b78640a6c9a59dfba4c5bdc9c09423573053e80b9d2f",
+      "bytes": 248
     },
     {
       "path": "package-lock.json",
@@ -2008,18 +2008,18 @@
     },
     {
       "path": "results/s2-005/s2-005-db-comparison.json",
-      "sha256": "6559fa653febe2733f626a983bdc74b6eb78b934a8c570b32c186089565ee603",
-      "bytes": 2573
+      "sha256": "325a4cd5a6f3dc0b5911273cc14404dd69dd09420240163ef106b0b5f445b972",
+      "bytes": 2555
     },
     {
       "path": "results/s2-005/s2-005-db-run-a.json",
-      "sha256": "895a593fea526fb03b85a26cb249e010495e126ee87a4a266190d90064c8a25f",
-      "bytes": 144394
+      "sha256": "721418a5e60220f2dd2159a4acd9e812fe490eef4e1d94246df2524a98c8f2b5",
+      "bytes": 184920
     },
     {
       "path": "results/s2-005/s2-005-db-run-b.json",
-      "sha256": "7342c5e26dce96eb0ab221568f5a85fb8908c569f123c86b6e0250194d341f2d",
-      "bytes": 144394
+      "sha256": "1184c99feb6071f67b8467dfb40089ad376defbf5b5498b22aa1c667fa303817",
+      "bytes": 184922
     },
     {
       "path": "results/s2-005/smoke.json",
@@ -2133,13 +2133,13 @@
     },
     {
       "path": "scripts/s2-005-db-replay.mjs",
-      "sha256": "7674720b429031d0d48895f21f2dfe00dfeb2811570aab29094f017a9926bb78",
-      "bytes": 9053
+      "sha256": "cec46a644696d14a272d47725ad5b2ed0f5303834cbd65b251c5c6c764736039",
+      "bytes": 9879
     },
     {
       "path": "scripts/s2-005-run.mjs",
-      "sha256": "eb5dc02991e60f3c7fde435c2d1e8491b237de60eee0423059c6f2e7339f494b",
-      "bytes": 34638
+      "sha256": "ce99203d4e8e4bda01d9c386ae8422fe63030d2197c23834c197435b0bd15911",
+      "bytes": 34644
     },
     {
       "path": "scripts/s2-005-security-probes.mjs",
@@ -2313,8 +2313,8 @@
     },
     {
       "path": "src/lib/claims/postgres-store.mjs",
-      "sha256": "f3ff5a7f6b7de2dd370764cc8c3e8e2d5df25b2c38cca2673e65dfc4fae176fd",
-      "bytes": 22254
+      "sha256": "908bb3d2a99230f76016c1445dbbf7206aefd67613484dffed2b8b12aea517f8",
+      "bytes": 28205
     },
     {
       "path": "src/lib/claims/provenance.mjs",
@@ -2640,6 +2640,11 @@
       "path": "tests/synthesis/contracts.types.test.mjs",
       "sha256": "f91b2a7f533dcdefbb7c57de6cff18eacc6beae64c70578af5ae71abc465ec7e",
       "bytes": 1346
+    },
+    {
+      "path": "tests/synthesis/db-replay-gates.test.mjs",
+      "sha256": "bb28623406d67000c6ca6cc8db9011641110b43a74cc975d92e6748b13ec8199",
+      "bytes": 1669
     },
     {
       "path": "tests/synthesis/dependency-binding.test.mjs",
