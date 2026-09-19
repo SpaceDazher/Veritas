@@ -1,0 +1,790 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "calibration metrics over the frozen fixture stratum (45 cases, dev/calibration/locked_test splits)",
+  "corpus": {
+    "manifestId": "anmf-s2006-fixture-corpus",
+    "corpusVersion": "1.0.0",
+    "manifestSha256": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+    "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+    "caseCount": 45,
+    "stratum": "fixture",
+    "splitComposition": {
+      "dev": 10,
+      "calibration": 12,
+      "locked_test": 23
+    }
+  },
+  "inputs": {
+    "thresholdsDigest": "863740bcc2c531d800e9b08b42d18e1689187f13bbb2cd9fb2c9afecabb0eff1",
+    "predictionSource": "evidence/s2-006-run-a.json (verified identical to run B by the comparator)",
+    "goldSource": "raw blind labels of prn-annotator-a/prn-annotator-b + adjudication records (corpus/s2-006)"
+  },
+  "metricRecords": [
+    {
+      "name": "decision_availability",
+      "numerator": 45,
+      "denominator": 45,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.9213484011503565,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "citation_coverage",
+      "numerator": 26,
+      "denominator": 45,
+      "missingCount": 0,
+      "value": 0.5777777777777777,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.43300788697983805,
+        "upper": 0.7103129754213283,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "abstention_rate",
+      "numerator": 19,
+      "denominator": 45,
+      "missingCount": 0,
+      "value": 0.4222222222222222,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.28968702457867157,
+        "upper": 0.5669921130201617,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:SUPPORTED",
+      "numerator": 8,
+      "denominator": 8,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6755924347630018,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:SUPPORTED",
+      "numerator": 8,
+      "denominator": 8,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6755924347630018,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:CONTRADICTED",
+      "numerator": 3,
+      "denominator": 3,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.43850296784825277,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:CONTRADICTED",
+      "numerator": 3,
+      "denominator": 3,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.43850296784825277,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:PARTIALLY_SUPPORTED",
+      "numerator": 6,
+      "denominator": 6,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6096657117144166,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:PARTIALLY_SUPPORTED",
+      "numerator": 6,
+      "denominator": 6,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6096657117144166,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:INSUFFICIENT_EVIDENCE",
+      "numerator": 19,
+      "denominator": 19,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.8318207757219879,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:INSUFFICIENT_EVIDENCE",
+      "numerator": 19,
+      "denominator": 19,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.8318207757219879,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:OUT_OF_SCOPE",
+      "numerator": 1,
+      "denominator": 1,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.2065493141131864,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:OUT_OF_SCOPE",
+      "numerator": 1,
+      "denominator": 1,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.2065493141131864,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:STALE_INPUT",
+      "numerator": 6,
+      "denominator": 6,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6096657117144166,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:STALE_INPUT",
+      "numerator": 6,
+      "denominator": 6,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6096657117144166,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "precision:BLOCKED_POLICY",
+      "numerator": 2,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.3423802271438862,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "recall:BLOCKED_POLICY",
+      "numerator": 2,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.3423802271438862,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "macro_precision",
+      "numerator": 0,
+      "denominator": 1,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "MEASURED"
+    },
+    {
+      "name": "macro_recall",
+      "numerator": 0,
+      "denominator": 1,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "MEASURED"
+    },
+    {
+      "name": "macro_f1",
+      "numerator": 0,
+      "denominator": 1,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "MEASURED"
+    },
+    {
+      "name": "citation_entailment_f1",
+      "numerator": 0,
+      "denominator": 1,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "MEASURED"
+    },
+    {
+      "name": "number_unit_preservation_recall",
+      "numerator": 6,
+      "denominator": 6,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6096657117144166,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "negation_preservation_recall",
+      "numerator": 2,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.3423802271438862,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "modality_preservation_recall",
+      "numerator": 2,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.3423802271438862,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "scope_binding_recall",
+      "numerator": 4,
+      "denominator": 4,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.5101091631427723,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "contradiction_precision",
+      "numerator": 3,
+      "denominator": 3,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.43850296784825277,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "contradiction_recall",
+      "numerator": 3,
+      "denominator": 3,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.43850296784825277,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "contradiction_scope_confusion_rate",
+      "numerator": 0,
+      "denominator": 7,
+      "missingCount": 0,
+      "value": 0,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0,
+        "upper": 0.3543304354352938,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "epistemic_type_exact_match",
+      "numerator": 4,
+      "denominator": 4,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.5101091631427723,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "causal_overclaim_miss_rate",
+      "numerator": 0,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 0,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0,
+        "upper": 0.6576197728561138,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "family_collapse_recall",
+      "numerator": 2,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.3423802271438862,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "stale_invalidation_recall",
+      "numerator": 6,
+      "denominator": 6,
+      "missingCount": 0,
+      "value": 1,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.6096657117144166,
+        "upper": 1,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "unauthorized_leakage_rate",
+      "numerator": 0,
+      "denominator": 2,
+      "missingCount": 0,
+      "value": 0,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0,
+        "upper": 0.6576197728561138,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "false_advisory_acceptance_rate",
+      "numerator": 0,
+      "denominator": 37,
+      "missingCount": 0,
+      "value": 0,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0,
+        "upper": 0.09405782597449268,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "false_advisory_rejection_rate",
+      "numerator": 0,
+      "denominator": 8,
+      "missingCount": 0,
+      "value": 0,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0,
+        "upper": 0.32440756523699826,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "selective_risk",
+      "numerator": 0,
+      "denominator": 26,
+      "missingCount": 0,
+      "value": 0,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0,
+        "upper": 0.12872892203992173,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "inter_annotator_agreement",
+      "numerator": 42,
+      "denominator": 45,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_MEASURED",
+      "notMeasuredReason": "evaluator_not_independent"
+    },
+    {
+      "name": "adjudication_rate",
+      "numerator": 3,
+      "denominator": 45,
+      "missingCount": 0,
+      "value": 0.06666666666666667,
+      "intervalMethod": "wilson",
+      "interval": {
+        "lower": 0.02293203258100722,
+        "upper": 0.17856601975535036,
+        "confidenceLevel": 0.95
+      },
+      "status": "MEASURED"
+    },
+    {
+      "name": "brier_score",
+      "numerator": 0,
+      "denominator": 0,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "expected_calibration_error",
+      "numerator": 0,
+      "denominator": 0,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "human_active_time",
+      "numerator": 0,
+      "denominator": 0,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_MEASURED",
+      "notMeasuredReason": "outcome_not_defined"
+    },
+    {
+      "name": "latency",
+      "numerator": 0,
+      "denominator": 0,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_MEASURED",
+      "notMeasuredReason": "outcome_not_defined"
+    },
+    {
+      "name": "actual_cost",
+      "numerator": 0,
+      "denominator": 0,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_MEASURED",
+      "notMeasuredReason": "outcome_not_defined"
+    },
+    {
+      "name": "evidence_map_completeness",
+      "numerator": 0,
+      "denominator": 0,
+      "missingCount": 0,
+      "value": null,
+      "intervalMethod": "none",
+      "interval": null,
+      "status": "NOT_APPLICABLE"
+    }
+  ],
+  "confusionMatrices": [
+    {
+      "name": "one_vs_rest:SUPPORTED",
+      "truePositive": 8,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 37,
+      "missing": 0
+    },
+    {
+      "name": "one_vs_rest:CONTRADICTED",
+      "truePositive": 3,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 42,
+      "missing": 0
+    },
+    {
+      "name": "one_vs_rest:PARTIALLY_SUPPORTED",
+      "truePositive": 6,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 39,
+      "missing": 0
+    },
+    {
+      "name": "one_vs_rest:INSUFFICIENT_EVIDENCE",
+      "truePositive": 19,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 26,
+      "missing": 0
+    },
+    {
+      "name": "one_vs_rest:OUT_OF_SCOPE",
+      "truePositive": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 44,
+      "missing": 0
+    },
+    {
+      "name": "one_vs_rest:STALE_INPUT",
+      "truePositive": 6,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 39,
+      "missing": 0
+    },
+    {
+      "name": "one_vs_rest:BLOCKED_POLICY",
+      "truePositive": 2,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "trueNegative": 43,
+      "missing": 0
+    }
+  ],
+  "coverage": {
+    "denominator": 45,
+    "evaluated": 45,
+    "missing": 0,
+    "abstained": 19
+  },
+  "selectiveRisk": {
+    "risk": 0,
+    "coverage": 0.5777777777777777,
+    "curve": [
+      {
+        "coverage": 1,
+        "risk": 0
+      },
+      {
+        "coverage": 0.5777777777777777,
+        "risk": 0
+      }
+    ]
+  },
+  "hardViolations": {
+    "unauthorizedLeakageEvents": 0,
+    "lockedLabelAccessEvents": 0,
+    "producerSelfReviewEvents": 0,
+    "upstreamArtifactMutationEvents": 0,
+    "unauthorizedSideEffectEvents": 0,
+    "total": 0
+  },
+  "rawAnnotatorAgreement": {
+    "agree": 42,
+    "total": 45,
+    "rate": 0.9333333333333333
+  },
+  "slices": [
+    {
+      "name": "fixture-all",
+      "stratum": "fixture",
+      "caseCount": 45,
+      "metricNames": [
+        "decision_availability",
+        "citation_coverage",
+        "abstention_rate",
+        "precision:SUPPORTED",
+        "recall:SUPPORTED",
+        "precision:CONTRADICTED",
+        "recall:CONTRADICTED",
+        "precision:PARTIALLY_SUPPORTED",
+        "recall:PARTIALLY_SUPPORTED",
+        "precision:INSUFFICIENT_EVIDENCE",
+        "recall:INSUFFICIENT_EVIDENCE",
+        "precision:OUT_OF_SCOPE",
+        "recall:OUT_OF_SCOPE",
+        "precision:STALE_INPUT",
+        "recall:STALE_INPUT",
+        "precision:BLOCKED_POLICY",
+        "recall:BLOCKED_POLICY",
+        "macro_precision",
+        "macro_recall",
+        "macro_f1",
+        "citation_entailment_f1",
+        "number_unit_preservation_recall",
+        "negation_preservation_recall",
+        "modality_preservation_recall",
+        "scope_binding_recall",
+        "contradiction_precision",
+        "contradiction_recall",
+        "contradiction_scope_confusion_rate",
+        "epistemic_type_exact_match",
+        "causal_overclaim_miss_rate",
+        "family_collapse_recall",
+        "stale_invalidation_recall",
+        "unauthorized_leakage_rate",
+        "false_advisory_acceptance_rate",
+        "false_advisory_rejection_rate",
+        "selective_risk",
+        "inter_annotator_agreement",
+        "adjudication_rate",
+        "brier_score",
+        "expected_calibration_error",
+        "human_active_time",
+        "latency",
+        "actual_cost",
+        "evidence_map_completeness"
+      ]
+    }
+  ],
+  "thresholdDecision": {
+    "thresholdsDigest": "863740bcc2c531d800e9b08b42d18e1689187f13bbb2cd9fb2c9afecabb0eff1",
+    "status": "NEEDS_INPUT",
+    "ownerDecisionRef": null,
+    "appliedAt": null
+  },
+  "independence": {
+    "tier": "NOT_INDEPENDENT",
+    "status": "NOT_MEASURED",
+    "reason": "evaluator_not_independent",
+    "details": {
+      "annotatorsAreFixturePrincipals": true,
+      "producerAndVerifierShareProject": true,
+      "noRealIndependentAnnotatorsOrAdjudicator": true,
+      "noMethodOwnerHumanDecision": true,
+      "note": "Synthetic principals prove policy mechanics only; they never create independence (spec §3)."
+    }
+  },
+  "decision": {
+    "status": "NEEDS_INPUT",
+    "winner": null,
+    "perSystem": {
+      "rubric-candidate": {
+        "eligible": true,
+        "step": "start",
+        "reasons": []
+      }
+    },
+    "pairedIntervals": [],
+    "needsInputReasons": [
+      "missing_human_decision",
+      "missing_thresholds"
+    ]
+  },
+  "externalStratum": {
+    "status": "NEEDS_INPUT",
+    "reason": "evaluator_not_independent"
+  },
+  "limitations": [
+    "Fixture stratum only: no externally authored, independently labelled cases exist.",
+    "Inter-annotator agreement is NOT_MEASURED on this stratum (evaluator_not_independent); raw agreement is kept for transparency.",
+    "Every owner-owned threshold numeric is null: no method-owner HumanDecision exists.",
+    "No EvidenceMap/HypothesisCard inputs in this offline harness: evidence_map_completeness is NOT_APPLICABLE here.",
+    "No probabilities emitted: Brier/ECE stay NOT_APPLICABLE."
+  ]
+}

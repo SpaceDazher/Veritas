@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "verification aggregator: dependency gate, contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + probes), DB replay status and §16 verdict",
+  "testedImplementationCommit": "465e04bd4f19a35df71fb0ab5d9fb68cfb0c3bfe",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
+  "gates": {
+    "dependency": {
+      "status": "PASS",
+      "exitCode": 0,
+      "checked": 76,
+      "mode": "FULL_GIT_BYTES"
+    },
+    "types": {
+      "status": "IN_SYNC",
+      "exitCode": 0,
+      "detail": "{\"ok\":true,\"bytes\":22876,\"contracts\":14}"
+    },
+    "testVerifier": {
+      "status": "PASS",
+      "exitCode": 0,
+      "counts": {
+        "tests": 191,
+        "pass": 190,
+        "fail": 0,
+        "skipped": 1
+      }
+    },
+    "evidenceRun": {
+      "status": "PASS",
+      "exitCode": 0,
+      "comparisonOk": true,
+      "calibration": {
+        "coverage": {
+          "denominator": 45,
+          "evaluated": 45,
+          "missing": 0,
+          "abstained": 19
+        },
+        "hardViolations": 0,
+        "decision": "NEEDS_INPUT",
+        "independence": "NOT_MEASURED"
+      },
+      "probes": {
+        "ok": true,
+        "total": 19,
+        "failed": 0,
+        "notRun": [
+          "NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics)."
+        ]
+      }
+    },
+    "dbReplay": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "evidence/s2-006-db-comparison.json from a prior verify:s2-006-db-replay run"
+    }
+  },
+  "verdict": "NEEDS_INPUT",
+  "verdictReasons": [
+    "method owner has not authored numeric thresholds: contracts/s2-006-thresholds.json is NEEDS_INPUT with ownerDecisionRef null (no immutable HumanDecision)",
+    "evaluator_not_independent: annotators/adjudicator are fixture principals authored by the same project; inter-annotator agreement is NOT_MEASURED",
+    "external corpus stratum absent: only the 45-case fixture stratum exists, so no external-validity or global paired statistic is measured"
+  ],
+  "verdictCeiling": "NEEDS_INPUT is the honest ceiling: an unconditional PASS or PASS_WITH_LIMITS is forbidden without independent held-out calibration, authored thresholds and PostgreSQL (spec §16).",
+  "notRun": [
+    "NOT_RUN_PROVIDER: no provider grant/model/runtime was declared mandatory for the first calibration scope; the offline deterministic implementation is fully tested without network or LLM",
+    "NOT_RUN_HUMAN_INPUTS: no real independent annotators, adjudicator or method-owner HumanDecision exists"
+  ],
+  "measured": {
+    "corpus": "corpus/s2-006 (45 fixture cases; dev 10 / calibration 12 / locked_test 23)",
+    "calibrationEvidence": "evidence/s2-006-calibration.json (fixture metrics MEASURED; independence NOT_MEASURED)",
+    "comparisonEvidence": "evidence/s2-006-comparison.json",
+    "probesEvidence": "evidence/s2-006-security-probes.json",
+    "dbReplayEvidence": "evidence/s2-006-db-comparison.json",
+    "dependencyBinding": "evidence/s2-006-dependency-binding.json"
+  },
+  "limitations": [
+    "No production claim of any kind; the verifier verdict is advisory and never replaces a human decision.",
+    "Fixture-annotator agreement and all quality thresholds are non-authenticated; downstream consumers must treat every numeric as indicative only."
+  ]
+}

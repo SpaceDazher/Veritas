@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "deterministic verifier store replay on PostgreSQL (PostgresVerifierStore, migration 0005)",
+  "runId": "s2-006-db-run-b",
+  "executorId": "exec-db-s2006-b",
+  "pid": 8352,
+  "databaseEngine": "PostgreSQL",
+  "schema": "run_b",
+  "ops": [
+    {
+      "operationId": "op-s2006-replay-publish-01",
+      "op": "publishVerificationResult",
+      "ok": true,
+      "error": null,
+      "replayed": false,
+      "outcomeDigest": "a321f6fd648e2226390f282d0dc084a3236b9a8a838a5514fbc4fa5244ba14c9"
+    },
+    {
+      "operationId": "op-s2006-replay-replay-01",
+      "op": "publishVerificationResultReplay",
+      "ok": true,
+      "error": null,
+      "replayed": true,
+      "outcomeDigest": "a321f6fd648e2226390f282d0dc084a3236b9a8a838a5514fbc4fa5244ba14c9"
+    },
+    {
+      "operationId": "op-s2006-replay-calibration-01",
+      "op": "publishCalibrationReport",
+      "ok": true,
+      "error": null,
+      "replayed": false,
+      "outcomeDigest": "0733e824fe39473f12ba876bc62fd58435d9c85f723388f76a85b74fd7ca5732"
+    },
+    {
+      "operationId": "op-s2006-replay-adjudication-01",
+      "op": "publishAdjudication",
+      "ok": true,
+      "error": null,
+      "replayed": false,
+      "outcomeDigest": "cdd87c9666a61c820367e75ed882f5925b9e75f182a84019bc3626ebb6b2f268"
+    },
+    {
+      "operationId": "op-s2006-replay-external-01",
+      "op": "externalCallReserveAcceptFinalize",
+      "ok": true,
+      "error": null,
+      "replayed": false,
+      "outcomeDigest": "b284baaf140c1ab0de10bd66bd8a7bc2bdba1c0b2eccc5d4095d482466843fc1",
+      "fencingToken": 1
+    }
+  ],
+  "committedOps": 4,
+  "replayedOps": 1,
+  "errorOps": 0,
+  "rows": {
+    "verifier_request": 1,
+    "verifier_result": 1,
+    "verifier_calibration_report": 1,
+    "verifier_adjudication_record": 1,
+    "verifier_operation_ledger": 3,
+    "verifier_audit_outbox": 6,
+    "verifier_external_call_run": 1
+  },
+  "ledger": [
+    {
+      "operation_id": "op-s2006-replay-adjudication-01",
+      "status": "COMMITTED",
+      "idempotency_key": "299f6bc574887ded4953fc700112fa829fe7a36b2a4d70e9bc84e702e681cf46"
+    },
+    {
+      "operation_id": "op-s2006-replay-calibration-01",
+      "status": "COMMITTED",
+      "idempotency_key": "a0af57ffada646357c55072b70aa0dc9d77eb78c6b0947415ebde4989df3c442"
+    },
+    {
+      "operation_id": "op-s2006-replay-publish-01",
+      "status": "COMMITTED",
+      "idempotency_key": "ebe759ade6f4c525393d3ec46eeea873df55b4e6ce548258ad334e6874cbd811"
+    }
+  ],
+  "outbox": [
+    {
+      "event_id": "aud-1bf1b011f35b09e82efd6bd7",
+      "event_type": "EXTERNAL_CALL_FINALIZED",
+      "operation_id": "op-s2006-replay-external-01"
+    },
+    {
+      "event_id": "aud-2388e175f821e22187f07c1a",
+      "event_type": "CALIBRATION_REPORT_PUBLISHED",
+      "operation_id": "op-s2006-replay-calibration-01"
+    },
+    {
+      "event_id": "aud-73d38c273cbe67a6567b7095",
+      "event_type": "VERIFICATION_RESULT_PUBLISHED",
+      "operation_id": "op-s2006-replay-publish-01"
+    },
+    {
+      "event_id": "aud-c3242a4a32acc039833bae4b",
+      "event_type": "ADJUDICATION_PUBLISHED",
+      "operation_id": "op-s2006-replay-adjudication-01"
+    },
+    {
+      "event_id": "aud-d6cf67a5027f01d33ecb4bae",
+      "event_type": "EXTERNAL_CALL_RESERVED",
+      "operation_id": "op-s2006-replay-external-01"
+    },
+    {
+      "event_id": "aud-eba5add6682eeca20d3b924d",
+      "event_type": "EXTERNAL_CALL_ACCEPTED",
+      "operation_id": "op-s2006-replay-external-01"
+    }
+  ],
+  "externalCall": [
+    {
+      "call_id": "call-s2006-replay-1",
+      "state": "FINALIZED",
+      "fencing_token": "1"
+    }
+  ],
+  "status": "COMPLETED",
+  "digest": "4e319f27165f223cca7bcb019a039813bb0cf61e6b616c94c822e11e1a0a25a9"
+}
