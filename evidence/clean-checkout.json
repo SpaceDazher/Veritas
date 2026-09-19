@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "73c124e4776a0eb89925112980d15f5c8535e8aa",
+  "testedImplementationCommit": "376e4adc810bd0284df08ad4dda27a315ab3481d",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "73c124e4776a0eb89925112980d15f5c8535e8aa",
-  "sourceTree": "5d05f1250eba60d73b9000e4c43174e3b8c8dbcf",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "376e4adc810bd0284df08ad4dda27a315ab3481d",
+  "sourceTree": "e481cafe6865503737abede4d86ebeda62d81868",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -35,14 +35,16 @@
     {
       "id": "root-manifest",
       "command": "node scripts/generate-manifests.mjs --check",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/lifecycle-blocked-denied.json',\r\n      sha256: '0863dc72b904f8a8f3ba138ecf11baee2ad39fa821d2f9b96eb6b8d1d379854b',\r\n      bytes: 1390\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/malformed-binary-in-md.json',\r\n      sha256: '97d8cd07e3c045e41e9806a009eaa068fbcd0d50884434f8d71bfca246bd42e6',\r\n      bytes: 1533\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/malformed-broken-frontmatter.json',\r\n      sha256: 'dffde84422ef5bfd7161045ec81a92c3961b4133b8c398b41455d974f53e45ad',\r\n      bytes: 1612\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/malformed-empty-file.json',\r\n      sha256: '0cdb443e0e300dac91296f7ecaa523f3dba9197cb2076ef3b0e8cb781fb6a624',\r\n      bytes: 1486\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/malformed-html-garbage.json',\r\n      sha256: '64752e6610ca1e83860c4f260853ef13c4cd79c80448e9fef9c80955683a9ccd',\r\n      bytes: 1554\r\n    },\r\n    {\r\n      path: 'corpus/s2-003/cases/malformed-huge-line.json',\r\n      sha256: '0e2d64aa6cb50102caa4148d759aa860108687f7e380a6e36c1338ed7b519b80',\r\n      bytes: 6503\r\n    },\r\n    ... 548 more items\r\n  ],\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": ".json': 'e32de7940e5f221f26712ec89fd02f057acf9ada38c35e39f16d2199140ed37b',\r\n    'tests/verifier/fixtures/canonical/evidence-map.json': '33c542e31b168780f911343de762990e919567f945d8c2f1b80fc34cab17c61a',\r\n    'tests/verifier/fixtures/canonical/hypothesis-card.json': 'f0d89585245217279f5241d78209e0fbf99fea0edf641b337a24c5f2a2f68aee',\r\n    'tests/verifier/fixtures/canonical/synthesis-result.json': 'eaf4726b802ef43079dacdaa9248317df9455b373b40824fca47bae3a9b407a2',\r\n    'tests/verifier/fixtures/keys.json': 'f7d2fb96339b501d14e0481828a149a53a792f30e72bf0f1f1ffc9aaa4ffb3e5',\r\n    'tests/verifier/policy.test.mjs': '4dcb38f30859a3f9650d6e54300a0fcb257d2561cb759fa1be714f17b833d98c',\r\n    'tests/verifier/rubric.test.mjs': '82be4c27c3b13fa8e2215acd6ff7691ea17291afdc59fb723a7327ba5bd54ef1',\r\n    'tests/verifier/security-probes.test.mjs': '2e867defdcb8e34c2ed7220993ac455eda77cad454d2c89a63ee5a63170492ba',\r\n    'tests/verifier/signature.test.mjs': '7613ab6b84b76a6c7b35c862e74b61715e67005d38cd472ba3bd9e35753c738f',\r\n    'tests/verifier/store.test.mjs': '265639822c8ed202c8a8e09a319851d91e219032e6614e2aac352cd318038f59'\r\n  },\r\n  operator: 'deepStrictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v22.23.2"
     },
     {
       "id": "synthetic-smoke",
@@ -53,8 +55,9 @@
     {
       "id": "inventory",
       "command": "node scripts/check-inventory.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "{\n  \"exitCode\": 1,\n  \"trackedFiles\": 653,\n  \"listedFiles\": 644,\n  \"missingFromInventory\": [\n    \"evidence/s2-006-db-crash-a.json\",\n    \"evidence/s2-006-db-crash-b.json\",\n    \"results/s2-006/s2-006-db-comparison.json\",\n    \"tests/verifier/db-replay-crash.test.mjs\",\n    \"tests/verifier/fixtures/canonical/claim.json\",\n    \"tests/verifier/fixtures/canonical/evidence-map.json\",\n    \"tests/verifier/fixtures/canonical/hypothesis-card.json\",\n    \"tests/verifier/fixtures/canonical/README.md\",\n    \"tests/verifier/fixtures/canonical/synthesis-result.json\"\n  ],\n  \"missingFromGit\": [],\n  \"inventoryPath\": \"evidence/FILE_INVENTORY.md\",\n  \"source\": \"git ls-files -z\"\n}"
     },
     {
       "id": "public-artifacts",
