@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/annotation-set.schema.json",
+  "description": "Independent annotation set (S2-006 spec section 3): frozen case ids, split, blinding flags, annotator identity and role, raw labels with digests, source/rubric digests and a signature over the exact corpus+split+case+rubric+label bytes by an authenticated subject (offline HMAC-SHA256 or Ed25519). Policy verifies the signature over the exact digest and never trusts auth_ref fields; self-attestation, role reuse, forged signatures or conflicts of interest are rejected before semantic comparison.",
+  "title": "Veritas Annotation Set (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "annotationSetId",
+    "corpusVersion",
+    "frozenCaseIds",
+    "split",
+    "blindAssignment",
+    "annotatorId",
+    "annotatorRole",
+    "labels",
+    "timestamps",
+    "sourceDigest",
+    "rubricDigest",
+    "signature"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "annotationSetId": { "type": "string", "pattern": "^ans-[a-z0-9][a-z0-9-]{0,62}$" },
+    "corpusVersion": { "$ref": "#/$defs/semVer" },
+    "frozenCaseIds": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^case-[a-z0-9][a-z0-9-]{0,62}$" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "split": { "enum": ["dev", "calibration", "locked_test"] },
+    "blindAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producerIdentityHidden", "producerVerdictHidden", "predictionsHidden", "thresholdsHidden", "splitAssignmentHidden"],
+      "properties": {
+        "producerIdentityHidden": { "type": "boolean" },
+        "producerVerdictHidden": { "type": "boolean" },
+        "predictionsHidden": { "type": "boolean" },
+        "thresholdsHidden": { "type": "boolean" },
+        "splitAssignmentHidden": { "type": "boolean" }
+      }
+    },
+    "annotatorId": { "$ref": "#/$defs/principalId" },
+    "annotatorRole": { "enum": ["annotator", "adjudicator", "label_custodian", "reviewer"] },
+    "labels": {
+      "description": "Raw independent labels; consensus never erases the original votes.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["caseId", "label", "labelDigest", "annotatorId", "labeledAt"],
+        "properties": {
+          "caseId": { "type": "string", "pattern": "^case-[a-z0-9][a-z0-9-]{0,62}$" },
+          "label": { "enum": ["SUPPORTED", "CONTRADICTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "STALE_INPUT", "BLOCKED_POLICY"] },
+          "labelDigest": {
+            "description": "SHA-256 over the canonical-json-v1 form of the raw label bytes as signed.",
+            "$ref": "#/$defs/sha256Hex"
+          },
+          "annotatorId": { "$ref": "#/$defs/principalId" },
+          "labeledAt": { "$ref": "#/$defs/utcTimestamp" }
+        }
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frozenAt", "createdAt"],
+      "properties": {
+        "frozenAt": { "$ref": "#/$defs/utcTimestamp" },
+        "createdAt": { "$ref": "#/$defs/utcTimestamp" }
+      }
+    },
+    "sourceDigest": {
+      "description": "Digest of the exact frozen corpus source bytes the labels refer to.",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "rubricDigest": { "$ref": "#/$defs/sha256Hex" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "keyRef", "digest", "verified", "attestedBy"],
+      "properties": {
+        "scheme": { "enum": ["hmac-sha256", "ed25519"] },
+        "keyRef": {
+          "description": "Custody reference of the signing key held by the named subject, never by the candidate or verifier operator.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "digest": {
+          "description": "Signature/attestation over the exact digest of corpus+split+case+rubric+label bytes.",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "verified": { "type": "boolean" },
+        "attestedBy": { "$ref": "#/$defs/principalId" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+  }
+}

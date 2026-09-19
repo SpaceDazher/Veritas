@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/calibration-report.schema.json",
+  "description": "Calibration report (S2-006): the aggregate over one calibration campaign. Every metric carries raw counts, numerator/denominator/missing, interval method and interval with a MEASURED|NOT_MEASURED|NEEDS_INPUT|NOT_APPLICABLE status — a zero denominator or violated independence is NOT_MEASURED, never 0% or 100%. Links the immutable per-run calibration-record entries (v1 legacy records stay readable via the untouched v1 schema; v2 records carry the richer independence profile) without duplicating their format. Aggregate scores never hide hard failures; abstain-all cannot win because precision without coverage is insufficient.",
+  "title": "Veritas Calibration Report (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "reportId",
+    "corpusVersion",
+    "rubricDigest",
+    "thresholdsDigest",
+    "metricRecords",
+    "confusionMatrices",
+    "slices",
+    "selectiveRisk",
+    "coverage",
+    "thresholdDecision",
+    "independenceTier",
+    "limitations",
+    "expiry",
+    "driftScope"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "reportId": { "type": "string", "pattern": "^rep-[a-z0-9][a-z0-9-]{0,62}$" },
+    "corpusVersion": { "$ref": "#/$defs/semVer" },
+    "rubricDigest": { "$ref": "#/$defs/sha256Hex" },
+    "thresholdsDigest": {
+      "description": "Digest of the frozen contracts/s2-006-thresholds.json preregistration applied.",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "metricRecords": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "numerator", "denominator", "missingCount", "value", "intervalMethod", "interval", "status"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "numerator": { "type": "integer", "minimum": 0 },
+          "denominator": { "type": "integer", "minimum": 0 },
+          "missingCount": { "type": "integer", "minimum": 0 },
+          "value": { "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }] },
+          "intervalMethod": { "enum": ["wilson", "clopper_pearson", "bootstrap", "paired_bootstrap", "none"] },
+          "interval": {
+            "description": "Paired confidence bounds may be negative (non-inferiority against -delta), hence the -1 lower bound.",
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["lower", "upper", "confidenceLevel"],
+                "properties": {
+                  "lower": { "type": "number", "minimum": -1, "maximum": 1 },
+                  "upper": { "type": "number", "minimum": -1, "maximum": 1 },
+                  "confidenceLevel": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 }
+                }
+              },
+              { "type": "null" }
+            ]
+          },
+          "status": { "enum": ["MEASURED", "NOT_MEASURED", "NEEDS_INPUT", "NOT_APPLICABLE"] },
+          "notMeasuredReason": { "$ref": "#/$defs/notMeasuredReason" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "MEASURED" } } },
+            "then": {
+              "required": ["value", "denominator"],
+              "properties": {
+                "value": { "type": "number", "minimum": 0, "maximum": 1 },
+                "denominator": { "type": "integer", "minimum": 1 }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "status": { "enum": ["NOT_MEASURED", "NEEDS_INPUT"] } } },
+            "then": {
+              "required": ["notMeasuredReason"],
+              "properties": { "notMeasuredReason": { "$ref": "#/$defs/notMeasuredReasonNonEmpty" } }
+            }
+          }
+        ]
+      }
+    },
+    "confusionMatrices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "truePositive", "falsePositive", "falseNegative", "trueNegative", "missing"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "truePositive": { "type": "integer", "minimum": 0 },
+          "falsePositive": { "type": "integer", "minimum": 0 },
+          "falseNegative": { "type": "integer", "minimum": 0 },
+          "trueNegative": { "type": "integer", "minimum": 0 },
+          "missing": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "slices": {
+      "description": "Results per preregistered slice; external-validity/global paired denominators count the external stratum only — fixture and reannotation strata never inflate them.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "stratum", "caseCount", "metricNames"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "stratum": { "enum": ["external", "fixture", "reannotation", "global", "local"] },
+          "caseCount": { "type": "integer", "minimum": 0 },
+          "metricNames": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "selectiveRisk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk", "coverage", "curve"],
+      "properties": {
+        "risk": { "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }] },
+        "coverage": { "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }] },
+        "curve": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["coverage", "risk"],
+            "properties": {
+              "coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+              "risk": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["denominator", "evaluated", "missing", "floor"],
+      "properties": {
+        "denominator": { "type": "integer", "minimum": 0 },
+        "evaluated": { "type": "integer", "minimum": 0 },
+        "missing": { "type": "integer", "minimum": 0 },
+        "floor": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "thresholdDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["thresholdsDigest", "status", "ownerDecisionRef", "appliedAt"],
+      "properties": {
+        "thresholdsDigest": { "$ref": "#/$defs/sha256Hex" },
+        "status": { "enum": ["APPLIED", "NEEDS_INPUT", "NOT_APPLICABLE"] },
+        "ownerDecisionRef": {
+          "description": "Digest of the immutable HumanDecision by the authenticated method owner; null until that decision exists.",
+          "oneOf": [{ "$ref": "#/$defs/sha256Hex" }, { "type": "null" }]
+        },
+        "appliedAt": { "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }] }
+      }
+    },
+    "independenceTier": { "enum": ["INDEPENDENTLY_CALIBRATED", "PARTIALLY_INDEPENDENT", "NOT_INDEPENDENT", "UNVERIFIED"] },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 1024 },
+      "minItems": 1
+    },
+    "expiry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "cause"],
+      "properties": {
+        "at": { "$ref": "#/$defs/utcTimestamp" },
+        "cause": { "enum": ["model_drift", "prompt_drift", "rubric_drift", "corpus_drift", "contract_drift", "source_revision_changed", "label_revoked", "threshold_changed"] }
+      }
+    },
+    "driftScope": {
+      "description": "Exact model/prompt/rubric/corpus/threshold/contract versions this calibration is valid for; anything outside is stale for new inputs.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 256 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "calibrationRecords": {
+      "description": "Embedded immutable v1 per-run calibration records (historical compatibility; the v1 schema is untouched).",
+      "type": "array",
+      "items": { "$ref": "https://veritas.local/contracts/calibration-record.schema.json" }
+    },
+    "calibrationRecordsV2": {
+      "description": "Embedded immutable v2 per-run calibration records with the richer evaluator independence profile.",
+      "type": "array",
+      "items": { "$ref": "https://veritas.local/contracts/calibration-record-v2.schema.json" }
+    }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "notMeasuredReason": {
+      "oneOf": [
+        {
+          "enum": [
+            "no_valid_corpus",
+            "insufficient_samples",
+            "evaluator_not_independent",
+            "outcome_not_defined",
+            "missing_thresholds",
+            "missing_human_decision",
+            "dependency_blocked"
+          ]
+        },
+        { "type": "null" }
+      ]
+    },
+    "notMeasuredReasonNonEmpty": {
+      "enum": [
+        "no_valid_corpus",
+        "insufficient_samples",
+        "evaluator_not_independent",
+        "outcome_not_defined",
+        "missing_thresholds",
+        "missing_human_decision",
+        "dependency_blocked"
+      ]
+    }
+  }
+}

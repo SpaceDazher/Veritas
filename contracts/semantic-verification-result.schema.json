@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/semantic-verification-result.schema.json",
+  "description": "Immutable semantic verification result (S2-006): input/output digests, item results, disagreements, critical findings, abstentions, coverage, independence profile reference and a status of READY_FOR_HUMAN_REVIEW|INCOMPLETE|BLOCKED. The result is a separate immutable evaluation artifact: humanDecisionRequired is const true, so a verifier verdict can never be recorded as a human ACCEPT_BOUNDED decision and never changes claim lifecycle by itself.",
+  "title": "Veritas Semantic Verification Result (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "resultId",
+    "requestRef",
+    "inputDigests",
+    "outputDigest",
+    "items",
+    "disagreements",
+    "criticalFindings",
+    "abstentions",
+    "coverage",
+    "independenceProfileRef",
+    "humanDecisionRequired",
+    "status"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "resultId": { "type": "string", "pattern": "^sres-[a-z0-9][a-z0-9-]{0,62}$" },
+    "requestRef": { "type": "string", "pattern": "^svr-[a-z0-9][a-z0-9-]{0,62}$" },
+    "inputDigests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactDigest", "rubricDigest", "corpusManifestDigest", "thresholdsDigest"],
+      "properties": {
+        "artifactDigest": {
+          "description": "Digest of the exact evaluated upstream artifact revision (immutable read).",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "rubricDigest": { "$ref": "#/$defs/sha256Hex" },
+        "corpusManifestDigest": { "$ref": "#/$defs/sha256Hex" },
+        "thresholdsDigest": { "$ref": "#/$defs/sha256Hex" },
+        "canonicalArgsDigest": {
+          "description": "canonical_args_digest of the originating semantic-verification-request.",
+          "$ref": "#/$defs/sha256Hex"
+        }
+      }
+    },
+    "outputDigest": {
+      "description": "SHA-256 over the canonical-json-v1 serialization of this result with outputDigest set to null (self-excluding).",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "https://veritas.local/contracts/semantic-verification-item.schema.json" }
+    },
+    "disagreements": {
+      "description": "Items where the independent gold label and the verifier prediction differ; raw labels are never erased by adjudication.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["itemId", "goldLabel", "predictedLabel", "annotationSetIds", "adjudicationRequired"],
+        "properties": {
+          "itemId": { "type": "string", "pattern": "^svi-[a-z0-9][a-z0-9-]{0,62}$" },
+          "goldLabel": { "oneOf": [{ "$ref": "#/$defs/verdictLabel" }, { "type": "null" }] },
+          "predictedLabel": { "$ref": "#/$defs/verdictLabel" },
+          "annotationSetIds": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^ans-[a-z0-9][a-z0-9-]{0,62}$" },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "adjudicationRequired": { "type": "boolean" }
+        }
+      }
+    },
+    "criticalFindings": {
+      "description": "Safety/authority findings; every hardFail finding forces status BLOCKED and a zero-tolerance counter.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["findingId", "code", "detail", "hardFail"],
+        "properties": {
+          "findingId": { "type": "string", "pattern": "^crt-[a-z0-9][a-z0-9-]{0,62}$" },
+          "code": { "enum": ["private_leak", "locked_label_access", "producer_self_review", "fabricated_citation", "upstream_mutation", "unauthorized_side_effect", "prompt_injection_override"] },
+          "detail": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "hardFail": { "type": "boolean" }
+        }
+      }
+    },
+    "abstentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["itemId", "scope", "reason", "detail"],
+        "properties": {
+          "itemId": { "oneOf": [{ "type": "string", "pattern": "^svi-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] },
+          "scope": { "enum": ["item", "artifact", "corpus", "provider"] },
+          "reason": { "enum": ["NO_CITATION", "SOURCE_UNAVAILABLE", "OUT_OF_SCOPE", "POLICY_BLOCK", "BUDGET_EXHAUSTED", "EVALUATOR_MISSING", "TIMEOUT"] },
+          "detail": { "type": "string", "maxLength": 1024 }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["denominator", "evaluated", "missing"],
+      "properties": {
+        "denominator": { "type": "integer", "minimum": 0 },
+        "evaluated": { "type": "integer", "minimum": 0 },
+        "missing": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "independenceProfileRef": {
+      "description": "Reference to the evaluator independence profile over the axes of spec section 3.",
+      "type": "string",
+      "pattern": "^ind-[a-z0-9][a-z0-9-]{0,62}$"
+    },
+    "humanDecisionRequired": {
+      "description": "Always true: this artifact is advisory input for an authorised human reviewer and is never a human ACCEPT_BOUNDED decision.",
+      "const": true
+    },
+    "status": { "enum": ["READY_FOR_HUMAN_REVIEW", "INCOMPLETE", "BLOCKED"] }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "verdictLabel": {
+      "enum": ["SUPPORTED", "CONTRADICTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "STALE_INPUT", "BLOCKED_POLICY"]
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/verifier-run.schema.json",
+  "description": "Verifier run record (S2-006): implementation/model/prompt/tool/config hashes, seed, environment, input/output roots, sealed predictionSet/runManifest digests, failures, cost and latency telemetry and execution provenance (executor id, pid, nonce, clock). Run A and process-separated Run B share one frozen implementation commit and inputs but always carry distinct executor id, pid, nonce and output root, so their runManifestDigests differ even when predictionSetDigests coincide. Latency and clock are telemetry only; they never enter decisions, seeds or oracles.",
+  "title": "Veritas Verifier Run (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "runId",
+    "runKind",
+    "implementationDigest",
+    "toolDigests",
+    "configHash",
+    "seed",
+    "environment",
+    "inputRoots",
+    "outputRoots",
+    "predictionSetDigest",
+    "runManifestDigest",
+    "failures",
+    "cost",
+    "execution"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "runId": { "type": "string", "pattern": "^run-[a-z0-9][a-z0-9-]{0,62}$" },
+    "runKind": { "enum": ["candidate", "deterministic_baseline", "heuristic_baseline", "comparator", "evaluation_harness"] },
+    "implementationDigest": {
+      "description": "Immutable digest of the exact verifier implementation commit/tree that produced this run.",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "modelRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modelId", "modelVersion"],
+      "properties": {
+        "modelId": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "modelVersion": { "$ref": "#/$defs/semVer" },
+        "modelDigest": { "oneOf": [{ "$ref": "#/$defs/sha256Hex" }, { "type": "null" }] }
+      }
+    },
+    "promptDigest": { "oneOf": [{ "$ref": "#/$defs/sha256Hex" }, { "type": "null" }] },
+    "toolDigests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool", "digest"],
+        "properties": {
+          "tool": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "digest": { "$ref": "#/$defs/sha256Hex" }
+        }
+      }
+    },
+    "configHash": { "$ref": "#/$defs/sha256Hex" },
+    "seed": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "platform", "arch"],
+      "properties": {
+        "node": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "platform": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "arch": { "type": "string", "minLength": 1, "maxLength": 64 }
+      }
+    },
+    "inputRoots": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "digest"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "digest": { "$ref": "#/$defs/sha256Hex" }
+        }
+      }
+    },
+    "outputRoots": {
+      "description": "Temporary runs write only to a dedicated output root, never to tracked evidence.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "digest"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "digest": { "$ref": "#/$defs/sha256Hex" }
+        }
+      }
+    },
+    "predictionSetDigest": {
+      "description": "Digest of the sealed prediction set produced before unseal of locked labels.",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "runManifestDigest": {
+      "description": "Digest of the sealed run manifest; distinct across Run A/B (executor id, pid, nonce, output root).",
+      "$ref": "#/$defs/sha256Hex"
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "detail"],
+        "properties": {
+          "code": { "type": "string", "maxLength": 128 },
+          "detail": { "type": "string", "maxLength": 1024 }
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operations", "retries", "providerCost"],
+      "properties": {
+        "operations": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
+        "providerCost": {
+          "description": "Settled provider cost in the grant currency; null when no provider call was made.",
+          "oneOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }]
+        }
+      }
+    },
+    "latencyMs": {
+      "description": "Telemetry only; never enters decisions, seeds or oracles.",
+      "type": "number",
+      "minimum": 0
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executorId", "pid", "nonce", "outputRootDigest", "clock"],
+      "properties": {
+        "executorId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "pid": { "type": "integer", "minimum": 0 },
+        "nonce": { "type": "string", "pattern": "^n-[A-Za-z0-9_-]{8,64}$" },
+        "outputRootDigest": { "$ref": "#/$defs/sha256Hex" },
+        "clock": { "$ref": "#/$defs/utcTimestamp" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+  }
+}

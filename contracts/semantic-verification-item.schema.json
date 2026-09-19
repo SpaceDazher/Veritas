@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/semantic-verification-item.schema.json",
+  "description": "Atomic semantic verification item (S2-006): one statement/span/card criterion evaluated against an independent gold label, with a bounded verdict, closed reason codes, exact evidence links, missingness, uncertainty and provenance. Verdicts are local advisory statuses — never global truth, never a claim lifecycle transition and never a human review decision.",
+  "title": "Veritas Semantic Verification Item (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "itemId",
+    "statement",
+    "spanRef",
+    "criterion",
+    "goldLabel",
+    "predictedLabel",
+    "verdict",
+    "reasonCodes",
+    "evidenceLinks",
+    "missingness",
+    "provenance"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "itemId": { "type": "string", "pattern": "^svi-[a-z0-9][a-z0-9-]{0,62}$" },
+    "statement": { "type": "string", "minLength": 1, "maxLength": 2048 },
+    "spanRef": {
+      "description": "Exact evaluated span: digest of the quoted bytes plus character offsets into the immutable artifact revision.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["quoteDigest", "start", "end"],
+      "properties": {
+        "quoteDigest": { "$ref": "#/$defs/sha256Hex" },
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "criterion": { "$ref": "#/$defs/checkName" },
+    "goldLabel": {
+      "description": "Independent human label; null while labels are unlabeled or still sealed.",
+      "oneOf": [{ "$ref": "#/$defs/verdictLabel" }, { "type": "null" }]
+    },
+    "predictedLabel": { "$ref": "#/$defs/verdictLabel" },
+    "verdict": { "$ref": "#/$defs/verdictLabel" },
+    "reasonCodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reasonCode" },
+      "uniqueItems": true
+    },
+    "evidenceLinks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claimId", "claimRevision"],
+        "properties": {
+          "claimId": { "type": "string", "pattern": "^clm-[a-z0-9][a-z0-9-]{0,62}$" },
+          "claimRevision": { "type": "integer", "minimum": 1 },
+          "segmentId": { "type": "string", "pattern": "^seg-[a-z0-9][a-z0-9-]{0,62}$" },
+          "span": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start", "end"],
+            "properties": {
+              "start": { "type": "integer", "minimum": 0 },
+              "end": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "quoteDigest": { "$ref": "#/$defs/sha256Hex" },
+          "evidenceMapId": { "oneOf": [{ "type": "string", "pattern": "^evm-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] },
+          "entryIndex": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] }
+        }
+      }
+    },
+    "missingness": {
+      "description": "Typed missingness: an exception, timeout or unavailable source is never a semantic pass/fail and never silently leaves the denominator.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["none", "source_unavailable", "evaluator_missing", "timeout", "policy_refusal", "budget_exhausted"] },
+        "detail": { "type": "string", "maxLength": 1024 }
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "enum": ["aleatoric", "epistemic"] },
+        "value": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runId"],
+      "properties": {
+        "runId": { "type": "string", "pattern": "^run-[a-z0-9][a-z0-9-]{0,62}$" },
+        "implementationDigest": { "$ref": "#/$defs/sha256Hex" },
+        "corpusVersion": { "$ref": "#/$defs/semVer" },
+        "rubricVersion": { "$ref": "#/$defs/semVer" },
+        "asOf": { "$ref": "#/$defs/utcTimestamp" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "verdictLabel": {
+      "description": "Bounded local status; not global truth and never a claim lifecycle transition without an authorised human review.",
+      "enum": ["SUPPORTED", "CONTRADICTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "STALE_INPUT", "BLOCKED_POLICY"]
+    },
+    "reasonCode": {
+      "enum": [
+        "topic_overlap",
+        "number_unit_drift",
+        "negation_drift",
+        "modality_drift",
+        "scope_difference",
+        "missing_citation",
+        "stale_source",
+        "future_source",
+        "revoked_source",
+        "family_collapse",
+        "causal_overclaim",
+        "out_of_scope",
+        "policy_block",
+        "evaluator_missing",
+        "other"
+      ]
+    },
+    "checkName": {
+      "description": "Closed set of independently verifiable properties from S2-006 spec sections 2 and 5; mirrors semantic-verification-request.requestedChecks.",
+      "enum": [
+        "citation_entailment",
+        "citation_coverage",
+        "qualifier_scope_binding",
+        "number_unit_preservation",
+        "negation_preservation",
+        "modality_preservation",
+        "contradiction_detection",
+        "scope_difference_discrimination",
+        "epistemic_type",
+        "causal_overclaim",
+        "temporal_ordering",
+        "evidence_family_independence",
+        "near_duplicate_collapse",
+        "stale_evidence_invalidation",
+        "future_evidence_invalidation",
+        "revoked_evidence_invalidation",
+        "as_of_leakage",
+        "completeness_and_abstention",
+        "bounded_novelty"
+      ]
+    }
+  }
+}
