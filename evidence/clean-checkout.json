@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "baa8a19e85b732d007ce9cd3101351879842722f",
+  "testedImplementationCommit": "74a55e73a5e2a7caaf7f308ed46f8bf6112333be",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "baa8a19e85b732d007ce9cd3101351879842722f",
-  "sourceTree": "6661a580638e9f4bcfc52d1d0a111980062c5b57",
+  "sourceCommit": "74a55e73a5e2a7caaf7f308ed46f8bf6112333be",
+  "sourceTree": "0a23341e48a893c5326f15cf1a822ba9cbd376bb",
   "exitCode": 0,
   "passed": true,
   "commands": [
@@ -191,6 +191,42 @@
     {
       "id": "s2-005-db-replay",
       "command": "npm.cmd run verify:s2-005-db-replay",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-006-types",
+      "command": "npm.cmd run verifier:types",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-006-verifier-tests",
+      "command": "npm.cmd run test:verifier",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-006-calibration",
+      "command": "npm.cmd run test:s2-006-calibration",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-006-security-probes",
+      "command": "npm.cmd run test:s2-006-security-probes",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-006-replay",
+      "command": "npm.cmd run verify:s2-006",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "id": "s2-006-db-replay",
+      "command": "npm.cmd run verify:s2-006-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },
