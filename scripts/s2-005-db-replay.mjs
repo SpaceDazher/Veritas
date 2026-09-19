@@ -64,11 +64,44 @@ async function runChild({ schema, runId, executorId, nonce, clock, out, database
   ]);
   const store = new PostgresClaimGraphStore(pool, { authorities, clock: () => clock });
   const result = await runCorpus({
-    runId, executorId, nonce, outputRoot: `results/s2-005/db-${runId}`, clock, pg: true,
+    runId, executorId, nonce, outputRoot: `results/s2-005/db-${runId}`, clock, pid: process.pid, pg: true,
   }, { store, authorities });
   fs.writeFileSync(out, `${JSON.stringify({ ...result, dbPid: process.pid }, null, 2)}\n`);
   await pool.end();
   process.exit(result.status === 'COMPLETED' ? 0 : 2);
+}
+
+const INTEGRITY_COUNTERS = [
+  'private_leaks', 'unauthorized_hits', 'future_leaks', 'stale_hits',
+  'provenance_substitutions', 'causal_overclaims', 'facts_from_analogy',
+  'hidden_contradictions', 'silent_exclusions', 'duplicate_side_effects',
+  'authority_expansions', 'type_promotions_without_review',
+];
+
+export function dbReplayIssues(a, b) {
+  const issues = [];
+  for (const [label, run] of [['a', a], ['b', b]]) {
+    if (run.status !== 'COMPLETED') issues.push(`run-${label}:not-completed`);
+    if (run.caseCount !== 55 || run.decisions?.length !== 55 || new Set(run.decisions.map((d) => d.case_id)).size !== 55) {
+      issues.push(`run-${label}:case-set-incomplete`);
+    }
+    if (run.decisionCounts?.PASS !== 55 || Object.keys(run.decisionCounts ?? {}).length !== 1 || run.decisions?.some((d) => d.decision !== 'PASS')) {
+      issues.push(`run-${label}:not-pass`);
+    }
+    for (const counter of INTEGRITY_COUNTERS) {
+      if (run.integrity?.[counter] !== 0) issues.push(`run-${label}:integrity:${counter}`);
+    }
+  }
+  if (a.graphDigest !== b.graphDigest) issues.push('comparison:graph-digest-mismatch');
+  if (a.executor_id === b.executor_id) issues.push('identity:executor-identical');
+  if (a.clock === b.clock) issues.push('identity:clock-identical');
+  if (a.dbPid === b.dbPid) issues.push('identity:pid-identical');
+  const bById = new Map((b.decisions ?? []).map((d) => [d.case_id, d]));
+  for (const da of a.decisions ?? []) {
+    const db = bById.get(da.case_id);
+    if (!db || db.decision !== da.decision) issues.push(`comparison:${da.case_id}:decision-mismatch`);
+  }
+  return issues;
 }
 
 async function coordinator(args) {
@@ -131,18 +164,7 @@ async function coordinator(args) {
     }
 
     const [a, b] = summaries;
-    const issues = [];
-    if (a.status !== 'COMPLETED' || b.status !== 'COMPLETED') issues.push('run:not-completed');
-    if (a.caseCount !== 55 || b.caseCount !== 55) issues.push('comparison:case-count-not-55');
-    if (a.graphDigest !== b.graphDigest) issues.push('comparison:graph-digest-mismatch');
-    if (a.executor_id === b.executor_id) issues.push('identity:executor-identical');
-    if (a.clock === b.clock) issues.push('identity:clock-identical');
-    if (a.dbPid === b.dbPid) issues.push('identity:pid-identical');
-    const bById = new Map((b.decisions ?? []).map((d) => [d.case_id, d]));
-    for (const da of a.decisions ?? []) {
-      const db = bById.get(da.case_id);
-      if (!db || db.decision !== da.decision) issues.push(`comparison:${da.case_id}:decision-mismatch`);
-    }
+    const issues = dbReplayIssues(a, b);
 
     const report = {
       schemaVersion: 1,
@@ -159,7 +181,7 @@ async function coordinator(args) {
       graphDigest: a.graphDigest,
       comparison: { ok: issues.length === 0, issues, comparedCases: (a.decisions ?? []).length },
       hardGates: {
-        ok: issues.length === 0 && Object.values(a.integrity ?? {}).every((v) => v === 0),
+        ok: issues.length === 0,
         violations: issues,
       },
     };
