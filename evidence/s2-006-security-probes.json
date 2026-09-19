@@ -1,0 +1,713 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "adversarial probes A–S over the verifier rubric/policy/signature/command surfaces (spec §12)",
+  "ok": true,
+  "totals": {
+    "probes": 19,
+    "ok": 19,
+    "failed": 0,
+    "attemptedViolations": 19,
+    "actualViolations": 0
+  },
+  "hardCounters": {
+    "unauthorizedLeakageEvents": 0,
+    "lockedLabelAccessEvents": 0,
+    "producerSelfReviewEvents": 0,
+    "upstreamArtifactMutationEvents": 0,
+    "unauthorizedSideEffectEvents": 0,
+    "total": 0
+  },
+  "notRun": [
+    "NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics)."
+  ],
+  "probes": [
+    {
+      "id": "A",
+      "name": "topic_overlap_citation_not_supported",
+      "expected": {
+        "forbiddenVerdict": "SUPPORTED",
+        "requiredReasonCode": "topic_overlap"
+      },
+      "observed": [
+        {
+          "caseId": "case-s2006-02",
+          "verdict": "PARTIALLY_SUPPORTED",
+          "reasonCodes": [
+            "topic_overlap"
+          ],
+          "notSupported": true,
+          "exactReason": true,
+          "matchesFixture": true
+        },
+        {
+          "caseId": "case-s2006-24",
+          "verdict": "PARTIALLY_SUPPORTED",
+          "reasonCodes": [
+            "topic_overlap"
+          ],
+          "notSupported": true,
+          "exactReason": true,
+          "matchesFixture": true
+        }
+      ],
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "B",
+      "name": "drift_detected_with_exact_reason_code",
+      "expected": {
+        "requiredVerdict": "INSUFFICIENT_EVIDENCE",
+        "exactReasonCodes": [
+          "number_unit_drift",
+          "negation_drift",
+          "modality_drift"
+        ]
+      },
+      "observed": [
+        {
+          "caseId": "case-s2006-03",
+          "category": "numeric",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "number_unit_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-04",
+          "category": "unit",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "number_unit_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-05",
+          "category": "negation",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "negation_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-06",
+          "category": "modality",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "modality_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-25",
+          "category": "numeric",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "number_unit_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-26",
+          "category": "unit",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "number_unit_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-27",
+          "category": "negation",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "negation_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        },
+        {
+          "caseId": "case-s2006-28",
+          "category": "modality",
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "reasonCodes": [
+            "modality_drift"
+          ],
+          "mismatch": true,
+          "exactReasonCode": true
+        }
+      ],
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "C",
+      "name": "scope_difference_is_not_contradiction",
+      "expected": {
+        "forbiddenVerdict": "CONTRADICTED",
+        "requiredReasonCode": "scope_difference",
+        "constructedVerdict": "SUPPORTED"
+      },
+      "observed": {
+        "corpus": [
+          {
+            "caseId": "case-s2006-07",
+            "verdict": "INSUFFICIENT_EVIDENCE",
+            "reasonCodes": [
+              "scope_difference"
+            ],
+            "notAContradiction": true,
+            "scopeDifference": true
+          },
+          {
+            "caseId": "case-s2006-13",
+            "verdict": "INSUFFICIENT_EVIDENCE",
+            "reasonCodes": [
+              "scope_difference"
+            ],
+            "notAContradiction": true,
+            "scopeDifference": true
+          },
+          {
+            "caseId": "case-s2006-31",
+            "verdict": "INSUFFICIENT_EVIDENCE",
+            "reasonCodes": [
+              "scope_difference"
+            ],
+            "notAContradiction": true,
+            "scopeDifference": true
+          },
+          {
+            "caseId": "case-s2006-32",
+            "verdict": "INSUFFICIENT_EVIDENCE",
+            "reasonCodes": [
+              "scope_difference"
+            ],
+            "notAContradiction": true,
+            "scopeDifference": true
+          }
+        ],
+        "constructed": {
+          "verdict": "SUPPORTED",
+          "reasonCodes": []
+        }
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "D",
+      "name": "correlation_never_becomes_mechanism",
+      "expected": {
+        "correlationVerdict": "PARTIALLY_SUPPORTED",
+        "requiredReasonCode": "causal_overclaim"
+      },
+      "observed": {
+        "overclaim": [
+          {
+            "caseId": "case-s2006-19",
+            "verdict": "PARTIALLY_SUPPORTED",
+            "reasonCodes": [
+              "causal_overclaim"
+            ],
+            "notPromotedToMechanism": true,
+            "overclaimFlagged": true
+          },
+          {
+            "caseId": "case-s2006-40",
+            "verdict": "PARTIALLY_SUPPORTED",
+            "reasonCodes": [
+              "causal_overclaim"
+            ],
+            "notPromotedToMechanism": true,
+            "overclaimFlagged": true
+          }
+        ],
+        "interventional": [
+          {
+            "caseId": "case-s2006-20",
+            "verdict": "SUPPORTED",
+            "interventionalBasisKept": true
+          },
+          {
+            "caseId": "case-s2006-41",
+            "verdict": "SUPPORTED",
+            "interventionalBasisKept": true
+          }
+        ]
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "E",
+      "name": "persuasive_output_without_spans_abstains",
+      "expected": {
+        "requiredVerdict": "INSUFFICIENT_EVIDENCE",
+        "requiredAbstention": "NO_CITATION"
+      },
+      "observed": {
+        "checkerWouldSay": "SUPPORTED",
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "reasonCodes": [
+          "missing_citation"
+        ],
+        "abstention": "NO_CITATION",
+        "coverageEvaluated": 1
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "F",
+      "name": "ten_paraphrases_are_one_evidence_family",
+      "expected": {
+        "expectedIndependentFamilies": 1,
+        "forbiddenVerdict": "SUPPORTED-with-multi-source-credit"
+      },
+      "observed": {
+        "paraphraseFamilies": {
+          "families": [
+            "fixture-family-21"
+          ],
+          "independentCount": 1
+        },
+        "corpusCases": [
+          {
+            "caseId": "case-s2006-21",
+            "verdict": "PARTIALLY_SUPPORTED",
+            "reasonCodes": [
+              "family_collapse"
+            ],
+            "independentCount": 1,
+            "collapsed": true
+          },
+          {
+            "caseId": "case-s2006-43",
+            "verdict": "PARTIALLY_SUPPORTED",
+            "reasonCodes": [
+              "family_collapse"
+            ],
+            "independentCount": 1,
+            "collapsed": true
+          }
+        ]
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "G",
+      "name": "private_span_in_shared_report_detected",
+      "expected": {
+        "hardFail": true,
+        "findingCode": "private_leak",
+        "findingEchoesContent": false
+      },
+      "observed": {
+        "auditOk": false,
+        "findings": [
+          {
+            "code": "private_leak",
+            "hardFail": true
+          }
+        ],
+        "findingEchoesContent": false,
+        "projectionClean": true
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "H",
+      "name": "post_as_of_source_and_early_locked_label_access_hard_fail",
+      "expected": {
+        "findingCodes": [
+          "locked_label_access",
+          "post_as_of_source"
+        ],
+        "runValid": false
+      },
+      "observed": {
+        "findings": [
+          {
+            "code": "locked_label_access",
+            "hardFail": true
+          },
+          {
+            "code": "post_as_of_source",
+            "hardFail": true
+          }
+        ],
+        "policyDeniedBeforeUnseal": true,
+        "runValid": false
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "I",
+      "name": "producer_self_review_and_forged_identity_rejected",
+      "expected": {
+        "policyDenied": true,
+        "publishDenied": true,
+        "selfAttestationRefused": true,
+        "acceptanceRecords": 0
+      },
+      "observed": {
+        "policyDenied": true,
+        "publishDenied": true,
+        "selfAttestationRefused": true,
+        "storeRecords": {
+          "adjudications": 0,
+          "outbox": 0,
+          "ledger": 0
+        }
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "J",
+      "name": "prompt_injection_is_inert",
+      "expected": {
+        "verdictsUnchanged": true,
+        "rubricIdentityUnchanged": true,
+        "authorityCountersZero": true
+      },
+      "observed": {
+        "cases": [
+          {
+            "caseId": "case-s2006-03",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-05",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-07",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-13",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-25",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-27",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-31",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          },
+          {
+            "caseId": "case-s2006-32",
+            "cleanVerdict": "INSUFFICIENT_EVIDENCE",
+            "hostileVerdict": "INSUFFICIENT_EVIDENCE",
+            "unchanged": true
+          }
+        ],
+        "policyInert": true,
+        "authorityCounters": {
+          "total": 0,
+          "unauthorizedLeakageEvents": 0,
+          "lockedLabelAccessEvents": 0,
+          "producerSelfReviewEvents": 0,
+          "upstreamArtifactMutationEvents": 0,
+          "unauthorizedSideEffectEvents": 0
+        },
+        "rubricId": "rub-s2006-semantic-v1",
+        "thresholdsDigestUnchanged": true
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "K",
+      "name": "abstain_all_fails_coverage_gate",
+      "expected": {
+        "candidateSelected": false,
+        "rejectionStep": "coverage_gate"
+      },
+      "observed": {
+        "status": "DECIDED",
+        "winner": "probe-k-high-coverage",
+        "candidate": {
+          "eligible": false,
+          "step": "coverage_gate",
+          "reasons": [
+            "coverage 0.000 < floor 0.8"
+          ]
+        },
+        "candidateCoverage": 0,
+        "candidatePrecisionStatus": "NOT_MEASURED"
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "L",
+      "name": "two_identically_broken_runs_fail_closed",
+      "expected": {
+        "comparatorOk": false,
+        "requiredFailure": "degenerate_run"
+      },
+      "observed": {
+        "ok": false,
+        "failureCodes": [
+          "degenerate_run",
+          "degenerate_run"
+        ]
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "M",
+      "name": "threshold_change_creates_new_version_old_run_invalid",
+      "expected": {
+        "sameOperationConflict": true,
+        "recordImmutability": true,
+        "oldResultState": "INVALID",
+        "newVersionRequired": true
+      },
+      "observed": {
+        "sameOperationConflict": true,
+        "recordImmutabilityConflict": true,
+        "oldResultImmutable": true,
+        "invalidationStored": true,
+        "newVersionStored": true,
+        "distinctResultIds": true,
+        "ledgerOperations": [
+          {
+            "operationId": "op-probe-m-publish-1",
+            "status": "COMMITTED"
+          },
+          {
+            "operationId": "op-probe-m-publish-3",
+            "status": "COMMITTED"
+          },
+          {
+            "operationId": "op-probe-m-invalidate-1",
+            "status": "COMMITTED"
+          }
+        ]
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "N",
+      "name": "stale_revoked_parent_invalidates_dependent_result",
+      "expected": {
+        "staleVerdict": "STALE_INPUT",
+        "calibrationApplicable": false
+      },
+      "observed": {
+        "stale": {
+          "verdict": "STALE_INPUT",
+          "reasonCodes": [
+            "stale_source"
+          ]
+        },
+        "revoked": {
+          "verdict": "STALE_INPUT",
+          "reasonCodes": [
+            "revoked_source"
+          ]
+        },
+        "calibrationApplicable": false
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "O",
+      "name": "novelty_is_corpus_bounded_only",
+      "expected": {
+        "priorFound": "similar_prior_found",
+        "worldNovelty": "NOT_ASSESSED",
+        "forbiddenClaim": "world novelty"
+      },
+      "observed": {
+        "priorFound": "similar_prior_found",
+        "noPrior": "novel_to_selected_corpus",
+        "worldClaim": "NOT_ASSESSED",
+        "corpusCases": [
+          {
+            "caseId": "case-s2006-44",
+            "verdict": "OUT_OF_SCOPE",
+            "reasonCodes": [
+              "out_of_scope"
+            ],
+            "novelty": "NOT_ASSESSED"
+          },
+          {
+            "caseId": "case-s2006-45",
+            "verdict": "SUPPORTED",
+            "reasonCodes": [],
+            "novelty": "novel_to_selected_corpus"
+          }
+        ]
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "P",
+      "name": "provider_timeout_and_refusal_are_typed_missingness",
+      "expected": {
+        "verdicts": [
+          "INSUFFICIENT_EVIDENCE",
+          "INSUFFICIENT_EVIDENCE"
+        ],
+        "abstentions": [
+          "TIMEOUT",
+          "POLICY_BLOCK"
+        ],
+        "excludedFromDenominator": false
+      },
+      "observed": {
+        "timeout": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "missingness": "timeout",
+          "abstention": "TIMEOUT",
+          "inDenominator": true,
+          "missing": 1
+        },
+        "refusal": {
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "missingness": "policy_refusal",
+          "abstention": "POLICY_BLOCK",
+          "inDenominator": true,
+          "missing": 1
+        }
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "Q",
+      "name": "post_unseal_candidate_access_and_reinvocation_hard_fail",
+      "expected": {
+        "candidateLabelAccess": "denied-forever",
+        "auditFinding": "locked_label_access",
+        "reinvocation": "run_divergence"
+      },
+      "observed": {
+        "candidateDeniedAfterUnseal": true,
+        "auditFindings": [
+          {
+            "code": "locked_label_access",
+            "hardFail": true
+          }
+        ],
+        "comparatorOk": false,
+        "comparatorFailures": [
+          "run_divergence"
+        ]
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "R",
+      "name": "role_reuse_self_attestation_and_forgery_rejected",
+      "expected": {
+        "dualRole": "denied",
+        "selfAttestation": "refused",
+        "forgedSignature": "refused"
+      },
+      "observed": {
+        "dualRoleDenied": true,
+        "commandRejected": true,
+        "selfAttested": true,
+        "forgedMac": true,
+        "forgedBinding": true,
+        "forgedIdentity": true,
+        "storeRecords": {
+          "ledger": 0,
+          "outbox": 0
+        }
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "ok": true
+    },
+    {
+      "id": "S",
+      "name": "crash_after_request_accepted_fenced_reconciliation",
+      "expected": {
+        "state": "RECONCILIATION_REQUIRED",
+        "duplicateEvents": 0,
+        "blindRetry": "refused"
+      },
+      "observed": {
+        "callStateAfterCrash": "RECONCILIATION_REQUIRED",
+        "settlementNull": true,
+        "staleFencingDenied": true,
+        "reconcileReplay": true,
+        "noDuplicateEvents": true,
+        "reservationReplayToken": 1,
+        "publishEscalated": true,
+        "publishBlindRetryRefused": true,
+        "publishOutboxEvents": 0,
+        "publishLedgerStatus": "RECONCILIATION_REQUIRED"
+      },
+      "attemptedViolations": 1,
+      "actualViolations": 0,
+      "notRun": [
+        "NOT_RUN_DB: PostgreSQL two-process crash/restart replay of probe S is a DB-gated scenario; offline suite covers the identical state machine on the in-memory store (migration 0005 semantics)."
+      ],
+      "ok": true
+    }
+  ],
+  "testedImplementationCommit": "465e04bd4f19a35df71fb0ab5d9fb68cfb0c3bfe",
+  "executedAt": "bound on the S2-006 branch"
+}
