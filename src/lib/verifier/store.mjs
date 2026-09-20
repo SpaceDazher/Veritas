@@ -326,17 +326,49 @@ export class InMemoryVerifierStore {
     return { uncertain: false, amount };
   }
 
-  #settledTotals(grantRef, operationId) {
+  // UTC calendar day of the INJECTED deterministic clock (never the wall
+  // clock): the day budget bucket key, 'YYYY-MM-DD'.
+  #dayKey() {
+    return String(this.clock()).slice(0, 10);
+  }
+
+  // Settled totals over a grant: task scope (this operation), campaign scope
+  // (the whole grant) and day scope (the UTC calendar day of the injected
+  // clock, fix2-C finding 3). Finalized calls carry the day_key they were
+  // settled under.
+  #settledTotals(grantRef, operationId, dayKey) {
     let task = 0;
     let campaign = 0;
+    let day = 0;
     for (const call of this.externalCalls.values()) {
       if (call.state !== 'FINALIZED' || call.grant_ref !== grantRef) continue;
       const amount = call.settlement?.amount;
       if (typeof amount !== 'number' || !Number.isFinite(amount)) continue;
       campaign += amount;
       if (call.operation_id === operationId) task += amount;
+      if (call.day_key === dayKey) day += amount;
     }
-    return { task, campaign };
+    return { task, campaign, day };
+  }
+
+  // Atomic failure escalation (fix2-C finding 4): the transition to
+  // RECONCILIATION_REQUIRED, its reason and the audit/outbox event are ONE
+  // step inside the failing operation. A crash after this step (simulated by
+  // the 'escalated-commit' fault) can never leave the call ACCEPTED without
+  // a reconcile event — there is no second, separate reconciliation call.
+  #escalateCall(call, reason) {
+    call.state = 'RECONCILIATION_REQUIRED';
+    call.reconcile_reason = String(reason ?? 'unknown outcome').slice(0, 1024);
+    this.#pushOutbox({ type: 'EXTERNAL_CALL_RECONCILIATION_REQUIRED', operationId: call.operation_id, actor: call.actor, recordKind: 'external_call', recordId: call.call_id, payload: { callId: call.call_id, reason: call.reconcile_reason } });
+  }
+
+  // Crash-window simulation: fires ONLY after the escalation step above has
+  // been applied (the post-COMMIT point of the old PostgreSQL branch).
+  #crashAfterEscalation() {
+    if (this.fault?.at === 'escalated-commit') {
+      if (this.fault.once) this.fault = null;
+      throw new StoreOutcomeUnknownError(`escalation of external call committed; the outcome is unknown to the caller (crash window simulation)`);
+    }
   }
 
   async acceptExternalCall({ callId, fencingToken, actor, workspaceId }) {
@@ -378,35 +410,34 @@ export class InMemoryVerifierStore {
     }
     const { uncertain, amount } = this.#parseSettlementAmount(call, settlement);
     if (uncertain) {
-      await this.markExternalCallReconciliation({
-        callId, fencingToken, actor,
-        reason: 'uncertain billing: settlement carries no parseable non-negative numeric `amount`',
-      });
+      this.#escalateCall(call, 'uncertain billing: settlement carries no parseable non-negative numeric `amount`');
+      this.#crashAfterEscalation();
       throw new ReconciliationRequired(`external call ${callId} settlement amount is uncertain; escalated to reconciliation, never silently counted as zero`);
     }
-    // Remaining-budget gate over the grant bound at reservation time: task
-    // and campaign scopes accumulate across the grant's finalized calls.
+    // Remaining-budget gate over the grant bound at reservation time: task,
+    // campaign AND day scopes accumulate across the grant's finalized calls
+    // (fix2-C finding 3: the day scope is bucketed by the UTC calendar day
+    // of the injected clock). Check + write are one synchronous step: the
+    // totals can never be read and charged non-atomically.
+    const dayKey = this.#dayKey();
     const binding = call.reservation?.grantBinding ?? null;
     if (binding && binding.budget) {
-      const { task, campaign } = this.#settledTotals(call.grant_ref, call.operation_id);
-      if (task + amount > binding.budget.task || campaign + amount > binding.budget.campaign) {
-        await this.markExternalCallReconciliation({
-          callId, fencingToken, actor,
-          reason: `settlement ${amount} exceeds the remaining grant budget (task spent ${task}/${binding.budget.task}, campaign spent ${campaign}/${binding.budget.campaign})`,
-        });
+      const { task, campaign, day } = this.#settledTotals(call.grant_ref, call.operation_id, dayKey);
+      if (task + amount > binding.budget.task || campaign + amount > binding.budget.campaign || day + amount > binding.budget.day) {
+        this.#escalateCall(call, `settlement ${amount} exceeds the remaining grant budget (task spent ${task}/${binding.budget.task}, campaign spent ${campaign}/${binding.budget.campaign}, day spent ${day}/${binding.budget.day})`);
+        this.#crashAfterEscalation();
         throw new BudgetExceeded(`external call ${callId} settlement ${amount} exceeds the remaining budget of grant ${call.grant_ref}`);
       }
       if (binding.currency === 'none' && amount > 0) {
-        await this.markExternalCallReconciliation({
-          callId, fencingToken, actor,
-          reason: `no-charge grant settled a positive amount (${amount})`,
-        });
+        this.#escalateCall(call, `no-charge grant settled a positive amount (${amount})`);
+        this.#crashAfterEscalation();
         throw new BudgetExceeded(`external call ${callId} settled ${amount} under a no-charge (currency none) grant ${call.grant_ref}`);
       }
     }
     call.state = 'FINALIZED';
     call.response_digest = responseDigest;
     call.settlement = settlement ?? {};
+    call.day_key = dayKey;
     this.#pushOutbox({ type: 'EXTERNAL_CALL_FINALIZED', operationId: call.operation_id, actor: call.actor, recordKind: 'external_call', recordId: callId, payload: { callId, state: 'FINALIZED', responseDigest } });
     return { callId, state: 'FINALIZED', fencingToken, replayed: false };
   }
@@ -421,9 +452,7 @@ export class InMemoryVerifierStore {
     if (call.state === 'RECONCILIATION_REQUIRED') {
       return { callId, state: 'RECONCILIATION_REQUIRED', replayed: true };
     }
-    call.state = 'RECONCILIATION_REQUIRED';
-    call.reconcile_reason = String(reason ?? 'unknown outcome').slice(0, 1024);
-    this.#pushOutbox({ type: 'EXTERNAL_CALL_RECONCILIATION_REQUIRED', operationId: call.operation_id, actor: call.actor, recordKind: 'external_call', recordId: callId, payload: { callId, reason: call.reconcile_reason } });
+    this.#escalateCall(call, reason);
     return { callId, state: 'RECONCILIATION_REQUIRED', replayed: false };
   }
 
@@ -433,7 +462,10 @@ export class InMemoryVerifierStore {
   // exists but lives in another workspace is a typed AclDenied — never a
   // silent null. The two-argument form stays the raw persistence primitive
   // (used by internal tooling, not by the ACL-enforced read API).
-  getRecord(kind, id, { workspaceId } = {}) {
+  // fix2-C finding 1: the read interface is ASYNCHRONOUS over BOTH stores —
+  // exactly the shape PostgresVerifierStore already had — so the query API
+  // awaits it and no store can bypass the ACL by testing a Promise.
+  async getRecord(kind, id, { workspaceId } = {}) {
     const record = this.records.get(kind)?.get(id) ?? null;
     if (record === null || workspaceId === undefined) return record;
     const meta = this.recordMeta.get(kind)?.get(id);
@@ -444,13 +476,14 @@ export class InMemoryVerifierStore {
   }
 
   // Store-level ACL metadata accessor (never part of the contract payload).
-  getRecordAcl(kind, id) {
+  async getRecordAcl(kind, id) {
     return this.recordMeta.get(kind)?.get(id)?.acl ?? null;
   }
 
   // Strictly workspace-scoped listing (review P1-3): a missing workspace is
   // a loud NEEDS_INPUT — a global listing across tenants can never happen.
-  listCalibrationReports(filter = {}) {
+  // Async for interface parity with PostgreSQL (fix2-C finding 1).
+  async listCalibrationReports(filter = {}) {
     if (!filter || typeof filter.workspaceId !== 'string' || filter.workspaceId.length === 0) {
       throw new NeedsInput('listCalibrationReports requires a workspaceId; un-scoped listing is refused');
     }
@@ -587,6 +620,25 @@ export class PostgresVerifierStore {
     }
   }
 
+  // Store-level ACL metadata row (fix2-C finding 1, migration 0006): the
+  // inherited strictest-of-inputs ACL lives OUTSIDE the frozen contract
+  // payload and is written in the SAME transaction as the record itself —
+  // a published record is never readable before its ACL exists.
+  async #putRecordAcl(client, kind, recordId, workspaceId, acl) {
+    if (!acl || typeof acl !== 'object') return;
+    const visibility = acl.visibility;
+    if (visibility !== 'public' && visibility !== 'project' && visibility !== 'private') {
+      throw new VerifierError('ACL_INVALID', `record acl visibility must be public|project|private, got ${String(visibility)}`);
+    }
+    const principals = Array.isArray(acl.allowedPrincipalIds) ? acl.allowedPrincipalIds : [];
+    await client.query(
+      `INSERT INTO verifier_record_acl (record_kind, record_id, workspace_id, visibility, inherited, allowed_principal_ids)
+       VALUES ($1,$2,$3,$4,$5,$6::jsonb)
+       ON CONFLICT (record_kind, record_id) DO NOTHING`,
+      [kind, recordId, workspaceId, visibility, acl.inherited ?? 'strictest_of_inputs', JSON.stringify(principals)],
+    );
+  }
+
   async publish({ workspaceId, operationId, actor, operation, idempotencyKey, records, audit }) {
     if (!OPERATION_ID.test(operationId ?? '')) throw new VerifierError('OPERATION_ID_INVALID', `bad operation id: ${operationId}`);
     if (!Array.isArray(records) || records.length === 0) throw new NeedsInput('publish requires at least one record');
@@ -625,8 +677,9 @@ export class PostgresVerifierStore {
           throw new ReconciliationRequired(`idempotency key ${idempotencyKey} maps to unreconciled operation ${mapped.operation_id}`);
         }
       }
-      for (const { kind, record } of records) {
+      for (const { kind, record, acl } of records) {
         await this.#putRecord(client, kind, record, workspaceId);
+        await this.#putRecordAcl(client, kind, recordIdOf(kind, record), workspaceId, acl);
       }
       const primary = records[0];
       const eventId = auditEventId(audit.type, operationId, `${workspaceId}:${operationId}`);
@@ -794,18 +847,70 @@ export class PostgresVerifierStore {
     return this.#transition({ callId, fencingToken, actor, workspaceId, fromStates: ['RESERVED'], toState: 'ACCEPTED', eventType: 'EXTERNAL_CALL_ACCEPTED' });
   }
 
-  async #settledTotals(client, grantRef, operationId) {
-    const campaign = await this.#one(
+  // UTC calendar day of the INJECTED deterministic clock (never the wall
+  // clock in tests): the day budget bucket key, 'YYYY-MM-DD'.
+  #dayKey() {
+    return String(this.clock()).slice(0, 10);
+  }
+
+  // Grant-level budget accumulator row, LOCKED inside the finalize
+  // transaction (fix2-C finding 3, migration 0006). The INSERT-if-missing
+  // plus SELECT ... FOR UPDATE serializes concurrent finalizes on one grant:
+  // the second transaction blocks until the first commits and then observes
+  // its committed totals. A freshly created row is backfilled from the
+  // aggregated FINALIZED settlements that predate migration 0006 —
+  // conservatively counting the whole historical spend as BOTH the task and
+  // the campaign scope; the day scope cannot be reconstructed for the past
+  // and starts at 0 by definition.
+  async #lockGrantTotals(client, call) {
+    const dayKey = this.#dayKey();
+    const inserted = await this.#one(
       client,
-      "SELECT COALESCE(SUM((settlement->>'amount')::float8), 0) AS total FROM verifier_external_call_run WHERE grant_ref = $1 AND state = 'FINALIZED'",
-      [grantRef],
+      `INSERT INTO verifier_grant_budget_totals (grant_ref, workspace_id, day_key)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (grant_ref) DO NOTHING
+       RETURNING grant_ref`,
+      [call.grant_ref, call.workspace_id, dayKey],
     );
-    const task = await this.#one(
+    if (inserted) {
+      await client.query(
+        `UPDATE verifier_grant_budget_totals t
+         SET settled_task = COALESCE(s.total, 0), settled_campaign = COALESCE(s.total, 0)
+         FROM (
+           SELECT COALESCE(SUM(CASE WHEN settlement ? 'amount' AND jsonb_typeof(settlement->'amount') = 'number'
+                                    THEN (settlement->>'amount')::float8 ELSE 0 END), 0) AS total
+           FROM verifier_external_call_run
+           WHERE grant_ref = $1 AND state = 'FINALIZED'
+         ) s
+         WHERE t.grant_ref = $1`,
+        [call.grant_ref],
+      );
+    }
+    return this.#one(
       client,
-      "SELECT COALESCE(SUM((settlement->>'amount')::float8), 0) AS total FROM verifier_external_call_run WHERE grant_ref = $1 AND operation_id = $2 AND state = 'FINALIZED'",
-      [grantRef, operationId],
+      'SELECT day_key, settled_task, settled_campaign, settled_day FROM verifier_grant_budget_totals WHERE grant_ref = $1 FOR UPDATE',
+      [call.grant_ref],
     );
-    return { task: Number(task?.total ?? 0), campaign: Number(campaign?.total ?? 0) };
+  }
+
+  // Atomic failure escalation INSIDE the finalize transaction (fix2-C
+  // finding 4): transition + reason + audit/outbox event commit together,
+  // before COMMIT returns control to the caller. No second
+  // markExternalCallReconciliation call runs after COMMIT.
+  async #escalateInTransaction(client, call, fencingToken, reason) {
+    const reconcileReason = String(reason ?? 'unknown outcome').slice(0, 1024);
+    await client.query(
+      `UPDATE verifier_external_call_run
+       SET state = 'RECONCILIATION_REQUIRED', reconcile_reason = $3, updated_at = NOW()
+       WHERE call_id = $1 AND fencing_token = $2`,
+      [call.call_id, fencingToken, reconcileReason],
+    );
+    await client.query(
+      `INSERT INTO verifier_audit_outbox (event_id, event_type, operation_id, actor, record_kind, record_id, payload_digest)
+       VALUES ($1,'EXTERNAL_CALL_RECONCILIATION_REQUIRED',$2,$3,'external_call',$4,$5)`,
+      [auditEventId('EXTERNAL_CALL_RECONCILIATION_REQUIRED', call.operation_id, call.call_id), call.operation_id, call.actor, call.call_id, canonicalDigest({ callId: call.call_id, reason: reconcileReason })],
+    );
+    await client.query('COMMIT');
   }
 
   async finalizeExternalCall({ callId, fencingToken, actor, workspaceId, grant, responseDigest, settlement }) {
@@ -839,41 +944,55 @@ export class PostgresVerifierStore {
         await client.query('ROLLBACK');
         throw new VerifierError('INVALID_TRANSITION', `external call ${callId} cannot be finalized from state ${call.state}`);
       }
-      const amount = settlement?.amount;
-      if (!settlement || typeof settlement !== 'object' || Array.isArray(settlement) ||
-          typeof amount !== 'number' || !Number.isFinite(amount) || amount < 0) {
-        await client.query('COMMIT');
-        await this.markExternalCallReconciliation({
-          callId, fencingToken, actor,
-          reason: 'uncertain billing: settlement carries no parseable non-negative numeric `amount`',
-        });
+      const settlementOk = settlement !== null && typeof settlement === 'object' && !Array.isArray(settlement) &&
+        typeof settlement.amount === 'number' && Number.isFinite(settlement.amount) && settlement.amount >= 0;
+      if (!settlementOk) {
+        // fix2-C finding 4: the transition, its reason and the audit/outbox
+        // event commit IN THIS transaction (before COMMIT) — one atomic
+        // step; there is no second markExternalCallReconciliation call after
+        // COMMIT, so a crash can never leave ACCEPTED without an event.
+        await this.#escalateInTransaction(client, call, fencingToken,
+          'uncertain billing: settlement carries no parseable non-negative numeric `amount`');
         throw new ReconciliationRequired(`external call ${callId} settlement amount is uncertain; escalated to reconciliation, never silently counted as zero`);
       }
+      const amount = settlement.amount;
       const binding = call.reservation?.grantBinding ?? null;
       if (binding && binding.budget) {
-        const { task, campaign } = await this.#settledTotals(client, call.grant_ref, call.operation_id);
-        if (task + amount > binding.budget.task || campaign + amount > binding.budget.campaign) {
-          await client.query('COMMIT');
-          await this.markExternalCallReconciliation({
-            callId, fencingToken, actor,
-            reason: `settlement ${amount} exceeds the remaining grant budget (task spent ${task}/${binding.budget.task}, campaign spent ${campaign}/${binding.budget.campaign})`,
-          });
+        // fix2-C finding 3: budget check + settlement are serialized by the
+        // grant-level totals row lock (migration 0006) held until COMMIT —
+        // parallel finalizes on one grant can never pass the check together,
+        // and the day scope is enforced alongside task/campaign.
+        const totals = await this.#lockGrantTotals(client, call);
+        const dayKey = this.#dayKey();
+        const taskSpent = Number(totals?.settled_task ?? 0);
+        const campaignSpent = Number(totals?.settled_campaign ?? 0);
+        const daySpent = totals && totals.day_key === dayKey ? Number(totals.settled_day) : 0;
+        if (
+          taskSpent + amount > binding.budget.task ||
+          campaignSpent + amount > binding.budget.campaign ||
+          daySpent + amount > binding.budget.day
+        ) {
+          await this.#escalateInTransaction(client, call, fencingToken,
+            `settlement ${amount} exceeds the remaining grant budget (task spent ${taskSpent}/${binding.budget.task}, campaign spent ${campaignSpent}/${binding.budget.campaign}, day spent ${daySpent}/${binding.budget.day})`);
           throw new BudgetExceeded(`external call ${callId} settlement ${amount} exceeds the remaining budget of grant ${call.grant_ref}`);
         }
         if (binding.currency === 'none' && amount > 0) {
-          await client.query('COMMIT');
-          await this.markExternalCallReconciliation({
-            callId, fencingToken, actor,
-            reason: `no-charge grant settled a positive amount (${amount})`,
-          });
+          await this.#escalateInTransaction(client, call, fencingToken,
+            `no-charge grant settled a positive amount (${amount})`);
           throw new BudgetExceeded(`external call ${callId} settled ${amount} under a no-charge (currency none) grant ${call.grant_ref}`);
         }
+        await client.query(
+          `UPDATE verifier_grant_budget_totals
+           SET settled_task = $2, settled_campaign = $3, settled_day = $4, day_key = $5, updated_at = NOW()
+           WHERE grant_ref = $1`,
+          [call.grant_ref, taskSpent + amount, campaignSpent + amount, daySpent + amount, dayKey],
+        );
       }
       await client.query(
         `UPDATE verifier_external_call_run
-         SET state = 'FINALIZED', response_digest = $3, settlement = $4::jsonb, updated_at = NOW()
+         SET state = 'FINALIZED', response_digest = $3, settlement = $4::jsonb, day_key = $5, updated_at = NOW()
          WHERE call_id = $1 AND fencing_token = $2`,
-        [callId, fencingToken, responseDigest, settlementJson],
+        [callId, fencingToken, responseDigest, settlementJson, this.#dayKey()],
       );
       await client.query(
         `INSERT INTO verifier_audit_outbox (event_id, event_type, operation_id, actor, record_kind, record_id, payload_digest)
@@ -943,13 +1062,21 @@ export class PostgresVerifierStore {
     return row.payload;
   }
 
-  // Interface parity with the in-memory store: until a new migration adds an
-  // acl column, PostgreSQL enforces the workspace binding (workspace_id) but
-  // has no place for strictest-of-inputs visibility metadata.
+  // Interface parity with the in-memory store (fix2-C finding 1, migration
+  // 0006): PostgreSQL now PERSISTS the strictest-of-inputs visibility
+  // metadata in verifier_record_acl and the read API enforces it.
   async getRecordAcl(kind, id) {
-    void kind;
-    void id;
-    return null;
+    const row = await this.#one(
+      this.pool,
+      'SELECT visibility, inherited, allowed_principal_ids FROM verifier_record_acl WHERE record_kind = $1 AND record_id = $2',
+      [kind, id],
+    );
+    if (!row) return null;
+    const acl = { visibility: row.visibility, inherited: row.inherited };
+    if (Array.isArray(row.allowed_principal_ids) && row.allowed_principal_ids.length > 0) {
+      acl.allowedPrincipalIds = row.allowed_principal_ids;
+    }
+    return acl;
   }
 
   async listCalibrationReports(filter = {}) {

@@ -5,6 +5,10 @@
 // fenced external-call state machine. No network, no LLM, no DB.
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import {
   computeCanonicalArgsDigest,
@@ -54,10 +58,18 @@ const AUTHORITIES = makeVerifierAuthorityRegistry([
   { principal: 'prn-custodian', roles: ['label_custodian'], workspaces: ['ws-verifier'] },
 ]);
 
-const PAYLOAD = {
-  statement: 'Trial X reported a 12% reduction in systolic blood pressure versus placebo.',
-  citations: [{ claimId: 'clm-src-0001', claimRevision: 1, segmentId: 'seg-0001' }],
-};
+const PAYLOAD = (() => {
+  // Tests never invent a second artifact format (fix2-C finding 2): the
+  // verified fixture claim is CANONICAL — validated against the REAL frozen
+  // contracts/claim.schema.json before any verifier call.
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const claim = JSON.parse(fs.readFileSync(path.join(root, 'tests/verifier/fixtures/canonical/claim.json'), 'utf8'));
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  ajv.addSchema(JSON.parse(fs.readFileSync(path.join(root, 'contracts/claim.schema.json'), 'utf8')));
+  const validate = ajv.getSchema('https://veritas.local/contracts/claim.schema.json');
+  assert.equal(validate(claim), true, `canonical claim fixture must be schema-valid: ${ajv.errorsText(validate.errors)}`);
+  return Object.freeze(claim);
+})();
 
 function makeRequest(overrides = {}) {
   const base = {
@@ -258,8 +270,8 @@ describe('S2-006 command API — publishVerificationResult', () => {
     const outbox = store.listOutbox();
     assert.equal(outbox.length, 1);
     assert.equal(outbox[0].event_type, 'VERIFICATION_RESULT_PUBLISHED');
-    assert.deepEqual(store.getRecord('result', result.resultId), result);
-    assert.deepEqual(store.getRecord('request', request.requestId), request);
+    assert.deepEqual(await store.getRecord('result', result.resultId), result);
+    assert.deepEqual(await store.getRecord('request', request.requestId), request);
   });
 
   test('an identical republish replays the recorded outcome and writes nothing twice', async () => {
@@ -292,7 +304,7 @@ describe('S2-006 command API — publishVerificationResult', () => {
     );
     assert.equal(store.listLedger().length, 1, 'conflict leaves the ledger untouched');
     assert.equal(store.listOutbox().length, 1, 'conflict leaves the outbox untouched');
-    assert.equal(store.getRecord('result', result.resultId).status, 'READY_FOR_HUMAN_REVIEW', 'original record untouched');
+    assert.equal((await store.getRecord('result', result.resultId)).status, 'READY_FOR_HUMAN_REVIEW', 'original record untouched');
   });
 
   test('capability gate: only evaluation_harness/reviewer may publish', async () => {
@@ -375,8 +387,8 @@ describe('S2-006 command API — calibration and adjudication', () => {
       store, authorities: AUTHORITIES, actor: 'prn-evaluation-harness', report, operationId: 'op-cal-1', workspaceId: 'ws-verifier',
     });
     assert.equal(outcome.replayed, false);
-    assert.deepEqual(store.getRecord('calibration_report', 'rep-fixture-1'), report);
-    assert.deepEqual(store.listCalibrationReports({ workspaceId: 'ws-verifier', corpusVersion: '0.3.0' }).map((r) => r.reportId), ['rep-fixture-1']);
+    assert.deepEqual(await store.getRecord('calibration_report', 'rep-fixture-1'), report);
+    assert.deepEqual((await store.listCalibrationReports({ workspaceId: 'ws-verifier', corpusVersion: '0.3.0' })).map((r) => r.reportId), ['rep-fixture-1']);
     await assert.rejects(
       publishCalibrationReport({
         store, authorities: AUTHORITIES, actor: 'prn-annotator-1', report, operationId: 'op-cal-2', workspaceId: 'ws-verifier',
@@ -391,7 +403,7 @@ describe('S2-006 command API — calibration and adjudication', () => {
     await publishAdjudication({
       store, authorities: AUTHORITIES, actor: 'prn-adjudicator', adjudication, operationId: 'op-adj-1', workspaceId: 'ws-verifier',
     });
-    assert.deepEqual(store.getRecord('adjudication', 'adj-fixture-1'), adjudication);
+    assert.deepEqual(await store.getRecord('adjudication', 'adj-fixture-1'), adjudication);
 
     await assert.rejects(
       publishAdjudication({
@@ -447,7 +459,7 @@ describe('S2-006 command API — calibration and adjudication', () => {
     await invalidateCalibration({
       store, authorities: AUTHORITIES, actor: 'prn-reviewer', event, operationId: 'op-inv-1', workspaceId: 'ws-verifier',
     });
-    assert.deepEqual(store.getRecord('invalidation', 'vinv-fixture-1'), event);
+    assert.deepEqual(await store.getRecord('invalidation', 'vinv-fixture-1'), event);
     const outbox = store.listOutbox();
     assert.equal(outbox.length, 1);
     assert.equal(outbox[0].event_type, 'CALIBRATION_INVALIDATED');
@@ -457,7 +469,7 @@ describe('S2-006 command API — calibration and adjudication', () => {
       event: makeInvalidationEvent({ eventId: 'vinv-fixture-2', cause: 'label_revoked' }),
       operationId: 'op-inv-2', workspaceId: 'ws-verifier',
     });
-    assert.ok(store.getRecord('invalidation', 'vinv-fixture-2'));
+    assert.ok(await store.getRecord('invalidation', 'vinv-fixture-2'));
 
     await assert.rejects(
       invalidateCalibration({
@@ -923,6 +935,32 @@ describe('S2-006 provider-call authorization (review P1-2)', () => {
       BudgetExceeded,
       'a no-charge grant settled a positive amount',
     );
+  });
+
+  test('fix2-C finding 3: budget.day is enforced through the command API (day:0 grant rejects settlement amount:1)', async () => {
+    const store = new InMemoryVerifierStore();
+    // task/campaign limits look generous; ONLY the day:0 scope catches the
+    // settlement. The reservation freezes the binding, finalize enforces it.
+    const grant = registeredGrant(AUTHORITIES, {
+      grantId: 'grt-day-zero', currency: 'USD', budget: { task: 5, campaign: 5, day: 0 },
+    });
+    const reserved = await reserveExternalCall({
+      store, authorities: AUTHORITIES, actor: 'prn-evaluation-harness', grant,
+      callId: 'call-day-zero', operationId: 'op-day-zero', reservation: RESERVATION, workspaceId: 'ws-verifier', now: NOW,
+    });
+    await acceptExternalCall({ store, actor: 'prn-evaluation-harness', callId: 'call-day-zero', fencingToken: reserved.fencingToken });
+    await assert.rejects(
+      finalizeExternalCall({
+        store, actor: 'prn-evaluation-harness', callId: 'call-day-zero', fencingToken: reserved.fencingToken,
+        responseDigest: HEX_A, settlement: { amount: 1, currency: 'USD' },
+      }),
+      BudgetExceeded,
+      'day:0 with settlement amount:1 must be BudgetExceeded, never finalized',
+    );
+    const call = await store.readExternalCall('call-day-zero');
+    assert.equal(call.state, 'RECONCILIATION_REQUIRED');
+    assert.equal(call.settlement, null, 'no partial settlement');
+    assert.ok(call.reconcile_reason.includes('day'));
   });
 
   test('finalize cannot substitute a grant different from the reservation-bound one', async () => {

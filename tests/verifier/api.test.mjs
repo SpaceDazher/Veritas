@@ -52,18 +52,65 @@ const HEX_D = 'd'.repeat(64);
 const HEX_E = 'e'.repeat(64);
 const AS_OF = '2026-03-22T00:00:00.000Z';
 
-const PAYLOAD = Object.freeze({
-  statement: 'Trial X reported a 12% reduction in systolic blood pressure versus placebo.',
-  citations: [
-    {
-      claimId: 'clm-src-0001',
-      claimRevision: 1,
-      segmentId: 'seg-0001',
-      span: { start: 0, end: 30 },
-      quoteDigest: HEX_B,
-    },
-  ],
-});
+// ---- frozen producer contracts + canonical fixtures -------------------------
+// Tests never invent a second artifact format: every payload fed to the
+// verifier is validated against the REAL frozen producer schema (Ajv,
+// draft 2020-12) before the call, and frozen-schema violations are asserted
+// as typed rejections (fix2-C finding 2).
+const PRODUCER_CONTRACTS = Object.freeze(['claim', 'evidence-map', 'hypothesis-card', 'synthesis-result']);
+const CANONICAL_DIR = path.join(ROOT, 'tests/verifier/fixtures/canonical');
+
+const PRODUCER_AJV = (() => {
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  for (const name of PRODUCER_CONTRACTS) {
+    ajv.addSchema(JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', `${name}.schema.json`), 'utf8')));
+  }
+  return ajv;
+})();
+
+function assertSchemaValid(name, doc) {
+  const validate = PRODUCER_AJV.getSchema(`https://veritas.local/contracts/${name}.schema.json`);
+  assert.equal(validate(doc), true, `fixture ${name} must be schema-valid: ${PRODUCER_AJV.errorsText(validate.errors)}`);
+}
+
+// Loads the canonical fixtures and validates each against the REAL frozen
+// producer schema (Ajv compiled in-test) BEFORE any verifier call. A fixture
+// that is not schema-valid is a test-suite bug, never a verifier concern.
+function loadCanonicalFixtures() {
+  const out = {};
+  for (const name of PRODUCER_CONTRACTS) {
+    const doc = JSON.parse(fs.readFileSync(path.join(CANONICAL_DIR, `${name}.json`), 'utf8'));
+    assertSchemaValid(name, doc);
+    out[name] = doc;
+  }
+  return out;
+}
+
+const CANONICAL = loadCanonicalFixtures();
+
+// A fresh schema-valid canonical claim payload with optional overrides.
+function canonicalClaim(overrides = {}) {
+  const claim = structuredClone(CANONICAL.claim);
+  Object.assign(claim, overrides);
+  assertSchemaValid('claim', claim);
+  return claim;
+}
+
+// The canonical claim replaces the homemade { statement, citations } body:
+// frozen claim.schema.json has additionalProperties:false and no citations
+// field, so citation checks over canonical claims abstain deterministically
+// (probe E) — the canonical payload itself is the repro, not an empty
+// homemade citations array.
+const PAYLOAD = Object.freeze(canonicalClaim());
+
+// Canonical S2-005 evidence-map artifact: entries carry REAL cited spans
+// (segment_id/span/quote_digest), so citation checks invoke the checker.
+function canonicalMapArtifact(artifactId = 'evm-canonical-001') {
+  return { kind: 'evidence_map', artifactId, revision: 1, payload: structuredClone(CANONICAL['evidence-map']) };
+}
+function canonicalMapDigest() {
+  return canonicalDigest(CANONICAL['evidence-map']);
+}
 
 function makeRequest(overrides = {}) {
   const base = {
@@ -71,7 +118,7 @@ function makeRequest(overrides = {}) {
     requestId: 'svr-fixture-1',
     actor: 'prn-evaluation-harness',
     workspaceId: 'ws-verifier',
-    artifact: { kind: 'claim', artifactId: 'clm-alpha-1', revision: 1, digest: canonicalDigest(PAYLOAD) },
+    artifact: { kind: 'claim', artifactId: PAYLOAD.claim_id, revision: 1, digest: canonicalDigest(PAYLOAD) },
     requestedChecks: ['citation_entailment', 'number_unit_preservation'],
     asOf: AS_OF,
     aclGrantRef: 'cap-verifier.read',
@@ -90,31 +137,11 @@ const DENY_ACL = Object.freeze({ can: () => false });
 const DIGESTS = Object.freeze({ rubricDigest: HEX_A, corpusManifestDigest: HEX_B, thresholdsDigest: HEX_C });
 
 function artifactFor(payload) {
-  return { kind: 'claim', artifactId: 'clm-alpha-1', revision: 1, payload };
+  return { kind: 'claim', artifactId: PAYLOAD.claim_id, revision: 1, payload };
 }
 
-// ---- canonical frozen-schema fixtures (review P1-1) -------------------------
-
-const PRODUCER_CONTRACTS = Object.freeze(['claim', 'evidence-map', 'hypothesis-card', 'synthesis-result']);
-const CANONICAL_DIR = path.join(ROOT, 'tests/verifier/fixtures/canonical');
-
-// Loads the canonical fixtures and validates each against the REAL frozen
-// producer schema (Ajv compiled in-test) BEFORE any verifier call. A fixture
-// that is not schema-valid is a test-suite bug, never a verifier concern.
-function loadCanonicalFixtures() {
-  const ajv = new Ajv2020({ allErrors: true, strict: false });
-  for (const name of PRODUCER_CONTRACTS) {
-    ajv.addSchema(JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', `${name}.schema.json`), 'utf8')));
-  }
-  const out = {};
-  for (const name of PRODUCER_CONTRACTS) {
-    const doc = JSON.parse(fs.readFileSync(path.join(CANONICAL_DIR, `${name}.json`), 'utf8'));
-    const validate = ajv.getSchema(`https://veritas.local/contracts/${name}.schema.json`);
-    assert.equal(validate(doc), true, `canonical fixture ${name} must be schema-valid: ${ajv.errorsText(validate.errors)}`);
-    out[name] = doc;
-  }
-  return out;
-}
+// Canonical frozen-schema fixtures are loaded and schema-validated ONCE at
+// module scope (PRODUCER_AJV / loadCanonicalFixtures above, review P1-1).
 
 // Deterministic content-driven checker: verdicts follow the CONTENT of the
 // canonical fixtures (entail / contradict / insufficient), not their shape.
@@ -149,11 +176,20 @@ describe('S2-006 verifier pure compute API', () => {
     assert.deepEqual(result.coverage, { denominator: 2, evaluated: 2, missing: 0 });
     assert.equal(result.items.length, 2);
     for (const item of result.items) {
-      assert.equal(item.verdict, 'SUPPORTED');
       assert.deepEqual(item.missingness, { kind: 'none' });
       assert.match(item.itemId, /^svi-[a-z0-9][a-z0-9-]{0,62}$/);
       assert.match(item.provenance.runId, /^run-[a-z0-9][a-z0-9-]{0,62}$/);
     }
+    // A canonical claim carries NO citations (frozen claim.schema.json,
+    // additionalProperties:false): the citation check abstains
+    // deterministically and the content check evaluates.
+    const citation = result.items.find((i) => i.criterion === 'citation_entailment');
+    assert.equal(citation.verdict, 'INSUFFICIENT_EVIDENCE');
+    assert.ok(citation.reasonCodes.includes('missing_citation'));
+    assert.equal(result.abstentions[0].reason, 'NO_CITATION');
+    const units = result.items.find((i) => i.criterion === 'number_unit_preservation');
+    assert.equal(units.verdict, 'SUPPORTED');
+    assert.equal(units.statement, PAYLOAD.normalized_text, 'normalized_text is the canonical claim statement');
     // outputDigest is self-excluding: digest over the canonical form with
     // outputDigest set to null.
     assert.equal(result.outputDigest, canonicalDigest({ ...result, outputDigest: null }));
@@ -178,7 +214,7 @@ describe('S2-006 verifier pure compute API', () => {
     await verifyClaim(request, { ...options });
     assert.equal(store.listLedger().length, 0, 'pure compute writes no ledger entries');
     assert.equal(store.listOutbox().length, 0, 'pure compute writes no outbox events');
-    assert.equal(store.getRecord('result', 'sres-any'), null);
+    assert.equal(await store.getRecord('result', 'sres-any'), null);
   });
 
   test('a typed checker failure never becomes a semantic pass/fail (probe P)', async () => {
@@ -189,20 +225,26 @@ describe('S2-006 verifier pure compute API', () => {
         throw error;
       },
     };
-    const { result } = await verifyClaim(makeRequest(), {
+    // The canonical evidence map carries real cited spans, so the checker is
+    // actually invoked (a canonical claim abstains before calling it).
+    const request = makeRequest({
+      artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, digest: canonicalMapDigest() },
+      requestedChecks: ['citation_entailment'],
+    });
+    const { result } = await verifyEvidenceMap(request, {
       checker: timeoutChecker,
       acl: ALLOW_ACL,
       digests: DIGESTS,
-      artifact: artifactFor(PAYLOAD),
+      artifact: canonicalMapArtifact(),
     });
     assert.equal(result.status, 'INCOMPLETE');
-    assert.deepEqual(result.coverage, { denominator: 2, evaluated: 0, missing: 2 });
+    assert.deepEqual(result.coverage, { denominator: 1, evaluated: 0, missing: 1 });
     for (const item of result.items) {
       assert.deepEqual(item.missingness, { kind: 'timeout', detail: 'provider deadline exceeded' });
       assert.equal(item.verdict, 'INSUFFICIENT_EVIDENCE');
       assert.ok(!['SUPPORTED', 'CONTRADICTED', 'PARTIALLY_SUPPORTED'].includes(item.verdict));
     }
-    assert.equal(result.abstentions.length, 2);
+    assert.equal(result.abstentions.length, 1);
     for (const abstention of result.abstentions) {
       assert.equal(abstention.reason, 'TIMEOUT');
       assert.equal(abstention.scope, 'item');
@@ -210,7 +252,13 @@ describe('S2-006 verifier pure compute API', () => {
   });
 
   test('policy refusal, evaluator failure and unbounded checker output map to typed missingness', async () => {
-    const run = (checker) => verifyClaim(makeRequest(), { checker, acl: ALLOW_ACL, digests: DIGESTS, artifact: artifactFor(PAYLOAD) });
+    const run = async (checker) => {
+      const request = makeRequest({
+        artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, digest: canonicalMapDigest() },
+        requestedChecks: ['citation_entailment'],
+      });
+      return verifyEvidenceMap(request, { checker, acl: ALLOW_ACL, digests: DIGESTS, artifact: canonicalMapArtifact() });
+    };
 
     const refused = await run({
       check() { throw new VerifierPolicyBlock('model content-policy refusal'); },
@@ -234,36 +282,36 @@ describe('S2-006 verifier pure compute API', () => {
       checker: SUPPORTING_CHECKER,
       acl: ALLOW_ACL,
       digests: DIGESTS,
-      artifact: artifactFor(PAYLOAD),
+      artifact: canonicalMapArtifact(),
     };
-    const future = await verifyClaim(makeRequest(), {
-      ...base,
-      sourceIndex: { 'seg-0001': { publishedAt: '2026-04-01T00:00:00.000Z' } },
-    });
+    // The canonical evidence map cites seg-canonical-0001 through its
+    // entries[], so the staleness rules bind on REAL canonical citations.
+    const run = (sourceIndex) => verifyEvidenceMap(makeRequest({
+      artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, digest: canonicalMapDigest() },
+      requestedChecks: ['citation_entailment'],
+    }), { ...base, sourceIndex });
+
+    const future = await run({ 'seg-canonical-0001': { publishedAt: '2026-04-01T00:00:00.000Z' } });
     assert.equal(future.result.items[0].verdict, 'STALE_INPUT');
     assert.ok(future.result.items[0].reasonCodes.includes('future_source'));
 
-    const revoked = await verifyClaim(makeRequest(), {
-      ...base,
-      sourceIndex: { 'seg-0001': { accessState: 'tombstoned' } },
-    });
+    const revoked = await run({ 'seg-canonical-0001': { accessState: 'tombstoned' } });
     assert.equal(revoked.result.items[0].verdict, 'STALE_INPUT');
     assert.ok(revoked.result.items[0].reasonCodes.includes('revoked_source'));
 
-    const stale = await verifyClaim(makeRequest(), {
-      ...base,
-      sourceIndex: { 'seg-0001': { stale: true } },
-    });
+    const stale = await run({ 'seg-canonical-0001': { stale: true } });
     assert.equal(stale.result.items[0].verdict, 'STALE_INPUT');
     assert.ok(stale.result.items[0].reasonCodes.includes('stale_source'));
   });
 
   test('a citation check without cited spans abstains deterministically without calling the checker (probe E)', async () => {
     let checkerCalls = 0;
-    const payload = { statement: 'Persuasive summary with zero citations.', citations: [] };
+    // Canonical claims can never carry citations (additionalProperties:false):
+    // the payload itself is the repro, not an empty homemade citations array.
+    const payload = canonicalClaim({ normalized_text: 'Persuasive summary with zero canonical citations.' });
     const request = makeRequest({
       requestedChecks: ['citation_entailment'],
-      artifact: { kind: 'claim', artifactId: 'clm-alpha-1', revision: 1, digest: canonicalDigest(payload) },
+      artifact: { kind: 'claim', artifactId: payload.claim_id, revision: 1, digest: canonicalDigest(payload) },
     });
     const { result } = await verifyClaim(request, {
       checker: { check: () => { checkerCalls += 1; return { verdict: 'SUPPORTED' }; } },
@@ -279,12 +327,15 @@ describe('S2-006 verifier pure compute API', () => {
   });
 
   test('independent gold labels surface disagreements without erasing raw labels', async () => {
-    const request = makeRequest({ requestedChecks: ['citation_entailment'] });
-    const { result } = await verifyClaim(request, {
+    const request = makeRequest({
+      artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, digest: canonicalMapDigest() },
+      requestedChecks: ['citation_entailment'],
+    });
+    const { result } = await verifyEvidenceMap(request, {
       checker: { check: () => ({ verdict: 'SUPPORTED' }) },
       acl: ALLOW_ACL,
       digests: DIGESTS,
-      artifact: artifactFor(PAYLOAD),
+      artifact: canonicalMapArtifact(),
       goldLabels: { 0: 'CONTRADICTED' },
       annotationSetIds: ['ans-annot-1', 'ans-annot-2'],
     });
@@ -389,7 +440,7 @@ describe('S2-006 verifier pure compute API', () => {
     await assert.rejects(
       verifyClaim(makeRequest(), {
         ...base, acl: ALLOW_ACL,
-        artifact: { kind: 'claim', artifactId: 'clm-alpha-1', revision: 1, payload: { statement: 'Rewritten payload.' } },
+        artifact: { kind: 'claim', artifactId: PAYLOAD.claim_id, revision: 1, payload: { statement: 'Rewritten payload.' } },
       }),
       StaleInput,
       'payload digest differing from the request-bound digest is STALE_INPUT',
@@ -408,9 +459,63 @@ describe('S2-006 verifier pure compute API', () => {
     );
   });
 
-  test('read-only query API delegates to the store without mutating anything', async () => {
+  test('fix2-C finding 2: a digest-matching payload that violates the frozen producer schema is typed-rejected, never evaluated', async () => {
+    const base = { checker: SUPPORTING_CHECKER, acl: ALLOW_ACL, digests: DIGESTS };
+
+    // Production repro: the payload digest is bound correctly, so the digest
+    // gate passes; only frozen-schema validation can catch these. On the old
+    // code such payloads sailed through to READY_FOR_HUMAN_REVIEW.
+    const noVersion = structuredClone(CANONICAL.claim);
+    delete noVersion.contractVersion;
+    await assert.rejects(
+      verifyClaim(
+        makeRequest({ artifact: { kind: 'claim', artifactId: CANONICAL.claim.claim_id, revision: 1, digest: canonicalDigest(noVersion) } }),
+        { ...base, artifact: artifactFor(noVersion) },
+      ),
+      (error) =>
+        error.name === 'ArtifactContractViolation' &&
+        error.code === 'BLOCKED_POLICY' &&
+        error.reasonCode === 'artifact_contract_violation' &&
+        /contractVersion/.test(error.issues),
+      'missing contractVersion must be a typed BLOCKED_POLICY-family contract violation, not an evaluated result',
+    );
+
+    const extraField = { ...structuredClone(CANONICAL.claim), verifier_hint: 'sneaky extra field' };
+    await assert.rejects(
+      verifyClaim(
+        makeRequest({ artifact: { kind: 'claim', artifactId: CANONICAL.claim.claim_id, revision: 1, digest: canonicalDigest(extraField) } }),
+        { ...base, artifact: artifactFor(extraField) },
+      ),
+      (error) => error.name === 'ArtifactContractViolation' && error.code === 'BLOCKED_POLICY',
+      'additionalProperties:false forbids extra fields at runtime',
+    );
+
+    // The review repro, verbatim: an EvidenceMap without contractVersion.
+    const mapNoVersion = structuredClone(CANONICAL['evidence-map']);
+    delete mapNoVersion.contractVersion;
+    await assert.rejects(
+      verifyEvidenceMap(
+        makeRequest({ artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, digest: canonicalDigest(mapNoVersion) } }),
+        { ...base, artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, payload: mapNoVersion } },
+      ),
+      (error) => error.name === 'ArtifactContractViolation' && error.reasonCode === 'artifact_contract_violation',
+    );
+
+    // Schema-valid canonical fixtures still pass end to end.
+    const ok = await verifyClaim(
+      makeRequest({ artifact: { kind: 'claim', artifactId: CANONICAL.claim.claim_id, revision: 1, digest: canonicalDigest(CANONICAL.claim) } }),
+      { ...base, artifact: artifactFor(CANONICAL.claim) },
+    );
+    assert.equal(ok.result.status, 'READY_FOR_HUMAN_REVIEW');
+  });
+
+  test('read-only query API is asynchronous and delegates to the store without mutating anything', async () => {
     const store = new InMemoryVerifierStore();
-    assert.throws(() => getVerificationResult(null, { resultId: 'x' }), NeedsInput);
+    // The query API is async over BOTH stores (fix2-C finding 1): the caller
+    // never receives record data before awaiting.
+    const pending = getVerificationResult(null, { resultId: 'x' });
+    assert.ok(pending && typeof pending.then === 'function', 'getVerificationResult must return a promise');
+    await assert.rejects(pending, NeedsInput);
     assert.equal(store.listLedger().length, 0, 'reads write no ledger entries');
     assert.equal(store.listOutbox().length, 0, 'reads write no outbox events');
   });
@@ -468,27 +573,27 @@ describe('S2-006 verifier read API enforces the workspace ACL (review P1-3)', ()
   test('legacy no-actor reads break loudly instead of silently returning everything', async () => {
     const store = new InMemoryVerifierStore();
     await seedWorkspace(store, 'ws-a');
-    assert.throws(
+    await assert.rejects(
       () => getVerificationResult(store, { resultId: 'sres-seed-1' }),
       AclDenied,
       'un-attributed reads must fail, never leak the record',
     );
-    assert.throws(() => listCalibrationReports(store), AclDenied, 'un-attributed listing must fail, never leak the corpus');
+    await assert.rejects(() => listCalibrationReports(store), AclDenied, 'un-attributed listing must fail, never leak the corpus');
   });
 
   test('an actor with no authority registry entry or without the read capability is denied', async () => {
     const store = new InMemoryVerifierStore();
     await seedWorkspace(store, 'ws-a');
-    assert.throws(
+    await assert.rejects(
       () => getVerificationResult(store, { resultId: 'sres-seed-1', actor: 'prn-ghost', workspaceId: 'ws-a', authorities: AUTHORITIES }),
       AclDenied,
     );
-    assert.throws(
+    await assert.rejects(
       () => getVerificationResult(store, { resultId: 'sres-seed-1', actor: 'prn-annotator-1', workspaceId: 'ws-a', authorities: AUTHORITIES }),
       AclDenied,
       'annotators hold no read capability over verification_result in the policy matrix',
     );
-    assert.throws(
+    await assert.rejects(
       () => getVerificationResult(store, { resultId: 'sres-seed-1', actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: undefined }),
       AclDenied,
       'no enforcement configured is a default deny, not an implicit allow',
@@ -499,29 +604,97 @@ describe('S2-006 verifier read API enforces the workspace ACL (review P1-3)', ()
     const store = new InMemoryVerifierStore();
     await seedWorkspace(store, 'ws-b', { resultId: 'sres-ws-b-1', reportId: 'rep-ws-b-1' });
     // prn-evaluation-harness has read capability, but only inside ws-a.
-    assert.throws(
+    await assert.rejects(
       () => getVerificationResult(store, { resultId: 'sres-ws-b-1', actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES }),
       AclDenied,
     );
     // A ws-b authority reads it through its own workspace binding.
-    const viaB = getVerificationResult(store, { resultId: 'sres-ws-b-1', actor: 'prn-reviewer-b', workspaceId: 'ws-b', authorities: AUTHORITIES });
+    const viaB = await getVerificationResult(store, { resultId: 'sres-ws-b-1', actor: 'prn-reviewer-b', workspaceId: 'ws-b', authorities: AUTHORITIES });
     assert.equal(viaB.resultId, 'sres-ws-b-1');
-    assert.equal(getVerificationResult(store, { resultId: 'sres-missing', actor: 'prn-reviewer-b', workspaceId: 'ws-b', authorities: AUTHORITIES }), null);
+    assert.equal(await getVerificationResult(store, { resultId: 'sres-missing', actor: 'prn-reviewer-b', workspaceId: 'ws-b', authorities: AUTHORITIES }), null);
   });
 
   test('calibration report listing is strictly workspace-scoped', async () => {
     const store = new InMemoryVerifierStore();
     await seedWorkspace(store, 'ws-a', { resultId: 'sres-a-1', reportId: 'rep-a-1' });
     await seedWorkspace(store, 'ws-b', { resultId: 'sres-b-1', reportId: 'rep-b-1' });
-    const own = listCalibrationReports(store, { actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES });
+    const own = await listCalibrationReports(store, { actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES });
     assert.deepEqual(own.map((r) => r.reportId), ['rep-a-1'], 'listing never mixes workspaces');
-    const other = listCalibrationReports(store, { actor: 'prn-reviewer-b', workspaceId: 'ws-b', authorities: AUTHORITIES, corpusVersion: '9.9.9' });
+    const other = await listCalibrationReports(store, { actor: 'prn-reviewer-b', workspaceId: 'ws-b', authorities: AUTHORITIES, corpusVersion: '9.9.9' });
     assert.deepEqual(other, [], 'corpusVersion filter still applies inside the workspace');
-    assert.throws(
+    await assert.rejects(
       () => listCalibrationReports(store, { actor: 'prn-evaluation-harness', workspaceId: 'ws-b', authorities: AUTHORITIES }),
       AclDenied,
       'an actor with no authority in the requested workspace is denied, not handed an empty list',
     );
+  });
+
+  // Production store interface: EVERY read primitive is asynchronous
+  // (PostgresVerifierStore has exactly this shape). The adapter reproduces
+  // that production shape offline — the old query API checked the ACL over
+  // the Promise itself and leaked private records for such stores.
+  function asyncStoreInterface(store) {
+    return {
+      publish: (...args) => store.publish(...args),
+      getRecord: async (...args) => store.getRecord(...args),
+      getRecordAcl: async (...args) => store.getRecordAcl(...args),
+      listCalibrationReports: async (...args) => store.listCalibrationReports(...args),
+      listLedger: () => store.listLedger(),
+      listOutbox: () => store.listOutbox(),
+    };
+  }
+
+  test('fix2-C finding 1: a private record NEVER resolves for an actor outside its private ACL (async production store shape)', async () => {
+    const store = new InMemoryVerifierStore();
+    await seedWorkspace(store, 'ws-a', {
+      resultId: 'sres-private-f1',
+      acl: { visibility: 'private', allowedPrincipalIds: ['prn-reviewer'], inherited: 'strictest_of_inputs' },
+    });
+    const production = asyncStoreInterface(store);
+
+    // The read API is asynchronous: nothing resolves before the await.
+    const pending = getVerificationResult(production, {
+      resultId: 'sres-private-f1', actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES,
+    });
+    assert.ok(pending && typeof pending.then === 'function', 'the query API must be asynchronous (every store access awaited), never a synchronously returned record');
+    // prn-evaluation-harness HOLDS the read capability in ws-a but is NOT in
+    // the private allow-list: the promised record must never resolve.
+    await assert.rejects(pending, AclDenied, 'a private record must never resolve for a non-allowed actor');
+
+    // The named principal reads the record through the same async API.
+    const seen = await getVerificationResult(production, {
+      resultId: 'sres-private-f1', actor: 'prn-reviewer', workspaceId: 'ws-a', authorities: AUTHORITIES,
+    });
+    assert.equal(seen.resultId, 'sres-private-f1');
+
+    // Same contract against the store's own (now async) read interface.
+    await assert.rejects(
+      getVerificationResult(store, { resultId: 'sres-private-f1', actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES }),
+      AclDenied,
+    );
+  });
+
+  test('fix2-C finding 1: private calibration reports are filtered from listings for actors outside the private ACL', async () => {
+    const store = new InMemoryVerifierStore();
+    const report = (reportId) => ({
+      contractVersion: '1.0.0', reportId, corpusVersion: '0.3.0', rubricDigest: HEX_A, thresholdsDigest: HEX_A,
+    });
+    await store.publish({
+      workspaceId: 'ws-a', operationId: 'op-f1-list-1', actor: 'prn-evaluation-harness',
+      operation: 'publishCalibrationReport', idempotencyKey: 'idem-f1-list-1',
+      records: [{ kind: 'calibration_report', record: report('rep-f1-private'), acl: { visibility: 'private', allowedPrincipalIds: ['prn-reviewer'], inherited: 'strictest_of_inputs' } }],
+      audit: { type: 'CALIBRATION_REPORT_PUBLISHED', recordKind: 'calibration_report', payload: {} },
+    });
+    await store.publish({
+      workspaceId: 'ws-a', operationId: 'op-f1-list-2', actor: 'prn-evaluation-harness',
+      operation: 'publishCalibrationReport', idempotencyKey: 'idem-f1-list-2',
+      records: [{ kind: 'calibration_report', record: report('rep-f1-open') }],
+      audit: { type: 'CALIBRATION_REPORT_PUBLISHED', recordKind: 'calibration_report', payload: {} },
+    });
+    const forHarness = await listCalibrationReports(store, { actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES });
+    assert.deepEqual(forHarness.map((r) => r.reportId), ['rep-f1-open'], 'private reports never leak into a listing');
+    const forReviewer = await listCalibrationReports(store, { actor: 'prn-reviewer', workspaceId: 'ws-a', authorities: AUTHORITIES });
+    assert.deepEqual(forReviewer.map((r) => r.reportId), ['rep-f1-private', 'rep-f1-open']);
   });
 
   test('a derived result stores the strictest-of-inputs ACL as store-level metadata and read enforces it', async () => {
@@ -542,20 +715,20 @@ describe('S2-006 verifier read API enforces the workspace ACL (review P1-3)', ()
     });
     // The inherited ACL lives in store-level metadata, NOT inside the
     // contract payload (the frozen result schema stays byte-pure).
-    assert.deepEqual(store.getRecord('result', result.resultId), result, 'payload untouched by ACL metadata');
-    assert.equal(Object.prototype.hasOwnProperty.call(store.getRecord('result', result.resultId), 'acl'), false);
-    const acl = store.getRecordAcl('result', result.resultId);
+    assert.deepEqual(await store.getRecord('result', result.resultId), result, 'payload untouched by ACL metadata');
+    assert.equal(Object.prototype.hasOwnProperty.call(await store.getRecord('result', result.resultId), 'acl'), false);
+    const acl = await store.getRecordAcl('result', result.resultId);
     assert.equal(acl.visibility, 'private', 'strictest of the inputs wins');
     assert.deepEqual(acl.allowedPrincipalIds, ['prn-reviewer']);
 
     // Read enforcement: a same-workspace harness with read capability is
     // still excluded by the inherited private ACL; the named principal reads.
-    assert.throws(
+    await assert.rejects(
       () => getVerificationResult(store, { resultId: result.resultId, actor: 'prn-evaluation-harness', workspaceId: 'ws-a', authorities: AUTHORITIES }),
       AclDenied,
       'strictest-of-inputs inheritance must bind at read time',
     );
-    const seen = getVerificationResult(store, { resultId: result.resultId, actor: 'prn-reviewer', workspaceId: 'ws-a', authorities: AUTHORITIES });
+    const seen = await getVerificationResult(store, { resultId: result.resultId, actor: 'prn-reviewer', workspaceId: 'ws-a', authorities: AUTHORITIES });
     assert.equal(seen.resultId, result.resultId);
   });
 });
@@ -660,8 +833,7 @@ describe('S2-006 verifier accepts canonical schema-valid artifacts with correct 
     assert.ok(item.reasonCodes.includes('revoked_source'));
   });
 
-  test('homemade producer-shaped payloads are no longer extractable: no second internal format', async () => {
-    const canonical = loadCanonicalFixtures();
+  test('homemade producer-shaped payloads are rejected by the frozen-schema gate BEFORE extraction (fix2-C finding 2)', async () => {
     const oldStyleMap = {
       entries: [{ claimId: 'clm-src-0001', claimRevision: 1, statement: 'Entry one statement.' }],
     };
@@ -670,8 +842,8 @@ describe('S2-006 verifier accepts canonical schema-valid artifacts with correct 
         requestFor('evidence_map', 'evm-canonical-001', oldStyleMap, ['citation_entailment']),
         { checker: CANONICAL_CHECKER, acl: ALLOW_ACL, digests: DIGESTS, artifact: { kind: 'evidence_map', artifactId: 'evm-canonical-001', revision: 1, payload: oldStyleMap } },
       ),
-      (error) => error instanceof NeedsInput && /map-level statement/.test(error.message),
-      'entries[].statement was never canonical: the map-level statement is',
+      (error) => error.name === 'ArtifactContractViolation' && error.code === 'BLOCKED_POLICY',
+      'entries[].statement was never canonical: the frozen schema rejects the payload before extraction',
     );
     const oldStyleCard = { criteria: [{ statement: 'Criterion text.' }] };
     await assert.rejects(
@@ -679,7 +851,7 @@ describe('S2-006 verifier accepts canonical schema-valid artifacts with correct 
         requestFor('hypothesis_card', 'hyc-canonical-001', oldStyleCard, ['citation_entailment']),
         { checker: CANONICAL_CHECKER, acl: ALLOW_ACL, digests: DIGESTS, artifact: { kind: 'hypothesis_card', artifactId: 'hyc-canonical-001', revision: 1, payload: oldStyleCard } },
       ),
-      NeedsInput,
+      (error) => error.name === 'ArtifactContractViolation',
       'criteria[] was never canonical: proposed_relation is',
     );
     const oldStyleSynth = { statements: [{ statement: 'Homemade top-level statement.' }] };
@@ -688,10 +860,9 @@ describe('S2-006 verifier accepts canonical schema-valid artifacts with correct 
         requestFor('synthesis_result', 'syn-canonical-001', oldStyleSynth, ['citation_entailment']),
         { checker: CANONICAL_CHECKER, acl: ALLOW_ACL, digests: DIGESTS, artifact: { kind: 'synthesis_result', artifactId: 'syn-canonical-001', revision: 1, payload: oldStyleSynth } },
       ),
-      NeedsInput,
+      (error) => error.name === 'ArtifactContractViolation',
       'statements[] was never canonical: embedded evidence_maps[]/hypothesis_cards[] are',
     );
-    void canonical;
   });
 });
 

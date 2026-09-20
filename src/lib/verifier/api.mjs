@@ -68,6 +68,71 @@ export const REASON_CODES = Object.freeze([
 const CITATION_CHECKS = Object.freeze(new Set(['citation_entailment', 'citation_coverage']));
 const HEX64 = /^[0-9a-f]{64}$/;
 
+// fix2-C finding 2: an upstream artifact whose payload passes the digest
+// gate but violates the FROZEN producer schema for its kind is a contract
+// violation in the BLOCKED_POLICY family — a typed rejection before any
+// statement extraction, never a semantic verdict and never silence.
+export class ArtifactContractViolation extends VerifierPolicyBlock {
+  constructor(message, detail = undefined) {
+    super(message, detail);
+    this.name = 'ArtifactContractViolation';
+    this.reasonCode = 'artifact_contract_violation';
+  }
+}
+
+// Frozen producer contracts by artifact kind (contracts/*.schema.json are
+// the single source of truth; additionalProperties:false rejects unknown
+// version extras, and required[] rejects missing members such as
+// contractVersion).
+const PRODUCER_CONTRACT_BY_KIND = Object.freeze({
+  claim: 'claim',
+  evidence_map: 'evidence-map',
+  hypothesis_card: 'hypothesis-card',
+  synthesis_result: 'synthesis-result',
+});
+
+let producerValidator = null;
+
+// Fail-closed Ajv (draft 2020-12) validation of upstream artifact payloads
+// against the frozen producer schemas, compiled once at first use (module
+// initialization of the validation closure; the schema FILES stay the
+// source of truth and are read at compilation time).
+export function producerArtifactValidators(io = {}) {
+  if (producerValidator && !io.reload) return producerValidator;
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  for (const name of Object.values(PRODUCER_CONTRACT_BY_KIND)) {
+    const schema = JSON.parse(fs.readFileSync(path.join(CONTRACTS_DIR, `${name}.schema.json`), 'utf8'));
+    ajv.addSchema(schema, schema.$id);
+  }
+  const compiled = new Map();
+  for (const [kind, name] of Object.entries(PRODUCER_CONTRACT_BY_KIND)) {
+    compiled.set(kind, ajv.getSchema(`https://veritas.local/contracts/${name}.schema.json`));
+  }
+  producerValidator = {
+    validate(kind, payload) {
+      const fn = compiled.get(kind);
+      if (!fn) return { ok: false, errors: `no frozen producer contract for artifact kind ${kind}` };
+      const ok = fn(payload);
+      return {
+        ok,
+        errors: ok ? '' : fn.errors.map((e) => `${e.instancePath} ${e.message}`).join('; '),
+      };
+    },
+  };
+  return producerValidator;
+}
+
+function requireValidArtifactPayload(kind, payload) {
+  const outcome = producerArtifactValidators().validate(kind, payload);
+  if (!outcome.ok) {
+    const error = new ArtifactContractViolation(
+      `upstream ${kind} payload violates the frozen producer contract: ${outcome.errors}`,
+    );
+    error.issues = outcome.errors;
+    throw error;
+  }
+}
+
 let validator = null;
 
 // Fail-closed ajv (draft 2020-12) validation over the verifier contract
@@ -450,6 +515,10 @@ async function verifyArtifact(request, options = {}) {
   if (payloadDigest !== request.artifact.digest) {
     throw new StaleInput(`artifact digest mismatch: request bound ${request.artifact.digest}, payload hashes to ${payloadDigest}`);
   }
+  // fix2-C finding 2: fail-closed frozen-schema validation BEFORE any
+  // statement extraction — a payload without contractVersion, with extra
+  // fields or missing required members never reaches READY_FOR_HUMAN_REVIEW.
+  requireValidArtifactPayload(request.artifact.kind, artifact.payload);
 
   const statements = extractStatements(request.artifact.kind, artifact.payload);
   const validators = verifierValidators();
@@ -576,20 +645,24 @@ function authorizeRead({ actor, workspaceId, authorities, resourceType, resource
   }
 }
 
-export function getVerificationResult(store, { actor, workspaceId, resultId, authorities } = {}) {
+export async function getVerificationResult(store, { actor, workspaceId, resultId, authorities } = {}) {
   if (!store || typeof store.getRecord !== 'function') {
     throw new NeedsInput('getVerificationResult requires a verifier store with getRecord()');
   }
   if (typeof resultId !== 'string' || resultId.length === 0) throw new NeedsInput('resultId required');
   authorizeRead({ actor, workspaceId, authorities, resourceType: 'verification_result', resourceRef: resultId });
+  // fix2-C finding 1: the query API is ASYNC over BOTH stores — every store
+  // access is awaited (the old synchronous call tested a Promise, skipped
+  // the ACL check and handed the caller a Promise of the private record).
   // Workspace-scoped selection: a record that exists but lives in another
   // workspace is an ACL denial, never an empty miss (review P1-3).
-  const record = store.getRecord('result', resultId, { workspaceId });
+  const record = await store.getRecord('result', resultId, { workspaceId });
   if (record === null) return null;
-  // Derived results inherit the strictest-of-inputs ACL as store-level
-  // metadata (never inside the contract payload): a private inherited ACL is
+  // ACL is enforced over the RESULT before anything is returned: derived
+  // results inherit the strictest-of-inputs ACL as store-level metadata
+  // (never inside the contract payload); a private inherited ACL is
   // readable only by the named principals.
-  const recordAcl = typeof store.getRecordAcl === 'function' ? store.getRecordAcl('result', resultId) : null;
+  const recordAcl = typeof store.getRecordAcl === 'function' ? await store.getRecordAcl('result', resultId) : null;
   if (recordAcl && recordAcl.visibility === 'private') {
     const allowed = Array.isArray(recordAcl.allowedPrincipalIds) ? recordAcl.allowedPrincipalIds : [];
     if (!allowed.includes(actor)) {
@@ -599,18 +672,32 @@ export function getVerificationResult(store, { actor, workspaceId, resultId, aut
   return record;
 }
 
-export function listCalibrationReports(store, filter = {}) {
+export async function listCalibrationReports(store, filter = {}) {
   if (!store || typeof store.listCalibrationReports !== 'function') {
     throw new NeedsInput('listCalibrationReports requires a verifier store with listCalibrationReports()');
   }
   const { actor, workspaceId, authorities, corpusVersion } = filter ?? {};
   authorizeRead({ actor, workspaceId, authorities, resourceType: 'calibration_report', resourceRef: null });
-  // Strictly workspace-scoped listing; the store also fails loudly when the
-  // workspace binding is missing.
-  return store.listCalibrationReports({
+  // Strictly workspace-scoped listing (async, fix2-C finding 1); the store
+  // also fails loudly when the workspace binding is missing.
+  const reports = await store.listCalibrationReports({
     workspaceId,
     ...(corpusVersion !== undefined ? { corpusVersion } : {}),
   });
+  // fix2-C finding 1: a privately-inherited report never appears in a
+  // listing for an actor outside its allow-list (same rule as direct reads).
+  const visible = [];
+  for (const report of reports) {
+    const recordAcl = typeof store.getRecordAcl === 'function' && typeof report?.reportId === 'string'
+      ? await store.getRecordAcl('calibration_report', report.reportId)
+      : null;
+    if (recordAcl && recordAcl.visibility === 'private') {
+      const allowed = Array.isArray(recordAcl.allowedPrincipalIds) ? recordAcl.allowedPrincipalIds : [];
+      if (!allowed.includes(actor)) continue;
+    }
+    visible.push(report);
+  }
+  return visible;
 }
 
 // ---- static leak audit (read-only, probe G/H/Q) ------------------------------
