@@ -192,20 +192,22 @@ export function inheritedAclOf(inputAcls) {
     throw new NeedsInput('inputAcls must be a non-empty array of { visibility, allowedPrincipalIds? }');
   }
   let visibility = 'public';
-  const principals = new Set();
+  let privatePrincipals = null;
   for (const [index, input] of inputAcls.entries()) {
     if (!input || typeof input !== 'object' || !(input.visibility in ACL_STRICTNESS)) {
       throw new NeedsInput(`inputAcls[${index}].visibility must be one of public|project|private`);
     }
     if (ACL_STRICTNESS[input.visibility] > ACL_STRICTNESS[visibility]) visibility = input.visibility;
     if (input.visibility === 'private') {
-      for (const principal of Array.isArray(input.allowedPrincipalIds) ? input.allowedPrincipalIds : []) {
-        if (typeof principal === 'string' && principal.length > 0) principals.add(principal);
-      }
+      const current = new Set((Array.isArray(input.allowedPrincipalIds) ? input.allowedPrincipalIds : [])
+        .filter((principal) => typeof principal === 'string' && principal.length > 0));
+      privatePrincipals = privatePrincipals === null
+        ? current
+        : new Set([...privatePrincipals].filter((principal) => current.has(principal)));
     }
   }
   const acl = { visibility, inherited: 'strictest_of_inputs' };
-  if (visibility === 'private') acl.allowedPrincipalIds = [...principals].sort();
+  if (visibility === 'private') acl.allowedPrincipalIds = [...(privatePrincipals ?? new Set())].sort();
   return acl;
 }
 

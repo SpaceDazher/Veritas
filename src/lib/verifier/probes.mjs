@@ -59,7 +59,7 @@ import {
   evaluateStatement,
 } from './rubric.mjs';
 import { computeMetrics, decideLexicographic } from './calibration.mjs';
-import { compareRuns } from './comparator.mjs';
+import { compareRuns, adjudicationAttestationDigest } from './comparator.mjs';
 import { check as policyCheck, enforce as policyEnforce, projectForActor } from './policy.mjs';
 import {
   bindingDigest,
@@ -80,7 +80,6 @@ const CANONICAL_DIR = path.join(ROOT, 'tests', 'verifier', 'fixtures', 'canonica
 
 // Fixture-corpus annotation HMAC key (same test-only material the corpus
 // manifest was frozen with; NOT a secret, production custody differs).
-const FIXTURE_ANNOTATION_HMAC_KEY = 's2-006-fixture-hmac-key';
 
 // Deterministic probe clock — no wall clock in decision-affecting output.
 const T0 = '2026-03-22T00:00:00.000Z';
@@ -283,15 +282,24 @@ const CORPUS_THRESHOLDS_DIGEST = canonicalDigest(
 );
 
 function comparatorInput(corpus, runA, runB) {
+  const registry = probeKeys();
   return {
     manifest: corpus.manifest,
     manifestBytes: corpus.manifestBytes,
     rubricBytes: corpus.rubricBytes,
     cases: corpus.cases.map((c) => ({ caseId: c.caseId, bytes: c.bytes, record: { caseId: c.caseId, textDigest: canonicalDigest(c.scenario) }, scenario: c.scenario, split: c.split })),
     labelSets: corpus.labelSets,
-    adjudications: corpus.adjudications,
+    adjudications: corpus.adjudications.map((record) => ({
+      ...record,
+      adjudicatorIdentity: sign(
+        record.adjudicatorIdentity.principalId,
+        'kms://test/s2-006/adjudicator-1',
+        adjudicationAttestationDigest(record),
+        { registry, form: 'adjudicator-identity' },
+      ),
+    })),
     thresholdsDigest: CORPUS_THRESHOLDS_DIGEST,
-    annotationHmacKey: FIXTURE_ANNOTATION_HMAC_KEY,
+    signatureKeyRegistry: registry,
     runA,
     runB,
   };
@@ -645,6 +653,8 @@ function probeKeys() {
     registerKey({ keyRef: 'kms://test/s2-006/label-custodian-1', custodian: PRINCIPALS.custodian, role: 'label_custodian', secret: 's2-006-fixture-custody-key-label-custodian-1', registry: KEYS });
     registerKey({ keyRef: 'kms://test/s2-006/annotator-a', custodian: PRINCIPALS.annotatorA, role: 'annotator', secret: 's2-006-fixture-custody-key-annotator-a', registry: KEYS });
     registerKey({ keyRef: 'kms://test/s2-006/annotator-b', custodian: PRINCIPALS.annotatorB, role: 'annotator', secret: 's2-006-fixture-custody-key-annotator-b', registry: KEYS });
+    registerKey({ keyRef: 'kms://fixture/s2-006/annotator/prn-annotator-a', custodian: PRINCIPALS.annotatorA, role: 'annotator', secret: 's2-006-fixture-hmac-key', registry: KEYS });
+    registerKey({ keyRef: 'kms://fixture/s2-006/annotator/prn-annotator-b', custodian: PRINCIPALS.annotatorB, role: 'annotator', secret: 's2-006-fixture-hmac-key', registry: KEYS });
     registerKey({ keyRef: 'kms://test/s2-006/adjudicator-1', custodian: PRINCIPALS.adjudicator, role: 'adjudicator', secret: 's2-006-fixture-custody-key-adjudicator-1', registry: KEYS });
     registerKey({ keyRef: 'kms://test/s2-006/reviewer-1', custodian: PRINCIPALS.reviewer, role: 'reviewer', secret: 's2-006-fixture-custody-key-reviewer-1', registry: KEYS });
   }

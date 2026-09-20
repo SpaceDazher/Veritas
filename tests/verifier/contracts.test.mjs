@@ -170,7 +170,7 @@ function calibrationRecordV2(overrides = {}) {
 }
 
 describe('S2-006 verifier contracts', () => {
-  test('all 13 verifier schemas are valid draft-2020-12 contracts and compile fail-closed', () => {
+  test('all 14 verifier schemas are valid draft-2020-12 contracts and compile fail-closed', () => {
     const { closure, ajv } = buildAjv();
     for (const name of VERIFIER_CONTRACTS) {
       assert.ok(closure.has(name), `closure missing ${name}`);
@@ -183,7 +183,7 @@ describe('S2-006 verifier contracts', () => {
       const validate = ajv.getSchema(CONTRACTS_URL(name));
       assert.equal(typeof validate, 'function', `${name} did not compile`);
     }
-    assert.equal(VERIFIER_CONTRACTS.length, 13);
+    assert.equal(VERIFIER_CONTRACTS.length, 14);
   });
 
   test('generator resolves the transitive $ref closure beyond the verifier set', () => {

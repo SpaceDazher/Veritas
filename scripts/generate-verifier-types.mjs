@@ -31,6 +31,7 @@ export const VERIFIER_CONTRACTS = Object.freeze([
   'semantic-provider-grant',
   'corpus-case',
   'annotation-manifest',
+  'owner-trust-bundle',
   'rubric',
   'calibration-record-v2',
 ]);

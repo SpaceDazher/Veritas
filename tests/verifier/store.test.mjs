@@ -646,7 +646,7 @@ describe('S2-006 fix2-C production paths on PostgreSQL (findings 1, 3, 4 — rea
 
   async function cleanupWorkspace(pool, workspaceId, pid) {
     for (const table of [
-      'verifier_record_acl', 'verifier_grant_budget_totals', 'verifier_external_call_run',
+      'verifier_record_acl', 'verifier_grant_task_budget_totals', 'verifier_grant_budget_totals', 'verifier_external_call_run',
       'verifier_result', 'verifier_request', 'verifier_calibration_report',
       'verifier_adjudication_record', 'verifier_run', 'verifier_invalidation_event',
       'verifier_operation_ledger',
@@ -691,6 +691,16 @@ describe('S2-006 fix2-C production paths on PostgreSQL (findings 1, 3, 4 — rea
         resultId: record.resultId, actor: 'prn-reviewer', workspaceId, authorities: AUTHORITIES,
       });
       assert.equal(seen.resultId, record.resultId);
+      await assert.rejects(
+        store.publish({
+          workspaceId, operationId: `op-f1-b-p${process.pid}`, actor: 'prn-evaluation-harness',
+          operation: 'publishVerificationResult', idempotencyKey: `idem-f1-b-p${process.pid}`,
+          records: [{ kind: 'result', record, acl: { visibility: 'public', inherited: 'strictest_of_inputs' } }],
+          audit: { type: 'VERIFICATION_RESULT_PUBLISHED', recordKind: 'result', payload: {} },
+        }),
+        IdempotencyConflict,
+        'byte-identical payload cannot silently retain incompatible ACL metadata',
+      );
     } finally {
       await cleanupWorkspace(pool, workspaceId, process.pid);
     }
@@ -727,12 +737,17 @@ describe('S2-006 fix2-C production paths on PostgreSQL (findings 1, 3, 4 — rea
       assert.equal(rejected.length, 1);
       assert.ok(rejected[0].reason instanceof BudgetExceeded, `the loser is BudgetExceeded, got: ${rejected[0].reason}`);
       const totals = await pool.query(
-        'SELECT settled_task, settled_campaign, settled_day FROM verifier_grant_budget_totals WHERE grant_ref = $1',
+        'SELECT settled_campaign, settled_day FROM verifier_grant_budget_totals WHERE grant_ref = $1',
+        [grantRef],
+      );
+      const taskTotals = await pool.query(
+        'SELECT operation_id, settled_task FROM verifier_grant_task_budget_totals WHERE grant_ref = $1 ORDER BY operation_id',
         [grantRef],
       );
       assert.equal(totals.rows.length, 1);
       assert.ok(Number(totals.rows[0].settled_day) <= 1, 'the day scope never exceeds the grant limit');
-      assert.ok(Number(totals.rows[0].settled_task) <= 1, 'the task scope never exceeds the grant limit');
+      assert.equal(taskTotals.rows.length, 2, 'each operation owns a separate task counter');
+      assert.ok(taskTotals.rows.every((row) => Number(row.settled_task) <= 1), 'every task scope stays within its limit');
       const a = await store.readExternalCall(calls.a.callId);
       const b = await store.readExternalCall(calls.b.callId);
       assert.deepEqual([a.state, b.state].sort(), ['FINALIZED', 'RECONCILIATION_REQUIRED']);
@@ -773,6 +788,81 @@ describe('S2-006 fix2-C production paths on PostgreSQL (findings 1, 3, 4 — rea
       );
       assert.equal(events.rows.length, 1, 'the reconcile event committed atomically with the transition');
     } finally {
+      await cleanupWorkspace(pool, workspaceId, process.pid);
+    }
+  });
+
+  test('round-three repro: separate operations do not share one task budget counter', async (t) => {
+    const pool = await connectPool(t, 4);
+    if (!pool) return;
+    const workspaceId = `ws-task-scope-p${process.pid}`;
+    try {
+      const store = new PostgresVerifierStore(pool);
+      const grantRef = `grt-task-scope-p${process.pid}`;
+      const binding = { grantDigest: HEX_A, budget: { task: 1, campaign: 2, day: 2 }, currency: 'USD' };
+      const calls = [];
+      for (const suffix of ['a', 'b']) {
+        const reserved = await store.beginExternalCall({
+          callId: `call-task-${suffix}-p${process.pid}`, workspaceId, actor: 'prn-evaluation-harness',
+          grantRef, operationId: `op-task-${suffix}-p${process.pid}`, reservation: { grantBinding: binding },
+        });
+        await store.acceptExternalCall({ callId: reserved.callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness' });
+        calls.push(reserved);
+      }
+      const outcomes = await Promise.all(calls.map((call, index) => store.finalizeExternalCall({
+        callId: call.callId,
+        fencingToken: call.fencingToken,
+        actor: 'prn-evaluation-harness',
+        responseDigest: index === 0 ? HEX_A : HEX_B,
+        settlement: { amount: 1 },
+      })));
+      assert.deepEqual(outcomes.map((outcome) => outcome.state), ['FINALIZED', 'FINALIZED']);
+      const rows = await pool.query(
+        'SELECT operation_id, settled_task FROM verifier_grant_task_budget_totals WHERE grant_ref = $1 ORDER BY operation_id',
+        [grantRef],
+      );
+      assert.equal(rows.rows.length, 2);
+      assert.deepEqual(rows.rows.map((row) => Number(row.settled_task)), [1, 1]);
+    } finally {
+      await cleanupWorkspace(pool, workspaceId, process.pid);
+    }
+  });
+
+  test('round-three repro: finalize and reconciliation cannot both commit from stale ACCEPTED state', async (t) => {
+    const pool = await connectPool(t, 5);
+    if (!pool) return;
+    const workspaceId = `ws-call-race-p${process.pid}`;
+    const blocker = await pool.connect();
+    try {
+      const store = new PostgresVerifierStore(pool);
+      const callId = `call-race-p${process.pid}`;
+      const reserved = await store.beginExternalCall({
+        callId, workspaceId, actor: 'prn-evaluation-harness', grantRef: `grt-race-p${process.pid}`,
+        operationId: `op-race-p${process.pid}`,
+        reservation: { grantBinding: { grantDigest: HEX_A, budget: { task: 1, campaign: 1, day: 1 }, currency: 'USD' } },
+      });
+      await store.acceptExternalCall({ callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness' });
+
+      await blocker.query('BEGIN');
+      await blocker.query('SELECT call_id FROM verifier_external_call_run WHERE call_id = $1 FOR UPDATE', [callId]);
+      const competing = [
+        store.finalizeExternalCall({ callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness', responseDigest: HEX_A, settlement: { amount: 1 } }),
+        store.markExternalCallReconciliation({ callId, fencingToken: reserved.fencingToken, actor: 'prn-evaluation-harness', reason: 'concurrent unknown outcome' }),
+      ];
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await blocker.query('COMMIT');
+      const outcomes = await Promise.allSettled(competing);
+      assert.equal(outcomes.filter((outcome) => outcome.status === 'fulfilled').length, 1);
+      assert.equal(outcomes.filter((outcome) => outcome.status === 'rejected').length, 1);
+      const events = await pool.query(
+        `SELECT event_type FROM verifier_audit_outbox
+         WHERE record_id = $1 AND event_type IN ('EXTERNAL_CALL_FINALIZED','EXTERNAL_CALL_RECONCILIATION_REQUIRED')`,
+        [callId],
+      );
+      assert.equal(events.rows.length, 1, 'exactly one terminal transition commits');
+    } finally {
+      await blocker.query('ROLLBACK').catch(() => {});
+      blocker.release();
       await cleanupWorkspace(pool, workspaceId, process.pid);
     }
   });

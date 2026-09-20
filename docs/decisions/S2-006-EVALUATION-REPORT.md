@@ -368,3 +368,22 @@ added to `evidence/frozen-manifest.json` via an explicit reviewed `--freeze`.
    NOT_RUN_PROVIDER without blocking.
 5. No dependent production/pilot ticket may start on the basis of this
    report: S2-006 is not a production authorization.
+
+## 13. Round-three review closure (2026-09-19)
+
+The third independent review found nine related authority, ACL, calibration
+and PostgreSQL concurrency defects. They are closed by the round-three
+hardening changes and the executable RED/GREEN record in
+`docs/decisions/S2-006-ROUND3-TDD-EVIDENCE.md`.
+
+The material changes are: intersection semantics for private inherited ACLs;
+immutable ACL/workspace metadata; one custody-aware signature verifier with no
+shared-key compatibility path; operator-supplied trust separated from the
+untrusted owner package; original-manifest schema validation; locked-test
+minimum and split-disjointness enforcement; owner evidence wired into §16
+verdict derivation; row-locked and state-predicated external-call transitions;
+and task spend keyed by `(grant, operation)` in migration 0007.
+
+These fixes remove the reviewed safety blockers. They do not change the honest
+default verdict: without real owner inputs the result remains `NEEDS_INPUT`,
+not a production authorization.

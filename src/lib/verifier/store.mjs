@@ -40,6 +40,30 @@ function payloadDigestOf(record) {
   return sha256HexText(canonicalize(record));
 }
 
+function normalizeRecordAcl(acl) {
+  if (acl === undefined || acl === null) return null;
+  if (typeof acl !== 'object' || Array.isArray(acl)) {
+    throw new VerifierError('ACL_INVALID', 'record acl must be an object');
+  }
+  const visibility = acl.visibility;
+  if (!['public', 'project', 'private'].includes(visibility)) {
+    throw new VerifierError('ACL_INVALID', `record acl visibility must be public|project|private, got ${String(visibility)}`);
+  }
+  const normalized = {
+    visibility,
+    inherited: typeof acl.inherited === 'string' && acl.inherited.length > 0
+      ? acl.inherited
+      : 'strictest_of_inputs',
+  };
+  if (visibility === 'private') {
+    normalized.allowedPrincipalIds = [...new Set(
+      (Array.isArray(acl.allowedPrincipalIds) ? acl.allowedPrincipalIds : [])
+        .filter((principal) => typeof principal === 'string' && principal.length > 0),
+    )].sort();
+  }
+  return normalized;
+}
+
 function auditEventId(type, operationId, sequence) {
   return `aud-${sha256HexText([type, operationId, sequence].join('\u0000')).slice(0, 24)}`;
 }
@@ -128,9 +152,15 @@ export class InMemoryVerifierStore {
       this.recordMeta.set(kind, metaById);
     }
     const existing = byId.get(id);
+    const normalizedAcl = normalizeRecordAcl(acl);
     if (existing) {
       if (payloadDigestOf(existing) !== payloadDigestOf(record)) {
         throw new IdempotencyConflict(`${kind} record ${id} already exists with different content; corrections publish a new version`);
+      }
+      const existingMeta = metaById.get(id);
+      if (!existingMeta || existingMeta.workspaceId !== workspaceId
+        || canonicalDigest(existingMeta.acl ?? null) !== canonicalDigest(normalizedAcl)) {
+        throw new IdempotencyConflict(`${kind} record ${id} already exists with different workspace/ACL metadata`);
       }
       return existing;
     }
@@ -138,7 +168,7 @@ export class InMemoryVerifierStore {
     // Store-level ACL metadata (review P1-3): the inherited strictest-of-
     // inputs ACL is persisted OUTSIDE the contract payload, which stays
     // byte-pure against the frozen schemas.
-    metaById.set(id, { workspaceId, ...(acl ? { acl } : {}) });
+    metaById.set(id, { workspaceId, ...(normalizedAcl ? { acl: normalizedAcl } : {}) });
     written.push(() => {
       byId.delete(id);
       metaById.delete(id);
@@ -613,10 +643,13 @@ export class PostgresVerifierStore {
        ON CONFLICT (${spec.pk}) DO NOTHING`,
       params,
     );
-    const row = await this.#one(client, `SELECT payload_digest FROM ${spec.table} WHERE ${spec.pk} = $1`, [id]);
+    const row = await this.#one(client, `SELECT payload_digest, workspace_id FROM ${spec.table} WHERE ${spec.pk} = $1`, [id]);
     if (!row) throw new VerifierError('RECORD_WRITE_FAILED', `${kind} ${id} could not be read back`);
     if (row.payload_digest !== digest) {
       throw new IdempotencyConflict(`${kind} record ${id} already exists with different content; corrections publish a new version`);
+    }
+    if (row.workspace_id !== workspaceId) {
+      throw new IdempotencyConflict(`${kind} record ${id} already exists in workspace ${row.workspace_id}, not ${workspaceId}`);
     }
   }
 
@@ -625,18 +658,30 @@ export class PostgresVerifierStore {
   // payload and is written in the SAME transaction as the record itself —
   // a published record is never readable before its ACL exists.
   async #putRecordAcl(client, kind, recordId, workspaceId, acl) {
-    if (!acl || typeof acl !== 'object') return;
-    const visibility = acl.visibility;
-    if (visibility !== 'public' && visibility !== 'project' && visibility !== 'private') {
-      throw new VerifierError('ACL_INVALID', `record acl visibility must be public|project|private, got ${String(visibility)}`);
+    const normalized = normalizeRecordAcl(acl);
+    if (normalized) {
+      await client.query(
+        `INSERT INTO verifier_record_acl (record_kind, record_id, workspace_id, visibility, inherited, allowed_principal_ids)
+         VALUES ($1,$2,$3,$4,$5,$6::jsonb)
+         ON CONFLICT (record_kind, record_id) DO NOTHING`,
+        [kind, recordId, workspaceId, normalized.visibility, normalized.inherited, JSON.stringify(normalized.allowedPrincipalIds ?? [])],
+      );
     }
-    const principals = Array.isArray(acl.allowedPrincipalIds) ? acl.allowedPrincipalIds : [];
-    await client.query(
-      `INSERT INTO verifier_record_acl (record_kind, record_id, workspace_id, visibility, inherited, allowed_principal_ids)
-       VALUES ($1,$2,$3,$4,$5,$6::jsonb)
-       ON CONFLICT (record_kind, record_id) DO NOTHING`,
-      [kind, recordId, workspaceId, visibility, acl.inherited ?? 'strictest_of_inputs', JSON.stringify(principals)],
+    const existing = await this.#one(
+      client,
+      'SELECT workspace_id, visibility, inherited, allowed_principal_ids FROM verifier_record_acl WHERE record_kind = $1 AND record_id = $2',
+      [kind, recordId],
     );
+    if (normalized === null && existing === null) return;
+    const stored = existing ? normalizeRecordAcl({
+      visibility: existing.visibility,
+      inherited: existing.inherited,
+      allowedPrincipalIds: existing.allowed_principal_ids,
+    }) : null;
+    if (!existing || existing.workspace_id !== workspaceId
+      || canonicalDigest(stored) !== canonicalDigest(normalized)) {
+      throw new IdempotencyConflict(`${kind} record ${recordId} already exists with different workspace/ACL metadata`);
+    }
   }
 
   async publish({ workspaceId, operationId, actor, operation, idempotencyKey, records, audit }) {
@@ -763,7 +808,7 @@ export class PostgresVerifierStore {
   async #callOrThrow(client, callId) {
     const row = await this.#one(
       client,
-      'SELECT call_id, workspace_id, actor, grant_ref, operation_id, state, fencing_token, reservation, response_digest, settlement, reconcile_reason FROM verifier_external_call_run WHERE call_id = $1',
+      'SELECT call_id, workspace_id, actor, grant_ref, operation_id, state, fencing_token, reservation, response_digest, settlement, reconcile_reason FROM verifier_external_call_run WHERE call_id = $1 FOR UPDATE',
       [callId],
     );
     if (!row) throw new NeedsInput(`unknown external call: ${callId}`);
@@ -822,10 +867,11 @@ export class PostgresVerifierStore {
         throw new VerifierError('INVALID_TRANSITION', `external call ${callId} cannot move ${call.state} -> ${toState}`);
       }
       const sets = ['state = $3', 'updated_at = NOW()', ...(extraSets ?? [])];
-      await client.query(
-        `UPDATE verifier_external_call_run SET ${sets.join(', ')} WHERE call_id = $1 AND fencing_token = $2`,
-        [callId, fencingToken, toState, ...params],
+      const updated = await client.query(
+        `UPDATE verifier_external_call_run SET ${sets.join(', ')} WHERE call_id = $1 AND fencing_token = $2 AND state = $${4 + params.length}`,
+        [callId, fencingToken, toState, ...params, call.state],
       );
+      if (updated.rowCount !== 1) throw new VerifierError('TRANSITION_RACE', `external call ${callId} changed state concurrently`);
       if (eventType) {
         await client.query(
           `INSERT INTO verifier_audit_outbox (event_id, event_type, operation_id, actor, record_kind, record_id, payload_digest)
@@ -853,15 +899,9 @@ export class PostgresVerifierStore {
     return String(this.clock()).slice(0, 10);
   }
 
-  // Grant-level budget accumulator row, LOCKED inside the finalize
-  // transaction (fix2-C finding 3, migration 0006). The INSERT-if-missing
-  // plus SELECT ... FOR UPDATE serializes concurrent finalizes on one grant:
-  // the second transaction blocks until the first commits and then observes
-  // its committed totals. A freshly created row is backfilled from the
-  // aggregated FINALIZED settlements that predate migration 0006 —
-  // conservatively counting the whole historical spend as BOTH the task and
-  // the campaign scope; the day scope cannot be reconstructed for the past
-  // and starts at 0 by definition.
+  // Campaign/day totals serialize on one grant row. Task totals use a second
+  // row keyed by (grant, operation): unrelated tasks never consume each
+  // other's task allowance. The lock order is always grant then task.
   async #lockGrantTotals(client, call) {
     const dayKey = this.#dayKey();
     const inserted = await this.#one(
@@ -875,7 +915,7 @@ export class PostgresVerifierStore {
     if (inserted) {
       await client.query(
         `UPDATE verifier_grant_budget_totals t
-         SET settled_task = COALESCE(s.total, 0), settled_campaign = COALESCE(s.total, 0)
+         SET settled_campaign = COALESCE(s.total, 0)
          FROM (
            SELECT COALESCE(SUM(CASE WHEN settlement ? 'amount' AND jsonb_typeof(settlement->'amount') = 'number'
                                     THEN (settlement->>'amount')::float8 ELSE 0 END), 0) AS total
@@ -886,11 +926,40 @@ export class PostgresVerifierStore {
         [call.grant_ref],
       );
     }
-    return this.#one(
+    const grantTotals = await this.#one(
       client,
       'SELECT day_key, settled_task, settled_campaign, settled_day FROM verifier_grant_budget_totals WHERE grant_ref = $1 FOR UPDATE',
       [call.grant_ref],
     );
+    const taskInserted = await this.#one(
+      client,
+      `INSERT INTO verifier_grant_task_budget_totals (grant_ref, operation_id, workspace_id)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (grant_ref, operation_id) DO NOTHING
+       RETURNING grant_ref`,
+      [call.grant_ref, call.operation_id, call.workspace_id],
+    );
+    if (taskInserted) {
+      await client.query(
+        `UPDATE verifier_grant_task_budget_totals t
+         SET settled_task = COALESCE(s.total, 0)
+         FROM (
+           SELECT COALESCE(SUM(CASE WHEN settlement ? 'amount' AND jsonb_typeof(settlement->'amount') = 'number'
+                                    THEN (settlement->>'amount')::float8 ELSE 0 END), 0) AS total
+           FROM verifier_external_call_run
+           WHERE grant_ref = $1 AND operation_id = $2 AND state = 'FINALIZED'
+         ) s
+         WHERE t.grant_ref = $1 AND t.operation_id = $2`,
+        [call.grant_ref, call.operation_id],
+      );
+    }
+    const taskTotals = await this.#one(
+      client,
+      `SELECT settled_task FROM verifier_grant_task_budget_totals
+       WHERE grant_ref = $1 AND operation_id = $2 FOR UPDATE`,
+      [call.grant_ref, call.operation_id],
+    );
+    return { grantTotals, taskTotals };
   }
 
   // Atomic failure escalation INSIDE the finalize transaction (fix2-C
@@ -899,12 +968,13 @@ export class PostgresVerifierStore {
   // markExternalCallReconciliation call runs after COMMIT.
   async #escalateInTransaction(client, call, fencingToken, reason) {
     const reconcileReason = String(reason ?? 'unknown outcome').slice(0, 1024);
-    await client.query(
+    const updated = await client.query(
       `UPDATE verifier_external_call_run
        SET state = 'RECONCILIATION_REQUIRED', reconcile_reason = $3, updated_at = NOW()
-       WHERE call_id = $1 AND fencing_token = $2`,
+       WHERE call_id = $1 AND fencing_token = $2 AND state = 'ACCEPTED'`,
       [call.call_id, fencingToken, reconcileReason],
     );
+    if (updated.rowCount !== 1) throw new VerifierError('TRANSITION_RACE', `external call ${call.call_id} changed state concurrently`);
     await client.query(
       `INSERT INTO verifier_audit_outbox (event_id, event_type, operation_id, actor, record_kind, record_id, payload_digest)
        VALUES ($1,'EXTERNAL_CALL_RECONCILIATION_REQUIRED',$2,$3,'external_call',$4,$5)`,
@@ -962,11 +1032,11 @@ export class PostgresVerifierStore {
         // grant-level totals row lock (migration 0006) held until COMMIT —
         // parallel finalizes on one grant can never pass the check together,
         // and the day scope is enforced alongside task/campaign.
-        const totals = await this.#lockGrantTotals(client, call);
+        const { grantTotals, taskTotals } = await this.#lockGrantTotals(client, call);
         const dayKey = this.#dayKey();
-        const taskSpent = Number(totals?.settled_task ?? 0);
-        const campaignSpent = Number(totals?.settled_campaign ?? 0);
-        const daySpent = totals && totals.day_key === dayKey ? Number(totals.settled_day) : 0;
+        const taskSpent = Number(taskTotals?.settled_task ?? 0);
+        const campaignSpent = Number(grantTotals?.settled_campaign ?? 0);
+        const daySpent = grantTotals && grantTotals.day_key === dayKey ? Number(grantTotals.settled_day) : 0;
         if (
           taskSpent + amount > binding.budget.task ||
           campaignSpent + amount > binding.budget.campaign ||
@@ -983,17 +1053,24 @@ export class PostgresVerifierStore {
         }
         await client.query(
           `UPDATE verifier_grant_budget_totals
-           SET settled_task = $2, settled_campaign = $3, settled_day = $4, day_key = $5, updated_at = NOW()
+           SET settled_campaign = $2, settled_day = $3, day_key = $4, updated_at = NOW()
            WHERE grant_ref = $1`,
-          [call.grant_ref, taskSpent + amount, campaignSpent + amount, daySpent + amount, dayKey],
+          [call.grant_ref, campaignSpent + amount, daySpent + amount, dayKey],
+        );
+        await client.query(
+          `UPDATE verifier_grant_task_budget_totals
+           SET settled_task = $3, updated_at = NOW()
+           WHERE grant_ref = $1 AND operation_id = $2`,
+          [call.grant_ref, call.operation_id, taskSpent + amount],
         );
       }
-      await client.query(
+      const finalized = await client.query(
         `UPDATE verifier_external_call_run
          SET state = 'FINALIZED', response_digest = $3, settlement = $4::jsonb, day_key = $5, updated_at = NOW()
-         WHERE call_id = $1 AND fencing_token = $2`,
+         WHERE call_id = $1 AND fencing_token = $2 AND state = 'ACCEPTED'`,
         [callId, fencingToken, responseDigest, settlementJson, this.#dayKey()],
       );
+      if (finalized.rowCount !== 1) throw new VerifierError('TRANSITION_RACE', `external call ${callId} changed state concurrently`);
       await client.query(
         `INSERT INTO verifier_audit_outbox (event_id, event_type, operation_id, actor, record_kind, record_id, payload_digest)
          VALUES ($1,'EXTERNAL_CALL_FINALIZED',$2,$3,'external_call',$4,$5)`,
@@ -1028,12 +1105,13 @@ export class PostgresVerifierStore {
         await client.query('ROLLBACK');
         return { callId, state: 'RECONCILIATION_REQUIRED', replayed: true };
       }
-      await client.query(
+      const updated = await client.query(
         `UPDATE verifier_external_call_run
          SET state = 'RECONCILIATION_REQUIRED', reconcile_reason = $3, updated_at = NOW()
-         WHERE call_id = $1 AND fencing_token = $2`,
+         WHERE call_id = $1 AND fencing_token = $2 AND state IN ('RESERVED','ACCEPTED')`,
         [callId, fencingToken, reconcileReason],
       );
+      if (updated.rowCount !== 1) throw new VerifierError('TRANSITION_RACE', `external call ${callId} changed state concurrently`);
       await client.query(
         `INSERT INTO verifier_audit_outbox (event_id, event_type, operation_id, actor, record_kind, record_id, payload_digest)
          VALUES ($1,'EXTERNAL_CALL_RECONCILIATION_REQUIRED',$2,$3,'external_call',$4,$5)`,

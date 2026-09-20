@@ -433,13 +433,44 @@ export interface AnnotationManifest {
   }>;
   frozenAt: AnnotationManifestUtcTimestamp;
   externalStratum?: {
-    status: "NEEDS_INPUT";
+    status: "NEEDS_INPUT" | "READY" | "MEASURED";
     reason: string;
   };
 }
 export type AnnotationManifestSha256Hex = string;
 export type AnnotationManifestUtcTimestamp = string;
 export type AnnotationManifestSemVer = string;
+
+// owner-trust-bundle.schema.json (contractVersion 1.0.0)
+export interface OwnerTrustBundle {
+  contractVersion: "1.0.0";
+  bundleId: string;
+  fixtureGrade: boolean;
+  principals: Array<{
+    principal: OwnerTrustBundlePrincipalId;
+    roles: Array<string>;
+    workspaces: Array<string>;
+  }>;
+  keys: Array<{
+    keyRef: string;
+    secret: string;
+    custodian: OwnerTrustBundlePrincipalId;
+    role: string;
+  }>;
+  grants: Array<{
+    grant: SemanticProviderGrant;
+    issuer: OwnerTrustBundlePrincipalId;
+    signature: {
+      scheme: "hmac-sha256";
+      keyRef: string;
+      digest: OwnerTrustBundleSha256Hex;
+      verified: true;
+      attestedBy: OwnerTrustBundlePrincipalId;
+    };
+  }>;
+}
+export type OwnerTrustBundlePrincipalId = string;
+export type OwnerTrustBundleSha256Hex = string;
 
 // rubric.schema.json (contractVersion 1.0.0)
 export interface Rubric {

@@ -92,7 +92,11 @@
       ],
       "properties": {
         "status": {
-          "const": "NEEDS_INPUT"
+          "enum": [
+            "NEEDS_INPUT",
+            "READY",
+            "MEASURED"
+          ]
         },
         "reason": {
           "type": "string"

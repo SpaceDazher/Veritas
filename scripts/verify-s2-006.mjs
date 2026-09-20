@@ -99,10 +99,10 @@ function headCommit() {
   }
 }
 
-// Owner-inputs summary propagation (review finding 7, fix2-F): present/absent
-// plus the resolved tiers, WITHOUT changing deriveVerdict's verdict logic.
-// Absence keeps the honest NOT_RUN_HUMAN_INPUTS marker; presence reflects the
-// actual recorded state of evidence/s2-006-owner-inputs.json.
+// Owner-inputs summary propagation: absence keeps the honest
+// NOT_RUN_HUMAN_INPUTS marker. A separately trusted, fully validated owner run
+// is also an input to deriveVerdict, so HUMAN_REVIEW/PASS_WITH_LIMITS can be
+// reached without a code edit while malformed or partial evidence fails closed.
 export function summarizeOwnerInputs(record) {
   if (!record || typeof record !== 'object' || record.ownerInputs == null) {
     return { present: false, status: 'NOT_RUN_HUMAN_INPUTS' };
@@ -125,7 +125,7 @@ export function summarizeOwnerInputs(record) {
 // NEEDS_INPUT (with the CONCRETE list of missing inputs) -> HUMAN_REVIEW ->
 // REVISE -> PASS_WITH_LIMITS. Non-primary observations are still appended to
 // the reason list so a higher-precedence verdict never masks a defect.
-export function deriveVerdict({ gates, runReport = null, calibration = null, comparison = null, probes = null, dbEvidence = null } = {}) {
+export function deriveVerdict({ gates, runReport = null, calibration = null, comparison = null, probes = null, dbEvidence = null, ownerInputs = null } = {}) {
   const safety = [];
   const authority = [];
   const missingInputs = [];
@@ -134,8 +134,31 @@ export function deriveVerdict({ gates, runReport = null, calibration = null, com
 
   // 1. safety/authority hard failures: hard counters, failed probes (an
   //    attempted violation was NOT blocked), comparator hard-gate violations
+  const ownerEligible = ownerInputs?.hardGates?.ok === true
+    && ownerInputs?.pipeline?.ok === true
+    && ownerInputs?.pipeline?.comparatorOk === true
+    && ownerInputs?.ownerInputs?.thresholdDecision?.resolved === true
+    && ownerInputs?.ownerInputs?.independence?.resolved === true
+    && ownerInputs?.ownerInputs?.independence?.tier === 'INDEPENDENTLY_CALIBRATED'
+    && ownerInputs?.ownerInputs?.manifest?.externalStratum?.status === 'MEASURED';
+  const effectiveCalibration = ownerEligible ? {
+    hardViolations: ownerInputs.pipeline.calibration?.hardViolations ?? { total: 0 },
+    independence: { status: 'MEASURED', tier: ownerInputs.ownerInputs.independence.tier },
+    externalStratum: ownerInputs.ownerInputs.manifest.externalStratum,
+    decision: ownerInputs.pipeline.decision,
+  } : calibration;
+  const effectiveComparison = ownerEligible
+    ? { hardGates: ownerInputs.hardGates }
+    : comparison;
+  if (ownerInputs && ownerInputs.hardGates?.ok === false) {
+    safety.push(`owner-inputs hard gates violated: ${(ownerInputs.hardGates.violations ?? []).join(', ')}`);
+  }
+  if (ownerInputs && ownerInputs.pipeline?.comparatorOk === false) {
+    safety.push('owner-inputs comparator rejected the sealed runs');
+  }
+
   const probesHard = probes?.hardCounters ?? {};
-  const calibrationHard = calibration?.hardViolations ?? {};
+  const calibrationHard = effectiveCalibration?.hardViolations ?? {};
   const totalHard = (probesHard.total ?? 0) + (calibrationHard.total ?? 0);
   const failedProbes = (probes?.probes ?? []).filter((p) => p.status === 'failed');
   if (totalHard > 0) {
@@ -146,17 +169,17 @@ export function deriveVerdict({ gates, runReport = null, calibration = null, com
   for (const p of failedProbes) {
     (['G', 'H', 'I', 'Q', 'R', 'S'].includes(p.id) ? safety : authority).push(`probe ${p.id} (${p.name}) FAILED: an attempted violation was not blocked`);
   }
-  if (comparison?.hardGates?.ok === false) {
-    safety.push(`comparator hard gates violated: ${(comparison.hardGates.violations ?? []).join(', ')}`);
+  if (effectiveComparison?.hardGates?.ok === false) {
+    safety.push(`comparator hard gates violated: ${(effectiveComparison.hardGates.violations ?? []).join(', ')}`);
   }
 
   // 2. dependency
   const depFail = gates.dependency.status !== 'PASS' && gates.dependency.status !== 'NOT_RUN_ARCHIVE_DEGRADED';
 
   // 3. missing owner inputs (NEEDS_INPUT), each naming what would advance it
-  const decision = calibration?.decision ?? {};
+  const decision = effectiveCalibration?.decision ?? {};
   const needsInputReasons = decision.needsInputReasons ?? [];
-  if (calibration === null) {
+  if (!effectiveCalibration) {
     missingInputs.push('calibration evidence unavailable: evidence/s2-006-calibration.json is missing — run npm run verify:s2-006');
   } else {
     if (needsInputReasons.includes('missing_human_decision')) {
@@ -165,10 +188,10 @@ export function deriveVerdict({ gates, runReport = null, calibration = null, com
     if (needsInputReasons.includes('missing_thresholds')) {
       missingInputs.push('numeric thresholds not authored: coverage_floor, non_inferiority_margin.delta, confidence_level, tie_rule and every thresholds.soft_thresholds value are null');
     }
-    if (calibration.independence?.status === 'NOT_MEASURED' || calibration.independence?.tier === 'NOT_INDEPENDENT') {
+    if (effectiveCalibration.independence?.status === 'NOT_MEASURED' || effectiveCalibration.independence?.tier === 'NOT_INDEPENDENT') {
       missingInputs.push('annotators not independent: annotators/adjudicator are fixture principals (evaluator_not_independent) — real independent annotators and a separate adjudicator would advance it');
     }
-    if (calibration.externalStratum?.status === 'NEEDS_INPUT') {
+    if (effectiveCalibration.externalStratum?.status === 'NEEDS_INPUT') {
       missingInputs.push('external corpus stratum absent: only the 45-case fixture stratum exists — an externally authored, independently labelled locked_test stratum would advance it');
     }
   }
@@ -206,8 +229,8 @@ export function deriveVerdict({ gates, runReport = null, calibration = null, com
     && gates.evidenceRun.status === 'PASS'
     && gates.probes.status === 'PASS'
     && gates.dbReplay.status === 'PASS'
-    && (calibration?.independence?.tier === 'INDEPENDENTLY_CALIBRATED')
-    && (calibration?.externalStratum?.status ?? 'NEEDS_INPUT') !== 'NEEDS_INPUT'
+    && (effectiveCalibration?.independence?.tier === 'INDEPENDENTLY_CALIBRATED')
+    && (effectiveCalibration?.externalStratum?.status ?? 'NEEDS_INPUT') === 'MEASURED'
     && decision.status === 'DECIDED';
 
   let verdict;
@@ -293,7 +316,10 @@ export async function verifyS2_006(args = {}) {
   };
 
   // ---- 4. offline evidence run (Run A/B, comparator, calibration, probes) --
-  const evidenceRun = runNode('scripts/s2-006-run.mjs', [], { timeout: 1200000 });
+  const ownerRunArgs = [];
+  if (args['owner-inputs']) ownerRunArgs.push('--owner-inputs', String(args['owner-inputs']));
+  if (args['owner-trust']) ownerRunArgs.push('--owner-trust', String(args['owner-trust']));
+  const evidenceRun = runNode('scripts/s2-006-run.mjs', ownerRunArgs, { timeout: 1200000 });
   let runReport = null;
   try {
     runReport = JSON.parse(evidenceRun.stdout);
@@ -377,6 +403,9 @@ export async function verifyS2_006(args = {}) {
   // ---- verdict: DERIVED from actual evidence fields (spec §16, review P2-7)
   const calibrationEvidence = readJson('evidence/s2-006-calibration.json');
   const comparisonEvidence = readJson('evidence/s2-006-comparison.json');
+  const ownerInputsRecord = args['owner-inputs'] && args['owner-trust']
+    ? readJson('evidence/s2-006-owner-inputs.json')
+    : null;
   const { verdict, verdictReasons, needsInputPath } = deriveVerdict({
     gates,
     runReport,
@@ -384,12 +413,13 @@ export async function verifyS2_006(args = {}) {
     comparison: comparisonEvidence,
     probes: probesRecord,
     dbEvidence,
+    ownerInputs: ownerInputsRecord,
   });
   notRun.push('NOT_RUN_PROVIDER: no provider grant/model/runtime was declared mandatory for the first calibration scope; the offline deterministic implementation is fully tested without network or LLM');
   // NOT_RUN_HUMAN_INPUTS is claimed ONLY when no owner-inputs record exists
   // (review finding 7): a validated owner-inputs run reflects its actual state
   // in the summary instead of an unconditional not-run marker.
-  const ownerInputsSummary = summarizeOwnerInputs(readJson('evidence/s2-006-owner-inputs.json'));
+  const ownerInputsSummary = summarizeOwnerInputs(ownerInputsRecord);
   if (ownerInputsSummary.status === 'NOT_RUN_HUMAN_INPUTS') {
     notRun.push('NOT_RUN_HUMAN_INPUTS: no real independent annotators, adjudicator or method-owner HumanDecision exists');
   }
@@ -425,7 +455,7 @@ export async function verifyS2_006(args = {}) {
     ],
   };
 
-  const exitCode = verdict === 'NEEDS_INPUT' ? 0 : 1;
+  const exitCode = ['NEEDS_INPUT', 'HUMAN_REVIEW', 'PASS_WITH_LIMITS'].includes(verdict) ? 0 : 1;
   if (args.write !== 'false') {
     fs.writeFileSync(path.join(ROOT, 'evidence/s2-006-summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
   }

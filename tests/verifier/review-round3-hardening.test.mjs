@@ -76,7 +76,7 @@ describe('review round 3: strict ACL derivation and immutable metadata', () => {
       IdempotencyConflict,
     );
     assert.equal(store.listLedger().length, 1, 'conflicting ACL must not commit a second ledger operation');
-    assert.deepEqual(store.getRecordAcl('result', record.resultId), {
+    assert.deepEqual(await store.getRecordAcl('result', record.resultId), {
       visibility: 'public', inherited: 'strictest_of_inputs',
     });
   });

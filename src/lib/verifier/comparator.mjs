@@ -89,33 +89,6 @@ export function adjudicationAttestationDigest(rec) {
   return canonicalDigest(attestedContent);
 }
 
-// DEPRECATED fixture-mode compatibility (review fix2-E). Synthesizes a
-// custody registry from ONE shared fixture HMAC key for legacy callers that
-// still pass the retired annotationHmacKey parameter (scripts/s2-006-run.mjs,
-// probes.mjs) on the frozen fixture corpus. keyRefs observed under more than
-// one annotator principal are poisoned: one custody key can never serve two
-// principals, no matter how valid the MAC is. LIMITATION (accepted, fixture
-// only): a brand-new keyRef minted by a holder of the shared secret passes —
-// which is exactly why the parameter is retired; real callers MUST pass
-// signatureKeyRegistry. Delete this shim once every caller migrated.
-function buildFixtureCompatRegistry(sharedKey, labelSets) {
-  const custodians = new Map();
-  for (const set of Object.values(labelSets)) {
-    const keyRef = set?.signature?.keyRef;
-    if (typeof keyRef !== 'string' || keyRef.length === 0) continue;
-    if (typeof set.annotatorId !== 'string' || set.annotatorId.length === 0) continue;
-    if (!custodians.has(keyRef)) custodians.set(keyRef, new Set());
-    custodians.get(keyRef).add(set.annotatorId);
-  }
-  const registry = new Map();
-  const sharedKeyRefs = new Set();
-  for (const [keyRef, who] of custodians) {
-    if (who.size === 1) registry.set(keyRef, { secret: sharedKey, custodian: [...who][0], role: 'annotator' });
-    else sharedKeyRefs.add(keyRef);
-  }
-  return { registry, sharedKeyRefs, fixture: true };
-}
-
 // ONE custody-aware verifying core for every annotation-set envelope:
 // signature.verifyDetailed enforces the exact contract shape, the scheme,
 // the verified gate, keyRef existence in the registry, custody
@@ -168,7 +141,10 @@ function verifyAdjudicationIdentity(rec, annotators, sigCtx, failures) {
   if (annotators.includes(identity.principalId)) {
     fail(failures, 'annotator_set_mismatch', `${id}: adjudicator ${identity.principalId} is one of the annotators of record — self-review is refused`);
   }
-  if (!sigCtx || sigCtx.fixture) return;
+  if (!sigCtx) {
+    fail(failures, 'signature_key_unavailable', `${id}: no adjudicator custody registry supplied`);
+    return;
+  }
   const verdict = verifySignatureDetailed(identity, identity.principalId, adjudicationAttestationDigest(rec), { registry: sigCtx.registry });
   if (!verdict.ok) fail(failures, 'signature_rejected', `${id}: custody-aware adjudicator attestation rejected (${verdict.reason})`);
 }
@@ -186,11 +162,8 @@ function verifyAdjudicationIdentity(rec, annotators, sigCtx, failures) {
 //     // tests/verifier/fixtures/keys.json). Every annotation-set signature
 //     // and every adjudicator attestation is verified through the ONE
 //     // custody-aware core signature.verifyDetailed against it.
-//   annotationHmacKey,
-//     // @deprecated FIXTURE-ONLY compatibility shim for legacy callers:
-//     // synthesizes a registry from ONE shared key and fails closed on any
-//     // keyRef observed under more than one annotator. Do NOT use in new
-//     // code; to be deleted once scripts/* migrated (review fix2-E).
+//   annotationHmacKey, // retired: accepted only to produce a fail-closed
+//                      // signature_key_unavailable result for old callers
 //   expectedAnnotators?: [principalId, ...]  // pins the required annotator pair;
 //                                            // defaults to the annotators in the data
 //   runA, runB: {runId, executorId, pid, nonce, outputRoot, implementationDigest,
@@ -200,7 +173,7 @@ export function compareRuns(input) {
   const failures = [];
   const {
     manifest, manifestBytes, rubricBytes, cases = [], labelSets = {}, adjudications = [],
-    thresholdsDigest = null, signatureKeyRegistry = null, annotationHmacKey = null,
+    thresholdsDigest = null, signatureKeyRegistry = null,
     expectedAnnotators = null, runA, runB,
   } = input ?? {};
 
@@ -211,8 +184,6 @@ export function compareRuns(input) {
       throw new TypeError('signatureKeyRegistry must be a Map (keyRef -> {secret, custodian, role}) built with signature.registerKey');
     }
     sigCtx = { registry: signatureKeyRegistry, sharedKeyRefs: new Set(), fixture: false };
-  } else if (typeof annotationHmacKey === 'string' && annotationHmacKey.length > 0) {
-    sigCtx = buildFixtureCompatRegistry(annotationHmacKey, labelSets); // deprecated
   }
 
   // ---- frozen bytes

@@ -21,7 +21,8 @@
 //
 // Validated owner-inputs path (review finding 7, fix2-F): without
 // --owner-inputs the run is byte-for-byte the honest fixture-only flow above.
-// With --owner-inputs <dir> the owner package (external manifest, independent
+// With --owner-inputs <dir> AND a separately stored --owner-trust <file>, the
+// owner package (external manifest, independent
 // signed annotation sets, adjudications, an authored thresholds
 // preregistration, a canonical HumanDecision bound to its exact digest and a
 // multi-axis independence profile) is loaded FAIL-CLOSED against the frozen
@@ -33,21 +34,28 @@
 //
 //   node scripts/s2-006-run.mjs                 # full offline evidence run
 //   node scripts/s2-006-run.mjs --candidate …   # internal child mode
-//   node scripts/s2-006-run.mjs --owner-inputs <dir> [--evidence-dir <dir>]
+//   node scripts/s2-006-run.mjs --owner-inputs <dir> --owner-trust <file> [--evidence-dir <dir>]
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { evaluateScenario, RUBRIC_ID, RUBRIC_VERSION } from '../src/lib/verifier/rubric.mjs';
-import { compareRuns, annotationSetBindingDigest, labelEntryDigest } from '../src/lib/verifier/comparator.mjs';
+import {
+  compareRuns,
+  adjudicationAttestationDigest,
+  annotationSetBindingDigest,
+  labelEntryDigest,
+} from '../src/lib/verifier/comparator.mjs';
 import { computeMetrics, decideLexicographic, resolveThresholdDecision } from '../src/lib/verifier/calibration.mjs';
 import { registerKey, sign, verifyDetailed as verifySignatureDetailed } from '../src/lib/verifier/signature.mjs';
 import { verifierValidators } from '../src/lib/verifier/api.mjs';
 import { makeVerifierAuthorityRegistry, registerProviderGrant } from '../src/lib/verifier/commands.mjs';
 import { runAllSecurityProbes } from '../src/lib/verifier/probes.mjs';
+
+export { adjudicationAttestationDigest };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CORPUS_DIR = path.join(ROOT, 'corpus/s2-006');
@@ -58,6 +66,26 @@ const THRESHOLDS_PATH = path.join(ROOT, 'contracts/s2-006-thresholds.json');
 // key custody with the label_custodian role is NOT_RUN — the fixture key
 // proves the signature verification path, never real independence.
 export const FIXTURE_ANNOTATION_HMAC_KEY = 's2-006-fixture-hmac-key';
+const FIXTURE_KEYS_PATH = path.join(ROOT, 'tests', 'verifier', 'fixtures', 'keys.json');
+
+function loadFixtureSignatureRegistry() {
+  const registry = new Map();
+  const fixture = JSON.parse(fs.readFileSync(FIXTURE_KEYS_PATH, 'utf8'));
+  for (const key of fixture.keys) registerKey({ ...key, registry });
+  return registry;
+}
+
+function custodySignFixtureAdjudications(records, registry) {
+  return records.map((record) => ({
+    ...record,
+    adjudicatorIdentity: sign(
+      record.adjudicatorIdentity.principalId,
+      'kms://test/s2-006/adjudicator-1',
+      adjudicationAttestationDigest(record),
+      { registry, form: 'adjudicator-identity' },
+    ),
+  }));
+}
 
 // Loader white-list for externalStratum.status on an OWNER external manifest
 // (review finding 7). The frozen contracts/annotation-manifest.schema.json
@@ -66,13 +94,6 @@ export const FIXTURE_ANNOTATION_HMAC_KEY = 's2-006-fixture-hmac-key';
 // additionally schema-validated with the status substituted back to
 // NEEDS_INPUT so every other field still passes the frozen schema as-is.
 export const OWNER_EXTERNAL_STATUS_WHITELIST = Object.freeze(['READY', 'MEASURED']);
-
-// Fixture-grade authority context identity (operator-side, in-repo material).
-// Real reviewer-issued grant custody is NOT_RUN; the context proves the
-// RESOLUTION mechanics of resolveThresholdDecision, never real authority.
-const OWNER_AUTHORITY_ISSUER = 'prn-s2-006-authority-reviewer';
-const OWNER_AUTHORITY_KEY_REF = 'kms://fixture/s2-006/owner-authority-issuer';
-const OWNER_AUTHORITY_WORKSPACE = 'ws-s2-006-verifier';
 
 // Candidate implementation identity: the exact modules the sealed predictions
 // depend on. Any change to these bytes changes the implementation digest.
@@ -266,50 +287,6 @@ const OWNER_REQUIRED_FILES = Object.freeze([
   'external-manifest.json', 'adjudication.json', 'threshold-decision.json', 'independence.json',
 ]);
 
-// The adjudicator attestation binds the decision-bearing content of the
-// record (identity block and audit reference excluded). Byte-identical to the
-// generator convention documented in tests/verifier/fixtures/owner-inputs/README.md.
-export function adjudicationAttestationDigest(record) {
-  return canonicalDigest({
-    adjudicationId: record.adjudicationId,
-    caseId: record.caseId,
-    annotationSetIds: record.annotationSetIds,
-    conflictingLabels: record.conflictingLabels,
-    retainedRawLabels: record.retainedRawLabels,
-    decision: record.decision,
-    rationale: record.rationale,
-    versions: record.versions,
-    createdAt: record.createdAt,
-  });
-}
-
-// Exact MAC construction of comparator.verifySetSignature / signature.mjs
-// macHex: HMAC(secret, scheme || 0x00 || subject || 0x00 || keyRef || 0x00 || binding).
-function annotationSetSignatureMac(hmacKey, sig, bindingDigest) {
-  return createHmac('sha256', hmacKey)
-    .update([sig.scheme, sig.attestedBy, sig.keyRef, bindingDigest].join('\u0000'), 'utf8')
-    .digest('hex');
-}
-
-function verifyAnnotationSetSignature(set, hmacKey) {
-  const sig = set?.signature;
-  if (typeof hmacKey !== 'string' || hmacKey.length === 0) {
-    return { ok: false, reason: 'signature_key_unavailable' };
-  }
-  if (!sig || typeof sig !== 'object' || Array.isArray(sig)
-    || sig.scheme !== 'hmac-sha256' || sig.verified !== true
-    || typeof sig.keyRef !== 'string' || sig.keyRef.length === 0
-    || typeof sig.digest !== 'string' || sig.digest.length === 0
-    || sig.attestedBy !== set.annotatorId) {
-    return { ok: false, reason: 'signature_unverifiable' };
-  }
-  const expected = annotationSetSignatureMac(hmacKey, sig, annotationSetBindingDigest(set));
-  const a = Buffer.from(sig.digest);
-  const b = Buffer.from(expected);
-  const equal = a.length === b.length && timingSafeEqual(a, b);
-  return equal ? { ok: true, reason: 'verified' } : { ok: false, reason: 'signature_invalid' };
-}
-
 // Lazy fail-closed validators compiled from the frozen contract files. The
 // frozen schemas are the single source of truth — never copied, never edited.
 let ownerSchemaValidators = null;
@@ -323,6 +300,8 @@ function ownerValidators() {
   };
   load('needs-input'); // $ref target of human-decision
   load('annotation-manifest');
+  load('semantic-provider-grant');
+  load('owner-trust-bundle');
   load('corpus-case');
   const v2 = load('calibration-record-v2');
   // the frozen evaluator_independence subschema is compiled AS-IS (with the
@@ -331,6 +310,7 @@ function ownerValidators() {
   const byId = (id) => ajv.getSchema(id);
   ownerSchemaValidators = {
     annotationManifest: byId('https://veritas.local/contracts/annotation-manifest.schema.json'),
+    ownerTrustBundle: byId('https://veritas.local/contracts/owner-trust-bundle.schema.json'),
     corpusCase: byId('https://veritas.local/contracts/corpus-case.schema.json'),
     evaluatorIndependence: byId('urn:veritas:s2-006:evaluator-independence'),
   };
@@ -341,28 +321,21 @@ function ajvErrors(validator) {
   return (validator.errors ?? []).map((e) => `${e.instancePath} ${e.message}`).join('; ');
 }
 
-// Frozen-schema validation of an owner external manifest. The loader
-// white-list (OWNER_EXTERNAL_STATUS_WHITELIST) extends ONLY the
-// externalStratum.status const: the document is schema-validated with the
-// status substituted back to NEEDS_INPUT so every other field passes the
-// frozen schema unchanged (the schema file itself is never modified).
+// Validate the ORIGINAL owner manifest object against the versioned schema.
+// Decision-bearing fields are never rewritten into a validator-only view.
 function validateExternalManifest(manifest) {
   const issues = [];
   const status = manifest?.externalStratum?.status;
   if (!OWNER_EXTERNAL_STATUS_WHITELIST.includes(status)) {
-    issues.push(`external-manifest: externalStratum.status ${JSON.stringify(status ?? null)} is outside the loader white-list [${OWNER_EXTERNAL_STATUS_WHITELIST.join(', ')}] (the frozen schema pins NEEDS_INPUT; only the loader extends it, with an explicit reason)`);
+    issues.push(`external-manifest: externalStratum.status ${JSON.stringify(status ?? null)} is outside [${OWNER_EXTERNAL_STATUS_WHITELIST.join(', ')}]`);
   }
   const reason = manifest?.externalStratum?.reason;
   if (typeof reason !== 'string' || reason.trim().length === 0) {
     issues.push('external-manifest: externalStratum.reason must be a non-empty explicit reason while the loader white-list applies');
   }
-  const view = {
-    ...manifest,
-    externalStratum: { ...(manifest?.externalStratum ?? {}), status: 'NEEDS_INPUT' },
-  };
   const validate = ownerValidators().annotationManifest;
-  if (validate(view) !== true) {
-    issues.push(`external-manifest: frozen annotation-manifest schema rejected the document (externalStratum.status white-listed): ${ajvErrors(validate)}`);
+  if (validate(manifest) !== true) {
+    issues.push(`external-manifest: annotation-manifest schema rejected the original document: ${ajvErrors(validate)}`);
   }
   return issues;
 }
@@ -453,61 +426,85 @@ export function loadOwnerExternalCorpus(dir) {
   return { ok: issues.length === 0, issues, manifest, manifestBytes, rubricBytes, rubricDigest: manifest.rubricDigest, cases, stratum: 'external_owner_inputs' };
 }
 
-// Operator-side authority context for resolveThresholdDecision (fixture-grade:
-// the owner principal and grant ref are DATA from the decision; the reviewer
-// issuer and its key material are the in-repo fixture convention). Real
-// reviewer-issued grant custody is NOT_RUN and every evidence record built on
-// this context says so. The RESOLUTION mechanics are real: registerProviderGrant
-// validates the grant against contracts/semantic-provider-grant.schema.json,
-// refuses self-issued grants and verifies the issuer MAC before registering.
-export function buildOwnerAuthorityContext(decision) {
+// Load operator-controlled trust anchors from a file supplied SEPARATELY from
+// the untrusted owner package. This is the only CLI bridge from serialized
+// custody material to runtime registries; owner package bytes can never add a
+// key, principal or grant to these registries.
+export function loadOwnerTrustBundle(file) {
+  const issues = [];
+  let bundle;
+  try {
+    bundle = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (error) {
+    return { ok: false, issues: [`owner-trust: unreadable or invalid JSON (${error.message})`], context: null };
+  }
+  const validate = ownerValidators().ownerTrustBundle;
+  if (validate(bundle) !== true) {
+    return { ok: false, issues: [`owner-trust: schema rejected the original document: ${ajvErrors(validate)}`], context: null };
+  }
+  const keyRegistry = new Map();
+  try {
+    for (const key of bundle.keys) registerKey({ ...key, registry: keyRegistry });
+  } catch (error) {
+    issues.push(`owner-trust: custody key registration refused (${error.message})`);
+  }
+  const authorities = makeVerifierAuthorityRegistry(bundle.principals);
+  if (issues.length === 0) {
+    for (const entry of bundle.grants) {
+      try {
+        registerProviderGrant(authorities, { ...entry, registry: keyRegistry });
+      } catch (error) {
+        issues.push(`owner-trust: grant ${entry.grant?.grantId ?? '?'} refused (${error.message})`);
+      }
+    }
+  }
+  return issues.length > 0
+    ? { ok: false, issues, context: null }
+    : {
+        ok: true,
+        issues: [],
+        context: {
+          authorities,
+          keyRegistry,
+          bundleId: bundle.bundleId,
+          fixtureGrade: bundle.fixtureGrade === true,
+          source: path.resolve(file),
+        },
+      };
+}
+
+export function buildOwnerAuthorityContext(decision, trustedContext) {
   const binding = decision?.authority_binding;
   if (!binding || typeof binding.principalId !== 'string' || typeof binding.grantRef !== 'string') {
     return { error: 'authority_binding_missing_or_malformed' };
   }
-  const keyRegistry = new Map();
-  registerKey({
-    keyRef: OWNER_AUTHORITY_KEY_REF,
-    secret: FIXTURE_ANNOTATION_HMAC_KEY,
-    custodian: OWNER_AUTHORITY_ISSUER,
-    role: 'reviewer',
-    registry: keyRegistry,
-  });
-  const grant = {
-    contractVersion: '1.0.0',
-    grantId: binding.grantRef,
-    authenticatedPrincipal: binding.principalId,
-    tool: 'threshold-authority',
-    workspaceId: OWNER_AUTHORITY_WORKSPACE,
-    modelAccess: { modelId: 'none', modelVersion: '1.0.0', access: 'inference_only' },
-    currency: 'none',
-    timeoutMs: 30000,
-    budget: { task: 0, campaign: 0, day: 0 },
-    noTraining: true,
-    noRetention: true,
-    issuedAt: decision.timestamp ?? '1970-01-01T00:00:00.000Z',
-    expiresAt: binding.expiresAt ?? '1970-01-01T00:00:00.000Z',
-  };
-  const authorities = makeVerifierAuthorityRegistry([
-    { principal: binding.principalId, roles: ['method_owner'], workspaces: [OWNER_AUTHORITY_WORKSPACE] },
-    { principal: OWNER_AUTHORITY_ISSUER, roles: ['reviewer'], workspaces: [OWNER_AUTHORITY_WORKSPACE] },
-  ]);
-  registerProviderGrant(authorities, {
-    grant,
-    issuer: OWNER_AUTHORITY_ISSUER,
-    signature: sign(OWNER_AUTHORITY_ISSUER, OWNER_AUTHORITY_KEY_REF, canonicalDigest(grant), { registry: keyRegistry }),
-    registry: keyRegistry,
-  });
-  return { authorities, keyRegistry, grant, issuer: OWNER_AUTHORITY_ISSUER, fixtureGrade: true };
+  if (!(trustedContext?.keyRegistry instanceof Map)
+    || !(trustedContext?.authorities instanceof Map)
+    || !(trustedContext.authorities.issuedGrants instanceof Map)) {
+    return { error: 'trusted_owner_context_missing' };
+  }
+  const registered = trustedContext.authorities.issuedGrants.get(binding.grantRef);
+  if (!registered) return { error: 'authority_grant_not_trusted' };
+  if (registered.grant.authenticatedPrincipal !== binding.principalId) {
+    return { error: 'authority_grant_principal_mismatch' };
+  }
+  return trustedContext;
 }
 
 // Full fail-closed loader for the owner-inputs package. Returns
 // { ok: false, issues, package: null } on ANY miss — schema violations, digest
 // drift, signature or attestation failures, a decision that does not bind the
 // exact thresholds digest, or an incomplete independence profile.
-export function loadOwnerInputs(dir) {
+export function loadOwnerInputs(dir, { trustedContext = null } = {}) {
   const issues = [];
   const fail = () => ({ ok: false, issues, package: null });
+  const trustProblem = !(trustedContext?.keyRegistry instanceof Map)
+    || !(trustedContext?.authorities instanceof Map)
+    || !(trustedContext.authorities.issuedGrants instanceof Map)
+    ? 'owner-inputs: trusted owner context is required and must be supplied independently of the package'
+    : trustedContext.fixtureGrade === true
+      ? 'owner-inputs: trusted owner context is fixture-grade and cannot establish independent calibration'
+      : null;
 
   for (const name of OWNER_REQUIRED_FILES) {
     if (!fs.existsSync(path.join(dir, name))) issues.push(`owner-inputs: required file ${name} is missing`);
@@ -575,6 +572,25 @@ export function loadOwnerInputs(dir) {
       issues.push(`case ${c.caseId}: owner-package cases must carry stratum "external" (found ${JSON.stringify(c.record?.stratum ?? null)})`);
     }
   }
+  const eligibleLocked = (corpus.cases ?? []).filter((entry) => entry.split === 'locked_test' && entry.record?.stratum === 'external');
+  const deduplicatedLocked = new Set(eligibleLocked.map((entry) => `${entry.record.sourceFamily}\u0000${entry.record.semanticTemplate}`));
+  if (deduplicatedLocked.size < 20) {
+    issues.push(`owner-inputs: locked_test external stratum has ${deduplicatedLocked.size} eligible cases after source-family/semantic-template dedup; at least 20 are required`);
+  }
+  const splitNames = ['dev', 'calibration', 'locked_test'];
+  for (let i = 0; i < splitNames.length; i += 1) {
+    for (let j = i + 1; j < splitNames.length; j += 1) {
+      const left = (corpus.cases ?? []).filter((entry) => entry.split === splitNames[i]);
+      const right = (corpus.cases ?? []).filter((entry) => entry.split === splitNames[j]);
+      for (const field of ['sourceFamily', 'semanticTemplate']) {
+        const leftValues = new Set(left.map((entry) => entry.record?.[field]));
+        const overlap = [...new Set(right.map((entry) => entry.record?.[field]))].filter((value) => leftValues.has(value));
+        if (overlap.length > 0) {
+          issues.push(`owner-inputs: ${field} overlaps ${splitNames[i]}/${splitNames[j]} (${overlap.join(', ')})`);
+        }
+      }
+    }
+  }
 
   // ---- annotation sets (frozen schema + signature + coverage) ----------------
   const labelSets = {};
@@ -608,8 +624,10 @@ export function loadOwnerInputs(dir) {
         setIssues.push(`annotation set ${set.annotationSetId}: label digest binding broken for ${l.caseId}`);
       }
     }
-    const signature = verifyAnnotationSetSignature(set, FIXTURE_ANNOTATION_HMAC_KEY);
-    if (!signature.ok) setIssues.push(`annotation set ${set.annotationSetId}: signature rejected (${signature.reason})`);
+    if (trustedContext?.keyRegistry instanceof Map) {
+      const signature = verifySignatureDetailed(set.signature, set.annotatorId, annotationSetBindingDigest(set), { registry: trustedContext.keyRegistry });
+      if (!signature.ok) setIssues.push(`annotation set ${set.annotationSetId}: signature rejected (${signature.reason})`);
+    }
     if (labelSets[set.annotationSetId]) setIssues.push(`annotation set ${set.annotationSetId}: duplicate id`);
     labelSets[set.annotationSetId] = set;
   }
@@ -627,7 +645,6 @@ export function loadOwnerInputs(dir) {
     return fail();
   }
   if (!Array.isArray(adjudications)) issues.push('adjudication.json must be an array of adjudication records');
-  const adjudicatorKeyRegistry = new Map();
   for (const rec of Array.isArray(adjudications) ? adjudications : []) {
     const verdict = verifierValidators().validate('adjudication-record', rec);
     if (verdict.ok !== true) {
@@ -643,14 +660,10 @@ export function loadOwnerInputs(dir) {
     }
     const identity = rec.adjudicatorIdentity;
     if (annotatorIds.includes(identity.principalId)) issues.push(`adjudication ${rec.adjudicationId}: the adjudicator must never be an annotator of the package`);
-    const keyRef = `kms://fixture/s2-006/owner-inputs/adjudicator/${identity.principalId}`;
-    try {
-      registerKey({ keyRef, secret: FIXTURE_ANNOTATION_HMAC_KEY, custodian: identity.principalId, role: 'adjudicator', registry: adjudicatorKeyRegistry });
-    } catch (e) {
-      issues.push(`adjudication ${rec.adjudicationId}: adjudicator custody registration refused: ${e.message}`);
+    if (trustedContext?.keyRegistry instanceof Map) {
+      const attestation = verifySignatureDetailed(identity, identity.principalId, adjudicationAttestationDigest(rec), { registry: trustedContext.keyRegistry });
+      if (!attestation.ok) issues.push(`adjudication ${rec.adjudicationId}: adjudicator attestation rejected (${attestation.reason})`);
     }
-    const attestation = verifySignatureDetailed(identity, identity.principalId, adjudicationAttestationDigest(rec), { registry: adjudicatorKeyRegistry });
-    if (!attestation.ok) issues.push(`adjudication ${rec.adjudicationId}: adjudicator attestation rejected (${attestation.reason})`);
     adjudicators.add(identity.principalId);
   }
 
@@ -662,15 +675,13 @@ export function loadOwnerInputs(dir) {
     issues.push(`threshold-decision.json is not valid JSON: ${e.message}`);
     return fail();
   }
-  const authorityContext = buildOwnerAuthorityContext(decision);
+  const authorityContext = buildOwnerAuthorityContext(decision, trustedContext);
+  let thresholdResolution = { resolved: false, reason: authorityContext.error ?? 'authority_unavailable' };
   if (authorityContext.error) {
     issues.push(`threshold-decision.json refused: ${authorityContext.error}`);
-    return fail();
-  }
-  const thresholdResolution = resolveThresholdDecision(thresholdsDoc, decision, authorityContext.authorities, { keyRegistry: authorityContext.keyRegistry });
-  if (!thresholdResolution.resolved) {
-    issues.push(`threshold-decision.json refused: ${thresholdResolution.reason}`);
-    return fail();
+  } else {
+    thresholdResolution = resolveThresholdDecision(thresholdsDoc, decision, authorityContext.authorities, { keyRegistry: authorityContext.keyRegistry });
+    if (!thresholdResolution.resolved) issues.push(`threshold-decision.json refused: ${thresholdResolution.reason}`);
   }
 
   // ---- independence profile (frozen evaluator_independence subschema) --------
@@ -709,6 +720,7 @@ export function loadOwnerInputs(dir) {
       issues.push('independence.json: the package adjudicator must be authenticated');
     }
   }
+  if (trustProblem) issues.push(trustProblem);
   if (issues.length > 0) return fail();
 
   return {
@@ -786,7 +798,7 @@ export async function runOwnerInputsPipeline({ pkg, evidenceDir } = {}) {
     labelSets: pkg.labelSets,
     adjudications: pkg.adjudications,
     thresholdsDigest: pkg.thresholdsDigest,
-    annotationHmacKey: FIXTURE_ANNOTATION_HMAC_KEY,
+    signatureKeyRegistry: pkg.authorityContext.keyRegistry,
     runA: {
       runId: sealed.a.runId,
       executorId: sealed.a.executorId,
@@ -891,9 +903,9 @@ function buildOwnerInputsRecord(pkg, run) {
     },
     hardGates: { ok: run.ok === true && run.comparison?.ok === true, violations: run.ok ? [] : [`OWNER_INPUTS_${String(run.stage).toUpperCase()}`] },
     honesty: {
-      annotationHmacKey: 'fixture-key (in-repo tests/verifier convention; real label_custodian custody NOT_RUN)',
-      authorityContext: 'fixture-grade operator-side registry (synthetic reviewer issuer, in-repo HMAC material): proves the resolveThresholdDecision mechanics, never real authority; real reviewer-issued grant custody is NOT_RUN',
-      independenceProvenance: 'owner-DECLARED profile, machine-checked against the frozen evaluator_independence subschema; a package does not by itself establish real-world independence, and the fixture package explicitly does NOT claim it as a production fact (see the package README)',
+      signatureVerification: 'every annotation and adjudication is verified against the separately supplied operator trust registry; package bytes cannot register custody keys',
+      authorityContext: `operator trust bundle ${pkg.authorityContext.bundleId ?? '<programmatic>'}; fixture-grade bundles are rejected before this record can be produced`,
+      independenceProvenance: 'owner-declared profile cross-checked against authenticated principals in a separate non-fixture trust context plus the mandatory corpus/split constraints',
       noSilentFallback: 'loader misses refuse the run (OWNER_INPUTS_REJECTED, exit 1) instead of falling back to fixture-only behavior',
     },
   };
@@ -1007,6 +1019,8 @@ async function parentMode() {
 
   // 3. UNSEAL: labels/adjudications/thresholds are opened only here
   const goldState = loadGold(corpus.cases);
+  const fixtureSignatureRegistry = loadFixtureSignatureRegistry();
+  goldState.adjudications = custodySignFixtureAdjudications(goldState.adjudications, fixtureSignatureRegistry);
   const thresholdsBytes = fs.readFileSync(THRESHOLDS_PATH);
   const thresholds = JSON.parse(thresholdsBytes.toString('utf8'));
   const thresholdsDigest = canonicalDigest(thresholds);
@@ -1020,7 +1034,7 @@ async function parentMode() {
     labelSets: goldState.labelSets,
     adjudications: goldState.adjudications,
     thresholdsDigest,
-    annotationHmacKey: FIXTURE_ANNOTATION_HMAC_KEY,
+    signatureKeyRegistry: fixtureSignatureRegistry,
     runA: {
       runId: sealed.a.runId,
       executorId: sealed.a.executorId,
@@ -1115,7 +1129,23 @@ async function parentMode() {
   // later probe outcome.
   let ownerInputsReport = null;
   if (args['owner-inputs']) {
-    const loaded = loadOwnerInputs(path.resolve(ROOT, String(args['owner-inputs'])));
+    const ownerDir = path.resolve(ROOT, String(args['owner-inputs']));
+    if (!args['owner-trust']) {
+      console.error(JSON.stringify({ ok: false, status: 'OWNER_INPUTS_REJECTED', issues: ['owner-inputs: --owner-trust <file> is required'] }, null, 2));
+      process.exit(1);
+    }
+    const trustPath = path.resolve(ROOT, String(args['owner-trust']));
+    const trustRelative = path.relative(ownerDir, trustPath);
+    if (trustRelative === '' || (!trustRelative.startsWith('..') && !path.isAbsolute(trustRelative))) {
+      console.error(JSON.stringify({ ok: false, status: 'OWNER_INPUTS_REJECTED', issues: ['owner-trust: trust anchors must be stored outside the untrusted owner-inputs directory'] }, null, 2));
+      process.exit(1);
+    }
+    const trusted = loadOwnerTrustBundle(trustPath);
+    if (!trusted.ok) {
+      console.error(JSON.stringify({ ok: false, status: 'OWNER_INPUTS_REJECTED', issues: trusted.issues }, null, 2));
+      process.exit(1);
+    }
+    const loaded = loadOwnerInputs(ownerDir, { trustedContext: trusted.context });
     if (!loaded.ok) {
       console.error(JSON.stringify({ ok: false, status: 'OWNER_INPUTS_REJECTED', issues: loaded.issues }, null, 2));
       process.exit(1);

@@ -180,7 +180,7 @@ describe('S2-006 comparator: green path over per-annotator custody keys (fix2-E)
     assert.equal(report.ok, true, JSON.stringify(report.failures, null, 1));
   });
 
-  test('the deprecated shared-secret path still verifies the frozen fixture corpus (legacy callers)', () => {
+  test('the deprecated shared-secret path fails closed without a custody registry', () => {
     const corpus = loadCorpus();
     const predictions = rubricPredictions(corpus.cases);
     const report = compareRuns({
@@ -188,7 +188,8 @@ describe('S2-006 comparator: green path over per-annotator custody keys (fix2-E)
       runA: { ...runMeta(), predictions },
       runB: { ...runMeta(), predictions },
     });
-    assert.equal(report.ok, true, JSON.stringify(report.failures, null, 1));
+    assert.equal(report.ok, false);
+    assert.ok(report.failures.some((failure) => failure.code === 'signature_key_unavailable'));
   });
 });
 
@@ -343,9 +344,9 @@ describe('S2-006 comparator: custody-aware signature core (finding 6, fix2-E)', 
       runB: { ...runMeta(), predictions },
     });
     assert.equal(report.ok, false);
-    const rejection = report.failures.find((f) => f.code === 'signature_rejected');
+    const rejection = report.failures.find((f) => f.code === 'signature_key_unavailable');
     assert.ok(rejection, JSON.stringify(report.failures));
-    assert.ok(rejection.detail.includes('more than one annotator'));
+    assert.ok(rejection.detail.includes('no signature key registry'));
   });
 
   test('an unknown keyRef is rejected even with a valid MAC (fail-closed custody lookup)', () => {
