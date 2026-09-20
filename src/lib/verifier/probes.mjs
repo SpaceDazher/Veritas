@@ -31,8 +31,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { canonicalDigest } from './canonical-json.mjs';
+// The REAL production digest rule for canonical claim documents: derived
+// probe variants recompute canonical_digest with it, so every content
+// mutation stays internally consistent with the frozen claim contract.
+import { canonicalDigestOfClaim } from '../claims/validation.mjs';
 import { InMemoryVerifierStore } from './store.mjs';
-import { AclDenied, VerifierError, VerifierPolicyBlock } from './errors.mjs';
+import { AclDenied, ReconciliationRequired, VerifierError, VerifierPolicyBlock } from './errors.mjs';
 import {
   auditVerifierRunForLeaks,
   computeCanonicalArgsDigest,
@@ -67,6 +71,12 @@ import {
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const CORPUS = path.join(ROOT, 'corpus', 's2-006');
+// Canonical producer fixtures (fix2-D): the frozen, schema-valid documents
+// every artifact-level probe builds on. Probes never feed homemade
+// { statement, citations } bodies to the verifier — the frozen producer
+// contracts (contracts/*.schema.json) are the single source of truth about
+// the canonical artifact form, and fix2-C rejects everything else.
+const CANONICAL_DIR = path.join(ROOT, 'tests', 'verifier', 'fixtures', 'canonical');
 
 // Fixture-corpus annotation HMAC key (same test-only material the corpus
 // manifest was frozen with; NOT a secret, production custody differs).
@@ -182,24 +192,71 @@ function runMeta(name, overrides = {}) {
   };
 }
 
-// ---- verification-request builder (contract-valid by construction) ----------
+// ---- canonical fixture payloads (fix2-D) ------------------------------------
 
-// A claim artifact for the compute API: exact identity + immutable body.
-function claimArtifact(artifactId, statement, citations = []) {
-  return { artifactId, body: { statement, citations } };
+let CANONICAL_CACHE = null;
+function canonicalFixtures() {
+  if (!CANONICAL_CACHE) {
+    CANONICAL_CACHE = {
+      claim: JSON.parse(fs.readFileSync(path.join(CANONICAL_DIR, 'claim.json'), 'utf8')),
+      'evidence-map': JSON.parse(fs.readFileSync(path.join(CANONICAL_DIR, 'evidence-map.json'), 'utf8')),
+      'hypothesis-card': JSON.parse(fs.readFileSync(path.join(CANONICAL_DIR, 'hypothesis-card.json'), 'utf8')),
+      'synthesis-result': JSON.parse(fs.readFileSync(path.join(CANONICAL_DIR, 'synthesis-result.json'), 'utf8')),
+    };
+  }
+  return CANONICAL_CACHE;
 }
 
-function verificationRequest({ requestId, artifactId, body, thresholdVersion = '1.0.0', actor = PRINCIPALS.harness }) {
+// A fresh deep copy of a canonical fixture document (schema-valid by
+// construction — the fixtures are frozen against the producer schemas).
+function canonicalDocument(name) {
+  return structuredClone(canonicalFixtures()[name]);
+}
+
+// A derived variant of the canonical claim: ONLY field CONTENT is mutated
+// (text/subject/predicate/object/units/value_range/scope), never the
+// document shape. canonical_digest is recomputed with the REAL production
+// digest rule so the variant stays internally consistent with the frozen
+// claim contract (a mutated body under a stale digest is exactly the
+// artifact-immutability violation probe M rejects).
+function canonicalClaimVariant({ claimId, text, overrides = {} }) {
+  const claim = canonicalDocument('claim');
+  claim.claim_id = claimId;
+  if (text !== undefined) {
+    claim.normalized_text = text;
+    claim.original_text = text;
+  }
+  Object.assign(claim, overrides);
+  claim.canonical_digest = canonicalDigestOfClaim(claim);
+  return claim;
+}
+
+const ARTIFACT_ID_FIELD = Object.freeze({
+  claim: 'claim_id',
+  evidence_map: 'map_id',
+  hypothesis_card: 'card_id',
+  synthesis_result: 'result_id',
+});
+
+// A canonical artifact for the compute API: exact identity + immutable
+// schema-valid body, keyed by the document's own canonical id.
+function canonicalArtifact(kind, payload) {
+  return { kind, artifactId: payload[ARTIFACT_ID_FIELD[kind]], revision: 1, payload };
+}
+
+// ---- verification-request builder (contract-valid by construction) ----------
+
+function verificationRequest({ requestId, kind, artifactId, payload, thresholdVersion = '1.0.0', actor = PRINCIPALS.harness }) {
   const request = {
     contractVersion: '1.0.0',
     requestId,
     actor,
     workspaceId: WS,
     artifact: {
-      kind: 'claim',
+      kind,
       artifactId,
       revision: 1,
-      digest: canonicalDigest(body),
+      digest: canonicalDigest(payload),
     },
     requestedChecks: ['citation_entailment'],
     asOf: T0,
@@ -240,7 +297,7 @@ function comparatorInput(corpus, runA, runB) {
   };
 }
 
-function verifyOptions(artifact, checker = SUPPORTIVE_CHECKER, sourceIndex = {}) {
+function verifyOptions({ kind, artifactId, payload }, checker = SUPPORTIVE_CHECKER, sourceIndex = {}) {
   const corpus = loadCorpus();
   return {
     acl: policyAcl(PRINCIPALS.harness, 'evaluation_harness'),
@@ -250,7 +307,7 @@ function verifyOptions(artifact, checker = SUPPORTIVE_CHECKER, sourceIndex = {})
       corpusManifestDigest: canonicalDigest(corpus.manifest),
       thresholdsDigest: THRESHOLDS_DIGEST,
     },
-    artifact: { kind: 'claim', artifactId: artifact.artifactId, revision: 1, payload: artifact.body },
+    artifact: { kind, artifactId, revision: 1, payload },
     sourceIndex,
   };
 }
@@ -378,26 +435,43 @@ function probeD() {
 
 // E. Persuasive output with no cited spans -> deterministic abstention, even
 // with a checker that would say SUPPORTED (real api.verifyClaim path).
+// fix2-D: both artifacts are CANONICAL claim documents — the untouched
+// frozen fixture and a derived variant whose normalized_text content is
+// mutated to persuasive text (schema shape unchanged, canonical_digest
+// recomputed with the production digest rule). Canonical claims carry NO
+// citations field, so the citation check abstains deterministically.
 async function probeE() {
-  const artifact = claimArtifact(
-    'clm-probe-e-0001',
-    'A revolutionary breakthrough definitively cuts energy use by 30% nationwide, experts confirm.',
-    [],
-  );
-  const request = verificationRequest({ requestId: 'svr-probe-e-0001', artifactId: artifact.artifactId, body: artifact.body });
-  const { result } = await verifyClaim(request, verifyOptions(artifact, SUPPORTIVE_CHECKER));
-  const item = result.items[0];
+  const canonical = canonicalDocument('claim');
+  const persuasiveText = 'A revolutionary breakthrough definitively cuts energy use by 30% nationwide, experts confirm.';
+  const variant = canonicalClaimVariant({ claimId: 'clm-probe-e-0001', text: persuasiveText });
+  const runCase = async (requestId, claim) => {
+    const artifact = canonicalArtifact('claim', claim);
+    const request = verificationRequest({ requestId, ...artifact });
+    const { result } = await verifyClaim(request, verifyOptions(artifact, SUPPORTIVE_CHECKER));
+    return result;
+  };
+  const canonicalResult = await runCase('svr-probe-e-0001', canonical);
+  const variantResult = await runCase('svr-probe-e-0002', variant);
+  const item = variantResult.items[0];
+  const canonicalItem = canonicalResult.items[0];
   const observed = {
+    payloadSource: 'canonical-fixture:claim',
+    canonicalFixtureText: canonical.normalized_text,
+    canonicalFixtureVerdict: canonicalItem.verdict,
+    derivedVariantText: variant.normalized_text,
+    derivedVariantVerdict: item.verdict,
     checkerWouldSay: 'SUPPORTED',
     verdict: item.verdict,
     reasonCodes: item.reasonCodes,
-    abstention: result.abstentions[0]?.reason ?? null,
-    coverageEvaluated: result.coverage.evaluated,
+    abstention: variantResult.abstentions[0]?.reason ?? null,
+    coverageEvaluated: variantResult.coverage.evaluated,
   };
-  const ok = item.verdict === 'INSUFFICIENT_EVIDENCE'
+  const ok = canonicalItem.verdict === 'INSUFFICIENT_EVIDENCE'
+    && canonicalResult.abstentions[0]?.reason === 'NO_CITATION'
+    && item.verdict === 'INSUFFICIENT_EVIDENCE'
     && item.reasonCodes.includes('missing_citation')
     && observed.abstention === 'NO_CITATION'
-    && result.abstentions.length === 1;
+    && variantResult.abstentions.length === 1;
   return { ...outcome('E', 'persuasive_output_without_spans_abstains', {
     requiredVerdict: 'INSUFFICIENT_EVIDENCE',
     requiredAbstention: 'NO_CITATION',
@@ -548,7 +622,7 @@ async function probeI() {
     registry: probeKeys(),
     artifactOwnerPrincipal: PRINCIPALS.annotatorA,
   }).reason === 'self_attestation';
-  const noAcceptanceRecord = store.getRecord('adjudication', forged.adjudicationId) === null
+  const noAcceptanceRecord = (await store.getRecord('adjudication', forged.adjudicationId)) === null
     && store.listOutbox().length === 0
     && store.listLedger().length === 0;
   const ok = policyDenied && publishDenied && selfAttestationRefused && noAcceptanceRecord;
@@ -803,10 +877,9 @@ function probeL() {
 async function probeM() {
   const store = new InMemoryVerifierStore({ clock: () => T0 });
   const authorities = AUTHORITIES();
-  const artifact = claimArtifact('clm-probe-m-001', 'The 2024 audit found a 12% overrun in Phase B.', [
-    { claimId: 'clm-probe-m-001', claimRevision: 1, segmentId: 'seg-probe-m' },
-  ]);
-  const request1 = verificationRequest({ requestId: 'svr-probe-m-0001', artifactId: artifact.artifactId, body: artifact.body });
+  // fix2-D: the published artifact is the untouched canonical claim fixture.
+  const artifact = canonicalArtifact('claim', canonicalDocument('claim'));
+  const request1 = verificationRequest({ requestId: 'svr-probe-m-0001', ...artifact });
   const { result: result1 } = await verifyClaim(request1, verifyOptions(artifact));
   const publish1 = await publishVerificationResult({
     store, authorities, actor: PRINCIPALS.harness, request: request1, result: result1, operationId: 'op-probe-m-publish-1',
@@ -831,9 +904,7 @@ async function probeM() {
 
   // correction path: new preregistration version + invalidation event
   const thresholds2 = { thresholds: 'probe-fixture-v2-preregistered' };
-  const request2 = verificationRequest({
-    requestId: 'svr-probe-m-0002', artifactId: artifact.artifactId, body: artifact.body, thresholdVersion: '1.1.0',
-  });
+  const request2 = verificationRequest({ requestId: 'svr-probe-m-0002', ...artifact, thresholdVersion: '1.1.0' });
   const options2 = verifyOptions(artifact);
   options2.digests.thresholdsDigest = canonicalDigest(thresholds2);
   const { result: result2 } = await verifyClaim(request2, options2);
@@ -863,16 +934,17 @@ async function probeM() {
     store, authorities, actor: PRINCIPALS.reviewer, event: invalidation, operationId: 'op-probe-m-invalidate-1', workspaceId: WS,
   });
 
-  const storedOld = store.getRecord('result', result1.resultId);
+  const storedOld = await store.getRecord('result', result1.resultId);
   const oldResultImmutable = canonicalDigest(storedOld) === canonicalDigest(result1);
-  const invalidationStored = store.getRecord('invalidation', invalidation.eventId) !== null;
-  const newVersionStored = store.getRecord('result', result2.resultId) !== null
+  const invalidationStored = (await store.getRecord('invalidation', invalidation.eventId)) !== null;
+  const newVersionStored = (await store.getRecord('result', result2.resultId)) !== null
     && result2.resultId !== result1.resultId;
   const ok = publish1.replayed === false && sameOperationConflict && recordImmutabilityConflict
     && oldResultImmutable && invalidationStored && newVersionStored && publish2.replayed === false;
   return { ...outcome('M', 'threshold_change_creates_new_version_old_run_invalid', {
     sameOperationConflict: true, recordImmutability: true, oldResultState: 'INVALID', newVersionRequired: true,
   }, {
+    payloadSource: 'canonical-fixture:claim',
     sameOperationConflict,
     recordImmutabilityConflict,
     oldResultImmutable,
@@ -884,32 +956,37 @@ async function probeM() {
 }
 
 // N. Stale/revoked parents invalidate dependent results — such verdicts can
-// never feed a calibration.
+// never feed a calibration. fix2-D: the evaluated artifacts are the
+// canonical evidence-map and hypothesis-card fixtures; their canonical
+// citations (entries[].segment_id / nodes[].claim_id) are what the source
+// index keys on.
 async function probeN() {
-  const artifact = claimArtifact('clm-probe-n-001', 'The 2024 broadband report shows 72% coverage in rural areas.', [
-    { claimId: 'clm-probe-n-001', claimRevision: 1, segmentId: 'seg-probe-n' },
-  ]);
-  const runCase = async (sourceState) => {
-    const request = verificationRequest({
-      requestId: `svr-probe-n-${sourceState}`, artifactId: artifact.artifactId, body: artifact.body,
-    });
+  const mapArtifact = canonicalArtifact('evidence_map', canonicalDocument('evidence-map'));
+  const cardArtifact = canonicalArtifact('hypothesis_card', canonicalDocument('hypothesis-card'));
+  const runCase = async (requestId, artifact, sourceState) => {
+    const sourceKey = artifact.kind === 'evidence_map' ? 'seg-canonical-0001' : 'clm-canonical-0101';
+    const request = verificationRequest({ requestId, ...artifact });
     const { result } = await verifyClaim(request, verifyOptions(artifact, SUPPORTIVE_CHECKER, {
-      'seg-probe-n': sourceState === 'stale' ? { stale: true } : { accessState: 'revoked' },
+      [sourceKey]: sourceState === 'stale' ? { stale: true } : { accessState: 'revoked' },
     }));
-    return { item: result.items[0] };
+    return result.items[0];
   };
-  const stale = await runCase('stale');
-  const revoked = await runCase('revoked');
+  const mapStale = await runCase('svr-probe-n-map-stale', mapArtifact, 'stale');
+  const mapRevoked = await runCase('svr-probe-n-map-revoked', mapArtifact, 'revoked');
+  const cardStale = await runCase('svr-probe-n-card-stale', cardArtifact, 'stale');
   const observed = {
-    stale: { verdict: stale.item.verdict, reasonCodes: stale.item.reasonCodes },
-    revoked: { verdict: revoked.item.verdict, reasonCodes: revoked.item.reasonCodes },
+    payloadSource: 'canonical-fixture:evidence-map+hypothesis-card',
+    mapStale: { verdict: mapStale.verdict, reasonCodes: mapStale.reasonCodes },
+    mapRevoked: { verdict: mapRevoked.verdict, reasonCodes: mapRevoked.reasonCodes },
+    cardStale: { verdict: cardStale.verdict, reasonCodes: cardStale.reasonCodes },
   };
-  const staleOk = observed.stale.verdict === 'STALE_INPUT' && observed.stale.reasonCodes.includes('stale_source');
-  const revokedOk = observed.revoked.verdict === 'STALE_INPUT' && observed.revoked.reasonCodes.includes('revoked_source');
+  const staleOk = observed.mapStale.verdict === 'STALE_INPUT' && observed.mapStale.reasonCodes.includes('stale_source');
+  const revokedOk = observed.mapRevoked.verdict === 'STALE_INPUT' && observed.mapRevoked.reasonCodes.includes('revoked_source');
+  const cardOk = observed.cardStale.verdict === 'STALE_INPUT' && observed.cardStale.reasonCodes.includes('stale_source');
   // a calibration built on stale/revoked-dependent verdicts is not applicable
-  const calibrationApplicable = [observed.stale.verdict, observed.revoked.verdict]
+  const calibrationApplicable = [observed.mapStale.verdict, observed.mapRevoked.verdict, observed.cardStale.verdict]
     .every((v) => !['STALE_INPUT', 'BLOCKED_POLICY'].includes(v));
-  const ok = staleOk && revokedOk && !calibrationApplicable;
+  const ok = staleOk && revokedOk && cardOk && !calibrationApplicable;
   return { ...outcome('N', 'stale_revoked_parent_invalidates_dependent_result', {
     staleVerdict: 'STALE_INPUT', calibrationApplicable: false,
   }, { ...observed, calibrationApplicable }, { actualViolations: ok ? 0 : 1 }), ok };
@@ -945,7 +1022,10 @@ function probeO() {
 
 // P. Provider timeout / content-policy refusal -> typed missingness and
 // abstention, never a semantic pass/fail, never silently dropped from the
-// denominator.
+// denominator. fix2-D: the evaluated artifacts are canonical producer
+// documents whose citations invoke the checker — the canonical evidence-map
+// (entries are cited spans) and the canonical synthesis-result (embedded
+// map + hypothesis card, so typed missingness must cover EVERY statement).
 async function probeP() {
   const timeoutChecker = {
     check: async () => {
@@ -959,18 +1039,18 @@ async function probeP() {
       throw new VerifierPolicyBlock('provider content-policy refusal for this input');
     },
   };
+  const mapArtifact = canonicalArtifact('evidence_map', canonicalDocument('evidence-map'));
+  const synthesisArtifact = canonicalArtifact('synthesis_result', canonicalDocument('synthesis-result'));
   const runCase = async (requestId, artifact, checker) => {
-    const request = verificationRequest({ requestId, artifactId: artifact.artifactId, body: artifact.body });
+    const request = verificationRequest({ requestId, ...artifact });
     const { result } = await verifyClaim(request, verifyOptions(artifact, checker));
     return result;
   };
-  const timeoutResult = await runCase('svr-probe-p-0001', claimArtifact('clm-probe-p-0001', 'The trial lowers blood pressure by 8 mmHg.', [
-    { claimId: 'clm-probe-p-0001', claimRevision: 1, segmentId: 'seg-clm-probe-p-0001' },
-  ]), timeoutChecker);
-  const refusalResult = await runCase('svr-probe-p-0002', claimArtifact('clm-probe-p-0002', 'The reform reduced waiting times by 15%.', [
-    { claimId: 'clm-probe-p-0002', claimRevision: 1, segmentId: 'seg-clm-probe-p-0002' },
-  ]), refusalChecker);
+  const timeoutResult = await runCase('svr-probe-p-0001', mapArtifact, timeoutChecker);
+  const refusalResult = await runCase('svr-probe-p-0002', mapArtifact, refusalChecker);
+  const synthesisTimeout = await runCase('svr-probe-p-0003', synthesisArtifact, timeoutChecker);
   const observed = {
+    payloadSource: 'canonical-fixture:evidence-map+synthesis-result',
     timeout: {
       verdict: timeoutResult.items[0].verdict,
       missingness: timeoutResult.items[0].missingness.kind,
@@ -985,8 +1065,21 @@ async function probeP() {
       inDenominator: refusalResult.coverage.denominator === refusalResult.items.length,
       missing: refusalResult.coverage.missing,
     },
+    synthesisTimeout: {
+      statements: synthesisTimeout.items.length,
+      allTypedMissing: synthesisTimeout.items.every((i) => i.missingness.kind === 'timeout'),
+      abstentions: synthesisTimeout.abstentions.map((a) => a.reason),
+      inDenominator: synthesisTimeout.coverage.denominator === synthesisTimeout.items.length,
+      status: synthesisTimeout.status,
+    },
   };
   const semanticPassFail = (r) => ['SUPPORTED', 'CONTRADICTED', 'PARTIALLY_SUPPORTED'].includes(r.items[0].verdict);
+  const synthesisOk = observed.synthesisTimeout.statements === 2
+    && observed.synthesisTimeout.allTypedMissing
+    && observed.synthesisTimeout.abstentions.length === 2
+    && observed.synthesisTimeout.abstentions.every((r) => r === 'TIMEOUT')
+    && observed.synthesisTimeout.inDenominator
+    && observed.synthesisTimeout.status === 'INCOMPLETE';
   const ok = observed.timeout.verdict === 'INSUFFICIENT_EVIDENCE'
     && observed.timeout.missingness === 'timeout'
     && observed.timeout.abstention === 'TIMEOUT'
@@ -995,6 +1088,7 @@ async function probeP() {
     && observed.refusal.missingness === 'policy_refusal'
     && observed.refusal.abstention === 'POLICY_BLOCK'
     && observed.refusal.inDenominator
+    && synthesisOk
     && !semanticPassFail(timeoutResult) && !semanticPassFail(refusalResult)
     && timeoutResult.status === 'INCOMPLETE' && refusalResult.status === 'INCOMPLETE';
   return { ...outcome('P', 'provider_timeout_and_refusal_are_typed_missingness', {
@@ -1108,84 +1202,192 @@ async function probeR() {
   }, { actualViolations: ok ? 0 : 1 }), ok };
 }
 
-// S. Crash after REQUEST_ACCEPTED / unknown provider outcome -> fenced
-// reconciliation, no duplicate charge, result or outbox event.
+// S. Crash after REQUEST_ACCEPTED / unknown provider outcome -> OBSERVED
+// atomic RECONCILIATION_REQUIRED -> AUTHORIZED reconciliation decision ->
+// exactly one settlement -> blind retry refused (fix2-D finding 5).
 //
-// The offline half drives the identical state machine on the in-memory store
-// (migration 0005 semantics). The DB half — a REAL two-process crash/restart
-// on PostgreSQL — is delegated to scripts/s2-006-db-replay.mjs: the caller
-// passes its result as `dbCrashPhase` ({ ok, status, ... }). Without a green
-// DB crash phase probe S is NOT_RUN_DB (status 'not_run') — review P2-6: a
-// not-run mandatory probe is never green.
+// The recovery process NEVER finalizes an ACCEPTED call directly with a
+// pre-known digest/settlement — that was the reviewed defect: reconciliation
+// was never observed and blind-retry protection was never exercised. The
+// production sequence, offline on the identical state machine:
+//   1. crash window: reserve -> accept -> the provider outcome is unknown;
+//      the unknown outcome escalates ATOMICALLY (state + reason + outbox
+//      event in ONE store step, fix2-C mechanism);
+//   2. the reconciled call is fenced: stale fencing refused, escalation
+//      replay idempotent, a direct finalize (blind retry) REFUSED, the call
+//      stays RECONCILIATION_REQUIRED with settlement null forever;
+//   3. a SEPARATE authorized reconciliation decision — a reviewer-issued
+//      grant naming the EXACT resolving actor (evaluation_harness), MAC
+//      verified at registration AND at every use — resolves the outcome
+//      through ONE replacement call: finalization exactly once;
+//   4. duplicates are impossible: a duplicate resolution replays without a
+//      second event, and no ledger/outbox row is ever written twice.
+//
+// The DB half — a REAL two-process crash/restart on PostgreSQL driving the
+// SAME sequence — is delegated to scripts/s2-006-db-replay.mjs (passed in as
+// `probeSDbCrashPhase`). Without a green DB crash phase probe S is
+// NOT_RUN_DB (status 'not_run'), never silently green (review P2-6).
 async function probeS({ dbCrashPhase = null } = {}) {
   const store = new InMemoryVerifierStore({ clock: () => T0 });
   const authorities = AUTHORITIES();
   const grant = issueProviderGrant(authorities, { grantId: 'grt-probe-s-000001' });
-  const callId = 'call-probe-s-0001';
+  const callId = 'call-probe-s-crash-1';
+  const operationId = 'op-probe-s-crash-1';
+  const crashReason = 'provider process died after REQUEST_ACCEPTED; provider outcome unknown';
+  const responseDigest = canonicalDigest({ probe: 's', resolution: 'reconciled outcome', verdict: 'INSUFFICIENT_EVIDENCE' });
+  const settlement = { amount: 0, currency: 'none', note: 'authorized reconciliation settlement; fenced, exactly once' };
+
+  // Phase 1 — crash window: reserve -> accept -> unknown provider outcome.
+  // The unknown outcome escalates ATOMICALLY to RECONCILIATION_REQUIRED:
+  // state + reason + outbox event in ONE store step, no settlement written.
   const reserved = await reserveExternalCall({
-    store, authorities, actor: PRINCIPALS.harness, grant, callId,
-    operationId: 'op-probe-s-reserve-1', reservation: { task: 'probe-s' }, workspaceId: WS, now: T0, keyRegistry: probeKeys(),
+    store, authorities, actor: PRINCIPALS.harness, grant, callId, operationId,
+    reservation: { task: 'probe-s crash window: reserved + accepted, then the outcome is lost' },
+    workspaceId: WS, now: T0, keyRegistry: probeKeys(),
   });
   await acceptExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken });
-  // crash: unknown provider outcome after REQUEST_ACCEPTED
-  await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken, outcome: 'unknown' });
+  const escalation = await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken, outcome: 'unknown', reason: crashReason });
   const callAfterCrash = await store.readExternalCall(callId);
-  // a stale fencing token can never move the reconciled call
+
+  // Phase 2 — the reconciled call is fenced.
   let staleFencingDenied = false;
   try {
-    await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken + 999, responseDigest: 'a'.repeat(64), settlement: { charge: 1 } });
+    await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken + 999, responseDigest, settlement, grant });
   } catch (error) {
     staleFencingDenied = error instanceof AclDenied;
   }
-  // reconciliation replay is idempotent (no duplicate events)
-  const reconcileReplay = await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken, outcome: 'unknown' });
-  const replayedCall = await store.readExternalCall(callId);
-  const outboxTypes = store.listOutbox().map((e) => e.event_type);
-  const externalEvents = outboxTypes.filter((t) => t.startsWith('EXTERNAL_CALL'));
-  const noDuplicateEvents = externalEvents.length === 3
-    && externalEvents.filter((t) => t === 'EXTERNAL_CALL_RESERVED').length === 1
-    && externalEvents.filter((t) => t === 'EXTERNAL_CALL_ACCEPTED').length === 1
-    && externalEvents.filter((t) => t === 'EXTERNAL_CALL_RECONCILIATION_REQUIRED').length === 1
-    && !outboxTypes.includes('EXTERNAL_CALL_FINALIZED');
-  // duplicate reservation with the same args replays, never re-charges
-  const reservedAgain = await reserveExternalCall({
-    store, authorities, actor: PRINCIPALS.harness, grant, callId,
-    operationId: 'op-probe-s-reserve-1', reservation: { task: 'probe-s' }, workspaceId: WS, now: T0, keyRegistry: probeKeys(),
+  // the escalation replay is idempotent: no second reconciliation event
+  const escalationReplay = await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken, outcome: 'unknown', reason: crashReason });
+  // blind retry: a direct finalize over the reconciled call is REFUSED
+  let blindRetryRefused = false;
+  try {
+    await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId, fencingToken: reserved.fencingToken, responseDigest, settlement, grant });
+  } catch (error) {
+    blindRetryRefused = error instanceof ReconciliationRequired;
+  }
+  const callAfterBlindRetry = await store.readExternalCall(callId);
+  // re-reserving the same operation replays the reconciled call — it can
+  // never escape reconciliation as a fresh charge
+  const reReserved = await reserveExternalCall({
+    store, authorities, actor: PRINCIPALS.harness, grant, callId, operationId,
+    reservation: { task: 'probe-s crash window: reserved + accepted, then the outcome is lost' },
+    workspaceId: WS, now: T0, keyRegistry: probeKeys(),
   });
+
+  // Phase 3 — the AUTHORIZED reconciliation decision. The reviewer issues a
+  // grant naming the EXACT resolving principal (evaluation_harness):
+  // issuer != beneficiary, the issuer MAC is verified at registration AND
+  // at every use, expiry against the injected clock (registerProviderGrant +
+  // requireGrant). The decision itself binds the observed state + reason to
+  // the resolution (replacement call + exact response digest + settlement).
+  const decisionGrant = {
+    contractVersion: '1.0.0',
+    grantId: 'grt-probe-s-reconcile-1',
+    authenticatedPrincipal: PRINCIPALS.harness,
+    tool: 'reconciliation-resolution',
+    workspaceId: WS,
+    modelAccess: { modelId: 'none', modelVersion: '1.0.0', access: 'inference_only' },
+    currency: 'none',
+    timeoutMs: 30000,
+    budget: { task: 0, campaign: 0, day: 0 },
+    noTraining: true,
+    noRetention: true,
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2027-01-01T00:00:00.000Z',
+  };
+  registerProviderGrant(authorities, {
+    grant: decisionGrant,
+    issuer: PRINCIPALS.reviewer,
+    signature: sign(PRINCIPALS.reviewer, 'kms://test/s2-006/reviewer-1', canonicalDigest(decisionGrant), { registry: probeKeys() }),
+    registry: probeKeys(),
+  });
+  const replacementCallId = 'call-probe-s-resolution-1';
+  const decision = {
+    decisionId: 'recd-probe-s-0001',
+    reconcilesCallId: callId,
+    observedState: callAfterCrash.state,
+    observedReason: callAfterCrash.reconcile_reason,
+    resolution: { replacementCallId, responseDigest, settlement },
+    decidedBy: PRINCIPALS.harness,
+    role: 'evaluation_harness',
+    authorityGrantRef: decisionGrant.grantId,
+    decidedAt: T0,
+  };
+  const decisionDigest = canonicalDigest(decision);
+  // negative: the SAME workspace's adjudicator — a valid role, but NOT the
+  // named actor — can never execute the decision.
+  let unauthorizedDecisionRefused = false;
+  try {
+    await reserveExternalCall({
+      store, authorities, actor: PRINCIPALS.adjudicator, grant: decisionGrant, callId: replacementCallId,
+      operationId, reservation: { reconcilesCallId: callId, decisionDigest }, workspaceId: WS, now: T0, keyRegistry: probeKeys(),
+    });
+  } catch (error) {
+    unauthorizedDecisionRefused = error instanceof AclDenied;
+  }
+  // authorized resolution: reserve -> accept -> finalize EXACTLY ONCE
+  const replacement = await reserveExternalCall({
+    store, authorities, actor: PRINCIPALS.harness, grant: decisionGrant, callId: replacementCallId,
+    operationId, reservation: { reconcilesCallId: callId, decisionDigest, purpose: 'authorized reconciliation resolution' },
+    workspaceId: WS, now: T0, keyRegistry: probeKeys(),
+  });
+  await acceptExternalCall({ store, actor: PRINCIPALS.harness, callId: replacementCallId, fencingToken: replacement.fencingToken });
+  const settled = await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId: replacementCallId, fencingToken: replacement.fencingToken, responseDigest, settlement, grant: decisionGrant });
+  // duplicate resolution replays WITHOUT a second settlement/event
+  const duplicateResolution = await finalizeExternalCall({ store, actor: PRINCIPALS.harness, callId: replacementCallId, fencingToken: replacement.fencingToken, responseDigest, settlement, grant: decisionGrant });
+
+  // whole-operation observability: exactly one FINALIZED event, exactly one
+  // reconciliation event, unique outbox event ids, no duplicate settlement
+  const outbox = store.listOutbox();
+  const outboxIds = outbox.map((e) => e.event_id);
+  const operationEvents = outbox.filter((e) => e.operation_id === operationId);
+  const finalizedEvents = operationEvents.filter((e) => e.event_type === 'EXTERNAL_CALL_FINALIZED');
+  const reconciliationEventCount = outbox.filter((e) => e.event_type === 'EXTERNAL_CALL_RECONCILIATION_REQUIRED').length;
+  const replacementRow = await store.readExternalCall(replacementCallId);
 
   // publish path: unknown commit outcome escalates, never blind-retries
   const publishStore = new InMemoryVerifierStore({ clock: () => T0 });
   publishStore.injectFault({ at: 'unknown-commit', once: true });
-  const artifact = claimArtifact('clm-probe-s-001', 'The 2025 audit confirmed a 5% backlog reduction.', [
-    { claimId: 'clm-probe-s-001', claimRevision: 1, segmentId: 'seg-probe-s' },
-  ]);
-  const request = verificationRequest({ requestId: 'svr-probe-s-0001', artifactId: artifact.artifactId, body: artifact.body });
-  const { result } = await verifyClaim(request, verifyOptions(artifact));
-  let escalated = false;
+  const publishArtifact = canonicalArtifact('claim', canonicalDocument('claim'));
+  const request = verificationRequest({ requestId: 'svr-probe-s-0001', ...publishArtifact });
+  const { result } = await verifyClaim(request, verifyOptions(publishArtifact));
+  let publishEscalated = false;
   try {
     await publishVerificationResult({ store: publishStore, authorities, actor: PRINCIPALS.harness, request, result, operationId: 'op-probe-s-publish-1' });
   } catch (error) {
-    escalated = error instanceof VerifierError && error.code === 'RECONCILIATION_REQUIRED';
+    publishEscalated = error instanceof VerifierError && error.code === 'RECONCILIATION_REQUIRED';
   }
-  let blindRetryRefused = false;
+  let publishBlindRetryRefused = false;
   try {
     await publishVerificationResult({ store: publishStore, authorities, actor: PRINCIPALS.harness, request, result, operationId: 'op-probe-s-publish-1' });
   } catch (error) {
-    blindRetryRefused = error instanceof VerifierError && error.code === 'RECONCILIATION_REQUIRED';
+    publishBlindRetryRefused = error instanceof VerifierError && error.code === 'RECONCILIATION_REQUIRED';
   }
   const publishOutbox = publishStore.listOutbox().filter((e) => e.operation_id === 'op-probe-s-publish-1');
   const ledger = publishStore.listLedger().find((l) => l.operationId === 'op-probe-s-publish-1');
 
   const offlineChecks = {
     reservationCommitted: reserved.replayed === false,
-    reconciledAfterCrash: callAfterCrash.state === 'RECONCILIATION_REQUIRED',
+    reconciledAfterCrash: escalation.state === 'RECONCILIATION_REQUIRED' && escalation.replayed === false
+      && callAfterCrash.state === 'RECONCILIATION_REQUIRED',
+    reconciliationReasonRecorded: callAfterCrash.reconcile_reason === crashReason,
+    reconciliationEventAtomicSingle: reconciliationEventCount === 1,
+    escalationReplayIdempotent: escalationReplay.replayed === true && reconciliationEventCount === 1,
     staleFencingDenied,
-    reconciliationReplayIdempotent: reconcileReplay.replayed === true,
-    reconciledStateStable: replayedCall.state === 'RECONCILIATION_REQUIRED',
-    noDuplicateEvents,
-    reservationReplayIdempotent: reservedAgain.replayed === true && reservedAgain.fencingToken === reserved.fencingToken,
-    publishEscalated: escalated,
-    publishBlindRetryRefused: blindRetryRefused,
+    blindRetryRefused,
+    reconciledCallNeverFinalized: callAfterBlindRetry.state === 'RECONCILIATION_REQUIRED' && callAfterBlindRetry.settlement === null,
+    reconciliationReplayIdempotent: escalationReplay.replayed === true,
+    reservationReplayIdempotent: reReserved.replayed === true && reReserved.fencingToken === reserved.fencingToken
+      && reReserved.state === 'RECONCILIATION_REQUIRED',
+    unauthorizedDecisionRefused,
+    reconciliationAuthorized: replacement.replayed === false && replacement.state === 'RESERVED',
+    resolutionSettledExactlyOnce: settled.state === 'FINALIZED' && settled.replayed === false
+      && finalizedEvents.length === 1 && replacementRow.settlement !== null,
+    duplicateResolutionReplayed: duplicateResolution.replayed === true && finalizedEvents.length === 1,
+    noDuplicateEvents: new Set(outboxIds).size === outboxIds.length
+      && finalizedEvents.length === 1 && reconciliationEventCount === 1,
+    publishEscalated,
+    publishBlindRetryRefused,
     noPublishOutbox: publishOutbox.length === 0,
     publishLedgerReconciliation: ledger?.status === 'RECONCILIATION_REQUIRED',
   };
@@ -1205,10 +1407,15 @@ async function probeS({ dbCrashPhase = null } = {}) {
     state: 'RECONCILIATION_REQUIRED', duplicateEvents: 0, blindRetry: 'refused',
     dbCrashPhase: status === 'pass' ? 'PASS' : 'NOT_RUN_DB',
   }, {
+    payloadSource: 'canonical-fixture:claim',
     ...offlineChecks,
     callStateAfterCrash: callAfterCrash.state,
-    settlementNull: callAfterCrash.settlement === null,
-    reservationReplayToken: reservedAgain.fencingToken,
+    settlementNull: callAfterCrash.settlement === null && replacementRow.state === 'FINALIZED',
+    observedReconciliationReason: callAfterCrash.reconcile_reason,
+    reconciliationEventCount,
+    operationFinalizedEvents: finalizedEvents.length,
+    reservationReplayToken: reReserved.fencingToken,
+    decisionBoundTo: { reconcilesCallId: decision.reconcilesCallId, observedState: decision.observedState, actor: decision.decidedBy },
     publishOutboxEvents: publishOutbox.length,
     publishLedgerStatus: ledger?.status ?? null,
     dbCrashPhase: dbPhase ? { ok: dbPhase.ok ?? false, status: dbPhase.status ?? null } : 'NOT_RUN_DB',

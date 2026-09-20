@@ -87,7 +87,9 @@ describe('S2-006 finding 7: well-formed owner-inputs package loads fail-closed a
 
 describe('S2-006 finding 7: the pipeline drives owner inputs to a verdict other than NEEDS_INPUT', () => {
   const pkg = loadOwnerInputs(FIXTURE_DIR).package;
-  const runPromise = runOwnerInputsPipeline({ pkg });
+  // review fix: redirect the evidence output — direct calls must not pollute
+  // the canonical evidence/ directory (module default).
+  const runPromise = runOwnerInputsPipeline({ pkg, evidenceDir: tmpEvidenceDir() });
 
   test('the fail-closed comparator accepts the two sealed owner runs', async () => {
     const run = await runPromise;

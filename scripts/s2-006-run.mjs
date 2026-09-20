@@ -750,10 +750,13 @@ const OWNER_RUN_PARAMS = {
   b: { runId: 's2-006-owner-run-b', executorId: 'exec-s2-006-owner-b', nonce: 'n-owner-b-8d24a7c1e5f90b32', clock: '2026-04-01T23:59:59.999Z', outputRoot: 'results/s2-006/owner-run-b' },
 };
 
-export async function runOwnerInputsPipeline({ pkg }) {
+export async function runOwnerInputsPipeline({ pkg, evidenceDir } = {}) {
+  // review fix: direct callers (tests) must be able to redirect the evidence
+  // output; the module default stays the canonical evidence/ directory.
+  const outDir = evidenceDir ? path.resolve(ROOT, String(evidenceDir)) : EVIDENCE_DIR;
   const sealed = {};
   for (const [key, params] of Object.entries(OWNER_RUN_PARAMS)) {
-    const out = path.join(EVIDENCE_DIR, `s2-006-owner-run-${key}.json`);
+    const out = path.join(outDir, `s2-006-owner-run-${key}.json`);
     const child = spawnSync(process.execPath, [
       path.join(ROOT, 'scripts/s2-006-run.mjs'),
       '--candidate',
@@ -764,6 +767,7 @@ export async function runOwnerInputsPipeline({ pkg }) {
       '--clock', params.clock,
       '--output-root', params.outputRoot,
       '--out', out,
+      ...(evidenceDir ? ['--evidence-dir', String(evidenceDir)] : []),
     ], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
     if (child.status !== 0) {
       return { ok: false, stage: 'candidate', error: `owner candidate run ${params.runId} exited ${child.status}: ${String(child.stderr ?? '').slice(-800)}`, comparison: null, metrics: null, decision: null };

@@ -35,7 +35,7 @@ import { randomBytes } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { computeCanonicalArgsDigest, verifyClaim } from '../src/lib/verifier/api.mjs';
-import { AclDenied, VerifierError } from '../src/lib/verifier/errors.mjs';
+import { AclDenied, ReconciliationRequired, VerifierError } from '../src/lib/verifier/errors.mjs';
 import { registerKey, sign } from '../src/lib/verifier/signature.mjs';
 import {
   makeVerifierAuthorityRegistry,
@@ -108,10 +108,13 @@ const HEX_B = 'b'.repeat(64);
 const HEX_C = 'c'.repeat(64);
 const HEX_D = 'd'.repeat(64);
 
-const PAYLOAD = {
-  statement: 'Replay fixture: trial X reported a 12% reduction in systolic blood pressure versus placebo.',
-  citations: [{ claimId: 'clm-src-0001', claimRevision: 1, segmentId: 'seg-0001' }],
-};
+// fix2: the replay artifact is the schema-valid canonical claim fixture —
+// the verifier fail-closed validates upstream payloads against the frozen
+// producer contract (review P1: ArtifactContractViolation), so a homemade
+// claim shape is correctly rejected before persistence.
+const PAYLOAD = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'tests/verifier/fixtures/canonical/claim.json'), 'utf8'),
+);
 
 function makeRequest() {
   const base = {
@@ -340,21 +343,61 @@ async function runChild({ schema, runId, executorId, out, databaseUrl }) {
   process.exit(report.status === 'COMPLETED' ? 0 : 2);
 }
 
-// ---- crash/restart phase (probe S DB half, review P2-6) ----------------------
-// Two SEPARATE OS processes per schema:
+// ---- crash/restart phase (probe S DB half; review P2-6 + fix2-D finding 5)
+// Two SEPARATE OS processes per schema drive the FULL production recovery
+// sequence — a recovery that finalizes an ACCEPTED call directly with a
+// pre-known digest/settlement is NOT reconciliation and fails this phase:
 //   crash-first : reserve -> accept -> abrupt death (exit 70) WITHOUT any
 //                 finalize — the provider outcome never lands;
-//   crash-recover: a NEW process/pool reconciles over the persisted fencing
-//                 token and completes EXACTLY ONE settlement; a duplicate
-//                 settlement replays idempotently, a stale fencing token is
-//                 refused, a finalized call cannot be dragged back into
-//                 reconciliation, and no ledger/outbox row is written twice.
+//   crash-recover: a NEW process/pool (1) OBSERVES the atomic escalation of
+//                 the call into RECONCILIATION_REQUIRED (state + reason +
+//                 exactly one outbox event, one transaction), (2) proves the
+//                 reconciled call is fenced (stale fencing refused,
+//                 escalation replay idempotent, direct finalize = blind
+//                 retry REFUSED, settlement stays null), (3) resolves the
+//                 outcome through an AUTHORIZED reconciliation decision — a
+//                 reviewer-issued grant naming the EXACT resolving actor —
+//                 whose replacement call settles EXACTLY ONCE, and (4) a
+//                 duplicate resolution replays without a second event.
 
 const CRASH_CALL = 'call-s2006-crash-1';
 const CRASH_OPERATION = 'op-s2006-crash-external-1';
-const CRASH_RESERVATION = { purpose: 'crash/restart replay: reserved + accepted, then the process dies without finalize' };
+const CRASH_RESOLUTION_CALL = 'call-s2006-crash-resolution-1';
+const CRASH_REASON = 'crash/restart replay: process 1 died after REQUEST_ACCEPTED; provider outcome unknown';
 const CRASH_RESPONSE_DIGEST = canonicalDigest({ replay: 'crash-recovery', verdict: 'INSUFFICIENT_EVIDENCE' });
-const CRASH_SETTLEMENT = { amount: 0, currency: 'none', note: 'crash-recovery settlement; fenced, exactly once' };
+const CRASH_SETTLEMENT = { amount: 0, currency: 'none', note: 'authorized reconciliation settlement; fenced, exactly once' };
+const CRASH_RESERVATION = { purpose: 'crash/restart replay: reserved + accepted, then the process dies without finalize' };
+const CRASH_DECISION = {
+  decisionId: 'recd-s2006-crash-1',
+  reconcilesCallId: CRASH_CALL,
+  resolution: { replacementCallId: CRASH_RESOLUTION_CALL, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT },
+  role: 'evaluation_harness',
+};
+
+// The reconciliation decision grant: reviewer-ISSUED, names the EXACT
+// resolving actor (the evaluation harness). registerProviderGrant verifies
+// the issuer role/workspace, non-self-issuance and the issuer MAC at
+// registration; requireGrant re-verifies registry resolution, digest,
+// issuer/beneficiary separation, expiry (against the injected clock) and
+// the MAC at EVERY use — a decision without this authority cannot reserve
+// the resolution call.
+function reconciliationDecisionGrant() {
+  return {
+    contractVersion: '1.0.0',
+    grantId: 'grt-s2006-crash-reconcile',
+    authenticatedPrincipal: ACTOR,
+    tool: 'reconciliation-resolution',
+    workspaceId: WORKSPACE,
+    modelAccess: { modelId: 'none', modelVersion: '1.0.0', access: 'inference_only' },
+    currency: 'none',
+    timeoutMs: 30000,
+    budget: { task: 0, campaign: 0, day: 0 },
+    noTraining: true,
+    noRetention: true,
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2027-01-01T00:00:00.000Z',
+  };
+}
 
 async function crashFirstChild({ schema, executorId, stateFile, databaseUrl }) {
   const pg = (await import('pg')).default;
@@ -376,7 +419,7 @@ async function crashFirstChild({ schema, executorId, stateFile, databaseUrl }) {
   }, null, 2)}\n`);
   await pool.end();
   // die as designed: no finalize, no settlement — the recovery process must
-  // reconcile over the fencing token
+  // observe the reconciliation escalation before ANY outcome is recorded
   process.exit(70);
 }
 
@@ -386,12 +429,13 @@ async function crashRecoverChild({ schema, runId, executorId, stateFile, out, da
   const pool = new pg.Pool({ connectionString: databaseUrl, max: 1, options: `-c search_path=${schema}` });
   const store = new PostgresVerifierStore(pool, { clock: FIXED_CLOCK });
   const checks = {};
+  const count = async (sql, params = []) => Number((await pool.query(sql, params)).rows[0].n);
 
   // 1. the crashed process left the call in ACCEPTED (crash after REQUEST_ACCEPTED)
   const crashed = await store.readExternalCall(handoff.callId);
   checks.crashedCallObservedInAcceptedState = crashed?.state === 'ACCEPTED' && Number(crashed.fencing_token) === handoff.fencingToken;
 
-  // 2. a stale fencing token can never settle the call
+  // 2. a stale fencing token can never touch the call
   let staleRefused = false;
   try {
     await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken + 999, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
@@ -400,48 +444,118 @@ async function crashRecoverChild({ schema, runId, executorId, stateFile, out, da
   }
   checks.staleFencingRefused = staleRefused;
 
-  // 3. reconciliation over the fencing token completes EXACTLY ONE settlement
-  const settled = await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
-  checks.exactlyOneSettlement = settled.state === 'FINALIZED' && settled.replayed === false;
+  // 3. OBSERVED atomic escalation (fix2-C mechanism): the unknown outcome
+  // moves the call into RECONCILIATION_REQUIRED — state + reason + outbox
+  // event in ONE transaction. The recovery process finalizes NOTHING here.
+  const escalated = await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, outcome: 'unknown', reason: CRASH_REASON, workspaceId: WORKSPACE });
+  const reconciled = await store.readExternalCall(handoff.callId);
+  checks.reconciliationObserved = escalated.state === 'RECONCILIATION_REQUIRED' && escalated.replayed === false
+    && reconciled.state === 'RECONCILIATION_REQUIRED';
+  checks.reconciliationReasonRecorded = reconciled.reconcile_reason === CRASH_REASON;
 
-  // 4. a duplicate settlement attempt replays WITHOUT a second event
-  const duplicate = await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
-  checks.duplicateFinalizeReplayed = duplicate.replayed === true;
+  // 4. the escalation replay is idempotent: no second reconciliation event
+  const escalateAgain = await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, outcome: 'unknown', reason: CRASH_REASON, workspaceId: WORKSPACE });
+  checks.escalationReplayIdempotent = escalateAgain.replayed === true
+    && (await count("SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE event_type = 'EXTERNAL_CALL_RECONCILIATION_REQUIRED' AND record_id = $1", [handoff.callId])) === 1;
 
-  // 5. a finalized call can never be dragged back into reconciliation
-  let dragBackRefused = false;
+  // 5. BLIND RETRY REFUSED: a direct finalize over the reconciled call can
+  // never record a result; the call stays RECONCILIATION_REQUIRED, null-settled.
+  let blindRetryRefused = false;
   try {
-    await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, outcome: 'unknown', reason: 'drag-back attempt after FINALIZED' });
+    await finalizeExternalCall({ store, actor: ACTOR, callId: handoff.callId, fencingToken: handoff.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: GRANT });
   } catch (error) {
-    dragBackRefused = error instanceof VerifierError && error.code === 'INVALID_TRANSITION';
+    blindRetryRefused = error instanceof ReconciliationRequired;
   }
-  checks.finalizedCallNotDraggedBack = dragBackRefused;
+  checks.blindRetryRefused = blindRetryRefused;
+  const afterBlindRetry = await store.readExternalCall(handoff.callId);
+  checks.reconciledCallNeverFinalized = afterBlindRetry.state === 'RECONCILIATION_REQUIRED' && afterBlindRetry.settlement === null;
 
-  // counts over the whole schema: no duplicate ledger/outbox writes, exactly
-  // one settlement row for the crash call
-  const count = async (sql, params = []) => Number((await pool.query(sql, params)).rows[0].n);
+  // 6. the AUTHORIZED reconciliation decision: a reviewer-issued grant names
+  // the exact resolving actor; a same-workspace principal with a different
+  // identity (the adjudicator) and an unregistered forged grant are both
+  // REFUSED before any resolution call can exist.
+  const decisionGrant = reconciliationDecisionGrant();
+  registerProviderGrant(AUTHORITIES, {
+    grant: decisionGrant,
+    issuer: GRANT_ISSUER,
+    signature: sign(GRANT_ISSUER, GRANT_KEY_REF, canonicalDigest(decisionGrant), { registry: GRANT_KEY_REGISTRY }),
+    registry: GRANT_KEY_REGISTRY,
+  });
+  const decisionReservation = {
+    reconcilesCallId: handoff.callId,
+    observedState: reconciled.state,
+    observedReason: reconciled.reconcile_reason,
+    decisionDigest: canonicalDigest({ ...CRASH_DECISION, observedState: reconciled.state, observedReason: reconciled.reconcile_reason }),
+  };
+  let wrongActorRefused = false;
+  try {
+    await reserveExternalCall({
+      store, authorities: AUTHORITIES, actor: ADJUDICATOR, grant: decisionGrant,
+      callId: CRASH_RESOLUTION_CALL, operationId: CRASH_OPERATION,
+      reservation: decisionReservation, workspaceId: WORKSPACE,
+      now: FIXED_CLOCK(), keyRegistry: GRANT_KEY_REGISTRY,
+    });
+  } catch (error) {
+    wrongActorRefused = error instanceof AclDenied;
+  }
+  const forgedGrant = { ...decisionGrant, grantId: 'grt-s2006-crash-reconcile-forged' };
+  let forgedGrantRefused = false;
+  try {
+    await reserveExternalCall({
+      store, authorities: AUTHORITIES, actor: ACTOR, grant: forgedGrant,
+      callId: 'call-s2006-crash-forged', operationId: CRASH_OPERATION,
+      reservation: decisionReservation, workspaceId: WORKSPACE,
+      now: FIXED_CLOCK(), keyRegistry: GRANT_KEY_REGISTRY,
+    });
+  } catch (error) {
+    forgedGrantRefused = error instanceof AclDenied;
+  }
+  checks.unauthorizedDecisionRefused = wrongActorRefused && forgedGrantRefused;
+
+  // 7. authorized resolution: the replacement call settles EXACTLY ONCE.
+  const replacement = await reserveExternalCall({
+    store, authorities: AUTHORITIES, actor: ACTOR, grant: decisionGrant,
+    callId: CRASH_RESOLUTION_CALL, operationId: CRASH_OPERATION,
+    reservation: { ...decisionReservation, purpose: 'authorized reconciliation resolution' },
+    workspaceId: WORKSPACE, now: FIXED_CLOCK(), keyRegistry: GRANT_KEY_REGISTRY,
+  });
+  checks.reconciliationDecisionAuthorized = replacement.replayed === false && replacement.state === 'RESERVED';
+  await acceptExternalCall({ store, actor: ACTOR, callId: replacement.callId, fencingToken: replacement.fencingToken, workspaceId: WORKSPACE });
+  const settled = await finalizeExternalCall({ store, actor: ACTOR, callId: replacement.callId, fencingToken: replacement.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: decisionGrant });
+  checks.resolutionSettledExactlyOnce = settled.state === 'FINALIZED' && settled.replayed === false;
+  // 8. a duplicate resolution replays WITHOUT a second event
+  const duplicate = await finalizeExternalCall({ store, actor: ACTOR, callId: replacement.callId, fencingToken: replacement.fencingToken, responseDigest: CRASH_RESPONSE_DIGEST, settlement: CRASH_SETTLEMENT, workspaceId: WORKSPACE, grant: decisionGrant });
+  checks.duplicateResolutionReplayed = duplicate.replayed === true;
+
+  // counts over the whole schema: no duplicate ledger/outbox writes, the
+  // reconciled call is never finalized, the operation settled EXACTLY once
   const counts = {};
   counts.outboxTotal = await count('SELECT count(*)::int AS n FROM verifier_audit_outbox');
   counts.ledgerTotal = await count('SELECT count(*)::int AS n FROM verifier_operation_ledger');
   counts.externalCallRows = await count('SELECT count(*)::int AS n FROM verifier_external_call_run');
   counts.crashCallEvents = await count('SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE record_id = $1', [handoff.callId]);
+  counts.crashCallReconciliationEvents = await count("SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE record_id = $1 AND event_type = 'EXTERNAL_CALL_RECONCILIATION_REQUIRED'", [handoff.callId]);
   counts.crashCallFinalizedEvents = await count("SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE record_id = $1 AND event_type = 'EXTERNAL_CALL_FINALIZED'", [handoff.callId]);
-  counts.crashCallSettlements = await count("SELECT count(*)::int AS n FROM verifier_external_call_run WHERE call_id = $1 AND state = 'FINALIZED' AND settlement IS NOT NULL", [handoff.callId]);
+  counts.operationFinalizedEvents = await count("SELECT count(*)::int AS n FROM verifier_audit_outbox WHERE operation_id = $1 AND event_type = 'EXTERNAL_CALL_FINALIZED'", [CRASH_OPERATION]);
+  counts.operationSettledCalls = await count("SELECT count(*)::int AS n FROM verifier_external_call_run WHERE operation_id = $1 AND state = 'FINALIZED' AND settlement IS NOT NULL", [CRASH_OPERATION]);
   counts.duplicateOutboxIds = await count('SELECT count(*)::int AS n FROM (SELECT event_id FROM verifier_audit_outbox GROUP BY event_id HAVING count(*) > 1) AS d');
   const countsExpected = {
-    outboxTotal: 9, // 3 publishes + replay-call RESERVED/ACCEPTED/FINALIZED + crash-call RESERVED/ACCEPTED/FINALIZED
+    outboxTotal: 12, // 3 publishes + main call RESERVED/ACCEPTED/FINALIZED + crash call RESERVED/ACCEPTED/RECONCILIATION_REQUIRED + resolution call RESERVED/ACCEPTED/FINALIZED
     ledgerTotal: 3,
-    externalCallRows: 2,
+    externalCallRows: 3, // main replay call + reconciled crash call + authorized resolution call
     crashCallEvents: 3,
-    crashCallFinalizedEvents: 1,
-    crashCallSettlements: 1,
+    crashCallReconciliationEvents: 1,
+    crashCallFinalizedEvents: 0, // the reconciled call is NEVER finalized
+    operationFinalizedEvents: 1, // the authorized resolution settles EXACTLY once
+    operationSettledCalls: 1,
     duplicateOutboxIds: 0,
   };
+  checks.reconciliationEventAtomicSingle = counts.crashCallReconciliationEvents === 1 && counts.crashCallEvents === 3;
   const countsOk = Object.entries(countsExpected).every(([k, v]) => counts[k] === v);
   const report = {
     schemaVersion: 1,
     ticket: 'S2-006',
-    role: 'crash/restart replay (probe S DB half): the first process died after REQUEST_ACCEPTED (exit 70, no finalize); this recovery process reconciled over the fencing token and completed exactly one settlement',
+    role: 'crash/restart replay (probe S DB half): the first process died after REQUEST_ACCEPTED (exit 70, no finalize); this recovery process OBSERVED the atomic RECONCILIATION_REQUIRED escalation, proved blind retry is refused, resolved the outcome through an AUTHORIZED reconciliation decision (reviewer-issued, actor-exact) and settled EXACTLY once',
     runId,
     executorId,
     schema,
@@ -449,6 +563,7 @@ async function crashRecoverChild({ schema, runId, executorId, stateFile, out, da
     crashFirstPid: handoff.crashFirstPid,
     crashFirstExecutor: handoff.crashFirstExecutor,
     fencingToken: handoff.fencingToken,
+    decision: { decisionGrantRef: decisionGrant.grantId, decidedBy: ACTOR, reconcilesCallId: handoff.callId },
     checks,
     counts,
     countsExpected,

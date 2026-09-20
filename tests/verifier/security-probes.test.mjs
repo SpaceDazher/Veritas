@@ -5,9 +5,41 @@
 // 'not_run' — never silently green. Probe S is green ONLY through the
 // PostgreSQL crash/restart phase of scripts/s2-006-db-replay.mjs; the
 // aggregate hard counters must stay zero.
+//
+// fix2-D finding: every artifact a probe feeds through api.verifyClaim is a
+// schema-valid CANONICAL producer document (the frozen fixtures under
+// tests/verifier/fixtures/canonical or a content-derived variant of one) —
+// homemade { statement, citations } bodies are a frozen-contract violation
+// and must never reach the verifier again.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
+import Ajv2020 from 'ajv/dist/2020.js';
 import { PROBE_IDS, runAllSecurityProbes, runSecurityProbe } from '../../src/lib/verifier/probes.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+// The REAL frozen producer schemas are the source of truth (never a
+// test-only shape): every canonical fixture the probes build on must
+// validate against them before any probe runs.
+const PRODUCER_CONTRACTS = Object.freeze(['claim', 'evidence-map', 'hypothesis-card', 'synthesis-result']);
+const PRODUCER_AJV = (() => {
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  for (const name of PRODUCER_CONTRACTS) {
+    ajv.addSchema(JSON.parse(fs.readFileSync(path.join(ROOT, 'contracts', `${name}.schema.json`), 'utf8')));
+  }
+  return ajv;
+})();
+for (const name of PRODUCER_CONTRACTS) {
+  const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/verifier/fixtures/canonical', `${name}.json`), 'utf8'));
+  const validate = PRODUCER_AJV.getSchema(`https://veritas.local/contracts/${name}.schema.json`);
+  assert.equal(
+    validate(doc), true,
+    `canonical fixture ${name} must be schema-valid: ${PRODUCER_AJV.errorsText(validate.errors)}`,
+  );
+}
 
 // run once at module load (top-level await is fine in ESM, describe bodies
 // must stay synchronous)
@@ -120,4 +152,39 @@ describe('S2-006 security probes: honest offline statuses (review P2-6)', () => 
       }
     });
   }
+});
+
+// REGRESSION (fix2-D): the artifact-level probes must run on CANONICAL
+// producer documents. Before the fix the probes fed homemade
+// { statement, citations } bodies, which fix2-C correctly rejects as
+// ArtifactContractViolation — the suite could not even load. The observed
+// surface now names the exact frozen fixture (or derived variant) every
+// artifact-level probe is built on.
+describe('S2-006 security probes: canonical producer payloads (fix2-D)', () => {
+  test('artifact-level probes E, M, N, P, S declare canonical fixture payloads', async () => {
+    const expectedPayloadSource = {
+      E: 'canonical-fixture:claim',
+      M: 'canonical-fixture:claim',
+      N: 'canonical-fixture:evidence-map+hypothesis-card',
+      P: 'canonical-fixture:evidence-map+synthesis-result',
+      S: 'canonical-fixture:claim',
+    };
+    for (const [id, payloadSource] of Object.entries(expectedPayloadSource)) {
+      const probe = await runSecurityProbe(id);
+      assert.equal(probe.observed.payloadSource, payloadSource, `probe ${id} payload source`);
+    }
+  });
+
+  test('derived probe variants stay schema-valid canonical documents (content mutations, not shape changes)', async () => {
+    // probe E derives a persuasive variant of the canonical claim by
+    // mutating normalized_text content — the mutation must stay a valid
+    // claim document, and the citation check must still abstain
+    // deterministically for BOTH the untouched fixture and the variant.
+    const probeE = await runSecurityProbe('E');
+    assert.equal(probeE.observed.payloadSource, 'canonical-fixture:claim');
+    assert.equal(probeE.observed.canonicalFixtureVerdict, 'INSUFFICIENT_EVIDENCE');
+    assert.equal(probeE.observed.derivedVariantVerdict, 'INSUFFICIENT_EVIDENCE');
+    assert.equal(probeE.observed.abstention, 'NO_CITATION');
+    assert.notEqual(probeE.observed.derivedVariantText, probeE.observed.canonicalFixtureText, 'the variant must be a real content mutation');
+  });
 });
