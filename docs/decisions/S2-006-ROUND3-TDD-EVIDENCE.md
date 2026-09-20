@@ -1,6 +1,6 @@
 # S2-006 round-three closure — TDD evidence
 
-Date: 2026-09-19  
+Date: 2026-09-19
 Branch: `codex/s2-006-independent-semantic-verifier`
 
 ## RED

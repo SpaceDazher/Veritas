@@ -35,6 +35,10 @@
         {
           "name": "0006_verifier_acl.sql",
           "sha256": "022ada4102f7f229313cb30f985e8bd04cd08a52b723847bf50c4b8e14c1b7b4"
+        },
+        {
+          "name": "0007_verifier_store_hardening.sql",
+          "sha256": "79be88b216f4b4bc4b2d26a97e916c917240d951798905dab9122e6982089dfb"
         }
       ]
     },
@@ -64,13 +68,17 @@
         {
           "name": "0006_verifier_acl.sql",
           "sha256": "022ada4102f7f229313cb30f985e8bd04cd08a52b723847bf50c4b8e14c1b7b4"
+        },
+        {
+          "name": "0007_verifier_store_hardening.sql",
+          "sha256": "79be88b216f4b4bc4b2d26a97e916c917240d951798905dab9122e6982089dfb"
         }
       ]
     }
   ],
   "pids": {
-    "run_a": 13440,
-    "run_b": 14104
+    "run_a": 15616,
+    "run_b": 16264
   },
   "executors": {
     "run_a": "exec-db-s2006-a",
@@ -104,12 +112,12 @@
     },
     "pids": {
       "recovery": {
-        "run_a": 22748,
-        "run_b": 29956
+        "run_a": 19236,
+        "run_b": 19960
       },
       "crash_first": {
-        "run_a": 18644,
-        "run_b": 5116
+        "run_a": 30676,
+        "run_b": 24164
       }
     },
     "fencingToken": 2,

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "verification aggregator: dependency gate (records owner-input state), contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + honest probe statuses), DB replay status with crash/restart phase and the DERIVED §16 verdict",
-  "testedImplementationCommit": "77c3607449a679383860930694947133640624df",
+  "testedImplementationCommit": "1381f3815c79c4d076647deace13bef35159c046",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
   "gates": {
     "dependency": {
@@ -14,16 +14,16 @@
     "types": {
       "status": "IN_SYNC",
       "exitCode": 0,
-      "detail": "{\"ok\":true,\"bytes\":22876,\"contracts\":14}"
+      "detail": "{\"ok\":true,\"bytes\":23704,\"contracts\":15}"
     },
     "testVerifier": {
       "status": "PASS",
       "exitCode": 0,
       "counts": {
-        "tests": 302,
-        "pass": 298,
+        "tests": 299,
+        "pass": 293,
         "fail": 0,
-        "skipped": 4
+        "skipped": 6
       }
     },
     "evidenceRun": {
