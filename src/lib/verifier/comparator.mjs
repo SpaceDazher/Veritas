@@ -9,9 +9,15 @@
 //   * split membership matches the frozen manifest;
 //   * every case/rubric/label byte digest recomputed and equal to the
 //     manifest;
-//   * annotation-set signatures verified over the exact binding digest by
-//     the shared signature core (contracts/annotation-set.schema.json
-//     envelope: scheme hmac-sha256, keyRef, digest=MAC, verified, attestedBy);
+//   * annotation-set signatures AND adjudicator-identity attestations are
+//     verified over the exact binding digests by the ONE custody-aware core
+//     signature.verifyDetailed (contracts/annotation-set.schema.json
+//     envelope: scheme hmac-sha256, keyRef, digest=MAC, verified,
+//     attestedBy; contracts/adjudication-record.schema.json
+//     adjudicatorIdentity): the keyRef must exist in the caller-provided
+//     custody registry and be held by exactly the annotator/adjudicator
+//     principal of record (review fix2-E: a valid MAC under a foreign or
+//     shared key is rejected — the comparator never recomputes HMACs);
 //   * annotator principals come from the annotation-set data itself
 //     (annotatorId fields) or the expectedAnnotators argument — never from
 //     hardcoded ids (review P1-4b);
@@ -25,13 +31,15 @@
 //   * zero hard counters in both run manifests.
 //
 // Node stdlib only; no producer-semantics imports (spec §3).
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { canonicalDigest } from './canonical-json.mjs';
+import { verifyDetailed as verifySignatureDetailed } from './signature.mjs';
 
 export const COMPARATOR_RULE = 'exact';
 
-const SIGNATURE_SCHEME = 'hmac-sha256';
+// Frozen contract envelope shapes (contracts/*.schema.json):
 const SIGNATURE_KEYS = ['scheme', 'keyRef', 'digest', 'verified', 'attestedBy'];
+const ADJUDICATOR_IDENTITY_KEYS = ['principalId', 'role', 'authenticated', 'attestationDigest'];
 
 const sha256Bytes = (buf) => createHash('sha256').update(buf).digest('hex');
 
@@ -72,39 +80,97 @@ export function caseLabelsDigest(caseId, entries) {
   });
 }
 
-function verifySetSignature(set, hmacKey, failures) {
+// Exact attestation binding of an adjudication record: the canonical digest
+// of every field EXCEPT the adjudicatorIdentity envelope itself (which
+// carries the MAC as attestationDigest). The identity attests exactly the
+// decision content and its manifest/rubric/thresholds bindings.
+export function adjudicationAttestationDigest(rec) {
+  const { adjudicatorIdentity, ...attestedContent } = rec ?? {};
+  return canonicalDigest(attestedContent);
+}
+
+// DEPRECATED fixture-mode compatibility (review fix2-E). Synthesizes a
+// custody registry from ONE shared fixture HMAC key for legacy callers that
+// still pass the retired annotationHmacKey parameter (scripts/s2-006-run.mjs,
+// probes.mjs) on the frozen fixture corpus. keyRefs observed under more than
+// one annotator principal are poisoned: one custody key can never serve two
+// principals, no matter how valid the MAC is. LIMITATION (accepted, fixture
+// only): a brand-new keyRef minted by a holder of the shared secret passes —
+// which is exactly why the parameter is retired; real callers MUST pass
+// signatureKeyRegistry. Delete this shim once every caller migrated.
+function buildFixtureCompatRegistry(sharedKey, labelSets) {
+  const custodians = new Map();
+  for (const set of Object.values(labelSets)) {
+    const keyRef = set?.signature?.keyRef;
+    if (typeof keyRef !== 'string' || keyRef.length === 0) continue;
+    if (typeof set.annotatorId !== 'string' || set.annotatorId.length === 0) continue;
+    if (!custodians.has(keyRef)) custodians.set(keyRef, new Set());
+    custodians.get(keyRef).add(set.annotatorId);
+  }
+  const registry = new Map();
+  const sharedKeyRefs = new Set();
+  for (const [keyRef, who] of custodians) {
+    if (who.size === 1) registry.set(keyRef, { secret: sharedKey, custodian: [...who][0], role: 'annotator' });
+    else sharedKeyRefs.add(keyRef);
+  }
+  return { registry, sharedKeyRefs, fixture: true };
+}
+
+// ONE custody-aware verifying core for every annotation-set envelope:
+// signature.verifyDetailed enforces the exact contract shape, the scheme,
+// the verified gate, keyRef existence in the registry, custody
+// (key.custodian === attestedBy === annotator of record) and the MAC over
+// the exact binding digest, constant-time. The comparator itself never
+// recomputes an HMAC (review fix2-E).
+function verifySetSignature(set, sigCtx, failures) {
   const sig = set?.signature;
-  const shapeOk = typeof sig === 'object' && sig !== null
+  const id = set?.annotationSetId ?? '<unknown-set>';
+  const shapeOk = typeof sig === 'object' && sig !== null && !Array.isArray(sig)
     && SIGNATURE_KEYS.every((k) => Object.prototype.hasOwnProperty.call(sig, k))
     && Object.keys(sig).length === SIGNATURE_KEYS.length
-    && sig.scheme === SIGNATURE_SCHEME
-    && sig.verified === true
-    && typeof sig.keyRef === 'string' && sig.keyRef.length > 0
-    && typeof sig.digest === 'string' && sig.digest.length > 0
-    && typeof sig.attestedBy === 'string' && sig.attestedBy.length > 0;
+    && ['keyRef', 'digest', 'attestedBy'].every((k) => typeof sig[k] === 'string' && sig[k].length > 0);
   if (!shapeOk) {
-    fail(failures, 'signature_unverifiable', `${set?.annotationSetId}: only a verified contract-shaped hmac-sha256 signature block (annotation-set contract) is accepted offline`);
+    fail(failures, 'signature_unverifiable', `${id}: only a verified contract-shaped hmac-sha256 signature block (annotation-set contract) is accepted offline`);
     return;
   }
-  if (typeof hmacKey !== 'string' || hmacKey.length === 0) {
-    fail(failures, 'signature_key_unavailable', `${set.annotationSetId}: no HMAC key in custody — failing closed, not trusting the attestation`);
+  if (!sigCtx) {
+    fail(failures, 'signature_key_unavailable', `${id}: no signature key registry in custody — failing closed, not trusting the attestation`);
     return;
   }
-  // the attesting subject named in the envelope must be the annotator of
-  // record carried by the data (no hardcoded principal ids)
-  if (sig.attestedBy !== set.annotatorId) {
-    fail(failures, 'signature_invalid', `${set.annotationSetId}: signature attested by ${sig.attestedBy}, not the annotator of record ${set.annotatorId}`);
+  if (sigCtx.sharedKeyRefs.has(sig.keyRef)) {
+    fail(failures, 'signature_rejected', `${id}: keyRef ${sig.keyRef} is observed under more than one annotator — one custody key can never serve two principals`);
     return;
   }
-  const binding = annotationSetBindingDigest(set);
-  // same MAC construction as the shared signature core:
-  // HMAC(secret, scheme || 0x00 || subject || 0x00 || keyRef || 0x00 || bindingDigest)
-  const expected = createHmac('sha256', hmacKey)
-    .update([sig.scheme, sig.attestedBy, sig.keyRef, binding].join('\u0000'), 'utf8')
-    .digest('hex');
-  const got = sig.digest;
-  const equal = got.length === expected.length && timingSafeEqual(Buffer.from(got), Buffer.from(expected));
-  if (!equal) fail(failures, 'signature_invalid', `${set.annotationSetId}: signature does not verify over the exact binding digest`);
+  const verdict = verifySignatureDetailed(sig, set.annotatorId, annotationSetBindingDigest(set), { registry: sigCtx.registry });
+  if (!verdict.ok) fail(failures, 'signature_rejected', `${id}: custody-aware signature verification rejected (${verdict.reason})`);
+}
+
+// Adjudicator identities go through the SAME core. Structural contract
+// checks run first; on the registry path the attestationDigest is verified
+// as a MAC over adjudicationAttestationDigest(rec) with the adjudicator's
+// custody key (resolved by verifyDetailed from the registry). In deprecated
+// fixture mode there is no adjudicator custody key: structural checks only,
+// the opaque fixture attestationDigest is NOT trusted as a MAC.
+function verifyAdjudicationIdentity(rec, annotators, sigCtx, failures) {
+  const identity = rec?.adjudicatorIdentity;
+  const id = rec?.adjudicationId ?? '<unknown-adjudication>';
+  const shapeOk = typeof identity === 'object' && identity !== null && !Array.isArray(identity)
+    && ADJUDICATOR_IDENTITY_KEYS.every((k) => Object.prototype.hasOwnProperty.call(identity, k))
+    && Object.keys(identity).length === ADJUDICATOR_IDENTITY_KEYS.length
+    && identity.role === 'adjudicator'
+    && identity.authenticated === true
+    && typeof identity.principalId === 'string' && identity.principalId.length > 0
+    && typeof identity.attestationDigest === 'string' && identity.attestationDigest.length > 0;
+  if (!shapeOk) {
+    fail(failures, 'signature_unverifiable', `${id}: only a fully authenticated adjudicator-identity block (adjudication-record contract) is accepted offline`);
+    return;
+  }
+  if (annotators.includes(identity.principalId)) {
+    fail(failures, 'annotator_set_mismatch', `${id}: adjudicator ${identity.principalId} is one of the annotators of record — self-review is refused`);
+  }
+  if (!sigCtx || sigCtx.fixture) return;
+  const verdict = verifySignatureDetailed(identity, identity.principalId, adjudicationAttestationDigest(rec), { registry: sigCtx.registry });
+  if (!verdict.ok) fail(failures, 'signature_rejected', `${id}: custody-aware adjudicator attestation rejected (${verdict.reason})`);
 }
 
 // input: {
@@ -114,7 +180,17 @@ function verifySetSignature(set, hmacKey, failures) {
 //   labelSets: {annotationSetId: set},
 //   adjudications: [record],
 //   thresholdsDigest,
+//   signatureKeyRegistry: Map<keyRef, {secret, custodian, role}>
+//     // REQUIRED for real (production) use: the custody registry of every
+//     // signing principal, built with signature.registerKey (see
+//     // tests/verifier/fixtures/keys.json). Every annotation-set signature
+//     // and every adjudicator attestation is verified through the ONE
+//     // custody-aware core signature.verifyDetailed against it.
 //   annotationHmacKey,
+//     // @deprecated FIXTURE-ONLY compatibility shim for legacy callers:
+//     // synthesizes a registry from ONE shared key and fails closed on any
+//     // keyRef observed under more than one annotator. Do NOT use in new
+//     // code; to be deleted once scripts/* migrated (review fix2-E).
 //   expectedAnnotators?: [principalId, ...]  // pins the required annotator pair;
 //                                            // defaults to the annotators in the data
 //   runA, runB: {runId, executorId, pid, nonce, outputRoot, implementationDigest,
@@ -124,8 +200,20 @@ export function compareRuns(input) {
   const failures = [];
   const {
     manifest, manifestBytes, rubricBytes, cases = [], labelSets = {}, adjudications = [],
-    thresholdsDigest = null, annotationHmacKey = null, expectedAnnotators = null, runA, runB,
+    thresholdsDigest = null, signatureKeyRegistry = null, annotationHmacKey = null,
+    expectedAnnotators = null, runA, runB,
   } = input ?? {};
+
+  // ---- signature verification context (fix2-E: one custody-aware core)
+  let sigCtx = null;
+  if (signatureKeyRegistry !== null && signatureKeyRegistry !== undefined) {
+    if (!(signatureKeyRegistry instanceof Map)) {
+      throw new TypeError('signatureKeyRegistry must be a Map (keyRef -> {secret, custodian, role}) built with signature.registerKey');
+    }
+    sigCtx = { registry: signatureKeyRegistry, sharedKeyRefs: new Set(), fixture: false };
+  } else if (typeof annotationHmacKey === 'string' && annotationHmacKey.length > 0) {
+    sigCtx = buildFixtureCompatRegistry(annotationHmacKey, labelSets); // deprecated
+  }
 
   // ---- frozen bytes
   if (!manifest || !manifestBytes || !rubricBytes) {
@@ -174,6 +262,7 @@ export function compareRuns(input) {
   }
 
   // ---- labels: per-case digest binding, signatures, blinding
+  // (every signature runs through the single custody-aware core)
   for (const set of Object.values(labelSets)) {
     if (set.blindAssignment && !Object.values(set.blindAssignment).every(Boolean)) {
       fail(failures, 'signature_invalid', `${set.annotationSetId}: annotation set is not fully blind`);
@@ -181,7 +270,7 @@ export function compareRuns(input) {
     if (set.rubricDigest !== manifest.rubricDigest) {
       fail(failures, 'digest_mismatch', `${set.annotationSetId}: rubric digest != manifest rubricDigest`);
     }
-    verifySetSignature(set, annotationHmacKey, failures);
+    verifySetSignature(set, sigCtx, failures);
   }
   const labelEntry = (caseId, annotatorId) => {
     for (const set of Object.values(labelSets)) {
@@ -206,6 +295,13 @@ export function compareRuns(input) {
   if (annotators.length < 2) {
     fail(failures, 'incomplete_case_set', `independent labeling requires at least two distinct annotators, found ${annotators.length}`);
   }
+
+  // ---- adjudicator identities: contract shape, no self-review, and on the
+  // registry path a custody-checked MAC over the attested record content
+  for (const rec of adjudications) {
+    verifyAdjudicationIdentity(rec, annotators, sigCtx, failures);
+  }
+
   for (const c of cases) {
     const found = [];
     let missing = false;
