@@ -525,6 +525,22 @@ describe('S2-006 comparator: adjudicator identity is custody-verified (finding 6
     assert.equal(report.ok, false);
     assert.ok(report.failures.some((f) => f.code === 'signature_unverifiable'));
   });
+
+  test('deprecated shared-key mode cannot accept a forged adjudicator attestation', () => {
+    const corpus = loadCorpus();
+    const adjudications = corpus.adjudications.map((rec, i) => (i === 0
+      ? { ...rec, adjudicatorIdentity: { ...rec.adjudicatorIdentity, attestationDigest: '0'.repeat(64) } }
+      : rec));
+    const predictions = rubricPredictions(corpus.cases);
+    const report = compareRuns({
+      ...corpus, adjudications, annotationHmacKey: DEPRECATED_SHARED_HMAC_KEY,
+      runA: { ...runMeta(), predictions },
+      runB: { ...runMeta(), predictions },
+    });
+    assert.equal(report.ok, false);
+    assert.ok(report.failures.some((f) => ['signature_key_unavailable', 'signature_rejected'].includes(f.code)),
+      JSON.stringify(report.failures, null, 2));
+  });
 });
 
 describe('S2-006 comparator: fail-closed paths', () => {
