@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 669.
+Generated from `git ls-files`; count: 673.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -36,6 +36,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `contracts/ingestion-run.schema.json`
 - `contracts/lease.schema.json`
 - `contracts/needs-input.schema.json`
+- `contracts/owner-trust-bundle.schema.json`
 - `contracts/pilot-profile.schema.json`
 - `contracts/principal.schema.json`
 - `contracts/research-dossier.schema.json`
@@ -358,6 +359,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-004-EVALUATION-REPORT.md`
 - `docs/decisions/S2-005-EVALUATION-REPORT.md`
 - `docs/decisions/S2-006-EVALUATION-REPORT.md`
+- `docs/decisions/S2-006-ROUND3-TDD-EVIDENCE.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
 - `docs/product/AUTONOMY_POLICY.md`
@@ -448,6 +450,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `migrations/0004_claim_graph_state.sql`
 - `migrations/0005_verifier_store.sql`
 - `migrations/0006_verifier_acl.sql`
+- `migrations/0007_verifier_store_hardening.sql`
 - `next.config.ts`
 - `package-lock.json`
 - `package.json`
@@ -667,6 +670,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/verifier/fixtures/owner-inputs/thresholds.json`
 - `tests/verifier/owner-inputs.test.mjs`
 - `tests/verifier/policy.test.mjs`
+- `tests/verifier/review-round3-hardening.test.mjs`
 - `tests/verifier/rubric.test.mjs`
 - `tests/verifier/security-probes.test.mjs`
 - `tests/verifier/signature.test.mjs`
