@@ -31,6 +31,10 @@
         {
           "name": "0005_verifier_store.sql",
           "sha256": "28ecabe6b7a6915b90d13317c824fe0eda3a2c4bb64dc5593470367c497794ef"
+        },
+        {
+          "name": "0006_verifier_acl.sql",
+          "sha256": "022ada4102f7f229313cb30f985e8bd04cd08a52b723847bf50c4b8e14c1b7b4"
         }
       ]
     },
@@ -56,13 +60,17 @@
         {
           "name": "0005_verifier_store.sql",
           "sha256": "28ecabe6b7a6915b90d13317c824fe0eda3a2c4bb64dc5593470367c497794ef"
+        },
+        {
+          "name": "0006_verifier_acl.sql",
+          "sha256": "022ada4102f7f229313cb30f985e8bd04cd08a52b723847bf50c4b8e14c1b7b4"
         }
       ]
     }
   ],
   "pids": {
-    "run_a": 23944,
-    "run_b": 1756
+    "run_a": 13440,
+    "run_b": 14104
   },
   "executors": {
     "run_a": "exec-db-s2006-a",
@@ -80,8 +88,8 @@
   "committedOps": 4,
   "replayedOps": 1,
   "digests": {
-    "run_a": "9ba5286c3befe89cb9d8ca532c600db9ec9f42e3a472e7e8b5773b3f197003e5",
-    "run_b": "9ba5286c3befe89cb9d8ca532c600db9ec9f42e3a472e7e8b5773b3f197003e5"
+    "run_a": "655d243e8a45f6ec7f8e38bf82c42910820d24a76cb4a88cfe802c2ab9805712",
+    "run_b": "655d243e8a45f6ec7f8e38bf82c42910820d24a76cb4a88cfe802c2ab9805712"
   },
   "crashPhase": {
     "ok": true,
@@ -91,31 +99,33 @@
       "run_b": "exec-db-s2006-crash-b"
     },
     "crashFirstExecutors": {
-      "run_a": "exec-db-s2006-crash-a",
-      "run_b": "exec-db-s2006-crash-b"
+      "run_a": "exec-db-s2006-dies-a",
+      "run_b": "exec-db-s2006-dies-b"
     },
     "pids": {
       "recovery": {
-        "run_a": 31732,
-        "run_b": 25728
+        "run_a": 22748,
+        "run_b": 29956
       },
       "crash_first": {
-        "run_a": 14240,
-        "run_b": 31164
+        "run_a": 18644,
+        "run_b": 5116
       }
     },
     "fencingToken": 2,
     "digests": {
-      "run_a": "351ea496bacb40bc8c4f197afe9b238508584ce536fc20c5c74e25a6727044ff",
-      "run_b": "351ea496bacb40bc8c4f197afe9b238508584ce536fc20c5c74e25a6727044ff"
+      "run_a": "cb4f8a317a80201b88c8c3c7b9846ac92ea22dd02d22684163326fbf1802f2e9",
+      "run_b": "cb4f8a317a80201b88c8c3c7b9846ac92ea22dd02d22684163326fbf1802f2e9"
     },
     "counts": {
-      "outboxTotal": 9,
+      "outboxTotal": 12,
       "ledgerTotal": 3,
-      "externalCallRows": 2,
+      "externalCallRows": 3,
       "crashCallEvents": 3,
-      "crashCallFinalizedEvents": 1,
-      "crashCallSettlements": 1,
+      "crashCallReconciliationEvents": 1,
+      "crashCallFinalizedEvents": 0,
+      "operationFinalizedEvents": 1,
+      "operationSettledCalls": 1,
       "duplicateOutboxIds": 0
     },
     "scenario": "process 1: reserve -> accept -> abrupt death (exit 70, no finalize); process 2: fenced reconciliation over the fencing token, exactly one settlement, zero duplicate ledger/outbox writes"

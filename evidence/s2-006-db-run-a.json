@@ -4,7 +4,7 @@
   "role": "deterministic verifier store replay on PostgreSQL (PostgresVerifierStore, migration 0005)",
   "runId": "s2-006-db-run-a",
   "executorId": "exec-db-s2006-a",
-  "pid": 23944,
+  "pid": 13440,
   "databaseEngine": "PostgreSQL",
   "schema": "run_a",
   "ops": [
@@ -14,7 +14,7 @@
       "ok": true,
       "error": null,
       "replayed": false,
-      "outcomeDigest": "a321f6fd648e2226390f282d0dc084a3236b9a8a838a5514fbc4fa5244ba14c9"
+      "outcomeDigest": "70afff04f0306c691f270ed8970ea7be16434fa7bfb075d716a698748bad8904"
     },
     {
       "operationId": "op-s2006-replay-replay-01",
@@ -22,7 +22,7 @@
       "ok": true,
       "error": null,
       "replayed": true,
-      "outcomeDigest": "a321f6fd648e2226390f282d0dc084a3236b9a8a838a5514fbc4fa5244ba14c9"
+      "outcomeDigest": "70afff04f0306c691f270ed8970ea7be16434fa7bfb075d716a698748bad8904"
     },
     {
       "operationId": "op-s2006-replay-calibration-01",
@@ -76,7 +76,7 @@
     {
       "operation_id": "op-s2006-replay-publish-01",
       "status": "COMMITTED",
-      "idempotency_key": "ebe759ade6f4c525393d3ec46eeea873df55b4e6ce548258ad334e6874cbd811"
+      "idempotency_key": "28f3a3ec2a53690ef9d91be93193ec9e142b93bde4f338b331946e476784064a"
     }
   ],
   "outbox": [
@@ -119,5 +119,5 @@
     }
   ],
   "status": "COMPLETED",
-  "digest": "9ba5286c3befe89cb9d8ca532c600db9ec9f42e3a472e7e8b5773b3f197003e5"
+  "digest": "655d243e8a45f6ec7f8e38bf82c42910820d24a76cb4a88cfe802c2ab9805712"
 }
