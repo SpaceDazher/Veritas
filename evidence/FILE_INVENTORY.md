@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 653.
+Generated from `git ls-files`; count: 669.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -447,6 +447,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `migrations/0003_claim_graph.sql`
 - `migrations/0004_claim_graph_state.sql`
 - `migrations/0005_verifier_store.sql`
+- `migrations/0006_verifier_acl.sql`
 - `next.config.ts`
 - `package-lock.json`
 - `package.json`
@@ -650,6 +651,21 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/verifier/fixtures/canonical/README.md`
 - `tests/verifier/fixtures/canonical/synthesis-result.json`
 - `tests/verifier/fixtures/keys.json`
+- `tests/verifier/fixtures/owner-inputs/adjudication.json`
+- `tests/verifier/fixtures/owner-inputs/annotation-sets/ans-owner-a.json`
+- `tests/verifier/fixtures/owner-inputs/annotation-sets/ans-owner-b.json`
+- `tests/verifier/fixtures/owner-inputs/cases/case-owner-ext-01.json`
+- `tests/verifier/fixtures/owner-inputs/cases/case-owner-ext-02.json`
+- `tests/verifier/fixtures/owner-inputs/cases/case-owner-ext-03.json`
+- `tests/verifier/fixtures/owner-inputs/cases/case-owner-ext-04.json`
+- `tests/verifier/fixtures/owner-inputs/cases/case-owner-ext-05.json`
+- `tests/verifier/fixtures/owner-inputs/cases/case-owner-ext-06.json`
+- `tests/verifier/fixtures/owner-inputs/external-manifest.json`
+- `tests/verifier/fixtures/owner-inputs/independence.json`
+- `tests/verifier/fixtures/owner-inputs/README.md`
+- `tests/verifier/fixtures/owner-inputs/threshold-decision.json`
+- `tests/verifier/fixtures/owner-inputs/thresholds.json`
+- `tests/verifier/owner-inputs.test.mjs`
 - `tests/verifier/policy.test.mjs`
 - `tests/verifier/rubric.test.mjs`
 - `tests/verifier/security-probes.test.mjs`

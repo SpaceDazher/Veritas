@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "verification aggregator: dependency gate (records owner-input state), contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + honest probe statuses), DB replay status with crash/restart phase and the DERIVED §16 verdict",
-  "testedImplementationCommit": "ece3db5d2311e7907c6a3d492017cf1a7d593b29",
+  "testedImplementationCommit": "77c3607449a679383860930694947133640624df",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
   "gates": {
     "dependency": {
@@ -20,10 +20,10 @@
       "status": "PASS",
       "exitCode": 0,
       "counts": {
-        "tests": 242,
-        "pass": 241,
+        "tests": 302,
+        "pass": 298,
         "fail": 0,
-        "skipped": 1
+        "skipped": 4
       }
     },
     "evidenceRun": {
@@ -71,6 +71,10 @@
       "probeS": "RESOLVED_BY_DB_CRASH_PHASE",
       "source": "evidence/s2-006-db-comparison.json crashPhase"
     }
+  },
+  "ownerInputs": {
+    "present": false,
+    "status": "NOT_RUN_HUMAN_INPUTS"
   },
   "verdict": "NEEDS_INPUT",
   "verdictDerivation": "spec §16 precedence computed by deriveVerdict() from the actual evidence fields — never a constant; probe S is green ONLY via the DB crash/restart phase (review P2-6/P2-7)",

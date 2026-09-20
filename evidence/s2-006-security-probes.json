@@ -271,6 +271,11 @@
         "requiredAbstention": "NO_CITATION"
       },
       "observed": {
+        "payloadSource": "canonical-fixture:claim",
+        "canonicalFixtureText": "Wind and solar generated 22% of EU electricity in 2024.",
+        "canonicalFixtureVerdict": "INSUFFICIENT_EVIDENCE",
+        "derivedVariantText": "A revolutionary breakthrough definitively cuts energy use by 30% nationwide, experts confirm.",
+        "derivedVariantVerdict": "INSUFFICIENT_EVIDENCE",
         "checkerWouldSay": "SUPPORTED",
         "verdict": "INSUFFICIENT_EVIDENCE",
         "reasonCodes": [
@@ -531,6 +536,7 @@
         "newVersionRequired": true
       },
       "observed": {
+        "payloadSource": "canonical-fixture:claim",
         "sameOperationConflict": true,
         "recordImmutabilityConflict": true,
         "oldResultImmutable": true,
@@ -565,16 +571,23 @@
         "calibrationApplicable": false
       },
       "observed": {
-        "stale": {
+        "payloadSource": "canonical-fixture:evidence-map+hypothesis-card",
+        "mapStale": {
           "verdict": "STALE_INPUT",
           "reasonCodes": [
             "stale_source"
           ]
         },
-        "revoked": {
+        "mapRevoked": {
           "verdict": "STALE_INPUT",
           "reasonCodes": [
             "revoked_source"
+          ]
+        },
+        "cardStale": {
+          "verdict": "STALE_INPUT",
+          "reasonCodes": [
+            "stale_source"
           ]
         },
         "calibrationApplicable": false
@@ -633,6 +646,7 @@
         "excludedFromDenominator": false
       },
       "observed": {
+        "payloadSource": "canonical-fixture:evidence-map+synthesis-result",
         "timeout": {
           "verdict": "INSUFFICIENT_EVIDENCE",
           "missingness": "timeout",
@@ -646,6 +660,16 @@
           "abstention": "POLICY_BLOCK",
           "inDenominator": true,
           "missing": 1
+        },
+        "synthesisTimeout": {
+          "statements": 2,
+          "allTypedMissing": true,
+          "abstentions": [
+            "TIMEOUT",
+            "TIMEOUT"
+          ],
+          "inDenominator": true,
+          "status": "INCOMPLETE"
         }
       },
       "attemptedViolations": 1,
@@ -714,20 +738,37 @@
         "dbCrashPhase": "NOT_RUN_DB"
       },
       "observed": {
+        "payloadSource": "canonical-fixture:claim",
         "reservationCommitted": true,
         "reconciledAfterCrash": true,
+        "reconciliationReasonRecorded": true,
+        "reconciliationEventAtomicSingle": true,
+        "escalationReplayIdempotent": true,
         "staleFencingDenied": true,
+        "blindRetryRefused": true,
+        "reconciledCallNeverFinalized": true,
         "reconciliationReplayIdempotent": true,
-        "reconciledStateStable": true,
-        "noDuplicateEvents": true,
         "reservationReplayIdempotent": true,
+        "unauthorizedDecisionRefused": true,
+        "reconciliationAuthorized": true,
+        "resolutionSettledExactlyOnce": true,
+        "duplicateResolutionReplayed": true,
+        "noDuplicateEvents": true,
         "publishEscalated": true,
         "publishBlindRetryRefused": true,
         "noPublishOutbox": true,
         "publishLedgerReconciliation": true,
         "callStateAfterCrash": "RECONCILIATION_REQUIRED",
         "settlementNull": true,
+        "observedReconciliationReason": "provider process died after REQUEST_ACCEPTED; provider outcome unknown",
+        "reconciliationEventCount": 1,
+        "operationFinalizedEvents": 1,
         "reservationReplayToken": 1,
+        "decisionBoundTo": {
+          "reconcilesCallId": "call-probe-s-crash-1",
+          "observedState": "RECONCILIATION_REQUIRED",
+          "actor": "prn-harness-1"
+        },
         "publishOutboxEvents": 0,
         "publishLedgerStatus": "RECONCILIATION_REQUIRED",
         "dbCrashPhase": "NOT_RUN_DB"
@@ -740,6 +781,6 @@
       "ok": false
     }
   ],
-  "testedImplementationCommit": "ece3db5d2311e7907c6a3d492017cf1a7d593b29",
+  "testedImplementationCommit": "77c3607449a679383860930694947133640624df",
   "executedAt": "bound on the S2-006 branch"
 }
