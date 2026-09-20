@@ -99,6 +99,27 @@ function headCommit() {
   }
 }
 
+// Owner-inputs summary propagation (review finding 7, fix2-F): present/absent
+// plus the resolved tiers, WITHOUT changing deriveVerdict's verdict logic.
+// Absence keeps the honest NOT_RUN_HUMAN_INPUTS marker; presence reflects the
+// actual recorded state of evidence/s2-006-owner-inputs.json.
+export function summarizeOwnerInputs(record) {
+  if (!record || typeof record !== 'object' || record.ownerInputs == null) {
+    return { present: false, status: 'NOT_RUN_HUMAN_INPUTS' };
+  }
+  return {
+    present: true,
+    status: 'OWNER_INPUTS_PRESENT',
+    evidence: 'evidence/s2-006-owner-inputs.json',
+    externalStratum: record.ownerInputs.manifest?.externalStratum ?? null,
+    independence: record.ownerInputs.independence ?? null,
+    thresholdDecision: record.ownerInputs.thresholdDecision ?? null,
+    decisionStatus: record.pipeline?.decision?.status ?? null,
+    comparatorOk: record.pipeline?.comparatorOk ?? null,
+    honesty: record.honesty ?? null,
+  };
+}
+
 // ---- §16 outcome precedence, derived from actual evidence (review P2-7) -----
 // Order: BLOCKED_SAFETY / BLOCKED_AUTHORITY -> BLOCKED_DEPENDENCY ->
 // NEEDS_INPUT (with the CONCRETE list of missing inputs) -> HUMAN_REVIEW ->
@@ -365,7 +386,13 @@ export async function verifyS2_006(args = {}) {
     dbEvidence,
   });
   notRun.push('NOT_RUN_PROVIDER: no provider grant/model/runtime was declared mandatory for the first calibration scope; the offline deterministic implementation is fully tested without network or LLM');
-  notRun.push('NOT_RUN_HUMAN_INPUTS: no real independent annotators, adjudicator or method-owner HumanDecision exists');
+  // NOT_RUN_HUMAN_INPUTS is claimed ONLY when no owner-inputs record exists
+  // (review finding 7): a validated owner-inputs run reflects its actual state
+  // in the summary instead of an unconditional not-run marker.
+  const ownerInputsSummary = summarizeOwnerInputs(readJson('evidence/s2-006-owner-inputs.json'));
+  if (ownerInputsSummary.status === 'NOT_RUN_HUMAN_INPUTS') {
+    notRun.push('NOT_RUN_HUMAN_INPUTS: no real independent annotators, adjudicator or method-owner HumanDecision exists');
+  }
 
   const summary = {
     schemaVersion: 1,
@@ -374,6 +401,7 @@ export async function verifyS2_006(args = {}) {
     testedImplementationCommit: headCommit(),
     evidenceContainerResolution: 'Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json',
     gates,
+    ownerInputs: ownerInputsSummary,
     verdict,
     verdictDerivation: 'spec §16 precedence computed by deriveVerdict() from the actual evidence fields — never a constant; probe S is green ONLY via the DB crash/restart phase (review P2-6/P2-7)',
     verdictReasons,

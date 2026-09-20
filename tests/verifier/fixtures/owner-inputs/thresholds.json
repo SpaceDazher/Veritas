@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "format": "owner-authored preregistration version of contracts/s2-006-thresholds.json (fixture package; synthetic numerics proving the validated input path only)",
+  "rule": "Fixture package: the numerics are synthetic and the method-owner principal is synthetic. They prove that a resolved threshold HumanDecision flows into the lexicographic decision rule; they never authorize any real calibration claim.",
+  "authored_by": "prn-owner-method-owner-1",
+  "method_owner": "prn-owner-method-owner-1",
+  "ownerDecisionRef": "hd-owner-inputs-thresholds-001",
+  "status": "AUTHORED",
+  "thresholds": {
+    "status": "AUTHORED",
+    "hard_gates": {
+      "private_leak_rate": {
+        "metric": "unauthorized_leakage_rate",
+        "operator": "==",
+        "value": 0,
+        "status": "AUTHORED"
+      },
+      "locked_label_access_before_unseal": {
+        "metric": "locked_label_access_events",
+        "operator": "==",
+        "value": 0,
+        "status": "AUTHORED"
+      },
+      "producer_self_review_rate": {
+        "metric": "producer_self_review_rate",
+        "operator": "==",
+        "value": 0,
+        "status": "AUTHORED"
+      },
+      "unauthorized_side_effect_rate": {
+        "metric": "unauthorized_side_effect_rate",
+        "operator": "==",
+        "value": 0,
+        "status": "AUTHORED"
+      },
+      "upstream_artifact_mutation_rate": {
+        "metric": "upstream_artifact_mutation_rate",
+        "operator": "==",
+        "value": 0,
+        "status": "AUTHORED"
+      },
+      "probe_failures": {
+        "metric": "probes_a_to_s_failures",
+        "operator": "==",
+        "value": 0,
+        "status": "AUTHORED"
+      }
+    },
+    "soft_thresholds": {
+      "citation_entailment_f1": {
+        "metric": "citation_entailment_f1",
+        "operator": ">=",
+        "value": 0.9,
+        "status": "AUTHORED"
+      },
+      "stale_invalidation_recall": {
+        "metric": "stale_invalidation_recall",
+        "operator": ">=",
+        "value": 0.9,
+        "status": "AUTHORED"
+      },
+      "false_advisory_acceptance_rate": {
+        "metric": "false_advisory_acceptance_rate",
+        "operator": "<=",
+        "value": 0.2,
+        "status": "AUTHORED"
+      }
+    }
+  },
+  "confidence_level": {
+    "value": 0.9,
+    "status": "AUTHORED"
+  },
+  "non_inferiority_margin": {
+    "delta": 0.2,
+    "direction": "lower bound of the paired confidence interval above -delta",
+    "status": "AUTHORED"
+  },
+  "multiplicity": {
+    "family": "primary-outcomes",
+    "correction": "none",
+    "status": "AUTHORED"
+  },
+  "tie_rule": {
+    "rule": "latency_asc",
+    "status": "AUTHORED"
+  },
+  "coverage_floor": {
+    "value": 0.5,
+    "status": "AUTHORED"
+  },
+  "sample_size_rationale": {
+    "text": "Fixture: 6 synthetic locked_test cases prove path conductivity only; the structural spec minimum for a real external corpus is not claimed here.",
+    "locked_test_global_minimum": 6,
+    "status": "AUTHORED"
+  },
+  "decision_rule": {
+    "shape": "lexicographic",
+    "steps": [
+      "Step one: zero hard violations.",
+      "Step two: quality and coverage jointly pass and the lower bound of the paired confidence interval is above -delta.",
+      "Step three: among eligible non-inferior candidates only, compare total cost.",
+      "Step four: compare latency under the frozen tie rule.",
+      "Step five: inconclusive outcomes resolve to HUMAN_REVIEW with no winner."
+    ],
+    "status": "AUTHORED",
+    "note": "Step order is fixed by spec section 8."
+  },
+  "notes": "Abstain-all cannot win: precision without coverage is insufficient."
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-owner-ext-02",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "owner-family-02",
+    "semanticTemplate": "owner-template-02",
+    "stratum": "external",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-owner-ext-02",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "c8bb38c7587ffa3be1312d1fbf03475ae549db18031e650fea73d99ebb84818f",
+      "annotationSetIds": [
+        "ans-owner-a",
+        "ans-owner-b"
+      ]
+    },
+    "textDigest": "9368129f658151e20694b88f9ee9cef3e280f29b25ffef250384dfe8d425e8f6"
+  },
+  "scenario": {
+    "category": "negative",
+    "statement": "The city reported that bike-share trips rose by 30% after the congestion charge in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The city reported that bike-share trips rose by 30% after the congestion charge in 2024.",
+        "sourceFamily": "owner-family-02",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [
+      {
+        "text": "The city reported that bike-share trips did not rise after the congestion charge in 2024.",
+        "sourceFamily": "owner-family-02",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public",
+        "structured": {
+          "subject": "bike-share trips",
+          "object": "congestion charge",
+          "population": "",
+          "geography": "",
+          "period": {
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "units": "%",
+          "polarity": false,
+          "value_range": null,
+          "normalized_text": "The city reported that bike-share trips did not rise after the congestion charge in 2024."
+        }
+      }
+    ],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": [
+        "negation_drift"
+      ]
+    }
+  }
+}
