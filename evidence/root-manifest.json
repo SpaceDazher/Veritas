@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "b07c3953d065013d6c7c9a400a32aa3f5de175b1",
-  "sourceTree": "2ed9b5b2929600b3b844417384e0206494c04310",
+  "sourceCommit": "397da659493da92cbb782978e74b017f3259c7d3",
+  "sourceTree": "9a5a1b4cb816151466429484e113092d15cc8c00",
   "trackedFileCount": 669,
   "manifestFileCount": 664,
-  "payloadManifestSha256": "d2dd68a619dbf402bb47a8a64eb9c611eae1ee6df94c8874c4023461209e07df",
-  "fileManifestSha256": "02cb7ce0182841e50a6623b2ab220a9fc2ed4cbb4ca7416cdd88c8b7d25a457a",
+  "payloadManifestSha256": "3e7a99d825a4e8d2bac14ecc97899f75580c55e5a1206d02d86e3c6802c17fb0",
+  "fileManifestSha256": "7ad4bcdf4c79acd145cf6f729750c3139d87606cb7dd50ccdc48ce70a430d437",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2123,28 +2123,28 @@
     },
     {
       "path": "evidence/s2-006-db-comparison.json",
-      "sha256": "a44bcba92ef37009da45c044decff77cc89dfcce53f54288c8decffe650c4cd9",
-      "bytes": 3899
+      "sha256": "1f74b3936c817e9bae7e2683b4dd28d8acc0d42b47ee399953f301e83d1ab676",
+      "bytes": 4280
     },
     {
       "path": "evidence/s2-006-db-crash-a.json",
-      "sha256": "add8907154abc01cc9763855e4c468f2bf34c47a8bb3c913c5696f4db43b11a1",
-      "bytes": 1277
+      "sha256": "b9a9014717b1dd75c8c4e152a39fd8aaa091a2641af1c1acde16b3739b9b1ad9",
+      "bytes": 2023
     },
     {
       "path": "evidence/s2-006-db-crash-b.json",
-      "sha256": "e4c07464d6679bfcc8867382d4fb53b4453671f69001d72ad1ddbdbdb8a0232a",
-      "bytes": 1277
+      "sha256": "b20ccc0677d318856cad482bde43bf41dd009fece8e3c31934e71883f1097492",
+      "bytes": 2022
     },
     {
       "path": "evidence/s2-006-db-run-a.json",
-      "sha256": "a469ed3817fa2e44eb6d48dcd7861040a9f29c4fef927b782620f5e6662cef52",
+      "sha256": "21c650523be5d6a330bc2f22feb970d8174f8e1fdd2822e24f9164fe09c7f411",
       "bytes": 3771
     },
     {
       "path": "evidence/s2-006-db-run-b.json",
-      "sha256": "7daef16474e4d94aed74fafc47df6693be235631681e6a1a31f346be44b64371",
-      "bytes": 3770
+      "sha256": "4c9248e433585992110cc7979b9987ce1ae65b8ba1152b8dbf78ba16ce9faaf0",
+      "bytes": 3771
     },
     {
       "path": "evidence/s2-006-dependency-binding.json",
@@ -2423,8 +2423,8 @@
     },
     {
       "path": "results/s2-006/s2-006-db-comparison.json",
-      "sha256": "fcbfe9863dd830ec36a242d10788cefcfec400655fb9c2c3c45cefac47ade410",
-      "bytes": 4279
+      "sha256": "d8fa5cf2ce5f621aba899d148e2d33d609a26fdaa0dd7941e23f40280d6d5f34",
+      "bytes": 4280
     },
     {
       "path": "scripts/acceptance-gate.mjs",
