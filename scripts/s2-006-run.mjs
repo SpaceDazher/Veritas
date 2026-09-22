@@ -391,12 +391,24 @@ export function loadOwnerExternalCorpus(dir) {
     return { ok: false, issues: [`external-manifest.json is not valid JSON: ${e.message}`] };
   }
   issues.push(...validateExternalManifest(manifest));
+  if (issues.length > 0) {
+    return { ok: false, issues };
+  }
   const rubricBytes = fs.readFileSync(path.join(CORPUS_DIR, 'rubric-v1.json'));
   if (sha256Bytes(rubricBytes) !== manifest.rubricDigest) {
     issues.push('external-manifest: rubricDigest does not bind the frozen in-repo rubric bytes');
   }
   const splitByCase = new Map(manifest.splitAssignments.map((a) => [a.caseId, a.split]));
   if (splitByCase.size !== manifest.cases.length) issues.push('external-manifest: split assignment incomplete');
+  const casesDir = path.join(dir, 'cases');
+  let submittedCaseFiles;
+  try {
+    submittedCaseFiles = fs.readdirSync(casesDir);
+  } catch {
+    issues.push('owner-inputs: cases directory is missing or unreadable');
+    return { ok: false, issues };
+  }
+  const validateCase = ownerValidators().corpusCase;
   const cases = [];
   for (const entry of manifest.cases) {
     let bytes;
@@ -414,11 +426,19 @@ export function loadOwnerExternalCorpus(dir) {
       issues.push(`case ${entry.caseId}: not valid JSON: ${e.message}`);
       continue;
     }
+    if (validateCase(file?.case) !== true) {
+      issues.push(`case ${entry.caseId}: frozen corpus-case schema rejected the record: ${ajvErrors(validateCase)}`);
+      continue;
+    }
+    if (!file.scenario || typeof file.scenario !== 'object' || Array.isArray(file.scenario)) {
+      issues.push(`case ${entry.caseId}: scenario must be an object`);
+      continue;
+    }
     if (file.case?.caseId !== entry.caseId) issues.push(`case ${entry.caseId}: record id mismatch`);
     if (canonicalDigest(file.scenario) !== file.case?.textDigest) issues.push(`case ${entry.caseId}: scenario digest != case.textDigest`);
     cases.push({ caseId: entry.caseId, bytes, record: file.case, scenario: file.scenario, split: splitByCase.get(entry.caseId) ?? null });
   }
-  for (const file of fs.readdirSync(path.join(dir, 'cases'))) {
+  for (const file of submittedCaseFiles) {
     if (file.endsWith('.json') && !manifest.cases.some((c) => c.caseId === file.replace(/\.json$/, ''))) {
       issues.push(`case file ${file}: unmanifested`);
     }
