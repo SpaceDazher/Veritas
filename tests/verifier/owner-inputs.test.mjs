@@ -195,6 +195,47 @@ describe('S2-006 owner CLI and blinded child boundary', () => {
     assert.equal(corpus.labelSets, undefined);
     assert.equal(corpus.adjudications, undefined);
   });
+
+  test('candidate-side loader quarantines a malformed manifest without throwing', () => {
+    const dir = tmpCopy((copy) => {
+      const target = path.join(copy, 'external-manifest.json');
+      const manifest = JSON.parse(fs.readFileSync(target, 'utf8'));
+      manifest.splitAssignments = { splits: { locked_test: [] } };
+      fs.writeFileSync(target, `${JSON.stringify(manifest, null, 2)}\n`);
+    });
+
+    assert.doesNotThrow(() => loadOwnerExternalCorpus(dir));
+    const corpus = loadOwnerExternalCorpus(dir);
+    assert.equal(corpus.ok, false);
+    assert.ok(corpus.issues.some((issue) => issue.includes('splitAssignments')), JSON.stringify(corpus.issues, null, 2));
+  });
+
+  test('candidate CLI reports QUARANTINED instead of a stack trace for a malformed manifest', () => {
+    const dir = tmpCopy((copy) => {
+      const target = path.join(copy, 'external-manifest.json');
+      const manifest = JSON.parse(fs.readFileSync(target, 'utf8'));
+      delete manifest.splitAssignments;
+      fs.writeFileSync(target, `${JSON.stringify(manifest, null, 2)}\n`);
+    });
+    const result = runCli(['--candidate', 'true', '--owner-corpus', dir, '--out', path.join(dir, 'sealed.json')]);
+
+    assert.equal(result.status, 2);
+    assert.ok(result.stderr.includes('QUARANTINED'), result.stderr);
+    assert.ok(!result.stderr.includes('TypeError'), result.stderr);
+  });
+
+  test('candidate-side loader rejects a corpus case that violates the frozen schema', () => {
+    const dir = tmpCopy((copy) => {
+      const target = path.join(copy, 'cases', 'case-owner-ext-01.json');
+      const file = JSON.parse(fs.readFileSync(target, 'utf8'));
+      delete file.case.contractVersion;
+      fs.writeFileSync(target, `${JSON.stringify(file, null, 2)}\n`);
+    });
+
+    const corpus = loadOwnerExternalCorpus(dir);
+    assert.equal(corpus.ok, false);
+    assert.ok(corpus.issues.some((issue) => issue.includes('frozen corpus-case schema rejected')), JSON.stringify(corpus.issues, null, 2));
+  });
 });
 
 describe('S2-006 owner summary semantics', () => {
