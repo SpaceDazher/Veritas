@@ -236,6 +236,17 @@ describe('S2-006 owner CLI and blinded child boundary', () => {
     assert.equal(corpus.ok, false);
     assert.ok(corpus.issues.some((issue) => issue.includes('frozen corpus-case schema rejected')), JSON.stringify(corpus.issues, null, 2));
   });
+
+  test('candidate-side loader reports a missing cases directory without throwing', () => {
+    const dir = tmpCopy((copy) => {
+      fs.rmSync(path.join(copy, 'cases'), { recursive: true, force: true });
+    });
+
+    assert.doesNotThrow(() => loadOwnerExternalCorpus(dir));
+    const corpus = loadOwnerExternalCorpus(dir);
+    assert.equal(corpus.ok, false);
+    assert.ok(corpus.issues.some((issue) => issue.includes('cases directory')), JSON.stringify(corpus.issues, null, 2));
+  });
 });
 
 describe('S2-006 owner summary semantics', () => {
