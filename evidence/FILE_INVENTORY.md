@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 673.
+Generated from `git ls-files`; count: 674.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -359,6 +359,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-004-EVALUATION-REPORT.md`
 - `docs/decisions/S2-005-EVALUATION-REPORT.md`
 - `docs/decisions/S2-006-EVALUATION-REPORT.md`
+- `docs/decisions/S2-006-OWNER-CORPUS-LOADER-TDD-EVIDENCE.md`
 - `docs/decisions/S2-006-ROUND3-TDD-EVIDENCE.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
