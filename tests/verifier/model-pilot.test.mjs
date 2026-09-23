@@ -1,5 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   MODEL,
   buildCandidate,
@@ -7,6 +12,7 @@ import {
   parseDiagnosis,
   requestDiagnosis,
   runPilot,
+  loadPilotCases,
 } from '../../scripts/s2-006m-pilot.mjs';
 
 const pair = { archive: 'v05', candidateId: 'vcase-1', episodeId: 'ep-1', semanticTemplate: 'event_date', qualityFlag: null };
@@ -79,6 +85,11 @@ test('provider request sends key only in auth header and rejects wrong model res
   assert.ok(!JSON.stringify(result).includes('private-test-key'));
   const wrong = await requestDiagnosis(candidate, { apiKey: 'private-test-key', fetchImpl: async () => ({ ok: true, status: 200, json: async () => ({ model: 'paid/model', choices: [{ message: { content: '{}' } }] }) }) });
   assert.equal(wrong.status, 'API_ERROR');
+  const invalid = await requestDiagnosis(candidate, { apiKey: 'private-test-key', fetchImpl: async () => ({ ok: true, status: 200, json: async () => ({ model: MODEL, id: 'gen-2', choices: [{ message: { content: 'not json' } }] }) }) });
+  assert.equal(invalid.status, 'INVALID_RESPONSE');
+  const transport = await requestDiagnosis(candidate, { apiKey: 'private-test-key', fetchImpl: async () => { throw new Error('private-test-key'); } });
+  assert.equal(transport.status, 'API_ERROR');
+  assert.ok(!JSON.stringify(transport).includes('private-test-key'));
 });
 
 test('pilot limits requests, keeps official verdict unchanged and does not retry errors', async () => {
@@ -86,7 +97,8 @@ test('pilot limits requests, keeps official verdict unchanged and does not retry
   const fetchImpl = async () => { calls++; return { ok: false, status: 429, json: async () => ({ error: { code: 429 } }) }; };
   const cases = [buildCandidate(pair, draft), { ...buildCandidate(pair, draft), caseId: 'vcase-2', episodeId: 'ep-2' }];
   const snapshots = [];
-  const report = await runPilot(cases, { apiKey: 'private-test-key', fetchImpl, maxCases: 1, onProgress: (x) => snapshots.push(x) });
+  await assert.rejects(() => runPilot(cases, { apiKey: 'private-test-key', fetchImpl, maxCases: 1 }), /consent/);
+  const report = await runPilot(cases, { apiKey: 'private-test-key', fetchImpl, maxCases: 1, consentTraining: true, onProgress: (x) => snapshots.push(x) });
   assert.equal(calls, 1);
   assert.equal(report.results.length, 1);
   assert.equal(report.results[0].status, 'API_ERROR');
@@ -94,4 +106,59 @@ test('pilot limits requests, keeps official verdict unchanged and does not retry
   assert.equal(report.independentLabels, 0);
   assert.equal(snapshots.length, 1);
   assert.ok(!JSON.stringify(report).includes('private-test-key'));
+});
+
+test('loader checks archive bytes and handles both source shapes without exposing text', () => {
+  const temp = mkdtempSync(path.join(os.tmpdir(), 'veritas-model-pilot-'));
+  try {
+    const archivePaths = {};
+    const sourceArchives = {};
+    for (const alias of ['v05', 'ah6', 'xuo']) {
+      archivePaths[alias] = path.join(temp, `${alias}.zip`);
+      writeFileSync(archivePaths[alias], alias);
+      sourceArchives[alias] = createHash('sha256').update(readFileSync(archivePaths[alias])).digest('hex');
+    }
+    const pairs = Array.from({ length: 21 }, (_, index) => ({
+      archive: ['v05', 'ah6', 'xuo'][index % 3],
+      candidateId: `c-${index}`,
+      episodeId: `ep-${index}`,
+      semanticTemplate: 'definition',
+      qualityFlag: null,
+    }));
+    const poolPath = path.join(temp, 'pool.json');
+    writeFileSync(poolPath, JSON.stringify({ ticket: 'S2-006M', pairs, sourceArchives }));
+    const records = Object.fromEntries(pairs.map((item) => [item.candidateId, {
+      candidateId: item.candidateId,
+      source: { episodeId: item.episodeId, speaker: 'Гость' },
+      semanticTemplate: item.semanticTemplate, status: 'ACCEPT',
+      claim: { statement: 'Это X.' }, evidenceSpans: [{ kind: 'supporting', quote: 'Это X.' }],
+    }]));
+    const readEntry = (archive, entry) => {
+      const alias = path.basename(archive, '.zip');
+      if (alias === 'v05') {
+        const id = path.basename(entry, '.json');
+        const i = Number(id.split('-')[1]);
+        return JSON.stringify({ ...draft, caseId: id, videoId: `ep-${i}`, semanticTemplate: 'definition' });
+      }
+      return pairs.filter((item) => item.archive === alias).map((item) => JSON.stringify(records[item.candidateId])).join('\n');
+    };
+    const cases = loadPilotCases(poolPath, archivePaths, readEntry);
+    assert.equal(cases.length, 21);
+    assert.equal(cases[1].caseId, 'c-1');
+    writeFileSync(archivePaths.ah6, 'tampered');
+    assert.throws(() => loadPilotCases(poolPath, archivePaths, readEntry), /digest mismatch/);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('CLI refuses a report inside the Git tree before reading key or calling provider', () => {
+  const script = path.resolve('scripts/s2-006m-pilot.mjs');
+  const output = path.resolve('results/s2-006/unsafe-provider-output.json');
+  const child = spawnSync(process.execPath, [script, '--allow-training', '--output', output], {
+    cwd: path.resolve('.'), encoding: 'utf8', env: { ...process.env, OPENROUTER_API_KEY: 'private-test-key' },
+  });
+  assert.equal(child.status, 1);
+  assert.match(child.stderr, /outside Veritas Git tree/);
+  assert.ok(!child.stderr.includes('private-test-key'));
 });
