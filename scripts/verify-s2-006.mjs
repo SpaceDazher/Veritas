@@ -16,10 +16,9 @@
 //                               exact comparator, fixture calibration metrics,
 //                               adversarial probes A–S with honest
 //                               pass|failed|not_run statuses (writes evidence/)
-//   5. db replay status       — evidence/s2-006-db-comparison.json from an
-//                               explicit `npm run verify:s2-006-db-replay`
-//                               (or --with-db to run it first); missing
-//                               evidence is an honest NOT_RUN_DB
+//   5. db replay status       — execute a fresh PostgreSQL replay and compare
+//                               its direct report with the written evidence.
+//                               Historical PASS files are never authority.
 //   6. summary + verdict      — evidence/s2-006-summary.json with the §16
 //                               outcome precedence, DERIVED from the actual
 //                               evidence fields (P2-7b), never a constant.
@@ -30,6 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { classifyCurrentDbReplay, engineeringGateExitCode } from './s2-006-db-gate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -336,32 +336,12 @@ export async function verifyS2_006(args = {}) {
   };
 
   // ---- 5. db replay status --------------------------------------------------
-  if (args['with-db'] === true) {
-    const replay = runNpm(['run', 'verify:s2-006-db-replay'], { timeout: 900000 });
-    gates.dbReplay = {
-      status: replay.exitCode === 0 ? 'PASS' : 'FAIL',
-      exitCode: replay.exitCode,
-      source: 'executed in this aggregation (--with-db)',
-    };
-  }
-  const dbEvidence = readJson('evidence/s2-006-db-comparison.json');
-  if (!gates.dbReplay) {
-    if (dbEvidence && dbEvidence.status === 'PASS') {
-      gates.dbReplay = {
-        status: 'PASS',
-        exitCode: dbEvidence.exitCode ?? 0,
-        source: 'evidence/s2-006-db-comparison.json from a prior verify:s2-006-db-replay run',
-        crashPhaseOk: dbEvidence.crashPhase?.ok === true,
-      };
-    } else if (dbEvidence && dbEvidence.status === 'NOT_RUN_DB') {
-      gates.dbReplay = { status: 'NOT_RUN_DB', source: 'evidence/s2-006-db-comparison.json', reason: dbEvidence.reason ?? null };
-      notRun.push('NOT_RUN_DB: PostgreSQL two-process verifier store replay');
-    } else if (dbEvidence) {
-      gates.dbReplay = { status: 'FAIL', source: 'evidence/s2-006-db-comparison.json', issues: dbEvidence.comparison?.issues ?? null };
-    } else {
-      gates.dbReplay = { status: 'NOT_RUN_DB', source: null, reason: 'no DB replay evidence; run npm run verify:s2-006-db-replay' };
-      notRun.push('NOT_RUN_DB: PostgreSQL two-process verifier store replay');
-    }
+  const replay = runNode('scripts/s2-006-db-replay.mjs', ['--write'], { timeout: 900000 });
+  const currentDb = classifyCurrentDbReplay(replay, readJson('evidence/s2-006-db-comparison.json'));
+  gates.dbReplay = currentDb.gate;
+  const dbEvidence = currentDb.evidence;
+  if (gates.dbReplay.status === 'NOT_RUN_DB') {
+    notRun.push('NOT_RUN_DB: PostgreSQL two-process verifier store replay');
   }
 
   // ---- probes gate: honest combine (review P2-6) --------------------------
@@ -455,7 +435,7 @@ export async function verifyS2_006(args = {}) {
     ],
   };
 
-  const exitCode = ['NEEDS_INPUT', 'HUMAN_REVIEW', 'PASS_WITH_LIMITS'].includes(verdict) ? 0 : 1;
+  const exitCode = engineeringGateExitCode(verdict, gates);
   if (args.write !== 'false') {
     fs.writeFileSync(path.join(ROOT, 'evidence/s2-006-summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
   }

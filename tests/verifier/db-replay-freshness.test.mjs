@@ -1,6 +1,6 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyCurrentDbReplay } from '../../scripts/verify-s2-006.mjs';
+import { classifyCurrentDbReplay, engineeringGateExitCode } from '../../scripts/s2-006-db-gate.mjs';
 
 const greenReport = () => ({
   schemaVersion: 1,
@@ -53,5 +53,19 @@ describe('S2-006 DB replay freshness gate', () => {
       assert.equal(result.gate.status, 'FAIL');
       assert.equal(result.evidence, null);
     }
+  });
+
+  test('a matching unavailable or failed DB report is classified by its observed status', () => {
+    const unavailable = { schemaVersion: 1, ticket: 'S2-006', status: 'NOT_RUN_DB', ok: false, reason: 'no database' };
+    assert.equal(classifyCurrentDbReplay(executed(unavailable), written(unavailable)).gate.status, 'NOT_RUN_DB');
+    const failed = { schemaVersion: 1, ticket: 'S2-006', status: 'FAIL', ok: false };
+    assert.equal(classifyCurrentDbReplay(executed(failed, 1), written(failed, 1)).gate.status, 'FAIL');
+  });
+
+  test('missing or failed mandatory DB replay makes the command fail even with NEEDS_INPUT verdict', () => {
+    for (const status of ['NOT_RUN_DB', 'FAIL']) {
+      assert.equal(engineeringGateExitCode('NEEDS_INPUT', { dbReplay: { status } }), 1);
+    }
+    assert.equal(engineeringGateExitCode('NEEDS_INPUT', { dbReplay: { status: 'PASS' } }), 0);
   });
 });
