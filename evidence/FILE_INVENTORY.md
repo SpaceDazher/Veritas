@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 683.
+Generated from `git ls-files`; count: 687.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -361,6 +361,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006-EVALUATION-REPORT.md`
 - `docs/decisions/S2-006-OWNER-CORPUS-LOADER-TDD-EVIDENCE.md`
 - `docs/decisions/S2-006-ROUND3-TDD-EVIDENCE.md`
+- `docs/decisions/S2-006E-ENGINEERING-CLOSURE.md`
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
@@ -524,6 +525,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-005-db-replay.mjs`
 - `scripts/s2-005-run.mjs`
 - `scripts/s2-005-security-probes.mjs`
+- `scripts/s2-006-db-gate.mjs`
 - `scripts/s2-006-db-replay.mjs`
 - `scripts/s2-006-run.mjs`
 - `scripts/s2-006m-pilot.mjs`
@@ -613,6 +615,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-003_SOURCE_INGESTION.md`
 - `tasks/S2-005_CROSS_DOMAIN_SYNTHESIS.md`
 - `tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md`
+- `tasks/S2-006E_ENGINEERING_CLOSURE.md`
 - `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
 - `tests/claims/contracts.schemas.test.mjs`
 - `tests/claims/contracts.types.test.mjs`
@@ -657,6 +660,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/verifier/comparator.test.mjs`
 - `tests/verifier/contracts.test.mjs`
 - `tests/verifier/db-replay-crash.test.mjs`
+- `tests/verifier/db-replay-freshness.test.mjs`
 - `tests/verifier/fixtures/canonical/claim.json`
 - `tests/verifier/fixtures/canonical/evidence-map.json`
 - `tests/verifier/fixtures/canonical/hypothesis-card.json`
