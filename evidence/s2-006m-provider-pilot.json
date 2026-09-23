@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006M-P1",
+  "status": "PARTIAL_RATE_LIMITED",
+  "model": "poolside/laguna-s-2.1:free",
+  "trainingPolicy": "TRAINING_PERMITTED_BY_USER_FOR_THIS_PILOT",
+  "independentLabels": 0,
+  "goldVerdicts": 0,
+  "officialS2006Verdict": "NEEDS_INPUT",
+  "syntheticConnectivity": {
+    "httpStatus": 200,
+    "returnedModel": "poolside/laguna-s-2.1:free",
+    "podcastTextSent": false
+  },
+  "smoke": {
+    "localReport": "D:/Project/AgentOS/.tmp/s2-006m-pilot-smoke.json",
+    "reportSha256": "ac5ac4e466e6335ec756be539e406fcae6a8f109f61531016a94d75719982a88",
+    "requestedCases": 2,
+    "completedCases": 2,
+    "validResponses": 2,
+    "statusCounts": { "SUPPORTED": 2 }
+  },
+  "fullAttempt": {
+    "localReport": "D:/Project/AgentOS/.tmp/s2-006m-pilot-full.json",
+    "reportSha256": "165298afdfa036ade1a2a98b362cf913c367117c4bd7767b0ba60768f229785f",
+    "requestedCases": 21,
+    "completedCases": 1,
+    "validResponses": 0,
+    "httpStatus": 429,
+    "retried": false,
+    "fallbackUsed": false
+  },
+  "repositoryContainsCasePromptOrKey": false,
+  "semanticMetrics": "NOT_MEASURED"
+}

@@ -31,6 +31,9 @@ test('candidate maps only the selected ACCEPT case and source quote', () => {
   assert.throws(() => buildCandidate(pair, { ...draft, sourceStatus: 'NEEDS_SOURCE' }), /ACCEPT/);
   assert.throws(() => buildCandidate(pair, { ...draft, videoId: 'other' }), /episode/);
   assert.throws(() => buildCandidate(pair, { ...draft, evidenceSpans: [] }), /quote/);
+  assert.throws(() => buildCandidate({ ...pair, archive: 'unknown' }, draft), /archive/);
+  assert.throws(() => buildCandidate(pair, { ...draft, semanticTemplate: 'other' }), /template/);
+  assert.throws(() => buildCandidate(pair, { ...draft, claim: 'x'.repeat(801) }), /too long/);
 });
 
 test('candidate maps package JSONL format and refuses a missing supporting span', () => {
@@ -66,6 +69,9 @@ test('diagnosis parser is fail-closed on prose, unknown values and extra authori
   assert.equal(parseDiagnosis('It is supported.'), null);
   assert.equal(parseDiagnosis('{"support":"PASS","externalVerificationRequired":true,"concern":"x"}'), null);
   assert.equal(parseDiagnosis('{"support":"SUPPORTED","externalVerificationRequired":true,"concern":"x","goldLabel":"PASS"}'), null);
+  assert.equal(parseDiagnosis('{"support":"SUPPORTED","externalVerificationRequired":false,"concern":"x"}'), null);
+  assert.equal(parseDiagnosis('[]'), null);
+  assert.equal(parseDiagnosis('x'.repeat(2001)), null);
 });
 
 test('provider request sends key only in auth header and rejects wrong model response', async () => {
@@ -90,6 +96,8 @@ test('provider request sends key only in auth header and rejects wrong model res
   const transport = await requestDiagnosis(candidate, { apiKey: 'private-test-key', fetchImpl: async () => { throw new Error('private-test-key'); } });
   assert.equal(transport.status, 'API_ERROR');
   assert.ok(!JSON.stringify(transport).includes('private-test-key'));
+  const limited = await requestDiagnosis(candidate, { apiKey: 'private-test-key', fetchImpl: async () => ({ ok: false, status: 429 }) });
+  assert.equal(limited.httpStatus, 429);
 });
 
 test('pilot limits requests, keeps official verdict unchanged and does not retry errors', async () => {
@@ -107,6 +115,9 @@ test('pilot limits requests, keeps official verdict unchanged and does not retry
   assert.equal(report.independentLabels, 0);
   assert.equal(snapshots.length, 1);
   assert.ok(!JSON.stringify(report).includes('private-test-key'));
+  await assert.rejects(() => runPilot(cases, { apiKey: 'private-test-key', fetchImpl, maxCases: 22, consentTraining: true }), /limit/);
+  await assert.rejects(() => runPilot([cases[0], cases[0]], { apiKey: 'private-test-key', fetchImpl, consentTraining: true }), /duplicate case/);
+  await assert.rejects(() => runPilot(cases, { fetchImpl, consentTraining: true }), /KEY missing/);
 });
 
 test('loader checks archive bytes and handles both source shapes without exposing text', () => {
