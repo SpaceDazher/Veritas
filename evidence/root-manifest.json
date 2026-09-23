@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "71703729f7654f80f4252aa359c2c4d6bb6ee2af",
-  "sourceTree": "a57706a27105c8f3c8df30e5526878645369776c",
+  "sourceCommit": "b3bd86f19aed8e31a1a13a5df0c607b2e160f28b",
+  "sourceTree": "e7856e73aaff2c935c870dffa20d626369aa9af0",
   "trackedFileCount": 687,
   "manifestFileCount": 682,
-  "payloadManifestSha256": "167593ee2c2b32c724a7ca26e0043224e145736982d537a939dfbba50345ee4e",
-  "fileManifestSha256": "a4c45ef6a0f14aa3b0989c7e2ce2eb1b8514ed8033e51c83dea0cb8b004bfa7e",
+  "payloadManifestSha256": "515307863177e779139e3e080aa120ca2797db4b7307064ef5643d5c08bafc31",
+  "fileManifestSha256": "c5788c6ee8ba45e078c5d331605fa1383bd02ee392e12fde0c1a4380935ae7f9",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1808,8 +1808,8 @@
     },
     {
       "path": "docs/decisions/S2-006E-ENGINEERING-CLOSURE.md",
-      "sha256": "bcb23e1454e98e01221a338591c960beb5ddc574207efb139386ea8c3b459936",
-      "bytes": 6481
+      "sha256": "814d679e7db19a8f095a7a0291d1b0e26e6891a5b49ee38cfef468b89ffad1ed",
+      "bytes": 7474
     },
     {
       "path": "docs/decisions/S2-006M-PROVIDER-PILOT.md",
@@ -1953,8 +1953,8 @@
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "552e08a5715cf4ddcea2ad0b350b68db1b1fa5c1a1a09d99cf674c62753e0803",
-      "bytes": 62646
+      "sha256": "f0f5659ff80dc44d2693d226b013aafcd1f0cdbb729122f4f3b6fbd7b6be4d2e",
+      "bytes": 62867
     },
     {
       "path": "evidence/policy-probes.json",
@@ -2638,8 +2638,8 @@
     },
     {
       "path": "scripts/validate-contracts.mjs",
-      "sha256": "d1f6619159d5ef2e72cddde72104292ea6be8e2786e81c127baa7bd8cc94458d",
-      "bytes": 12752
+      "sha256": "4676502284d359939c5d0e29980a597a4d79c85fffde31d8a01b907fff3f6ba9",
+      "bytes": 12784
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
@@ -3278,8 +3278,8 @@
     },
     {
       "path": "tests/verifier/db-replay-freshness.test.mjs",
-      "sha256": "7c7731b7e54b7b339181e071a3186deff2c3b9ddc0d6cf4b7898f1f9ebbc5c53",
-      "bytes": 3221
+      "sha256": "970a33c0d0f481420e701e37a1d5ab3418e5a6cc0c835603ef12920c3755cc77",
+      "bytes": 3872
     },
     {
       "path": "tests/verifier/fixtures/canonical/claim.json",
