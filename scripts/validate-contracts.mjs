@@ -157,7 +157,8 @@ const frozenTargets = [
   // dependency bindings share this gate.
   'src/lib/verifier', 'tests/verifier', 'corpus/s2-006',
   'scripts/s2-006-run.mjs', 'scripts/s2-006-db-replay.mjs',
-  'scripts/verify-s2-006.mjs', 'scripts/verify-s2-006-dependencies.mjs',
+  'scripts/s2-006-db-gate.mjs', 'scripts/verify-s2-006.mjs',
+  'scripts/verify-s2-006-dependencies.mjs',
   'scripts/generate-verifier-types.mjs',
   'evidence/s2-006-dependency-binding.json', 'evidence/s2-006-security-probes.json',
 ];
