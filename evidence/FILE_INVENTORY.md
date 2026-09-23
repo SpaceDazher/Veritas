@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 678.
+Generated from `git ls-files`; count: 682.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -361,6 +361,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006-EVALUATION-REPORT.md`
 - `docs/decisions/S2-006-OWNER-CORPUS-LOADER-TDD-EVIDENCE.md`
 - `docs/decisions/S2-006-ROUND3-TDD-EVIDENCE.md`
+- `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
@@ -444,6 +445,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-006-security-probes.json`
 - `evidence/s2-006-summary.json`
 - `evidence/s2-006m-intake.json`
+- `evidence/s2-006m-provider-pilot.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -524,6 +526,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-005-security-probes.mjs`
 - `scripts/s2-006-db-replay.mjs`
 - `scripts/s2-006-run.mjs`
+- `scripts/s2-006m-pilot.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
@@ -673,6 +676,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/verifier/fixtures/owner-inputs/README.md`
 - `tests/verifier/fixtures/owner-inputs/threshold-decision.json`
 - `tests/verifier/fixtures/owner-inputs/thresholds.json`
+- `tests/verifier/model-pilot.test.mjs`
 - `tests/verifier/owner-inputs.test.mjs`
 - `tests/verifier/policy.test.mjs`
 - `tests/verifier/review-round3-hardening.test.mjs`
