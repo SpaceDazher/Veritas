@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 682.
+Generated from `git ls-files`; count: 683.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -608,6 +608,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/verifier/rubric.mjs`
 - `src/lib/verifier/signature.mjs`
 - `src/lib/verifier/store.mjs`
+- `tasks/S2_AUTONOMOUS_DELIVERY_PLAN.md`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tasks/S2-003_SOURCE_INGESTION.md`
 - `tasks/S2-005_CROSS_DOMAIN_SYNTHESIS.md`
