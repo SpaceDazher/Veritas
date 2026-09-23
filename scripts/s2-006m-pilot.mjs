@@ -133,16 +133,21 @@ export async function runPilot(cases, { apiKey, fetchImpl = fetch, maxCases = 21
     independentLabels: 0,
     goldVerdicts: 0,
     requestedCases: selected.length,
+    runStatus: 'IN_PROGRESS',
     results: [],
   };
   for (const candidate of selected) {
     const result = await requestDiagnosis(candidate, { apiKey, fetchImpl });
     report.results.push(result);
+    report.completedCases = report.results.length;
+    report.validResponses = report.results.filter((item) => SUPPORT.has(item.status)).length;
+    if (result.httpStatus === 429) report.runStatus = 'PARTIAL_RATE_LIMITED';
+    else if (result.status === 'API_ERROR') report.runStatus = 'PARTIAL_API_ERROR';
+    else if (result.status === 'INVALID_RESPONSE') report.runStatus = 'PARTIAL_INVALID_RESPONSE';
+    else if (report.completedCases === report.requestedCases) report.runStatus = 'COMPLETE_SELECTED_SLICE';
     await onProgress(report);
-    if (result.httpStatus === 429) break;
+    if (report.runStatus.startsWith('PARTIAL_')) break;
   }
-  report.completedCases = report.results.length;
-  report.validResponses = report.results.filter((result) => SUPPORT.has(result.status)).length;
   return report;
 }
 
@@ -207,7 +212,8 @@ async function main() {
     onProgress: (current) => writeLocalReport(outputPath, current),
   });
   writeLocalReport(outputPath, report);
-  console.log(JSON.stringify({ ticket: report.ticket, model: report.model, completedCases: report.completedCases, validResponses: report.validResponses, officialS2006Verdict: report.officialS2006Verdict, outputPath }));
+  console.log(JSON.stringify({ ticket: report.ticket, model: report.model, runStatus: report.runStatus, completedCases: report.completedCases, validResponses: report.validResponses, officialS2006Verdict: report.officialS2006Verdict, outputPath }));
+  if (report.runStatus !== 'COMPLETE_SELECTED_SLICE') process.exitCode = 2;
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
