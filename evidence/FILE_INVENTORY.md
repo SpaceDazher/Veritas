@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 674.
+Generated from `git ls-files`; count: 678.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -361,6 +361,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006-EVALUATION-REPORT.md`
 - `docs/decisions/S2-006-OWNER-CORPUS-LOADER-TDD-EVIDENCE.md`
 - `docs/decisions/S2-006-ROUND3-TDD-EVIDENCE.md`
+- `docs/decisions/S2-006M-SOURCE-REVIEW.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
 - `docs/product/AUTONOMY_POLICY.md`
@@ -442,6 +443,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-006-run-b.json`
 - `evidence/s2-006-security-probes.json`
 - `evidence/s2-006-summary.json`
+- `evidence/s2-006m-intake.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -493,6 +495,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-005/s2-005-db-run-a.json`
 - `results/s2-005/s2-005-db-run-b.json`
 - `results/s2-005/smoke.json`
+- `results/s2-006/model-assisted-pilot-pool.json`
 - `results/s2-006/s2-006-db-comparison.json`
 - `scripts/acceptance-gate.mjs`
 - `scripts/apply-migrations.mjs`
@@ -606,6 +609,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-003_SOURCE_INGESTION.md`
 - `tasks/S2-005_CROSS_DOMAIN_SYNTHESIS.md`
 - `tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md`
+- `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
 - `tests/claims/contracts.schemas.test.mjs`
 - `tests/claims/contracts.types.test.mjs`
 - `tests/claims/dependency-binding.test.mjs`
