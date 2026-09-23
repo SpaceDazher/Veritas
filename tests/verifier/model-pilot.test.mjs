@@ -102,6 +102,7 @@ test('pilot limits requests, keeps official verdict unchanged and does not retry
   assert.equal(calls, 1);
   assert.equal(report.results.length, 1);
   assert.equal(report.results[0].status, 'API_ERROR');
+  assert.equal(report.runStatus, 'PARTIAL_RATE_LIMITED');
   assert.equal(report.officialS2006Verdict, 'NEEDS_INPUT');
   assert.equal(report.independentLabels, 0);
   assert.equal(snapshots.length, 1);
