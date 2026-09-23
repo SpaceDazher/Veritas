@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "20d9d83aae42426003bcf5b82a203692e381fe8d",
-  "sourceTree": "a3c0444c561a4ef8b17514bba4ed39a3c3e89dd2",
-  "trackedFileCount": 682,
-  "manifestFileCount": 677,
-  "payloadManifestSha256": "cd73b85b139728612d4ab90ec1e2f4bebd81f7b4ab028500003b602f432f892f",
-  "fileManifestSha256": "3c93e27b4f387d59a9f18f17321d553ae354ec4c957350035b4f2e5aeb2ecb2f",
+  "sourceCommit": "1fed8c840d0dca3bb92a79f887d1a2e5057a10e4",
+  "sourceTree": "ede53141c14c5b4dc1c1b69fd8022b93a1e25d8e",
+  "trackedFileCount": 683,
+  "manifestFileCount": 678,
+  "payloadManifestSha256": "555c0621901293cc5ba15dfa03f09de13001e1a51d449bfe777c5c4131f4f239",
+  "fileManifestSha256": "6a77aec41a22014ac98fc68639a80617a19b4f459be1d0aa24f766293a20dc12",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1943,8 +1943,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "22a72156e2c1b8f7cae086dc22506aa9cb6b4427b71eeef755760223a124d7d9",
-      "bytes": 28541
+      "sha256": "1f19880cdb698afe4c4bb20ce40ab43a6bfc15f54056c0ee11396f150e4a38f2",
+      "bytes": 28582
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3017,6 +3017,11 @@
       "bytes": 56811
     },
     {
+      "path": "tasks/S2_AUTONOMOUS_DELIVERY_PLAN.md",
+      "sha256": "39d3187a83754f32970d4e5cfc6a1f016fecd7bcc5ac535e7df99880f4580a45",
+      "bytes": 11319
+    },
+    {
       "path": "tasks/S2-002_IDENTITY_SANDBOX.md",
       "sha256": "f9731177ca11c6aaec3f746561d50640ac5a7cfdc4bf73a9e3f423832c7fa48d",
       "bytes": 14752
@@ -3033,13 +3038,13 @@
     },
     {
       "path": "tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md",
-      "sha256": "b95058eca5ef743f6916a9452ff81ac05a3fbfbbfb8214bcaf7f808c763d7d74",
-      "bytes": 45112
+      "sha256": "d59948dc12131afafc7e94c405ff4561df3ca9fee863a0f09d40d0cd408e93bf",
+      "bytes": 45439
     },
     {
       "path": "tasks/S2-006M_MODEL_ASSISTED_PILOT.md",
-      "sha256": "b1256a19b53cbfe359acc6073eb16972abba055ce0048b63791e22dc12b0f198",
-      "bytes": 10263
+      "sha256": "6121be67aa958d0593084dbb06e932d9151220d015b33858749203c4f7910225",
+      "bytes": 10465
     },
     {
       "path": "tests/claims/contracts.schemas.test.mjs",
