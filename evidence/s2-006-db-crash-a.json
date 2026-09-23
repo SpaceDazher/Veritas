@@ -5,8 +5,8 @@
   "runId": "s2-006-db-crash-a",
   "executorId": "exec-db-s2006-crash-a",
   "schema": "run_a",
-  "recoveryPid": 19236,
-  "crashFirstPid": 30676,
+  "recoveryPid": 960,
+  "crashFirstPid": 22232,
   "crashFirstExecutor": "exec-db-s2006-dies-a",
   "fencingToken": 2,
   "decision": {

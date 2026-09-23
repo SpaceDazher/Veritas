@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "verification aggregator: dependency gate (records owner-input state), contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + honest probe statuses), DB replay status with crash/restart phase and the DERIVED §16 verdict",
-  "testedImplementationCommit": "f136c4b13971ebd62246e1c3faf8654c570c68a7",
+  "testedImplementationCommit": "f2bc6672ef72e6625759bbcc66dcf7de860fbe13",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
   "gates": {
     "dependency": {
@@ -20,8 +20,8 @@
       "status": "PASS",
       "exitCode": 0,
       "counts": {
-        "tests": 303,
-        "pass": 297,
+        "tests": 317,
+        "pass": 311,
         "fail": 0,
         "skipped": 6
       }
@@ -54,7 +54,7 @@
     "dbReplay": {
       "status": "PASS",
       "exitCode": 0,
-      "source": "evidence/s2-006-db-comparison.json from a prior verify:s2-006-db-replay run",
+      "source": "current DB replay",
       "crashPhaseOk": true
     },
     "probes": {

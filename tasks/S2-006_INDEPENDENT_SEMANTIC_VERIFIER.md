@@ -14,7 +14,12 @@
 
 ## Статус и цель
 
-- Статус: `READY`. S2-005 слит через PR #18 в `origin/main`.
+- Инженерный статус: `COMPLETE_WITH_LIMITS` по отдельному контракту
+  `tasks/S2-006E_ENGINEERING_CLOSURE.md` и отчёту
+  `docs/decisions/S2-006E-ENGINEERING-CLOSURE.md` — только при зелёном
+  финальном `verify:clean-checkout`. Официальный verdict S2-006 остаётся
+  `NEEDS_INPUT`: независимая калибровка не получена.
+- S2-005 слит через PR #18 в `origin/main`.
 - Ветка задания: `codex/s2-006-independent-semantic-verifier`, от
   `origin/main` `d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f`.
 - Канонический head S2-005:

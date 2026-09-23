@@ -4,7 +4,7 @@
   "role": "deterministic verifier store replay on PostgreSQL (PostgresVerifierStore, migration 0005)",
   "runId": "s2-006-db-run-a",
   "executorId": "exec-db-s2006-a",
-  "pid": 15616,
+  "pid": 28584,
   "databaseEngine": "PostgreSQL",
   "schema": "run_a",
   "ops": [

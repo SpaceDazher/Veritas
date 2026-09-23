@@ -77,8 +77,8 @@
     }
   ],
   "pids": {
-    "run_a": 15616,
-    "run_b": 16264
+    "run_a": 28584,
+    "run_b": 26904
   },
   "executors": {
     "run_a": "exec-db-s2006-a",
@@ -112,12 +112,12 @@
     },
     "pids": {
       "recovery": {
-        "run_a": 19236,
-        "run_b": 19960
+        "run_a": 960,
+        "run_b": 19572
       },
       "crash_first": {
-        "run_a": 30676,
-        "run_b": 24164
+        "run_a": 22232,
+        "run_b": 268
       }
     },
     "fencingToken": 2,
