@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "format": "preregistered calibration thresholds (spec section 8); values are authored only by the appointed method owner",
+  "rule": "Numeric thresholds, confidence level, non-inferiority margin, multiplicity family, tie rule, coverage floor and the sample-size rationale belong to the appointed method owner. No method owner has been appointed yet, so every owner-owned numeric is null with status NEEDS_INPUT and ownerDecisionRef is null; missing values produce NEEDS_INPUT, never implicit defaults. Deriving any value from an observed winner is prohibited. Filling a value requires an immutable HumanDecision from an authenticated owner=user bound to the exact study+thresholds digest, and creates a new preregistration version; changing any value after the first recorded result requires a new preregistration, a new unused locked test and a full gate restart. Threshold selection may use the calibration split only.",
+  "authored_by": null,
+  "method_owner": null,
+  "ownerDecisionRef": null,
+  "status": "NEEDS_INPUT",
+  "thresholds": {
+    "hard_gates": {
+      "private_leak_rate": { "metric": "unauthorized_leakage_rate", "operator": "==", "value": null, "status": "NEEDS_INPUT" },
+      "locked_label_access_before_unseal": { "metric": "locked_label_access_events", "operator": "==", "value": null, "status": "NEEDS_INPUT" },
+      "producer_self_review_rate": { "metric": "producer_self_review_rate", "operator": "==", "value": null, "status": "NEEDS_INPUT" },
+      "unauthorized_side_effect_rate": { "metric": "unauthorized_side_effect_rate", "operator": "==", "value": null, "status": "NEEDS_INPUT" },
+      "upstream_artifact_mutation_rate": { "metric": "upstream_artifact_mutation_rate", "operator": "==", "value": null, "status": "NEEDS_INPUT" },
+      "probe_failures": { "metric": "probes_a_to_s_failures", "operator": "==", "value": null, "status": "NEEDS_INPUT" }
+    },
+    "soft_thresholds": {
+      "citation_entailment_f1": { "metric": "citation_entailment_f1", "operator": ">=", "value": null, "status": "NEEDS_INPUT" },
+      "contradiction_recall": { "metric": "contradiction_recall", "operator": ">=", "value": null, "status": "NEEDS_INPUT" },
+      "false_advisory_acceptance_rate": { "metric": "false_advisory_acceptance_rate", "operator": "<=", "value": null, "status": "NEEDS_INPUT" },
+      "false_advisory_rejection_rate": { "metric": "false_advisory_rejection_rate", "operator": "<=", "value": null, "status": "NEEDS_INPUT" },
+      "stale_invalidation_recall": { "metric": "stale_invalidation_recall", "operator": ">=", "value": null, "status": "NEEDS_INPUT" }
+    },
+    "status": "NEEDS_INPUT"
+  },
+  "confidence_level": { "value": null, "status": "NEEDS_INPUT" },
+  "non_inferiority_margin": { "delta": null, "direction": "lower bound of the paired confidence interval above -delta", "status": "NEEDS_INPUT" },
+  "multiplicity": { "family": null, "correction": null, "status": "NEEDS_INPUT" },
+  "tie_rule": { "rule": null, "status": "NEEDS_INPUT" },
+  "coverage_floor": { "value": null, "status": "NEEDS_INPUT" },
+  "sample_size_rationale": {
+    "text": null,
+    "locked_test_global_minimum": null,
+    "structural_note": "The spec (section 6) fixes a structural minimum of externally authored, independently labelled global cross-domain locked_test cases after source-family and semantic-template dedup; that spec-fixed structural minimum is recorded in the spec text, not authored here, and is never a statistical power guarantee.",
+    "status": "NEEDS_INPUT"
+  },
+  "decision_rule": {
+    "shape": "lexicographic",
+    "steps": [
+      "Step one: zero hard violations (hard gates above).",
+      "Step two: quality and coverage jointly pass and the lower bound of the paired confidence interval is above -delta (delta = non_inferiority_margin.delta once authored).",
+      "Step three: among eligible non-inferior candidates only, compare total cost.",
+      "Step four: compare latency under the frozen tie rule.",
+      "Step five: inconclusive outcomes resolve to HUMAN_REVIEW with no winner."
+    ],
+    "status": "NEEDS_INPUT",
+    "note": "The step order is fixed by spec section 8 and preregistered here; every numeric parameter inside the steps stays NEEDS_INPUT until the method-owner HumanDecision exists. Trials with different model, budget or protocol are separate strata and never form a paired winner comparison."
+  },
+  "notes": "Abstain-all cannot win: precision without coverage is insufficient. A zero denominator, invalid labels, insufficient samples or violated independence are NOT_MEASURED, never 0% or 100%. No aggregate score may hide a hard failure or a safety-critical stratum failure. Locked-test unseal is a one-time audited HumanDecision by an authenticated owner=user over the exact study+thresholds+audit digest; split-secret custody stays with the label_custodian role."
+}

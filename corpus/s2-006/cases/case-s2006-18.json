@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-18",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-17",
+    "semanticTemplate": "template-18",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-18",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "9e366d35ca7a932c44c470a648d5ef10337e6d82c97b60341f7d9a82a1afa264",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "689e91fe20cd07f3f44879ca0e2737d9023db3977bc3d00bba947797d6720201"
+  },
+  "scenario": {
+    "category": "multilingual",
+    "statement": "Программа обучения повысила успеваемость на 20% в 2024 году.",
+    "supportingSpans": [
+      {
+        "text": "The training program raised test scores by 12% in 2024.",
+        "sourceFamily": "fixture-family-17",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "translationAlignment": [
+      {
+        "statementTerm": "программа",
+        "spanTerm": "program"
+      },
+      {
+        "statementTerm": "обучения",
+        "spanTerm": "training"
+      },
+      {
+        "statementTerm": "повысила",
+        "spanTerm": "raised"
+      },
+      {
+        "statementTerm": "успеваемость",
+        "spanTerm": "scores"
+      }
+    ],
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ]
+    }
+  }
+}

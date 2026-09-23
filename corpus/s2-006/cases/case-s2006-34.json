@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-34",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-34",
+    "semanticTemplate": "template-34",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-34",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "afba4fe7662258fe0c71b35ddfac351d1ca8aa17e0f365b56dcea05a914565ac",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "98d55978e305b8f739d1039171ce01abeb7dc1611cd523594a160c44bda3e176"
+  },
+  "scenario": {
+    "category": "private",
+    "statement": "The sealed settlement mentions a 4M EUR penalty in 2025.",
+    "supportingSpans": [
+      {
+        "text": "Sealed: Company X paid a 4M EUR penalty in 2025.",
+        "sourceFamily": "fixture-family-34",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "private"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "BLOCKED_POLICY",
+      "reasonCodes": [
+        "policy_block"
+      ],
+      "missingnessKind": "policy_refusal"
+    }
+  }
+}

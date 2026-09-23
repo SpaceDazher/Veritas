@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-owner-ext-04",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "owner-family-04",
+    "semanticTemplate": "owner-template-04",
+    "stratum": "external",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-owner-ext-04",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "26d082013d320fe2a41f908b79931594165f51e80301d39352d70817022057cc",
+      "annotationSetIds": [
+        "ans-owner-a",
+        "ans-owner-b"
+      ]
+    },
+    "textDigest": "c249ac46aee1ef5d6bc80dea553b351a1456b688bd0067a560cb00e6aa501dee"
+  },
+  "scenario": {
+    "category": "abstention",
+    "statement": "Ridership on the water bus grew by 8% year over year.",
+    "supportingSpans": [],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ]
+    }
+  }
+}

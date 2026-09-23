@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-15",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-15",
+    "semanticTemplate": "template-15",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-15",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "0ef07213d4c3af1a402887c462f8b04d16abdff74755a288c7fb9c726e6579a6",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "035ff0284f10a4e101c94350a4bf96fc788b1f4271964f0a12903d67924bd5e5"
+  },
+  "scenario": {
+    "category": "stale",
+    "statement": "The energy price cap saved households 120 EUR per year as of 2025.",
+    "supportingSpans": [
+      {
+        "text": "The energy price cap saves households 120 EUR per year.",
+        "sourceFamily": "fixture-family-15",
+        "status": "stale",
+        "publishedAt": "2021-02-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ]
+    }
+  }
+}

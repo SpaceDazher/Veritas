@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "title": "Independent semantic verifier and calibration",
+  "scope": "Dependency gate record for S2-006: every protected S2-005/policy input is pinned by Git blob id and SHA-256 over bytes read via `git show d7ce192:<path>` — never from the working tree or a self-generated narrative. The `resolved` section is written only by scripts/verify-s2-006-dependencies.mjs on a fully green verification and is deterministic (no wall clock, no pids).",
+  "rule": "Any miss (missing object, wrong parent order, blob drift, digest drift, payload mismatch, executable drift, unpinned consumer input) exits non-zero as BLOCKED_DEPENDENCY before any measured semantic result may be published.",
+  "s2_005": {
+    "ticket": "S2-005",
+    "title": "Cross-domain retrieval and synthesis",
+    "status": "BOUND_PASS_WITH_LIMITS",
+    "canonicalMerge": "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f",
+    "canonicalMergeSubject": "Merge pull request #18 from SpaceDazher/codex/s2-005-cross-domain-synthesis",
+    "expectedParents": [
+      "7662face2091c1f591af2b586502beb4ea698e5e",
+      "36fd8f854459f3ee419a997293c966e6840a2373"
+    ],
+    "expectedParentsRule": "Exactly these two parents, in Git order; the second parent is the exact S2-005 head. On task start refs/remotes/origin/main must point at the merge object; a later advance of origin/main requires a separate reviewed rebase binding (s2_005.rebaseBinding), which does not exist yet and therefore fails closed.",
+    "implementationHead": "36fd8f854459f3ee419a997293c966e6840a2373",
+    "testedImplementationCommit": "dd683ceb614e95777cf08c09089454efd48749ef",
+    "rebaseBinding": null,
+    "expected": {
+      "cleanCheckoutPassed": true,
+      "cleanCheckoutExitCode": 0,
+      "comparisonOk": true,
+      "comparisonVerdict": "PASS_WITH_LIMITS",
+      "comparedCases": 55,
+      "hardGatesOk": true,
+      "dbComparisonOk": true,
+      "aclLeaks": 0,
+      "authorityExpansions": 0,
+      "typePromotionsWithoutReview": 0,
+      "staleSurvivors": 0,
+      "duplicateSideEffects": 0
+    },
+    "evidenceReadFromGitBytes": {
+      "evidence/clean-checkout.json": "5dd93ee43cf966ffaf5cb87f24336d93d11bbf94",
+      "evidence/s2-005-run-a.json": "6d87793b7d8e23f35c43e87696cd7a3f8489f563",
+      "evidence/s2-005-run-b.json": "67f81386ce9280167a605c962e4ede00c49ec87a",
+      "evidence/s2-005-comparison.json": "a9f3798ddda98f6e91eda52fa1609200472fe221",
+      "evidence/s2-005-db-run-a.json": "3bcaac057dee108aa81e29e8f85c6bb6a108a3f2",
+      "evidence/s2-005-db-run-b.json": "7686b9bf2ecfde920cabd830d166d25ab972c1c2",
+      "evidence/s2-005-db-comparison.json": "a1d5ccc1be087a8530a19a44830a93ec86ea8132",
+      "evidence/s2-005-security-probes.json": "088fb308ae1ddc882dbb08f198d4bc87aab2f3c9",
+      "evidence/s2-005-dependency-binding.json": "5ae8f8c1737d86def9c0c7c2aa5a3349c90729de",
+      "evidence/s2-005-commit-manifest.json": "abdaffaa8eb0bb99c90c291969c2391a3cae2584",
+      "evidence/frozen-manifest.json": "c123217417331a02155c8778f17472c50baabd76",
+      "corpus/s2-005/manifest.json": "cc9424f993ad2b6d6a5782c717e1595dc163cdda",
+      "contracts/s2-005-thresholds.json": "3607cd77766004b668c8fbb216ca27e83ad381db",
+      "docs/decisions/S2-005-EVALUATION-REPORT.md": "e01740970a3ce369df381658517e8e54efebae59"
+    }
+  },
+  "frozenS2_005InputsSha256": {
+    "rule": "SHA-256 over the raw bytes of `git show d7ce192:<path>`; each digest is additionally cross-checked against the independently frozen evidence/frozen-manifest.json — a mismatch between Git bytes and the frozen manifest fails the gate.",
+    "inputs": {
+      "corpus/s2-005/manifest.json": "d90b8d1a27f7121de874c27c983b0f734af239e6ddaab76c188f050358f50537",
+      "contracts/s2-005-thresholds.json": "fb4814911576564b4b1770082b79b54ecd2c86ac164554f89a9f3c150b8bfda3",
+      "docs/decisions/S2-005-EVALUATION-REPORT.md": "407093fe5095766a5ac8e6b9ab23aab8b23469a0cf57fab4d36068feaafdf1ce",
+      "evidence/s2-005-run-a.json": "e3e01a7d3468d3d7d6d5f57d38ac9fe87070bae667514efa20f1b67ef310abf6",
+      "evidence/s2-005-run-b.json": "b9ebf9d61e55600f9e95a4a86f3a0275aaa8abfcd3728bf4f734802714475dfc",
+      "evidence/s2-005-comparison.json": "aa3c918bc8d8f2f7bfe7913ad80a11e88c849724d3ac8bf355791d82326e3b93",
+      "evidence/s2-005-db-comparison.json": "ca11bc499256fb658a33402df40137fbb067398e57445e5ce6945a95b6d5c0e0",
+      "evidence/s2-005-security-probes.json": "91b387fba0dd3697e92b7c1b803d8e81cd88ec0c27ae7bd3b65138c8ebda9f8c",
+      "evidence/s2-005-dependency-binding.json": "cc5092ea484326ad309cbe789031fff56612eea3e2b5e666130f2d994edd1346",
+      "evidence/s2-005-commit-manifest.json": "6ec1269c3b3f7a0351d9fdc63971f1b7f7b9a6808075739508827d0edc3776c8",
+      "evidence/clean-checkout.json": "22f2589c856b09db615f3e3cdeca992943f89abbcce1f9af3290af60ee398408",
+      "evidence/frozen-manifest.json": "bd13d7cf310766f4b160135c54ed2cf954567188249a17250d5e2aa7cd66aa3d"
+    }
+  },
+  "protectedPolicySha256": {
+    "rule": "SHA-256 over `git show d7ce192:<path>` of the policy surfaces S2-006 inherits. METRIC_POLICY, HUMAN_APPROVAL_POLICY and AUTONOMY_POLICY are stage-1 AgentOS artifacts; in this repository their executable surfaces are the contract policy engine, the human-decision contract, the capability matrix and the provider grant contract. The working-tree bytes must stay byte-identical to the pinned Git bytes.",
+    "mapping": {
+      "src/lib/contract-policy.mjs": "METRIC_POLICY / AUTONOMY_POLICY executable surface (evaluatePolicy)",
+      "contracts/human-decision.schema.json": "HUMAN_APPROVAL_POLICY surface (immutable HumanDecision contract)",
+      "contracts/capability.schema.json": "AUTONOMY_POLICY surface (capability matrix)",
+      "contracts/grant.schema.json": "AUTONOMY_POLICY surface (provider grant, S2-002 frozen upstream schema)",
+      "scripts/policy-probes.mjs": "policy probe suite (S2-001 adversarial probes)"
+    },
+    "inputs": {
+      "src/lib/contract-policy.mjs": "29fdd978b0d91509e49ec8137fe50eb5c41a95bb9185907dd957341a25543839",
+      "contracts/human-decision.schema.json": "e5d34bba2959bef8ec2ccacbb946fa90aad7613f9b9f9cb058b349e5af96a133",
+      "contracts/capability.schema.json": "b19c9386ec3211b0f47da14345d7af1d39588c8b8136c38b53c0f1b825485d2c",
+      "contracts/grant.schema.json": "d948c47d1037fbc11e8d73028186fa7d3f2b1216245531777cef2069a5426a8f",
+      "scripts/policy-probes.mjs": "2d9ac50670a22a9b978a55a6eeff665934daa3e0c3613bdbc33bbc57d128ad96"
+    }
+  },
+  "stage1": {
+    "sourceRepository": {
+      "remote": "https://github.com/SpaceDazher/AgentOS.git",
+      "pinnedCommit": "a7940e113492c83a29533d1e93f2724c36a9bbc1",
+      "pinnedTree": "804d6f5dbad8a419f71b5cae343edba434f48e5f"
+    },
+    "bindings": {
+      "s1_011": {
+        "ticket": "S1-011",
+        "title": "Human decisions and authority binding",
+        "relevanceToS2_006": "Method-owner appointment and locked-test unseal are immutable HumanDecisions from an authenticated owner=user (spec §8); the authority-binding semantics come from verified S1-011 evidence, not narrative.",
+        "recordPath": "research/tickets/stage-1/S1-011/evaluation-record.json",
+        "recordBlob": null,
+        "recordSha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+        "recordBytes": 17897,
+        "trackedCopy": "evidence/external/s1-011/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-011",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_94X52VCQDV30J84Z01M1MSPWRD",
+          "artifact_chain_hash": "027c456355d30f760dc4fe077c29c619a91db1fd7d26f31f2a6cb9f18210b313"
+        }
+      },
+      "s1_012": {
+        "ticket": "S1-012",
+        "title": "Separation of confidence, calibration and support",
+        "relevanceToS2_006": "Expert lens, author confidence, measured calibration, evidence support and reviewer decision stay separate; no aggregate truth score (spec §10). Bound to verified S1-012 evidence.",
+        "recordPath": "research/tickets/stage-1/S1-012/evaluation-record.json",
+        "recordBlob": null,
+        "recordSha256": "d76439e89be4e8c09745d92b691c7e2f3aaec435ee11b37296fb029c252c8501",
+        "recordBytes": 22310,
+        "trackedCopy": "evidence/external/s1-012/evaluation-record.json",
+        "expected": {
+          "ticket_id": "S1-012",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_EPR9JR5JWBHXST6301M1NNPB5P",
+          "artifact_chain_hash": "818a25e67a1865d425eebcb754376f06d143aaac9fa7f07aa704804311ffb21c"
+        }
+      }
+    },
+    "recordBlobNote": "recordBlob (Git blob id inside the pinned AgentOS repository) is null for S1-011/S1-012: the AgentOS object database is not reachable from this offline gate. The tracked copies are digest- and length-verified, and the payload fields are checked; the cross-repository blob id is resolved only in the full AgentOS checkout."
+  },
+  "s2_006FrozenInputsSha256": {
+    "rule": "SHA-256 of the S2-006 frozen inputs as authored on this branch (executable consistency check): the working-tree bytes must match these digests. These files are not part of d7ce192 and are therefore not read from Git — they are pinned here and must never change after the first recorded result.",
+    "inputs": {
+      "contracts/s2-006-thresholds.json": "ddd02c1a87ce68f732f4913c014fddfa80628e1d825259dc16a3c0f4fc37cf19",
+      "corpus/s2-006/manifest.json": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+      "corpus/s2-006/rubric-v1.json": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+      "corpus/s2-006/adjudication.json": "585dd83cf57b26c5a49f8e51165282761106d0d2b622158128d86ee3332ba623",
+      "corpus/s2-006/labels/annotator-a.json": "359cc364a5fe077acc610081eb81c291b5967846a580e23073381229871acb5b",
+      "corpus/s2-006/labels/annotator-b.json": "2e2dc1077e7c108dc241c3eaf5032ffc08b2e15bfa5459a65bc0131ac80d454d"
+    },
+    "note": "SHA-256 of the S2-006 frozen inputs as authored on this branch (executable consistency check): the working-tree bytes must match these digests. These files are not part of d7ce192 and are therefore not read from Git — they are pinned here and must never change after the first recorded result."
+  },
+  "upstreamLimits": {
+    "rule": "All upstream limitations must be carried into S2-006, never silently dropped (spec §1.6).",
+    "carried": [
+      "synthetic-only corpus: corpus/s2-006 is a fixture stratum; external-validity claims require externally authored, independently labelled cases",
+      "hashed TF-IDF instead of production embeddings (S2-005 vector baseline; no production semantic model)",
+      "global paired statistics NOT_MEASURED: the external locked_test global stratum is empty",
+      "novelty is only novel_to_selected_corpus against a named frozen corpus; world-novelty claims are refused",
+      "no production claim and no production authorization of any kind",
+      "semantic calibration is NOT_MEASURED / evaluator_not_independent until independent annotators and adjudicator exist"
+    ],
+    "verifiedMarkers": [
+      "externalStratumNeedsWithReason"
+    ]
+  },
+  "consumerInputs": {
+    "rule": "Every upstream input the S2-006 consumer depends on must be pinned by digest in s2_005.evidenceReadFromGitBytes, frozenS2_005InputsSha256, protectedPolicySha256 or s2_006FrozenInputsSha256 of this record; a consumer input that is not pinned fails the gate.",
+    "inputs": {
+      "frozenCorpusS2_005": [
+        "corpus/s2-005/manifest.json"
+      ],
+      "thresholdsS2_005": [
+        "contracts/s2-005-thresholds.json"
+      ],
+      "limitationsS2_005": [
+        "docs/decisions/S2-005-EVALUATION-REPORT.md"
+      ],
+      "s2_005RunAndReplayEvidence": [
+        "evidence/s2-005-run-a.json",
+        "evidence/s2-005-run-b.json",
+        "evidence/s2-005-comparison.json",
+        "evidence/s2-005-db-comparison.json",
+        "evidence/s2-005-security-probes.json",
+        "evidence/s2-005-dependency-binding.json",
+        "evidence/s2-005-commit-manifest.json"
+      ],
+      "policySurfaces": [
+        "src/lib/contract-policy.mjs",
+        "contracts/human-decision.schema.json",
+        "contracts/capability.schema.json",
+        "contracts/grant.schema.json",
+        "scripts/policy-probes.mjs"
+      ],
+      "s2_006FrozenCorpusAndThresholds": [
+        "contracts/s2-006-thresholds.json",
+        "corpus/s2-006/manifest.json",
+        "corpus/s2-006/rubric-v1.json",
+        "corpus/s2-006/adjudication.json",
+        "corpus/s2-006/labels/annotator-a.json",
+        "corpus/s2-006/labels/annotator-b.json"
+      ]
+    }
+  },
+  "consequence": "If every check passes, S2-006 verifier evidence may be recorded. Any missing file, unreachable commit, wrong parent order, digest drift, payload mismatch, executable drift or unpinned consumer input exits non-zero as BLOCKED_DEPENDENCY.",
+  "resolved": {
+    "gate": "scripts/verify-s2-006-dependencies.mjs",
+    "mode": "FULL_GIT_BYTES",
+    "ok": true,
+    "checkedCount": 75,
+    "issueCount": 0,
+    "resolvedRefs": {
+      "originMain": "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f",
+      "canonicalMerge": "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f",
+      "canonicalMergeParents": [
+        "7662face2091c1f591af2b586502beb4ea698e5e",
+        "36fd8f854459f3ee419a997293c966e6840a2373"
+      ],
+      "s2_005ImplementationHead": "36fd8f854459f3ee419a997293c966e6840a2373",
+      "s2_005TestedImplementationCommit": "dd683ceb614e95777cf08c09089454efd48749ef"
+    },
+    "objectIds": {
+      "canonicalMergeType": "commit",
+      "parentReadBack": [
+        "git cat-file -p",
+        "git rev-list --parents"
+      ],
+      "evidenceBlobsAtCanonicalMerge": 14,
+      "frozenInputDigestsAtCanonicalMerge": 12
+    },
+    "exitCodes": {
+      "dependencyGate": 0,
+      "blockedDependency": null
+    },
+    "ownerInputs": {
+      "thresholdsStatus": "NEEDS_INPUT",
+      "methodOwner": null,
+      "ownerDecisionRef": null,
+      "externalStratumStatus": "NEEDS_INPUT",
+      "externalStratumReason": "evaluator_not_independent",
+      "note": "recorded, not required to be empty: owner-input state feeds the §16 verdict derivation, not the dependency gate (review P2-7)"
+    }
+  }
+}

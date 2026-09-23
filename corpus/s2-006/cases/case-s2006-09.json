@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-09",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-09",
+    "semanticTemplate": "template-09",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-09",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "3886c8e477c578b80de988f3ada7fc992371e250676fcc590bc6b168202e217d",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "4a3ec390a410b274ecb616065bd6778f5d7fda86eabdfc00af5baef5d9e2434e"
+  },
+  "scenario": {
+    "category": "stale",
+    "statement": "The broadband report shows 72% coverage in rural areas as of 2024.",
+    "supportingSpans": [
+      {
+        "text": "The broadband report shows 72% coverage in rural areas.",
+        "sourceFamily": "fixture-family-09",
+        "status": "stale",
+        "publishedAt": "2021-05-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ]
+    }
+  }
+}

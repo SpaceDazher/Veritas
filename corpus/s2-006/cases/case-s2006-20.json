@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-20",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-20",
+    "semanticTemplate": "template-20",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-20",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "12d2cd526c5204be2269238adfa6aba3b82cf0e76413ec78ab18ad90b66be960",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "51302d278b9cd58fdff5878b39f137f4f34e1b9cec8a7d6982fc924f1f6379a4"
+  },
+  "scenario": {
+    "category": "causal",
+    "statement": "The randomized trial showed that the app lowers HbA1c by 0.9% in diabetic patients.",
+    "supportingSpans": [
+      {
+        "text": "In a randomized controlled trial, the app lowered HbA1c by 0.9% among diabetic patients compared to usual care.",
+        "sourceFamily": "fixture-family-20",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": true,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

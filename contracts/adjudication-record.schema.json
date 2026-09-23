@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/adjudication-record.schema.json",
+  "description": "Adjudication record (S2-006 spec section 3): conflicting independent labels with all raw votes retained verbatim, the adjudicated decision, rationale, authenticated adjudicator identity (never an annotator of the same case, never the producer), exact corpus/rubric/manifest/threshold versions and an audit reference.",
+  "title": "Veritas Adjudication Record (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "adjudicationId",
+    "caseId",
+    "annotationSetIds",
+    "conflictingLabels",
+    "retainedRawLabels",
+    "decision",
+    "rationale",
+    "adjudicatorIdentity",
+    "versions",
+    "auditRef",
+    "createdAt"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "adjudicationId": { "type": "string", "pattern": "^adj-[a-z0-9][a-z0-9-]{0,62}$" },
+    "caseId": { "type": "string", "pattern": "^case-[a-z0-9][a-z0-9-]{0,62}$" },
+    "annotationSetIds": {
+      "description": "Annotation sets whose labels conflict; at least two independent blind sets per locked case.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^ans-[a-z0-9][a-z0-9-]{0,62}$" },
+      "minItems": 2,
+      "uniqueItems": true
+    },
+    "conflictingLabels": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/rawLabel" }
+    },
+    "retainedRawLabels": {
+      "description": "Every raw label for the case, including non-conflicting ones; consensus never erases the original votes.",
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/rawLabel" }
+    },
+    "decision": { "enum": ["SUPPORTED", "CONTRADICTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "STALE_INPUT", "BLOCKED_POLICY"] },
+    "rationale": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "adjudicatorIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principalId", "role", "authenticated", "attestationDigest"],
+      "properties": {
+        "principalId": { "$ref": "#/$defs/principalId" },
+        "role": { "const": "adjudicator" },
+        "authenticated": { "type": "boolean" },
+        "attestationDigest": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpusVersion", "rubricDigest", "annotationManifestDigest", "thresholdsDigest"],
+      "properties": {
+        "corpusVersion": { "$ref": "#/$defs/semVer" },
+        "rubricDigest": { "$ref": "#/$defs/sha256Hex" },
+        "annotationManifestDigest": { "$ref": "#/$defs/sha256Hex" },
+        "thresholdsDigest": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "auditRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["auditEntryId", "auditDigest"],
+      "properties": {
+        "auditEntryId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "auditDigest": { "$ref": "#/$defs/sha256Hex" }
+      }
+    },
+    "createdAt": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "rawLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["annotationSetId", "annotatorId", "label", "labelDigest"],
+      "properties": {
+        "annotationSetId": { "type": "string", "pattern": "^ans-[a-z0-9][a-z0-9-]{0,62}$" },
+        "annotatorId": { "$ref": "#/$defs/principalId" },
+        "label": { "enum": ["SUPPORTED", "CONTRADICTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT_EVIDENCE", "OUT_OF_SCOPE", "STALE_INPUT", "BLOCKED_POLICY"] },
+        "labelDigest": { "$ref": "#/$defs/sha256Hex" }
+      }
+    }
+  }
+}

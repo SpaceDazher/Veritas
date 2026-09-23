@@ -1,0 +1,69 @@
+{
+  "contractVersion": "1.0.0",
+  "manifestId": "anmf-owner-inputs-fixture",
+  "corpusVersion": "1.0.0",
+  "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+  "splitAssignments": [
+    {
+      "caseId": "case-owner-ext-01",
+      "split": "locked_test"
+    },
+    {
+      "caseId": "case-owner-ext-02",
+      "split": "locked_test"
+    },
+    {
+      "caseId": "case-owner-ext-03",
+      "split": "locked_test"
+    },
+    {
+      "caseId": "case-owner-ext-04",
+      "split": "locked_test"
+    },
+    {
+      "caseId": "case-owner-ext-05",
+      "split": "locked_test"
+    },
+    {
+      "caseId": "case-owner-ext-06",
+      "split": "locked_test"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "case-owner-ext-01",
+      "caseSha256": "ece069c954f548f32adfddcf6d7699bcad8242a2445ddd32d30978b6c2686554",
+      "labelsSha256": "282229a65cbf9e7b281b3b0fc661f560aa4f307f28766d3ae9a9e3ab5e773eb2"
+    },
+    {
+      "caseId": "case-owner-ext-02",
+      "caseSha256": "7b7789023987165b167b4a5f05a42311ff7812a7b3275dad9b9ab3467bae06c8",
+      "labelsSha256": "c8bb38c7587ffa3be1312d1fbf03475ae549db18031e650fea73d99ebb84818f"
+    },
+    {
+      "caseId": "case-owner-ext-03",
+      "caseSha256": "b0c8e20cad3d4efa29a90c6fab4bebe2301ac59052bc1027336b32d33708adb8",
+      "labelsSha256": "4715b6d23af4bad82302b29edd033f3f76cd0f2b4dcf56579fe0bddb57c7755e"
+    },
+    {
+      "caseId": "case-owner-ext-04",
+      "caseSha256": "850f5f46c3a7fd6bb5a2c0dd3c11de0237b447a4820e43f26a0f0f029d740d92",
+      "labelsSha256": "26d082013d320fe2a41f908b79931594165f51e80301d39352d70817022057cc"
+    },
+    {
+      "caseId": "case-owner-ext-05",
+      "caseSha256": "0ab82de20f3f8c7d753bf599fe983a4e35ad26caa868582667fc37b5c52c883c",
+      "labelsSha256": "6b52de7d54326a4d979c2f8f049322988000186e78f9459eb4a5b8fb7547669f"
+    },
+    {
+      "caseId": "case-owner-ext-06",
+      "caseSha256": "0abfb936ab4fff02c0873d3b289dff5111a1d0a3ffa58aea7a823514089a8090",
+      "labelsSha256": "51b7c798d4f664266088a78eab918aa7145108f8007154c899520b99dfd15a07"
+    }
+  ],
+  "frozenAt": "2026-03-25T00:00:00.000Z",
+  "externalStratum": {
+    "status": "MEASURED",
+    "reason": "SYNTHETIC PATH-CONDUCTIVITY FIXTURE (tests/verifier/fixtures/owner-inputs/README.md): principals and signing material are synthetic in-repo fixtures; real-world independence is NOT claimed as a production fact."
+  }
+}

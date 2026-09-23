@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-41",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-41",
+    "semanticTemplate": "template-41",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-41",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "c91855ecfe11a053ac9e606aaf2a601fd02d17d0a1ee699d15803dbc17cb69d8",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "23c15644f25b5d211719f23154457f9a4c7fd26b12f0c1dfd164df312291d899"
+  },
+  "scenario": {
+    "category": "causal",
+    "statement": "The randomized trial showed that the new drug lowers blood pressure by 8 mmHg.",
+    "supportingSpans": [
+      {
+        "text": "In a randomized controlled trial, the new drug lowered blood pressure by 8 mmHg compared to placebo.",
+        "sourceFamily": "fixture-family-41",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": true,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006M",
+  "status": "MODEL_ASSISTED_INTAKE_COMPLETE",
+  "inputArchiveSha256Matches": 3,
+  "v05Sha256SumsEntries": 75,
+  "v05Sha256SumsMatched": 75,
+  "v05DraftCases": 29,
+  "v05ModelCheckabilityRows": 29,
+  "v05GoldVerdicts": 0,
+  "v05RawEpisodeTemplatePairs": 13,
+  "v05AcceptEpisodeTemplatePairs": 12,
+  "candidatePoolPairs": 21,
+  "candidatePoolUniqueEpisodeTemplatePairs": 21,
+  "candidatePoolEpisodes": 5,
+  "candidatePoolSelectedQuoteMatches": 21,
+  "quoteNormalization": "remove HH:MM:SS|HH:MM:SS| cue prefixes and >> speaker markers; collapse Unicode whitespace; then require exact substring",
+  "sourceReviewedDraftCases": [
+    "vcase-chp-ShURuLesU0I-016",
+    "vcase-chp-ShURuLesU0I-047",
+    "vcase-chp-xlA_65w29Mk-011"
+  ],
+  "sourceReviewStatus": "MODEL_NOT_GOLD",
+  "independentLabels": 0,
+  "methodOwnerHumanDecision": false,
+  "officialS2006Verdict": "NEEDS_INPUT",
+  "newLicensedRawContentInGit": false,
+  "limits": [
+    "candidate pool is exposed to the model and is not a locked test",
+    "two candidate archives declare license unknown",
+    "model/source review cannot establish annotation independence",
+    "semantic accuracy, agreement and external validity are NOT_MEASURED"
+  ]
+}

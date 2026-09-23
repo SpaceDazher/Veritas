@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-37",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-37",
+    "semanticTemplate": "template-37",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-37",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "2d6e454ef5162b430f7f1087a5372fb0f600ddd1db27b76815b70311b1bc2d7a",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "8bfd28d230b0a9f16868b27360983ca88efca404d3057656d1520c42645b0fa4"
+  },
+  "scenario": {
+    "category": "revoked",
+    "statement": "The retracted study reported a 60% symptom improvement.",
+    "supportingSpans": [
+      {
+        "text": "The study reported a 60% symptom improvement.",
+        "sourceFamily": "fixture-family-37",
+        "status": "revoked",
+        "publishedAt": "2022-03-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "revoked_source"
+      ]
+    }
+  }
+}

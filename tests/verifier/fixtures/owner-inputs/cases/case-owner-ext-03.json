@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-owner-ext-03",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "owner-family-03",
+    "semanticTemplate": "owner-template-03",
+    "stratum": "external",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-owner-ext-03",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "4715b6d23af4bad82302b29edd033f3f76cd0f2b4dcf56579fe0bddb57c7755e",
+      "annotationSetIds": [
+        "ans-owner-a",
+        "ans-owner-b"
+      ]
+    },
+    "textDigest": "c796275693894351d74a4420d1083ea9086ab9dcd36ca1139d6722d91b4badce"
+  },
+  "scenario": {
+    "category": "stale",
+    "statement": "The operator states that the light-rail extension carries 40,000 passengers per day.",
+    "supportingSpans": [
+      {
+        "text": "The light-rail extension carries 40,000 passengers per day according to the operator.",
+        "sourceFamily": "owner-family-03",
+        "status": "stale",
+        "publishedAt": "2019-02-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ]
+    }
+  }
+}

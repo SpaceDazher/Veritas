@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/semantic-provider-grant.schema.json",
+  "description": "Provider grant for the S2-006 semantic verifier (spec section 9): names the authenticated principal, tool, workspace, exact model access, currency, timeout and the three numeric budget limits (task, campaign, day; null until the grant is issued). Reserve happens atomically before any provider call; a missing field is NEEDS_INPUT before the call. Even a free provider requires this grant and a verified no-charge path; uncertain billing or outcomes go to reconciliation, never blind retry. noTraining/noRetention name the data-processing status explicitly.",
+  "title": "Veritas Semantic Provider Grant (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "grantId",
+    "authenticatedPrincipal",
+    "tool",
+    "workspaceId",
+    "modelAccess",
+    "currency",
+    "timeoutMs",
+    "budget",
+    "noTraining",
+    "noRetention",
+    "issuedAt",
+    "expiresAt"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "grantId": { "$ref": "#/$defs/grantId" },
+    "authenticatedPrincipal": { "$ref": "#/$defs/principalId" },
+    "tool": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{0,127}$",
+      "maxLength": 128
+    },
+    "workspaceId": { "$ref": "#/$defs/workspaceId" },
+    "modelAccess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modelId", "modelVersion", "access"],
+      "properties": {
+        "modelId": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "modelVersion": { "$ref": "#/$defs/semVer" },
+        "access": { "enum": ["inference_only"] }
+      }
+    },
+    "currency": { "enum": ["USD", "EUR", "GBP", "none"] },
+    "timeoutMs": { "type": "integer", "minimum": 1 },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task", "campaign", "day"],
+      "properties": {
+        "task": { "oneOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }] },
+        "campaign": { "oneOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }] },
+        "day": { "oneOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }] }
+      }
+    },
+    "noTraining": { "type": "boolean" },
+    "noRetention": { "type": "boolean" },
+    "issuedAt": { "$ref": "#/$defs/utcTimestamp" },
+    "expiresAt": { "$ref": "#/$defs/utcTimestamp" }
+  },
+  "$defs": {
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "principalId": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspaceId": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "grantId": { "type": "string", "pattern": "^grt-[a-z0-9][a-z0-9-]{0,62}$" },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+  }
+}

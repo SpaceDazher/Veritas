@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "id": "hd-owner-inputs-thresholds-001",
+  "artifact_ref": "contracts/s2-006-thresholds.json",
+  "artifact_digest": "9ad71b56333315fb04e499a5432380f1008e66181b617ad032527bb11ee0827f",
+  "status": "APPROVED",
+  "actor_type": "human",
+  "actor_id": "user",
+  "producer_id": "s2-006-evaluation-harness",
+  "decision_scope": "research",
+  "reason": "Author the numeric calibration thresholds as a new preregistration version bound to the exact canonical thresholds digest (spec section 8). FIXTURE PACKAGE: synthetic owner principal proving the validated input path, never a real method-owner decision.",
+  "timestamp": "2026-03-26T00:00:00.000Z",
+  "authority": "Requires server-authenticated human identity; JSON is not authorization.",
+  "authority_binding": {
+    "bindingType": "server_authenticated_human",
+    "principalId": "prn-owner-method-owner-1",
+    "scope": "s2-006 calibration thresholds (fixture package)",
+    "grantRef": "grt-owner-threshold-authority-001",
+    "expiresAt": "2027-01-01T00:00:00.000Z"
+  },
+  "pending": null
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "crash/restart replay (probe S DB half): the first process died after REQUEST_ACCEPTED (exit 70, no finalize); this recovery process OBSERVED the atomic RECONCILIATION_REQUIRED escalation, proved blind retry is refused, resolved the outcome through an AUTHORIZED reconciliation decision (reviewer-issued, actor-exact) and settled EXACTLY once",
+  "runId": "s2-006-db-crash-a",
+  "executorId": "exec-db-s2006-crash-a",
+  "schema": "run_a",
+  "recoveryPid": 960,
+  "crashFirstPid": 22232,
+  "crashFirstExecutor": "exec-db-s2006-dies-a",
+  "fencingToken": 2,
+  "decision": {
+    "decisionGrantRef": "grt-s2006-crash-reconcile",
+    "decidedBy": "prn-evaluation-harness",
+    "reconcilesCallId": "call-s2006-crash-1"
+  },
+  "checks": {
+    "crashedCallObservedInAcceptedState": true,
+    "staleFencingRefused": true,
+    "reconciliationObserved": true,
+    "reconciliationReasonRecorded": true,
+    "escalationReplayIdempotent": true,
+    "blindRetryRefused": true,
+    "reconciledCallNeverFinalized": true,
+    "unauthorizedDecisionRefused": true,
+    "reconciliationDecisionAuthorized": true,
+    "resolutionSettledExactlyOnce": true,
+    "duplicateResolutionReplayed": true,
+    "reconciliationEventAtomicSingle": true
+  },
+  "counts": {
+    "outboxTotal": 12,
+    "ledgerTotal": 3,
+    "externalCallRows": 3,
+    "crashCallEvents": 3,
+    "crashCallReconciliationEvents": 1,
+    "crashCallFinalizedEvents": 0,
+    "operationFinalizedEvents": 1,
+    "operationSettledCalls": 1,
+    "duplicateOutboxIds": 0
+  },
+  "countsExpected": {
+    "outboxTotal": 12,
+    "ledgerTotal": 3,
+    "externalCallRows": 3,
+    "crashCallEvents": 3,
+    "crashCallReconciliationEvents": 1,
+    "crashCallFinalizedEvents": 0,
+    "operationFinalizedEvents": 1,
+    "operationSettledCalls": 1,
+    "duplicateOutboxIds": 0
+  },
+  "status": "COMPLETED",
+  "digest": "cb4f8a317a80201b88c8c3c7b9846ac92ea22dd02d22684163326fbf1802f2e9",
+  "diedAsDesigned": true,
+  "crashFirstExitCode": 70
+}

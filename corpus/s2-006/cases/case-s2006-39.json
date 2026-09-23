@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-39",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-38",
+    "semanticTemplate": "template-39",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-39",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "83f839c979fc35cba4fb3ab73d6d09d7050bfebd8a6e6c1bec5f59f3b48774ba",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "c52a0f491c70419b192da14daa63b5dd6a6de1b923d23d7491e0b1f218d2f36c"
+  },
+  "scenario": {
+    "category": "multilingual",
+    "statement": "Реформа повысила явку на выборах на 9% в 2023 году.",
+    "supportingSpans": [
+      {
+        "text": "The reform raised voter turnout by 6% in 2023.",
+        "sourceFamily": "fixture-family-38",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "translationAlignment": [
+      {
+        "statementTerm": "реформа",
+        "spanTerm": "reform"
+      },
+      {
+        "statementTerm": "повысила",
+        "spanTerm": "raised"
+      },
+      {
+        "statementTerm": "явку",
+        "spanTerm": "turnout"
+      },
+      {
+        "statementTerm": "выборах",
+        "spanTerm": "voter"
+      }
+    ],
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ]
+    }
+  }
+}

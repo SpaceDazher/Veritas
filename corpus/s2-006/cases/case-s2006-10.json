@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-10",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-10",
+    "semanticTemplate": "template-10",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-10",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "324a460a3d69abd1eb948a81246b1cf77f83fecd32fd60c6602904a4c7dca558",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "7154fbcd3ae21dda440cf46234b74ef22a709ed0443f3920c034aa8dfadbd809"
+  },
+  "scenario": {
+    "category": "abstention",
+    "statement": "The 2026 procurement reform reduced software costs.",
+    "supportingSpans": [],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ]
+    }
+  }
+}

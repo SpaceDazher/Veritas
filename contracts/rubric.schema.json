@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/rubric.schema.json",
+  "description": "Versioned rubric (S2-006 spec section 7): for every class a definition, examples, counterexamples, the allowed ambiguity and the abstention rule. Entailment holds only for the exact statement with its polarity, quantities, units, population, geography, period and modality; topic overlap is not entailment; scope differences, missing data and independent claims are not contradictions; analogy, temporal co-occurrence and correlation never prove mechanism; PARTIALLY_SUPPORTED never auto-converts to support.",
+  "title": "Veritas Rubric (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "rubricId",
+    "rubricVersion",
+    "classes"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "rubricId": { "type": "string", "pattern": "^rub-[a-z0-9][a-z0-9-]{0,62}$" },
+    "rubricVersion": { "$ref": "#/$defs/semVer" },
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "definition", "examples", "counterexamples", "ambiguityRule", "abstentionRule"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "definition": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "examples": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "maxLength": 2048 },
+            "minItems": 1
+          },
+          "counterexamples": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "maxLength": 2048 },
+            "minItems": 1
+          },
+          "ambiguityRule": {
+            "description": "How admissible ambiguity is decided for this class; unresolvable ambiguity falls back to the abstention rule.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "abstentionRule": {
+            "description": "When the annotator/verifier must abstain (e.g. INSUFFICIENT_EVIDENCE) instead of guessing.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006M",
+  "status": "MODEL_ASSISTED_CANDIDATE_POOL",
+  "lineageRule": "sourceFamily is the upstream podcast episode, not the subject domain",
+  "pairRule": "one ACCEPT candidate per episodeId and semanticTemplate; prefer STRICT or no transcript_uncertain",
+  "caseTextInGit": false,
+  "independentLabels": 0,
+  "goldVerdicts": 0,
+  "officialLockedTest": false,
+  "sourceArchives": {
+    "v05": "89da330bb6386df48399c17669ddfb5db26829a25712a63c172555a4ce648ff2",
+    "ah6": "991c88dc6d71dee9d078ba8716783f59d0427a1ff1619f034edaabcf092b01fb",
+    "xuo": "b65ff5d148d7f68b884b5c8eb22356f6efb352a0a4f85272a4dc67d42d09144c"
+  },
+  "pairs": [
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"book_attribution","candidateId":"vcase-chp-ShURuLesU0I-059","archive":"v05","qualityFlag":"MIRROR_TRANSCRIPT_TIER"},
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"definition","candidateId":"vcase-chp-ShURuLesU0I-002","archive":"v05","qualityFlag":null},
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"entity_property","candidateId":"vcase-chp-ShURuLesU0I-027","archive":"v05","qualityFlag":null},
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"event_date","candidateId":"vcase-chp-ShURuLesU0I-011","archive":"v05","qualityFlag":null},
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"event_description","candidateId":"vcase-chp-ShURuLesU0I-043","archive":"v05","qualityFlag":"MIRROR_TRANSCRIPT_TIER"},
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"person_property","candidateId":"vcase-chp-ShURuLesU0I-033","archive":"v05","qualityFlag":null},
+    {"episodeId":"ShURuLesU0I","semanticTemplate":"quantitative_statement","candidateId":"vcase-chp-ShURuLesU0I-001","archive":"v05","qualityFlag":null},
+    {"episodeId":"t2r0dURAZPI","semanticTemplate":"article_attribution","candidateId":"vcase-chp-t2r0dURAZPI-005","archive":"v05","qualityFlag":null},
+    {"episodeId":"t2r0dURAZPI","semanticTemplate":"self_description","candidateId":"vcase-chp-t2r0dURAZPI-001","archive":"v05","qualityFlag":null},
+    {"episodeId":"xlA_65w29Mk","semanticTemplate":"composition","candidateId":"vcase-chp-xlA_65w29Mk-001","archive":"v05","qualityFlag":null},
+    {"episodeId":"xlA_65w29Mk","semanticTemplate":"definition","candidateId":"vcase-chp-xlA_65w29Mk-008","archive":"v05","qualityFlag":null},
+    {"episodeId":"xlA_65w29Mk","semanticTemplate":"discourse_description","candidateId":"vcase-chp-xlA_65w29Mk-012","archive":"v05","qualityFlag":null},
+    {"episodeId":"ah6KmQsmVUc","semanticTemplate":"attribution","candidateId":"pcase-chistota-ponimaniya-ah6KmQsmVUc-010","archive":"ah6","qualityFlag":"transcript_uncertain"},
+    {"episodeId":"ah6KmQsmVUc","semanticTemplate":"causal_mechanism","candidateId":"pcase-chistota-ponimaniya-ah6KmQsmVUc-013","archive":"ah6","qualityFlag":null},
+    {"episodeId":"ah6KmQsmVUc","semanticTemplate":"comparison","candidateId":"pcase-chistota-ponimaniya-ah6KmQsmVUc-008","archive":"ah6","qualityFlag":null},
+    {"episodeId":"ah6KmQsmVUc","semanticTemplate":"contradiction","candidateId":"pcase-chistota-ponimaniya-ah6KmQsmVUc-016","archive":"ah6","qualityFlag":null},
+    {"episodeId":"ah6KmQsmVUc","semanticTemplate":"other_atomic_claim","candidateId":"pcase-chistota-ponimaniya-ah6KmQsmVUc-009","archive":"ah6","qualityFlag":null},
+    {"episodeId":"xuoTnImRuCQ","semanticTemplate":"attribution","candidateId":"pcase-chistota-ponimaniya-xuoTnImRuCQ-021","archive":"xuo","qualityFlag":null},
+    {"episodeId":"xuoTnImRuCQ","semanticTemplate":"comparison","candidateId":"pcase-chistota-ponimaniya-xuoTnImRuCQ-027","archive":"xuo","qualityFlag":null},
+    {"episodeId":"xuoTnImRuCQ","semanticTemplate":"numeric_effect","candidateId":"pcase-chistota-ponimaniya-xuoTnImRuCQ-023","archive":"xuo","qualityFlag":"transcript_uncertain"},
+    {"episodeId":"xuoTnImRuCQ","semanticTemplate":"other_atomic_claim","candidateId":"pcase-chistota-ponimaniya-xuoTnImRuCQ-006","archive":"xuo","qualityFlag":null}
+  ],
+  "limits": [
+    "29 v05 checkability rows contain no verdict or gold label",
+    "two additional source archives declare license unknown",
+    "model and producer selection are not independent",
+    "candidate pool has no dev/calibration/locked_test assignment"
+  ]
+}

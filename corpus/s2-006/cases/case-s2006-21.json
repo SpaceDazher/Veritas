@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-21",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-21",
+    "semanticTemplate": "template-21",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-21",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "18eae478feb207c03cf823006a2bcfd96b11049274e0942255bc961aa6fbb2c1",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "eef8a92fe93761b9e4506e59a58c942a16302145a49844fefb80fff53718dbe4"
+  },
+  "scenario": {
+    "category": "family_collapse",
+    "statement": "Two independent audits confirm the plant cut emissions by 40% in 2024.",
+    "supportingSpans": [
+      {
+        "text": "Two independent audits confirm the plant cut emissions by 40% in 2024.",
+        "sourceFamily": "fixture-family-21",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      },
+      {
+        "text": "Two independent audits confirm the plant cut emissions by 40% in 2024.",
+        "sourceFamily": "fixture-family-21",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": true,
+    "expected": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "family_collapse"
+      ]
+    }
+  }
+}

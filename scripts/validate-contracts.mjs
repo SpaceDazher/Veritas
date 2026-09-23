@@ -152,6 +152,15 @@ const frozenTargets = [
   'scripts/s2-005-security-probes.mjs', 'scripts/verify-s2-005.mjs',
   'scripts/verify-s2-005-dependencies.mjs', 'scripts/generate-synthesis-types.mjs',
   'evidence/s2-005-dependency-binding.json', 'evidence/s2-005-security-probes.json',
+  // S2-006: verifier contracts, canonical JSON, type generation, rubric engine,
+  // calibration/comparator, capability matrix, offline signatures, probes and
+  // dependency bindings share this gate.
+  'src/lib/verifier', 'tests/verifier', 'corpus/s2-006',
+  'scripts/s2-006-run.mjs', 'scripts/s2-006-db-replay.mjs',
+  'scripts/s2-006-db-gate.mjs', 'scripts/verify-s2-006.mjs',
+  'scripts/verify-s2-006-dependencies.mjs',
+  'scripts/generate-verifier-types.mjs',
+  'evidence/s2-006-dependency-binding.json', 'evidence/s2-006-security-probes.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');

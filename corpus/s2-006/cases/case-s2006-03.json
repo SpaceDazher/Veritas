@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-03",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-03",
+    "semanticTemplate": "template-03",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-03",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "e45c2f8f6eb3553a87dcad4f78727622643caed2c022a7718df853390fc1eafc",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "0bec65a5d3045db0b426c3829c520ca87bff9d02ead77196a33942b477329f6d"
+  },
+  "scenario": {
+    "category": "numeric",
+    "statement": "Congestion pricing reduced car trips by 25% in Oslo in 2023.",
+    "supportingSpans": [
+      {
+        "text": "Congestion pricing reduced car trips by 15% in Oslo in 2023.",
+        "sourceFamily": "fixture-family-03",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ]
+    }
+  }
+}

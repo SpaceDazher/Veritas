@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "S2-006 DB-backed verifier store replay A vs B (PostgresVerifierStore, separate OS processes) + crash/restart phase (probe S DB half)",
+  "databaseEngine": "PostgreSQL",
+  "databaseSource": "ephemeral loopback-only podman container",
+  "schemas": [
+    "run_a",
+    "run_b"
+  ],
+  "migrations": [
+    {
+      "schema": "run_a",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        },
+        {
+          "name": "0003_claim_graph.sql",
+          "sha256": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3"
+        },
+        {
+          "name": "0004_claim_graph_state.sql",
+          "sha256": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d"
+        },
+        {
+          "name": "0005_verifier_store.sql",
+          "sha256": "28ecabe6b7a6915b90d13317c824fe0eda3a2c4bb64dc5593470367c497794ef"
+        },
+        {
+          "name": "0006_verifier_acl.sql",
+          "sha256": "022ada4102f7f229313cb30f985e8bd04cd08a52b723847bf50c4b8e14c1b7b4"
+        },
+        {
+          "name": "0007_verifier_store_hardening.sql",
+          "sha256": "79be88b216f4b4bc4b2d26a97e916c917240d951798905dab9122e6982089dfb"
+        }
+      ]
+    },
+    {
+      "schema": "run_b",
+      "migrations": [
+        {
+          "name": "0001_veritas_board.sql",
+          "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898"
+        },
+        {
+          "name": "0002_source_ingestion.sql",
+          "sha256": "4ce4d9181926439fa125148e2750a2e647caa47b0af904764c7dd9435bc80468"
+        },
+        {
+          "name": "0003_claim_graph.sql",
+          "sha256": "b47ec3636c069a07f13cd4c35c497f5d05ae1ab1bdd75a2dc8f3d83d2cab90b3"
+        },
+        {
+          "name": "0004_claim_graph_state.sql",
+          "sha256": "c6909b2dd6fcd0655d751ff5566323a6e4868eaaf8e68541e61456b1aebba35d"
+        },
+        {
+          "name": "0005_verifier_store.sql",
+          "sha256": "28ecabe6b7a6915b90d13317c824fe0eda3a2c4bb64dc5593470367c497794ef"
+        },
+        {
+          "name": "0006_verifier_acl.sql",
+          "sha256": "022ada4102f7f229313cb30f985e8bd04cd08a52b723847bf50c4b8e14c1b7b4"
+        },
+        {
+          "name": "0007_verifier_store_hardening.sql",
+          "sha256": "79be88b216f4b4bc4b2d26a97e916c917240d951798905dab9122e6982089dfb"
+        }
+      ]
+    }
+  ],
+  "pids": {
+    "run_a": 28584,
+    "run_b": 26904
+  },
+  "executors": {
+    "run_a": "exec-db-s2006-a",
+    "run_b": "exec-db-s2006-b"
+  },
+  "rows": {
+    "verifier_request": 1,
+    "verifier_result": 1,
+    "verifier_calibration_report": 1,
+    "verifier_adjudication_record": 1,
+    "verifier_operation_ledger": 3,
+    "verifier_audit_outbox": 6,
+    "verifier_external_call_run": 1
+  },
+  "committedOps": 4,
+  "replayedOps": 1,
+  "digests": {
+    "run_a": "655d243e8a45f6ec7f8e38bf82c42910820d24a76cb4a88cfe802c2ab9805712",
+    "run_b": "655d243e8a45f6ec7f8e38bf82c42910820d24a76cb4a88cfe802c2ab9805712"
+  },
+  "crashPhase": {
+    "ok": true,
+    "issues": [],
+    "executors": {
+      "run_a": "exec-db-s2006-crash-a",
+      "run_b": "exec-db-s2006-crash-b"
+    },
+    "crashFirstExecutors": {
+      "run_a": "exec-db-s2006-dies-a",
+      "run_b": "exec-db-s2006-dies-b"
+    },
+    "pids": {
+      "recovery": {
+        "run_a": 960,
+        "run_b": 19572
+      },
+      "crash_first": {
+        "run_a": 22232,
+        "run_b": 268
+      }
+    },
+    "fencingToken": 2,
+    "digests": {
+      "run_a": "cb4f8a317a80201b88c8c3c7b9846ac92ea22dd02d22684163326fbf1802f2e9",
+      "run_b": "cb4f8a317a80201b88c8c3c7b9846ac92ea22dd02d22684163326fbf1802f2e9"
+    },
+    "counts": {
+      "outboxTotal": 12,
+      "ledgerTotal": 3,
+      "externalCallRows": 3,
+      "crashCallEvents": 3,
+      "crashCallReconciliationEvents": 1,
+      "crashCallFinalizedEvents": 0,
+      "operationFinalizedEvents": 1,
+      "operationSettledCalls": 1,
+      "duplicateOutboxIds": 0
+    },
+    "scenario": "process 1: reserve -> accept -> abrupt death (exit 70, no finalize); process 2: fenced reconciliation over the fencing token, exactly one settlement, zero duplicate ledger/outbox writes"
+  },
+  "comparison": {
+    "ok": true,
+    "issues": []
+  },
+  "hardGates": {
+    "ok": true,
+    "violations": []
+  },
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0
+}

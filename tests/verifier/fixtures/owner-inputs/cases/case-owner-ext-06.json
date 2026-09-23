@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-owner-ext-06",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "owner-family-05",
+    "semanticTemplate": "owner-template-06",
+    "stratum": "external",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-owner-ext-06",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "51b7c798d4f664266088a78eab918aa7145108f8007154c899520b99dfd15a07",
+      "annotationSetIds": [
+        "ans-owner-a",
+        "ans-owner-b"
+      ]
+    },
+    "textDigest": "4de117bf84e75de0e74795439748892f3c47b857078bbf23044f77de4a34fda7"
+  },
+  "scenario": {
+    "category": "positive",
+    "statement": "The mayor said the tram upgrade cut delays by 25% across the network in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The mayor said the tram upgrade cut delays by 25% across the network in 2024.",
+        "sourceFamily": "owner-family-05",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [
+        "scope_difference"
+      ]
+    }
+  }
+}

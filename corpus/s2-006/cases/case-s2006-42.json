@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-42",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-42",
+    "semanticTemplate": "template-42",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-42",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "12a2c09a36f9ded4cf43cca62b0580ecc779bfa4552170ddcce6f11593936b2b",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "afbbb50010aa9bd73207498213e04a5f1cea420c73f7160d02765afac210494e"
+  },
+  "scenario": {
+    "category": "abstention",
+    "statement": "The 2026 pension indexation reform succeeded.",
+    "supportingSpans": [],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ]
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-owner-ext-01",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "owner-family-01",
+    "semanticTemplate": "owner-template-01",
+    "stratum": "external",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-owner-ext-01",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "282229a65cbf9e7b281b3b0fc661f560aa4f307f28766d3ae9a9e3ab5e773eb2",
+      "annotationSetIds": [
+        "ans-owner-a",
+        "ans-owner-b"
+      ]
+    },
+    "textDigest": "c28fdace8f4e8b16a25035e24480253815536e26bd03392c1192e1acf4f87c46"
+  },
+  "scenario": {
+    "category": "positive",
+    "statement": "A 2024 field study reported that the new ferry line cut average commute time by 12% on the served route.",
+    "supportingSpans": [
+      {
+        "text": "A 2024 field study reported that the new ferry line cut average commute time by 12% on the served route.",
+        "sourceFamily": "owner-family-01",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

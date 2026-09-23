@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "fail-closed comparator over two pre-sealed process-separated prediction sets (spec §9); the candidate is never re-run after unseal",
+  "testedImplementationCommit": "1805084473f0c1cf2e0d132eef9e3953ca2bff93",
+  "corpus": {
+    "manifestId": "anmf-s2006-fixture-corpus",
+    "manifestSha256": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+    "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+    "caseCount": 45,
+    "stratum": "fixture"
+  },
+  "runParameters": {
+    "run_a": {
+      "executor": "exec-s2-006-a",
+      "pid": 1012,
+      "clock": "2026-01-15T08:00:00.000Z",
+      "nonce": "n-a-7c1e4d90a2b8f3e6",
+      "output_root": "results/s2-006/run-a"
+    },
+    "run_b": {
+      "executor": "exec-s2-006-b",
+      "pid": 27904,
+      "clock": "2026-03-21T23:59:59.999Z",
+      "nonce": "n-b-3f9a62d1c5e80b74",
+      "output_root": "results/s2-006/run-b"
+    }
+  },
+  "predictionSetDigests": {
+    "run_a": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac",
+    "run_b": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac"
+  },
+  "runManifestDigests": {
+    "run_a": "caad0405dea25a602ae941979a9fa6baf7f43e1917be2eef6f603811017e000e",
+    "run_b": "e2ae1bdfc7dd2df2df2fab9481c6fdc82e65385c9427c81cc2fadfceb9d7b239"
+  },
+  "hardCounters": {
+    "run_a": {
+      "unauthorizedLeakageEvents": 0,
+      "lockedLabelAccessEvents": 0,
+      "producerSelfReviewEvents": 0,
+      "upstreamArtifactMutationEvents": 0,
+      "unauthorizedSideEffectEvents": 0
+    },
+    "run_b": {
+      "unauthorizedLeakageEvents": 0,
+      "lockedLabelAccessEvents": 0,
+      "producerSelfReviewEvents": 0,
+      "upstreamArtifactMutationEvents": 0,
+      "unauthorizedSideEffectEvents": 0
+    }
+  },
+  "comparison": {
+    "ok": true,
+    "failures": [],
+    "rule": "exact",
+    "checks": {
+      "caseCount": 45,
+      "manifestSha256": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+      "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+      "predictionDigests": {
+        "runA": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac",
+        "runB": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac"
+      },
+      "runManifestDigests": {
+        "runA": "caad0405dea25a602ae941979a9fa6baf7f43e1917be2eef6f603811017e000e",
+        "runB": "e2ae1bdfc7dd2df2df2fab9481c6fdc82e65385c9427c81cc2fadfceb9d7b239"
+      },
+      "consensusGold": {
+        "case-s2006-01": "SUPPORTED",
+        "case-s2006-02": "PARTIALLY_SUPPORTED",
+        "case-s2006-03": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-04": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-05": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-06": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-07": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-08": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-09": "STALE_INPUT",
+        "case-s2006-10": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-11": "SUPPORTED",
+        "case-s2006-12": "CONTRADICTED",
+        "case-s2006-13": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-14": "BLOCKED_POLICY",
+        "case-s2006-15": "STALE_INPUT",
+        "case-s2006-16": "STALE_INPUT",
+        "case-s2006-17": "SUPPORTED",
+        "case-s2006-18": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-19": "PARTIALLY_SUPPORTED",
+        "case-s2006-20": "SUPPORTED",
+        "case-s2006-21": "PARTIALLY_SUPPORTED",
+        "case-s2006-22": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-23": "SUPPORTED",
+        "case-s2006-24": "PARTIALLY_SUPPORTED",
+        "case-s2006-25": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-26": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-27": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-28": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-29": "CONTRADICTED",
+        "case-s2006-30": "CONTRADICTED",
+        "case-s2006-31": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-32": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-33": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-34": "BLOCKED_POLICY",
+        "case-s2006-35": "STALE_INPUT",
+        "case-s2006-36": "STALE_INPUT",
+        "case-s2006-37": "STALE_INPUT",
+        "case-s2006-38": "SUPPORTED",
+        "case-s2006-39": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-40": "PARTIALLY_SUPPORTED",
+        "case-s2006-41": "SUPPORTED",
+        "case-s2006-42": "INSUFFICIENT_EVIDENCE",
+        "case-s2006-43": "PARTIALLY_SUPPORTED",
+        "case-s2006-44": "OUT_OF_SCOPE",
+        "case-s2006-45": "SUPPORTED"
+      },
+      "perRun": {
+        "runA": {
+          "runId": "s2-006-run-a",
+          "verdictDistribution": {
+            "SUPPORTED": true,
+            "PARTIALLY_SUPPORTED": true,
+            "INSUFFICIENT_EVIDENCE": true,
+            "STALE_INPUT": true,
+            "CONTRADICTED": true,
+            "BLOCKED_POLICY": true,
+            "OUT_OF_SCOPE": true
+          }
+        },
+        "runB": {
+          "runId": "s2-006-run-b",
+          "verdictDistribution": {
+            "SUPPORTED": true,
+            "PARTIALLY_SUPPORTED": true,
+            "INSUFFICIENT_EVIDENCE": true,
+            "STALE_INPUT": true,
+            "CONTRADICTED": true,
+            "BLOCKED_POLICY": true,
+            "OUT_OF_SCOPE": true
+          }
+        }
+      }
+    }
+  },
+  "hardGates": {
+    "ok": true,
+    "violations": []
+  },
+  "blinding": {
+    "candidateNeverReadLabels": true,
+    "comparatorNeverReRunsCandidate": true,
+    "annotationHmacKey": "fixture-key (real label_custodian custody NOT_RUN)"
+  }
+}

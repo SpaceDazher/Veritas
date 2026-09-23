@@ -1,0 +1,32 @@
+{
+  "artifact_producer": "s2-006 rubric candidate (offline deterministic harness)",
+  "implementation_owner": "prn-owner-verifier-owner-1",
+  "implementation_digest": "5476efec94f71d4e960dc3c01e8a511c59ffb8e5bd260adaff150d23f01062bc",
+  "annotators": [
+    {
+      "principal_id": "prn-owner-annotator-a",
+      "authenticated": true,
+      "domain_competence": "synthetic transport-policy annotation (fixture)"
+    },
+    {
+      "principal_id": "prn-owner-annotator-b",
+      "authenticated": true,
+      "domain_competence": "synthetic transport-policy annotation (fixture)"
+    }
+  ],
+  "adjudicator": {
+    "principal_id": "prn-owner-adjudicator-1",
+    "authenticated": true
+  },
+  "blindness": {
+    "producer_identity_hidden": true,
+    "producer_verdict_hidden": true,
+    "predictions_hidden": true,
+    "thresholds_hidden": true,
+    "split_assignment_hidden": true
+  },
+  "data_independence": true,
+  "model_independence": true,
+  "process_independence": true,
+  "locked_label_access": []
+}

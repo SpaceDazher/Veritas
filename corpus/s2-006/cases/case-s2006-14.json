@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-14",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-14",
+    "semanticTemplate": "template-14",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-14",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "e495c5d409d70dffb7f2b794827a49b41fe3c5acd3db8f1d1d84afcf9e539328",
+      "annotationSetIds": [
+        "ans-s2006-a-calibration",
+        "ans-s2006-b-calibration"
+      ]
+    },
+    "textDigest": "8f2461e8c2a4201120bdfd126daf35f56768788b0609dc47fcb055b91ddd8cec"
+  },
+  "scenario": {
+    "category": "private",
+    "statement": "The internal review found 2 unpaid overtime cases in Q4 2025.",
+    "supportingSpans": [
+      {
+        "text": "Internal only: the review counted 2 unpaid overtime cases in Q4 2025.",
+        "sourceFamily": "fixture-family-14",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "private"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "BLOCKED_POLICY",
+      "reasonCodes": [
+        "policy_block"
+      ],
+      "missingnessKind": "policy_refusal"
+    }
+  }
+}

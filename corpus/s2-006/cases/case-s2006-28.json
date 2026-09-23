@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-28",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-28",
+    "semanticTemplate": "template-28",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-28",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "84ba4c801432f4de15c1cde1e6116f0fb910c8944cf43de18c36168fc309e2ef",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "85fe40b647001a316432ae7ac6a19b3f1fc1f4a067aff2f1d40adc6cf6018498"
+  },
+  "scenario": {
+    "category": "modality",
+    "statement": "The study confirms the diet is effective.",
+    "supportingSpans": [
+      {
+        "text": "The study suggests the diet may be effective.",
+        "sourceFamily": "fixture-family-28",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "modality_drift"
+      ]
+    }
+  }
+}

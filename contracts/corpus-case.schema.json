@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/corpus-case.schema.json",
+  "description": "Corpus case (S2-006 spec section 6): one externally authored or generated case with source family, semantic template, stratum (external|fixture|reannotation), license, provenance, as-of, expected-labels reference and the SHA-256 of the case text. Private/licensed raw content never enters Git or evidence: when the text cannot be distributed only locator+digest are stored and non-reproducibility for readers without access is recorded.",
+  "title": "Veritas Corpus Case (S2-006)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "caseId",
+    "corpusVersion",
+    "sourceFamily",
+    "semanticTemplate",
+    "stratum",
+    "license",
+    "locator",
+    "provenance",
+    "asOf",
+    "expectedLabelsRef",
+    "textDigest"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "caseId": { "type": "string", "pattern": "^case-[a-z0-9][a-z0-9-]{0,62}$" },
+    "corpusVersion": { "$ref": "#/$defs/semVer" },
+    "sourceFamily": {
+      "description": "Upstream lineage family used for dedup, split disjointness and evidence-family collapse.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "semanticTemplate": {
+      "description": "Semantic template tag; splits must be disjoint by source family AND semantic template so paraphrase/duplicate leakage between splits is impossible.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "stratum": {
+      "description": "external = externally authored, independently labelled; fixture = generated; reannotation = blind re-annotation of S2-004/S2-005 synthetic cases, never counted in external-validity/global paired denominators.",
+      "enum": ["external", "fixture", "reannotation"]
+    },
+    "license": { "enum": ["public_domain", "cc0", "cc_by_4_0", "licensed_local_only", "synthetic"] },
+    "locator": {
+      "description": "Resolved pointer when the text cannot be distributed; null when the case text is reproducible from the manifest.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "ref"],
+          "properties": {
+            "type": { "enum": ["url", "doi", "file_path"] },
+            "ref": { "type": "string", "minLength": 1, "maxLength": 2048 }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotId", "sourceDigest", "retrievedAt", "lineage"],
+      "properties": {
+        "snapshotId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "sourceDigest": { "oneOf": [{ "$ref": "#/$defs/sha256Hex" }, { "type": "null" }] },
+        "retrievedAt": { "oneOf": [{ "$ref": "#/$defs/utcTimestamp" }, { "type": "null" }] },
+        "lineage": { "enum": ["UPSTREAM_AUTHORED", "DERIVED", "SYNTHETIC"] }
+      }
+    },
+    "asOf": { "$ref": "#/$defs/utcTimestamp" },
+    "expectedLabelsRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["labelsDigest", "annotationSetIds"],
+      "properties": {
+        "labelsDigest": { "$ref": "#/$defs/sha256Hex" },
+        "annotationSetIds": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^ans-[a-z0-9][a-z0-9-]{0,62}$" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "textDigest": { "$ref": "#/$defs/sha256Hex" }
+  },
+  "$defs": {
+    "sha256Hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "semVer": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+  }
+}

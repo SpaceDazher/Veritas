@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-owner-ext-05",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "owner-family-04",
+    "semanticTemplate": "owner-template-05",
+    "stratum": "external",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-owner-ext-05",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "6b52de7d54326a4d979c2f8f049322988000186e78f9459eb4a5b8fb7547669f",
+      "annotationSetIds": [
+        "ans-owner-a",
+        "ans-owner-b"
+      ]
+    },
+    "textDigest": "26166a5c93a78061c1508bf804544bdcc6dbc7022c2230023a55d65cbc7cf30c"
+  },
+  "scenario": {
+    "category": "positive",
+    "statement": "The transit authority confirmed that weekend night bus frequency doubled in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The transit authority confirmed that weekend night bus frequency doubled in 2024.",
+        "sourceFamily": "owner-family-04",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-29",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-29",
+    "semanticTemplate": "template-29",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-29",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "277d2a7dc6f06021ca64a46e11bd5f825280d7d0c28925745a12e24e05119199",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "4e55f7478ac413b7fff37dd92a53141d7bf76887ef1800b8ebf3ec96255eaff6"
+  },
+  "scenario": {
+    "category": "contradictory",
+    "statement": "Congestion pricing reduced car trips by 15% in Stockholm in 2023.",
+    "supportingSpans": [
+      {
+        "text": "Congestion pricing reduced car trips by 15% in Stockholm in 2023.",
+        "sourceFamily": "fixture-family-29",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [
+      {
+        "text": "Congestion pricing did not reduce car trips in Stockholm in 2023.",
+        "sourceFamily": "fixture-family-29",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public",
+        "structured": {
+          "subject": "congestion pricing",
+          "object": "car trips",
+          "population": "",
+          "geography": "Stockholm",
+          "period": {
+            "start": "2023-01-01",
+            "end": "2023-12-31"
+          },
+          "units": "%",
+          "polarity": false,
+          "value_range": null,
+          "normalized_text": "Congestion pricing did not reduce car trips in Stockholm in 2023."
+        }
+      }
+    ],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "statementStructured": {
+      "subject": "congestion pricing",
+      "object": "car trips",
+      "population": "",
+      "geography": "Stockholm",
+      "period": {
+        "start": "2023-01-01",
+        "end": "2023-12-31"
+      },
+      "units": "%",
+      "polarity": true,
+      "value_range": null,
+      "normalized_text": "Congestion pricing reduced car trips by 15% in Stockholm in 2023."
+    },
+    "expected": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": []
+    }
+  }
+}

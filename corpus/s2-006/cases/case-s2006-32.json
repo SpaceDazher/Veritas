@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-32",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-31",
+    "semanticTemplate": "template-32",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-32",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "23214bf10153fa537e0c68f66160bac81eaf1780ecaa012fd78ddf03fea92fdf",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "972f10fe1fca724f01c3a93d9d826b868b520280e0cc9c82e887de106ff9730f"
+  },
+  "scenario": {
+    "category": "ambiguous",
+    "statement": "The mRNA vaccine reduces infection risk by 40% in adults.",
+    "supportingSpans": [
+      {
+        "text": "The mRNA vaccine reduces infection risk by 40% in children.",
+        "sourceFamily": "fixture-family-31",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ]
+    }
+  }
+}

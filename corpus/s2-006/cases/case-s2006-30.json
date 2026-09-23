@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-30",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-29",
+    "semanticTemplate": "template-30",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-30",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "046a410b64a0915a722edaf160d1705298738a67ec7c35a2c1f9ffa2e5c37293",
+      "annotationSetIds": [
+        "ans-s2006-a-locked",
+        "ans-s2006-b-locked"
+      ]
+    },
+    "textDigest": "11878e196846c345b02db31ad7715a716204333136403179f35c4c410ea489f0"
+  },
+  "scenario": {
+    "category": "contradictory",
+    "statement": "The sugar tax reduced soda sales by 9% in Hungary in 2024.",
+    "supportingSpans": [
+      {
+        "text": "The sugar tax reduced soda sales by 9% in Hungary in 2024.",
+        "sourceFamily": "fixture-family-29",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [
+      {
+        "text": "The sugar tax did not reduce soda sales in Hungary in 2024.",
+        "sourceFamily": "fixture-family-29",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public",
+        "structured": {
+          "subject": "sugar tax",
+          "object": "soda sales",
+          "population": "",
+          "geography": "Hungary",
+          "period": {
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "units": "%",
+          "polarity": false,
+          "value_range": null,
+          "normalized_text": "The sugar tax did not reduce soda sales in Hungary in 2024."
+        }
+      }
+    ],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "statementStructured": {
+      "subject": "sugar tax",
+      "object": "soda sales",
+      "population": "",
+      "geography": "Hungary",
+      "period": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "units": "%",
+      "polarity": true,
+      "value_range": null,
+      "normalized_text": "The sugar tax reduced soda sales by 9% in Hungary in 2024."
+    },
+    "expected": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": []
+    }
+  }
+}

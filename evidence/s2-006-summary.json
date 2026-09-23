@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "verification aggregator: dependency gate (records owner-input state), contract type drift, verifier suite, offline evidence run (Run A/B + comparator + calibration + honest probe statuses), DB replay status with crash/restart phase and the DERIVED §16 verdict",
+  "testedImplementationCommit": "f2bc6672ef72e6625759bbcc66dcf7de860fbe13",
+  "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/s2-006-summary.json",
+  "gates": {
+    "dependency": {
+      "status": "PASS",
+      "exitCode": 0,
+      "checked": 75,
+      "mode": "FULL_GIT_BYTES"
+    },
+    "types": {
+      "status": "IN_SYNC",
+      "exitCode": 0,
+      "detail": "{\"ok\":true,\"bytes\":23704,\"contracts\":15}"
+    },
+    "testVerifier": {
+      "status": "PASS",
+      "exitCode": 0,
+      "counts": {
+        "tests": 317,
+        "pass": 311,
+        "fail": 0,
+        "skipped": 6
+      }
+    },
+    "evidenceRun": {
+      "status": "PASS",
+      "exitCode": 0,
+      "comparisonOk": true,
+      "calibration": {
+        "coverage": {
+          "denominator": 45,
+          "evaluated": 45,
+          "missing": 0,
+          "abstained": 19
+        },
+        "hardViolations": 0,
+        "decision": "NEEDS_INPUT",
+        "independence": "NOT_MEASURED"
+      },
+      "probes": {
+        "green": false,
+        "total": 19,
+        "pass": 18,
+        "failed": 0,
+        "not_run": 1,
+        "probeS": "not_run",
+        "combine": "probe S green ONLY via verify:s2-006-db-replay crash phase"
+      }
+    },
+    "dbReplay": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "current DB replay",
+      "crashPhaseOk": true
+    },
+    "probes": {
+      "status": "PASS",
+      "totals": {
+        "probes": 19,
+        "ok": 18,
+        "pass": 18,
+        "failed": 0,
+        "not_run": 1,
+        "attemptedViolations": 19,
+        "actualViolations": 0
+      },
+      "probeS": "RESOLVED_BY_DB_CRASH_PHASE",
+      "source": "evidence/s2-006-db-comparison.json crashPhase"
+    }
+  },
+  "ownerInputs": {
+    "present": false,
+    "status": "NOT_RUN_HUMAN_INPUTS"
+  },
+  "verdict": "NEEDS_INPUT",
+  "verdictDerivation": "spec §16 precedence computed by deriveVerdict() from the actual evidence fields — never a constant; probe S is green ONLY via the DB crash/restart phase (review P2-6/P2-7)",
+  "verdictReasons": [
+    "thresholds decision not resolved: contracts/s2-006-thresholds.json is NEEDS_INPUT — an immutable HumanDecision from authenticated owner=user bound to the exact canonical thresholds digest (verified against the authority registry) would advance it",
+    "numeric thresholds not authored: coverage_floor, non_inferiority_margin.delta, confidence_level, tie_rule and every thresholds.soft_thresholds value are null",
+    "annotators not independent: annotators/adjudicator are fixture principals (evaluator_not_independent) — real independent annotators and a separate adjudicator would advance it",
+    "external corpus stratum absent: only the 45-case fixture stratum exists — an externally authored, independently labelled locked_test stratum would advance it"
+  ],
+  "needsInputPath": [
+    "thresholds decision not resolved: contracts/s2-006-thresholds.json is NEEDS_INPUT — an immutable HumanDecision from authenticated owner=user bound to the exact canonical thresholds digest (verified against the authority registry) would advance it",
+    "numeric thresholds not authored: coverage_floor, non_inferiority_margin.delta, confidence_level, tie_rule and every thresholds.soft_thresholds value are null",
+    "annotators not independent: annotators/adjudicator are fixture principals (evaluator_not_independent) — real independent annotators and a separate adjudicator would advance it",
+    "external corpus stratum absent: only the 45-case fixture stratum exists — an externally authored, independently labelled locked_test stratum would advance it"
+  ],
+  "verdictCeiling": "NEEDS_INPUT is the honest verdict for the current inputs; needsInputPath lists exactly which owner actions would advance the verdict. An unconditional PASS is forbidden (spec §16).",
+  "notRun": [
+    "NOT_RUN_PROVIDER: no provider grant/model/runtime was declared mandatory for the first calibration scope; the offline deterministic implementation is fully tested without network or LLM",
+    "NOT_RUN_HUMAN_INPUTS: no real independent annotators, adjudicator or method-owner HumanDecision exists"
+  ],
+  "measured": {
+    "corpus": "corpus/s2-006 (45 fixture cases; dev 10 / calibration 12 / locked_test 23)",
+    "calibrationEvidence": "evidence/s2-006-calibration.json (fixture metrics MEASURED; independence NOT_MEASURED)",
+    "comparisonEvidence": "evidence/s2-006-comparison.json",
+    "probesEvidence": "evidence/s2-006-security-probes.json",
+    "dbReplayEvidence": "evidence/s2-006-db-comparison.json",
+    "dbCrashEvidence": "evidence/s2-006-db-crash-{a,b}.json",
+    "dependencyBinding": "evidence/s2-006-dependency-binding.json"
+  },
+  "limitations": [
+    "No production claim of any kind; the verifier verdict is advisory and never replaces a human decision.",
+    "Fixture-annotator agreement and all quality thresholds are non-authenticated; downstream consumers must treat every numeric as indicative only."
+  ]
+}

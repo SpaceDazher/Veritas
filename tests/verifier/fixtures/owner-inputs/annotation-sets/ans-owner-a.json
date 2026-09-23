@@ -1,0 +1,80 @@
+{
+  "contractVersion": "1.0.0",
+  "annotationSetId": "ans-owner-a",
+  "corpusVersion": "1.0.0",
+  "frozenCaseIds": [
+    "case-owner-ext-01",
+    "case-owner-ext-02",
+    "case-owner-ext-03",
+    "case-owner-ext-04",
+    "case-owner-ext-05",
+    "case-owner-ext-06"
+  ],
+  "split": "locked_test",
+  "blindAssignment": {
+    "producerIdentityHidden": true,
+    "producerVerdictHidden": true,
+    "predictionsHidden": true,
+    "thresholdsHidden": true,
+    "splitAssignmentHidden": true
+  },
+  "annotatorId": "prn-owner-annotator-a",
+  "annotatorRole": "annotator",
+  "labels": [
+    {
+      "caseId": "case-owner-ext-01",
+      "label": "SUPPORTED",
+      "labelDigest": "06f321a1d09b5916ad7af3af54cf5571e09917921eb98474223c8383268b3453",
+      "annotatorId": "prn-owner-annotator-a",
+      "labeledAt": "2026-03-24T00:00:00.000Z"
+    },
+    {
+      "caseId": "case-owner-ext-02",
+      "label": "CONTRADICTED",
+      "labelDigest": "d7ca669b705596a955720a4ca96eb4d488e904a931a04913c8b368af09833039",
+      "annotatorId": "prn-owner-annotator-a",
+      "labeledAt": "2026-03-24T00:00:00.000Z"
+    },
+    {
+      "caseId": "case-owner-ext-03",
+      "label": "STALE_INPUT",
+      "labelDigest": "e65b598ee6eb0bc968dfc96a5840e91f53b100e72bc5cc2ca3fe7dc5f5e77d06",
+      "annotatorId": "prn-owner-annotator-a",
+      "labeledAt": "2026-03-24T00:00:00.000Z"
+    },
+    {
+      "caseId": "case-owner-ext-04",
+      "label": "INSUFFICIENT_EVIDENCE",
+      "labelDigest": "f33265580ba7644fe3c176448b8bc577006160077a5c1ceb89b1aabb22399e0b",
+      "annotatorId": "prn-owner-annotator-a",
+      "labeledAt": "2026-03-24T00:00:00.000Z"
+    },
+    {
+      "caseId": "case-owner-ext-05",
+      "label": "SUPPORTED",
+      "labelDigest": "1b012683b46e9e60cdf7a16173e79d813fccc4064cea6b73942cd542ddfdec92",
+      "annotatorId": "prn-owner-annotator-a",
+      "labeledAt": "2026-03-24T00:00:00.000Z"
+    },
+    {
+      "caseId": "case-owner-ext-06",
+      "label": "SUPPORTED",
+      "labelDigest": "d38f57d3c5559794f369de823236842f94cfd34efb9044822316cbaf2235b964",
+      "annotatorId": "prn-owner-annotator-a",
+      "labeledAt": "2026-03-24T00:00:00.000Z"
+    }
+  ],
+  "timestamps": {
+    "frozenAt": "2026-03-25T00:00:00.000Z",
+    "createdAt": "2026-03-24T00:00:00.000Z"
+  },
+  "sourceDigest": "e448767665eeec135e118d314b0f3b3528528d33f9504998bb7ea3d5dbbb155d",
+  "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+  "signature": {
+    "scheme": "hmac-sha256",
+    "keyRef": "kms://fixture/s2-006/owner-inputs/annotator-a",
+    "digest": "9d1cd3f10a77966b94c4b78cc17b62d94c10873b026099a0a873cffa0448962a",
+    "verified": true,
+    "attestedBy": "prn-owner-annotator-a"
+  }
+}

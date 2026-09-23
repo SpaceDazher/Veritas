@@ -1,0 +1,107 @@
+{
+  "contractVersion": "1.0.0",
+  "rubricId": "rub-s2006-semantic-v1",
+  "rubricVersion": "1.0.0",
+  "classes": [
+    {
+      "name": "entailment",
+      "definition": "The exact cited span supports the statement as written: identical polarity; every quantity preserved together with its unit (conservative equality, no silent unit conversion); population, geography, period and modality class preserved. Topic overlap alone is never entailment. PARTIALLY_SUPPORTED satisfies no full-entailment criterion and is never auto-converted into support.",
+      "examples": [
+        "Statement 'Congestion pricing reduced car trips by 15% in Stockholm in 2023.' cited to a span saying exactly that -> SUPPORTED.",
+        "Statement quantity '12 weeks' preserved verbatim in the span -> quantity and unit preserved."
+      ],
+      "counterexamples": [
+        "Statement says 25%, span says 15% -> not entailed (number_unit_drift).",
+        "Span about car trips cited for an air-pollution statement -> topic overlap only, not entailment.",
+        "Statement 'did not increase diesel sales', span 'increased diesel sales' -> negation drift, not entailment.",
+        "Assertive statement cited to a hedged span ('may have reduced') -> modality drift, not entailment."
+      ],
+      "ambiguityRule": "When statement content coverage is in [0.5, 1.0) with all polarity/quantity/unit/scope/modality checks passing, the verdict is PARTIALLY_SUPPORTED; it is never upgraded to SUPPORTED.",
+      "abstentionRule": "If no span is cited, the cited source is unavailable, or content coverage is below 0.5, abstain with INSUFFICIENT_EVIDENCE (reason missing_citation or topic_overlap) instead of guessing."
+    },
+    {
+      "name": "contradiction",
+      "definition": "A direct contradiction exists only when a cited span asserts the opposite polarity, or a disjoint quantity, for the same proposition within compatible population, geography, period and units. Different scope, missing data and independent claims are never contradictions.",
+      "examples": [
+        "'reduced car trips by 15% in Stockholm in 2023' versus 'did not reduce car trips in Stockholm in 2023' -> CONTRADICTED (compatible scope, polarity flip)."
+      ],
+      "counterexamples": [
+        "Oslo statement cited against a Stockholm span -> scope_difference, not contradiction.",
+        "adults statement versus children study -> scope_difference, not contradiction.",
+        "A span that simply does not mention the statement's quantity -> missing support, not contradiction."
+      ],
+      "ambiguityRule": "If polarity differs but scope compatibility cannot be established from the texts, record scope_difference and continue support evaluation; do not guess a contradiction.",
+      "abstentionRule": "If scope compatibility is indeterminate, abstain from the contradiction verdict (INSUFFICIENT_EVIDENCE) rather than emitting CONTRADICTED."
+    },
+    {
+      "name": "scope_difference",
+      "definition": "The statement and the cited span bind different populations, geographies or periods. The span may be perfectly true and the statement still unsupported for the stated scope; a scope difference is never scored as a contradiction.",
+      "examples": [
+        "Statement about Oslo cited to a Stockholm span -> scope_difference.",
+        "Statement about adults cited to a children study -> scope_difference."
+      ],
+      "counterexamples": [
+        "Same city but a different quantity -> number_unit_drift, not scope_difference.",
+        "A span that omits the statement's scope qualifier entirely -> qualifier gap (PARTIALLY_SUPPORTED), not a conflict."
+      ],
+      "ambiguityRule": "A statement whose scope is narrower than the span's is a qualifier gap recorded as PARTIALLY_SUPPORTED with scope_difference; only disjoint explicit values are conflicts.",
+      "abstentionRule": "When neither statement nor span pins the disputed scope dimension, abstain rather than resolving it with world knowledge."
+    },
+    {
+      "name": "evidence_family",
+      "definition": "Evidence independence is judged by upstream lineage: all spans descending from one source family are one evidence family; unknown lineage never creates additional independence. A claim of multiple independent sources fails with family_collapse when the cited spans collapse into fewer families than claimed.",
+      "examples": [
+        "Ten retellings of one upstream report -> one evidence family; 'two independent studies confirm X' cited to copies of one report -> family_collapse."
+      ],
+      "counterexamples": [
+        "Two spans with distinct source families and distinct upstream snapshots -> independent evidence."
+      ],
+      "ambiguityRule": "When lineage metadata is missing, treat the family as unknown: never count it as an independent second source.",
+      "abstentionRule": "If independence cannot be assessed, keep the textual support level but mark the independence claim unassessed instead of confirming it."
+    },
+    {
+      "name": "causal_status",
+      "definition": "Mechanism or causal language requires predefined causal-basis markers (interventional design, randomized/controlled trial, before/after intervention) plus established temporal ordering. Correlation, analogy and temporal co-occurrence never promote to mechanism. Even when markers are present, the verdict stays advisory and human review is never waived.",
+      "examples": [
+        "'Night-shift work causes metabolic syndrome' cited to an association cohort -> PARTIALLY_SUPPORTED with causal_overclaim.",
+        "'the drug lowers blood pressure by 8 mmHg' cited to a randomized controlled trial -> causal basis present."
+      ],
+      "counterexamples": [
+        "Temporal order alone ('prices rose, then trips fell') -> no mechanism.",
+        "Analogy to another domain -> no mechanism.",
+        "Correlation in a survey -> no mechanism."
+      ],
+      "ambiguityRule": "If causal-basis markers are ambiguous, keep the textual support level but never assert a mechanism verdict.",
+      "abstentionRule": "Never emit a mechanism confirmation without markers; abstain on causal status and flag for human review."
+    },
+    {
+      "name": "novelty",
+      "definition": "Novelty is assessed only against the named frozen corpus and its search horizon, with exactly three outcomes: novel_to_selected_corpus, similar_prior_found, NOT_ASSESSED. World-wide novelty claims are out of scope and rejected. No global truth or world-novelty verdict is ever issued.",
+      "examples": [
+        "Prior art exists in the selected corpus -> similar_prior_found.",
+        "No prior art within the corpus horizon -> novel_to_selected_corpus (corpus-relative only)."
+      ],
+      "counterexamples": [
+        "'First in the world to do X' -> OUT_OF_SCOPE regardless of the corpus state.",
+        "Novelty asserted for a horizon larger than the named corpus -> not assessable."
+      ],
+      "ambiguityRule": "If the corpus scope or search horizon is not provided, the assessment is NOT_ASSESSED.",
+      "abstentionRule": "Never claim or deny world novelty; outside the named corpus the only valid output is abstention or NOT_ASSESSED."
+    },
+    {
+      "name": "staleness",
+      "definition": "Stale, future (published after the as-of boundary) or revoked evidence invalidates the dependent verdict regardless of textual similarity: STALE_INPUT with reason stale_source, future_source or revoked_source. A semantically similar but invalidated span never supports a statement.",
+      "examples": [
+        "Span published after the as-of boundary -> STALE_INPUT (future_source).",
+        "Retracted study as the cited span -> STALE_INPUT (revoked_source).",
+        "Superseded 2021 assessment cited for a 2025 statement -> STALE_INPUT (stale_source)."
+      ],
+      "counterexamples": [
+        "A fresh span with a quantity drift -> semantic mismatch reason (number_unit_drift), not staleness.",
+        "A revoked span that matches word for word -> still STALE_INPUT, never SUPPORTED."
+      ],
+      "ambiguityRule": "When publication time is unknown, freshness is unverifiable: the dependent verdict may not be SUPPORTED.",
+      "abstentionRule": "If freshness cannot be established, the dependent verdict is INSUFFICIENT_EVIDENCE (typed missingness), never SUPPORTED."
+    }
+  ]
+}

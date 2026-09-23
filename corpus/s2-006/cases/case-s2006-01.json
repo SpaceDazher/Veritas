@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "case": {
+    "contractVersion": "1.0.0",
+    "caseId": "case-s2006-01",
+    "corpusVersion": "1.0.0",
+    "sourceFamily": "fixture-family-01",
+    "semanticTemplate": "template-01",
+    "stratum": "fixture",
+    "license": "synthetic",
+    "locator": null,
+    "provenance": {
+      "snapshotId": "snp-fixture-s2006-01",
+      "sourceDigest": null,
+      "retrievedAt": null,
+      "lineage": "SYNTHETIC"
+    },
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "expectedLabelsRef": {
+      "labelsDigest": "b6173823500b26c6a64408a5657456df235d8418382551f74ee52dc7de28500a",
+      "annotationSetIds": [
+        "ans-s2006-a-dev",
+        "ans-s2006-b-dev"
+      ]
+    },
+    "textDigest": "ffd2cd015caead4ee4e81f2713ba95a7ed51755a17b00ce65d84daefa7cf071f"
+  },
+  "scenario": {
+    "category": "positive",
+    "statement": "Congestion pricing reduced car trips by 15% in Stockholm in 2023.",
+    "supportingSpans": [
+      {
+        "text": "Congestion pricing reduced car trips by 15% in Stockholm in 2023.",
+        "sourceFamily": "fixture-family-01",
+        "status": "current",
+        "publishedAt": "2024-06-01T00:00:00.000Z",
+        "access": "public"
+      }
+    ],
+    "contradictingSpans": [],
+    "asOf": "2026-01-31T00:00:00.000Z",
+    "mechanismClaim": false,
+    "claimsMultipleIndependentSources": false,
+    "expected": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": []
+    }
+  }
+}

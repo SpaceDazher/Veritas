@@ -1,0 +1,58 @@
+[
+  {
+    "contractVersion": "1.0.0",
+    "adjudicationId": "adj-owner-001",
+    "caseId": "case-owner-ext-06",
+    "annotationSetIds": [
+      "ans-owner-a",
+      "ans-owner-b"
+    ],
+    "conflictingLabels": [
+      {
+        "annotationSetId": "ans-owner-a",
+        "annotatorId": "prn-owner-annotator-a",
+        "label": "SUPPORTED",
+        "labelDigest": "d38f57d3c5559794f369de823236842f94cfd34efb9044822316cbaf2235b964"
+      },
+      {
+        "annotationSetId": "ans-owner-b",
+        "annotatorId": "prn-owner-annotator-b",
+        "label": "INSUFFICIENT_EVIDENCE",
+        "labelDigest": "015d002e7992fb7a19029e40e7ffc03980b8ed6efe134b29d90bfaa30723d4e9"
+      }
+    ],
+    "retainedRawLabels": [
+      {
+        "annotationSetId": "ans-owner-a",
+        "annotatorId": "prn-owner-annotator-a",
+        "label": "SUPPORTED",
+        "labelDigest": "d38f57d3c5559794f369de823236842f94cfd34efb9044822316cbaf2235b964"
+      },
+      {
+        "annotationSetId": "ans-owner-b",
+        "annotatorId": "prn-owner-annotator-b",
+        "label": "INSUFFICIENT_EVIDENCE",
+        "labelDigest": "015d002e7992fb7a19029e40e7ffc03980b8ed6efe134b29d90bfaa30723d4e9"
+      }
+    ],
+    "decision": "INSUFFICIENT_EVIDENCE",
+    "rationale": "Annotator A accepted the cited span, but the span scopes the 25% delay reduction to the upgraded segment while the statement claims the whole network; the scope drift means the statement is not fully entailed, so the case is adjudicated INSUFFICIENT_EVIDENCE. Both raw votes are retained.",
+    "versions": {
+      "corpusVersion": "1.0.0",
+      "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+      "annotationManifestDigest": "e448767665eeec135e118d314b0f3b3528528d33f9504998bb7ea3d5dbbb155d",
+      "thresholdsDigest": "9ad71b56333315fb04e499a5432380f1008e66181b617ad032527bb11ee0827f"
+    },
+    "createdAt": "2026-03-25T00:00:00.000Z",
+    "adjudicatorIdentity": {
+      "principalId": "prn-owner-adjudicator-1",
+      "role": "adjudicator",
+      "authenticated": true,
+      "attestationDigest": "42222a762f4871e7b97578529aa147449a770ef4a48f587a413f8b106e191748"
+    },
+    "auditRef": {
+      "auditEntryId": "audit-owner-adj-001",
+      "auditDigest": "b59a27a77dee7d6853d5e9aa6f8a6e583d3462a7210bb1d178b742ff68e6e6c7"
+    }
+  }
+]
