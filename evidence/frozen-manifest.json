@@ -543,6 +543,7 @@
     "tests/verifier/fixtures/owner-inputs/independence.json": "edcda14b982d4e31eaae8ca31d367dee4e6be1a3db004ccdef673be19af8ad77",
     "tests/verifier/fixtures/owner-inputs/threshold-decision.json": "4928d03ae49f69090284493ce0b89753fce472943397f1b760611fcbd5be9626",
     "tests/verifier/fixtures/owner-inputs/thresholds.json": "c30b123929302b28574b9dfb8ff0bac8d373b29ebaba2e7d27d1fa51ca6103ee",
+    "tests/verifier/model-pilot.test.mjs": "2c10e8a93d275c43674f55cf4b5fcac3438c7ee2f163d4fe71d124f6a6521308",
     "tests/verifier/owner-inputs.test.mjs": "93ce2d5194f3118e55a7ed61b3d9d7213ac9ecbd4d415250ab849b8e7f3d7752",
     "tests/verifier/policy.test.mjs": "4dcb38f30859a3f9650d6e54300a0fcb257d2561cb759fa1be714f17b833d98c",
     "tests/verifier/review-round3-hardening.test.mjs": "99446e44c544d85d4659ce3ceac64f04d2e5c9ef6ca49ea0fc0f87121127f3ed",
