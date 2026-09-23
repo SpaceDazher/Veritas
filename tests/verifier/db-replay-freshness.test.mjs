@@ -1,6 +1,12 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import { classifyCurrentDbReplay, engineeringGateExitCode } from '../../scripts/s2-006-db-gate.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 const greenReport = () => ({
   schemaVersion: 1,
@@ -67,5 +73,12 @@ describe('S2-006 DB replay freshness gate', () => {
       assert.equal(engineeringGateExitCode('NEEDS_INPUT', { dbReplay: { status } }), 1);
     }
     assert.equal(engineeringGateExitCode('NEEDS_INPUT', { dbReplay: { status: 'PASS' } }), 0);
+  });
+
+  test('the fresh replay gate is included in the frozen manifest with exact bytes', () => {
+    const relativePath = 'scripts/s2-006-db-gate.mjs';
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'evidence/frozen-manifest.json'), 'utf8'));
+    const digest = createHash('sha256').update(fs.readFileSync(path.join(root, relativePath))).digest('hex');
+    assert.equal(manifest.files[relativePath], digest);
   });
 });
