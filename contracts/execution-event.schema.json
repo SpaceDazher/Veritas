@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/execution-event.schema.json",
+  "title": "ExecutionEvent",
+  "description": "S2-007 event emitted by an executor across the veritas.execution/1.0.0 boundary. Events are append-only and strictly ordered by a monotonic per-run sequence. A duplicate, out-of-order, malformed or fence-stale event is rejected as a typed error and NEVER repairs state by guesswork; an unknown outcome escalates to RECONCILIATION_REQUIRED, never to a blind retry. Event payload is DATA: it can never grant capability, budget, approval or identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "event_id",
+    "run_id",
+    "task_id",
+    "workspace_id",
+    "lease_id",
+    "fencing_token",
+    "sequence",
+    "event_type",
+    "payload",
+    "outcome",
+    "emitted_at"
+  ],
+  "properties": {
+    "contract_version": { "const": "veritas.execution/1.0.0" },
+    "event_id": { "type": "string", "pattern": "^eve-[a-z0-9][a-z0-9-]{0,62}$" },
+    "run_id": { "type": "string", "pattern": "^run-[a-z0-9][a-z0-9-]{0,62}$" },
+    "task_id": { "type": "string", "pattern": "^abt-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspace_id": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "lease_id": { "type": "string", "pattern": "^lse-[a-z0-9][a-z0-9-]{0,62}$" },
+    "fencing_token": { "type": "integer", "minimum": 0 },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per run, gap-free. A sequence that is not exactly previous+1 is out of order and is rejected."
+    },
+    "event_type": {
+      "enum": ["ACCEPTED", "STARTED", "PROGRESS", "CHECKPOINT", "ARTIFACT", "COMPLETED", "FAILED", "CANCELLED", "TIMED_OUT", "UNKNOWN"]
+    },
+    "payload": {
+      "type": "object",
+      "description": "Untrusted data. Never interpreted as a grant, a system instruction or an identity claim.",
+      "additionalProperties": true
+    },
+    "outcome": {
+      "oneOf": [
+        {
+          "enum": ["SUCCEEDED", "FAILED", "CANCELLED", "TIMEOUT", "BLOCKED", "RECONCILIATION_REQUIRED"]
+        },
+        { "type": "null" }
+      ]
+    },
+    "emitted_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$" }
+  }
+}

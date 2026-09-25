@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/board-error.schema.json",
+  "title": "BoardError",
+  "description": "S2-007 closed typed error set for the Agent Board and the veritas.execution/1.0.0 boundary. Every failure on this boundary is typed: an exception, timeout, unavailable executor or unknown outcome NEVER collapses into a silent success or into a semantic pass/fail. Code AUTH_REQUIRED, CAPABILITY_MISMATCH, BUDGET_EXCEEDED, AGENT_UNAVAILABLE, TIMEOUT, CANCELLED, MALFORMED_RESULT, UNKNOWN_OUTCOME and RECONCILIATION_REQUIRED are mandatory; the remaining codes are the fail-closed internal conditions. retryable NEVER means 'safe to blind retry': only reconciliation may follow an unknown side effect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "code", "message", "retryable", "detail", "occurred_at"],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "code": {
+      "enum": [
+        "AUTH_REQUIRED",
+        "CAPABILITY_MISMATCH",
+        "BUDGET_EXCEEDED",
+        "AGENT_UNAVAILABLE",
+        "TIMEOUT",
+        "CANCELLED",
+        "MALFORMED_RESULT",
+        "UNKNOWN_OUTCOME",
+        "RECONCILIATION_REQUIRED",
+        "PROVIDER_FAILURE",
+        "EMPTY_RESPONSE",
+        "ACL_DENIED",
+        "BLOCKED_POLICY",
+        "BLOCKED_SANDBOX",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "STALE_FENCE",
+        "CONTRACT_VERSION_UNKNOWN",
+        "TRANSITION_NOT_ALLOWED",
+        "NEEDS_INPUT",
+        "NOT_RUN_REAL_ADAPTER",
+        "NOT_RUN_DB"
+      ]
+    },
+    "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "retryable": {
+      "type": "boolean",
+      "description": "Whether the SAME request may be re-issued after a fresh authorization. False for RECONCILIATION_REQUIRED and UNKNOWN_OUTCOME: those require observation or an authorized reconciliation decision, never a blind retry."
+    },
+    "detail": { "oneOf": [{ "type": "string", "maxLength": 2000 }, { "type": "null" }] },
+    "occurred_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$" }
+  }
+}
