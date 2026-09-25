@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "artifact": "slo-contract",
+  "ticket": "SLOQUAL-001",
+  "version": "1.0.0",
+  "status": "FROZEN",
+  "frozenAt": "2026-09-25T00:00:00.000Z",
+  "authoredBy": "veritas-ticket-owner",
+  "countersignature": {
+    "status": "NEEDS_INPUT",
+    "owner": "user",
+    "reason": "No authenticated human owner has countersigned a Veritas SLO contract. Thresholds in this file are an engineering baseline, not an owned SLO, and this JSON is not authorization."
+  },
+  "extends": [
+    "S1-002",
+    "S1-008"
+  ],
+  "sourceTicket": {
+    "repository": "SpaceDazher/AgentOS",
+    "commit": "a7940e113492c83a29533d1e93f2724c36a9bbc1",
+    "path": "research/tickets/stage-1/SLOQUAL-001",
+    "verdict": "PASS_WITH_LIMITS",
+    "relationship": "Method donor only. The AgentOS numbers measured the AgentOS engine; they are NOT measurements of this repository and are not inherited as a Veritas result."
+  },
+  "scope": {
+    "systemUnderTest": "src/lib/identity/policy-engine.mjs authorization decisions issued in-process on one local host",
+    "included": [
+      "In-process policy decision latency (ALLOW and DENY paths) of the frozen scenario manifest.",
+      "S1-008 revoke-to-deny latency and post-revoke deny enforcement.",
+      "Fail-closed counters for cross-tenant, malformed, unknown-entity, single-use-replay and frozen-principal paths.",
+      "Two process-separated independent runs over the same frozen contract, scenario manifest and seeds."
+    ],
+    "excluded": [
+      "HTTP/Next.js request path, PostgreSQL store, migrations, sandbox process execution, provider calls, network egress and Next.js build/runtime.",
+      "Multi-host, multi-tenant or production-representative traffic.",
+      "Anything about cost, capacity planning, rollout or legal approval."
+    ]
+  },
+  "nonScope": [
+    "This contract does not establish a production SLO, a capacity plan or production readiness.",
+    "Local measurements are not transferable to a production deployment: no production workload profile is mapped.",
+    "A PASS verdict from this contract means the frozen local contract was satisfied by the recorded runs. It never means production SLO authorization.",
+    "Changing any threshold, statistic, gate or proof after the first recorded result requires a new contract version, a new scenario-manifest version and a complete new run."
+  ],
+  "selfHash": {
+    "algorithm": "SHA-256",
+    "canonicalization": "canonical-json-v1 (src/lib/verifier/canonical-json.mjs)",
+    "excludes": [
+      "selfHash.sha256"
+    ],
+    "sha256": "961e044d92c7131ec50efb5751e3c5e5554ffd257b32707c47b4593d7b0bf76d"
+  },
+  "scenarioManifest": {
+    "path": "contracts/sloqual-001-scenario-manifest.json",
+    "version": "1.0.0",
+    "sha256": "7b5715bb1063e38d35f16ee60e881e6efd65242001f8d6206964e3fb5e6bca6b"
+  },
+  "measurement": {
+    "clock": "process.hrtime.bigint monotonic nanoseconds",
+    "arrivalModel": "open_loop_no_coordinated_omission",
+    "latencyDefinition": "latency_ms = (response_complete_ns - scheduled_send_ns) / 1e6, where scheduled_send_ns is the planned arrival instant computed before the run",
+    "latenessDefinition": "lateness_ms = (dispatch_start_ns - scheduled_send_ns) / 1e6; a positive value means the host could not keep up with the frozen schedule",
+    "unitOfAnalysis": "one engine.authorize() call",
+    "seeds": [
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "scenariosPerSeed": 17,
+    "expectedScenarioSeedResultsPerRun": 85,
+    "revocationTrialsPerRun": 105,
+    "warmup": {
+      "requestsPerNonSecurityScenarioSeed": 10,
+      "rule": "The first 10 requests of every non-security scenario-seed are a declared warmup. They are dispatched, judged, counted and recorded exactly like every other request, but excluded from the latency and lateness statistics so the warm SLI describes warm behaviour instead of first-call JIT cost. The revocation family has no warmup: its latency is commit-to-deny, where a warmup would only add unrelated trials.",
+      "excludedFrom": [
+        "latency statistics",
+        "lateness statistics"
+      ],
+      "retainedIn": [
+        "hard counters",
+        "decision sequence digests",
+        "raw observations",
+        "realization ratio denominator"
+      ]
+    }
+  },
+  "statistics": {
+    "percentileMethod": "nearest_rank",
+    "latencyConfidenceInterval": {
+      "method": "percentile_bootstrap",
+      "resamples": 2000,
+      "confidence": 0.95,
+      "seed": 20260925,
+      "note": "Seeded so the interval is reproducible byte-for-byte for the same raw samples."
+    },
+    "proportionMethod": "wilson_score",
+    "aggregation": "Warm SLI is aggregated over the steady family (all seeds, all scenarios in the family). Burst SLI is aggregated over the burst family. Per-scenario and per-family records are reported, never substituted for the aggregate the threshold names."
+  },
+  "hardGates": {
+    "rule": "Every hard gate is an exact zero. A missing, non-finite or unknown counter is a violation, never an implicit pass.",
+    "cross_tenant_allow": 0,
+    "unexpected_decision": 0,
+    "allow_after_principal_freeze": 0,
+    "single_use_grant_replay_allow": 0,
+    "decision_divergence_within_run": 0,
+    "decision_divergence_between_runs": 0,
+    "missing_or_censored_samples": 0,
+    "degenerate_scenario_decision_distribution": 0,
+    "allow_after_revocation_commit": 0,
+    "revocation_trial_precondition_failures": 0
+  },
+  "limits": {
+    "warm_authorization_p95_ms": {
+      "metric": "authorization_latency_ms",
+      "family": "steady",
+      "statistic": "nearest_rank_p95",
+      "operator": "<=",
+      "threshold": 20,
+      "unit": "ms",
+      "requireCiUpperWithin": true,
+      "description": "Warm p95 of the steady family; both the point estimate and the 95% bootstrap CI upper bound must stay within the threshold."
+    },
+    "warm_authorization_p99_ms": {
+      "metric": "authorization_latency_ms",
+      "family": "steady",
+      "statistic": "nearest_rank_p99",
+      "operator": "<=",
+      "threshold": 50,
+      "unit": "ms",
+      "description": "Warm tail of the steady family."
+    },
+    "burst_authorization_p95_ms": {
+      "metric": "authorization_latency_ms",
+      "family": "burst",
+      "statistic": "nearest_rank_p95",
+      "operator": "<=",
+      "threshold": 200,
+      "unit": "ms",
+      "requireCiUpperWithin": true,
+      "description": "Burst p95 with zero inter-arrival spacing inside the burst window."
+    },
+    "scheduling_lateness_p95_ms": {
+      "metric": "scheduling_lateness_ms",
+      "family": "all",
+      "statistic": "nearest_rank_p95",
+      "operator": "<=",
+      "threshold": 100,
+      "unit": "ms",
+      "description": "How late the host was against the frozen open-loop schedule. A breach means the host could not deliver the offered load and the latency numbers are optimistic."
+    },
+    "revocation_to_deny_max_ms": {
+      "metric": "revocation_commit_to_deny_ms",
+      "statistic": "max",
+      "operator": "<=",
+      "threshold": 5000,
+      "unit": "ms",
+      "source": "S1-008",
+      "description": "Worst commit-to-deny latency over the run's revocation trials."
+    },
+    "revocation_trials_per_run": {
+      "metric": "revocation_trial_count",
+      "statistic": "count",
+      "operator": ">=",
+      "threshold": 105,
+      "unit": "trials",
+      "source": "S1-008",
+      "description": "Minimum revocation trials per run."
+    },
+    "realization_ratio": {
+      "metric": "dispatch_realization_ratio",
+      "statistic": "completed_over_dispatched",
+      "operator": ">=",
+      "threshold": 0.999,
+      "unit": "ratio",
+      "description": "Measured samples over dispatched requests, per family. Below 1.0 the run did not deliver the offered load."
+    }
+  },
+  "passRule": {
+    "verdicts": [
+      "PASS",
+      "PASS_WITH_LIMITS",
+      "FAIL"
+    ],
+    "FAIL": "Any hard gate violation, any structural failure (frozen contract or manifest digest mismatch, missing or partial scenario/seed coverage, absent or non-finite metric, run-manifest collision, missing run) or any declared required proof that is registered as MAPPED and measured as violated.",
+    "PASS_WITH_LIMITS": "No failure, but at least one registered proof is unsatisfied: a threshold miss on a measured metric, or a proof whose missing evidence is itemized.",
+    "PASS": "No failure and every registered proof satisfied.",
+    "invariant": "A missing measurement is never a satisfied threshold. An empty sample set is a structural failure, not a zero.",
+    "independentRerun": "Two process-separated runs with distinct executor id, pid, nonce and output root must both exist and must agree on every decision under the exact rule."
+  },
+  "registeredProofs": [
+    {
+      "id": "warm_latency_within_threshold",
+      "description": "Warm authorization p95 point estimate and 95% bootstrap CI upper bound within the frozen warm threshold over the steady family.",
+      "status": "MAPPED",
+      "satisfiedBy": "limits.warm_authorization_p95_ms",
+      "missingProof": null
+    },
+    {
+      "id": "burst_latency_within_threshold",
+      "description": "Burst authorization p95 point estimate and 95% bootstrap CI upper bound within the frozen burst threshold over the burst family.",
+      "status": "MAPPED",
+      "satisfiedBy": "limits.burst_authorization_p95_ms",
+      "missingProof": null
+    },
+    {
+      "id": "revocation_gate_s1_008",
+      "description": "At least 105 revoke-to-deny trials per run, maximum within 5000 ms, zero post-revoke allows.",
+      "status": "MAPPED",
+      "satisfiedBy": "limits.revocation_to_deny_max_ms",
+      "missingProof": null
+    },
+    {
+      "id": "fail_closed_invariants",
+      "description": "Zero cross-tenant allows, unexpected decisions, post-freeze allows, single-use replay allows, divergence and censored samples.",
+      "status": "MAPPED",
+      "satisfiedBy": "hardGates",
+      "missingProof": null
+    },
+    {
+      "id": "independent_rerun_same_host",
+      "description": "Second process-separated run over the same frozen contract, manifest and seeds, agreeing on every decision.",
+      "status": "MAPPED",
+      "satisfiedBy": "hardGates.decision_divergence_between_runs",
+      "missingProof": null
+    },
+    {
+      "id": "production_profile_mapping",
+      "description": "An owner-approved production-like workload profile (rate, mix, workspace/principal scale, database scale) mapped onto this harness.",
+      "status": "NOT_MEASURED",
+      "satisfiedBy": null,
+      "missingProof": "No representative production profile exists for Veritas. Local numbers are single-host, in-process and cannot be read as a production SLO."
+    },
+    {
+      "id": "full_scale_fault_and_soak_families",
+      "description": "Full-scale fault and soak families: sustained >= 6 h, soak >= 24 h, process-loss and mass-invalidation runs at production-like scale.",
+      "status": "NOT_MEASURED",
+      "satisfiedBy": null,
+      "missingProof": "Local fault and soak families are pilot-scale only (seconds, one process, in-memory enforcement state). Statistical power for these families is insufficient for a full claim."
+    },
+    {
+      "id": "external_independent_execution",
+      "description": "Independent qualification executed by a separate external host and executor, not a second process on the same machine.",
+      "status": "NOT_MEASURED",
+      "satisfiedBy": null,
+      "missingProof": "Both runs execute on one host. Process separation is not host separation; shared CPU, memory and kernel noise remain uncontrolled."
+    },
+    {
+      "id": "human_slo_countersignature",
+      "description": "Authenticated human owner countersignature bound to this exact contract digest, naming the SLO, its owner and its review date.",
+      "status": "NEEDS_INPUT",
+      "satisfiedBy": null,
+      "missingProof": "countersignature.status is NEEDS_INPUT. A Veritas SLO has no accountable owner yet; this file cannot grant that authority."
+    },
+    {
+      "id": "end_to_end_request_path",
+      "description": "Latency and availability of the full request path (HTTP/API, database, sandbox, provider edge) rather than the in-process decision function.",
+      "status": "NOT_MEASURED",
+      "satisfiedBy": null,
+      "missingProof": "The harness measures the decision function only. End-to-end SLOs need a deployed instance and are out of the frozen scope of this contract."
+    }
+  ],
+  "authority": {
+    "productionSloAuthorized": false,
+    "productionReadinessClaimed": false,
+    "independentExternalAuditClaimed": false,
+    "legalReviewClaimed": false,
+    "spendAuthorized": false,
+    "statement": "PASS_WITH_LIMITS is not PASS. A PASS from this contract covers the frozen local contract only and never authorizes a production SLO, a rollout, a legal opinion or spending."
+  },
+  "changeRule": "The contract is frozen at the recorded commit. Any threshold, statistic, gate, proof, scope or manifest change requires a new version, a new self-hash, a new manifest version and a complete new run; the previous results become historical, read-only input."
+}
