@@ -1,0 +1,3896 @@
+{
+  "schemaVersion": 1,
+  "role": "SLOQUAL-001 independent qualification run B",
+  "freeze": {
+    "contractVersion": "1.0.1",
+    "contractSelfHash": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d",
+    "manifestVersion": "1.0.0",
+    "manifestSha256": "7b5715bb1063e38d35f16ee60e881e6efd65242001f8d6206964e3fb5e6bca6b"
+  },
+  "provenance": {
+    "status": "VERIFIED",
+    "head": "06a1fcc7cb64b9942ec896bd7bca8590c7d15902",
+    "freezeCommit": "06a1fcc7cb64b9942ec896bd7bca8590c7d15902",
+    "manifestCommit": "1e2d56c2208e16df4a4cd150d21ed5af18edf1d0",
+    "frozenBeforeImplementation": true,
+    "rule": "The recorded thresholds and proofs must be committed before the commit whose implementation produced the runs."
+  },
+  "run": {
+    "schemaVersion": 1,
+    "ticket": "SLOQUAL-001",
+    "runnerVersion": "sloqual-runner-v1",
+    "contractVersion": "1.0.1",
+    "contractSelfHash": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d",
+    "manifestVersion": "1.0.0",
+    "manifestDigest": "505541943b05a795b495294487f1fab5cb08563fba67e7e83324e00d67e199d5",
+    "policyVersion": "s2-002-policy-v5",
+    "runId": "sloqual-b",
+    "executorId": "exec-beta",
+    "pid": 431681,
+    "nonce": "sloqual-nonce-beta-9c07",
+    "outputRoot": "results/sloqual-001/sloqual-b",
+    "platform": "linux/x64",
+    "nodeVersion": "v22.23.2",
+    "policyClock": "2026-09-12T12:00:00.000Z",
+    "coverage": {
+      "scenariosDeclared": 17,
+      "seedsDeclared": 5,
+      "scenarioSeedResults": 85,
+      "expectedScenarioSeedResults": 85,
+      "complete": true
+    },
+    "dispatchedSamples": 13305,
+    "measuredSamples": 12505,
+    "warmupPolicy": {
+      "requestsPerScenarioSeed": 10,
+      "excludedFromLatencyStatistics": true,
+      "retainedInHardCountersAndDecisionSequence": true,
+      "rule": "The first 10 requests of every non-security scenario-seed are a declared warmup. They are dispatched and judged exactly like every other request (hard counters, decision sequence, raw observations) but are excluded from the latency and lateness statistics, so the warm SLI describes warm behaviour rather than first-call JIT cost."
+    },
+    "realization": {
+      "steady": 1,
+      "burst": 1,
+      "fault": 1,
+      "soak": 1,
+      "security": 1,
+      "all": 1
+    },
+    "realizationDetail": {
+      "steady": {
+        "dispatched": 5500,
+        "completed": 5500,
+        "ratio": 1,
+        "status": "MEASURED"
+      },
+      "burst": {
+        "dispatched": 1700,
+        "completed": 1700,
+        "ratio": 1,
+        "status": "MEASURED"
+      },
+      "fault": {
+        "dispatched": 1650,
+        "completed": 1650,
+        "ratio": 1,
+        "status": "MEASURED"
+      },
+      "soak": {
+        "dispatched": 3550,
+        "completed": 3550,
+        "ratio": 1,
+        "status": "MEASURED"
+      },
+      "security": {
+        "dispatched": 105,
+        "completed": 105,
+        "ratio": 1,
+        "status": "MEASURED"
+      },
+      "all": {
+        "dispatched": 12505,
+        "completed": 12505,
+        "ratio": 1,
+        "status": "MEASURED"
+      }
+    },
+    "metrics": {
+      "all": {
+        "latency": {
+          "samples": 12505,
+          "status": "MEASURED",
+          "p50": 0.247734,
+          "p95": 0.513405,
+          "p99": 1.990237,
+          "max": 12.553751,
+          "mean": 0.31136771011595227,
+          "ci95": {
+            "lower": 0.494216,
+            "upper": 0.529404,
+            "method": "percentile_bootstrap",
+            "resamples": 2000,
+            "confidence": 0.95,
+            "seed": 20260925,
+            "samples": 12505
+          }
+        },
+        "lateness": {
+          "samples": 12505,
+          "status": "MEASURED",
+          "p50": 0.105818,
+          "p95": 0.301395,
+          "p99": 1.416893,
+          "max": 12.185728,
+          "mean": 0.16453644110355878,
+          "ci95": {
+            "lower": 0.288637,
+            "upper": 0.308632,
+            "method": "percentile_bootstrap",
+            "resamples": 2000,
+            "confidence": 0.95,
+            "seed": 20260925,
+            "samples": 12505
+          }
+        }
+      },
+      "families": {
+        "steady": {
+          "latency": {
+            "samples": 5500,
+            "status": "MEASURED",
+            "p50": 0.262139,
+            "p95": 0.677266,
+            "p99": 3.296607,
+            "max": 12.553751,
+            "mean": 0.37285922636363655,
+            "ci95": {
+              "lower": 0.620469,
+              "upper": 0.745353,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 5500
+            },
+            "p99Ci95": {
+              "pointEstimate": 3.296607,
+              "lower": 2.789973,
+              "upper": 3.676793,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 5500
+            }
+          },
+          "lateness": {
+            "samples": 5500,
+            "status": "MEASURED",
+            "p50": 0.105727,
+            "p95": 0.377601,
+            "p99": 2.693054,
+            "max": 12.185728,
+            "mean": 0.20485354836363664,
+            "ci95": {
+              "lower": 0.351097,
+              "upper": 0.429001,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 5500
+            }
+          }
+        },
+        "burst": {
+          "latency": {
+            "samples": 1700,
+            "status": "MEASURED",
+            "p50": 0.229196,
+            "p95": 0.440246,
+            "p99": 1.036117,
+            "max": 4.549647,
+            "mean": 0.26552984176470584,
+            "ci95": {
+              "lower": 0.41287,
+              "upper": 0.467998,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 1700
+            }
+          },
+          "lateness": {
+            "samples": 1700,
+            "status": "MEASURED",
+            "p50": 0.098875,
+            "p95": 0.250524,
+            "p99": 0.640167,
+            "max": 4.294443,
+            "mean": 0.13013296000000008,
+            "ci95": {
+              "lower": 0.225089,
+              "upper": 0.267942,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 1700
+            }
+          }
+        },
+        "fault": {
+          "latency": {
+            "samples": 1650,
+            "status": "MEASURED",
+            "p50": 0.236265,
+            "p95": 0.4198,
+            "p99": 0.609708,
+            "max": 5.506297,
+            "mean": 0.25927592606060607,
+            "ci95": {
+              "lower": 0.402364,
+              "upper": 0.441744,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 1650
+            }
+          },
+          "lateness": {
+            "samples": 1650,
+            "status": "MEASURED",
+            "p50": 0.105359,
+            "p95": 0.264269,
+            "p99": 0.39267,
+            "max": 5.071169,
+            "mean": 0.13017271151515156,
+            "ci95": {
+              "lower": 0.242944,
+              "upper": 0.28275,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 1650
+            }
+          }
+        },
+        "soak": {
+          "latency": {
+            "samples": 3550,
+            "status": "MEASURED",
+            "p50": 0.24789,
+            "p95": 0.451956,
+            "p99": 0.801117,
+            "max": 2.550578,
+            "mean": 0.27095161352112723,
+            "ci95": {
+              "lower": 0.436356,
+              "upper": 0.467337,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 3550
+            }
+          },
+          "lateness": {
+            "samples": 3550,
+            "status": "MEASURED",
+            "p50": 0.110099,
+            "p95": 0.282823,
+            "p99": 0.518249,
+            "max": 2.421123,
+            "mean": 0.13935507154929572,
+            "ci95": {
+              "lower": 0.272586,
+              "upper": 0.29515,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 3550
+            }
+          }
+        },
+        "security": {
+          "latency": {
+            "samples": 105,
+            "status": "MEASURED",
+            "p50": 0.014344,
+            "p95": 0.021549,
+            "p99": 0.052517,
+            "max": 0.218552,
+            "mean": 0.01755460000000001,
+            "ci95": {
+              "lower": 0.017083,
+              "upper": 0.050419,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 105
+            }
+          },
+          "lateness": {
+            "samples": 105,
+            "status": "MEASURED",
+            "p50": 0.00084,
+            "p95": 0.001787,
+            "p99": 0.00724,
+            "max": 0.009358,
+            "mean": 0.0010682857142857135,
+            "ci95": {
+              "lower": 0.001091,
+              "upper": 0.003131,
+              "method": "percentile_bootstrap",
+              "resamples": 2000,
+              "confidence": 0.95,
+              "seed": 20260925,
+              "samples": 105
+            }
+          }
+        }
+      },
+      "perScenario": {
+        "warm_steady_state#11": {
+          "scenarioId": "warm_steady_state",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.33838,
+            "p95": 0.571881,
+            "p99": 0.753296,
+            "max": 0.758336,
+            "mean": 0.3537745454545454
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.123709,
+            "p95": 0.29373,
+            "p99": 0.337709,
+            "max": 0.36713,
+            "mean": 0.15025249090909093
+          }
+        },
+        "warm_steady_state#12": {
+          "scenarioId": "warm_steady_state",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.369554,
+            "p95": 0.552993,
+            "p99": 0.700111,
+            "max": 1.004497,
+            "mean": 0.3878938000000002
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.130021,
+            "p95": 0.321436,
+            "p99": 0.414939,
+            "max": 0.425646,
+            "mean": 0.15855502727272733
+          }
+        },
+        "warm_steady_state#13": {
+          "scenarioId": "warm_steady_state",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.398909,
+            "p95": 4.010057,
+            "p99": 9.686618,
+            "max": 11.032914,
+            "mean": 1.0580234181818178
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.132794,
+            "p95": 3.180404,
+            "p99": 9.589235,
+            "max": 10.780438,
+            "mean": 0.7379705545454546
+          }
+        },
+        "warm_steady_state#14": {
+          "scenarioId": "warm_steady_state",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.372348,
+            "p95": 1.662869,
+            "p99": 2.222979,
+            "max": 2.623601,
+            "mean": 0.5150074454545456
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.128569,
+            "p95": 1.427517,
+            "p99": 1.980034,
+            "max": 2.345725,
+            "mean": 0.2886256454545455
+          }
+        },
+        "warm_steady_state#15": {
+          "scenarioId": "warm_steady_state",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.807827,
+            "p95": 4.695177,
+            "p99": 6.166087,
+            "max": 6.765775,
+            "mean": 1.4592616727272723
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.365326,
+            "p95": 3.160915,
+            "p99": 5.272383,
+            "max": 6.030113,
+            "mean": 0.9217839545454547
+          }
+        },
+        "deny_heavy_steady_state#11": {
+          "scenarioId": "deny_heavy_steady_state",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.61962,
+            "p95": 4.406125,
+            "p99": 4.967675,
+            "max": 5.084327,
+            "mean": 1.2670272272727277
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.34576,
+            "p95": 3.323069,
+            "p99": 4.301519,
+            "max": 4.542565,
+            "mean": 0.9239873454545452
+          }
+        },
+        "deny_heavy_steady_state#12": {
+          "scenarioId": "deny_heavy_steady_state",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.392086,
+            "p95": 2.444256,
+            "p99": 5.782701,
+            "max": 6.253077,
+            "mean": 0.751939190909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.128156,
+            "p95": 1.584377,
+            "p99": 5.30647,
+            "max": 5.591719,
+            "mean": 0.4671817090909089
+          }
+        },
+        "deny_heavy_steady_state#13": {
+          "scenarioId": "deny_heavy_steady_state",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.349287,
+            "p95": 0.613453,
+            "p99": 0.754623,
+            "max": 1.007148,
+            "mean": 0.3648205090909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.119797,
+            "p95": 0.341127,
+            "p99": 0.578884,
+            "max": 0.80672,
+            "mean": 0.1530501272727273
+          }
+        },
+        "deny_heavy_steady_state#14": {
+          "scenarioId": "deny_heavy_steady_state",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.318078,
+            "p95": 2.842619,
+            "p99": 3.502118,
+            "max": 4.077489,
+            "mean": 0.5512400090909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.116545,
+            "p95": 2.720807,
+            "p99": 3.413254,
+            "max": 3.774531,
+            "mean": 0.3453103363636364
+          }
+        },
+        "deny_heavy_steady_state#15": {
+          "scenarioId": "deny_heavy_steady_state",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.34819,
+            "p95": 2.988911,
+            "p99": 5.240876,
+            "max": 5.291928,
+            "mean": 0.6157500181818182
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.12333,
+            "p95": 2.626723,
+            "p99": 5.143223,
+            "max": 5.177135,
+            "mean": 0.38741975454545446
+          }
+        },
+        "burst_allow_traffic#11": {
+          "scenarioId": "burst_allow_traffic",
+          "family": "burst",
+          "seed": 11,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.297939,
+            "p95": 1.401972,
+            "p99": 3.952955,
+            "max": 4.549647,
+            "mean": 0.4741610764705881
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.109251,
+            "p95": 1.342537,
+            "p99": 3.887975,
+            "max": 4.294443,
+            "mean": 0.2786297647058824
+          }
+        },
+        "burst_allow_traffic#12": {
+          "scenarioId": "burst_allow_traffic",
+          "family": "burst",
+          "seed": 12,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.251663,
+            "p95": 0.440246,
+            "p99": 0.997573,
+            "max": 1.261303,
+            "mean": 0.2715056294117647
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.105247,
+            "p95": 0.27443,
+            "p99": 0.667832,
+            "max": 0.940062,
+            "mean": 0.1298497117647058
+          }
+        },
+        "burst_allow_traffic#13": {
+          "scenarioId": "burst_allow_traffic",
+          "family": "burst",
+          "seed": 13,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.250816,
+            "p95": 0.446347,
+            "p99": 0.567062,
+            "max": 0.680896,
+            "mean": 0.27015900588235287
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.100149,
+            "p95": 0.228118,
+            "p99": 0.458868,
+            "max": 0.462487,
+            "mean": 0.11429340588235291
+          }
+        },
+        "burst_allow_traffic#14": {
+          "scenarioId": "burst_allow_traffic",
+          "family": "burst",
+          "seed": 14,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.22585,
+            "p95": 0.395391,
+            "p99": 0.56722,
+            "max": 0.73957,
+            "mean": 0.24124941176470602
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.094867,
+            "p95": 0.195198,
+            "p99": 0.351899,
+            "max": 0.361557,
+            "mean": 0.10793454117647057
+          }
+        },
+        "burst_allow_traffic#15": {
+          "scenarioId": "burst_allow_traffic",
+          "family": "burst",
+          "seed": 15,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.2364,
+            "p95": 0.460971,
+            "p99": 0.668409,
+            "max": 1.499834,
+            "mean": 0.25752432941176445
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.103376,
+            "p95": 0.253531,
+            "p99": 0.340668,
+            "max": 0.341747,
+            "mean": 0.11953765294117646
+          }
+        },
+        "burst_mixed_traffic#11": {
+          "scenarioId": "burst_mixed_traffic",
+          "family": "burst",
+          "seed": 11,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.219529,
+            "p95": 0.382582,
+            "p99": 0.502581,
+            "max": 0.640797,
+            "mean": 0.23418434705882338
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.095746,
+            "p95": 0.257071,
+            "p99": 0.335045,
+            "max": 0.476462,
+            "mean": 0.11400819999999992
+          }
+        },
+        "burst_mixed_traffic#12": {
+          "scenarioId": "burst_mixed_traffic",
+          "family": "burst",
+          "seed": 12,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.192052,
+            "p95": 0.362212,
+            "p99": 0.544141,
+            "max": 1.189236,
+            "mean": 0.21676075294117658
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.087727,
+            "p95": 0.195675,
+            "p99": 0.286484,
+            "max": 0.330574,
+            "mean": 0.10187131764705881
+          }
+        },
+        "burst_mixed_traffic#13": {
+          "scenarioId": "burst_mixed_traffic",
+          "family": "burst",
+          "seed": 13,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.230095,
+            "p95": 0.429252,
+            "p99": 0.623578,
+            "max": 0.625693,
+            "mean": 0.25091517058823526
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.101242,
+            "p95": 0.230262,
+            "p99": 0.30646,
+            "max": 0.306876,
+            "mean": 0.11629179999999997
+          }
+        },
+        "burst_mixed_traffic#14": {
+          "scenarioId": "burst_mixed_traffic",
+          "family": "burst",
+          "seed": 14,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.209648,
+            "p95": 0.344924,
+            "p99": 1.172788,
+            "max": 1.462071,
+            "mean": 0.2269099529411764
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.092266,
+            "p95": 0.185838,
+            "p99": 0.596163,
+            "max": 1.138807,
+            "mean": 0.11119752352941174
+          }
+        },
+        "burst_mixed_traffic#15": {
+          "scenarioId": "burst_mixed_traffic",
+          "family": "burst",
+          "seed": 15,
+          "requests": 180,
+          "warmupRequests": 10,
+          "measuredRequests": 170,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.199913,
+            "p95": 0.333346,
+            "p99": 0.567909,
+            "max": 0.58991,
+            "mean": 0.2119287411764706
+          },
+          "lateness": {
+            "samples": 170,
+            "status": "MEASURED",
+            "p50": 0.091796,
+            "p95": 0.193589,
+            "p99": 0.413567,
+            "max": 0.503563,
+            "mean": 0.1077156823529412
+          }
+        },
+        "grant_path_focus#11": {
+          "scenarioId": "grant_path_focus",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.21021,
+            "p95": 0.401967,
+            "p99": 0.56959,
+            "max": 0.766084,
+            "mean": 0.23448861818181813
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.09459,
+            "p95": 0.223981,
+            "p99": 0.288169,
+            "max": 0.304443,
+            "mean": 0.1120470363636364
+          }
+        },
+        "grant_path_focus#12": {
+          "scenarioId": "grant_path_focus",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.267228,
+            "p95": 0.477199,
+            "p99": 0.761824,
+            "max": 0.954107,
+            "mean": 0.2928587363636365
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.105406,
+            "p95": 0.285354,
+            "p99": 0.352072,
+            "max": 0.593756,
+            "mean": 0.13093528181818181
+          }
+        },
+        "grant_path_focus#13": {
+          "scenarioId": "grant_path_focus",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.269924,
+            "p95": 0.512453,
+            "p99": 0.720482,
+            "max": 0.774701,
+            "mean": 0.28614103636363636
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.108642,
+            "p95": 0.346545,
+            "p99": 0.468256,
+            "max": 0.52006,
+            "mean": 0.1373471
+          }
+        },
+        "grant_path_focus#14": {
+          "scenarioId": "grant_path_focus",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.250712,
+            "p95": 0.440407,
+            "p99": 0.466911,
+            "max": 1.752182,
+            "mean": 0.27733219090909095
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.104062,
+            "p95": 0.261356,
+            "p99": 0.33332,
+            "max": 0.401328,
+            "mean": 0.12716241818181823
+          }
+        },
+        "grant_path_focus#15": {
+          "scenarioId": "grant_path_focus",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.248126,
+            "p95": 0.358769,
+            "p99": 0.469965,
+            "max": 0.765978,
+            "mean": 0.2545876727272727
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.106584,
+            "p95": 0.221745,
+            "p99": 0.305482,
+            "max": 0.345488,
+            "mean": 0.12090523636363638
+          }
+        },
+        "acl_path_focus#11": {
+          "scenarioId": "acl_path_focus",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.231968,
+            "p95": 0.379045,
+            "p99": 0.437547,
+            "max": 0.586807,
+            "mean": 0.23656327272727265
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.104788,
+            "p95": 0.222906,
+            "p99": 0.290131,
+            "max": 0.290201,
+            "mean": 0.11607359999999999
+          }
+        },
+        "acl_path_focus#12": {
+          "scenarioId": "acl_path_focus",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.219471,
+            "p95": 0.460179,
+            "p99": 0.570016,
+            "max": 0.639812,
+            "mean": 0.24262867272727265
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.092548,
+            "p95": 0.288656,
+            "p99": 0.464976,
+            "max": 0.478435,
+            "mean": 0.1178010363636363
+          }
+        },
+        "acl_path_focus#13": {
+          "scenarioId": "acl_path_focus",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.211287,
+            "p95": 0.333414,
+            "p99": 0.418378,
+            "max": 0.453436,
+            "mean": 0.22283403636363625
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.096447,
+            "p95": 0.188951,
+            "p99": 0.265682,
+            "max": 0.358278,
+            "mean": 0.10698776363636361
+          }
+        },
+        "acl_path_focus#14": {
+          "scenarioId": "acl_path_focus",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.193997,
+            "p95": 0.40923,
+            "p99": 0.51652,
+            "max": 0.560096,
+            "mean": 0.22135619090909087
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.09215,
+            "p95": 0.269076,
+            "p99": 0.439645,
+            "max": 0.467575,
+            "mean": 0.1126014181818182
+          }
+        },
+        "acl_path_focus#15": {
+          "scenarioId": "acl_path_focus",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.222304,
+            "p95": 0.457167,
+            "p99": 1.847027,
+            "max": 2.146728,
+            "mean": 0.26854639090909094
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.100275,
+            "p95": 0.280432,
+            "p99": 0.393061,
+            "max": 1.798901,
+            "mean": 0.13237802727272724
+          }
+        },
+        "lease_binding_focus#11": {
+          "scenarioId": "lease_binding_focus",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.236379,
+            "p95": 0.333294,
+            "p99": 0.398842,
+            "max": 0.432573,
+            "mean": 0.23280818181818183
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.098079,
+            "p95": 0.193924,
+            "p99": 0.264649,
+            "max": 0.275657,
+            "mean": 0.10699136363636363
+          }
+        },
+        "lease_binding_focus#12": {
+          "scenarioId": "lease_binding_focus",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.252107,
+            "p95": 0.409482,
+            "p99": 0.542861,
+            "max": 0.620469,
+            "mean": 0.2545971727272727
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.102838,
+            "p95": 0.238939,
+            "p99": 0.30324,
+            "max": 0.331078,
+            "mean": 0.11526766363636363
+          }
+        },
+        "lease_binding_focus#13": {
+          "scenarioId": "lease_binding_focus",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.246287,
+            "p95": 0.387255,
+            "p99": 0.488399,
+            "max": 0.557366,
+            "mean": 0.25368569090909093
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.104433,
+            "p95": 0.208914,
+            "p99": 0.265287,
+            "max": 0.447173,
+            "mean": 0.11662339090909096
+          }
+        },
+        "lease_binding_focus#14": {
+          "scenarioId": "lease_binding_focus",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.200998,
+            "p95": 0.384603,
+            "p99": 0.481435,
+            "max": 0.590547,
+            "mean": 0.21909838181818175
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.086292,
+            "p95": 0.235019,
+            "p99": 0.306621,
+            "max": 0.392903,
+            "mean": 0.10216612727272724
+          }
+        },
+        "lease_binding_focus#15": {
+          "scenarioId": "lease_binding_focus",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.212035,
+            "p95": 0.484325,
+            "p99": 0.577676,
+            "max": 1.721613,
+            "mean": 0.24452173636363642
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.098272,
+            "p95": 0.287607,
+            "p99": 0.36564,
+            "max": 0.513514,
+            "mean": 0.13052420909090906
+          }
+        },
+        "sandbox_gate_focus#11": {
+          "scenarioId": "sandbox_gate_focus",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.20587,
+            "p95": 0.331961,
+            "p99": 0.393966,
+            "max": 1.755782,
+            "mean": 0.2278774181818181
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.08281,
+            "p95": 0.206637,
+            "p99": 0.265512,
+            "max": 1.65684,
+            "mean": 0.11410650000000004
+          }
+        },
+        "sandbox_gate_focus#12": {
+          "scenarioId": "sandbox_gate_focus",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.22261,
+            "p95": 0.378085,
+            "p99": 0.589365,
+            "max": 0.609283,
+            "mean": 0.2355557
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.096367,
+            "p95": 0.222847,
+            "p99": 0.28515,
+            "max": 0.301455,
+            "mean": 0.10632165454545452
+          }
+        },
+        "sandbox_gate_focus#13": {
+          "scenarioId": "sandbox_gate_focus",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.209774,
+            "p95": 0.403702,
+            "p99": 0.533953,
+            "max": 0.544294,
+            "mean": 0.24000499090909094
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.090459,
+            "p95": 0.248698,
+            "p99": 0.319527,
+            "max": 0.396374,
+            "mean": 0.11413177272727272
+          }
+        },
+        "sandbox_gate_focus#14": {
+          "scenarioId": "sandbox_gate_focus",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.278825,
+            "p95": 0.469776,
+            "p99": 0.736308,
+            "max": 1.695193,
+            "mean": 0.3008185090909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.100036,
+            "p95": 0.272659,
+            "p99": 0.368322,
+            "max": 0.635259,
+            "mean": 0.12595853636363635
+          }
+        },
+        "sandbox_gate_focus#15": {
+          "scenarioId": "sandbox_gate_focus",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.313803,
+            "p95": 0.532677,
+            "p99": 0.610719,
+            "max": 0.659071,
+            "mean": 0.3204469090909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.105015,
+            "p95": 0.357812,
+            "p99": 0.515072,
+            "max": 0.56732,
+            "mean": 0.13720557272727274
+          }
+        },
+        "derived_inheritance_focus#11": {
+          "scenarioId": "derived_inheritance_focus",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.222518,
+            "p95": 8.645765,
+            "p99": 11.027959,
+            "max": 12.553751,
+            "mean": 1.0697561090909093
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.105624,
+            "p95": 8.614205,
+            "p99": 10.945734,
+            "max": 12.185728,
+            "mean": 0.9556870545454547
+          }
+        },
+        "derived_inheritance_focus#12": {
+          "scenarioId": "derived_inheritance_focus",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.258319,
+            "p95": 0.458561,
+            "p99": 0.702917,
+            "max": 0.982255,
+            "mean": 0.2798736363636365
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.096848,
+            "p95": 0.198974,
+            "p99": 0.208073,
+            "max": 0.22676,
+            "mean": 0.10804686363636361
+          }
+        },
+        "derived_inheritance_focus#13": {
+          "scenarioId": "derived_inheritance_focus",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.320469,
+            "p95": 0.642882,
+            "p99": 1.502771,
+            "max": 1.99073,
+            "mean": 0.36881719999999996
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.112667,
+            "p95": 0.393749,
+            "p99": 1.3724,
+            "max": 1.446366,
+            "mean": 0.17004724545454547
+          }
+        },
+        "derived_inheritance_focus#14": {
+          "scenarioId": "derived_inheritance_focus",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.339767,
+            "p95": 0.741441,
+            "p99": 1.199396,
+            "max": 1.451291,
+            "mean": 0.38466717272727297
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.115103,
+            "p95": 0.410748,
+            "p99": 0.599578,
+            "max": 0.807459,
+            "mean": 0.16248172727272725
+          }
+        },
+        "derived_inheritance_focus#15": {
+          "scenarioId": "derived_inheritance_focus",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.282858,
+            "p95": 0.712709,
+            "p99": 1.702371,
+            "max": 1.744883,
+            "mean": 0.3434341181818182
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.109248,
+            "p95": 0.41945,
+            "p99": 1.04056,
+            "max": 1.180262,
+            "mean": 0.1600962636363636
+          }
+        },
+        "fail_closed_malformed_inputs#11": {
+          "scenarioId": "fail_closed_malformed_inputs",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.210625,
+            "p95": 0.355626,
+            "p99": 0.423675,
+            "max": 0.432538,
+            "mean": 0.2275836090909092
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.100795,
+            "p95": 0.201316,
+            "p99": 0.263303,
+            "max": 0.282899,
+            "mean": 0.11451098181818181
+          }
+        },
+        "fail_closed_malformed_inputs#12": {
+          "scenarioId": "fail_closed_malformed_inputs",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.244516,
+            "p95": 0.377679,
+            "p99": 0.442609,
+            "max": 0.644644,
+            "mean": 0.2516752545454545
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.096487,
+            "p95": 0.187389,
+            "p99": 0.245465,
+            "max": 0.308601,
+            "mean": 0.10818048181818178
+          }
+        },
+        "fail_closed_malformed_inputs#13": {
+          "scenarioId": "fail_closed_malformed_inputs",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.223152,
+            "p95": 0.395323,
+            "p99": 1.22037,
+            "max": 1.604946,
+            "mean": 0.2495531363636363
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.098091,
+            "p95": 0.251696,
+            "p99": 0.280627,
+            "max": 1.15589,
+            "mean": 0.1265683272727273
+          }
+        },
+        "fail_closed_malformed_inputs#14": {
+          "scenarioId": "fail_closed_malformed_inputs",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.188105,
+            "p95": 0.30295,
+            "p99": 0.473779,
+            "max": 0.488578,
+            "mean": 0.1966126272727272
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.084337,
+            "p95": 0.218084,
+            "p99": 0.319084,
+            "max": 0.376847,
+            "mean": 0.10129673636363638
+          }
+        },
+        "fail_closed_malformed_inputs#15": {
+          "scenarioId": "fail_closed_malformed_inputs",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.197422,
+            "p95": 0.311111,
+            "p99": 0.371642,
+            "max": 0.557019,
+            "mean": 0.20605152727272724
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.088603,
+            "p95": 0.176198,
+            "p99": 0.24777,
+            "max": 0.287573,
+            "mean": 0.09681795454545457
+          }
+        },
+        "separation_of_duties_focus#11": {
+          "scenarioId": "separation_of_duties_focus",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.210405,
+            "p95": 0.424813,
+            "p99": 0.546175,
+            "max": 0.572643,
+            "mean": 0.2361810090909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.094832,
+            "p95": 0.283237,
+            "p99": 0.326935,
+            "max": 0.411026,
+            "mean": 0.11307615454545454
+          }
+        },
+        "separation_of_duties_focus#12": {
+          "scenarioId": "separation_of_duties_focus",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.20569,
+            "p95": 0.295724,
+            "p99": 0.329045,
+            "max": 0.420417,
+            "mean": 0.20513690000000004
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.089655,
+            "p95": 0.189894,
+            "p99": 0.213025,
+            "max": 0.241994,
+            "mean": 0.09795749090909087
+          }
+        },
+        "separation_of_duties_focus#13": {
+          "scenarioId": "separation_of_duties_focus",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.19708,
+            "p95": 0.292777,
+            "p99": 0.355967,
+            "max": 0.425954,
+            "mean": 0.19885185454545448
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.083656,
+            "p95": 0.168995,
+            "p99": 0.220306,
+            "max": 0.291705,
+            "mean": 0.09192685454545453
+          }
+        },
+        "separation_of_duties_focus#14": {
+          "scenarioId": "separation_of_duties_focus",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.20489,
+            "p95": 0.302555,
+            "p99": 0.398648,
+            "max": 1.720135,
+            "mean": 0.22328522727272726
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.093901,
+            "p95": 0.17807,
+            "p99": 0.268201,
+            "max": 0.279139,
+            "mean": 0.1053190454545455
+          }
+        },
+        "separation_of_duties_focus#15": {
+          "scenarioId": "separation_of_duties_focus",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.181365,
+            "p95": 0.291497,
+            "p99": 0.336002,
+            "max": 0.40039,
+            "mean": 0.18778582727272716
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.082365,
+            "p95": 0.183387,
+            "p99": 0.201957,
+            "max": 0.209315,
+            "mean": 0.09638200909090908
+          }
+        },
+        "single_use_grant_replay#11": {
+          "scenarioId": "single_use_grant_replay",
+          "family": "fault",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.202012,
+            "p95": 0.395847,
+            "p99": 0.608386,
+            "max": 0.64994,
+            "mean": 0.2178881272727273
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.091239,
+            "p95": 0.224729,
+            "p99": 0.444594,
+            "max": 0.540678,
+            "mean": 0.11220146363636364
+          }
+        },
+        "single_use_grant_replay#12": {
+          "scenarioId": "single_use_grant_replay",
+          "family": "fault",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.232452,
+            "p95": 0.470084,
+            "p99": 0.710403,
+            "max": 0.814361,
+            "mean": 0.2645674636363637
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.10029,
+            "p95": 0.303362,
+            "p99": 0.583441,
+            "max": 0.728721,
+            "mean": 0.13902340909090907
+          }
+        },
+        "single_use_grant_replay#13": {
+          "scenarioId": "single_use_grant_replay",
+          "family": "fault",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.255536,
+            "p95": 0.407216,
+            "p99": 0.458804,
+            "max": 0.458825,
+            "mean": 0.2573792090909091
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.113141,
+            "p95": 0.238655,
+            "p99": 0.286794,
+            "max": 0.328075,
+            "mean": 0.1256204272727273
+          }
+        },
+        "single_use_grant_replay#14": {
+          "scenarioId": "single_use_grant_replay",
+          "family": "fault",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.259198,
+            "p95": 0.4883,
+            "p99": 0.657384,
+            "max": 2.402992,
+            "mean": 0.30371967272727274
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.110911,
+            "p95": 0.270494,
+            "p99": 0.454737,
+            "max": 0.558766,
+            "mean": 0.1397153545454545
+          }
+        },
+        "single_use_grant_replay#15": {
+          "scenarioId": "single_use_grant_replay",
+          "family": "fault",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.260023,
+            "p95": 0.452965,
+            "p99": 0.497446,
+            "max": 0.544274,
+            "mean": 0.27879387272727263
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.109683,
+            "p95": 0.317279,
+            "p99": 0.365055,
+            "max": 0.397648,
+            "mean": 0.1388844454545455
+          }
+        },
+        "engine_recreation_fault#11": {
+          "scenarioId": "engine_recreation_fault",
+          "family": "fault",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.240807,
+            "p95": 0.412641,
+            "p99": 0.447041,
+            "max": 0.477722,
+            "mean": 0.2536878363636363
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.109021,
+            "p95": 0.250079,
+            "p99": 0.311042,
+            "max": 0.357735,
+            "mean": 0.12742506363636363
+          }
+        },
+        "engine_recreation_fault#12": {
+          "scenarioId": "engine_recreation_fault",
+          "family": "fault",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.227538,
+            "p95": 0.35444,
+            "p99": 0.397891,
+            "max": 0.400352,
+            "mean": 0.2284380545454546
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.101599,
+            "p95": 0.21546,
+            "p99": 0.232268,
+            "max": 0.302491,
+            "mean": 0.11289030909090904
+          }
+        },
+        "engine_recreation_fault#13": {
+          "scenarioId": "engine_recreation_fault",
+          "family": "fault",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.240843,
+            "p95": 0.490688,
+            "p99": 5.136178,
+            "max": 5.506297,
+            "mean": 0.3663416545454546
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.104675,
+            "p95": 0.28275,
+            "p99": 2.095164,
+            "max": 5.071169,
+            "mean": 0.18549586363636364
+          }
+        },
+        "engine_recreation_fault#14": {
+          "scenarioId": "engine_recreation_fault",
+          "family": "fault",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.235801,
+            "p95": 0.44777,
+            "p99": 0.619578,
+            "max": 0.692702,
+            "mean": 0.2538786090909093
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.106593,
+            "p95": 0.264283,
+            "p99": 0.42929,
+            "max": 0.531139,
+            "mean": 0.1272896909090909
+          }
+        },
+        "engine_recreation_fault#15": {
+          "scenarioId": "engine_recreation_fault",
+          "family": "fault",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.220967,
+            "p95": 0.437085,
+            "p99": 0.535558,
+            "max": 0.551544,
+            "mean": 0.23827006363636363
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.098594,
+            "p95": 0.330985,
+            "p99": 0.411678,
+            "max": 0.431961,
+            "mean": 0.13190545454545458
+          }
+        },
+        "principal_freeze_fault#11": {
+          "scenarioId": "principal_freeze_fault",
+          "family": "fault",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.19534,
+            "p95": 0.351456,
+            "p99": 0.396773,
+            "max": 0.488138,
+            "mean": 0.21005068181818187
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.10076,
+            "p95": 0.250073,
+            "p99": 0.334246,
+            "max": 0.349959,
+            "mean": 0.11746545454545454
+          }
+        },
+        "principal_freeze_fault#12": {
+          "scenarioId": "principal_freeze_fault",
+          "family": "fault",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.211611,
+            "p95": 0.342389,
+            "p99": 1.064751,
+            "max": 1.299161,
+            "mean": 0.23289249090909095
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.094439,
+            "p95": 0.240578,
+            "p99": 0.303305,
+            "max": 1.007513,
+            "mean": 0.11630278181818184
+          }
+        },
+        "principal_freeze_fault#13": {
+          "scenarioId": "principal_freeze_fault",
+          "family": "fault",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.227703,
+            "p95": 0.385938,
+            "p99": 0.465768,
+            "max": 0.620089,
+            "mean": 0.2324618545454546
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.103976,
+            "p95": 0.223238,
+            "p99": 0.302108,
+            "max": 0.386199,
+            "mean": 0.11751460000000001
+          }
+        },
+        "principal_freeze_fault#14": {
+          "scenarioId": "principal_freeze_fault",
+          "family": "fault",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.264482,
+            "p95": 0.441873,
+            "p99": 0.547402,
+            "max": 0.604326,
+            "mean": 0.2749973636363637
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.111185,
+            "p95": 0.265357,
+            "p99": 0.36252,
+            "max": 0.385248,
+            "mean": 0.13026055454545454
+          }
+        },
+        "principal_freeze_fault#15": {
+          "scenarioId": "principal_freeze_fault",
+          "family": "fault",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.282051,
+            "p95": 0.393862,
+            "p99": 0.441752,
+            "max": 0.940972,
+            "mean": 0.2757719363636363
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.116227,
+            "p95": 0.289208,
+            "p99": 0.340124,
+            "max": 0.368525,
+            "mean": 0.13059579999999996
+          }
+        },
+        "sustained_soak_pilot#11": {
+          "scenarioId": "sustained_soak_pilot",
+          "family": "soak",
+          "seed": 11,
+          "requests": 720,
+          "warmupRequests": 10,
+          "measuredRequests": 710,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.245981,
+            "p95": 0.416639,
+            "p99": 0.584296,
+            "max": 2.394388,
+            "mean": 0.2581502211267606
+          },
+          "lateness": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.110055,
+            "p95": 0.253892,
+            "p99": 0.413821,
+            "max": 0.82288,
+            "mean": 0.12791138028169008
+          }
+        },
+        "sustained_soak_pilot#12": {
+          "scenarioId": "sustained_soak_pilot",
+          "family": "soak",
+          "seed": 12,
+          "requests": 720,
+          "warmupRequests": 10,
+          "measuredRequests": 710,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.242496,
+            "p95": 0.512248,
+            "p99": 1.145342,
+            "max": 2.40686,
+            "mean": 0.2793728507042249
+          },
+          "lateness": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.108978,
+            "p95": 0.307108,
+            "p99": 0.729943,
+            "max": 1.644342,
+            "mean": 0.14538975492957731
+          }
+        },
+        "sustained_soak_pilot#13": {
+          "scenarioId": "sustained_soak_pilot",
+          "family": "soak",
+          "seed": 13,
+          "requests": 720,
+          "warmupRequests": 10,
+          "measuredRequests": 710,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.252476,
+            "p95": 0.472364,
+            "p99": 1.640763,
+            "max": 2.550578,
+            "mean": 0.29029593802816883
+          },
+          "lateness": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.111509,
+            "p95": 0.301992,
+            "p99": 1.257914,
+            "max": 2.421123,
+            "mean": 0.15585023521126753
+          }
+        },
+        "sustained_soak_pilot#14": {
+          "scenarioId": "sustained_soak_pilot",
+          "family": "soak",
+          "seed": 14,
+          "requests": 720,
+          "warmupRequests": 10,
+          "measuredRequests": 710,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.256795,
+            "p95": 0.449637,
+            "p99": 0.730053,
+            "max": 1.007089,
+            "mean": 0.2718452239436621
+          },
+          "lateness": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.108387,
+            "p95": 0.283852,
+            "p99": 0.44114,
+            "max": 0.802033,
+            "mean": 0.13347947887323935
+          }
+        },
+        "sustained_soak_pilot#15": {
+          "scenarioId": "sustained_soak_pilot",
+          "family": "soak",
+          "seed": 15,
+          "requests": 720,
+          "warmupRequests": 10,
+          "measuredRequests": 710,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.241346,
+            "p95": 0.437009,
+            "p99": 0.550815,
+            "max": 0.755206,
+            "mean": 0.2550938338028171
+          },
+          "lateness": {
+            "samples": 710,
+            "status": "MEASURED",
+            "p50": 0.111492,
+            "p95": 0.272325,
+            "p99": 0.421871,
+            "max": 0.575877,
+            "mean": 0.13414450845070447
+          }
+        },
+        "uniform_mixed_workload#11": {
+          "scenarioId": "uniform_mixed_workload",
+          "family": "steady",
+          "seed": 11,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.294272,
+            "p95": 0.572739,
+            "p99": 0.738379,
+            "max": 0.921665,
+            "mean": 0.3192775818181817
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.111561,
+            "p95": 0.284223,
+            "p99": 0.429001,
+            "max": 0.708816,
+            "mean": 0.13759384545454548
+          }
+        },
+        "uniform_mixed_workload#12": {
+          "scenarioId": "uniform_mixed_workload",
+          "family": "steady",
+          "seed": 12,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.298256,
+            "p95": 0.619378,
+            "p99": 0.861066,
+            "max": 0.87,
+            "mean": 0.322584909090909
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.111854,
+            "p95": 0.291203,
+            "p99": 0.548386,
+            "max": 0.657585,
+            "mean": 0.1394150727272727
+          }
+        },
+        "uniform_mixed_workload#13": {
+          "scenarioId": "uniform_mixed_workload",
+          "family": "steady",
+          "seed": 13,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.299051,
+            "p95": 0.54189,
+            "p99": 0.671681,
+            "max": 0.958273,
+            "mean": 0.31173146363636356
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.111882,
+            "p95": 0.263044,
+            "p99": 0.402283,
+            "max": 0.478272,
+            "mean": 0.13598960000000002
+          }
+        },
+        "uniform_mixed_workload#14": {
+          "scenarioId": "uniform_mixed_workload",
+          "family": "steady",
+          "seed": 14,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.297318,
+            "p95": 0.527415,
+            "p99": 0.680869,
+            "max": 0.848309,
+            "mean": 0.32312369999999996
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.11203,
+            "p95": 0.269584,
+            "p99": 0.320414,
+            "max": 0.433151,
+            "mean": 0.1363111909090909
+          }
+        },
+        "uniform_mixed_workload#15": {
+          "scenarioId": "uniform_mixed_workload",
+          "family": "steady",
+          "seed": 15,
+          "requests": 120,
+          "warmupRequests": 10,
+          "measuredRequests": 110,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.305336,
+            "p95": 0.673338,
+            "p99": 2.063906,
+            "max": 2.075469,
+            "mean": 0.34548910909090896
+          },
+          "lateness": {
+            "samples": 110,
+            "status": "MEASURED",
+            "p50": 0.11197,
+            "p95": 0.367254,
+            "p99": 0.960987,
+            "max": 1.981976,
+            "mean": 0.1672998636363636
+          }
+        },
+        "revocation_gate_s1_008#11": {
+          "scenarioId": "revocation_gate_s1_008",
+          "family": "security",
+          "seed": 11,
+          "requests": 21,
+          "warmupRequests": 0,
+          "measuredRequests": 21,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.015287,
+            "p95": 0.050419,
+            "p99": 0.218552,
+            "max": 0.218552,
+            "mean": 0.027721333333333344
+          },
+          "lateness": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.000899,
+            "p95": 0.00724,
+            "p99": 0.009358,
+            "max": 0.009358,
+            "mean": 0.001757380952380952
+          }
+        },
+        "revocation_gate_s1_008#12": {
+          "scenarioId": "revocation_gate_s1_008",
+          "family": "security",
+          "seed": 12,
+          "requests": 21,
+          "warmupRequests": 0,
+          "measuredRequests": 21,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.014308,
+            "p95": 0.015582,
+            "p99": 0.017083,
+            "max": 0.017083,
+            "mean": 0.014444380952380952
+          },
+          "lateness": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.00084,
+            "p95": 0.000993,
+            "p99": 0.002073,
+            "max": 0.002073,
+            "mean": 0.0008986190476190476
+          }
+        },
+        "revocation_gate_s1_008#13": {
+          "scenarioId": "revocation_gate_s1_008",
+          "family": "security",
+          "seed": 13,
+          "requests": 21,
+          "warmupRequests": 0,
+          "measuredRequests": 21,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.014366,
+            "p95": 0.015971,
+            "p99": 0.021549,
+            "max": 0.021549,
+            "mean": 0.014798333333333332
+          },
+          "lateness": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.000826,
+            "p95": 0.001033,
+            "p99": 0.003131,
+            "max": 0.003131,
+            "mean": 0.0009388095238095238
+          }
+        },
+        "revocation_gate_s1_008#14": {
+          "scenarioId": "revocation_gate_s1_008",
+          "family": "security",
+          "seed": 14,
+          "requests": 21,
+          "warmupRequests": 0,
+          "measuredRequests": 21,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.014142,
+            "p95": 0.01517,
+            "p99": 0.016655,
+            "max": 0.016655,
+            "mean": 0.014315285714285713
+          },
+          "lateness": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.000813,
+            "p95": 0.001035,
+            "p99": 0.001094,
+            "max": 0.001094,
+            "mean": 0.0008485714285714286
+          }
+        },
+        "revocation_gate_s1_008#15": {
+          "scenarioId": "revocation_gate_s1_008",
+          "family": "security",
+          "seed": 15,
+          "requests": 21,
+          "warmupRequests": 0,
+          "measuredRequests": 21,
+          "decisionClasses": [
+            "ALLOW",
+            "DENY"
+          ],
+          "counters": {
+            "cross_tenant_allow": 0,
+            "unexpected_decision": 0,
+            "allow_after_principal_freeze": 0,
+            "single_use_grant_replay_allow": 0,
+            "decision_divergence_within_run": 0,
+            "missing_or_censored_samples": 0,
+            "degenerate_scenario_decision_distribution": 0,
+            "allow_after_revocation_commit": 0,
+            "revocation_trial_precondition_failures": 0
+          },
+          "latency": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.014438,
+            "p95": 0.018459,
+            "p99": 0.052517,
+            "max": 0.052517,
+            "mean": 0.016493666666666667
+          },
+          "lateness": {
+            "samples": 21,
+            "status": "MEASURED",
+            "p50": 0.000826,
+            "p95": 0.001203,
+            "p99": 0.001762,
+            "max": 0.001762,
+            "mean": 0.0008980476190476193
+          }
+        }
+      }
+    },
+    "revocation": {
+      "trials": 105,
+      "allowAfterCommit": 0,
+      "preconditionFailures": 0,
+      "latency": {
+        "samples": 105,
+        "status": "MEASURED",
+        "p50": 0.014344,
+        "p95": 0.021549,
+        "p99": 0.052517,
+        "max": 0.218552,
+        "mean": 0.01755460000000001
+      },
+      "forbiddenPostRevokeEffects": 0
+    },
+    "hardCounters": {
+      "cross_tenant_allow": 0,
+      "unexpected_decision": 0,
+      "allow_after_principal_freeze": 0,
+      "single_use_grant_replay_allow": 0,
+      "decision_divergence_within_run": 0,
+      "missing_or_censored_samples": 0,
+      "degenerate_scenario_decision_distribution": 0,
+      "allow_after_revocation_commit": 0,
+      "revocation_trial_precondition_failures": 0
+    },
+    "digests": {
+      "decisionSequence": "6ea5a581dd33b4d1d1ed1a2d50a773ed68dd98be7a1c2aa2d683839d1a2721e4",
+      "perScenario": "831682d405a80e886f776bb783487ec546650e40c1c02886f5a6e2cbcd1c7d26",
+      "digestsExclude": [
+        "latency",
+        "lateness",
+        "duration",
+        "host load"
+      ]
+    },
+    "durationMs": 57784.220184
+  },
+  "observationsSha256": "1a41a3ea115ad808a3c2dbeec9a002a668cd13838fdaff3548ca0fa05b0e7d47",
+  "environment": {
+    "schemaVersion": 1,
+    "artifact": "environment-manifest",
+    "ticket": "SLOQUAL-001",
+    "runId": "sloqual-b",
+    "executorId": "exec-beta",
+    "nonce": "sloqual-nonce-beta-9c07",
+    "outputRoot": "results/sloqual-001/sloqual-b",
+    "runnerVersion": "sloqual-runner-v1",
+    "contractVersion": "1.0.1",
+    "contractSelfHash": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d",
+    "manifestVersion": "1.0.0",
+    "manifestDigest": "505541943b05a795b495294487f1fab5cb08563fba67e7e83324e00d67e199d5",
+    "policyVersion": "s2-002-policy-v5",
+    "policyClock": "2026-09-12T12:00:00.000Z",
+    "platform": "linux/x64",
+    "nodeVersion": "v22.23.2",
+    "host": {
+      "cpuModel": "12th Gen Intel(R) Core(TM) i7-12650H",
+      "cpuCount": 16,
+      "totalMemoryBytes": 8180621312,
+      "loadAverage": [
+        13.81,
+        15.02,
+        12.52
+      ],
+      "hostnameDigest": "87dbdad2d572c696"
+    },
+    "limits": {
+      "note": "Host resources and load are recorded, not controlled. This is a single-host qualification: the host is shared with the operator and the harness, and process separation is not host separation."
+    }
+  }
+}

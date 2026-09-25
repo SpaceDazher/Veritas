@@ -9,7 +9,7 @@ Veritas - исследовательская и инженерная платф�
 | Контур | Состояние | Что означает |
 | --- | --- | --- |
 | AgentOS Stage 1 | Research closed, `PASS_WITH_LIMITS` | 20 активных тикетов `S1-001...S1-020` закрыты на уровне research; полный индекс перенесён в issues Veritas. |
-| SLOQUAL-001 | `PASS_WITH_LIMITS` | Production-like qualification extension для S1-002; полный SLO authorization не выдан. |
+| SLOQUAL-001 | `PASS_WITH_LIMITS` | Frozen SLO contract, 17 scenarios × 5 seeds и 105 revocation trials в двух независимых запусках; hard counters равны нулю, но production SLO не авторизован. |
 | Veritas S2-001...S2-006 | Engineering issues closed | Есть контракты, code paths, migrations, тесты и evidence. Это не означает независимую semantic calibration. |
 | Veritas S2-007...S2-012 | Open | SolutionPack harness, web/API, R&D, self-improvement, persistence и pilot acceptance ещё не завершены. |
 | Public board | Synthetic demo | Web, HTTP API и CLI работают с публичной planning fixture; real adapters, auth и private data отключены. |
@@ -92,6 +92,8 @@ node scripts/veritas-cli.mjs create "Synthetic planning task"
 | `npm run test:verifier` | Независимый semantic verifier, calibration, ACL и crash replay. |
 | `npm run verify:s2-006` | Полный S2-006 gate. Сейчас ожидаемо `BLOCKED_DEPENDENCY` до внешней calibration. |
 | `npm run verify:pilot-binding` | Проверка frozen external Scenario A pilot binding. |
+| `npm run verify:sloqual-001` | SLOQUAL-001: два независимых прогона frozen SLO contract и fail-closed comparator. |
+| `npm run test:sloqual` | Unit-тесты SLO harness: статистика, open-loop, comparator, freeze, сценарии. |
 | `npm run verify:postgres-smoke` | Disposable PostgreSQL smoke test. |
 | `npm run verify:podman-sandbox` | Наблюдаемая проверка `LOCAL_RESTRICTED` boundary. |
 | `npm run verify:gvisor-sandbox` | Наблюдаемая проверка `UNTRUSTED_CODE` boundary. |
@@ -105,6 +107,7 @@ node scripts/veritas-cli.mjs create "Synthetic planning task"
 - Identity, ingestion, claim graph, synthesis и verifier реализованы как typed domain modules, contract stores и verification harnesses. Не каждый из них уже exposed через пользовательский Web/API.
 - `src/lib/identity/policy-engine.mjs` и sandbox bridges имеют собственные tests/evidence. Public synthetic board не следует выдавать за authenticated multi-user deployment.
 - `PASS_WITH_LIMITS`, schema validation, fixture corpus или process-separated replay не равны external human audit, nearly 100% accuracy или production SLO.
+- SLOQUAL-001 измеряет только in-process решение policy на одном хосте. Без production-профиля нагрузки, full-scale fault/soak, внешнего хоста и human countersignature его verdict остаётся `PASS_WITH_LIMITS`; см. [SLOQUAL-001-EVALUATION-REPORT.md](docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md).
 - Не публикуйте secrets, private source content, private locators или credentials в Git, issues, logs или public artifacts.
 
 ## Документация
@@ -115,6 +118,7 @@ node scripts/veritas-cli.mjs create "Synthetic planning task"
 | [Architecture](docs/ARCHITECTURE.md) | Реализованные компоненты, data flows и интеграционные ограничения. |
 | [Development](docs/DEVELOPMENT.md) | Setup, migrations, tests, verification и troubleshooting. |
 | [Stage 1](docs/stages/stage-1.md) | Импортированные AgentOS research tickets, решения и limits. |
+| [SLOQUAL-001 Evaluation](docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md) | Локальная SLO qualification: измерения, hard counters, limits и граница полномочий. |
 | [Open Decisions](docs/decisions/OPEN_DECISIONS.md) | Входы, которые блокируют новые executions. |
 | [Out of Scope](docs/decisions/OUT_OF_SCOPE.md) | Запрещённые и неподтверждённые claims. |
 | [Evaluation Reports](docs/decisions/) | Исторические S2 evaluation records и evidence boundaries. |

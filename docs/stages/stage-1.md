@@ -54,6 +54,8 @@ Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и
 
 SLOQUAL-001 выполнил два authoritative runs по 17 scenarios × 5 seeds и 105 revocation trials. Hard failures и mandatory security violations равны нулю, но warm p95 confidence interval пересекает 20 ms, сохраняются pilot-scale limits, pending human SLO ownership и same-host independent rerun. Полный `PASS` не заявлен.
 
+В Veritas этот метод перенесён как локальный qualification-пакет control plane: frozen SLO contract ([contracts/sloqual-001-slo-contract.json](../contracts/sloqual-001-slo-contract.json)), версионированный scenario manifest, open-loop измерение настоящего `policy-engine.mjs`, fail-closed comparator и gate `npm run verify:sloqual-001`. Veritas-пакет повторяет структуру доказательства (17 scenarios × 5 seeds, 105 revocation trials, два независимых запуска), но измеряет другой код: числа AgentOS к Veritas не переносятся, а его verdict не наследуется. Локальный verdict — `PASS_WITH_LIMITS`: [SLOQUAL-001-EVALUATION-REPORT.md](../decisions/SLOQUAL-001-EVALUATION-REPORT.md).
+
 ## Dependency DAG
 
 ```text
@@ -88,6 +90,7 @@ S1-019 зафиксировал research-scoped baseline:
 - Все внешние аудиторы, процессы и replay runners находятся на одном host.
 - S1-001 не проверил все 176 исторических `u` sources.
 - S1-002 является коротким local benchmark; SLOQUAL-001 сам остаётся `PASS_WITH_LIMITS`.
+- Veritas-реализация SLOQUAL-001 измеряет только in-process decision path: HTTP, PostgreSQL, sandbox и provider path не измерены.
 - S1-004 формальные модели имеют bounded state space и моделируют design contract.
 - S1-013/014/015 не имеют population human study.
 - S1-018 не имеет hardware TEE evidence.

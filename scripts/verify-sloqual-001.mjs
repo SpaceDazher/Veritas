@@ -151,6 +151,7 @@ function main() {
       role: 'SLOQUAL-001 run A vs run B fail-closed comparison',
       ticket: 'SLOQUAL-001',
       verdict: comparison.verdict,
+      provenance,
       startedAt,
       completedAt: new Date().toISOString(),
       command: 'npm run verify:sloqual-001',
