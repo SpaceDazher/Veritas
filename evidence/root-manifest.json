@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "b3bd86f19aed8e31a1a13a5df0c607b2e160f28b",
-  "sourceTree": "e7856e73aaff2c935c870dffa20d626369aa9af0",
-  "trackedFileCount": 687,
-  "manifestFileCount": 682,
-  "payloadManifestSha256": "515307863177e779139e3e080aa120ca2797db4b7307064ef5643d5c08bafc31",
-  "fileManifestSha256": "c5788c6ee8ba45e078c5d331605fa1383bd02ee392e12fde0c1a4380935ae7f9",
+  "sourceCommit": "b385f8fced69d83a88f600d292dfa714c596fdbe",
+  "sourceTree": "c2e7bf6870ce01876e004c04f8e9fce1ec3af50d",
+  "trackedFileCount": 692,
+  "manifestFileCount": 687,
+  "payloadManifestSha256": "7b457b0acbab2a2e74e14329f35680c7cf9594ead08c02dc138e6e8bd179a4f8",
+  "fileManifestSha256": "199166e6988eec62d6797950d08138be83f756bb17563431fc0344a252ba60aa",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -28,8 +28,18 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "1cdf25dc82811d62363d593cf399c5faa38603b9825548ab7d25018ebc5d579a",
-      "bytes": 101
+      "sha256": "9515c905fe2e3fa6a5746cbe9db24564d66f02f58a9bf0c37933d356789eb5e3",
+      "bytes": 106
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "7b2c65932ae912a0587108b4fef0dc2b1520d790dbe8a3d5a1e39196fc5def25",
+      "bytes": 3045
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "bytes": 11
     },
     {
       "path": "contracts/acceptance-cases.schema.json",
@@ -1722,6 +1732,11 @@
       "bytes": 8370
     },
     {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "29e131609e6c2d87681b7d4cac40ef632bc183df5afdb2571da8288783b68959",
+      "bytes": 13799
+    },
+    {
       "path": "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md",
       "sha256": "bc235696dcab7b2574c11448fd13a0f457f6b616726123688b991bb209b40f37",
       "bytes": 5555
@@ -1822,6 +1837,11 @@
       "bytes": 3319
     },
     {
+      "path": "docs/DEVELOPMENT.md",
+      "sha256": "ae3f8c70bac334edcdf5a71c3d13af86648b131751eae2535c4c7c3c078fe97c",
+      "bytes": 7127
+    },
+    {
       "path": "docs/ingestion/S2-003-CONNECTOR-CONTRACT.md",
       "sha256": "f3501f4b6959f00ecdbe7c8561f2a47efc6a98fa0b56753a0db79007fbd7e2d7",
       "bytes": 6981
@@ -1875,6 +1895,11 @@
       "path": "docs/security/S2-002-THREAT-MODEL.md",
       "sha256": "2a1734852e8cf2b1f352e2809e25606ae4a788e2f023fd40e303dba7c42503b4",
       "bytes": 6368
+    },
+    {
+      "path": "docs/stages/stage-1.md",
+      "sha256": "ca9baf7ac0fa7e8967766f4512d5b6eddd128c4fffad39880f3f46210f0efd01",
+      "bytes": 10724
     },
     {
       "path": "eslint.config.mjs",
@@ -1948,8 +1973,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "1124fd04ab008b4ee86e7931537e381d88a737b46123a18f9c9acfe70cd262ac",
-      "bytes": 28752
+      "sha256": "94a10dda0dd81d1a99495f2ff37d3fd614c7be6d37f8b872afa5ec7549b38dfd",
+      "bytes": 28856
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -2338,8 +2363,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "f0cba11419e766c511aa585b75e0480f74403d0272c7343c8c2e121b76ba150f",
-      "bytes": 7874
+      "sha256": "4cde5f1927e59372fd1bcaf8432be3a5b68e60f50ae3ff3fa7da6a29a61084d2",
+      "bytes": 8104
     },
     {
       "path": "results/s2-002/run-a/observations.json",
