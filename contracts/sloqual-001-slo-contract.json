@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "artifact": "slo-contract",
   "ticket": "SLOQUAL-001",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "FROZEN",
   "frozenAt": "2026-09-25T00:00:00.000Z",
   "authoredBy": "veritas-ticket-owner",
@@ -48,7 +48,7 @@
     "excludes": [
       "selfHash.sha256"
     ],
-    "sha256": "961e044d92c7131ec50efb5751e3c5e5554ffd257b32707c47b4593d7b0bf76d"
+    "sha256": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d"
   },
   "scenarioManifest": {
     "path": "contracts/sloqual-001-scenario-manifest.json",
@@ -99,13 +99,12 @@
     "aggregation": "Warm SLI is aggregated over the steady family (all seeds, all scenarios in the family). Burst SLI is aggregated over the burst family. Per-scenario and per-family records are reported, never substituted for the aggregate the threshold names."
   },
   "hardGates": {
-    "rule": "Every hard gate is an exact zero. A missing, non-finite or unknown counter is a violation, never an implicit pass.",
+    "rule": "Every hard gate is an exact zero evaluated per run. Cross-run invariants (decision agreement, provenance collision) are structural checks of the run set and are listed in passRule.independentRerun, not here. A missing, non-finite or unknown counter is a violation, never an implicit pass.",
     "cross_tenant_allow": 0,
     "unexpected_decision": 0,
     "allow_after_principal_freeze": 0,
     "single_use_grant_replay_allow": 0,
     "decision_divergence_within_run": 0,
-    "decision_divergence_between_runs": 0,
     "missing_or_censored_samples": 0,
     "degenerate_scenario_decision_distribution": 0,
     "allow_after_revocation_commit": 0,
@@ -187,7 +186,7 @@
     "PASS_WITH_LIMITS": "No failure, but at least one registered proof is unsatisfied: a threshold miss on a measured metric, or a proof whose missing evidence is itemized.",
     "PASS": "No failure and every registered proof satisfied.",
     "invariant": "A missing measurement is never a satisfied threshold. An empty sample set is a structural failure, not a zero.",
-    "independentRerun": "Two process-separated runs with distinct executor id, pid, nonce and output root must both exist and must agree on every decision under the exact rule."
+    "independentRerun": "Two process-separated runs with distinct executor id, pid, nonce and output root must both exist and must agree on every decision under the exact rule: identical ordered decision-sequence digest and identical per-scenario decision digests, with no shared provenance field and no policy-version divergence. Any difference is a structural FAIL, not a limit."
   },
   "registeredProofs": [
     {
@@ -222,7 +221,7 @@
       "id": "independent_rerun_same_host",
       "description": "Second process-separated run over the same frozen contract, manifest and seeds, agreeing on every decision.",
       "status": "MAPPED",
-      "satisfiedBy": "hardGates.decision_divergence_between_runs",
+      "satisfiedBy": "decision_divergence_between_runs",
       "missingProof": null
     },
     {
@@ -269,5 +268,10 @@
     "spendAuthorized": false,
     "statement": "PASS_WITH_LIMITS is not PASS. A PASS from this contract covers the frozen local contract only and never authorizes a production SLO, a rollout, a legal opinion or spending."
   },
-  "changeRule": "The contract is frozen at the recorded commit. Any threshold, statistic, gate, proof, scope or manifest change requires a new version, a new self-hash, a new manifest version and a complete new run; the previous results become historical, read-only input."
+  "changeRule": "The contract is frozen at the recorded commit. Any threshold, statistic, gate, proof, scope or manifest change requires a new version, a new self-hash, a new manifest version and a complete new run; the previous results become historical, read-only input.",
+  "supersedes": "1.0.0",
+  "changeNote": [
+    "v1.0.1 removes hardGates.decision_divergence_between_runs. A divergence between two runs is a property of the run SET, not a per-run counter, and v1.0.0 evaluated it as a per-run counter, so the first executed run reported it as an unreported gate. The invariant itself is unchanged and stronger: the comparator still fails closed on any difference in the ordered decision sequence or the per-scenario decision digests, and the independent_rerun_same_host proof now depends on that structural check.",
+    "No threshold, statistic, scenario, seed, workload or proof requirement was changed in v1.0.1. v1.0.0 produced verdict FAIL and no qualifying result, so this is a contract defect fix, not a threshold adjustment after a pass."
+  ]
 }
