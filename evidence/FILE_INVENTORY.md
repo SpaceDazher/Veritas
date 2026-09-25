@@ -1,11 +1,13 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 687.
+Generated from `git ls-files`; count: 692.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
 - `.gitattributes`
 - `.gitignore`
+- `AGENTS.md`
+- `CLAUDE.md`
 - `contracts/acceptance-cases.schema.json`
 - `contracts/adjudication-record.schema.json`
 - `contracts/annotation-manifest.schema.json`
@@ -344,6 +346,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-006/labels/annotator-b.json`
 - `corpus/s2-006/manifest.json`
 - `corpus/s2-006/rubric-v1.json`
+- `docs/ARCHITECTURE.md`
 - `docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md`
 - `docs/claims/S2-004-EXPERT-LENS-POLICY.md`
 - `docs/claims/S2-004-INVALIDATION-AND-RETENTION.md`
@@ -364,6 +367,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006E-ENGINEERING-CLOSURE.md`
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
+- `docs/DEVELOPMENT.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
 - `docs/product/AUTONOMY_POLICY.md`
@@ -375,6 +379,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
 - `docs/security/S2-002-SANDBOX-PROFILE.md`
 - `docs/security/S2-002-THREAT-MODEL.md`
+- `docs/stages/stage-1.md`
 - `eslint.config.mjs`
 - `evidence/clean-checkout.json`
 - `evidence/closure-record.json`

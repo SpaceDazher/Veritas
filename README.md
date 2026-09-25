@@ -1,137 +1,133 @@
 # Veritas
 
-Ad Veritatem · От источников — к знаниям. От гипотез — к проверенным решениям.
+*Ad Veritatem*: от источников к знаниям, от гипотез к проверяемым решениям.
 
-## S2-001 — Product contract and control scenarios
+Veritas - исследовательская и инженерная платформа для версионированных источников, атомарных утверждений, междисциплинарного синтеза и независимой проверки результатов. Проект разделяет знания, доказательства, решения и право действовать: research verdict сам по себе не является production-разрешением.
 
-**Ticket result: PASS_WITH_LIMITS.** The product contract is published and scenario A
-was executed in the public
-[Veritas-AI-Production-Pilot](https://github.com/SpaceDazher/Veritas-AI-Production-Pilot)
-repository with real Codex and pi processes, PostgreSQL canonical state, a
-digest-bound human solution approval and a clean-archive replay. The upstream result
-is bound here by `evidence/s2-001-pilot-binding.json` to merge commit
-`6845858bccf3aec27c656649ac40ad01148e7505`.
+## Текущее состояние
 
-This is not production approval. Scenario B remains a frozen contract and is not
-executed; it depends on the Stage 2 ingestion, provenance, synthesis and verifier
-tickets. The original synthetic workspace evidence remains historical and must not
-be reinterpreted as a real local adapter run.
+| Контур | Состояние | Что означает |
+| --- | --- | --- |
+| AgentOS Stage 1 | Research closed, `PASS_WITH_LIMITS` | 20 активных тикетов `S1-001...S1-020` закрыты на уровне research; полный индекс перенесён в issues Veritas. |
+| SLOQUAL-001 | `PASS_WITH_LIMITS` | Production-like qualification extension для S1-002; полный SLO authorization не выдан. |
+| Veritas S2-001...S2-006 | Engineering issues closed | Есть контракты, code paths, migrations, тесты и evidence. Это не означает независимую semantic calibration. |
+| Veritas S2-007...S2-012 | Open | SolutionPack harness, web/API, R&D, self-improvement, persistence и pilot acceptance ещё не завершены. |
+| Public board | Synthetic demo | Web, HTTP API и CLI работают с публичной planning fixture; real adapters, auth и private data отключены. |
 
-Start with [Product Contract](docs/product/PRODUCT_CONTRACT.md),
-[Open Decisions](docs/decisions/OPEN_DECISIONS.md),
-[Scenario A](docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md),
-[Scenario B](docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md) and
-[Evaluation Report](docs/decisions/S2-001-EVALUATION-REPORT.md).
+Подробности Stage 1 и ссылка на перенесённые issues: [docs/stages/stage-1.md](docs/stages/stage-1.md).
 
-## S2-002 — Identity, agent rights and the local sandbox gate
+## Архитектура
 
-**Ticket result: PASS_WITH_LIMITS. Bounded live execution: ENABLED.**
+```text
+Browser
+   |
+   v
+Next.js App Router (src/app)
+   |-- Web workspace (src/components)
+   |-- HTTP API (src/app/api)
+   |
+   v
+Domain contracts and policy
+   |-- board / contract-policy
+   |-- identity / sandbox
+   |-- ingestion / claims / synthesis / verifier
+   |
+   v
+PostgreSQL + ordered SQL migrations
+   |
+   +---- bounded evidence, contracts and test harnesses
 
-The board now has a server-side authorization gate shared by Web, API and CLI:
-8 fail-closed contracts (workspace, principal, role, capability, grant, lease,
-sandbox profile, authorization decision), a 20-principal subjects model across
-7 workspaces, grants with fencing tokens and one-time nonces, immediate
-revocation, human-only producer-blocked approvals, derived-artifact ACL
-inheritance, and a sandbox adapter with observed filesystem, network, secret,
-process-tree and output controls. All eleven adversarial probes (A–K) are detected
-by the production path; two process-separated replay runs (280 trials each)
-show zero hard-counter violations and zero decision mismatches.
+AgentOS is a separate executor. It is not wired into this repository yet and
+cannot create its own grants, approvals, budgets or knowledge authority.
+```
 
-Start with [Threat Model](docs/security/S2-002-THREAT-MODEL.md),
-[Sandbox Profile](docs/security/S2-002-SANDBOX-PROFILE.md) and the
-[S2-002 Evaluation Report](docs/decisions/S2-002-EVALUATION-REPORT.md).
-Commands: `npm run test:identity`, `npm run test:sandbox`,
-`npm run test:security-probes`, `npm run verify:podman-sandbox`,
-`npm run verify:gvisor-sandbox`, `npm run verify:postgres-smoke`,
-`npm run verify:s2-002`.
+Подробная карта компонентов и текущие точки интеграции: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-Limits: no production authentication; enforcement state is per-engine
-in-memory. `LOCAL_RESTRICTED` is evidence-bound to rootless Podman and
-`UNTRUSTED_CODE` to gVisor's systrap userspace kernel plus Podman auto-userns.
-Personal agents act only via explicit human grants; platform agents
-cannot self-grant; producers cannot approve their own results.
+## Быстрый старт
 
-## Additional local contract workspace
+Требования: Node.js 22+, npm и PostgreSQL. Для sandbox verification также нужны Podman и, для `UNTRUSTED_CODE`, gVisor.
 
-Next.js App Router + PostgreSQL via Drizzle. Web Kanban, HTTP API and a generic
-**board client CLI** share one canonical synthetic planning state. The CLI is **not**
-a runnable agent adapter. No real adapters, scheduler, authenticated human approval,
-private data, production rollout or multi-user authorization are implemented.
-Displayed RUNNING and agent labels are explicitly synthetic fixtures, not live work.
-Do not expose this demo as a private multi-user service or submit private data.
+```bash
+git clone https://github.com/SpaceDazher/Veritas.git
+cd Veritas
+cp .env.example .env
+npm ci
+```
 
-### Clean checkout
+Укажите локальный `DATABASE_URL` в `.env`, затем примените migrations:
 
-1. Use Node.js 22+ and npm; run `npm ci` with the committed lockfile.
-2. For a persistent development database, set `DATABASE_URL` in an untracked
-   `.env` (see `.env.example`), then run `npm run db:migrate`. Migrations are
-   ordered SQL files with stored SHA-256 drift detection; no credentials are
-   bundled or inferred.
-3. Run `npm run verify:postgres-smoke` for the disposable loopback-only
-   PostgreSQL container proof (tmpfs data and random runtime credentials).
-4. Run `node scripts/validate-contracts.mjs` (offline, reads committed fixtures).
-5. Run `npx next typegen`, `npm exec tsc -- --noEmit --pretty false`, and `npm run build`.
-6. Run `npm run verify:gvisor-sandbox` to re-observe the UNTRUSTED_CODE runtime.
-   For operator use, run `npm run dev` for the local Web demo. The managed sandbox
-   uses its own production lifecycle and `/api/health` healthcheck.
-7. Open the local URL; fixture tasks seed idempotently on the first board read.
+```bash
+npm run db:migrate
+npm run dev
+```
 
-### Web / API / CLI
+Откройте URL, который напечатает Next.js. Fixture tasks создаются идемпотентно при первом чтении board.
 
-- `/`: search/filter Kanban, list view, create a public planning task, view criteria,
-  update planning state, inspect journal and export task/document artifacts.
-- `GET /api/board`: consistent task/event snapshot with canonical revision.
-- `GET /api/capabilities`: machine-readable discovery; explicitly disabled execution.
-- `POST /api/board`: create/update planning only; expected revision, persistent
-  idempotency key bound to payload, atomic event snapshot. DONE/RUNNING/CLAIMED
-  transitions are rejected. This is a public synthetic demo, not authentication.
-- `node scripts/veritas-cli.mjs discovery`
-- `node scripts/veritas-cli.mjs tasks`
-- `node scripts/veritas-cli.mjs events`
-- `node scripts/veritas-cli.mjs create "Synthetic planning task"`
+### Board CLI
 
-Use `VERITAS_URL` for a different local endpoint. Real pilot runner commands remain
-NEEDS_INPUT; no speculative Codex/pi credentials or provider calls are supplied.
+CLI является клиентом synthetic board, а не agent adapter:
 
-### Verification and evidence
+```bash
+node scripts/veritas-cli.mjs discovery
+node scripts/veritas-cli.mjs tasks
+node scripts/veritas-cli.mjs events
+node scripts/veritas-cli.mjs create "Synthetic planning task"
+```
 
-- `node scripts/validate-contracts.mjs`: schemas, output-to-case traceability,
-  draft integrity and 34 synthetic policy probes (including the seven S2-001
-  adversarial probes). No semantic calibration claim.
-- `npm run verify:draft`: deterministic contract, policy, inventory, public-artifact,
-  typecheck, build and audit checks; returns `PASS_WITH_LIMITS` while pilots are blocked.
-- `npm run verify:pilot-binding`: verifies the frozen external pilot snapshots,
-  upstream commit/tree binding, canonical evidence digests and production boundary.
-- `npm run verify:acceptance`: still returns nonzero `BLOCKED` for this repository's
-  synthetic local workspace. The completed external scenario A pilot is evaluated
-  by `verify:pilot-binding`; it does not turn the demo into a production runner.
-- `node scripts/synthetic-smoke.mjs`: offline synthetic smoke plus validation of
-  tracked real PostgreSQL evidence. `npm run verify:postgres-smoke` re-creates the
-  disposable loopback-only database, applies hash-bound migrations and checks a
-  transaction plus duplicate-operation rejection. Browser smoke and real pilot
-  results are not claimed.
-- `npx tsx scripts/cleanup-smoke.ts`: deletes only task IDs explicitly recorded by
-  the smoke run from the dedicated synthetic database. Not a production operation.
-- `scripts/generate-contracts.py` and `scripts/generate-docs.py` reproduce public
-  draft files. `node scripts/validate-contracts.mjs --freeze` is an explicit draft
-  integrity update, **not** experiment freeze or approval. Review changes first.
-- `python3 scripts/collect-baseline.py <existing-approved-AgentOS-checkout>` records
-  safe dependency hashes. It does not run Stage 1 or fetch private sources.
+Для другого endpoint задайте `VERITAS_URL`.
 
-### Next implementation ticket
+## Основные команды
 
-S2-002 is specified in
-[`tasks/S2-002_IDENTITY_SANDBOX.md`](tasks/S2-002_IDENTITY_SANDBOX.md). It is the
-identity, authorization and sandbox gate that must pass before Veritas enables
-live agent execution or starts dependent Stage 2 work.
+| Команда | Назначение |
+| --- | --- |
+| `npm run dev` | Локальный Web workspace. |
+| `npm run build` | Production build Next.js. TypeScript проверяется отдельно. |
+| `npm run typecheck` | Строгая проверка TypeScript без emit. |
+| `npm run lint` | ESLint. |
+| `npm test` | Полный Node test suite; S2-002 process-tree tests требуют поддерживаемой OS. |
+| `npm run test:identity` | Identity, authorization и sandbox tests. |
+| `npm run test:ingestion` | Source ingestion, provenance, dedup и ACL tests. |
+| `npm run test:claims` | Claim graph и invalidation tests. |
+| `npm run test:synthesis` | Retrieval, evidence maps, hypotheses и policy probes. |
+| `npm run test:verifier` | Независимый semantic verifier, calibration, ACL и crash replay. |
+| `npm run verify:s2-006` | Полный S2-006 gate. Сейчас ожидаемо `BLOCKED_DEPENDENCY` до внешней calibration. |
+| `npm run verify:pilot-binding` | Проверка frozen external Scenario A pilot binding. |
+| `npm run verify:postgres-smoke` | Disposable PostgreSQL smoke test. |
+| `npm run verify:podman-sandbox` | Наблюдаемая проверка `LOCAL_RESTRICTED` boundary. |
+| `npm run verify:gvisor-sandbox` | Наблюдаемая проверка `UNTRUSTED_CODE` boundary. |
 
-### Rollback
+Подробный workflow разработчика: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-Stop the local demo, preserve/export its dedicated database if needed, and use
-`git switch --detach 57ce8a4a6a607c4a421ee12dc49c6dd854d404b5` for the original
-README-only repository. That baseline has no app. Do not drop shared databases.
-Returning to this branch restores the source; schema push is additive for the two
-`veritas_demo_*` tables. Actual agent-run rollback remains a future SolutionPack
-acceptance case, NOT_RUN.
+## Границы текущей реализации
 
-This branch must not be merged to main without separate owner permission.
+- `/`, `/api/board` и board CLI используют одну PostgreSQL fixture state, но это публичный synthetic planning workspace.
+- Эти интерфейсы не реализуют production authentication, private tenancy, leases, scheduler, process runner или final human approval.
+- Identity, ingestion, claim graph, synthesis и verifier реализованы как typed domain modules, contract stores и verification harnesses. Не каждый из них уже exposed через пользовательский Web/API.
+- `src/lib/identity/policy-engine.mjs` и sandbox bridges имеют собственные tests/evidence. Public synthetic board не следует выдавать за authenticated multi-user deployment.
+- `PASS_WITH_LIMITS`, schema validation, fixture corpus или process-separated replay не равны external human audit, nearly 100% accuracy или production SLO.
+- Не публикуйте secrets, private source content, private locators или credentials в Git, issues, logs или public artifacts.
+
+## Документация
+
+| Документ | Назначение |
+| --- | --- |
+| [Product Contract](docs/product/PRODUCT_CONTRACT.md) | Продуктовая граница, версии, state machine и authority policy. |
+| [Architecture](docs/ARCHITECTURE.md) | Реализованные компоненты, data flows и интеграционные ограничения. |
+| [Development](docs/DEVELOPMENT.md) | Setup, migrations, tests, verification и troubleshooting. |
+| [Stage 1](docs/stages/stage-1.md) | Импортированные AgentOS research tickets, решения и limits. |
+| [Open Decisions](docs/decisions/OPEN_DECISIONS.md) | Входы, которые блокируют новые executions. |
+| [Out of Scope](docs/decisions/OUT_OF_SCOPE.md) | Запрещённые и неподтверждённые claims. |
+| [Evaluation Reports](docs/decisions/) | Исторические S2 evaluation records и evidence boundaries. |
+| [AGENTS.md](AGENTS.md) | Правила работы с проектом. |
+
+## Источник истины
+
+- Frozen machine contracts: [`contracts/`](contracts/).
+- Tracked evidence и replay records: [`evidence/`](evidence/) и [`results/`](results/).
+- Исследовательские решения и их границы: [`docs/`](docs/).
+- Активная работа: [GitHub Issues](https://github.com/SpaceDazher/Veritas/issues).
+- Stage 1 canonical source: [AgentOS research tickets](https://github.com/SpaceDazher/AgentOS/tree/a7940e113492c83a29533d1e93f2724c36a9bbc1/research/tickets/stage-1).
+
+## Лицензирование и данные
+
+Перед добавлением внешнего материала проверьте license, attribution и retention requirements. Публичные fixtures безопасны для CI; private inputs должны оставаться в утверждённом private registry и не попадать в этот repository.
