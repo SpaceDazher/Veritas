@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 692.
+Generated from `git ls-files`; count: 714.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -54,6 +54,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `contracts/semantic-verification-item.schema.json`
 - `contracts/semantic-verification-request.schema.json`
 - `contracts/semantic-verification-result.schema.json`
+- `contracts/sloqual-001-scenario-manifest.json`
+- `contracts/sloqual-001-slo-contract.json`
 - `contracts/solution-pack.schema.json`
 - `contracts/source-descriptor.schema.json`
 - `contracts/source-lineage.schema.json`
@@ -367,6 +369,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006E-ENGINEERING-CLOSURE.md`
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
+- `docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md`
 - `docs/DEVELOPMENT.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
@@ -452,6 +455,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-006-summary.json`
 - `evidence/s2-006m-intake.json`
 - `evidence/s2-006m-provider-pilot.json`
+- `evidence/sloqual-001-comparison.json`
+- `evidence/sloqual-001-integrity.json`
+- `evidence/sloqual-001-run-a.json`
+- `evidence/sloqual-001-run-b.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -535,6 +542,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-006-run.mjs`
 - `scripts/s2-006m-pilot.mjs`
 - `scripts/security-probes.mjs`
+- `scripts/sloqual-freeze.mjs`
+- `scripts/sloqual-run.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
 - `scripts/validate-contracts.mjs`
@@ -553,6 +562,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-s2-005.mjs`
 - `scripts/verify-s2-006-dependencies.mjs`
 - `scripts/verify-s2-006.mjs`
+- `scripts/verify-sloqual-001.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-cli.mjs`
 - `src/app/api/board/route.ts`
@@ -597,6 +607,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
+- `src/lib/sloqual/comparator.mjs`
+- `src/lib/sloqual/contract.mjs`
+- `src/lib/sloqual/index.mjs`
+- `src/lib/sloqual/measure.mjs`
+- `src/lib/sloqual/open-loop.mjs`
+- `src/lib/sloqual/statistics.mjs`
 - `src/lib/synthesis/contracts.d.ts`
 - `src/lib/synthesis/probes.mjs`
 - `src/lib/synthesis/retrieval.mjs`
@@ -622,6 +638,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md`
 - `tasks/S2-006E_ENGINEERING_CLOSURE.md`
 - `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
+- `tasks/SLOQUAL-001_SLO_QUALIFICATION.md`
 - `tests/claims/contracts.schemas.test.mjs`
 - `tests/claims/contracts.types.test.mjs`
 - `tests/claims/dependency-binding.test.mjs`
@@ -650,6 +667,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/security-hardening.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
 - `tests/ingestion/transactional-audit.test.mjs`
+- `tests/sloqual/comparator.test.mjs`
+- `tests/sloqual/contract.test.mjs`
+- `tests/sloqual/harness.test.mjs`
+- `tests/sloqual/open-loop.test.mjs`
+- `tests/sloqual/statistics.test.mjs`
 - `tests/synthesis/contracts.schemas.test.mjs`
 - `tests/synthesis/contracts.types.test.mjs`
 - `tests/synthesis/db-replay-gates.test.mjs`

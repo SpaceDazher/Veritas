@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "b385f8fced69d83a88f600d292dfa714c596fdbe",
-  "sourceTree": "c2e7bf6870ce01876e004c04f8e9fce1ec3af50d",
-  "trackedFileCount": 692,
-  "manifestFileCount": 687,
-  "payloadManifestSha256": "7b457b0acbab2a2e74e14329f35680c7cf9594ead08c02dc138e6e8bd179a4f8",
-  "fileManifestSha256": "199166e6988eec62d6797950d08138be83f756bb17563431fc0344a252ba60aa",
+  "sourceCommit": "d237850953f407e41db5516c4a9986390ae0fd74",
+  "sourceTree": "e69980579c2a2ae4b26e17c1a916abd0f766f552",
+  "trackedFileCount": 714,
+  "manifestFileCount": 709,
+  "payloadManifestSha256": "ab94192e8f6527c6c411d3fff0070c18c1332929153b0656343d34e14c22d3e5",
+  "fileManifestSha256": "2e6fe45b9d72931d925d3edc1ae1b810488c96550405c29dac5156dfc606df51",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -28,8 +28,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "9515c905fe2e3fa6a5746cbe9db24564d66f02f58a9bf0c37933d356789eb5e3",
-      "bytes": 106
+      "sha256": "1a5f3857b07babcb07280f99846922be301d0216f76b5795bb8cd37aa8728aee",
+      "bytes": 127
     },
     {
       "path": "AGENTS.md",
@@ -270,6 +270,16 @@
       "path": "contracts/semantic-verification-result.schema.json",
       "sha256": "9e6bdff5736276ba2d050a39ac58f217d0ffa7acccdfd56a344b9475f19624f5",
       "bytes": 5831
+    },
+    {
+      "path": "contracts/sloqual-001-scenario-manifest.json",
+      "sha256": "7b5715bb1063e38d35f16ee60e881e6efd65242001f8d6206964e3fb5e6bca6b",
+      "bytes": 28642
+    },
+    {
+      "path": "contracts/sloqual-001-slo-contract.json",
+      "sha256": "759d83dd3226edd4b345e1e5fe3ab3d2845d02ffe3fb4deea262f142ff317dbd",
+      "bytes": 14247
     },
     {
       "path": "contracts/solution-pack.schema.json",
@@ -1733,8 +1743,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "sha256": "29e131609e6c2d87681b7d4cac40ef632bc183df5afdb2571da8288783b68959",
-      "bytes": 13799
+      "sha256": "9ce0df70feb97458f05fb50d431ee6833879f2d83148a212d145e4a3be6fbfca",
+      "bytes": 15139
     },
     {
       "path": "docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md",
@@ -1837,9 +1847,14 @@
       "bytes": 3319
     },
     {
+      "path": "docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md",
+      "sha256": "c451d2744cf43f52af8cfc2e3a417ea1d220000d292d1dc7b57d70fb1114a578",
+      "bytes": 7489
+    },
+    {
       "path": "docs/DEVELOPMENT.md",
-      "sha256": "ae3f8c70bac334edcdf5a71c3d13af86648b131751eae2535c4c7c3c078fe97c",
-      "bytes": 7127
+      "sha256": "f7ed252eabf60dda16302f674ddf9ad1c82145f28929b6ba18545c5bc7d866d0",
+      "bytes": 8597
     },
     {
       "path": "docs/ingestion/S2-003-CONNECTOR-CONTRACT.md",
@@ -1898,8 +1913,8 @@
     },
     {
       "path": "docs/stages/stage-1.md",
-      "sha256": "ca9baf7ac0fa7e8967766f4512d5b6eddd128c4fffad39880f3f46210f0efd01",
-      "bytes": 10724
+      "sha256": "90a85d18f6b632c7b56f3b55cd998293bc16e82c7a0d3a6b9490af557243aa92",
+      "bytes": 11764
     },
     {
       "path": "eslint.config.mjs",
@@ -2237,6 +2252,26 @@
       "bytes": 1121
     },
     {
+      "path": "evidence/sloqual-001-comparison.json",
+      "sha256": "edfc355b1eb878fb0494ab5092fed2068109342b5c2e5d4ab85b6053d47d924d",
+      "bytes": 8357
+    },
+    {
+      "path": "evidence/sloqual-001-integrity.json",
+      "sha256": "d8f35ca967314da62670667844cf7c4f11d99a198afd722987129e562fc13f96",
+      "bytes": 715
+    },
+    {
+      "path": "evidence/sloqual-001-run-a.json",
+      "sha256": "6be2e0a8b92029e69bffd66f9bd86773e5bfb43e02fcde27df9d75637ab37203",
+      "bytes": 122941
+    },
+    {
+      "path": "evidence/sloqual-001-run-b.json",
+      "sha256": "efc7ca440db86a5c64c162540b95acc46ab961cfc0576f09b166ce97ebe8a194",
+      "bytes": 122921
+    },
+    {
       "path": "evidence/synthetic-smoke.json",
       "sha256": "0d44647e94b784c41ff32cdf73afac8ec350c2829e1e333587d3171d4fd0511b",
       "bytes": 873
@@ -2298,8 +2333,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "5e954c37802223638ecd54d0fe2883fa06f487e0b695360e7724b6a4212175bf",
-      "bytes": 4835
+      "sha256": "9eb796df53469f61fbb08890e9a77c48845b920bc43c979b8f498cf59b51c855",
+      "bytes": 5101
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -2363,8 +2398,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "4cde5f1927e59372fd1bcaf8432be3a5b68e60f50ae3ff3fa7da6a29a61084d2",
-      "bytes": 8104
+      "sha256": "ba658fac28fc3bbb91fa0b845430b2685f37093b60fd76bd52467314cf4f4a32",
+      "bytes": 9053
     },
     {
       "path": "results/s2-002/run-a/observations.json",
@@ -2652,6 +2687,16 @@
       "bytes": 21139
     },
     {
+      "path": "scripts/sloqual-freeze.mjs",
+      "sha256": "7013624c0d34ca5e45e1b9a5c208377706ae54bcdb191349e6a11bc8edee62ed",
+      "bytes": 1946
+    },
+    {
+      "path": "scripts/sloqual-run.mjs",
+      "sha256": "c1da9732b9f6e64237728ce1fbf0b880e4847ba1fabf705e5c1767ba42e9e7cd",
+      "bytes": 4785
+    },
+    {
       "path": "scripts/smoke.mjs",
       "sha256": "7791a5dddc95ea32308484783c7e54ee00244462d7be91e619fae1925a58861e",
       "bytes": 246
@@ -2668,8 +2713,8 @@
     },
     {
       "path": "scripts/verify-clean-checkout.mjs",
-      "sha256": "6fbbe2f846b5ed0fddf8d52581adcfde30bff6ffa15c8b1320f85ce570363581",
-      "bytes": 11758
+      "sha256": "9504c801febc78dd1de5498fc67ad73c73e069cb4039955b676cbb0fcf2f9b75",
+      "bytes": 12264
     },
     {
       "path": "scripts/verify-gvisor-sandbox.mjs",
@@ -2740,6 +2785,11 @@
       "path": "scripts/verify-s2-006.mjs",
       "sha256": "c5cb71df1a6a28b920a8aaf38953e27ae9e1c90e15d6cbcd9bc4520bbde0c8a4",
       "bytes": 23584
+    },
+    {
+      "path": "scripts/verify-sloqual-001.mjs",
+      "sha256": "d53a1d6f82681b6a5b8f562679e89f38d03425013eacfd791b26db7f7cb19300",
+      "bytes": 8290
     },
     {
       "path": "scripts/verify.mjs",
@@ -2962,6 +3012,36 @@
       "bytes": 3196
     },
     {
+      "path": "src/lib/sloqual/comparator.mjs",
+      "sha256": "b13e67c22fa732ba88fad45c359050c5366497df48715d6c578062ca8e612487",
+      "bytes": 15956
+    },
+    {
+      "path": "src/lib/sloqual/contract.mjs",
+      "sha256": "8dd339febb3704d3191bc6904c642fa99bc19c6dbac0d733701ce190fe7af034",
+      "bytes": 9462
+    },
+    {
+      "path": "src/lib/sloqual/index.mjs",
+      "sha256": "c0af0333b0aa7431a8dd6b8b9003632c506fe2a1846fb35fccc10037a611f801",
+      "bytes": 1041
+    },
+    {
+      "path": "src/lib/sloqual/measure.mjs",
+      "sha256": "2baa49306767e0ccf6899e65fbe41080bf95b8c2e440a2be816c3db50c9c7e13",
+      "bytes": 20517
+    },
+    {
+      "path": "src/lib/sloqual/open-loop.mjs",
+      "sha256": "a068160319df0d45af5ebd24edb147f0ffc71f0717995a56838bf8d64389e52b",
+      "bytes": 4277
+    },
+    {
+      "path": "src/lib/sloqual/statistics.mjs",
+      "sha256": "55acc1ad0e3c9bf9ff370d58e6053b8a70ace9540f139185ed92252294133dc6",
+      "bytes": 6850
+    },
+    {
       "path": "src/lib/synthesis/contracts.d.ts",
       "sha256": "079e0fcfe9d6296dc89223f48282b93c50ee83810d6461baf19c17e98938fac3",
       "bytes": 9743
@@ -3085,6 +3165,11 @@
       "path": "tasks/S2-006M_MODEL_ASSISTED_PILOT.md",
       "sha256": "6121be67aa958d0593084dbb06e932d9151220d015b33858749203c4f7910225",
       "bytes": 10465
+    },
+    {
+      "path": "tasks/SLOQUAL-001_SLO_QUALIFICATION.md",
+      "sha256": "ffad42346ef8b0e906d994e3507f6e580e670d6834c7b48ceae45c588c9da4ab",
+      "bytes": 5743
     },
     {
       "path": "tests/claims/contracts.schemas.test.mjs",
@@ -3225,6 +3310,31 @@
       "path": "tests/ingestion/transactional-audit.test.mjs",
       "sha256": "e4f1589df9a8b1884aeea0946bf61ce7ae3c68a5a45acd962e9f0c70ab575cc7",
       "bytes": 4360
+    },
+    {
+      "path": "tests/sloqual/comparator.test.mjs",
+      "sha256": "439fc817cc21db7ce1f24aa215fefe58983d9314da0a2fa52f17380e28af145b",
+      "bytes": 16909
+    },
+    {
+      "path": "tests/sloqual/contract.test.mjs",
+      "sha256": "7cf8393016b2fe5673f413035a82a829aba97aec9c8b75445b428728ff4a58aa",
+      "bytes": 7569
+    },
+    {
+      "path": "tests/sloqual/harness.test.mjs",
+      "sha256": "cebb5b767d8460f3ca3c380902268c51f5b387a45af441e454ef513748cfe46b",
+      "bytes": 7361
+    },
+    {
+      "path": "tests/sloqual/open-loop.test.mjs",
+      "sha256": "9f6b3175ac5775c3aea272f6de5ef40b4959f102352f01e5c9eaf1b4665cf395",
+      "bytes": 4857
+    },
+    {
+      "path": "tests/sloqual/statistics.test.mjs",
+      "sha256": "acc837d5e59948727411144d2571df1473eb89242c916fcb8da16973758eb037",
+      "bytes": 5803
     },
     {
       "path": "tests/synthesis/contracts.schemas.test.mjs",
