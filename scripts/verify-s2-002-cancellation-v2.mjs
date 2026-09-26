@@ -12,6 +12,11 @@
 // Writes evidence/s2-002-cancellation-v2.json and
 // evidence/s2-002-cancellation-v2-integrity.json; exits non-zero on any
 // violation.
+// Usage: node scripts/verify-s2-002-cancellation-v2.mjs [--write] [--out <file>]
+// Writes the evidence record and its integrity sidecar; exits non-zero on any
+// violation. `--out` defaults to the linux record, so a second host writes a
+// separate file instead of overwriting the first host's observation: the two
+// platforms must be evidenced independently, never merged.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -21,13 +26,13 @@ import { pathToFileURL } from 'node:url';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
 import { SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
 import { DEFAULT_PROCESS_OBSERVER } from '../src/lib/identity/process-observer.mjs';
+import { buildEscapingProcessTree, readPublishedPids, waitForPublishedPids } from '../src/lib/identity/process-tree-fixture.mjs';
 import { runCorpus } from './s2-002-run.mjs';
 import { compareRuns } from './verify-s2-002.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
 const EVIDENCE_REVISION = 2;
-const PROOF_VALUES = ['TERMINATED', 'SURVIVORS_REMAINING', 'UNVERIFIED'];
 
 // Records produced before the #41 fix. This stage must never rewrite them: the
 // new evidence is additive, so a post-fix claim can never overwrite the
@@ -81,49 +86,28 @@ function sandboxFor(root, extra = {}) {
 }
 
 // A tree that leaves the child's process group, which is the shape a
-// group-only or parent-only kill cannot reach: `start /b` on Windows,
-// setsid(2) on POSIX. `pidFile` is written by the deepest process, so the
-// harness observes a pid it did not create.
-function escapingTree(root, { depth = 1, heartbeat = null } = {}) {
-  const pidFile = path.join(root, 'tree.pid').split('\\').join('/');
-  if (IS_WINDOWS) {
-    return {
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-      pidFile: null,
-    };
-  }
-  let inner = `echo $$ > ${pidFile}; for i in 1 2 3 4 5 6 7 8 9 10 11 12; do sleep 5; done`;
-  for (let level = 1; level < depth; level += 1) {
-    inner = `/bin/sh -c ${JSON.stringify(inner)}`;
-  }
-  const beat = heartbeat ? `while true; do echo x >> ${heartbeat.split('\\').join('/')}; sleep 1; done & ` : '';
-  return {
-    command: '/bin/sh',
-    args: ['-c', `${beat}setsid /bin/sh -c ${JSON.stringify(inner)} & sleep 60`],
-    pidFile,
-  };
+// group-only or parent-only kill cannot reach. `pidFile` is written by the
+// deepest process, so the harness observes a pid it did not create and can
+// check its liveness independently of the adapter's own verdict.
+//
+// POSIX uses setsid(2), which moves the descendant to a new session; the
+// Windows counterpart is Start-Process, which starts an independent process
+// that does not inherit the parent's stdio handles. Both are the hardest
+// available shape: a run can finish while such a descendant is still alive.
+// A tree that leaves the child's process group, which is the shape a
+// group-only or parent-only kill cannot reach. Defined once, in
+// process-tree-fixture.mjs, so the corpus runner, the adversarial probes and
+// this stage cannot drift into observing different trees.
+function escapingTree(root, { depth = 1 } = {}) {
+  return buildEscapingProcessTree(root, { depth });
 }
 
 async function readPids(file) {
-  if (!file) return [];
-  try {
-    return fs.readFileSync(file, 'utf8')
-      .split(/\s+/)
-      .map((value) => Number(value))
-      .filter((value) => Number.isInteger(value) && value > 0);
-  } catch {
-    return [];
-  }
+  return readPublishedPids(file);
 }
 
-async function waitForPids(file, attempts = 40) {
-  let pids = [];
-  for (let attempt = 0; attempt < attempts && pids.length === 0; attempt += 1) {
-    await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
-    pids = await readPids(file);
-  }
-  return pids;
+async function waitForPids(file) {
+  return waitForPublishedPids(file);
 }
 
 function proofOf(result) {
@@ -194,16 +178,13 @@ function checkHistoricalEvidenceUntouched() {
 async function caseCancellationProvesTree() {
   const root = tempRoot();
   const sandbox = sandboxFor(root);
-  const tree = escapingTree(root, { depth: 3, heartbeat: path.join(root, 'beat') });
+  const tree = escapingTree(root, { depth: 3 });
   const { pid, done } = sandbox.startForControlProbe({ ...tree, timeoutMs: 60000 });
   const descendants = await waitForPids(tree.pidFile);
   const cancel = await sandbox.cancel(pid);
   const outcome = await done;
   // Independent ground truth: the pids the deepest process published.
   const alive = descendants.filter((value) => sandbox.isAlive(value));
-  const beats = fs.existsSync(path.join(root, 'beat'))
-    ? fs.readFileSync(path.join(root, 'beat'), 'utf8').trim().split('\n').filter(Boolean).length
-    : 0;
   fs.rmSync(root, { recursive: true, force: true });
   return ok('cancellation/descendant-session-escape', [
     descendants.length > 0,
@@ -216,7 +197,7 @@ async function caseCancellationProvesTree() {
     !sandbox.isAlive(pid),
     alive.length === 0,
     outcome.trackedProcessIds.length > descendants.length,
-  ], `descendantsObserved=${descendants.length}; descendantHeartbeats=${beats}; ${JSON.stringify(proofOf(cancel))}; outcome.status=${outcome.status}`);
+  ], `platform=${tree.platform}; descendantsObserved=${descendants.length}; descendantAlive=${alive.length}; ${JSON.stringify(proofOf(cancel))}; outcome.status=${outcome.status}`);
 }
 
 // Case 2: the same guarantee through the timeout path, without an explicit
@@ -325,24 +306,40 @@ async function caseSelfCompletedRunMakesNoClaim() {
 }
 
 // Case 5: a recycled pid must never be signalled or counted as a survivor.
-// Uses the real platform observer with a deliberately wrong starttime identity
-// for a live pid, so the guard is exercised without killing an unrelated
-// process.
+// Uses the real platform observer with a deliberately wrong identity token for
+// a live pid, so the guard is exercised without killing an unrelated process.
+//
+// pid identity needs a per-pid token (Linux /proc starttime). Windows CIM does
+// not expose one, so there the case asserts the normalised contract shape and
+// records the missing control as a stated residual rather than as a proven one.
 async function caseRecycledPidIsNeverSignalled() {
+  const identity = DEFAULT_PROCESS_OBSERVER.identityFor(process.pid);
+  const identitySupported = typeof identity === 'string' && identity.includes(':');
   const result = await DEFAULT_PROCESS_OBSERVER.listExisting(
     [process.pid],
     { [process.pid]: `${process.pid}:1` },
   );
-  const checks = [
-    result.observable === true,
-    Array.isArray(result.alive),
-    Array.isArray(result.pidReused),
-    !result.alive.includes(process.pid),
-    result.pidReused.includes(process.pid),
-    process.getuid !== undefined || process.platform === 'win32',
-  ];
+  const shapeOk = Array.isArray(result.alive)
+    && Array.isArray(result.pidReused)
+    && result.observable === true;
+  const checks = identitySupported
+    ? [
+      shapeOk,
+      !result.alive.includes(process.pid),
+      result.pidReused.includes(process.pid),
+      // The harness itself must still be alive: the guard prevented a signal.
+      process.kill(process.pid, 0),
+      true,
+    ]
+    : [
+      shapeOk,
+      result.pidReused.length === 0,
+      result.identitySupported === false,
+    ];
   return ok('cancellation/recycled-pid-not-signalled', checks,
-    `observer=${DEFAULT_PROCESS_OBSERVER.id}; alive=${JSON.stringify(result.alive)}; pidReused=${JSON.stringify(result.pidReused)}`);
+    `observer=${DEFAULT_PROCESS_OBSERVER.id}; identitySupported=${identitySupported}; ` +
+    `alive=${JSON.stringify(result.alive)}; pidReused=${JSON.stringify(result.pidReused)}; ` +
+    (identitySupported ? 'stale identity token detected as reuse' : 'no per-pid identity token on this platform: stated residual, not a proven control'));
 }
 
 // The whole S2-002 hard-counter set, re-observed on this host after the fix.
@@ -386,7 +383,7 @@ async function caseFrozenCorpusHardCounters() {
     `counterViolations=${JSON.stringify(comparison.counterViolations)}`);
 }
 
-export async function runCancellationVerification() {
+export async function runCancellationVerification({ evidencePath = DEFAULT_EVIDENCE_PATH } = {}) {
   const cases = [
     await caseCancellationProvesTree(),
     await caseTimeoutProvesTree(),
@@ -416,6 +413,7 @@ export async function runCancellationVerification() {
       supersedes: null,
       issue: 'SpaceDazher/Veritas#41',
       scope: 'Cross-platform process-tree cancellation proof: termination is either proven by re-observing the OS process table, or reported as a fail-closed blocked/unknown outcome.',
+      evidenceFile: evidencePath,
       generatedAt: NOW,
       policyVersion: 's2-002-policy-v5',
       corpusRevision: 2,
@@ -431,22 +429,31 @@ export async function runCancellationVerification() {
         'Descendant discovery on POSIX reads /proc; on a host without /proc it falls back to ps, and if neither answers the outcome is UNVERIFIED rather than zero survivors.',
         'A Windows-only replay still does not establish the non-Windows property; both platforms must be observed independently.',
         'The adversarial A-K report evidence/s2-002-security-probes.json is the pre-fix record and is left untouched; npm run test:security-probes regenerates it in the working tree by design, so re-running it is an explicit separate act.',
+        ...(DEFAULT_PROCESS_OBSERVER.id.startsWith('platform:win32') ? [
+          'On this Windows host the process observer has no per-pid identity token, so a recycled pid cannot be told apart from one of ours. The case records that residual instead of asserting a control the platform cannot support.',
+        ] : []),
       ],
     },
     ok: okAll,
   };
 }
 
+const DEFAULT_EVIDENCE_PATH = 'evidence/s2-002-cancellation-v2.json';
+
 async function main() {
-  const { evidence, ok: passed } = await runCancellationVerification();
-  if (process.argv.includes('--write')) {
-    const evidencePath = 'evidence/s2-002-cancellation-v2.json';
-    const integrityPath = 'evidence/s2-002-cancellation-v2-integrity.json';
+  const argv = process.argv.slice(2);
+  const outFlag = argv.indexOf('--out');
+  const evidencePath = (outFlag >= 0 && argv[outFlag + 1]) ? argv[outFlag + 1] : DEFAULT_EVIDENCE_PATH;
+  const integrityPath = evidencePath.replace(/\.json$/, '-integrity.json');
+  const { evidence, ok: passed } = await runCancellationVerification({ evidencePath });
+  if (argv.includes('--write')) {
     fs.writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
     const digest = createHash('sha256').update(fs.readFileSync(evidencePath)).digest('hex');
     fs.writeFileSync(integrityPath, `${JSON.stringify({
       schemaVersion: 1,
       evidenceRevision: EVIDENCE_REVISION,
+      platform: evidence.platform,
+      evidenceFile: evidencePath,
       algorithm: 'SHA-256 raw file bytes',
       files: { [evidencePath]: digest },
       historicalEvidenceRewritten: false,
@@ -455,7 +462,9 @@ async function main() {
   console.log(JSON.stringify({
     exitCode: passed ? 0 : 1,
     verdict: evidence.verdict,
+    evidencePath,
     platform: evidence.platform,
+    observationSource: evidence.observationSource,
     counters: evidence.counters,
     cases: evidence.cases.map((c) => ({ caseId: c.caseId, verdict: c.verdict })),
   }, null, 2));

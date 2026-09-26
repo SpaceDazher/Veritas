@@ -106,10 +106,13 @@ S2-002 проверяет process-tree cancellation, local execution и sandbox 
 - недоступная таблица процессов даёт fail-closed `UNVERIFIED`, а не успех.
 
 Проверка: `npm run verify:s2-002-cancellation` публикует новую версионированную
-запись `evidence/s2-002-cancellation-v2.json` и не переписывает историческое
-evidence. Полный разбор: [S2-002-PROCESS-CANCELLATION.md](security/S2-002-PROCESS-CANCELLATION.md).
-Windows-host должен независимо перепрогнать тот же gate: успешный replay только
-на Windows не доказывает свойство на не-Windows.
+запись evidence и не переписывает историческое evidence. Каждый хост пишет
+свой файл: `evidence/s2-002-cancellation-v2.json` (linux) и
+`evidence/s2-002-cancellation-v2-win32.json` (win32). Оба наблюдения
+независимы, один не выводится из другого.
+Полный разбор: [S2-002-PROCESS-CANCELLATION.md](security/S2-002-PROCESS-CANCELLATION.md).
+После изменения этого контроля его снова нужно наблюдать на обеих платформах:
+успешный replay только на Windows не доказывает свойство на не-Windows.
 
 ## S2-006 и calibration
 

@@ -1,10 +1,11 @@
 # S2-002 — Process Cancellation Must Not Report Unverified Success
 
 Issue: [SpaceDazher/Veritas#41](https://github.com/SpaceDazher/Veritas/issues/41)
-Status: fixed, with new versioned evidence.
+Status: fixed, with new versioned evidence on **both** platforms.
 Scope: `src/lib/identity/sandbox.mjs`, `src/lib/identity/process-observer.mjs`
-(new), the frozen S2-002 corpus runner, the S2-002 comparator, adversarial
-probe G, and the cancellation regression suite.
+(new), `src/lib/identity/process-tree-fixture.mjs` (new), the frozen S2-002
+corpus runner, the S2-002 comparator, adversarial probe G, and the cancellation
+regression suite.
 
 ## 1. The defect
 
@@ -71,15 +72,21 @@ empty descendant list, which is the same lie in a different place.
 ### 2.2 A real process observer
 
 `src/lib/identity/process-observer.mjs` is the only source of truth about what
-is running. Every query returns `{ ..., observable, reason }`:
+is running. Every query returns `{ ..., observable, rootPresent, reason }`:
 
 - **Windows** — `Win32_Process` (CIM), as before, but a query failure is now
-  `observable: false` instead of `[]`.
+  `observable: false` instead of `[]`. The root's existence is answered from the
+  same CIM snapshot as the descendant walk, so a vanished root is no longer
+  indistinguishable from a live one.
 - **Linux** — a `/proc` snapshot: a parent walk from the root, plus process
   group and **session** membership, plus `/proc` `starttime` as a pid identity
   token.
 - **Other POSIX** — `ps -A -o pid=,ppid=,pgid=,sid=`, same three facts.
 - **None available** — `observable: false`, fail closed.
+
+`rootPresent: false` on a readable table means the tree's shape is unknown, not
+that the tree was empty: descendants are re-parented to init and stop being
+reachable from a pid that is gone.
 
 ### 2.3 A tree the OS can actually be asked about
 
@@ -102,7 +109,18 @@ is running. Every query returns `{ ..., observable, reason }`:
   (`SBX_PROCESS_GROUP_NOT_ISOLATED` when it is not), so it can never sweep in
   unrelated host processes.
 - A recycled pid is reported as `SBX_PID_REUSED`, is never signalled, and is
-  never counted as a survivor.
+  never counted as a survivor. The identity token exists where the platform
+  exposes one (Linux `/proc` starttime); Windows CIM has none, so the case
+  records that residual rather than asserting a control the platform cannot
+  support.
+- One tree definition, in `src/lib/identity/process-tree-fixture.mjs`, is shared
+  by the corpus runner, the adversarial probes, the verification stage and the
+  regression suite, so the four cannot drift into observing different trees.
+  POSIX uses `setsid(2)`; Windows uses `Start-Process`, which starts an
+  independent process that does **not** inherit the parent's stdio handles, so a
+  run can finish while the descendant is still alive. Both publish the
+  descendant's own pid, which is what gives every live case independent ground
+  truth instead of the adapter's own verdict.
 
 ### 2.4 Counters that cannot be laundered
 
@@ -154,24 +172,26 @@ wired into the hard counter).
 
 ## 4. Evidence
 
-New, versioned, and additive. No historical record is rewritten.
+New, versioned, and additive. No historical record is rewritten. Each host
+writes its own file, so the two observations stay separate records and are never
+merged — a Windows-only replay still does not establish the non-Windows
+property.
 
 | file | content |
 |---|---|
-| `evidence/s2-002-cancellation-v2.json` | `evidenceRevision: 2`, host, observation source, preserved hard gates, counters, per-case raw detail, verdict |
-| `evidence/s2-002-cancellation-v2-integrity.json` | SHA-256 of the record, `historicalEvidenceRewritten: false` |
+| `evidence/s2-002-cancellation-v2.json` | `evidenceRevision: 2`, `linux/x64`, observer `platform:linux`, preserved hard gates, counters, 8 cases with raw detail, verdict `PASS` |
+| `evidence/s2-002-cancellation-v2-win32.json` | the same 8 cases observed on `win32/x64`, observer `platform:win32`, verdict `PASS` |
+| `*-integrity.json` | SHA-256 of the record, `historicalEvidenceRewritten: false` |
 
-Untouched: `evidence/s2-002-run-a.json`, `evidence/s2-002-run-b.json`,
-`evidence/s2-002-comparison.json`, `evidence/s2-002-comparison-integrity.json`,
-`evidence/s2-002-security-probes.json`, `evidence/s2-002-podman-sandbox.json`,
-`evidence/s2-002-gvisor-sandbox.json`, `evidence/s2-002-dependency-binding.json`.
+Untouched, and verified byte-identical to their committed digests by the
+`cancellation/historical-evidence-untouched` case:
+`evidence/s2-002-run-a.json`, `run-b.json`, `comparison.json`,
+`comparison-integrity.json`, `security-probes.json`, `podman-sandbox.json`,
+`gvisor-sandbox.json`, `dependency-binding.json`.
 
-That is enforced, not just intended: the
-`cancellation/historical-evidence-untouched` case compares each of those eight
-files against its committed blob and fails the gate on any difference. Note
-that `npm run test:security-probes` regenerates
-`evidence/s2-002-security-probes.json` in the working tree by design, so
-re-running it is an explicit separate act, not part of publishing this fix.
+That is enforced, not just intended. Note that `npm run test:security-probes`
+and `npm run verify:s2-002` regenerate their own reports by design, so
+re-running them is an explicit separate act, not part of publishing this fix.
 
 The new evidence file is deliberately **not** in the frozen integrity manifest
 (`scripts/validate-contracts.mjs`): it records raw pids from a live process
@@ -198,14 +218,16 @@ replay could not establish the non-Windows property: the old corpus had no
 non-Windows cancellation evidence in it to begin with.
 
 `npm run verify:s2-002` — the process-separated authority — was re-run on
-`linux/x64` after the fix and exits `0`: 284 compared trials, zero mismatched
-decisions, zero counter violations, and all six hard counters at zero. Before
-the fix the same command could not pass off Windows at all. That run is not
-committed here, because `verify:s2-002` writes `evidence/s2-002-run-a.json`,
-`run-b`, `comparison` and `comparison-integrity` by design and those are the
-pre-fix records; the in-process replay inside
-`cancellation/s2-002-frozen-corpus-hard-counters` publishes the same result as
-new versioned evidence instead.
+**both** hosts after the fix and exits `0` on each: 284 compared trials, zero
+mismatched decisions, zero counter violations, all six hard counters at zero.
+Before the fix the same command could not pass off Windows at all. Those runs
+are not committed, because `verify:s2-002` writes
+`evidence/s2-002-run-a.json`, `run-b`, `comparison` and
+`comparison-integrity` by design and those are the pre-fix records; the
+in-process replay inside `cancellation/s2-002-frozen-corpus-hard-counters`
+publishes the same result as new versioned evidence instead. Both hosts report
+the same corpus digest, which is the point of making the corpus
+platform-independent.
 
 ## 5. What this does not establish
 
@@ -218,18 +240,15 @@ new versioned evidence instead.
    `ps` report them. A descendant that escapes both (a nested container with its
    own PID namespace) is outside the observation boundary and is reported as
    unobserved rather than as terminated.
-4. On Windows the CIM descendant walk seeds its result set with the root pid,
-   so the observer cannot distinguish a vanished root from a live one and
-   assumes `rootPresent: true`. That does not weaken the cancellation proof,
-   which captures the tree while the root is alive, but it is an untested
-   residual on this host — the Windows path has not been re-observed after the
-   fix.
+4. The Windows observer has no per-pid identity token, so a recycled pid
+   cannot be told apart from one of ours there. The case records that residual
+   rather than asserting a control the platform cannot support.
 5. A self-completed run never gets a termination proof, because its tree shape
    is unknowable once the root is gone. That is the honest outcome, but it also
    means `proof: TERMINATED` on this adapter means exactly one thing: "a tree
    observed while the root was alive was re-observed as empty", nothing more.
-6. Both platforms must be observed independently. The evidence here was
-   produced on `linux/x64`; the Windows replay has to be re-run on a Windows
-   host after the fix, and the two records are separate.
-7. Live execution in #7 must not rely on this property until that independent
-   Windows observation exists.
+6. Both platforms have now been observed independently and both records are in
+   `evidence/`, neither derived from the other. A future change to the
+   termination control still has to be re-observed on both.
+7. Live execution in #7 must not rely on this property until that
+   two-platform evidence is re-accepted in review.

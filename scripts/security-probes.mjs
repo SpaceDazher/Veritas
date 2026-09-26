@@ -22,6 +22,7 @@ import {
   executeAuthorizedGvisorTool,
 } from '../src/lib/identity/gvisor-sandbox.mjs';
 import { assertValidContract, validateContract } from '../src/lib/identity/contract-registry.mjs';
+import { buildEscapingProcessTree, readPublishedPids, waitForPublishedPids } from '../src/lib/identity/process-tree-fixture.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
@@ -240,7 +241,6 @@ async function probeF() {
 // fail-closed blocked/unknown outcome rather than a zero-survivor success.
 async function probeG() {
   const root = tempRoot();
-  const pidFile = path.join(root, 'descendant.pid');
   const sandbox = createSandbox({
     profile: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 8 } },
     workspaceRoots: [root],
@@ -248,27 +248,13 @@ async function probeG() {
     secrets: SECRETS,
     now: NOW,
   });
-  const readDescendants = () => {
-    try {
-      return fs.readFileSync(pidFile, 'utf8').split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0);
-    } catch {
-      return [];
-    }
-  };
-  const tree = IS_WINDOWS
-    ? { command: 'cmd.exe', args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'] }
-    : {
-      command: '/bin/sh',
-      args: ['-c', `setsid /bin/sh -c 'echo $$ > ${pidFile.split('\\').join('/')}; for i in 1 2 3 4 5 6 7 8 9 10; do sleep 5; done' & sleep 60`],
-    };
-  // The probe child spawns its own descendant via `start`/`setsid`; killing the
-  // tree must reap both. This is the survivor check demanded for cancellation.
+  // The probe child spawns its own descendant that a group- or parent-only kill
+  // cannot reach — setsid(2) on POSIX, Start-Process on Windows — and publishes
+  // the descendant's pid, so the survivor check has independent ground truth.
+  // This is the survivor check demanded for cancellation.
+  const tree = buildEscapingProcessTree(root, { depth: 2 });
   const { pid, done } = sandbox.startForControlProbe({ ...tree, timeoutMs: 60000 });
-  let descendants = [];
-  for (let attempt = 0; attempt < 40 && descendants.length === 0; attempt += 1) {
-    await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
-    descendants = readDescendants();
-  }
+  const descendants = await waitForPublishedPids(tree.pidFile);
   const cancel = await sandbox.cancel(pid);
   const outcome = await done;
   const survivorsAlive = descendants.filter((value) => sandbox.isAlive(value));
@@ -305,8 +291,7 @@ async function probeG() {
   });
   await new Promise((resolveTimer) => setTimeout(resolveTimer, 200));
   const blindCancel = await blind.cancel(blindRun.pid);
-  const blindOutcome = await blindRun.done;
-  const failClosed = blindCancel.proof === 'UNVERIFIED'
+  const blindOutcome = await blindRun.done;  const failClosed = blindCancel.proof === 'UNVERIFIED'
     && blindCancel.terminated === false
     && blindCancel.survivors === null
     && blindOutcome.survivors === null
@@ -314,7 +299,7 @@ async function probeG() {
     && blindCancel.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE')
     && blindOutcome.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE');
 
-  const detail = `descendantsObserved=${descendants.length}; cancel.proof=${cancel.proof}; cancel.survivors=${cancel.survivors}; ` +
+  const detail = `platform=${tree.platform}; descendantsObserved=${descendants.length}; cancel.proof=${cancel.proof}; cancel.survivors=${cancel.survivors}; ` +
     `outcome.proof=${outcome.proof}; outcome.status=${outcome.status}; outcome.survivors=${outcome.survivors}; ` +
     `descendantAlive=${survivorsAlive.length}; rootAlive=${sandbox.isAlive(pid)}; ` +
     `negativeControl.proof=${blindCancel.proof}; negativeControl.failClosed=${failClosed}`;

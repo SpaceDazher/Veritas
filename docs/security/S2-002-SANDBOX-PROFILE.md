@@ -87,9 +87,12 @@ and by both frozen replay runs.
   empty tree it never observed. Cancellation and timeout capture the tree while
   the root is alive, which is what makes their proof valid.
 - `src/lib/identity/process-observer.mjs` is the only source of truth about
-  what is still running. Windows uses `Win32_Process` (CIM); Linux reads
+  what is still running. Windows uses `Win32_Process` (CIM), answering the
+  root's existence and the descendant walk from one snapshot; Linux reads
   `/proc`; other POSIX hosts fall back to `ps -A`. A failed query is
-  `observable: false`, never an empty result.
+  `observable: false`, never an empty result, and a readable table with the
+  root already gone is `rootPresent: false` — the tree's shape is unknown, not
+  empty.
 - On POSIX the probe child is spawned as a **process-group leader**
   (`detached: true` → `setsid`), so a group-directed `SIGKILL` reaches every
   descendant that stays in the group. Windows keeps `detached: false` because
@@ -100,9 +103,17 @@ and by both frozen replay runs.
   are re-parented to init when their parent dies. Session/pgroup expansion is
   only used when the root is genuinely isolated from the adapter's own session
   and process group, so it can never sweep in unrelated host processes.
-- Tracked pids carry their `/proc` starttime as an identity token. A recycled
-  pid is reported as `SBX_PID_REUSED` and is never signalled and never counted
-  as a survivor.
+- Tracked pids carry a per-pid identity token where the platform exposes one
+  (Linux `/proc` starttime). A recycled pid is reported as `SBX_PID_REUSED` and
+  is never signalled and never counted as a survivor; Windows CIM exposes no
+  such token, and the evidence records that residual instead of asserting it.
+- One tree definition, `src/lib/identity/process-tree-fixture.mjs`, is shared by
+  the corpus runner, the probes, the verification stage and the tests, so they
+  cannot drift into observing different trees. POSIX uses `setsid(2)`; Windows
+  uses `Start-Process`, which does not inherit the parent's stdio handles, so a
+  run can finish while the descendant is still alive. Both publish the
+  descendant's own pid, which is the independent ground truth every live case
+  checks.
 - A descendant that inherits the child's stdout/stderr pipes keeps Node's
   `close` event from firing, so such a run cannot be reported as `completed`
   before the descendant is gone; it terminates as `timeout` with a proven,

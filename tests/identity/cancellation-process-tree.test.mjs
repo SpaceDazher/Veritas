@@ -21,6 +21,7 @@ import path from 'node:path';
 import { createSandbox } from '../../src/lib/identity/sandbox.mjs';
 import { SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../../src/lib/identity/sandbox-profiles.mjs';
 import { DEFAULT_PROCESS_OBSERVER } from '../../src/lib/identity/process-observer.mjs';
+import { buildEscapingProcessTree, readPublishedPids, waitForPublishedPids } from '../../src/lib/identity/process-tree-fixture.mjs';
 import { runCancellationVerification } from '../../scripts/verify-s2-002-cancellation-v2.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
@@ -51,39 +52,13 @@ function unobservableObserver(id) {
   };
 }
 
-async function readPids(file) {
-  if (!file) return [];
-  try {
-    return fs.readFileSync(file, 'utf8').split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0);
-  } catch {
-    return [];
-  }
-}
+const readPids = readPublishedPids;
+const waitForPids = waitForPublishedPids;
 
-async function waitForPids(file, attempts = 40) {
-  let pids = [];
-  for (let attempt = 0; attempt < attempts && pids.length === 0; attempt += 1) {
-    await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
-    pids = await readPids(file);
-  }
-  return pids;
-}
-
-// depth 1 = the escaping descendant; depth 3 = root -> child -> grandchild ->
-// great-grandchild, so the whole chain has to be discovered and reaped.
+// The tree definition is shared with the frozen corpus runner, the adversarial
+// probes and the verification stage, so all four observe the same shape.
 function escapingTree(root, depth = 1) {
-  const pidFile = path.join(root, 'tree.pid').split('\\').join('/');
-  if (IS_WINDOWS) {
-    return {
-      platform: 'win32',
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-      pidFile: null,
-    };
-  }
-  let inner = `echo $$ > ${pidFile}; for i in 1 2 3 4 5 6 7 8 9 10 11 12; do sleep 5; done`;
-  for (let level = 1; level < depth; level += 1) inner = `/bin/sh -c ${JSON.stringify(inner)}`;
-  return { platform: 'posix', command: '/bin/sh', args: ['-c', `setsid /bin/sh -c ${JSON.stringify(inner)} & sleep 60`], pidFile };
+  return buildEscapingProcessTree(root, { depth });
 }
 
 describe('S2-002 #41: cancellation proves the whole spawned process tree', { timeout: 120000 }, () => {
@@ -227,13 +202,25 @@ describe('S2-002 #41: unavailable process observation fails closed', { timeout: 
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  test('a recycled pid is reported as reused and never counted as a survivor', async () => {
+  test('pid identity handling matches what this platform can actually prove', async () => {
+    const identity = DEFAULT_PROCESS_OBSERVER.identityFor(process.pid);
+    const identitySupported = typeof identity === 'string' && identity.includes(':');
     const result = await DEFAULT_PROCESS_OBSERVER.listExisting(
       [process.pid],
       { [process.pid]: `${process.pid}:1` },
     );
+    // The shape is part of the contract on every platform.
     assert.equal(result.observable, true);
     assert.ok(Array.isArray(result.alive));
+    assert.ok(Array.isArray(result.pidReused));
+    if (!identitySupported) {
+      // No per-pid identity token here: the control is absent, and the case
+      // says so rather than asserting a guard that cannot run.
+      assert.equal(result.identitySupported, false);
+      assert.deepEqual(result.pidReused, []);
+      return;
+    }
+    assert.equal(result.identitySupported, true);
     assert.equal(result.alive.includes(process.pid), false, 'a reused pid is not our process');
     assert.equal(result.pidReused.includes(process.pid), true);
     // The harness itself must still be alive: the guard prevented a signal.

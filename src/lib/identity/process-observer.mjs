@@ -68,10 +68,9 @@ function runCommand(command, args) {
 async function windowsQuery(script) {
   const result = await runCommand('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script]);
   if (!result.ok) {
-    return { pids: [], observable: false, reason: `SBX_PROCESS_TABLE_QUERY_FAILED:${result.reason}` };
+    return { stdout: '', observable: false, reason: `SBX_PROCESS_TABLE_QUERY_FAILED:${result.reason}` };
   }
-  const pids = uniquePids(result.stdout.split(/\s+/).map(Number));
-  return { pids, observable: true, reason: null };
+  return { stdout: result.stdout, observable: true, reason: null };
 }
 
 // /proc ---------------------------------------------------------------------
@@ -247,20 +246,31 @@ export function createProcessObserver({ platform = process.platform } = {}) {
   async function listDescendants(rootPid, known = {}) {
     if (isWindows) {
       const literal = Number(rootPid);
+      // One CIM snapshot answers both questions: which pids descend from the
+      // root, and whether the root is still there at all. The root flag has to
+      // be emitted separately, because the walk seeds its set with the root
+      // pid — without it a vanished root is indistinguishable from a live one,
+      // and a vanished root means the tree's shape is unknown, not empty.
       const script = `$p=@(${literal});$all=Get-CimInstance Win32_Process;` +
+        `$root=@($all | Where-Object { [int]$_.ProcessId -eq ${literal} }).Count -gt 0;` +
         `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
-        `($p | Select-Object -Unique) -join ' '`;
+        `("ROOT=" + [int]$root + ";" + (($p | Select-Object -Unique) -join ' '))`;
       const result = await windowsQuery(script);
       // A failed CIM query is NOT an empty process tree.
-      // rootPresent is assumed here: the CIM walk seeds the set with the root
-      // pid, so the script cannot distinguish a vanished root. Cancellation
-      // captures the tree while the root is alive, so this does not weaken the
-      // cancellation proof; a self-completed run is not given a proof at all.
+      if (result.observable !== true) {
+        return {
+          pids: [], observable: false, rootPresent: false, reason: result.reason,
+          platform, sessions: [], processGroups: [], processGroupIsolated: null,
+        };
+      }
+      const rootPresent = /ROOT=1;/.test(result.stdout);
+      const pidText = result.stdout.replace(/^.*?ROOT=[01];/, '');
       return {
-        ...result,
-        pids: result.pids.filter((pid) => pid !== rootPid),
+        pids: uniquePids(pidText.split(/\s+/).map(Number)).filter((pid) => pid !== rootPid),
+        observable: true,
+        rootPresent,
+        reason: rootPresent ? null : 'SBX_ROOT_NOT_IN_PROCESS_TABLE',
         platform,
-        rootPresent: true,
         sessions: [],
         processGroups: [],
         processGroupIsolated: null,
@@ -278,17 +288,34 @@ export function createProcessObserver({ platform = process.platform } = {}) {
 
   async function listExisting(pids, identities = {}) {
     const candidates = uniquePids(pids);
-    if (candidates.length === 0) return { alive: [], observable: true, reason: null, platform };
-    if (isWindows) {      const literal = candidates.join(',');
+    if (candidates.length === 0) {
+      return { alive: [], observable: true, reason: null, platform, pidReused: [], identitySupported: !isWindows };
+    }
+    if (isWindows) {
+      const literal = candidates.join(',');
       const script = `$ids=@(${literal});` +
         `Get-CimInstance Win32_Process | Where-Object { $ids -contains [int]$_.ProcessId } | ` +
         `ForEach-Object ProcessId`;
       const result = await windowsQuery(script);
-      return { ...result, alive: result.pids.filter((pid) => candidates.includes(pid)), platform };
+      // pidReused is always an array so callers can rely on the shape. On
+      // Windows it is always empty: the CIM path carries no per-pid identity
+      // token, so a recycled pid cannot be distinguished from ours. That
+      // residual is stated in the evidence, not hidden behind a passing
+      // assertion.
+      return {
+        alive: result.observable === true
+          ? uniquePids(result.stdout.split(/\s+/).map(Number)).filter((pid) => candidates.includes(pid))
+          : candidates,
+        observable: result.observable,
+        reason: result.reason,
+        platform,
+        pidReused: [],
+        identitySupported: false,
+      };
     }
     if (platform === 'linux' && procAvailable()) {
       const table = procSnapshot();
-      if (!table) return { alive: candidates, observable: false, reason: 'SBX_PROCFS_SNAPSHOT_EMPTY', platform };
+      if (!table) return { alive: candidates, observable: false, reason: 'SBX_PROCFS_SNAPSHOT_EMPTY', platform, pidReused: [], identitySupported: true };
       const alive = [];
       const pidReused = [];
       for (const pid of candidates) {
@@ -304,7 +331,7 @@ export function createProcessObserver({ platform = process.platform } = {}) {
         }
         alive.push(pid);
       }
-      return { alive, observable: true, reason: null, platform, pidReused };
+      return { alive, observable: true, reason: null, platform, pidReused, identitySupported: true };
     }
     const alive = [];
     for (const pid of candidates) {
@@ -316,7 +343,7 @@ export function createProcessObserver({ platform = process.platform } = {}) {
         if (error.code !== 'ESRCH') alive.push(pid);
       }
     }
-    return { alive, observable: true, reason: null, platform };
+    return { alive, observable: true, reason: null, platform, pidReused: [], identitySupported: false };
   }
 
   return Object.freeze({

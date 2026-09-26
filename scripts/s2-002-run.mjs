@@ -18,6 +18,7 @@ import { PRINCIPALS, WORKSPACES } from '../src/lib/identity/principals.mjs';
 import { createPolicyEngine, POLICY_VERSION } from '../src/lib/identity/policy-engine.mjs';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
 import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
+import { buildEscapingProcessTree, waitForPublishedPids } from '../src/lib/identity/process-tree-fixture.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const REVOCATION_TRIALS = 100;
@@ -120,35 +121,15 @@ const DESCENDANT_MARKER = 'descendant.pid';
 const NO_EXEC_PROBE_COMMAND = IS_WINDOWS ? 'cmd.exe' : '/bin/sh';
 const NO_EXEC_PROBE_ARGS = IS_WINDOWS ? ['/c', 'echo hi'] : ['-c', 'echo hi'];
 
+// A descendant that deliberately leaves the child's process group is the
+// hardest case on both platforms: a group- or parent-only kill cannot reach
+// it. setsid(2) on POSIX, Start-Process on Windows. The tree definition lives
+// in process-tree-fixture.mjs so this runner, the adversarial probes and the
+// cancellation verification stage cannot drift apart.
 function descendantTreeCommand(root) {
-  const pidFile = path.join(root, DESCENDANT_MARKER).split('\\').join('/');
-  if (IS_WINDOWS) {
-    return {
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', `start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul`],
-      readDescendantPids: () => [],
-    };
-  }
-  return {
-    command: '/bin/sh',
-    args: [
-      '-c',
-      // setsid puts the descendant in its own session, so the only way to
-      // still see it (and its own children) is session identity, not ppid.
-      `setsid /bin/sh -c 'echo $$ > ${pidFile}; for i in 1 2 3 4 5 6 7 8 9 10; do sleep 5; done' & sleep 60`,
-    ],
-    readDescendantPids: () => {
-      try {
-        return fs.readFileSync(path.join(root, DESCENDANT_MARKER), 'utf8')
-          .split(/\s+/)
-          .map((value) => Number(value))
-          .filter((value) => Number.isInteger(value) && value > 0);
-      } catch {
-        return [];
-      }
-    },
-  };
+  return buildEscapingProcessTree(root, { depth: 2 });
 }
+
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -243,11 +224,7 @@ function sandboxTrialSet(root) {
     const { pid, done } = live.startForControlProbe({ ...tree, timeoutMs: 60000 });
     // Wait until the descendant has published its own pid, so the trial really
     // observes a two-level tree instead of racing process creation.
-    let descendantPids = [];
-    for (let attempt = 0; attempt < 40 && descendantPids.length === 0; attempt += 1) {
-      await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
-      descendantPids = tree.readDescendantPids();
-    }
+    const descendantPids = await waitForPublishedPids(tree.pidFile);
     const cancel = await live.cancel(pid);
     const outcome = await done;
     // Independent ground truth: the descendant's own pid must be gone, checked
