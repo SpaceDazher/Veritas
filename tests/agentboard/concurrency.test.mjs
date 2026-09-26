@@ -69,10 +69,9 @@ const execFileAsync = promisify(execFile);
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../..');
-// The race child lives in this chat's tmp/ and imports the store by absolute
-// path. If it is missing the test fails loudly — a helper that vanished must
-// never turn into a green cross-process claim.
-const RACE_CHILD = path.join(ROOT, '.bb/chats/thr_8sxageuj7j/tmp/s2-007-claim-race-child.mjs');
+// A tracked child fixture is required: clean checkouts must exercise the same
+// two real processes as the author's local chat workspace.
+const RACE_CHILD = path.join(HERE, 'fixtures', 'claim-race-child.mjs');
 
 // The image is pinned by digest (spec §5): a floating tag would make this test
 // depend on whatever the registry served today.
