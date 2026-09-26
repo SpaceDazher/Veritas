@@ -47,7 +47,7 @@
         true,
         true
       ],
-      "detail": "descendantsObserved=1; descendantHeartbeats=1; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[596931,596932,596933,596934,596935,596936,596937,596938],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; outcome.status=cancelled"
+      "detail": "descendantsObserved=1; descendantHeartbeats=1; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[612001,612002,612003,612004,612005,612006,612007,612008],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; outcome.status=cancelled"
     },
     {
       "caseId": "cancellation/timeout-descendant-escape",
@@ -60,7 +60,7 @@
         true,
         true
       ],
-      "detail": "status=timeout; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[596940,596941,596942,596943,596944],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; descendantAlive=0"
+      "detail": "status=timeout; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[612010,612011,612012,612013,612027],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; descendantAlive=0"
     },
     {
       "caseId": "cancellation/negative-control-no-process-table",
@@ -77,7 +77,7 @@
         true,
         true
       ],
-      "detail": "cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[596957],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:process-table-unavailable\"}; outcome.survivors=null"
+      "detail": "cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[612028],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:process-table-unavailable\"}; outcome.survivors=null"
     },
     {
       "caseId": "cancellation/negative-control-descendant-query-fails",
@@ -90,7 +90,7 @@
         true,
         true
       ],
-      "detail": "descendantsObserved=1; cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[596966],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:descendant-query-unavailable\"}"
+      "detail": "descendantsObserved=1; cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[612040],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:descendant-query-unavailable\"}"
     },
     {
       "caseId": "cancellation/recycled-pid-not-signalled",
@@ -103,7 +103,7 @@
         true,
         true
       ],
-      "detail": "observer=platform:linux; alive=[]; pidReused=[596923]"
+      "detail": "observer=platform:linux; alive=[]; pidReused=[611993]"
     },
     {
       "caseId": "cancellation/historical-evidence-untouched",
@@ -111,7 +111,7 @@
       "checks": [
         true
       ],
-      "detail": "checked=8; rewritten=[]"
+      "detail": "checked=8; source=git:HEAD; rewritten=[]"
     }
   ],
   "verdict": "PASS",

@@ -143,9 +143,30 @@ function ok(caseId, checks, detail) {
 
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
-// Compares each historical record against the committed blob. Any difference
-// means a gate rewrote the pre-fix evidence, which is a violation of the
-// issue's "publish new evidence without rewriting historical evidence" rule.
+// Compares each historical record against its committed digest. Any difference
+// means a gate rewrote the pre-fix evidence, which violates the issue's
+// "publish new evidence without rewriting historical evidence" rule.
+//
+// Two independent committed sources are accepted, because the gate also runs
+// from a `git archive` export that has no .git directory:
+//   - `git show HEAD:<path>`, the blob of record;
+//   - the SHA-256 recorded in evidence/root-manifest.json, which is itself
+//     bound to the implementation commit by the closure record.
+function committedDigest(relative) {
+  if (fs.existsSync(path.join('.git'))) {
+    try {
+      return { source: 'git:HEAD', sha256: sha256(execFileSync('git', ['show', `HEAD:${relative}`], { encoding: null, maxBuffer: 30 * 1024 * 1024 })) };
+    } catch {
+      // fall through to the manifest
+    }
+  }
+  const rootManifestPath = 'evidence/root-manifest.json';
+  if (!fs.existsSync(rootManifestPath)) return null;
+  const manifest = JSON.parse(fs.readFileSync(rootManifestPath, 'utf8'));
+  const entry = (manifest.files ?? []).find((file) => file.path === relative);
+  return entry ? { source: 'root-manifest', sha256: entry.sha256 } : null;
+}
+
 function checkHistoricalEvidenceUntouched() {
   const records = [];
   for (const relative of HISTORICAL_EVIDENCE) {
@@ -154,18 +175,16 @@ function checkHistoricalEvidenceUntouched() {
       continue;
     }
     const workingTree = sha256(fs.readFileSync(relative));
-    let committed = null;
-    try {
-      committed = sha256(execFileSync('git', ['show', `HEAD:${relative}`], { encoding: null, maxBuffer: 30 * 1024 * 1024 }));
-    } catch {
-      records.push({ path: relative, present: true, unchanged: false, sha256: workingTree, reason: 'NO_COMMITTED_BLOB' });
+    const committed = committedDigest(relative);
+    if (!committed) {
+      records.push({ path: relative, present: true, unchanged: false, sha256: workingTree, reason: 'NO_COMMITTED_DIGEST' });
       continue;
     }
-    records.push({ path: relative, present: true, unchanged: workingTree === committed, sha256: workingTree });
+    records.push({ path: relative, present: true, unchanged: workingTree === committed.sha256, sha256: workingTree, source: committed.source });
   }
   const rewritten = records.filter((record) => record.unchanged !== true).map((record) => record.path);
   return ok('cancellation/historical-evidence-untouched', [rewritten.length === 0],
-    `checked=${records.length}; rewritten=${JSON.stringify(rewritten)}`);
+    `checked=${records.length}; source=${records[0]?.source ?? 'none'}; rewritten=${JSON.stringify(rewritten)}`);
 }
 
 // Case 1: the reported defect. A descendant in its own session, killed only if
