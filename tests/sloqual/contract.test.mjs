@@ -4,6 +4,7 @@
 // bytes the contract bound must be a stop condition.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -16,7 +17,7 @@ import {
   verifyFreeze,
 } from '../../src/lib/sloqual/contract.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const contractBytes = fs.readFileSync(path.join(ROOT, CONTRACT_PATH));
 const manifestBytes = fs.readFileSync(path.join(ROOT, MANIFEST_PATH));
 const contract = JSON.parse(contractBytes.toString('utf8'));

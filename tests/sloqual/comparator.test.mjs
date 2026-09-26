@@ -9,10 +9,11 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { compareQualification, resolveVerdict } from '../../src/lib/sloqual/comparator.mjs';
 import { CONTRACT_PATH, MANIFEST_PATH, stampContract } from '../../src/lib/sloqual/contract.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const manifestBytes = fs.readFileSync(path.join(ROOT, MANIFEST_PATH));
 const frozenContract = JSON.parse(fs.readFileSync(path.join(ROOT, CONTRACT_PATH), 'utf8'));
 const manifest = JSON.parse(manifestBytes.toString('utf8'));

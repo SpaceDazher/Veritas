@@ -25,6 +25,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
   EXPECTED_AGGREGATOR_SCRIPT,
@@ -50,7 +51,7 @@ import {
 import { decideGateOutcome, redactConnectionString, resolveDatabase, HEAD_GATE_COUNTERS } from '../../scripts/s2-007-security-probes.mjs';
 import { HARD_GATE_COUNTERS } from '../../src/lib/agentboard/probes.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HEAD = headIdentity(ROOT);
 const PROBES_GATE = EXPECTED_GATES.find((gate) => gate.id === 'security-probes');
 const DB_GATE = EXPECTED_GATES.find((gate) => gate.id === 'db-replay');
