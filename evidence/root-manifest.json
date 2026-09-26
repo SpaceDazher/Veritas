@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "b385f8fced69d83a88f600d292dfa714c596fdbe",
-  "sourceTree": "c2e7bf6870ce01876e004c04f8e9fce1ec3af50d",
-  "trackedFileCount": 692,
-  "manifestFileCount": 687,
-  "payloadManifestSha256": "7b457b0acbab2a2e74e14329f35680c7cf9594ead08c02dc138e6e8bd179a4f8",
-  "fileManifestSha256": "199166e6988eec62d6797950d08138be83f756bb17563431fc0344a252ba60aa",
+  "sourceCommit": "c21afd636bb404a008a6396b4d0b9cda4981e9f5",
+  "sourceTree": "e880fb472eb800e927b04a48b23ec88f673e128d",
+  "trackedFileCount": 746,
+  "manifestFileCount": 741,
+  "payloadManifestSha256": "49f1ed278475eef8a7957ff8117b960b0626583d4cae26bbd3f13f674ba34083",
+  "fileManifestSha256": "17c8e52cfaf1953e8f9404b58b1c39b0272ff097728f6acd78a50915515afd14",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -47,6 +47,11 @@
       "bytes": 1707
     },
     {
+      "path": "contracts/adapter-registration.schema.json",
+      "sha256": "b00493951c3c8bdeea5a30fa9ff8543ddd2b36b5f6ea4ad7a8a3404b817fa7ce",
+      "bytes": 3223
+    },
+    {
       "path": "contracts/adjudication-record.schema.json",
       "sha256": "5c5b73167b5277a5225ac1f54a715d7219e2f5c9f957c0ccf36c8d04b4fa0d5f",
       "bytes": 4142
@@ -65,6 +70,21 @@
       "path": "contracts/authorization-decision.schema.json",
       "sha256": "2c544059102538043505e5bad8f51a5b447ff4d9d69d83256299798fe1f5a974",
       "bytes": 2356
+    },
+    {
+      "path": "contracts/board-error.schema.json",
+      "sha256": "dfa6a568d18aab4d2a156be435f34f3bd1b95700f960c18035f28a9e493893c8",
+      "bytes": 2193
+    },
+    {
+      "path": "contracts/board-task.schema.json",
+      "sha256": "c8919f918d61f1eba039b50a89d79027e412ad5d0b2705e8ffa260bac1a63983",
+      "bytes": 7742
+    },
+    {
+      "path": "contracts/board-transition.schema.json",
+      "sha256": "ea0c4831127aa936566782118a609c5726df96e67c5abd9c0d4eb40eee01e14e",
+      "bytes": 2699
     },
     {
       "path": "contracts/calibration-record-v2.schema.json",
@@ -132,6 +152,11 @@
       "bytes": 3899
     },
     {
+      "path": "contracts/dispatch-decision.schema.json",
+      "sha256": "a5d695dca5fa1ff1d8029312e86b3bb86e026beb7784340e2b57c490d247ae02",
+      "bytes": 3982
+    },
+    {
       "path": "contracts/evidence-edge.schema.json",
       "sha256": "ab5e93ac657775c09fc49f4fec3c9b441f0488f1c5066010199f084eb6b28b52",
       "bytes": 3484
@@ -140,6 +165,21 @@
       "path": "contracts/evidence-map.schema.json",
       "sha256": "4a4dcdbb23adab0db005c62e7666ffc0b37bdec8bfe4bbf1fe0f228da092c7dd",
       "bytes": 5422
+    },
+    {
+      "path": "contracts/execution-event.schema.json",
+      "sha256": "26b4eba1ffd6fd98de64750eec8ff44dcde19269fe242911e498b1f189cfd38b",
+      "bytes": 2333
+    },
+    {
+      "path": "contracts/execution-request.schema.json",
+      "sha256": "33b4d9324dba3885a375280c0598f2d629067284c5b08942e54ab8f7c30f6f37",
+      "bytes": 5022
+    },
+    {
+      "path": "contracts/execution-result.schema.json",
+      "sha256": "8e0211f1d56059a0055a17c85a9145dc4b8fc522bd47aab2f5586def851f291d",
+      "bytes": 4344
     },
     {
       "path": "contracts/expert-lens.schema.json",
@@ -1837,6 +1877,11 @@
       "bytes": 3319
     },
     {
+      "path": "docs/decisions/S2-007-EVALUATION-REPORT.md",
+      "sha256": "50c779896023cdf5b0ee5a0be76c9fc2aa5bd2ba8c9a4bdb7f21abd4882323fc",
+      "bytes": 55899
+    },
+    {
       "path": "docs/DEVELOPMENT.md",
       "sha256": "ae3f8c70bac334edcdf5a71c3d13af86648b131751eae2535c4c7c3c078fe97c",
       "bytes": 7127
@@ -1895,6 +1940,11 @@
       "path": "docs/security/S2-002-THREAT-MODEL.md",
       "sha256": "2a1734852e8cf2b1f352e2809e25606ae4a788e2f023fd40e303dba7c42503b4",
       "bytes": 6368
+    },
+    {
+      "path": "docs/stages/S2-007.md",
+      "sha256": "6d6897a240379fb24461b9d8c7a8c99353ae465d1cf88129193d68241cb2c705",
+      "bytes": 7497
     },
     {
       "path": "docs/stages/stage-1.md",
@@ -2237,6 +2287,51 @@
       "bytes": 1121
     },
     {
+      "path": "evidence/s2-007-comparison.json",
+      "sha256": "c6987a6d03aad996d5a477cb5b222edca621579f99156e1e5f838352e2af15f4",
+      "bytes": 12986
+    },
+    {
+      "path": "evidence/s2-007-db-comparison.json",
+      "sha256": "b66188755ab03c8cff61ecbdd588a2a0e43cf9ba2ab907dfd1d115de3090378a",
+      "bytes": 12307
+    },
+    {
+      "path": "evidence/s2-007-db-run-a.json",
+      "sha256": "5d3a9c0b22e3070123bab6536a6a26f7942e5929a4a7d5c58d04da67c07df3d7",
+      "bytes": 26010
+    },
+    {
+      "path": "evidence/s2-007-db-run-b.json",
+      "sha256": "e52ac8d43d52b9c167e24ecd641d4cc4595e2594a4aa3539f70a63065d41e5d2",
+      "bytes": 26008
+    },
+    {
+      "path": "evidence/s2-007-dependency-binding.json",
+      "sha256": "267a976c8b40d18346f2bf10c42a8e415202b0c5a0a2bee9d9e2ed5a06431d10",
+      "bytes": 25691
+    },
+    {
+      "path": "evidence/s2-007-run-a.json",
+      "sha256": "19d45cdee1d79312ec8d0140dd5a39224a64f52eb801c30a2751302013fbbc40",
+      "bytes": 48155
+    },
+    {
+      "path": "evidence/s2-007-run-b.json",
+      "sha256": "df971949045aa730fccaaf3ab0d3332644a78956273d1bca4c5e4a03e2a22104",
+      "bytes": 48159
+    },
+    {
+      "path": "evidence/s2-007-security-probes.json",
+      "sha256": "1b01c6576ca4029c5a4497b43c5e974f619550c4a3161bc967ed32ac6eab6075",
+      "bytes": 114257
+    },
+    {
+      "path": "evidence/s2-007-summary.json",
+      "sha256": "1fe737808997c897af4cd0dd0077988f80d5f46958b5cb8390466840c8e98856",
+      "bytes": 41376
+    },
+    {
       "path": "evidence/synthetic-smoke.json",
       "sha256": "0d44647e94b784c41ff32cdf73afac8ec350c2829e1e333587d3171d4fd0511b",
       "bytes": 873
@@ -2287,6 +2382,11 @@
       "bytes": 1282
     },
     {
+      "path": "migrations/0008_agent_board.sql",
+      "sha256": "3c021cec4b5b5b9f877d85cdd77065e5fa1d4e8bfc4ff65cde242997cfd4c7d7",
+      "bytes": 20677
+    },
+    {
       "path": "next.config.ts",
       "sha256": "6e05adeabf1bc550afa5b78640a6c9a59dfba4c5bdc9c09423573053e80b9d2f",
       "bytes": 248
@@ -2298,8 +2398,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "5e954c37802223638ecd54d0fe2883fa06f487e0b695360e7724b6a4212175bf",
-      "bytes": 4835
+      "sha256": "df4b778255f03135d2ef0a4184296b1361bdc3de44a6a032b6be82c25999f464",
+      "bytes": 5417
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -2363,8 +2463,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "4cde5f1927e59372fd1bcaf8432be3a5b68e60f50ae3ff3fa7da6a29a61084d2",
-      "bytes": 8104
+      "sha256": "26957cb5e1412333bee3502a5b595cc900d0ead8740756200ca086cc2f313cf9",
+      "bytes": 9385
     },
     {
       "path": "results/s2-002/run-a/observations.json",
@@ -2532,6 +2632,11 @@
       "bytes": 1925
     },
     {
+      "path": "scripts/generate-board-types.mjs",
+      "sha256": "befa8bd49f4e6516bfb9f0b4f991831fe86f834f2ec8d91c910f0ee7bf242025",
+      "bytes": 9583
+    },
+    {
       "path": "scripts/generate-claim-types.mjs",
       "sha256": "11a4e68c993affb617df3d1bc28e11689f7100ee79c5b0dc882b5951caad4d74",
       "bytes": 5733
@@ -2647,6 +2752,26 @@
       "bytes": 11459
     },
     {
+      "path": "scripts/s2-007-db-replay-executor.mjs",
+      "sha256": "baa1b4c7bcb93c16f875ce463371bf8b35cd6af0aeeaea607d049fca24252a38",
+      "bytes": 79363
+    },
+    {
+      "path": "scripts/s2-007-db-replay.mjs",
+      "sha256": "5c50ccea8583bad1734f6465f7f35a7fd7df6be4b43e8681995a27d5a3baa2fa",
+      "bytes": 64097
+    },
+    {
+      "path": "scripts/s2-007-run.mjs",
+      "sha256": "80fbca4d8b51400ab56918d3bd1e76ffa3db26a8a4061225748badd18b2ee78d",
+      "bytes": 105906
+    },
+    {
+      "path": "scripts/s2-007-security-probes.mjs",
+      "sha256": "9f62b56726610c624b5079b04db6279e649c84cd27c35cf8493f393968a342f9",
+      "bytes": 20024
+    },
+    {
       "path": "scripts/security-probes.mjs",
       "sha256": "4a3e95b1559308e0b90397e7997c866872cbdb03bc1c081d7601766248e729df",
       "bytes": 21139
@@ -2742,14 +2867,39 @@
       "bytes": 23584
     },
     {
+      "path": "scripts/verify-s2-007-dependencies.mjs",
+      "sha256": "7dc64803f525be0b5c54270f62f53364688c3e14e8a5543f5090ff2e31590d4a",
+      "bytes": 48569
+    },
+    {
+      "path": "scripts/verify-s2-007.mjs",
+      "sha256": "cdaccb4e40bc493dd377359aea72079218008e1b0199f8079526b14c09843605",
+      "bytes": 79787
+    },
+    {
       "path": "scripts/verify.mjs",
       "sha256": "eb4c6975786c78a96695ffe3b9ea6bd500011a2d255eacb2d02a10b01ffe0a14",
       "bytes": 10022
     },
     {
+      "path": "scripts/veritas-board-cli.mjs",
+      "sha256": "f24b6034fd6a12a5eb86139c8cb309bdf7bfbbffb533307729aecf500e30225b",
+      "bytes": 14966
+    },
+    {
       "path": "scripts/veritas-cli.mjs",
       "sha256": "962bbfa219f9e38b485d7f5d0ae928a555d3b38ff9994189ec5908cf2c5fc4d9",
       "bytes": 1129
+    },
+    {
+      "path": "src/app/api/agent-board/[...path]/route.ts",
+      "sha256": "fdde2a13402cfb6551d83d5dd4c3d199d5ac4faedfb1269b2f2d2795c0ed2be1",
+      "bytes": 1069
+    },
+    {
+      "path": "src/app/api/agent-board/route.ts",
+      "sha256": "22c5dd9e629fac9a071f4a683cb71b985d9fa73cc0f8d2513a3bc6ead426b656",
+      "bytes": 3937
     },
     {
       "path": "src/app/api/board/route.ts",
@@ -2795,6 +2945,71 @@
       "path": "src/db/schema.ts",
       "sha256": "c09866bdd93a6cfa4eaf180b32f6acf569fe2daf1f9f48c043fa808c84c36cf5",
       "bytes": 1134
+    },
+    {
+      "path": "src/lib/agentboard/adapters.mjs",
+      "sha256": "d4068c2fdccc44e096b633a899ed06a7f5df52c1c544d60ba24c9c461e783438",
+      "bytes": 81545
+    },
+    {
+      "path": "src/lib/agentboard/commands.mjs",
+      "sha256": "06ad73bb268d0190bce7df4240d2096346dfc65a3025c4b3606701eead0b71ae",
+      "bytes": 106290
+    },
+    {
+      "path": "src/lib/agentboard/constants.mjs",
+      "sha256": "bb87414752d736604300c447ce079123a70d76556a3272c937b1c828314882ff",
+      "bytes": 8290
+    },
+    {
+      "path": "src/lib/agentboard/contracts.d.ts",
+      "sha256": "76dc9eea0414100c93a16d5769b573495b06408164f45ae9b45863a0f8002b34",
+      "bytes": 8034
+    },
+    {
+      "path": "src/lib/agentboard/contracts.mjs",
+      "sha256": "d315c6f584f319e7732ef8130234327b03e8e3a227830652a9fb50b20a3708fd",
+      "bytes": 9004
+    },
+    {
+      "path": "src/lib/agentboard/errors.mjs",
+      "sha256": "6c17faf13d87c06f2b7c415630c9c8bf7e966a80b0fda1db819138ff211b92e1",
+      "bytes": 10760
+    },
+    {
+      "path": "src/lib/agentboard/http.d.mts",
+      "sha256": "6154a7c98c550a7f0d16de5d86737dc17b05a668813e713b34ad1520efbe6851",
+      "bytes": 4094
+    },
+    {
+      "path": "src/lib/agentboard/http.mjs",
+      "sha256": "82c58110ce8a573db5e64df17942d24207ced292e6ad7d25667c5952c79b22c3",
+      "bytes": 36119
+    },
+    {
+      "path": "src/lib/agentboard/next-transport.ts",
+      "sha256": "e0becd1837ec70fcfba004eebbceec85a8baecf6c605cbb65b3f66654f5316e4",
+      "bytes": 4472
+    },
+    {
+      "path": "src/lib/agentboard/policy.mjs",
+      "sha256": "17ec9bac65c9e23829a2666a62f9b26b8ab64e2602dcff9c27e35847d293337e",
+      "bytes": 74769
+    },
+    {
+      "path": "src/lib/agentboard/probes.mjs",
+      "sha256": "3a48dcc7019743d87724bc798aaf45d91d5ccb8663b5becee80899e1367a8363",
+      "bytes": 161931
+    },
+    {
+      "path": "src/lib/agentboard/scheduler.mjs",
+      "sha256": "baf36a1e93f9f32b4c5e2212d18a67dbf44ef0bfd79e11c02c0633c126b8ebf1",
+      "bytes": 72800
+    },
+    {
+      "path": "src/lib/agentboard/store.mjs",
+      "sha256": "748d08f6f84541d23aec680c3b7f4409cf96484e6f022eb4c537bf2fd685069a",
+      "bytes": 178763
     },
     {
       "path": "src/lib/board.ts",
@@ -3085,6 +3300,61 @@
       "path": "tasks/S2-006M_MODEL_ASSISTED_PILOT.md",
       "sha256": "6121be67aa958d0593084dbb06e932d9151220d015b33858749203c4f7910225",
       "bytes": 10465
+    },
+    {
+      "path": "tests/agentboard/concurrency.test.mjs",
+      "sha256": "b748e9e924870d623c38fc86a136aa9139a64067d39adf56d250f65f929b7719",
+      "bytes": 39698
+    },
+    {
+      "path": "tests/agentboard/contracts-drift.test.mjs",
+      "sha256": "d40245fb5fc87b9e19fec2f40db5829f1cd83de3326839be623047e7fccce98b",
+      "bytes": 19755
+    },
+    {
+      "path": "tests/agentboard/contracts.test.mjs",
+      "sha256": "8ea5a3a76603f9e44de5a2ba988add7f51ccb264f7c2b9d83a0c16c20540bdca",
+      "bytes": 32078
+    },
+    {
+      "path": "tests/agentboard/execution-callbacks.test.mjs",
+      "sha256": "da7587694708ecbe193594e6efe18d82ba64f4701bc645f443af77cbf167c5e1",
+      "bytes": 40399
+    },
+    {
+      "path": "tests/agentboard/idempotency.test.mjs",
+      "sha256": "95c0572a0867721be2efba535ef5071c192d44f3d4ceeeec06537d8ddc3a991e",
+      "bytes": 35818
+    },
+    {
+      "path": "tests/agentboard/injection.test.mjs",
+      "sha256": "edb86927d08bd8ab718d6844f643fa990641f1c9e1fd7fa0d894c34dcd9c9f7c",
+      "bytes": 35959
+    },
+    {
+      "path": "tests/agentboard/lease.test.mjs",
+      "sha256": "d25c1be6b9651d4ae5a9072aa312be60291258eaccbf683145d41e8941ea00d5",
+      "bytes": 51369
+    },
+    {
+      "path": "tests/agentboard/policy.test.mjs",
+      "sha256": "ceaeb2cdff9c3fd7b6b5f2950bff522b88f94d57af36786c97977c1601782970",
+      "bytes": 43160
+    },
+    {
+      "path": "tests/agentboard/recovery.test.mjs",
+      "sha256": "e6a079418cc21ea52b7b9fb544403eac3858666a94ad23443fb2d3f57ddace3c",
+      "bytes": 53466
+    },
+    {
+      "path": "tests/agentboard/summary-aggregator.test.mjs",
+      "sha256": "23ca89759ef296ae49672b232684d6e9ec71643acd6f18d6692a26bdafbfbc7c",
+      "bytes": 36885
+    },
+    {
+      "path": "tests/agentboard/transitions.test.mjs",
+      "sha256": "3871f17c7c0bb0479516111a2a979e96730d30dd1fa55db8a5be7a229e949a78",
+      "bytes": 16153
     },
     {
       "path": "tests/claims/contracts.schemas.test.mjs",

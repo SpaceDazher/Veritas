@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 692.
+Generated from `git ls-files`; count: 746.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -9,10 +9,14 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `AGENTS.md`
 - `CLAUDE.md`
 - `contracts/acceptance-cases.schema.json`
+- `contracts/adapter-registration.schema.json`
 - `contracts/adjudication-record.schema.json`
 - `contracts/annotation-manifest.schema.json`
 - `contracts/annotation-set.schema.json`
 - `contracts/authorization-decision.schema.json`
+- `contracts/board-error.schema.json`
+- `contracts/board-task.schema.json`
+- `contracts/board-transition.schema.json`
 - `contracts/calibration-record-v2.schema.json`
 - `contracts/calibration-record.schema.json`
 - `contracts/calibration-report.schema.json`
@@ -26,8 +30,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `contracts/connector-error.schema.json`
 - `contracts/content-segment.schema.json`
 - `contracts/corpus-case.schema.json`
+- `contracts/dispatch-decision.schema.json`
 - `contracts/evidence-edge.schema.json`
 - `contracts/evidence-map.schema.json`
+- `contracts/execution-event.schema.json`
+- `contracts/execution-request.schema.json`
+- `contracts/execution-result.schema.json`
 - `contracts/expert-lens.schema.json`
 - `contracts/expert-profile.schema.json`
 - `contracts/fetch-request.schema.json`
@@ -367,6 +375,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006E-ENGINEERING-CLOSURE.md`
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
+- `docs/decisions/S2-007-EVALUATION-REPORT.md`
 - `docs/DEVELOPMENT.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
 - `docs/ingestion/S2-003-PROVENANCE-AND-RETENTION.md`
@@ -379,6 +388,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
 - `docs/security/S2-002-SANDBOX-PROFILE.md`
 - `docs/security/S2-002-THREAT-MODEL.md`
+- `docs/stages/S2-007.md`
 - `docs/stages/stage-1.md`
 - `eslint.config.mjs`
 - `evidence/clean-checkout.json`
@@ -452,6 +462,15 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-006-summary.json`
 - `evidence/s2-006m-intake.json`
 - `evidence/s2-006m-provider-pilot.json`
+- `evidence/s2-007-comparison.json`
+- `evidence/s2-007-db-comparison.json`
+- `evidence/s2-007-db-run-a.json`
+- `evidence/s2-007-db-run-b.json`
+- `evidence/s2-007-dependency-binding.json`
+- `evidence/s2-007-run-a.json`
+- `evidence/s2-007-run-b.json`
+- `evidence/s2-007-security-probes.json`
+- `evidence/s2-007-summary.json`
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
@@ -462,6 +481,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `migrations/0005_verifier_store.sql`
 - `migrations/0006_verifier_acl.sql`
 - `migrations/0007_verifier_store_hardening.sql`
+- `migrations/0008_agent_board.sql`
 - `next.config.ts`
 - `package-lock.json`
 - `package.json`
@@ -511,6 +531,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/check-public-artifacts.mjs`
 - `scripts/cleanup-smoke.ts`
 - `scripts/collect-baseline.py`
+- `scripts/generate-board-types.mjs`
 - `scripts/generate-claim-types.mjs`
 - `scripts/generate-contracts.py`
 - `scripts/generate-docs.py`
@@ -534,6 +555,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-006-db-replay.mjs`
 - `scripts/s2-006-run.mjs`
 - `scripts/s2-006m-pilot.mjs`
+- `scripts/s2-007-db-replay-executor.mjs`
+- `scripts/s2-007-db-replay.mjs`
+- `scripts/s2-007-run.mjs`
+- `scripts/s2-007-security-probes.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
@@ -553,8 +578,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-s2-005.mjs`
 - `scripts/verify-s2-006-dependencies.mjs`
 - `scripts/verify-s2-006.mjs`
+- `scripts/verify-s2-007-dependencies.mjs`
+- `scripts/verify-s2-007.mjs`
 - `scripts/verify.mjs`
+- `scripts/veritas-board-cli.mjs`
 - `scripts/veritas-cli.mjs`
+- `src/app/api/agent-board/[...path]/route.ts`
+- `src/app/api/agent-board/route.ts`
 - `src/app/api/board/route.ts`
 - `src/app/api/capabilities/route.ts`
 - `src/app/api/health/route.ts`
@@ -564,6 +594,19 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/components/workspace.tsx`
 - `src/db/index.ts`
 - `src/db/schema.ts`
+- `src/lib/agentboard/adapters.mjs`
+- `src/lib/agentboard/commands.mjs`
+- `src/lib/agentboard/constants.mjs`
+- `src/lib/agentboard/contracts.d.ts`
+- `src/lib/agentboard/contracts.mjs`
+- `src/lib/agentboard/errors.mjs`
+- `src/lib/agentboard/http.d.mts`
+- `src/lib/agentboard/http.mjs`
+- `src/lib/agentboard/next-transport.ts`
+- `src/lib/agentboard/policy.mjs`
+- `src/lib/agentboard/probes.mjs`
+- `src/lib/agentboard/scheduler.mjs`
+- `src/lib/agentboard/store.mjs`
 - `src/lib/board.ts`
 - `src/lib/claims/contracts.d.ts`
 - `src/lib/claims/contradiction.mjs`
@@ -622,6 +665,17 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md`
 - `tasks/S2-006E_ENGINEERING_CLOSURE.md`
 - `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
+- `tests/agentboard/concurrency.test.mjs`
+- `tests/agentboard/contracts-drift.test.mjs`
+- `tests/agentboard/contracts.test.mjs`
+- `tests/agentboard/execution-callbacks.test.mjs`
+- `tests/agentboard/idempotency.test.mjs`
+- `tests/agentboard/injection.test.mjs`
+- `tests/agentboard/lease.test.mjs`
+- `tests/agentboard/policy.test.mjs`
+- `tests/agentboard/recovery.test.mjs`
+- `tests/agentboard/summary-aggregator.test.mjs`
+- `tests/agentboard/transitions.test.mjs`
 - `tests/claims/contracts.schemas.test.mjs`
 - `tests/claims/contracts.types.test.mjs`
 - `tests/claims/dependency-binding.test.mjs`
