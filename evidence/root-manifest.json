@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "b1eb6e1e7fdc7c5d9adf2a1bc36881b4ab02a402",
-  "sourceTree": "8e55c56eb5850403f2ae79c02f51f4bcaf9cbb15",
-  "trackedFileCount": 768,
-  "manifestFileCount": 763,
-  "payloadManifestSha256": "70ea624b15ce96b6b003fb61e03ca70fa19f19c4774dbaf51f43df62a9f76722",
-  "fileManifestSha256": "122ccae771c75deb4c1827f6eb0347f439b0d7ed0e8e56551f07570585c3709f",
+  "sourceCommit": "e2d4a2cfaa645c4cbec796ec049808bba12dca1e",
+  "sourceTree": "75a9b9a36bca6552f928311ef53d946e3584282a",
+  "trackedFileCount": 769,
+  "manifestFileCount": 764,
+  "payloadManifestSha256": "70e37e601e5002efd8584ff53781fab870c772fd04ef820071ff724f0ef6fc25",
+  "fileManifestSha256": "cea7548e1751bab0fab4afd5f57e60feef94e7c2354f11f3c60457da22e61293",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1837,6 +1837,11 @@
       "bytes": 18062
     },
     {
+      "path": "docs/decisions/S2-002-NON-WINDOWS-HOST-ANALYSIS.md",
+      "sha256": "892481930232ba32002a627c834f92f8e9c9b77168d73057e87664fe786f47b7",
+      "bytes": 10586
+    },
+    {
       "path": "docs/decisions/S2-002-TEST-REVIEW-LOG.md",
       "sha256": "ba24033e2e838215ec20cd8a13e97a54f3ab2204f00055167792b283c0e4f28f",
       "bytes": 6678
@@ -1888,8 +1893,8 @@
     },
     {
       "path": "docs/decisions/S2-007-EVALUATION-REPORT.md",
-      "sha256": "2ce1b8faa6854b99cb01d422a374e1efbb2936821151a82ff96c9fa23b51f67c",
-      "bytes": 58585
+      "sha256": "544cc08f1261b58f5acb6419b75986365ddb2cb5c9c9f6877ef797e360e8a388",
+      "bytes": 61436
     },
     {
       "path": "docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md",
@@ -1958,8 +1963,8 @@
     },
     {
       "path": "docs/stages/S2-007.md",
-      "sha256": "6d6897a240379fb24461b9d8c7a8c99353ae465d1cf88129193d68241cb2c705",
-      "bytes": 7497
+      "sha256": "3af4ebc1d0f85122da114401ade48488ff8f064fda1bd58cf95f1bf181712603",
+      "bytes": 11024
     },
     {
       "path": "docs/stages/stage-1.md",
@@ -2498,8 +2503,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "519c5adae9636a20a04a045bbfd6ec4856df35769c94297e3960bc49cb71d967",
-      "bytes": 10334
+      "sha256": "09a5e582411c9861e6356464a66f4f71618012fd17c9d644a169a97b7e476a18",
+      "bytes": 10907
     },
     {
       "path": "results/s2-002/run-a/observations.json",
