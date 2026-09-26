@@ -171,6 +171,13 @@ The new evidence file is deliberately **not** in the frozen integrity manifest
 tree, so it is a per-run observation record rather than a reproducible digest.
 The verification code is frozen; the observation it produces is evidence.
 
+Ordering matters when running the gates: `npm run test:security-probes` and
+`npm run verify:s2-002` regenerate their own reports by design, and the A–K
+report is inside the frozen manifest, so run `node scripts/validate-contracts.mjs`
+on a pristine checkout, and re-freeze (`--freeze`) only after a deliberate
+evidence regeneration on the target platform. A probe-G detail line produced on
+POSIX is not the Windows record.
+
 The S2-002 hard gates are unchanged and still enforced at zero:
 `cross_tenant_success`, `authority_expansion`, `fs_network_secret_escapes`,
 `survivors_after_cancellation`, `allow_after_revocation_commit`,
