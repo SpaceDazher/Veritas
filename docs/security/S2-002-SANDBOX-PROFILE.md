@@ -68,13 +68,51 @@ and by both frozen replay runs.
   controls: `cwd` inside the workspace, filtered environment, non-detached
   spawn, hidden window, per-profile `max_processes` (violations rejected
   with `LIMIT_PROCESSES`), `timeout_ms`.
-- Cancellation and timeouts capture descendants before termination, use
-  direct `SIGKILL` plus `taskkill /T /F` on Windows (process-group kill on
-  POSIX), and retry addressable survivors. Terminal survivor proof queries
-  the Windows process table rather than relying on `process.kill(pid, 0)`.
-  Query/termination failures remain non-zero (fail-closed). A
-  grandchild spawned via `start /b` is reaped; timeout and cancellation
-  produce terminal outcomes (`timeout` / `cancelled`), never `success`.
+- Cancellation and timeouts capture the tree **before** the root is
+  terminated, because once the parent exits the OS re-parents descendants and
+  a post-kill parent walk can no longer prove the original tree is gone.
+- Termination is a **proven** claim, never an assumed one (issue #41). The
+  adapter re-observes the OS process table and returns exactly one of:
+  - `TERMINATED` — observed, nothing of the tracked tree is left alive;
+  - `SURVIVORS_REMAINING` — observed, at least one tracked pid is alive;
+  - `UNVERIFIED` — the process table could not be read, so the tree shape or
+    its liveness is unknown.
+  `terminated: true` is emitted only for `TERMINATED`. `survivors` is a
+  non-negative count, or `null` for `UNVERIFIED` — never `0` for an
+  unobserved tree.
+- `src/lib/identity/process-observer.mjs` is the only source of truth about
+  what is still running. Windows uses `Win32_Process` (CIM); Linux reads
+  `/proc`; other POSIX hosts fall back to `ps -A`. A failed query is
+  `observable: false`, never an empty result.
+- On POSIX the probe child is spawned as a **process-group leader**
+  (`detached: true` → `setsid`), so a group-directed `SIGKILL` reaches every
+  descendant that stays in the group. Windows keeps `detached: false` because
+  `taskkill /T` walks the parent chain.
+- Group and session membership is tracked as a tree edge of its own, which is
+  what catches a descendant that deliberately left the group with `setsid(2)`
+  — the POSIX counterpart of Windows `start /b` — and its own children, which
+  are re-parented to init when their parent dies. Session/pgroup expansion is
+  only used when the root is genuinely isolated from the adapter's own session
+  and process group, so it can never sweep in unrelated host processes.
+- Tracked pids carry their `/proc` starttime as an identity token. A recycled
+  pid is reported as `SBX_PID_REUSED` and is never signalled and never counted
+  as a survivor.
+- A descendant that inherits the child's stdout/stderr pipes keeps Node's
+  `close` event from firing, so such a run cannot be reported as `completed`
+  before the descendant is gone; it terminates as `timeout` with a proven,
+  empty tree.
+- Per-profile `max_processes`, `LIMIT_PROCESSES`, and terminal outcomes
+  (`timeout` / `cancelled`) round out the lifecycle control. A grandchild
+  spawned via `start /b` or `setsid` is reaped; timeout and cancellation never
+  produce `success`.
+
+Coverage for this control is platform-specific by construction: the live cases
+in `tests/identity/cancellation-process-tree.test.mjs` and
+`scripts/verify-s2-002-cancellation-v2.mjs` spawn a real descendant that
+leaves the child's process group, check the independent liveness of the pids
+that descendant published, and include two negative controls for unavailable
+process observation. `npm run verify:s2-002-cancellation` publishes the
+versioned evidence `evidence/s2-002-cancellation-v2.json`.
 
 The Podman backend additionally enforces rootless execution, UID 65534,
 read-only rootfs, all capabilities dropped, `no-new-privileges`, seccomp,
@@ -102,8 +140,11 @@ mounts, no environment injection, loopback-only networking, 32 PIDs,
 ### 2.6 Lifecycle semantics (enforced)
 
 - Every run ends in exactly one terminal state: `completed`, `failed`,
-  `timeout`, `cancelled` or `BLOCKED_SANDBOX`. There is no `success` state
-  and no unknown-outcome path; unknown outcomes would fail closed.
+  `timeout`, `cancelled` or `BLOCKED_SANDBOX`. There is no `success` state.
+- Every terminal state carries a termination proof (`TERMINATED`,
+  `SURVIVORS_REMAINING` or `UNVERIFIED`) and the observation source that
+  produced it. An unknown outcome is a valid state, but it fails closed: it
+  never becomes a success.
 
 ## 3. What this sandbox is NOT (honest boundary statement)
 

@@ -231,12 +231,16 @@ async function probeF() {
   return { detected, detail: outcomes.map((o) => `${o.decision}(${o.reasonCodes.join('|')})`).join('; ') };
 }
 
-// G: child process surviving cancellation/timeout (live, Windows).
+// G: child process surviving cancellation/timeout (live, every platform).
+// The probe child spawns a descendant that leaves the child's process group —
+// `start /b` on Windows, setsid(2) on POSIX — so a group- or parent-only kill
+// provably cannot reach it. Both the cancellation proof and the independent
+// liveness of the descendant's own pid are checked; a second, negative-control
+// case proves that an observer which cannot see the process table produces a
+// fail-closed blocked/unknown outcome rather than a zero-survivor success.
 async function probeG() {
-  if (!IS_WINDOWS) {
-    return { skipped: true, detected: false, detail: 'platform does not expose the Windows process tree; tier remains blocked' };
-  }
   const root = tempRoot();
+  const pidFile = path.join(root, 'descendant.pid');
   const sandbox = createSandbox({
     profile: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 8 } },
     workspaceRoots: [root],
@@ -244,21 +248,78 @@ async function probeG() {
     secrets: SECRETS,
     now: NOW,
   });
-  // The probe child spawns its own descendant via `start`; killing the tree
-  // must reap both. This is the survivor check demanded for cancellation.
-  const { pid, done } = sandbox.startForControlProbe({
-    command: 'cmd.exe',
-    args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-    timeoutMs: 60000,
-  });
-  await new Promise((resolveTimer) => setTimeout(resolveTimer, 500));
+  const readDescendants = () => {
+    try {
+      return fs.readFileSync(pidFile, 'utf8').split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0);
+    } catch {
+      return [];
+    }
+  };
+  const tree = IS_WINDOWS
+    ? { command: 'cmd.exe', args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'] }
+    : {
+      command: '/bin/sh',
+      args: ['-c', `setsid /bin/sh -c 'echo $$ > ${pidFile.split('\\').join('/')}; for i in 1 2 3 4 5 6 7 8 9 10; do sleep 5; done' & sleep 60`],
+    };
+  // The probe child spawns its own descendant via `start`/`setsid`; killing the
+  // tree must reap both. This is the survivor check demanded for cancellation.
+  const { pid, done } = sandbox.startForControlProbe({ ...tree, timeoutMs: 60000 });
+  let descendants = [];
+  for (let attempt = 0; attempt < 40 && descendants.length === 0; attempt += 1) {
+    await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
+    descendants = readDescendants();
+  }
   const cancel = await sandbox.cancel(pid);
   const outcome = await done;
-  const detected = cancel.survivors === 0 && outcome.terminated === true
-    && (outcome.status === 'cancelled' || outcome.status === 'timeout')
-    && !sandbox.isAlive(pid);
+  const survivorsAlive = descendants.filter((value) => sandbox.isAlive(value));
+  const detected = cancel.proof === 'TERMINATED'
+    && outcome.proof === 'TERMINATED'
+    && cancel.terminated === true
+    && outcome.terminated === true
+    && cancel.survivors === 0
+    && outcome.survivors === 0
+    && outcome.status === 'cancelled'
+    && !sandbox.isAlive(pid)
+    && descendants.length > 0
+    && survivorsAlive.length === 0;
+
+  // Negative control: unavailable process observation must fail closed.
+  const unobservable = {
+    id: 'negative-control:process-table-unavailable',
+    listDescendants: async () => ({ pids: [], observable: false, reason: 'SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE' }),
+    listExisting: async (pids) => ({ alive: pids, observable: false, reason: 'SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE' }),
+    identityFor: (value) => String(value),
+  };
+  const blind = createSandbox({
+    profile: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 8 } },
+    workspaceRoots: [root],
+    artifactRoot: path.join(root, 'artifacts'),
+    secrets: SECRETS,
+    now: NOW,
+    processObserver: unobservable,
+  });
+  const blindRun = blind.startForControlProbe({
+    command: process.execPath,
+    args: ['-e', 'setTimeout(() => {}, 30000)'],
+    timeoutMs: 30000,
+  });
+  await new Promise((resolveTimer) => setTimeout(resolveTimer, 200));
+  const blindCancel = await blind.cancel(blindRun.pid);
+  const blindOutcome = await blindRun.done;
+  const failClosed = blindCancel.proof === 'UNVERIFIED'
+    && blindCancel.terminated === false
+    && blindCancel.survivors === null
+    && blindOutcome.survivors === null
+    && blindOutcome.terminated === false
+    && blindCancel.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE')
+    && blindOutcome.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE');
+
+  const detail = `descendantsObserved=${descendants.length}; cancel.proof=${cancel.proof}; cancel.survivors=${cancel.survivors}; ` +
+    `outcome.proof=${outcome.proof}; outcome.status=${outcome.status}; outcome.survivors=${outcome.survivors}; ` +
+    `descendantAlive=${survivorsAlive.length}; rootAlive=${sandbox.isAlive(pid)}; ` +
+    `negativeControl.proof=${blindCancel.proof}; negativeControl.failClosed=${failClosed}`;
   fs.rmSync(root, { recursive: true, force: true });
-  return { detected, detail: `survivors=${cancel.survivors}; status=${outcome.status}; alive=${sandbox.isAlive(pid)}` };
+  return { detected: detected && failClosed, detail };
 }
 
 // H: stale grant/lease/fencing token after revocation.

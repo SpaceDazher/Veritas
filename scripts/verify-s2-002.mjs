@@ -111,7 +111,7 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
   }
 
   const counterLimitEntries = Object.entries(COUNTER_LIMITS);
-  for (const [label, summary] of runs) {
+  for (const [label, summary, observations] of runs) {
     const counters = summary?.counters;
     if (!counters || typeof counters !== 'object') {
       counterViolations.push(`${label}/missingCounters`);
@@ -119,9 +119,11 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
     }
     for (const [counter, limit] of counterLimitEntries) {
       const value = counters[counter];
-      // Fail closed: a missing or non-finite counter is a violation, never
-      // an implicit pass (NaN comparisons are always false).
-      if (typeof value !== 'number' || !Number.isFinite(value) || value > limit) {
+      // Fail closed: a missing, non-numeric, non-integer or negative counter is
+      // a violation, never an implicit pass. A negative value used to slip
+      // through a `value > limit` test and launder an unobserved process
+      // observation into a zero-survivor pass (issue #41).
+      if (!Number.isInteger(value) || value < 0 || value > limit) {
         counterViolations.push(`${label}/${counter}=${String(value)}`);
       }
     }
@@ -137,6 +139,29 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
     }
     if (summary.corpusDigest !== summaryA?.corpusDigest || summary.corpusDigest !== summaryB?.corpusDigest) {
       counterViolations.push(`${label}/corpusDigestDrift`);
+    }
+    // A zero-survivor cancellation result is only acceptable together with the
+    // termination proof that backs it. An unproven or unavailable process
+    // observation must be reported as blocked/unknown, never as success.
+    for (const observation of observations) {
+      if (!String(observation.trialId ?? '').startsWith('sandbox/cancellation-')) continue;
+      const reported = observation.survivors;
+      if (!Number.isInteger(reported) && reported !== null) {
+        counterViolations.push(`${label}/${observation.trialId}/survivorsNotCountable=${String(reported)}`);
+        continue;
+      }
+      if (reported !== null && reported < 0) {
+        counterViolations.push(`${label}/${observation.trialId}/negativeSurvivors=${String(reported)}`);
+        continue;
+      }
+      if (observation.observed === 'SURVIVORS_ZERO'
+        && (reported !== 0 || observation.terminationProof !== 'TERMINATED' || observation.outcomeProof !== 'TERMINATED')) {
+        counterViolations.push(`${label}/${observation.trialId}/unprovenZeroSurvivorSuccess`);
+      }
+      if (observation.observed === 'BLOCKED_UNVERIFIED'
+        && (reported !== null || observation.terminationProof !== 'UNVERIFIED')) {
+        counterViolations.push(`${label}/${observation.trialId}/unverifiedMustNotCarrySurvivorCount`);
+      }
     }
   }
 

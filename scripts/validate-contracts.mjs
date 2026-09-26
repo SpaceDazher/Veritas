@@ -122,6 +122,11 @@ const frozenTargets = [
   // comparator and security documentation are frozen alongside S2-001 files.
   'src/lib/identity', 'tests/identity', 'docs/security',
   'scripts/s2-002-run.mjs', 'scripts/security-probes.mjs', 'scripts/verify-s2-002.mjs',
+  // S2-002 cancellation verification stage for issue #41. Its evidence file is
+  // deliberately NOT frozen: it records raw pids from a live process tree, so
+  // it is a per-run observation record, not a reproducible digest. The
+  // verification code is frozen; the observation it produces is evidence.
+  'scripts/verify-s2-002-cancellation-v2.mjs',
   'scripts/verify-s2-002-dependencies.mjs', 'scripts/verify-clean-checkout.mjs',
   'scripts/verify-podman-sandbox.mjs', 'scripts/verify-gvisor-sandbox.mjs',
   'scripts/verify-postgres-smoke.mjs', 'scripts/apply-migrations.mjs',

@@ -84,7 +84,7 @@ node scripts/veritas-cli.mjs create "Synthetic planning task"
 | `npm run build` | Production build Next.js. TypeScript проверяется отдельно. |
 | `npm run typecheck` | Строгая проверка TypeScript без emit. |
 | `npm run lint` | ESLint. |
-| `npm test` | Полный Node test suite; S2-002 process-tree tests требуют поддерживаемой OS. |
+| `npm test` | Полный Node test suite; S2-002 process-tree tests наблюдаются на любой поддерживаемой OS. |
 | `npm run test:identity` | Identity, authorization и sandbox tests. |
 | `npm run test:ingestion` | Source ingestion, provenance, dedup и ACL tests. |
 | `npm run test:claims` | Claim graph и invalidation tests. |
@@ -92,6 +92,7 @@ node scripts/veritas-cli.mjs create "Synthetic planning task"
 | `npm run test:verifier` | Независимый semantic verifier, calibration, ACL и crash replay. |
 | `npm run verify:s2-006` | Полный S2-006 gate. Сейчас ожидаемо `BLOCKED_DEPENDENCY` до внешней calibration. |
 | `npm run verify:pilot-binding` | Проверка frozen external Scenario A pilot binding. |
+| `npm run verify:s2-002-cancellation` | Process-tree cancellation: доказанное termination или fail-closed blocked/unknown, с negative control. |
 | `npm run verify:sloqual-001` | SLOQUAL-001: два независимых прогона frozen SLO contract и fail-closed comparator. |
 | `npm run test:sloqual` | Unit-тесты SLO harness: статистика, open-loop, comparator, freeze, сценарии. |
 | `npm run verify:postgres-smoke` | Disposable PostgreSQL smoke test. |
