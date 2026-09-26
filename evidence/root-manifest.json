@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "44f674d205d3bcded7cc1be77d04f98184526145",
-  "sourceTree": "0fbd06708cab915bcdd461fe87742bef833216df",
+  "sourceCommit": "43e69dafe5b35f8e99220d4e7c466d8510e622d6",
+  "sourceTree": "b9055dbeef0e57394337b588c00f75c50cc01a62",
   "trackedFileCount": 720,
   "manifestFileCount": 715,
-  "payloadManifestSha256": "17c0cbb4d40c72c339a8d707475470a5486995b0995cb8fa4526b2b254d94482",
-  "fileManifestSha256": "96ff5b67ca0e6e751cdbe5cb3bd43ce46320395566ef2c048cfe1f2ad2173f7d",
+  "payloadManifestSha256": "55455543df1973de875d13eca91c54557fc3e731eb16344320d5989bde104abb",
+  "fileManifestSha256": "4c07dbf7318dbf35763498f41523d29860489d814cdf3e7d4fe25f5c0ed4ecb5",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2028,13 +2028,13 @@
     },
     {
       "path": "evidence/s2-002-cancellation-v2-integrity.json",
-      "sha256": "9a028e9f3300824476f7aed25d58614a66c00f7511f95b13252340b5dc638e05",
+      "sha256": "4fd525fe3ec761cc34a5a05180a764febdd214a2b4e94423190645f4047c233a",
       "bytes": 260
     },
     {
       "path": "evidence/s2-002-cancellation-v2.json",
-      "sha256": "0bb7c0d2a9b7a37f1855f57ef81156deef310f8c3728f9d803baaa72a2c095a0",
-      "bytes": 4666
+      "sha256": "4d57c08fabe9f418e740ccf69cc98e9eb4c7df3dc8b5882e5b5f9886e75134c7",
+      "bytes": 4683
     },
     {
       "path": "evidence/s2-002-comparison-integrity.json",
@@ -2753,8 +2753,8 @@
     },
     {
       "path": "scripts/verify-s2-002-cancellation-v2.mjs",
-      "sha256": "40e1883cac6a36968888f432780a962e764a0e11418bcb8afae3cb82cb5ba12a",
-      "bytes": 16313
+      "sha256": "5aaccf82f165adbd5b71ee750aadeb4329d4a4ad064a76868cd5b85462af30bf",
+      "bytes": 17254
     },
     {
       "path": "scripts/verify-s2-002-dependencies.mjs",
