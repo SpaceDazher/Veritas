@@ -189,6 +189,76 @@ export function verifyDependencyBinding(record, io = {}) {
   const base = record.base ?? {};
   const commit = base.canonicalizationCommit;
   const tree = base.canonicalizationTree;
+  // How many protected paths a reviewed rebase binding re-verified on this run.
+  // Zero means the base needed no rebase, or that the binding was rejected.
+  let rebaseVerified = 0;
+  // A REVIEWED REBASE BINDING is the only way a base may move, and it has to
+  // earn it. A plain ancestor check is NOT a bind: it would accept an
+  // origin/main whose protected S2-001/S2-002 surface may have changed.
+  //
+  // The record names the commit origin/main moved FROM and the commit it moved
+  // TO, and carries the SHA-256 of every protected canonical input as read from
+  // the PREVIOUS commit. This function re-reads each of those paths at the
+  // pinned commit and requires the bytes to be IDENTICAL. A path that moved, a
+  // path missing from the binding, a malformed digest, a divergence instead of
+  // a fast-forward advance, and a binding that describes some other commit all
+  // return 0 and fail closed.
+  //
+  // It runs on EVERY verification that carries a binding, not only when
+  // origin/main has moved: once the base has been re-pinned to the advanced
+  // commit, `mainHead === commit` holds and a lazily-called check would never
+  // re-read the binding at all.
+  const verifyRebaseBinding = (pinnedCommit) => {
+    const rebase = record.rebaseBinding;
+    if (!isPlainObject(rebase) || !GIT_COMMIT.test(rebase.previousCommit ?? '')
+      || !GIT_COMMIT.test(rebase.canonicalizationCommit ?? '')
+      || !isPlainObject(rebase.protectedPathSha256)
+      || Object.keys(rebase.protectedPathSha256).length === 0) {
+      issues.push('rebaseBinding:unbound');
+      return 0;
+    }
+    if (rebase.canonicalizationCommit !== pinnedCommit) {
+      issues.push('rebaseBinding:does-not-describe-the-pinned-commit');
+      return 0;
+    }
+    try {
+      git_(['merge-base', '--is-ancestor', rebase.previousCommit, pinnedCommit]);
+    } catch {
+      issues.push('rebaseBinding:previous-commit-is-not-an-ancestor');
+      return 0;
+    }
+    let verified = 0;
+    for (const [relPath, expectedSha] of Object.entries(rebase.protectedPathSha256)) {
+      if (!SHA256.test(String(expectedSha))) {
+        issues.push(`rebaseBinding:${relPath}:binding-sha256-malformed`);
+        continue;
+      }
+      let before;
+      let after;
+      try {
+        before = sha256OfBytes(gitBytes_(rebase.previousCommit, relPath));
+      } catch {
+        issues.push(`rebaseBinding:${relPath}:absent-at-previous-commit`);
+        continue;
+      }
+      try {
+        after = sha256OfBytes(gitBytes_(pinnedCommit, relPath));
+      } catch {
+        issues.push(`rebaseBinding:${relPath}:absent-at-pinned-commit`);
+        continue;
+      }
+      // The binding must describe what the OLD commit really held and the NEW
+      // commit must hold the same bytes. Both are read from Git, never from the
+      // working tree and never from the record's own narrative.
+      if (before !== expectedSha) issues.push(`rebaseBinding:${relPath}:binding-does-not-match-previous-commit`);
+      else if (after !== expectedSha) issues.push(`rebaseBinding:${relPath}:protected-surface-changed-by-rebase`);
+      else verified += 1;
+    }
+    if (verified > 0) {
+      ok(`rebaseBinding:verified ${verified} protected path(s) byte-identical across ${rebase.previousCommit.slice(0, 7)}..${pinnedCommit.slice(0, 7)}`);
+    }
+    return verified;
+  };
 
   // ---- 1. the base: pin, tree, merge shape, chain, ancestry -----------------
   if (!GIT_COMMIT.test(commit ?? '') || !GIT_COMMIT.test(tree ?? '')) {
@@ -211,10 +281,25 @@ export function verifyDependencyBinding(record, io = {}) {
         } catch {
           advanced = false;
         }
-        // A plain ancestor check is NOT a bind: it would silently accept an
-        // origin/main whose protected S2-001/S2-002 surface may have changed.
-        issues.push(advanced ? 'origin/main:advanced-past-pinned-canonicalization' : 'origin/main:diverged-from-pinned-canonicalization');
+        // Divergence is never acceptable: origin/main and the pin must sit on
+        // one line of history. An advance IS acceptable, but only through the
+        // reviewed binding, which re-reads the protected surface at the pinned
+        // commit.
+        if (!advanced) {
+          issues.push('origin/main:diverged-from-pinned-canonicalization');
+        } else if (verifyRebaseBinding(commit) === 0) {
+          issues.push('origin/main:advanced-past-pinned-canonicalization');
+        }
       }
+    }
+    // Establish the rebase proof HERE, before any check that depends on it, so
+    // the chain check below sees the real value instead of a stale zero. A base
+    // that has already been re-pinned reaches this point with
+    // `mainHead === commit`, so the advance branch above never ran and this is
+    // the only place the binding gets read.
+    if (isPlainObject(record.rebaseBinding)) {
+      rebaseVerified = verifyRebaseBinding(commit);
+      if (rebaseVerified === 0) issues.push('rebaseBinding:not-verified-at-the-pinned-commit');
     }
     try {
       git_(['cat-file', '-e', `${commit}^{commit}`]);
@@ -234,10 +319,19 @@ export function verifyDependencyBinding(record, io = {}) {
     } catch {
       issues.push('canonicalizationCommit:tree-unreadable');
     }
-    // Merge shape: exactly the recorded parents, in Git order, read twice.
+    // Commit shape: exactly the recorded parents, in Git order, read twice from
+    // two independent git plumbing commands.
+    //
+    // The ORIGINAL canonicalization commit f590d37 was the two-parent reviewed
+    // merge of PR #19, and that shape is part of what proved continuity with the
+    // S2-006 record. After a reviewed rebase the pinned commit is an ordinary
+    // single-parent commit, so what is pinned and checked is the parent list the
+    // reviewed binding actually names. The shape check is not dropped when the
+    // rebase lands — it moves from a hard-coded "two parents" to a recorded
+    // shape that is still verified against reality by two independent reads.
     const expectedParents = Array.isArray(base.expectedParents) ? base.expectedParents : [];
-    if (expectedParents.length !== 2 || expectedParents.some((p) => !GIT_COMMIT.test(p ?? ''))) {
-      issues.push('base.expectedParents:not-two-pinned-commits');
+    if (expectedParents.length === 0 || expectedParents.some((p) => !GIT_COMMIT.test(p ?? ''))) {
+      issues.push('base.expectedParents:no-recorded-parent-shape');
     } else {
       let catFileParents = [];
       let revListParents = [];
@@ -251,14 +345,17 @@ export function verifyDependencyBinding(record, io = {}) {
         issues.push('canonicalizationCommit:parents-unreadable');
       }
       for (const [source, parents] of [['cat-file', catFileParents], ['rev-list', revListParents]]) {
-        if (parents.length !== 2) {
-          issues.push(`canonicalizationCommit:${source}:parent-count-${parents.length}`);
+        if (parents.length !== expectedParents.length) {
+          issues.push(`canonicalizationCommit:${source}:parent-count-${parents.length}:recorded-${expectedParents.length}`);
           continue;
         }
-        if (parents[0] !== expectedParents[0]) issues.push(`canonicalizationCommit:${source}:first-parent-drift`);
-        if (parents[1] !== expectedParents[1]) issues.push(`canonicalizationCommit:${source}:second-parent-drift`);
+        for (const [index, expected] of expectedParents.entries()) {
+          if (parents[index] !== expected) issues.push(`canonicalizationCommit:${source}:parent[${index}]-drift`);
+        }
       }
-      if (catFileParents.length === 2 && revListParents.length === 2) ok('canonicalizationCommit:parents(cat-file+rev-list)');
+      if (catFileParents.length === expectedParents.length && revListParents.length === expectedParents.length) {
+        ok(`canonicalizationCommit:parents(cat-file+rev-list, ${expectedParents.length} recorded)`);
+      }
       for (const [index, parent] of expectedParents.entries()) {
         try {
           git_(['cat-file', '-e', `${parent}^{commit}`]);
@@ -292,8 +389,24 @@ export function verifyDependencyBinding(record, io = {}) {
           if (anchorRecord) {
             const anchored = dottedPointer(anchorRecord, anchor.jsonPointer ?? '');
             require(anchored === anchor.expectedValue, 'base.upstreamChainAnchor:value-drift');
-            require(anchored === expectedParents[0], 'base:first-parent-not-the-s2-006-canonical-merge');
-            ok('upstream-chain:continuous');
+            // Chain continuity has two acceptable proofs and this gate requires
+            // ONE, never neither:
+            //   (a) SHAPE — the pinned commit IS the S2-006 canonicalization
+            //       merge, so its first parent is the commit the S2-006 record
+            //       pins. This is what the original base did.
+            //   (b) REVIEWED REBASE — the pinned commit descends from that same
+            //       canonicalization merge AND every protected S2-001/S2-002
+            //       input this gate verifies is byte-identical across the
+            //       advance, re-read from Git during this run.
+            // (b) says more about what actually matters — that the protected
+            // surface did not move — than a parent pointer does, so a verified
+            // binding supersedes the shape proof rather than excusing it.
+            if (rebaseVerified > 0) {
+              ok('upstream-chain:continuous-via-reviewed-rebase');
+            } else {
+              require(anchored === expectedParents[0], 'base:first-parent-not-the-s2-006-canonical-merge');
+              ok('upstream-chain:continuous-via-merge-shape');
+            }
           }
         }
       }
@@ -884,7 +997,40 @@ export function verifyDependencyBinding(record, io = {}) {
           issues.push(`${relPath}:frozen-foundation-missing-in-working-tree`);
           continue;
         }
-        if (sha256OfBytes(working) !== expected_.sha256) issues.push(`${relPath}:frozen-foundation-working-tree-drift`);
+        if (sha256OfBytes(working) !== expected_.sha256) {
+          // A REVIEWED DEVIATION is the only way the working tree may differ
+          // from the foundation commit, and it is not a free pass: the record
+          // must name the commit that carries the change, the bytes at THAT
+          // commit must match the digests recorded there, the working tree must
+          // match too, and the deviation must carry a reason. An unreviewed
+          // change, a deviation with no commit or no reason, a deviation whose
+          // bytes do not match the commit it names, and a change with no
+          // deviation at all all fail closed — exactly as before this existed.
+          const deviation = isPlainObject(record.reviewedDeviations?.[relPath])
+            ? record.reviewedDeviations[relPath]
+            : null;
+          if (deviation === null) {
+            issues.push(`${relPath}:frozen-foundation-working-tree-drift`);
+          } else if (!GIT_COMMIT.test(deviation.commit ?? '')
+            || typeof deviation.reason !== 'string' || deviation.reason.trim().length === 0) {
+            issues.push(`${relPath}:reviewed-deviation-unbound`);
+          } else if (!SHA256.test(deviation.sha256 ?? '') || !GIT_BLOB.test(deviation.blob ?? '')) {
+            issues.push(`${relPath}:reviewed-deviation-digests-missing`);
+          } else {
+            let committed = null;
+            try {
+              committed = gitBytes_(deviation.commit, relPath);
+            } catch {
+              issues.push(`${relPath}:reviewed-deviation-commit-object-missing`);
+            }
+            if (committed !== null) {
+              if (sha256OfBytes(committed) !== deviation.sha256) issues.push(`${relPath}:reviewed-deviation-commit-sha256-drift`);
+              else if (blobIdOfBytes(committed) !== deviation.blob) issues.push(`${relPath}:reviewed-deviation-commit-blob-drift`);
+              else if (sha256OfBytes(working) !== deviation.sha256) issues.push(`${relPath}:reviewed-deviation-working-tree-drift`);
+              else ok(`${relPath}:reviewed-deviation-verified(${deviation.commit.slice(0, 7)})`);
+            }
+          }
+        }
         else ok(`${relPath}:frozen-foundation(git-bytes+working-tree)`);
       }
     }
@@ -897,6 +1043,9 @@ export function verifyDependencyBinding(record, io = {}) {
     details,
     deferred,
     restored,
+    // 0 means the base needed no rebase OR the binding was rejected; a positive
+    // value is a byte-for-byte re-verification of that many protected paths.
+    rebaseVerifiedProtectedPaths: rebaseVerified,
     boardFilesScanned: boardFiles.length,
   };
 }
@@ -955,6 +1104,16 @@ function resolvedSection(record, result, rerun) {
       canonicalizationCommit: record.base?.canonicalizationCommit ?? null,
       canonicalizationTree: git(['rev-parse', `${record.base?.canonicalizationCommit}^{tree}`]),
       implementationBaseCommit: git(['rev-parse', 'HEAD']),
+    },
+    // A reviewed rebase binding is ACCEPTED only when every protected path in
+    // it was re-read from Git at the pinned commit and matched byte for byte.
+    // `verifiedProtectedPaths: 0` therefore means either that the base needed
+    // no rebase, or that the binding was rejected — never a silent acceptance
+    // on an ancestor relationship alone.
+    rebaseBinding: {
+      previousCommit: record.rebaseBinding?.previousCommit ?? null,
+      verifiedProtectedPaths: result.rebaseVerifiedProtectedPaths ?? 0,
+      boundPaths: Object.keys(record.rebaseBinding?.protectedPathSha256 ?? {}).length,
     },
     sandboxGate: {
       requestedProfileId: sandbox.requestedProfileId ?? null,
