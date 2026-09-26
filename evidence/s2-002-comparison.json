@@ -5,9 +5,14 @@
     "comparedTrials": 283,
     "mismatchedDecisions": 0,
     "mismatches": [],
-    "counterViolations": [],
+    "counterViolations": [
+      "run-a/hardControlNotRun=sandbox/cancellation-survivors",
+      "run-b/hardControlNotRun=sandbox/cancellation-survivors",
+      "run-a/survivors_after_cancellation=null",
+      "run-b/survivors_after_cancellation=null"
+    ],
     "expectedOracleViolations": [],
-    "ok": true
+    "ok": false
   },
   "hardCounterLimits": {
     "cross_tenant_success": 0,

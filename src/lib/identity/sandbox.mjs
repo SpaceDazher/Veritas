@@ -209,8 +209,65 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
   }
 
+  // POSIX descendant enumeration.
+  //
+  // Returning [] here used to be harmless-looking and was not: `cancel()`
+  // derives its survivor count from the descendants it enumerated, so an empty
+  // list on a non-Windows host produced `survivors: 0` while the grandchildren
+  // the child had forked were still running. That is a FALSE PASS, and it is
+  // the defect tracked as SpaceDazher/Veritas#41.
+  //
+  // On Linux the parent of every process is field 4 of /proc/<pid>/stat. That
+  // field sits after the (possibly space- or paren-containing) comm field, so
+  // it is read from the LAST ')' rather than by splitting the whole line.
+  // One full pass builds a parent -> children index, then breadth-first
+  // closure from the root yields the descendants.
+  function posixDescendants(rootPid) {
+    let entries;
+    try {
+      entries = fs.readdirSync('/proc');
+    } catch {
+      return [];
+    }
+    const childrenOf = new Map();
+    for (const entry of entries) {
+      if (!/^\d+$/.test(entry)) continue;
+      const stat = (() => {
+        try {
+          return fs.readFileSync(`/proc/${entry}/stat`, 'utf8');
+        } catch {
+          return null;
+        }
+      })();
+      if (stat === null) continue;
+      const close = stat.lastIndexOf(')');
+      if (close < 0) continue;
+      const ppid = Number(stat.slice(close + 1).trim().split(/\s+/)[1]);
+      if (!Number.isInteger(ppid) || ppid <= 0) continue;
+      if (!childrenOf.has(ppid)) childrenOf.set(ppid, []);
+      childrenOf.get(ppid).push(Number(entry));
+    }
+    const found = [];
+    const seen = new Set([rootPid]);
+    let frontier = [rootPid];
+    // Bounded depth so a cycle in a racy /proc snapshot cannot spin.
+    for (let depth = 0; depth < 64 && frontier.length > 0; depth += 1) {
+      const next = [];
+      for (const parent of frontier) {
+        for (const child of childrenOf.get(parent) ?? []) {
+          if (seen.has(child)) continue;
+          seen.add(child);
+          found.push(child);
+          next.push(child);
+        }
+      }
+      frontier = next;
+    }
+    return found;
+  }
+
   function listDescendants(pid) {
-    if (process.platform !== 'win32') return Promise.resolve([]);
+    if (process.platform !== 'win32') return Promise.resolve(posixDescendants(pid));
     const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
       `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
       `($p | Select-Object -Unique) -join ' '`;

@@ -79,6 +79,10 @@ const CAPABILITY_TRIALS = [
   { trialId: 'nonce/export/replay-with-nonce', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
 ];
 
+// The marker a sandbox control returns when this platform cannot exercise it.
+// Declared once so the producer and every consumer agree.
+const NOT_RUN_PLATFORM = 'PLATFORM_UNSUPPORTED';
+
 const SANDBOX_EXPECTATIONS = Object.freeze([
   ['sandbox/fs-traversal', 'PATH_ESCAPE'],
   ['sandbox/fs-absolute-outside', 'ROOT_VIOLATION'],
@@ -92,7 +96,15 @@ const SANDBOX_EXPECTATIONS = Object.freeze([
   ['sandbox/output-digest-provenance', 'RECORDED'],
   ['sandbox/output-name-escape', 'PATH_ESCAPE'],
   ['sandbox/no-exec-refuses-execution', 'BLOCKED'],
-  ...(IS_WINDOWS ? [['sandbox/fs-junction-escape', 'LINK_ESCAPE']] : []),
+  // Expected on every platform, and attempted whenever the link can be
+  // created. The two used to be scoped differently — the oracle dropped this
+  // trial off Windows while the runner still pushed it (symlinks work on
+  // POSIX), so a Linux run executed a trial the oracle had never heard of and
+  // reported trialCount=283/oracle=282 plus two UNKNOWN_TRIALs. If a host
+  // genuinely cannot create the link the trial is not pushed and the run then
+  // fails closed with missingTrial, which is the correct outcome for a control
+  // that could not be set up.
+  ['sandbox/fs-junction-escape', 'LINK_ESCAPE'],
   ['sandbox/cancellation-survivors', 'SURVIVORS_ZERO'],
 ]);
 
@@ -243,15 +255,32 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
   // Sandbox trials (including the live cancellation probe).
   for (const trial of sandboxSet.trials) {
     const observed = await trial.run();
+    // A control this platform cannot exercise is NOT_RUN: nothing was
+    // violated, and nothing was proven. It used to be recorded as a mismatch
+    // with reason SANDBOX_CONTROL_VIOLATED and a -1 survivor sentinel, which
+    // made a declined measurement look like a safety failure AND fed that -1
+    // into the survivor count and, through `match: false`, into the
+    // filesystem/network secret-escape count.
+    const notRun = observed === NOT_RUN_PLATFORM;
     record({
       trialId: trial.id,
       kind: 'sandbox',
       expected: trial.expected,
       observed,
-      decision: observed === trial.expected ? 'ALLOW' : 'DENY',
-      reasonCodes: [observed === trial.expected ? 'SANDBOX_CONTROL_AS_EXPECTED' : 'SANDBOX_CONTROL_VIOLATED'],
-      survivors: trial.id === 'sandbox/cancellation-survivors' ? (observed === 'SURVIVORS_ZERO' ? 0 : Number(observed?.match(/SURVIVORS_(\d+)/)?.[1] ?? -1)) : undefined,
-      match: observed === trial.expected,
+      // BLOCKED_SANDBOX, not DENY: the tier is unavailable here, so the
+      // honest decision is that the control did not happen.
+      decision: notRun ? 'BLOCKED_SANDBOX' : (observed === trial.expected ? 'ALLOW' : 'DENY'),
+      reasonCodes: [notRun
+        ? 'SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM'
+        : (observed === trial.expected ? 'SANDBOX_CONTROL_AS_EXPECTED' : 'SANDBOX_CONTROL_VIOLATED')],
+      // An unexercised control has no survivor count. `null` is not a number,
+      // so the gate's counter check fails closed on it by construction.
+      survivors: trial.id === 'sandbox/cancellation-survivors'
+        ? (notRun ? null : (observed === 'SURVIVORS_ZERO' ? 0 : Number(observed?.match(/SURVIVORS_(\d+)/)?.[1] ?? -1)))
+        : undefined,
+      notRun,
+      // `null` rather than `false`: not a mismatch, and not a pass either.
+      match: notRun ? null : observed === trial.expected,
     });
   }
   sandboxSet.cleanup();
@@ -289,14 +318,27 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
   }
 
   // Hard counters, computed strictly from recorded observations.
+  // An unexercised control is excluded from the violation counters (its
+  // `match` is null, never false) and the survivor count becomes an explicit
+  // `null` — unmeasured — which the gate rejects. Neither of those can be read
+  // as a pass.
+  const cancellationObservations = observations.filter((o) => o.trialId === 'sandbox/cancellation-survivors');
+  const cancellationMeasured = cancellationObservations.length > 0
+    && cancellationObservations.every((o) => o.notRun !== true);
   const counters = {
+    // Visible, informational: how many sandbox controls this host could not
+    // exercise. Never a substitute for the hard counters.
+    not_run_controls: observations.filter((o) => o.notRun === true).length,
     cross_tenant_success: observations.filter((o) => o.crossTenant && o.decision === 'ALLOW').length,
     authority_expansion: observations.filter((o) => ['DENY', 'BLOCKED_SANDBOX'].includes(o.expected) && o.decision === 'ALLOW' && o.kind !== 'sandbox').length
       + observations.filter((o) => o.kind === 'sandbox' && ['PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE', 'DENIED', 'BLOCKED', 'REDACTED', 'FILTERED', 'SURVIVORS_ZERO'].includes(o.expected) && o.observed === 'ALLOWED').length,
     fs_network_secret_escapes: observations.filter((o) => o.kind === 'sandbox' && o.match === false).length,
-    survivors_after_cancellation: observations
-      .filter((o) => o.trialId === 'sandbox/cancellation-survivors')
-      .reduce((sum, o) => sum + (typeof o.survivors === 'number' ? o.survivors : 1), 0),
+    // `null` when the property was not measured here. The gate requires a
+    // finite non-negative number, so an unmeasured survivor count fails closed
+    // instead of passing as zero.
+    survivors_after_cancellation: cancellationMeasured
+      ? cancellationObservations.reduce((sum, o) => sum + (typeof o.survivors === 'number' ? o.survivors : 1), 0)
+      : null,
     allow_after_revocation_commit: allowAfterCommit,
     missing_or_censored_trials: observations.filter((o) => o.expected === 'ALLOW' && o.decision !== 'ALLOW').length
       + Math.max(0, corpus.length + sandboxSet.trials.length + REVOCATION_TRIALS - observations.length),

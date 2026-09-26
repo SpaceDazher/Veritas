@@ -27,6 +27,11 @@ const COUNTER_LIMITS = Object.freeze({
   missing_or_censored_trials: 0,
 });
 
+// The sandbox trials that back a hard counter. If one of these cannot be
+// exercised on the current platform, the run has not proven the property and
+// the gate must say so instead of passing on an absent measurement.
+const HARD_COUNTER_TRIALS = Object.freeze(new Set(['sandbox/cancellation-survivors']));
+
 const REVOCATION_MIN_TRIALS = 100;
 const REVOCATION_MAX_MS = 5000;
 
@@ -74,6 +79,18 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
         continue;
       }
       seen.add(observation.trialId);
+      // A hard-counter control that this platform could not exercise is NOT a
+      // pass. Without this rule a host could decline the measurement — and the
+      // gate would still be green, which is precisely how a false pass reaches
+      // a record. The tier stays blocked instead.
+      if (observation.notRun === true) {
+        if (HARD_COUNTER_TRIALS.has(observation.trialId)) {
+          counterViolations.push(`${label}/hardControlNotRun=${observation.trialId}`);
+        } else {
+          expectedOracleViolations.push({ run: label, trialId: observation.trialId, reason: 'NOT_RUN_ON_THIS_PLATFORM' });
+        }
+        continue;
+      }
       const oracleExpected = oracle.expectedByTrialId[observation.trialId];
       if (oracleExpected === undefined) {
         expectedOracleViolations.push({ run: label, trialId: observation.trialId, reason: 'UNKNOWN_TRIAL' });
@@ -121,7 +138,13 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
       const value = counters[counter];
       // Fail closed: a missing or non-finite counter is a violation, never
       // an implicit pass (NaN comparisons are always false).
-      if (typeof value !== 'number' || !Number.isFinite(value) || value > limit) {
+      // A counter is a COUNT of observed events, so it must be a finite,
+      // non-negative number. Comparing with `value > limit` alone let any
+      // negative sentinel pass: -1, -9999 and -1e9 were all accepted as a
+      // clean zero, which is how an unmeasured control could be reported as a
+      // passing one. A null counter (an explicitly unmeasured control) and a
+      // negative or non-finite one both fail closed here.
+      if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > limit) {
         counterViolations.push(`${label}/${counter}=${String(value)}`);
       }
     }

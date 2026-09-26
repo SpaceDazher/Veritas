@@ -1,7 +1,7 @@
 # S2-002 on a non-Windows host: three accounting defects, and one of them fails in the permissive direction
 
-**Status: DECIDED by the owner. Nothing in S2-002 was changed, and the Linux gate is
-deliberately left red.** See §6.
+**Status: DECIDED by the owner, and the accounting defects are now FIXED. The Linux gate
+is deliberately still red.** See §6 and §8.
 **Ticket:** [SpaceDazher/Veritas#7](https://github.com/SpaceDazher/Veritas/issues/7) (S2-007 is
 `BLOCKED_DEPENDENCY` on this) and S2-002 itself.
 **Sandbox defect:** [SpaceDazher/Veritas#41](https://github.com/SpaceDazher/Veritas/issues/41) (`bug`).
@@ -185,22 +185,10 @@ available in the owner's Windows copy, and the owner therefore does **not** decl
 gate green. S2-007 remains `engineeringStatus = BLOCKED_DEPENDENCY`, which is the correct
 fail-closed outcome, not a defect to be worked around.
 
-Still unfixed and still untracked by an issue: Defects 1, 2 and 4 — the harness
-accounting defects. They belong to S2-002, so they are the owner's to file or fix. They
-would make a non-Windows run report `NOT_RUN` honestly instead of fabricating a
-violation, and would close the negative-sentinel hole; **none of them turns the gate green
-on Linux**, and fixing them must not be used as a reason to relax the counters:
-
-1. **Give platform-scoped trials a real `NOT_RUN` semantic** instead of scoring them as
-   violations: a distinct not-run state, `decision: 'BLOCKED_SANDBOX'`, reason code
-   `SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM` (never `..._VIOLATED`), exclusion from
-   `fs_network_secret_escapes` and from the survivors sum, and a visible `not_run_trials`
-   count so a skipped hard counter is *reported* rather than fabricated — while leaving
-   `LOCAL_RESTRICTED` blocked. Replace "no probe is silently skipped" with "no probe is
-   skipped **without a recorded reason and a blocked tier**".
-2. **Scope the oracle and the trial set consistently** (Defect 2) and **close the negative
-   sentinel hole** in the gate (Defect 4) — e.g. reject any counter that is not a finite
-   non-negative number, rather than comparing it with `>`.
+Defects 1, 2 and 4 — the harness accounting defects — are now **fixed**; see §8. The
+sandbox defect (Defect 3) is fixed in `src/lib/identity/sandbox.mjs` and tracked as
+[#41](https://github.com/SpaceDazher/Veritas/issues/41). **The gate is still red on Linux,
+by design.**
 
 ## 7. How to reproduce
 
@@ -225,3 +213,44 @@ git worktree add --detach /tmp/veritas-base f590d37   # base has zero S2-007 fil
 ```
 
 No secret, credential or private locator appears in this document.
+
+## 8. The fixes (implemented after the decision, gate still red)
+
+Four defects were closed. The governing constraint was: **the Linux gate must still fail**,
+and it does — for the honest reason, not a fabricated one.
+
+| # | File | Change |
+| --- | --- | --- |
+| 1 | `scripts/s2-002-run.mjs` | A sandbox control this platform cannot exercise is recorded as `notRun: true`, `decision: 'BLOCKED_SANDBOX'`, `reasonCodes: ['SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM']`, `match: null`, `survivors: null`. It is excluded from the violation counters, and a new **informational** `not_run_controls` counter makes the skip visible. `survivors_after_cancellation` is `null` when unmeasured. |
+| 2 | `scripts/s2-002-run.mjs` | `SANDBOX_EXPECTATIONS` no longer drops `sandbox/fs-junction-escape` off Windows, so the oracle matches the trial set the runner builds. A host that genuinely cannot create the link still fails closed with `missingTrial`. |
+| 3 | `scripts/verify-s2-002.mjs` | The counter check now rejects `value < 0` and non-finite values, so no negative sentinel can pass. And an observation with `notRun: true` on a hard-counter trial (`HARD_COUNTER_TRIALS`) pushes `hardControlNotRun=<trialId>` — an unexercised hard control **blocks** the gate instead of passing it. |
+| 4 | `src/lib/identity/sandbox.mjs` | `listDescendants` enumerates POSIX descendants from `/proc/<pid>/stat` (parent read from the field after the last `)`, depth-bounded) instead of returning `[]`. This closes [#41](https://github.com/SpaceDazher/Veritas/issues/41): `cancel()` no longer reports `survivors: 0` while grandchildren are alive. |
+
+Verified on this host:
+
+* A Linux run now produces **283 observations against a 283-trial oracle** — the
+  `trialCount=283/oracle=282` mismatch is gone, and the oracle digest is
+  `a5a63dc0c53c29bcd10003a31179342bc1f3a2fbe0fb39b6c69dbb5ee3eeb7e0`, **identical to the
+  committed Windows digest**. POSIX now matches Windows instead of diverging from it.
+* `fs_network_secret_escapes` is **0** — and now truthfully so, because the declined trial
+  no longer masquerades as an escape. No `match: false` sandbox observation remains.
+* The single not-run control is recorded honestly, with `survivors: null`.
+* `npm run verify:s2-002` **still exits 1**, with the precise reason:
+  `run-a/hardControlNotRun=sandbox/cancellation-survivors`, `run-b/…`,
+  `run-a/survivors_after_cancellation=null`, `run-b/…`. The gate is red because the
+  property is genuinely unmeasured here, and the record now says exactly that.
+* The frozen Windows evidence still verifies from Git bytes:
+  `npm run verify:s2-002-dependencies` → `verified: 4, issues: []`.
+* `tests/identity/**` goes from 149 pass / 6 fail to **157 pass / 0 fail / 1 skipped**, and
+  the full `npm test` from 1103 pass / 6 fail to **1181 pass / 0 fail** (1188 tests,
+  7 skipped).
+* The `cancel()` false success is gone: the same probe that previously reported
+  `survivors: 0` with `2 / 2` descendants alive now reports `0 / 2` alive after cancel —
+  the count is true **and** the tree is actually terminated.
+
+The POSIX fix enumerates and kills descendants individually rather than creating a process
+group, because the child is spawned `detached: false` and switching it to `detached: true`
+would change reaping and stdio inheritance for every execution path. The process-group
+route remains an option in [#41](https://github.com/SpaceDazher/Veritas/issues/41); the
+correctness requirement is the same either way: **never report `survivors: 0` while a
+descendant is alive.**

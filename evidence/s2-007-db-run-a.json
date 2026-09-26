@@ -15,8 +15,8 @@
   "database_engine": "PostgreSQL",
   "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
   "pids": {
-    "contended": 416228,
-    "crash": 416296
+    "contended": 458853,
+    "crash": 458938
   },
   "status": "RECORDED",
   "calls": [
@@ -777,14 +777,14 @@
       "spend_rows": 1
     },
     "digest": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-    "rawDigest": "6be81274022bdefb97052f68b1e94bfda982c59803b4cd2ffbd8192cc9831857"
+    "rawDigest": "b31da08cb7a118bd0307f73f57d6d34d324169afb1d6eecf6b054996032f8353"
   },
   "contended": {
-    "barrierDir": "/tmp/s2-007-db-replay-DdNPiw/barrier",
+    "barrierDir": "/tmp/s2-007-db-replay-QRp1kj/barrier",
     "label": "a",
     "contestedClaim": {
       "outcome": "REFUSE",
-      "code": "TRANSITION_NOT_ALLOWED",
+      "code": "REVISION_CONFLICT",
       "typed": true,
       "presented_revision": 2,
       "lease_id": null,
@@ -832,7 +832,7 @@
     "exitCode": null,
     "signal": "SIGKILL",
     "diedAsDesigned": true,
-    "pid": 416296,
+    "pid": 458938,
     "executorId": "exec-s2-007-db-a"
   }
 }

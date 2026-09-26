@@ -70,13 +70,27 @@ the symptom and fix criteria only — no PoC and no raw process data, per the pr
 `ecc:security-review` boundary. The `-1` comparator hole (Defect 4) was confirmed
 separately by the owner.
 
+**The four defects have since been fixed, and the gate is STILL red.** An unexercised
+sandbox control is now recorded as `notRun` / `BLOCKED_SANDBOX` /
+`SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM` with `survivors: null` and an informational
+`not_run_controls` count; the oracle and the trial set are scoped consistently; the gate
+rejects negative and non-finite counters and **blocks** on `hardControlNotRun`; and
+`listDescendants` enumerates POSIX descendants from `/proc`, so `cancel()` can no longer
+report `survivors: 0` while descendants live ([#41](https://github.com/SpaceDazher/Veritas/issues/41)).
+
+The effect is that a Linux run is now **honest rather than loud**: 283 observations against
+a 283-trial oracle, oracle digest `a5a63dc0…` identical to the committed Windows digest,
+`fs_network_secret_escapes = 0` truthfully, and `npm run verify:s2-002` still exiting **1**
+with the precise reason `hardControlNotRun=sandbox/cancellation-survivors` and
+`survivors_after_cancellation=null`. The gate is red because the property is genuinely
+unmeasured on this host — which is the correct fail-closed outcome, not a defect to work
+around. The frozen Windows evidence still verifies from Git bytes, and `tests/identity`
+goes from 149 pass / 6 fail to 157 pass / 0 fail while the full `npm test` reaches
+1181 pass / 0 fail.
+
 **Consequence for this ticket: S2-007 stays `BLOCKED_DEPENDENCY`.** The owner does not
-declare this gate green, and this report does not either. That is the correct fail-closed
-outcome. The three harness accounting defects (unhandled `PLATFORM_UNSUPPORTED`, the
-oracle/trial scoping mismatch, the negative sentinel) remain unfixed and belong to S2-002;
-fixing them would make a non-Windows run report `NOT_RUN` honestly, but **would not turn
-the gate green on Linux and must not be used as a reason to relax the counters.** Full
-analysis, symptom map, the four defects, the reproduction and the decision:
+declare this gate green, and this report does not either. Full analysis, symptom map, the
+defects, the reproduction, the decision and the fixes:
 [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md).
 
 Nothing in S2-002 was changed from inside S2-007: the counter arithmetic, its runner,
