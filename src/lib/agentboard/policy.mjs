@@ -729,7 +729,9 @@ function assertRelativePath(value, label) {
 }
 
 function splitPath(value) {
-  return value.split('/').filter((segment) => segment.length > 0 && segment !== '.');
+  // Trusted roots and realpath() results use the host separator. The untrusted
+  // relative ref rejects backslashes above, but Windows realpaths do not.
+  return value.split(/[\\/]/).filter((segment) => segment.length > 0 && segment !== '.');
 }
 
 function joinPath(root, relative) {
