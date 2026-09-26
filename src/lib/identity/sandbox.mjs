@@ -241,6 +241,7 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
         sessions: [],
         processGroups: [],
         processGroupIsolated: null,
+        rootPresent: false,
         observable: false,
         reason: result?.reason ?? 'SBX_PROCESS_OBSERVATION_UNAVAILABLE',
       };
@@ -253,6 +254,9 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       sessions: uniqueIds([...(known.sessions ?? []), ...(result.sessions ?? [])]),
       processGroups: uniqueIds([...(known.processGroups ?? []), ...(result.processGroups ?? [])]),
       processGroupIsolated: result.processGroupIsolated ?? null,
+      // readable-but-absent is different from unreadable: an absent root means
+      // the tree's shape is unknown, not that the tree was empty.
+      rootPresent: result.rootPresent !== false,
       observable: true,
       reason: result.reason ?? null,
       processGroup: result.processGroup ?? null,
@@ -405,7 +409,15 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     trackPid(tracked, identities, pid);
     for (const descendant of first.pids) trackPid(tracked, identities, descendant);
     let observable = first.observable;
+    // A readable process table with the root already gone cannot describe the
+    // tree: descendants are re-parented to init and are no longer reachable
+    // from it. Reporting an empty tree here would be the same false zero the
+    // proof exists to prevent, so the shape counts as unobserved.
     let reason = first.reason;
+    if (observable && !first.rootPresent) {
+      observable = false;
+      reason = 'SBX_TREE_SHAPE_NOT_OBSERVED';
+    }
     let sessions = first.sessions;
     let processGroups = first.processGroups;
     if (observable) {
@@ -447,6 +459,9 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       if (exitSeen.has(pid)) tracked.delete(pid);
       // A tree of unknown shape can never be reported as fully terminated:
       // the pids we would check are exactly the ones we could not enumerate.
+      // A vanished root is expected here (the tree was just killed), so only
+      // an unreadable table fails the proof closed; the tracked set captured
+      // before the kill is what gets re-observed.
       const discovered = await discoverTree(pid, known);
       if (!discovered.observable) {
         const observedBlind = await observeExisting([...tracked], identityMap);

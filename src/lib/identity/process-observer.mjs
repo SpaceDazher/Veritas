@@ -205,7 +205,10 @@ export function createProcessObserver({ platform = process.platform } = {}) {
   async function posixTree(rootPid, table, known) {
     const root = table.get(rootPid);
     if (!root) {
-      return { pids: [], observable: true, reason: 'SBX_ROOT_NOT_IN_PROCESS_TABLE', sessions: [], processGroups: [] };
+      // The table is readable; the subject is not in it. That is not an empty
+      // tree — the tree's shape is simply unknown, because a descendant
+      // re-parented to init is no longer reachable from a pid that is gone.
+      return { pids: [], observable: true, rootPresent: false, reason: 'SBX_ROOT_NOT_IN_PROCESS_TABLE', sessions: [], processGroups: [], processGroupIsolated: null };
     }
     const own = ownIdentity(table);
     const isolated = root.session !== own.session && root.pgrp !== own.pgrp;
@@ -232,6 +235,7 @@ export function createProcessObserver({ platform = process.platform } = {}) {
     return {
       pids: uniquePids([...pids]),
       observable: true,
+      rootPresent: true,
       reason: isolated ? null : 'SBX_PROCESS_GROUP_NOT_ISOLATED',
       sessions: uniqueIds([...sessions]),
       processGroups: uniqueIds([...processGroups]),
@@ -248,10 +252,15 @@ export function createProcessObserver({ platform = process.platform } = {}) {
         `($p | Select-Object -Unique) -join ' '`;
       const result = await windowsQuery(script);
       // A failed CIM query is NOT an empty process tree.
+      // rootPresent is assumed here: the CIM walk seeds the set with the root
+      // pid, so the script cannot distinguish a vanished root. Cancellation
+      // captures the tree while the root is alive, so this does not weaken the
+      // cancellation proof; a self-completed run is not given a proof at all.
       return {
         ...result,
         pids: result.pids.filter((pid) => pid !== rootPid),
         platform,
+        rootPresent: true,
         sessions: [],
         processGroups: [],
         processGroupIsolated: null,
@@ -259,19 +268,18 @@ export function createProcessObserver({ platform = process.platform } = {}) {
     }
     if (platform === 'linux' && procAvailable()) {
       const table = procSnapshot();
-      if (!table) return { pids: [], observable: false, reason: 'SBX_PROCFS_SNAPSHOT_EMPTY', platform };
+      if (!table) return { pids: [], observable: false, rootPresent: false, reason: 'SBX_PROCFS_SNAPSHOT_EMPTY', platform };
       return { ...(await posixTree(rootPid, table, known)), platform };
     }
     const table = await psSnapshot();
-    if (!table) return { pids: [], observable: false, reason: 'SBX_PS_QUERY_UNAVAILABLE', platform };
+    if (!table) return { pids: [], observable: false, rootPresent: false, reason: 'SBX_PS_QUERY_UNAVAILABLE', platform };
     return { ...(await posixTree(rootPid, table, known)), platform };
   }
 
   async function listExisting(pids, identities = {}) {
     const candidates = uniquePids(pids);
     if (candidates.length === 0) return { alive: [], observable: true, reason: null, platform };
-    if (isWindows) {
-      const literal = candidates.join(',');
+    if (isWindows) {      const literal = candidates.join(',');
       const script = `$ids=@(${literal});` +
         `Get-CimInstance Win32_Process | Where-Object { $ids -contains [int]$_.ProcessId } | ` +
         `ForEach-Object ProcessId`;

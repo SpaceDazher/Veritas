@@ -133,7 +133,7 @@ describe('S2-002 #41: cancellation proves the whole spawned process tree', { tim
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  test('a run that exits on its own is still observed, never assumed empty', async () => {
+  test('a run that exits on its own makes no termination claim at all', async () => {
     const root = makeWorkspace();
     const sandbox = sandboxFor(root);
     const outcome = await sandbox.spawnForControlProbe({
@@ -143,9 +143,13 @@ describe('S2-002 #41: cancellation proves the whole spawned process tree', { tim
     });
     assert.equal(outcome.status, 'completed');
     assert.equal(outcome.terminated, false, 'a completed run is not a termination claim');
-    assert.equal(outcome.proof, 'TERMINATED', JSON.stringify(outcome));
-    assert.equal(outcome.survivors, 0);
-    assert.equal(outcome.treeVerified, true, 'the tree was observed, not assumed');
+    // The root was already gone when the tree was observed, so the tree's
+    // shape was never captured. "No survivors" would be a claim about data the
+    // adapter never had, so the honest outcome is UNVERIFIED with no count.
+    assert.equal(outcome.proof, 'UNVERIFIED', JSON.stringify(outcome));
+    assert.equal(outcome.survivors, null);
+    assert.equal(outcome.treeVerified, false);
+    assert.ok(outcome.reasonCodes.includes('SBX_TREE_SHAPE_NOT_OBSERVED'), JSON.stringify(outcome.reasonCodes));
     fs.rmSync(root, { recursive: true, force: true });
   });
 
@@ -282,9 +286,11 @@ describe('S2-002 #41: versioned cancellation evidence', () => {
       }
       if (entry.caseId === 'cancellation/recycled-pid-not-signalled'
         || entry.caseId === 'cancellation/historical-evidence-untouched'
+        || entry.caseId === 'cancellation/self-completed-run-makes-no-claim'
         || entry.caseId === 'cancellation/s2-002-frozen-corpus-hard-counters') {
         // Not cancellation cases: the pid-reuse guard, the evidence-integrity
-        // check and the corpus replay have no single survivor count to report.
+        // check, the self-completed run and the corpus replay have no single
+        // proven zero-survivor count to report.
         continue;
       }
       assert.ok(entry.detail.includes('"survivors":0'), `${entry.caseId} must report a counted zero`);
@@ -301,8 +307,7 @@ describe('S2-002 #41: versioned cancellation evidence', () => {
       && !p.includes('cancellation-v2')), 'the new record must not list itself as historical');
   });
 
-  test('the frozen S2-002 corpus replays clean on this host with the hardened counters', () => {
-    const entry = evidence.cases.find((c) => c.caseId === 'cancellation/s2-002-frozen-corpus-hard-counters');
+  test('the frozen S2-002 corpus replays clean on this host with the hardened counters', () => {    const entry = evidence.cases.find((c) => c.caseId === 'cancellation/s2-002-frozen-corpus-hard-counters');
     assert.ok(entry, 'the corpus replay must run');
     assert.equal(entry.verdict, 'PASS', entry.detail);
     // Every hard counter, including survivors_after_cancellation, at zero.

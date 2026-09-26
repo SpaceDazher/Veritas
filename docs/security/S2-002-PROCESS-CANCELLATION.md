@@ -83,6 +83,12 @@ is running. Every query returns `{ ..., observable, reason }`:
 
 ### 2.3 A tree the OS can actually be asked about
 
+- A readable process table with the root already gone is not an empty tree:
+  descendants are re-parented to init and stop being reachable from it. A run
+  that ends on its own (`completed` / `failed`) is therefore reported
+  `UNVERIFIED` with `survivors: null` and `SBX_TREE_SHAPE_NOT_OBSERVED`, not as
+  an empty tree. Cancellation and timeout capture the tree while the root is
+  alive, which is exactly what makes their proof valid.
 - POSIX probe children are spawned as process-group leaders
   (`detached: true` → `setsid`), so a group-directed `SIGKILL` is meaningful.
   Windows keeps `detached: false` because `taskkill /T` walks the parent chain.
@@ -137,6 +143,7 @@ verify:s2-002-cancellation`):
 | `cancellation/negative-control-no-process-table` | negative control | an observer that cannot read the process table yields `UNVERIFIED`, `terminated: false`, `survivors: null` |
 | `cancellation/negative-control-descendant-query-fails` | negative control | descendant enumeration failing alone also fails the proof closed, even when liveness still works |
 | `cancellation/recycled-pid-not-signalled` | negative control | a stale identity token reports `pidReused`; the unrelated live pid is neither signalled nor counted |
+| `cancellation/self-completed-run-makes-no-claim` | negative control | a run that exits on its own reports `UNVERIFIED` with no survivor count, because its tree was never observed while the root lived |
 | `cancellation/s2-002-frozen-corpus-hard-counters` | replay | the frozen corpus replays clean on this host: all six hard counters at zero, no counter violations, no oracle violations |
 | `cancellation/historical-evidence-untouched` | integrity | the eight pre-fix evidence records still match their committed digests |
 
@@ -211,8 +218,18 @@ new versioned evidence instead.
    `ps` report them. A descendant that escapes both (a nested container with its
    own PID namespace) is outside the observation boundary and is reported as
    unobserved rather than as terminated.
-4. Both platforms must be observed independently. The evidence here was
+4. On Windows the CIM descendant walk seeds its result set with the root pid,
+   so the observer cannot distinguish a vanished root from a live one and
+   assumes `rootPresent: true`. That does not weaken the cancellation proof,
+   which captures the tree while the root is alive, but it is an untested
+   residual on this host — the Windows path has not been re-observed after the
+   fix.
+5. A self-completed run never gets a termination proof, because its tree shape
+   is unknowable once the root is gone. That is the honest outcome, but it also
+   means `proof: TERMINATED` on this adapter means exactly one thing: "a tree
+   observed while the root was alive was re-observed as empty", nothing more.
+6. Both platforms must be observed independently. The evidence here was
    produced on `linux/x64`; the Windows replay has to be re-run on a Windows
    host after the fix, and the two records are separate.
-5. Live execution in #7 must not rely on this property until that independent
+7. Live execution in #7 must not rely on this property until that independent
    Windows observation exists.

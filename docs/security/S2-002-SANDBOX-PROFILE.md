@@ -80,6 +80,12 @@ and by both frozen replay runs.
   `terminated: true` is emitted only for `TERMINATED`. `survivors` is a
   non-negative count, or `null` for `UNVERIFIED` — never `0` for an
   unobserved tree.
+- A readable process table with the root already gone is not an empty tree:
+  descendants are re-parented to init and stop being reachable from it. A run
+  that ends on its own therefore reports `UNVERIFIED` with
+  `SBX_TREE_SHAPE_NOT_OBSERVED` and no survivor count, instead of claiming an
+  empty tree it never observed. Cancellation and timeout capture the tree while
+  the root is alive, which is what makes their proof valid.
 - `src/lib/identity/process-observer.mjs` is the only source of truth about
   what is still running. Windows uses `Win32_Process` (CIM); Linux reads
   `/proc`; other POSIX hosts fall back to `ps -A`. A failed query is

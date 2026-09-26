@@ -300,6 +300,30 @@ async function caseNegativeControlDescendantQueryFails() {
     `descendantsObserved=${descendants.length}; cancel=${JSON.stringify(proofOf(cancel))}`);
 }
 
+// Case 6: a run that ends on its own was never observed while its root was
+// alive, so its tree shape is unknown. It must make no claim rather than
+// publishing a zero-survivor success.
+async function caseSelfCompletedRunMakesNoClaim() {
+  const root = tempRoot();
+  const sandbox = sandboxFor(root);
+  const outcome = await sandbox.spawnForControlProbe({
+    command: process.execPath,
+    args: ['-e', 'process.exit(0)'],
+    timeoutMs: 20000,
+  });
+  const checks = [
+    outcome.status === 'completed',
+    outcome.terminated === false,
+    outcome.proof === 'UNVERIFIED',
+    outcome.survivors === null,
+    outcome.treeVerified === false,
+    outcome.reasonCodes.includes('SBX_TREE_SHAPE_NOT_OBSERVED'),
+  ];
+  fs.rmSync(root, { recursive: true, force: true });
+  return ok('cancellation/self-completed-run-makes-no-claim', checks,
+    `status=${outcome.status}; proof=${outcome.proof}; survivors=${String(outcome.survivors)}; reasonCodes=${JSON.stringify(outcome.reasonCodes)}`);
+}
+
 // Case 5: a recycled pid must never be signalled or counted as a survivor.
 // Uses the real platform observer with a deliberately wrong starttime identity
 // for a live pid, so the guard is exercised without killing an unrelated
@@ -369,6 +393,7 @@ export async function runCancellationVerification() {
     await caseNegativeControlNoProcessTable(),
     await caseNegativeControlDescendantQueryFails(),
     await caseRecycledPidIsNeverSignalled(),
+    await caseSelfCompletedRunMakesNoClaim(),
     await caseFrozenCorpusHardCounters(),
     checkHistoricalEvidenceUntouched(),
   ];
