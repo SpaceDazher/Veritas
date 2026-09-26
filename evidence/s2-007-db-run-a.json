@@ -15,8 +15,8 @@
   "database_engine": "PostgreSQL",
   "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
   "pids": {
-    "contended": 328545,
-    "crash": 328595
+    "contended": 335232,
+    "crash": 335281
   },
   "status": "RECORDED",
   "calls": [
@@ -777,18 +777,18 @@
       "spend_rows": 1
     },
     "digest": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-    "rawDigest": "3133097ad9cb9b2778cec5fd03449b1e7cd9037bdc61216d338561a96efeb6cc"
+    "rawDigest": "853b6a4745f15b5b1be58d2cfc7cf2b3fad32cd656915c9b88fb801a7357189f"
   },
   "contended": {
-    "barrierDir": "/tmp/s2-007-db-replay-Bjev6S/barrier",
+    "barrierDir": "/tmp/s2-007-db-replay-Y58bCl/barrier",
     "label": "a",
     "contestedClaim": {
-      "outcome": "ACCEPT",
-      "code": null,
+      "outcome": "REFUSE",
+      "code": "REVISION_CONFLICT",
       "typed": true,
       "presented_revision": 2,
-      "lease_id": "lse-exec-s2-007-db-a-000001",
-      "fencing_token": 1
+      "lease_id": null,
+      "fencing_token": null
     },
     "boundedClaim": {
       "task_id": "abt-s2007-db-a",
@@ -832,7 +832,7 @@
     "exitCode": null,
     "signal": "SIGKILL",
     "diedAsDesigned": true,
-    "pid": 328595,
+    "pid": 335281,
     "executorId": "exec-s2-007-db-a"
   }
 }

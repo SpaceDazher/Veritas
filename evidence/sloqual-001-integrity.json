@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "SHA-256 of the canonical written evidence file bytes",
+  "files": {
+    "evidence/sloqual-001-run-a.json": "6be2e0a8b92029e69bffd66f9bd86773e5bfb43e02fcde27df9d75637ab37203",
+    "evidence/sloqual-001-run-b.json": "efc7ca440db86a5c64c162540b95acc46ab961cfc0576f09b166ce97ebe8a194",
+    "evidence/sloqual-001-comparison.json": "edfc355b1eb878fb0494ab5092fed2068109342b5c2e5d4ab85b6053d47d924d"
+  },
+  "note": "Re-derive with: node -e \"const fs=require('fs');const c=require('crypto');for(const [p] of Object.entries(JSON.parse(fs.readFileSync('evidence/sloqual-001-integrity.json')).files))console.log(p, c.createHash('sha256').update(fs.readFileSync(p)).digest('hex'))\""
+}

@@ -112,6 +112,16 @@ Connector types включают Markdown/Obsidian, web/PDF, GitHub, Telegram, Y
 
 Verifier является library/harness surface. В текущем Web workspace нет пользовательского endpoint для calibration approval.
 
+#### SLO qualification
+
+- `src/lib/sloqual/contract.mjs` проверяет замороженный SLO contract (self-hash + байтовая привязка scenario manifest) и структуру manifest.
+- `src/lib/sloqual/open-loop.mjs` строит план приходов заранее, поэтому медленный ответ не уменьшает предложенную нагрузку (нет coordinated omission).
+- `src/lib/sloqual/measure.mjs` исполняет сценарии против настоящего `policy-engine.mjs` и считает hard counters.
+- `src/lib/sloqual/comparator.mjs` — единственное место, где называется verdict: `PASS`, `PASS_WITH_LIMITS` или `FAIL` с перечнем причин.
+- `src/lib/sloqual/statistics.mjs` — nearest-rank percentiles, seeded bootstrap CI, Wilson interval; отсутствие данных — ошибка, а не ноль.
+
+Harness измеряет только in-process decision path. Он не покрывает HTTP, PostgreSQL, sandbox и provider edge и никогда не выдаёт production SLO.
+
 ### 4. Persistence
 
 - `src/db/index.ts` создаёт PostgreSQL pool и Drizzle client.
@@ -179,6 +189,7 @@ Versioned SourceSnapshot
 | Claim graph | Memory/PostgreSQL stores, migrations, tests | Нет user UI/API | Contract/store deliverable. |
 | Synthesis | Retrieval, evidence maps, hypotheses, tests | Нет user UI/API | Frozen research/engine deliverable. |
 | Semantic verifier | API, stores, calibration, probes | Нет approval UI | Official S2-006 ждёт independent external inputs. |
+| SLO qualification | Frozen contract, scenario manifest, open-loop harness, comparator, evidence | Нет product surface | `PASS_WITH_LIMITS`; production SLO не авторизован. |
 | Agent execution | Не реализован | Нет | Future S2-007...S2-012 scope. |
 
 ## Инварианты безопасности

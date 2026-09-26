@@ -17,9 +17,9 @@ Canonical source:
 
 Тикеты перенесены как migration-index issues `#20...#40`. В каждом body сохранены canonical ID, wave, priority, owner role, verdict, dependencies, краткий результат, limits и pinned AgentOS source.
 
-Текущий GitHub token позволил создать issues, но не позволяет закрывать, редактировать или добавлять comments/labels. Поэтому созданные issues #20-#40 пока остаются `OPEN`; исследовательский статус определяется verdict в body, а не GitHub open/closed state. У первого issue #20 первая попытка создания сохранила текст `CLOSED` до обнаружения ограничения; фактическое состояние GitHub и этот индекс являются авторитетными. Source bundle и evaluation record остаются каноническим evidence.
+2026-09-26: право на запись в issues подтверждено (PATCH по #20 вернул 200), и issues #20-#39 закрыты как research closure: в каждом добавлен комментарий с canonical record, verdict, pinned commit `a7940e1` и границей полномочий. Закрытие означает research evaluation, а не `PASS`, production readiness или разрешение rollout; `PASS_WITH_LIMITS` и parked items PARK-01..PARK-04 остаются частью решения. Issue #40 (SLOQUAL-001) оставлен `OPEN`: у него human threshold countersignature в статусе `NEEDS_INPUT`.
 
-Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и `status:pass-with-limits` созданы, но из-за того же write limitation не прикреплены к issues.
+Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и `status:pass-with-limits` созданы и прикреплены к issues #20-#39 (`status:pass` — у #22 / S1-003, у остальных `status:pass-with-limits`).
 
 ## Активные тикеты
 
@@ -53,6 +53,8 @@ Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и
 | SLOQUAL-001 | [#40](https://github.com/SpaceDazher/Veritas/issues/40) | `PASS_WITH_LIMITS` | Production-like SLO qualification, расширяющая S1-002 и использующая revocation gate S1-008. |
 
 SLOQUAL-001 выполнил два authoritative runs по 17 scenarios × 5 seeds и 105 revocation trials. Hard failures и mandatory security violations равны нулю, но warm p95 confidence interval пересекает 20 ms, сохраняются pilot-scale limits, pending human SLO ownership и same-host independent rerun. Полный `PASS` не заявлен.
+
+В Veritas этот метод перенесён как локальный qualification-пакет control plane: frozen SLO contract ([contracts/sloqual-001-slo-contract.json](../contracts/sloqual-001-slo-contract.json)), версионированный scenario manifest, open-loop измерение настоящего `policy-engine.mjs`, fail-closed comparator и gate `npm run verify:sloqual-001`. Veritas-пакет повторяет структуру доказательства (17 scenarios × 5 seeds, 105 revocation trials, два независимых запуска), но измеряет другой код: числа AgentOS к Veritas не переносятся, а его verdict не наследуется. Локальный verdict — `PASS_WITH_LIMITS`: [SLOQUAL-001-EVALUATION-REPORT.md](../decisions/SLOQUAL-001-EVALUATION-REPORT.md).
 
 ## Dependency DAG
 
@@ -88,6 +90,7 @@ S1-019 зафиксировал research-scoped baseline:
 - Все внешние аудиторы, процессы и replay runners находятся на одном host.
 - S1-001 не проверил все 176 исторических `u` sources.
 - S1-002 является коротким local benchmark; SLOQUAL-001 сам остаётся `PASS_WITH_LIMITS`.
+- Veritas-реализация SLOQUAL-001 измеряет только in-process decision path: HTTP, PostgreSQL, sandbox и provider path не измерены.
 - S1-004 формальные модели имеют bounded state space и моделируют design contract.
 - S1-013/014/015 не имеют population human study.
 - S1-018 не имеет hardware TEE evidence.

@@ -137,13 +137,19 @@ try {
     run('s2-006-security-probes', NPM, ['run', 'test:s2-006-security-probes'], {env: npmEnv});
     run('s2-006-replay', NPM, ['run', 'verify:s2-006'], {env: npmEnv});
     run('s2-006-db-replay', NPM, ['run', 'verify:s2-006-db-replay'], {env: npmEnv});
+    // SLOQUAL-001: the frozen SLO contract, its statistics/comparator units
+    // and the two-run qualification must all be green from the archive too.
+    // Freeze provenance is reported NOT_RUN there (no .git), never as a
+    // pass, and the verdict is expected to stay PASS_WITH_LIMITS.
+    run('sloqual-tests', NPM, ['run', 'test:sloqual'], {env: npmEnv});
+    run('sloqual-001', NPM, ['run', 'verify:sloqual-001'], {env: npmEnv});
     run('typecheck', NPM, ['run', 'typecheck'], {env: npmEnv});
     run('lint', NPM, ['run', 'lint'], {env: npmEnv});
     run('build', NPM, ['run', 'build'], {env: buildEnv});
     run('runtime-audit', NPM, ['audit', '--omit=dev', '--json'], {env: npmEnv});
     run('tooling-audit', NPM, ['audit', '--json'], {env: npmEnv});
   } else {
-    for (const id of ['npm-ci', 's2-002-dependencies', 's2-003-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay', 's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay', 's2-005-types', 's2-005-retrieval-tests', 's2-005-synthesis-tests', 's2-005-security-probes', 's2-005-replay', 's2-005-db-replay', 's2-006-types', 's2-006-verifier-tests', 's2-006-calibration', 's2-006-security-probes', 's2-006-replay', 's2-006-db-replay', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
+    for (const id of ['npm-ci', 's2-002-dependencies', 's2-003-dependencies', 'contracts', 'synthetic-smoke', 'inventory', 'public-artifacts', 'root-manifest', 'podman-sandbox', 'gvisor-sandbox', 'postgres-smoke', 'identity-tests', 'sandbox-tests', 'security-probes', 's2-003-ingestion-tests', 's2-003-security-probes', 's2-003-replay', 's2-003-db-replay', 's2-002-replay', 's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay', 's2-005-types', 's2-005-retrieval-tests', 's2-005-synthesis-tests', 's2-005-security-probes', 's2-005-replay', 's2-005-db-replay', 's2-006-types', 's2-006-verifier-tests', 's2-006-calibration', 's2-006-security-probes', 's2-006-replay', 's2-006-db-replay', 'sloqual-tests', 'sloqual-001', 'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit']) {
       commands.push({id, command: id === 'root-manifest' ? 'node scripts/generate-manifests.mjs --check' : id, exitCode: null, status: 'NOT_RUN_SANDBOX', reason: 'clean archive prerequisite was blocked by the sandbox'});
     }
   }
@@ -165,6 +171,7 @@ const requiredIds = [
   's2-004-dependencies', 's2-004-claims-tests', 's2-004-security-probes', 's2-004-replay', 's2-004-db-replay',
   's2-005-types', 's2-005-retrieval-tests', 's2-005-synthesis-tests', 's2-005-security-probes', 's2-005-replay', 's2-005-db-replay',
   's2-006-types', 's2-006-verifier-tests', 's2-006-calibration', 's2-006-security-probes', 's2-006-replay', 's2-006-db-replay',
+  'sloqual-tests', 'sloqual-001',
   'typecheck', 'lint', 'build', 'runtime-audit', 'tooling-audit',
 ];
 const byId = new Map(commands.map((command) => [command.id, command]));

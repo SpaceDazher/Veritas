@@ -1,0 +1,622 @@
+{
+  "schemaVersion": 1,
+  "artifact": "scenario-manifest",
+  "ticket": "SLOQUAL-001",
+  "version": "1.0.0",
+  "status": "FROZEN",
+  "frozenAt": "2026-09-25T00:00:00.000Z",
+  "authoredBy": "veritas-ticket-owner",
+  "scope": "Veritas control-plane authorization decisions issued by src/lib/identity/policy-engine.mjs under a single local host. Every request is a real engine.authorize() call; no synthetic decision function, no mock, no recorded fixture is substituted for the engine.",
+  "nonScope": [
+    "No HTTP, Next.js, PostgreSQL, provider or network path is exercised: this manifest measures the in-process decision path only.",
+    "Pilot scaleClass only. Nothing here is a production workload profile, a capacity plan or a production SLO.",
+    "Scenario definitions are frozen: changing any request, arrival, weight or seed requires a new manifest version and a new contract version plus a complete new run."
+  ],
+  "arrivalModel": {
+    "mode": "open_loop",
+    "rule": "Every arrival instant is computed up front from the scenario rate and the seed; a request that is dispatched late is still measured against its planned instant (response_complete - scheduled_send). Slow responses therefore accumulate into measured latency instead of silently reducing the offered load (no coordinated omission).",
+    "latencyDefinition": "latency_ms = (response_complete_ns - scheduled_send_ns) / 1e6",
+    "latenessDefinition": "lateness_ms = (dispatch_start_ns - scheduled_send_ns) / 1e6",
+    "clock": "process.hrtime.bigint monotonic"
+  },
+  "policyEngine": {
+    "module": "src/lib/identity/policy-engine.mjs",
+    "fixedClock": "2026-09-12T12:00:00.000Z",
+    "clockRule": "The engine clock is injected and never read from the system, so decisions are reproducible byte-for-byte for the same input. Time-based denials (expired grants, expired leases) are therefore fixed, not wall-clock dependent."
+  },
+  "warmupPolicy": {
+    "requestsPerScenarioSeed": 10,
+    "rule": "The first 10 requests of every non-security scenario-seed are a declared warmup. They are dispatched and judged exactly like every other request (hard counters, decision sequence, raw observations) but are excluded from the latency and lateness statistics, so the warm SLI describes warm behaviour rather than first-call JIT cost.",
+    "securityFamilyWarmup": "none; the revocation family measures commit-to-deny latency, where a warmup would only add unrelated trials"
+  },
+  "seeds": [11, 12, 13, 14, 15],
+  "families": {
+    "steady": "Warm steady-state traffic; aggregate of this family is the warm latency SLI.",
+    "burst": "Arrival bursts with zero inter-arrival spacing inside the burst window; aggregate is the burst latency SLI.",
+    "fault": "Injected in-process faults (engine recreation, principal freeze, single-use grant replay).",
+    "soak": "Sustained pilot-scale run; pilot duration only, not the full-scale soak requirement.",
+    "security": "S1-008 revocation gate trials."
+  },
+  "workloads": [
+    {
+      "id": "allow_acl_owner_read",
+      "denialClass": null,
+      "expectedDecisions": ["ALLOW"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-owner-alice",
+        "workspaceId": "ws-alice-private",
+        "action": "board.read",
+        "resource": {"type": "board", "id": "board:primary"},
+        "args": {"workspace_id": "ws-alice-private"}
+      }
+    },
+    {
+      "id": "allow_grant_agent_read",
+      "denialClass": null,
+      "expectedDecisions": ["ALLOW"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-agent-alice",
+        "workspaceId": "ws-alice-private",
+        "action": "board.read",
+        "resource": {"type": "board", "id": "board:primary"},
+        "args": {"workspace_id": "ws-alice-private"}
+      }
+    },
+    {
+      "id": "deny_cross_tenant_board_read",
+      "denialClass": "cross_tenant",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-agent-alice",
+        "workspaceId": "ws-bob-private",
+        "action": "board.read",
+        "resource": {"type": "board", "id": "board:primary"},
+        "args": {"workspace_id": "ws-bob-private"}
+      }
+    },
+    {
+      "id": "deny_cross_tenant_source_read",
+      "denialClass": "cross_tenant",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-external-pi",
+        "workspaceId": "ws-bob-private",
+        "action": "source.read",
+        "resource": {"type": "source", "id": "source:bob-notes-1"},
+        "args": {"source_id": "source:bob-notes-1"}
+      }
+    },
+    {
+      "id": "deny_cross_tenant_message_send",
+      "denialClass": "cross_tenant",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-owner-alice",
+        "workspaceId": "ws-alice-private",
+        "action": "message.send",
+        "resource": {"type": "message", "id": "message:cross"},
+        "args": {"to_principal": "prn-owner-bob", "body_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"}
+      }
+    },
+    {
+      "id": "deny_cross_tenant_cache_read",
+      "denialClass": "cross_tenant",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "cli",
+        "principalId": "prn-owner-alice",
+        "workspaceId": "ws-bob-private",
+        "action": "cache.read",
+        "resource": {"type": "cache", "id": "cache:bob-index"},
+        "args": {"cache_id": "cache:bob-index"}
+      }
+    },
+    {
+      "id": "deny_expired_grant_search",
+      "denialClass": "expired_authority",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-external-hermes",
+        "workspaceId": "ws-veritas-project",
+        "action": "search.query",
+        "resource": {"type": "source", "id": "source:docs"},
+        "args": {"query": "veritas"}
+      }
+    },
+    {
+      "id": "deny_missing_lease_summary",
+      "denialClass": "missing_authority_artifact",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-platform-analyst",
+        "workspaceId": "ws-veritas-project",
+        "action": "summary.generate",
+        "resource": {"type": "summary", "id": "summary:analyst-1"},
+        "args": {"summary_id": "summary:analyst-1", "inputs": [{"workspaceId": "ws-veritas-project", "resourceId": "claim:c1"}]}
+      }
+    },
+    {
+      "id": "allow_lease_task_update",
+      "denialClass": null,
+      "expectedDecisions": ["ALLOW"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-external-pi",
+        "workspaceId": "ws-veritas-project",
+        "action": "task.update",
+        "resource": {"type": "task", "id": "task:tsk-pilot-1"},
+        "lease": {"leaseId": "lse-pi-project-0001", "fencingToken": 5},
+        "args": {"task_id": "task:tsk-pilot-1", "expected_revision": 3}
+      }
+    },
+    {
+      "id": "deny_lease_binding_mismatch",
+      "denialClass": "authority_artifact_binding",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-external-pi",
+        "workspaceId": "ws-veritas-project",
+        "action": "task.update",
+        "resource": {"type": "task", "id": "task:tsk-pilot-1"},
+        "lease": {"leaseId": "lse-pi-project-0007", "fencingToken": 3},
+        "args": {"task_id": "task:tsk-pilot-1", "expected_revision": 3}
+      }
+    },
+    {
+      "id": "allow_sandbox_tool_execute",
+      "denialClass": null,
+      "expectedDecisions": ["ALLOW"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-platform-experimenter",
+        "workspaceId": "ws-veritas-project",
+        "action": "tool.execute",
+        "resource": {"type": "tool", "id": "tool:runner"},
+        "lease": {"leaseId": "lse-experimenter-0005", "fencingToken": 1},
+        "args": {"tool_id": "tool:runner", "canonical_args": {"argv": ["true"], "timeout_ms": 5000}}
+      }
+    },
+    {
+      "id": "deny_foreign_capability_lease",
+      "denialClass": "authority_artifact_binding",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-platform-curator",
+        "workspaceId": "ws-veritas-project",
+        "action": "claim.write",
+        "resource": {"type": "claim", "id": "claim:curation-1"},
+        "lease": {"leaseId": "lse-curator-0004", "fencingToken": 2},
+        "args": {"claim_id": "claim:curation-1", "provenance": "synthetic"}
+      }
+    },
+    {
+      "id": "allow_derived_summary_same_workspace",
+      "denialClass": null,
+      "expectedDecisions": ["ALLOW"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-platform-curator",
+        "workspaceId": "ws-veritas-project",
+        "action": "summary.generate",
+        "resource": {"type": "summary", "id": "summary:board-weekly"},
+        "lease": {"leaseId": "lse-curator-0004", "fencingToken": 2},
+        "args": {
+          "summary_id": "summary:board-weekly",
+          "inputs": [{"workspaceId": "ws-veritas-project", "resourceId": "claim:c1"}]
+        }
+      }
+    },
+    {
+      "id": "deny_derived_cross_tenant_poison",
+      "denialClass": "cross_tenant",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-platform-curator",
+        "workspaceId": "ws-veritas-project",
+        "action": "summary.generate",
+        "resource": {"type": "summary", "id": "summary:poisoned"},
+        "lease": {"leaseId": "lse-curator-0004", "fencingToken": 2},
+        "args": {
+          "summary_id": "summary:poisoned",
+          "inputs": [
+            {"workspaceId": "ws-veritas-project", "resourceId": "claim:c1"},
+            {"workspaceId": "ws-bob-private", "resourceId": "claim:secret"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "single_use_grant_export",
+      "denialClass": null,
+      "expectedDecisions": ["ALLOW", "DENY"],
+      "stateful": true,
+      "stateNote": "One-time nonce grant: the first dispatch in a scenario may ALLOW, every later dispatch of the same request must DENY. The runner counts replay allows as a hard-gate violation.",
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-agent-carol",
+        "workspaceId": "ws-carol-private",
+        "action": "artifact.export",
+        "resource": {"type": "artifact", "id": "artifact:final-1"},
+        "args": {"artifact_id": "artifact:final-1", "destination": "export:local"}
+      }
+    },
+    {
+      "id": "deny_malformed_request",
+      "denialClass": "malformed_input",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-owner-alice",
+        "workspaceId": "ws-alice-private",
+        "action": "board.read",
+        "resource": {"type": "board"},
+        "args": {"workspace_id": "ws-alice-private"}
+      }
+    },
+    {
+      "id": "deny_unknown_principal",
+      "denialClass": "unknown_entity",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-agent-ghost",
+        "workspaceId": "ws-alice-private",
+        "action": "board.read",
+        "resource": {"type": "board", "id": "board:primary"},
+        "args": {"workspace_id": "ws-alice-private"}
+      }
+    },
+    {
+      "id": "deny_unknown_action",
+      "denialClass": "unknown_entity",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-owner-alice",
+        "workspaceId": "ws-alice-private",
+        "action": "task.teleport",
+        "resource": {"type": "task", "id": "task:1"},
+        "args": {"task_id": "task:1"}
+      }
+    },
+    {
+      "id": "deny_self_approval",
+      "denialClass": "separation_of_duties",
+      "expectedDecisions": ["DENY"],
+      "request": {
+        "adapter": "api",
+        "principalId": "prn-owner-alice",
+        "workspaceId": "ws-alice-private",
+        "action": "approval.decide",
+        "resource": {"type": "approval", "id": "approval:self", "producerPrincipalId": "prn-owner-alice"},
+        "args": {"approval_id": "approval:self", "verdict": "APPROVED"}
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "warm_steady_state",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Warm steady-state authorization mix",
+      "purpose": "Baseline warm decision latency for the ordinary allow/deny control-plane mix.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "sustained >= 6 h at a representative production-like rate", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_acl_owner_read", "weight": 25},
+        {"workloadId": "allow_grant_agent_read", "weight": 25},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 15},
+        {"workloadId": "deny_missing_lease_summary", "weight": 15},
+        {"workloadId": "deny_expired_grant_search", "weight": 10},
+        {"workloadId": "allow_lease_task_update", "weight": 10}
+      ]
+    },
+    {
+      "id": "deny_heavy_steady_state",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Deny-heavy steady state",
+      "purpose": "Warm latency of the negative control-plane path: mostly denials that must never become allows.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "sustained >= 6 h denial-heavy at production-like rate", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 20},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 20},
+        {"workloadId": "deny_cross_tenant_message_send", "weight": 15},
+        {"workloadId": "deny_cross_tenant_cache_read", "weight": 10},
+        {"workloadId": "deny_lease_binding_mismatch", "weight": 15},
+        {"workloadId": "deny_self_approval", "weight": 10},
+        {"workloadId": "deny_foreign_capability_lease", "weight": 5},
+        {"workloadId": "allow_acl_owner_read", "weight": 5}
+      ]
+    },
+    {
+      "id": "burst_allow_traffic",
+      "family": "burst",
+      "scaleClass": "PILOT",
+      "title": "Burst of allow-path decisions",
+      "purpose": "Queueing behaviour when a burst arrives with zero inter-arrival spacing.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "burst at production-like concurrency and database scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "burst", "ratePerSecond": 600, "requests": 180, "burstSize": 90, "burstWindowMs": 30},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_acl_owner_read", "weight": 30},
+        {"workloadId": "allow_grant_agent_read", "weight": 25},
+        {"workloadId": "allow_lease_task_update", "weight": 15},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 30}
+      ]
+    },
+    {
+      "id": "burst_mixed_traffic",
+      "family": "burst",
+      "scaleClass": "PILOT",
+      "title": "Burst of mixed allow/deny decisions",
+      "purpose": "Burst latency including the fail-closed malformed and unknown-entity paths.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "burst at production-like concurrency and database scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "burst", "ratePerSecond": 600, "requests": 180, "burstSize": 90, "burstWindowMs": 30},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_grant_agent_read", "weight": 20},
+        {"workloadId": "allow_derived_summary_same_workspace", "weight": 15},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 20},
+        {"workloadId": "deny_malformed_request", "weight": 15},
+        {"workloadId": "deny_unknown_principal", "weight": 15},
+        {"workloadId": "deny_unknown_action", "weight": 15}
+      ]
+    },
+    {
+      "id": "grant_path_focus",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Explicit grant resolution path",
+      "purpose": "Warm latency when access is resolved through an explicit human-issued grant instead of the workspace ACL.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "grant issuance volume at production-like scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_grant_agent_read", "weight": 45},
+        {"workloadId": "deny_expired_grant_search", "weight": 30},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 25}
+      ]
+    },
+    {
+      "id": "acl_path_focus",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Workspace ACL resolution path",
+      "purpose": "Warm latency of the role-ACL path and of its cross-tenant negative control.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "ACL size and workspace count at production-like scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_acl_owner_read", "weight": 55},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 30},
+        {"workloadId": "deny_self_approval", "weight": 15}
+      ]
+    },
+    {
+      "id": "lease_binding_focus",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Lease binding and fencing path",
+      "purpose": "Warm latency of lease presence, binding and fencing-token validation.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "concurrent leases and fencing-token churn at production-like scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_lease_task_update", "weight": 40},
+        {"workloadId": "deny_lease_binding_mismatch", "weight": 35},
+        {"workloadId": "deny_missing_lease_summary", "weight": 25}
+      ]
+    },
+    {
+      "id": "sandbox_gate_focus",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Sandbox profile gate on the execution path",
+      "purpose": "Warm latency of the LOCAL_RESTRICTED sandbox gate for tool execution, with its negative control.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "tool execution volume with real podman/gVisor sandboxes", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_sandbox_tool_execute", "weight": 50},
+        {"workloadId": "deny_foreign_capability_lease", "weight": 25},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 25}
+      ]
+    },
+    {
+      "id": "derived_inheritance_focus",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Derived-artifact ACL inheritance",
+      "purpose": "Warm latency when a derived artifact inherits the strictest ACL of its inputs.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "derived-artifact fan-in at production-like scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_derived_summary_same_workspace", "weight": 45},
+        {"workloadId": "deny_derived_cross_tenant_poison", "weight": 40},
+        {"workloadId": "deny_cross_tenant_cache_read", "weight": 15}
+      ]
+    },
+    {
+      "id": "fail_closed_malformed_inputs",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Fail-closed handling of malformed and unknown input",
+      "purpose": "Warm latency of the fail-closed path; no malformed or unknown-entity request may ever be allowed.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "adversarial input mix at production-like volume", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "deny_malformed_request", "weight": 40},
+        {"workloadId": "deny_unknown_principal", "weight": 30},
+        {"workloadId": "deny_unknown_action", "weight": 20},
+        {"workloadId": "allow_acl_owner_read", "weight": 10}
+      ]
+    },
+    {
+      "id": "separation_of_duties_focus",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Approval separation of duties and recipient scoping",
+      "purpose": "Warm latency of the approval and message-recipient authority boundaries.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "approval and message volume at production-like scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "deny_self_approval", "weight": 40},
+        {"workloadId": "deny_cross_tenant_message_send", "weight": 35},
+        {"workloadId": "allow_acl_owner_read", "weight": 25}
+      ]
+    },
+    {
+      "id": "single_use_grant_replay",
+      "family": "fault",
+      "scaleClass": "PILOT",
+      "title": "Single-use nonce grant replay",
+      "purpose": "Injected stateful fault: a one-time grant may be spent exactly once; every replay must be denied.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "replay attempts at production-like volume from a separate process", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "single_use_grant_export", "weight": 60},
+        {"workloadId": "allow_grant_agent_read", "weight": 25},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 15}
+      ]
+    },
+    {
+      "id": "engine_recreation_fault",
+      "family": "fault",
+      "scaleClass": "PILOT",
+      "title": "Policy engine recreation under load",
+      "purpose": "Injected fault: the engine instance is recreated every 25 requests; decisions must stay byte-identical to the uninterrupted reference sequence.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "process restart and worker loss at production-like concurrency", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "engineRecreateEveryRequests": 25,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_grant_agent_read", "weight": 30},
+        {"workloadId": "allow_lease_task_update", "weight": 20},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 25},
+        {"workloadId": "deny_expired_grant_search", "weight": 15},
+        {"workloadId": "deny_malformed_request", "weight": 10}
+      ]
+    },
+    {
+      "id": "principal_freeze_fault",
+      "family": "fault",
+      "scaleClass": "PILOT",
+      "title": "Principal freeze (mass invalidation)",
+      "purpose": "Injected fault: the frozen principal is denied with PRINCIPAL_NOT_ACTIVE from the freeze instant on; no allow may survive the freeze.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "mass invalidation with production-scale principal and lease counts", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "freezeAfterRequests": 40,
+      "freezePrincipalId": "prn-owner-alice",
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_acl_owner_read", "weight": 40},
+        {"workloadId": "allow_lease_task_update", "weight": 20},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 20},
+        {"workloadId": "deny_self_approval", "weight": 20}
+      ]
+    },
+    {
+      "id": "sustained_soak_pilot",
+      "family": "soak",
+      "scaleClass": "PILOT",
+      "title": "Sustained pilot soak over the mixed control plane",
+      "purpose": "Longest local run: leak, growth and drift observation at pilot duration only.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "soak >= 24 h at a representative production-like profile", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 900, "requests": 720},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_acl_owner_read", "weight": 20},
+        {"workloadId": "allow_grant_agent_read", "weight": 15},
+        {"workloadId": "allow_lease_task_update", "weight": 10},
+        {"workloadId": "allow_derived_summary_same_workspace", "weight": 5},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 15},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 10},
+        {"workloadId": "deny_lease_binding_mismatch", "weight": 10},
+        {"workloadId": "deny_malformed_request", "weight": 5},
+        {"workloadId": "deny_unknown_principal", "weight": 5},
+        {"workloadId": "deny_self_approval", "weight": 5}
+      ]
+    },
+    {
+      "id": "uniform_mixed_workload",
+      "family": "steady",
+      "scaleClass": "PILOT",
+      "title": "Uniform mix over every frozen workload",
+      "purpose": "Broadest local coverage: every declared workload appears in each seed, so a regression in any single path shows up in the aggregate.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": "uniform mix at production-like volume and scale", "status": "NOT_RUN"},
+      "arrival": {"mode": "open_loop", "ratePerSecond": 600, "requests": 120},
+      "warmupRequests": 10,
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_acl_owner_read", "weight": 6},
+        {"workloadId": "allow_grant_agent_read", "weight": 6},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 5},
+        {"workloadId": "deny_cross_tenant_source_read", "weight": 5},
+        {"workloadId": "deny_cross_tenant_message_send", "weight": 5},
+        {"workloadId": "deny_cross_tenant_cache_read", "weight": 5},
+        {"workloadId": "deny_expired_grant_search", "weight": 5},
+        {"workloadId": "deny_missing_lease_summary", "weight": 5},
+        {"workloadId": "allow_lease_task_update", "weight": 6},
+        {"workloadId": "deny_lease_binding_mismatch", "weight": 5},
+        {"workloadId": "allow_sandbox_tool_execute", "weight": 6},
+        {"workloadId": "deny_foreign_capability_lease", "weight": 5},
+        {"workloadId": "allow_derived_summary_same_workspace", "weight": 6},
+        {"workloadId": "deny_derived_cross_tenant_poison", "weight": 5},
+        {"workloadId": "single_use_grant_export", "weight": 5},
+        {"workloadId": "deny_malformed_request", "weight": 5},
+        {"workloadId": "deny_unknown_principal", "weight": 5},
+        {"workloadId": "deny_unknown_action", "weight": 5},
+        {"workloadId": "deny_self_approval", "weight": 5}
+      ]
+    },
+    {
+      "id": "revocation_gate_s1_008",
+      "family": "security",
+      "scaleClass": "PILOT",
+      "title": "S1-008 revoke-to-deny gate",
+      "purpose": "Revocation security gate: commit-to-deny latency for a revoked grant, with zero post-revoke allows.",
+      "fullScaleRequirement": {"class": "FULL", "requirement": ">= 100 revocation trials at production-like scale, executed by an independent external host", "status": "NOT_RUN"},
+      "revocationTrials": 21,
+      "revocationTrialsPerSeed": 21,
+      "arrival": {"mode": "closed_loop", "ratePerSecond": 0, "requests": 21},
+      "decisionClassesRequired": ["ALLOW", "DENY"],
+      "mix": [
+        {"workloadId": "allow_grant_agent_read", "weight": 50},
+        {"workloadId": "deny_cross_tenant_board_read", "weight": 50}
+      ]
+    }
+  ]
+}

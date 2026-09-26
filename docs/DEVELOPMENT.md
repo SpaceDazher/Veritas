@@ -73,6 +73,7 @@ npm run build
 | Claims | `npm run test:claims`, `npm run verify:s2-004`, `npm run verify:s2-004-db-replay` |
 | Synthesis | `npm run test:synthesis`, `npm run verify:s2-005`, `npm run verify:s2-005-db-replay` |
 | Verifier | `npm run test:verifier`, `npm run verify:s2-006`, `npm run verify:s2-006-db-replay` |
+| SLO qualification | `npm run test:sloqual`, `npm run verify:sloqual-001` |
 | Contract workspace | `npm run verify:draft`, `npm run verify:pilot-binding` |
 | Inventory/manifests | `npm run inventory:check`, `npm run manifest:check` |
 
@@ -102,6 +103,30 @@ npm run verify:s2-006
 - независимая human decision по exact threshold/package digest.
 
 Fixture labels, same-host replay и provider-free tests проверяют engineering behavior, но не повышают assurance автоматически.
+
+## SLOQUAL-001 и SLO contract
+
+```bash
+npm run verify:sloqual-001
+```
+
+Gate выполняет два process-separated запуска замороженного scenario manifest
+(17 scenarios x 5 seeds, 105 revocation trials) против настоящего policy
+engine и применяет fail-closed comparator. Ожидаемый честный verdict —
+`PASS_WITH_LIMITS`: hard counters равны нулю, но пять зарегистрированных
+proof остаются неснятыми (production profile, full-scale fault/soak,
+external host, human countersignature, end-to-end request path).
+
+Особенности, которые нельзя обойти:
+
+- контракт и manifest заморожены self-hash; правка порога после заморозки
+  ломает digest и останавливает gate;
+- gate проверяет, что коммит с контрактом — предок HEAD, иначе verdict
+  `NOT_RUN`: это проверка пре-регистрации, а не декларация;
+- `PASS_WITH_LIMITS` не является `PASS` и не даёт production authority;
+- gate занимает около двух минут: 85 scenario-seed исполнений на запуск.
+
+Полный разбор: [SLOQUAL-001-EVALUATION-REPORT.md](decisions/SLOQUAL-001-EVALUATION-REPORT.md).
 
 ## Contracts и generated types
 

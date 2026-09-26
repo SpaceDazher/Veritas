@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "role": "SLOQUAL-001 run A vs run B fail-closed comparison",
+  "ticket": "SLOQUAL-001",
+  "verdict": "PASS_WITH_LIMITS",
+  "provenance": {
+    "status": "VERIFIED",
+    "head": "06a1fcc7cb64b9942ec896bd7bca8590c7d15902",
+    "freezeCommit": "06a1fcc7cb64b9942ec896bd7bca8590c7d15902",
+    "manifestCommit": "1e2d56c2208e16df4a4cd150d21ed5af18edf1d0",
+    "frozenBeforeImplementation": true,
+    "rule": "The recorded thresholds and proofs must be committed before the commit whose implementation produced the runs."
+  },
+  "startedAt": "2026-09-25T22:17:28.204Z",
+  "completedAt": "2026-09-25T22:19:33.113Z",
+  "command": "npm run verify:sloqual-001",
+  "rawObservationRoots": [
+    "results/sloqual-001/sloqual-a",
+    "results/sloqual-001/sloqual-b"
+  ],
+  "comparatorVersion": "sloqual-comparator-v1",
+  "ok": true,
+  "contractVersion": "1.0.1",
+  "contractSelfHash": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d",
+  "manifestVersion": "1.0.0",
+  "manifestDigest": "505541943b05a795b495294487f1fab5cb08563fba67e7e83324e00d67e199d5",
+  "freeze": {
+    "rule": "sloqual-freeze-v1",
+    "ok": true,
+    "issues": [],
+    "contractVersion": "1.0.1",
+    "contractSelfHash": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d",
+    "recomputedSelfHash": "b400e41efc0e4012685056883033524ebd7e9ecb132e8d5baf4e8864aa83697d",
+    "manifestVersion": "1.0.0",
+    "manifestSha256": "7b5715bb1063e38d35f16ee60e881e6efd65242001f8d6206964e3fb5e6bca6b",
+    "recomputedManifestSha256": "7b5715bb1063e38d35f16ee60e881e6efd65242001f8d6206964e3fb5e6bca6b",
+    "manifestDigest": "505541943b05a795b495294487f1fab5cb08563fba67e7e83324e00d67e199d5"
+  },
+  "runs": [
+    {
+      "label": "runA",
+      "runId": "sloqual-a",
+      "executorId": "exec-alpha",
+      "pid": 431437,
+      "nonce": "sloqual-nonce-alpha-4d21",
+      "outputRoot": "results/sloqual-001/sloqual-a",
+      "platform": "linux/x64",
+      "nodeVersion": "v22.23.2",
+      "policyVersion": "s2-002-policy-v5",
+      "durationMs": 55245.633,
+      "scenarioSeedResults": 85,
+      "warmP95Ms": 0.6,
+      "warmP95Ci95Ms": {
+        "lower": 0.572,
+        "upper": 0.627
+      },
+      "warmP99Ms": 3.867,
+      "burstP95Ms": 1.554,
+      "burstP95Ci95Ms": {
+        "lower": 1.223,
+        "upper": 2.072
+      },
+      "revocationMaxMs": 143.009,
+      "revocationTrials": 105
+    },
+    {
+      "label": "runB",
+      "runId": "sloqual-b",
+      "executorId": "exec-beta",
+      "pid": 431681,
+      "nonce": "sloqual-nonce-beta-9c07",
+      "outputRoot": "results/sloqual-001/sloqual-b",
+      "platform": "linux/x64",
+      "nodeVersion": "v22.23.2",
+      "policyVersion": "s2-002-policy-v5",
+      "durationMs": 57784.22,
+      "scenarioSeedResults": 85,
+      "warmP95Ms": 0.677,
+      "warmP95Ci95Ms": {
+        "lower": 0.62,
+        "upper": 0.745
+      },
+      "warmP99Ms": 3.297,
+      "burstP95Ms": 0.44,
+      "burstP95Ci95Ms": {
+        "lower": 0.413,
+        "upper": 0.468
+      },
+      "revocationMaxMs": 0.219,
+      "revocationTrials": 105
+    }
+  ],
+  "hardCounters": {
+    "runA": {
+      "cross_tenant_allow": 0,
+      "unexpected_decision": 0,
+      "allow_after_principal_freeze": 0,
+      "single_use_grant_replay_allow": 0,
+      "decision_divergence_within_run": 0,
+      "missing_or_censored_samples": 0,
+      "degenerate_scenario_decision_distribution": 0,
+      "allow_after_revocation_commit": 0,
+      "revocation_trial_precondition_failures": 0
+    },
+    "runB": {
+      "cross_tenant_allow": 0,
+      "unexpected_decision": 0,
+      "allow_after_principal_freeze": 0,
+      "single_use_grant_replay_allow": 0,
+      "decision_divergence_within_run": 0,
+      "missing_or_censored_samples": 0,
+      "degenerate_scenario_decision_distribution": 0,
+      "allow_after_revocation_commit": 0,
+      "revocation_trial_precondition_failures": 0
+    }
+  },
+  "satisfiedLimits": [
+    "burst_authorization_p95_ms",
+    "decision_divergence_between_runs",
+    "hardGates",
+    "independent_rerun_same_host",
+    "realization_ratio",
+    "revocation_to_deny_max_ms",
+    "revocation_trials_per_run",
+    "scheduling_lateness_p95_ms",
+    "warm_authorization_p95_ms",
+    "warm_authorization_p99_ms"
+  ],
+  "proofStatus": [
+    {
+      "id": "warm_latency_within_threshold",
+      "status": "SATISFIED",
+      "evidence": "limits.warm_authorization_p95_ms"
+    },
+    {
+      "id": "burst_latency_within_threshold",
+      "status": "SATISFIED",
+      "evidence": "limits.burst_authorization_p95_ms"
+    },
+    {
+      "id": "revocation_gate_s1_008",
+      "status": "SATISFIED",
+      "evidence": "limits.revocation_to_deny_max_ms"
+    },
+    {
+      "id": "fail_closed_invariants",
+      "status": "SATISFIED",
+      "evidence": "hardGates"
+    },
+    {
+      "id": "independent_rerun_same_host",
+      "status": "SATISFIED",
+      "evidence": "decision_divergence_between_runs"
+    },
+    {
+      "id": "production_profile_mapping",
+      "status": "NOT_MEASURED",
+      "evidence": null,
+      "missing": "No representative production profile exists for Veritas. Local numbers are single-host, in-process and cannot be read as a production SLO."
+    },
+    {
+      "id": "full_scale_fault_and_soak_families",
+      "status": "NOT_MEASURED",
+      "evidence": null,
+      "missing": "Local fault and soak families are pilot-scale only (seconds, one process, in-memory enforcement state). Statistical power for these families is insufficient for a full claim."
+    },
+    {
+      "id": "external_independent_execution",
+      "status": "NOT_MEASURED",
+      "evidence": null,
+      "missing": "Both runs execute on one host. Process separation is not host separation; shared CPU, memory and kernel noise remain uncontrolled."
+    },
+    {
+      "id": "human_slo_countersignature",
+      "status": "NEEDS_INPUT",
+      "evidence": null,
+      "missing": "countersignature.status is NEEDS_INPUT. A Veritas SLO has no accountable owner yet; this file cannot grant that authority."
+    },
+    {
+      "id": "end_to_end_request_path",
+      "status": "NOT_MEASURED",
+      "evidence": null,
+      "missing": "The harness measures the decision function only. End-to-end SLOs need a deployed instance and are out of the frozen scope of this contract."
+    }
+  ],
+  "failures": [],
+  "limits": [
+    {
+      "code": "registered_proof_unmet",
+      "detail": "production_profile_mapping: No representative production profile exists for Veritas. Local numbers are single-host, in-process and cannot be read as a production SLO.",
+      "proof": "production_profile_mapping"
+    },
+    {
+      "code": "registered_proof_unmet",
+      "detail": "full_scale_fault_and_soak_families: Local fault and soak families are pilot-scale only (seconds, one process, in-memory enforcement state). Statistical power for these families is insufficient for a full claim.",
+      "proof": "full_scale_fault_and_soak_families"
+    },
+    {
+      "code": "registered_proof_unmet",
+      "detail": "external_independent_execution: Both runs execute on one host. Process separation is not host separation; shared CPU, memory and kernel noise remain uncontrolled.",
+      "proof": "external_independent_execution"
+    },
+    {
+      "code": "registered_proof_unmet",
+      "detail": "human_slo_countersignature: countersignature.status is NEEDS_INPUT. A Veritas SLO has no accountable owner yet; this file cannot grant that authority.",
+      "proof": "human_slo_countersignature"
+    },
+    {
+      "code": "registered_proof_unmet",
+      "detail": "end_to_end_request_path: The harness measures the decision function only. End-to-end SLOs need a deployed instance and are out of the frozen scope of this contract.",
+      "proof": "end_to_end_request_path"
+    }
+  ],
+  "failureCount": 0,
+  "limitCount": 5,
+  "authority": {
+    "productionSloAuthorized": false,
+    "productionReadinessClaimed": false,
+    "independentExternalAuditClaimed": false,
+    "legalReviewClaimed": false,
+    "spendAuthorized": false,
+    "statement": "PASS_WITH_LIMITS is not PASS. A PASS from this contract covers the frozen local contract only and never authorizes a production SLO, a rollout, a legal opinion or spending.",
+    "verdictMeaning": "No hard violation, but at least one registered proof is unsatisfied and itemized above. This is not PASS."
+  }
+}
