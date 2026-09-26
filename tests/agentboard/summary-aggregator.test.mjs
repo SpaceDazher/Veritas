@@ -742,7 +742,9 @@ describe('the probe runner never writes a credential and never claims a database
   });
 
   it('reports the in-memory tier honestly when container provisioning is refused', async () => {
-    const database = await resolveDatabase({ podmanAllowed: false });
+    // This case models an operator with no supplied database, even when the
+    // suite itself has DATABASE_URL for its separate integration tests.
+    const database = await resolveDatabase({ podmanAllowed: false, env: {} });
     assert.equal(database.tier, 'in_memory');
     assert.equal(database.connectionString, null);
     assert.match(database.reason, /NO_DATABASE_URL/);
