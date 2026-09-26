@@ -6,8 +6,8 @@
   "gate": "test:s2-007-security-probes",
   "probeModule": "src/lib/agentboard/probes.mjs",
   "version": "s2-007-probes-v1",
-  "commit": "d7ea79fbac357ea17057511044d5235655ee33e1",
-  "tree": "b1a72d70554f1c14f6369fefb73756a559a811ba",
+  "commit": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+  "tree": "efae7534c7b496687ca217f35f4906cbdd41c99c",
   "status": "PASS",
   "ok": true,
   "exitCode": 0,
@@ -491,7 +491,7 @@
     "container": "veritas-s2-007-security-probes",
     "migrationsApplied": 8,
     "migrationCount": 8,
-    "connection": "postgresql://veritas_s2_007_probes@127.0.0.1:39815/veritas_s2_007_probes (password redacted)",
+    "connection": "postgresql://veritas_s2_007_probes@127.0.0.1:44107/veritas_s2_007_probes (password redacted)",
     "reason": null,
     "note": "a disposable hardened container was provisioned for this gate, migrated through scripts/apply-migrations.mjs, and removed afterwards"
   },
@@ -3396,6 +3396,6 @@
     "A green probe run is evidence about REFUSALS, not about task quality, human review or calibration.",
     "The database tier is a disposable container with a fixture task set; it is not a production persistence, backup or restore validation."
   ],
-  "runId": "s2-007-probes-54d049b6712b785990fda1e1",
-  "recordDigest": "023e4c199ab80a7d9c641201f8d4731bc19e7105a628293693cc6de7c798ea11"
+  "runId": "s2-007-probes-ae83265a163181958b6a41b7",
+  "recordDigest": "debfd68c67966c0f512e8090c4616cf5da28401cf57e662923317e84337f3f1c"
 }

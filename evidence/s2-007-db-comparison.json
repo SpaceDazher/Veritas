@@ -144,8 +144,8 @@
       "run_b": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb"
     },
     "raw_digests": {
-      "run_a": "853b6a4745f15b5b1be58d2cfc7cf2b3fad32cd656915c9b88fb801a7357189f",
-      "run_b": "2c40f53116aee210d7164ac19a9b75234508337df0bf30845fa9ed9737f8ec10"
+      "run_a": "010882cf90821ddf0b96783e0084c257ab018495ace3e8e76f8d3d63dcbe1299",
+      "run_b": "3ce39e56a0d6864a17ca01074e93b647e81c4f766a7bae7170b8aaa9b5e0dbab"
     },
     "raw_digest_note": "the raw digests differ by construction: the database clock wrote different instants into the two schemas. The canonical comparison uses the documented projection (see the executor header).",
     "crash_phase_digests": {
@@ -264,8 +264,8 @@
       "b": "SIGKILL"
     },
     "pids": {
-      "a": 335281,
-      "b": 335306
+      "a": 362315,
+      "b": 362341
     },
     "effects_issued": {
       "a": 1,
@@ -300,10 +300,10 @@
     "ok": true
   },
   "freshness": {
-    "started_at": "2026-09-26T04:18:03.455Z",
-    "finished_at": "2026-09-26T04:18:11.289Z",
-    "duration_ms": 7834,
-    "observed_at": "2026-09-26T04:18:11.289Z",
+    "started_at": "2026-09-26T04:26:43.176Z",
+    "finished_at": "2026-09-26T04:26:52.021Z",
+    "duration_ms": 8845,
+    "observed_at": "2026-09-26T04:26:52.021Z",
     "run_ids": [
       "s2-007-db-run-a",
       "s2-007-db-run-b"
@@ -318,9 +318,9 @@
     }
   },
   "git": {
-    "commit_sha": "9e6e518fe73bacb6ff98796293d9f86d2b89d273",
-    "tree_sha": "d2a63ad098ccc2cc9fcb0218c62c121e1359ee02",
-    "dirty": false,
+    "commit_sha": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+    "tree_sha": "efae7534c7b496687ca217f35f4906cbdd41c99c",
+    "dirty": true,
     "note": "the record describes this TREE; an aggregator re-reads HEAD^{tree} and refuses a record that no longer matches"
   },
   "exitCode": 0

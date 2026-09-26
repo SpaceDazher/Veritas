@@ -4,9 +4,9 @@
   "issue": "SpaceDazher/Veritas#7",
   "role": "verification aggregator: freshness, internal status, the seven hard-gate counters, the tamper matrix and the derived verdict",
   "gate": "verify:s2-007",
-  "commit": "d7ea79fbac357ea17057511044d5235655ee33e1",
-  "tree": "b1a72d70554f1c14f6369fefb73756a559a811ba",
-  "runId": "s2-007-verify-600417597d5a9b7f95d6a94b",
+  "commit": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+  "tree": "efae7534c7b496687ca217f35f4906cbdd41c99c",
+  "runId": "s2-007-verify-149e4966ea0216e1301fb2a2",
   "freshnessModel": "Every mandatory gate is re-run by THIS process. An evidence artifact is accepted only when (a) the process exited 0, (b) the bytes on disk hash to the digest the gate reported for the file it just wrote, (c) the record content address matches, (d) the record is bound to the current HEAD commit and, where the record carries one, to the current HEAD tree, and (e) the internal status, hardGates.ok, comparison.ok and the seven counters say PASS. The frozen evidence/s2-007-dependency-binding.json format has no HEAD-tree field, so that gate is anchored on the HEAD commit, which subsumes the tree for any committed change; uncommitted changes are caught by the dirty-checkout check, which caps the verdict at PASS_WITH_LIMITS.",
   "gateContracts": {
     "dependencies": {
@@ -62,19 +62,17 @@
       "counters": null,
       "freshness": {
         "evidenceFile": "evidence/s2-007-dependency-binding.json",
-        "beforeSha256": "267a976c8b40d18346f2bf10c42a8e415202b0c5a0a2bee9d9e2ed5a06431d10",
-        "afterSha256": "267a976c8b40d18346f2bf10c42a8e415202b0c5a0a2bee9d9e2ed5a06431d10",
+        "beforeSha256": "c6bc111eddade35e5b54c550a1c7b2cee2d6455fa19ea6b815eb11db048aaeff",
+        "afterSha256": "c6bc111eddade35e5b54c550a1c7b2cee2d6455fa19ea6b815eb11db048aaeff",
         "rewritten": false,
         "createdByThisRun": false,
-        "commitAnchor": "d7ea79fbac357ea17057511044d5235655ee33e1",
-        "treeAnchor": "b1a72d70554f1c14f6369fefb73756a559a811ba"
+        "commitAnchor": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+        "treeAnchor": "efae7534c7b496687ca217f35f4906cbdd41c99c"
       },
       "stderrTail": null,
-      "stdoutTail": "          \"     39, 100, 111,  99, 115,  47, 100, 101,  99, 105, 115, 105,\",\n          \"    111, 110, 115,  47,  83,  50,  45,  48,  48,  55,  45,  69,\",\n          \"     86,  65,  76,  85,  65,  84,  73,  79,  78,  45,  82,  69,\",\n          \"     80,  79,  82,  84,  46, 109, 100,  39,  32, 101, 120, 105,\",\n          \"    115, 116, 115,  32, 111, 110,  32, 100, 105, 115, 107,  44,\",\n          \"     32,  98, 117, 116,  32, 110, 111, 116,  32, 105, 110,  32,\",\n          \"     39,  72,  69,  65,  68,  39,  10\",\n          \"  ]\",\n          \"}\",\n          \"\",\n          \"Node.js v22.23.2\"\n        ]\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 15\n}\n",
+      "stdoutTail": " \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 1,\n        \"signal\": null,\n        \"status\": \"FAILED_NONZERO\",\n        \"diagnostics\": [\n          \"run-a/trialCount=283/oracle=282\",\n          \"run-b/trialCount=283/oracle=282\",\n          \"run-a/fs_network_secret_escapes=1\",\n          \"run-b/fs_network_secret_escapes=1\"\n        ]\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 15\n}\n",
       "reportedIssues": [
-        "rerun.verify-s2-002:failed_nonzero(exit=1)",
-        "rerun.manifest-check:failed_nonzero(exit=1)",
-        "src/lib/agentboard/contracts.mjs:frozen-foundation-working-tree-drift"
+        "rerun.verify-s2-002:failed_nonzero(exit=1)"
       ]
     },
     "agentboard-tests": {
@@ -111,10 +109,10 @@
         "artifact": null,
         "note": "node --test --test-concurrency=1 over tests/agentboard/*.test.mjs: exit 0, \"# fail 0\", a non-zero test count. This gate has no artifact by design, so its freshness is the fact that THIS aggregator spawned the process in THIS invocation and binds the output digest into this run id.",
         "boundToThisInvocation": true,
-        "stdoutSha256": "481bcd72b277a67f1f57f039ddd2e48d967ea7913e8777389362d09a77c13e1b"
+        "stdoutSha256": "40ca611e8df1d8fc1da706aa05a1ce7e02601be830b272bfb3e6f7d0b543fba5"
       },
       "stderrTail": null,
-      "stdoutTail": "er claim\n    ok 5 - the current state is read from the task row, never from the caller claim\n      ---\n      duration_ms: 0.074509\n      type: 'test'\n      ...\n    # Subtest: no argument is optional\n    ok 6 - no argument is optional\n      ---\n      duration_ms: 0.094023\n      type: 'test'\n      ...\n    1..6\nok 62 - S2-007 every disallowed pair is refused with TRANSITION_NOT_ALLOWED\n  ---\n  duration_ms: 4.021783\n  type: 'suite'\n  ...\n# Subtest: S2-007 a guard authorizes only the edge the table binds it to\n    # Subtest: each guard refuses a pair that is not its own\n    ok 1 - each guard refuses a pair that is not its own\n      ---\n      duration_ms: 0.241008\n      type: 'test'\n      ...\n    # Subtest: a guard given only its own edge and no proof still refuses\n    ok 2 - a guard given only its own edge and no proof still refuses\n      ---\n      duration_ms: 0.290316\n      type: 'test'\n      ...\n    # Subtest: a guard with a context that is not an object refuses\n    ok 3 - a guard with a context that is not an object refuses\n      ---\n      duration_ms: 0.544128\n      type: 'test'\n      ...\n    1..3\nok 63 - S2-007 a guard authorizes only the edge the table binds it to\n  ---\n  duration_ms: 1.139566\n  type: 'suite'\n  ...\n# Subtest: S2-007 actor kinds are closed and machine kinds cannot be the gate\n    # Subtest: the actor kind list is the frozen six\n    ok 1 - the actor kind list is the frozen six\n      ---\n      duration_ms: 0.110169\n      type: 'test'\n      ...\n    # Subtest: the DONE edge requires an approval actor kind, so a producer cannot finish its own task\n    ok 2 - the DONE edge requires an approval actor kind, so a producer cannot finish its own task\n      ---\n      duration_ms: 0.079294\n      type: 'test'\n      ...\n    1..2\nok 64 - S2-007 actor kinds are closed and machine kinds cannot be the gate\n  ---\n  duration_ms: 0.250542\n  type: 'suite'\n  ...\n1..64\n# tests 338\n# suites 64\n# pass 338\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 9578.702401\n",
+      "stdoutTail": "er claim\n    ok 5 - the current state is read from the task row, never from the caller claim\n      ---\n      duration_ms: 0.104944\n      type: 'test'\n      ...\n    # Subtest: no argument is optional\n    ok 6 - no argument is optional\n      ---\n      duration_ms: 0.121711\n      type: 'test'\n      ...\n    1..6\nok 62 - S2-007 every disallowed pair is refused with TRANSITION_NOT_ALLOWED\n  ---\n  duration_ms: 4.778531\n  type: 'suite'\n  ...\n# Subtest: S2-007 a guard authorizes only the edge the table binds it to\n    # Subtest: each guard refuses a pair that is not its own\n    ok 1 - each guard refuses a pair that is not its own\n      ---\n      duration_ms: 0.307289\n      type: 'test'\n      ...\n    # Subtest: a guard given only its own edge and no proof still refuses\n    ok 2 - a guard given only its own edge and no proof still refuses\n      ---\n      duration_ms: 0.360039\n      type: 'test'\n      ...\n    # Subtest: a guard with a context that is not an object refuses\n    ok 3 - a guard with a context that is not an object refuses\n      ---\n      duration_ms: 0.668502\n      type: 'test'\n      ...\n    1..3\nok 63 - S2-007 a guard authorizes only the edge the table binds it to\n  ---\n  duration_ms: 1.422004\n  type: 'suite'\n  ...\n# Subtest: S2-007 actor kinds are closed and machine kinds cannot be the gate\n    # Subtest: the actor kind list is the frozen six\n    ok 1 - the actor kind list is the frozen six\n      ---\n      duration_ms: 0.096078\n      type: 'test'\n      ...\n    # Subtest: the DONE edge requires an approval actor kind, so a producer cannot finish its own task\n    ok 2 - the DONE edge requires an approval actor kind, so a producer cannot finish its own task\n      ---\n      duration_ms: 0.082582\n      type: 'test'\n      ...\n    1..2\nok 64 - S2-007 actor kinds are closed and machine kinds cannot be the gate\n  ---\n  duration_ms: 0.243869\n  type: 'suite'\n  ...\n1..64\n# tests 338\n# suites 64\n# pass 338\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 9791.151322\n",
       "reportedIssues": null
     },
     "security-probes": {
@@ -127,7 +125,7 @@
         {
           "check": "freshness:byte-digest-matches-this-run",
           "ok": true,
-          "detail": "file=1b01c6576ca4029c reported=1b01c6576ca4029c"
+          "detail": "file=ea6ee97060290731 reported=ea6ee97060290731"
         },
         {
           "check": "freshness:record-digest-matches-this-run",
@@ -187,12 +185,12 @@
       },
       "freshness": {
         "evidenceFile": "evidence/s2-007-security-probes.json",
-        "beforeSha256": "1420cf19bae3f8596defc63f607761df2cf81489304288f6b5dda31e2946fa67",
-        "afterSha256": "1b01c6576ca4029c5a4497b43c5e974f619550c4a3161bc967ed32ac6eab6075",
+        "beforeSha256": "1b01c6576ca4029c5a4497b43c5e974f619550c4a3161bc967ed32ac6eab6075",
+        "afterSha256": "ea6ee9706029073185d0f71c88fdb229a76aedf6bcdbf641df056fcb24d472cb",
         "rewritten": true,
         "createdByThisRun": true,
-        "commitAnchor": "d7ea79fbac357ea17057511044d5235655ee33e1",
-        "treeAnchor": "b1a72d70554f1c14f6369fefb73756a559a811ba"
+        "commitAnchor": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+        "treeAnchor": "efae7534c7b496687ca217f35f4906cbdd41c99c"
       },
       "stderrTail": null,
       "stdoutTail": null,
@@ -263,16 +261,16 @@
       },
       "freshness": {
         "evidenceFile": "evidence/s2-007-db-comparison.json",
-        "beforeSha256": "1bbaff6a5627109b3c4fea6062196af16cef1e9414976a0c8620deb427f0be2c",
-        "afterSha256": "b66188755ab03c8cff61ecbdd588a2a0e43cf9ba2ab907dfd1d115de3090378a",
+        "beforeSha256": "ed896bb60bf3631e75ff989e2518a8b34e7cb2c4c610096c1a763b5fb161d827",
+        "afterSha256": "67b7d35ce2fc821728d16f19a723fbffb6d2e9a860f3abd9fb1988d5648136a2",
         "rewritten": true,
         "createdByThisRun": true,
-        "commitAnchor": "d7ea79fbac357ea17057511044d5235655ee33e1",
-        "treeAnchor": "b1a72d70554f1c14f6369fefb73756a559a811ba",
+        "commitAnchor": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+        "treeAnchor": "efae7534c7b496687ca217f35f4906cbdd41c99c",
         "boundBy": "the written file is deep-equal to {this run's stdout report, its exit code}"
       },
       "stderrTail": null,
-      "stdoutTail": "\"b\": \"SIGKILL\"\n    },\n    \"pids\": {\n      \"a\": 288733,\n      \"b\": 288758\n    },\n    \"effects_issued\": {\n      \"a\": 1,\n      \"b\": 1\n    },\n    \"effects_issued_after_blind_retry\": {\n      \"a\": 1,\n      \"b\": 1\n    },\n    \"refusals\": {\n      \"a\": {\n        \"lateResult\": \"TRANSITION_NOT_ALLOWED\",\n        \"reconcileByProducer\": \"AUTH_REQUIRED\"\n      },\n      \"b\": {\n        \"lateResult\": \"TRANSITION_NOT_ALLOWED\",\n        \"reconcileByProducer\": \"AUTH_REQUIRED\"\n      }\n    }\n  },\n  \"hardGates\": {\n    \"counters\": {\n      \"crossWorkspaceLeaks\": 0,\n      \"authorityExpansions\": 0,\n      \"duplicateActiveLeases\": 0,\n      \"duplicateExternalEffects\": 0,\n      \"staleFenceMutations\": 0,\n      \"missingJournalOrOutbox\": 0,\n      \"falseApprovals\": 0\n    },\n    \"violations\": [],\n    \"ok\": true\n  },\n  \"freshness\": {\n    \"started_at\": \"2026-09-26T04:03:16.577Z\",\n    \"finished_at\": \"2026-09-26T04:03:27.696Z\",\n    \"duration_ms\": 11119,\n    \"observed_at\": \"2026-09-26T04:03:27.696Z\",\n    \"run_ids\": [\n      \"s2-007-db-run-a\",\n      \"s2-007-db-run-b\"\n    ],\n    \"run_ids_unique\": true,\n    \"window_ms\": 86400000,\n    \"age_ms\": 0,\n    \"verdict\": {\n      \"ok\": true,\n      \"issues\": [],\n      \"age_ms\": 0\n    }\n  },\n  \"git\": {\n    \"commit_sha\": \"d7ea79fbac357ea17057511044d5235655ee33e1\",\n    \"tree_sha\": \"b1a72d70554f1c14f6369fefb73756a559a811ba\",\n    \"dirty\": true,\n    \"note\": \"the record describes this TREE; an aggregator re-reads HEAD^{tree} and refuses a record that no longer matches\"\n  },\n  \"exitCode\": 0\n}\n",
+      "stdoutTail": " \"b\": \"SIGKILL\"\n    },\n    \"pids\": {\n      \"a\": 359311,\n      \"b\": 359336\n    },\n    \"effects_issued\": {\n      \"a\": 1,\n      \"b\": 1\n    },\n    \"effects_issued_after_blind_retry\": {\n      \"a\": 1,\n      \"b\": 1\n    },\n    \"refusals\": {\n      \"a\": {\n        \"lateResult\": \"TRANSITION_NOT_ALLOWED\",\n        \"reconcileByProducer\": \"AUTH_REQUIRED\"\n      },\n      \"b\": {\n        \"lateResult\": \"TRANSITION_NOT_ALLOWED\",\n        \"reconcileByProducer\": \"AUTH_REQUIRED\"\n      }\n    }\n  },\n  \"hardGates\": {\n    \"counters\": {\n      \"crossWorkspaceLeaks\": 0,\n      \"authorityExpansions\": 0,\n      \"duplicateActiveLeases\": 0,\n      \"duplicateExternalEffects\": 0,\n      \"staleFenceMutations\": 0,\n      \"missingJournalOrOutbox\": 0,\n      \"falseApprovals\": 0\n    },\n    \"violations\": [],\n    \"ok\": true\n  },\n  \"freshness\": {\n    \"started_at\": \"2026-09-26T04:26:00.179Z\",\n    \"finished_at\": \"2026-09-26T04:26:07.952Z\",\n    \"duration_ms\": 7773,\n    \"observed_at\": \"2026-09-26T04:26:07.952Z\",\n    \"run_ids\": [\n      \"s2-007-db-run-a\",\n      \"s2-007-db-run-b\"\n    ],\n    \"run_ids_unique\": true,\n    \"window_ms\": 86400000,\n    \"age_ms\": 0,\n    \"verdict\": {\n      \"ok\": true,\n      \"issues\": [],\n      \"age_ms\": 0\n    }\n  },\n  \"git\": {\n    \"commit_sha\": \"fcc4ced561c455f5c6e3263a4a58b824005ca092\",\n    \"tree_sha\": \"efae7534c7b496687ca217f35f4906cbdd41c99c\",\n    \"dirty\": true,\n    \"note\": \"the record describes this TREE; an aggregator re-reads HEAD^{tree} and refuses a record that no longer matches\"\n  },\n  \"exitCode\": 0\n}\n",
       "reportedIssues": null
     }
   },
@@ -395,8 +393,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=675d4d55881a63ac reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--stale-commit.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=e01f3767fec007f5 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--stale-commit.json"
       },
       {
         "gate": "security-probes",
@@ -406,8 +404,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=728d0f80048a755a reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--stale-tree.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=3563547e728eb04e reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--stale-tree.json"
       },
       {
         "gate": "security-probes",
@@ -417,8 +415,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=8fc63243b5a0dd13 reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--counter-nonzero.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=01db7cb5e8e100c7 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--counter-nonzero.json"
       },
       {
         "gate": "security-probes",
@@ -428,8 +426,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=7f59f4f490e68a19 reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--hardgates-flipped.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9680954b5be162af reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--hardgates-flipped.json"
       },
       {
         "gate": "security-probes",
@@ -439,8 +437,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=21d492381905b641 reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--status-not-run-db.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=787d58f2a5ab7a68 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--status-not-run-db.json"
       },
       {
         "gate": "security-probes",
@@ -450,8 +448,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--hand-written-green.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--hand-written-green.json"
       },
       {
         "gate": "security-probes",
@@ -461,8 +459,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=a821ad35adefcf66 reported=1b01c6576ca4029c",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/security-probes--omits-hidden.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=19ed94dae1c272f7 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--omits-hidden.json"
       },
       {
         "gate": "db-replay",
@@ -473,7 +471,7 @@
         "baselineStatus": "PASS",
         "strong": true,
         "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/db-replay--db-stale-commit.json"
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-stale-commit.json"
       },
       {
         "gate": "db-replay",
@@ -484,7 +482,7 @@
         "baselineStatus": "PASS",
         "strong": true,
         "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/db-replay--db-stale-tree.json"
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-stale-tree.json"
       },
       {
         "gate": "db-replay",
@@ -495,7 +493,7 @@
         "baselineStatus": "PASS",
         "strong": true,
         "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/db-replay--db-counter-nonzero.json"
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-counter-nonzero.json"
       },
       {
         "gate": "db-replay",
@@ -506,7 +504,7 @@
         "baselineStatus": "PASS",
         "strong": true,
         "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/db-replay--db-status-not-run-db.json"
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-status-not-run-db.json"
       },
       {
         "gate": "db-replay",
@@ -517,7 +515,7 @@
         "baselineStatus": "PASS",
         "strong": true,
         "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
-        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-d7ea79fbac35/db-replay--db-crash-phase-faked.json"
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-crash-phase-faked.json"
       }
     ]
   },
@@ -566,7 +564,7 @@
     {
       "criterion": "C1 dependency binding",
       "requirement": "issue §1: an upstream binding is verified before any implementation; a missing binding is BLOCKED_DEPENDENCY",
-      "observation": "dependency gate BLOCKED_DEPENDENCY (exit 1); the binding record is bound to HEAD commit d7ea79fbac357ea17057511044d5235655ee33e1",
+      "observation": "dependency gate BLOCKED_DEPENDENCY (exit 1); the binding record is bound to HEAD commit fcc4ced561c455f5c6e3263a4a58b824005ca092",
       "evidence": "evidence/s2-007-dependency-binding.json",
       "status": "BLOCKED_DEPENDENCY"
     },
@@ -689,7 +687,7 @@
       }
     ],
     "note": "A-MVP stays NOT_RUN. Engineering fixture/replay evidence never upgrades it (issue #7, spec rule 8).",
-    "headCommit": "d7ea79fbac357ea17057511044d5235655ee33e1"
+    "headCommit": "fcc4ced561c455f5c6e3263a4a58b824005ca092"
   },
   "engineeringStatus": "BLOCKED_DEPENDENCY",
   "assuranceStatus": "NOT_MEASURED",
@@ -710,48 +708,12 @@
   "checkout": {
     "available": true,
     "clean": false,
-    "changedPathCount": 45,
+    "changedPathCount": 4,
     "changedPaths": [
-      "README.md",
-      "docs/decisions/S2-007-EVALUATION-REPORT.md",
-      "docs/stages/S2-007.md",
-      "evidence/s2-007-comparison.json",
-      "evidence/s2-007-db-comparison.json",
-      "evidence/s2-007-db-run-a.json",
-      "evidence/s2-007-db-run-b.json",
-      "evidence/s2-007-dependency-binding.json",
-      "evidence/s2-007-run-a.json",
-      "evidence/s2-007-run-b.json",
-      "evidence/s2-007-security-probes.json",
-      "evidence/s2-007-summary.json",
-      "package.json",
-      "scripts/generate-board-types.mjs",
-      "scripts/s2-007-db-replay-executor.mjs",
-      "scripts/s2-007-db-replay.mjs",
-      "scripts/s2-007-run.mjs",
-      "scripts/s2-007-security-probes.mjs",
-      "scripts/verify-s2-007-dependencies.mjs",
-      "scripts/verify-s2-007.mjs",
-      "scripts/veritas-board-cli.mjs",
-      "src/app/api/agent-board/[...path]/route.ts",
-      "src/app/api/agent-board/route.ts",
-      "src/lib/agentboard/adapters.mjs",
-      "src/lib/agentboard/commands.mjs",
-      "src/lib/agentboard/contracts.d.ts",
-      "src/lib/agentboard/contracts.mjs",
-      "src/lib/agentboard/http.d.mts",
-      "src/lib/agentboard/http.mjs",
-      "src/lib/agentboard/next-transport.ts",
-      "src/lib/agentboard/policy.mjs",
-      "src/lib/agentboard/probes.mjs",
-      "src/lib/agentboard/scheduler.mjs",
-      "src/lib/agentboard/store.mjs",
-      "tests/agentboard/concurrency.test.mjs",
-      "tests/agentboard/contracts-drift.test.mjs",
-      "tests/agentboard/contracts.test.mjs",
-      "tests/agentboard/execution-callbacks.test.mjs",
-      "tests/agentboard/idempotency.test.mjs",
-      "tests/agentboard/injection.test.mjs"
+      "vidence/public-artifact-check.json",
+      "vidence/s2-007-db-comparison.json",
+      "vidence/s2-007-db-run-a.json",
+      "vidence/s2-007-db-run-b.json"
     ]
   },
   "finalAcceptance": {
@@ -790,5 +752,5 @@
     "evidence": "delete evidence/s2-007-*.json; the gates are re-runnable from a clean checkout.",
     "verification": "npm run verify:s2-007 (the aggregator will report NOT_RUN/BLOCKED rather than green until every gate is green again)."
   },
-  "recordDigest": "2b80d7bc57a2825f3591a91f0d50d918ea72cc8504a45dc93bbdc0dac2ea39f1"
+  "recordDigest": "c2aee6435284a6b771e5f1bb2b4635399980f114676fb74d1f5d86f1f3b1a37f"
 }
