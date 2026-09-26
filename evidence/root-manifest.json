@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "029e4145eb5af985f7548b7feff641453b933fa0",
-  "sourceTree": "ba4937d9f5209c07d083d4d09a4329458000c052",
+  "sourceCommit": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+  "sourceTree": "921fcb8582c4267ad6bb9ad738553257ca1c428a",
   "trackedFileCount": 770,
   "manifestFileCount": 765,
-  "payloadManifestSha256": "8bfc31e02e4aff898a8484e754e3a8a0011f7eec085257399d7f4365c1ed955b",
-  "fileManifestSha256": "df6d4724090b4145f74459ac1628e693267edc3b5f771683354bf1bf00f28f3c",
+  "payloadManifestSha256": "e04384467411a8a36d79bb9d7f43ae362923a01ff124fcab608b42c6a2dd3fd0",
+  "fileManifestSha256": "5eaaa9bef92df4250242115da35f933e9ef94fa13561d56b5bb62666a2317ad8",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1893,8 +1893,8 @@
     },
     {
       "path": "docs/decisions/S2-007-EVALUATION-REPORT.md",
-      "sha256": "cb68e98b6b52c5c1f6341f5ca9aab68e88e02187a5b632b1776c30a2feb59481",
-      "bytes": 64941
+      "sha256": "2d51d803aef0b91d43d273f549e74d0c7b4fd6ef0779594ac91ce4116ff9bb13",
+      "bytes": 63446
     },
     {
       "path": "docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md",
@@ -1963,8 +1963,8 @@
     },
     {
       "path": "docs/stages/S2-007.md",
-      "sha256": "3e58a822c57826db2923ed50c09f1fc7b3a154f51eeb051ae39597bb07e3982b",
-      "bytes": 13181
+      "sha256": "431591d318b54b75096d82013ce262e8e156c6d0dc276539caf19fa4cd617e4e",
+      "bytes": 13221
     },
     {
       "path": "docs/stages/stage-1.md",
@@ -2068,7 +2068,7 @@
     },
     {
       "path": "evidence/public-artifact-check.json",
-      "sha256": "e4c4dfe6f0677483171183d654c980c0c111963b5dc33c3dc55c08d7b848ae9a",
+      "sha256": "ebd4a6643b87ad4c03d9c029b7a3ba4b8ef6c055f4eaeef62263b01700530033",
       "bytes": 370
     },
     {
@@ -2503,8 +2503,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "5fdc4157f1239b3d8731bdbc562af0469091badad0fef1cd56df72c7a8bcd647",
-      "bytes": 11229
+      "sha256": "c84774a1249776c132d60ec845a82a29563903e66894c94a52889271dc4ed00b",
+      "bytes": 10422
     },
     {
       "path": "results/s2-002/run-a/observations.json",
