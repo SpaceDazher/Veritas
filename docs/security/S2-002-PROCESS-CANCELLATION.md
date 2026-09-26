@@ -137,6 +137,8 @@ verify:s2-002-cancellation`):
 | `cancellation/negative-control-no-process-table` | negative control | an observer that cannot read the process table yields `UNVERIFIED`, `terminated: false`, `survivors: null` |
 | `cancellation/negative-control-descendant-query-fails` | negative control | descendant enumeration failing alone also fails the proof closed, even when liveness still works |
 | `cancellation/recycled-pid-not-signalled` | negative control | a stale identity token reports `pidReused`; the unrelated live pid is neither signalled nor counted |
+| `cancellation/s2-002-frozen-corpus-hard-counters` | replay | the frozen corpus replays clean on this host: all six hard counters at zero, no counter violations, no oracle violations |
+| `cancellation/historical-evidence-untouched` | integrity | the eight pre-fix evidence records still match their committed digests |
 
 In the frozen corpus: `sandbox/cancellation-survivors` (real descendant, plus
 independent ground truth on the pids the descendant published) and
@@ -180,6 +182,16 @@ platform-conditional one. That is a corpus revision, recorded as
 `corpusRevision: 2` in every summary, and it is exactly why a Windows-only
 replay could not establish the non-Windows property: the old corpus had no
 non-Windows cancellation evidence in it to begin with.
+
+`npm run verify:s2-002` — the process-separated authority — was re-run on
+`linux/x64` after the fix and exits `0`: 284 compared trials, zero mismatched
+decisions, zero counter violations, and all six hard counters at zero. Before
+the fix the same command could not pass off Windows at all. That run is not
+committed here, because `verify:s2-002` writes `evidence/s2-002-run-a.json`,
+`run-b`, `comparison` and `comparison-integrity` by design and those are the
+pre-fix records; the in-process replay inside
+`cancellation/s2-002-frozen-corpus-hard-counters` publishes the same result as
+new versioned evidence instead.
 
 ## 5. What this does not establish
 

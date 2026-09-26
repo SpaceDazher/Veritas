@@ -21,6 +21,8 @@ import { pathToFileURL } from 'node:url';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
 import { SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
 import { DEFAULT_PROCESS_OBSERVER } from '../src/lib/identity/process-observer.mjs';
+import { runCorpus } from './s2-002-run.mjs';
+import { compareRuns } from './verify-s2-002.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
@@ -319,6 +321,47 @@ async function caseRecycledPidIsNeverSignalled() {
     `observer=${DEFAULT_PROCESS_OBSERVER.id}; alive=${JSON.stringify(result.alive)}; pidReused=${JSON.stringify(result.pidReused)}`);
 }
 
+// The whole S2-002 hard-counter set, re-observed on this host after the fix.
+// `npm run verify:s2-002` remains the process-separated authority; this
+// records the same frozen corpus replayed in-process, so the post-fix result is
+// published as new versioned evidence instead of overwriting the pre-fix run
+// records.
+async function caseFrozenCorpusHardCounters() {
+  const runA = await runCorpus({
+    runId: 'cancellation-v2-a',
+    executorId: 'exec-cancel-v2-alpha',
+    nonceBase: 'nb-cancel-v2-alpha',
+    outputRoot: fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-v2-a-')),
+  });
+  const runB = await runCorpus({
+    runId: 'cancellation-v2-b',
+    executorId: 'exec-cancel-v2-beta',
+    nonceBase: 'nb-cancel-v2-beta',
+    outputRoot: fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-v2-b-')),
+  });
+  const comparison = compareRuns(runA.summary, runB.summary, runA.observations, runB.observations);
+  for (const root of [runA.summary.outputRoot, runB.summary.outputRoot]) {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+  const counters = runA.summary.counters;
+  const checks = [
+    comparison.ok === true,
+    comparison.mismatchedDecisions === 0,
+    comparison.counterViolations.length === 0,
+    comparison.expectedOracleViolations.length === 0,
+    runA.summary.corpusDigest === runB.summary.corpusDigest,
+    ...Object.entries(PRESERVED_HARD_GATES).map(([counter, limit]) => {
+      const value = counters[counter];
+      return Number.isInteger(value) && value >= 0 && value <= limit;
+    }),
+    runB.summary.counters.survivors_after_cancellation === 0,
+  ];
+  return ok('cancellation/s2-002-frozen-corpus-hard-counters', checks,
+    `inProcessReplay; comparedTrials=${comparison.comparedTrials}; corpusRevision=${runA.summary.corpusRevision}; ` +
+    `corpusDigest=${runA.summary.corpusDigest.slice(0, 16)}; counters=${JSON.stringify(counters)}; ` +
+    `counterViolations=${JSON.stringify(comparison.counterViolations)}`);
+}
+
 export async function runCancellationVerification() {
   const cases = [
     await caseCancellationProvesTree(),
@@ -326,6 +369,7 @@ export async function runCancellationVerification() {
     await caseNegativeControlNoProcessTable(),
     await caseNegativeControlDescendantQueryFails(),
     await caseRecycledPidIsNeverSignalled(),
+    await caseFrozenCorpusHardCounters(),
     checkHistoricalEvidenceUntouched(),
   ];
   const counters = {

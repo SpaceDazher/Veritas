@@ -281,9 +281,10 @@ describe('S2-002 #41: versioned cancellation evidence', () => {
         continue;
       }
       if (entry.caseId === 'cancellation/recycled-pid-not-signalled'
-        || entry.caseId === 'cancellation/historical-evidence-untouched') {
-        // Not cancellation cases: the pid-reuse guard and the evidence-integrity
-        // check have no survivor count to report.
+        || entry.caseId === 'cancellation/historical-evidence-untouched'
+        || entry.caseId === 'cancellation/s2-002-frozen-corpus-hard-counters') {
+        // Not cancellation cases: the pid-reuse guard, the evidence-integrity
+        // check and the corpus replay have no single survivor count to report.
         continue;
       }
       assert.ok(entry.detail.includes('"survivors":0'), `${entry.caseId} must report a counted zero`);
@@ -298,6 +299,17 @@ describe('S2-002 #41: versioned cancellation evidence', () => {
     assert.ok(evidence.historicalEvidence.length >= 8);
     assert.ok(evidence.historicalEvidence.every((p) => p.startsWith('evidence/s2-002-')
       && !p.includes('cancellation-v2')), 'the new record must not list itself as historical');
+  });
+
+  test('the frozen S2-002 corpus replays clean on this host with the hardened counters', () => {
+    const entry = evidence.cases.find((c) => c.caseId === 'cancellation/s2-002-frozen-corpus-hard-counters');
+    assert.ok(entry, 'the corpus replay must run');
+    assert.equal(entry.verdict, 'PASS', entry.detail);
+    // Every hard counter, including survivors_after_cancellation, at zero.
+    for (const gate of Object.keys(evidence.preservedHardGates)) {
+      assert.match(entry.detail, new RegExp(`"${gate}":0`), `${gate} must be zero on this host`);
+    }
+    assert.ok(entry.detail.includes('counterViolations=[]'), entry.detail);
   });
 });
 
