@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 720.
+Generated from `git ls-files`; count: 723.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -410,6 +410,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/root-manifest.json`
 - `evidence/s2-001-pilot-binding.json`
 - `evidence/s2-002-cancellation-v2-integrity.json`
+- `evidence/s2-002-cancellation-v2-win32-integrity.json`
+- `evidence/s2-002-cancellation-v2-win32.json`
 - `evidence/s2-002-cancellation-v2.json`
 - `evidence/s2-002-comparison-integrity.json`
 - `evidence/s2-002-comparison.json`
@@ -596,6 +598,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/identity/policy-engine.mjs`
 - `src/lib/identity/principals.mjs`
 - `src/lib/identity/process-observer.mjs`
+- `src/lib/identity/process-tree-fixture.mjs`
 - `src/lib/identity/sandbox-profiles.mjs`
 - `src/lib/identity/sandbox.mjs`
 - `src/lib/ingestion/canonical.mjs`
