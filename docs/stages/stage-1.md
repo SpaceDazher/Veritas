@@ -17,9 +17,9 @@ Canonical source:
 
 Тикеты перенесены как migration-index issues `#20...#40`. В каждом body сохранены canonical ID, wave, priority, owner role, verdict, dependencies, краткий результат, limits и pinned AgentOS source.
 
-Текущий GitHub token позволил создать issues, но не позволяет закрывать, редактировать или добавлять comments/labels. Поэтому созданные issues #20-#40 пока остаются `OPEN`; исследовательский статус определяется verdict в body, а не GitHub open/closed state. У первого issue #20 первая попытка создания сохранила текст `CLOSED` до обнаружения ограничения; фактическое состояние GitHub и этот индекс являются авторитетными. Source bundle и evaluation record остаются каноническим evidence.
+2026-09-26: право на запись в issues подтверждено (PATCH по #20 вернул 200), и issues #20-#39 закрыты как research closure: в каждом добавлен комментарий с canonical record, verdict, pinned commit `a7940e1` и границей полномочий. Закрытие означает research evaluation, а не `PASS`, production readiness или разрешение rollout; `PASS_WITH_LIMITS` и parked items PARK-01..PARK-04 остаются частью решения. Issue #40 (SLOQUAL-001) оставлен `OPEN`: у него human threshold countersignature в статусе `NEEDS_INPUT`.
 
-Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и `status:pass-with-limits` созданы, но из-за того же write limitation не прикреплены к issues.
+Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и `status:pass-with-limits` созданы и прикреплены к issues #20-#39 (`status:pass` — у #22 / S1-003, у остальных `status:pass-with-limits`).
 
 ## Активные тикеты
 
