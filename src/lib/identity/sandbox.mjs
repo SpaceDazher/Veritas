@@ -266,6 +266,20 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     return found;
   }
 
+  // The parent of ONE pid, read the same way. Used to re-validate a
+  // captured descendant immediately before it is signalled.
+  function posixParentOf(pid) {
+    try {
+      const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
+      const close = stat.lastIndexOf(')');
+      if (close < 0) return null;
+      const ppid = Number(stat.slice(close + 1).trim().split(/\s+/)[1]);
+      return Number.isInteger(ppid) && ppid > 0 ? ppid : null;
+    } catch {
+      return null;
+    }
+  }
+
   function listDescendants(pid) {
     if (process.platform !== 'win32') return Promise.resolve(posixDescendants(pid));
     const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
@@ -390,7 +404,24 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     // exists. Killing the root handle first can re-parent a child that raced
     // the CIM snapshot and make /T unable to discover it.
     await treeKill(pid);
+    // Re-validate each captured pid immediately before signalling it. A pid
+    // can exit between the snapshot and the kill and be RECYCLED to an
+    // unrelated process, and SIGKILL does not care. A pid is only signalled
+    // while its current parent is still the root or another captured
+    // descendant; a recycled pid has some other parent and is left alone, and a
+    // pid that is simply gone needs no signal.
+    //
+    // The comparison is against the CAPTURED set, not a fresh walk: the root
+    // has already been killed, so its survivors were re-parented to init and a
+    // fresh walk would find nothing and leave them running.
+    const captured = new Set([pid, ...descendants]);
+    let skipped = 0;
     for (const descendant of [...descendants].reverse()) {
+      if (process.platform !== 'win32') {
+        const parent = posixParentOf(descendant);
+        if (parent === null) { skipped += 1; continue; }        // already gone
+        if (!captured.has(parent)) { skipped += 1; continue; }  // recycled pid
+      }
       directKill(descendant);
       await treeKill(descendant);
     }
@@ -521,7 +552,33 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const descendants = await termination;
     if (record) record.knownDescendants = descendants;
     const remainingProcessIds = await survivorPids(pid, descendants);
-    return { terminated: true, survivors: remainingProcessIds.length, remainingProcessIds, pid };
+    // `survivors` counts what this platform could actually SEE, and on neither
+    // supported platform is that a proof.
+    //
+    // Both enumerations are parent-based: Windows walks the CIM parent/child
+    // graph, POSIX walks /proc ppid. A process that re-parents itself away from
+    // the tree before the snapshot — a double fork is enough — is invisible to
+    // both, survives the kill, and is still not in `remainingProcessIds`. That
+    // was reproduced here: a double-forked grandchild outlived `cancel()` while
+    // the returned count was 0. Closing it fully needs a mechanism that is not
+    // parent-based (a cgroup, a pid namespace, or job objects), not a better
+    // walk.
+    //
+    // So the count is returned together with an explicit non-authoritative
+    // marker. A consumer MUST NOT read `survivors: 0` as "nothing survived";
+    // S2-002 keeps the tier blocked on any host where this control is
+    // unexercised, and that is the correct posture until the mechanism is
+    // replaced rather than refined.
+    return {
+      terminated: true,
+      survivors: remainingProcessIds.length,
+      remainingProcessIds,
+      pid,
+      enumeration: process.platform === 'win32' ? 'windows-cim-parent-walk' : 'posix-proc-parent-walk',
+      authoritative: false,
+      survivorsAreProof: false,
+      enumerationNote: 'parent-based enumeration cannot see a process that re-parented out of the tree; survivors is the count of VISIBLE survivors, not a guarantee',
+    };
   }
 
   // Public execution path: blocked tiers never spawn anything.

@@ -224,7 +224,7 @@ and it does — for the honest reason, not a fabricated one.
 | 1 | `scripts/s2-002-run.mjs` | A sandbox control this platform cannot exercise is recorded as `notRun: true`, `decision: 'BLOCKED_SANDBOX'`, `reasonCodes: ['SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM']`, `match: null`, `survivors: null`. It is excluded from the violation counters, and a new **informational** `not_run_controls` counter makes the skip visible. `survivors_after_cancellation` is `null` when unmeasured. |
 | 2 | `scripts/s2-002-run.mjs` | `SANDBOX_EXPECTATIONS` no longer drops `sandbox/fs-junction-escape` off Windows, so the oracle matches the trial set the runner builds. A host that genuinely cannot create the link still fails closed with `missingTrial`. |
 | 3 | `scripts/verify-s2-002.mjs` | The counter check now rejects `value < 0` and non-finite values, so no negative sentinel can pass. And an observation with `notRun: true` on a hard-counter trial (`HARD_COUNTER_TRIALS`) pushes `hardControlNotRun=<trialId>` — an unexercised hard control **blocks** the gate instead of passing it. |
-| 4 | `src/lib/identity/sandbox.mjs` | `listDescendants` enumerates POSIX descendants from `/proc/<pid>/stat` (parent read from the field after the last `)`, depth-bounded) instead of returning `[]`. This closes [#41](https://github.com/SpaceDazher/Veritas/issues/41): `cancel()` no longer reports `survivors: 0` while grandchildren are alive. |
+| 4 | `src/lib/identity/sandbox.mjs` | `listDescendants` enumerates POSIX descendants from `/proc/<pid>/stat` (parent read from the field after the last `)`, depth-bounded) instead of returning `[]`; each captured pid is re-validated against the captured parentage immediately before it is signalled, so a recycled pid is not killed; and `cancel()` now returns `enumeration`, `authoritative: false` and `survivorsAreProof: false` alongside the count. **This improves [#41](https://github.com/SpaceDazher/Veritas/issues/41) but does not close it — see below.** |
 
 Verified on this host:
 
@@ -244,13 +244,36 @@ Verified on this host:
 * `tests/identity/**` goes from 149 pass / 6 fail to **157 pass / 0 fail / 1 skipped**, and
   the full `npm test` from 1103 pass / 6 fail to **1181 pass / 0 fail** (1188 tests,
   7 skipped).
-* The `cancel()` false success is gone: the same probe that previously reported
-  `survivors: 0` with `2 / 2` descendants alive now reports `0 / 2` alive after cancel —
-  the count is true **and** the tree is actually terminated.
+* The common cancellation case is fixed and the tree is really terminated: the same probe
+  that previously reported `survivors: 0` with `2 / 2` descendants alive now reports
+  `0 / 2` alive after cancel.
 
-The POSIX fix enumerates and kills descendants individually rather than creating a process
-group, because the child is spawned `detached: false` and switching it to `detached: true`
-would change reaping and stdio inheritance for every execution path. The process-group
-route remains an option in [#41](https://github.com/SpaceDazher/Veritas/issues/41); the
-correctness requirement is the same either way: **never report `survivors: 0` while a
-descendant is alive.**
+### 8.1 What fix 4 does NOT close
+
+`cancel()`'s survivor count is still not a proof, and a further probe proves it. A
+**double-forked** grandchild re-parents itself away from the tree (observed `ppid` 367,
+not the sandbox child) *before* the enumeration runs, so it is invisible to any
+parent-based walk, it survives the kill, and it is still absent from
+`remainingProcessIds`:
+
+```
+orphan pid(s): 523895 | current ppid: 367 (re-parented away)
+alive before cancel: 1 / 1
+cancel() -> {"terminated":true,"survivors":0,"remainingProcessIds":[],...}
+alive after cancel : 1 / 1  LEAKED 523895
+HONESTY: FALSE PASS
+```
+
+This is the honest limit of the approach, and it applies to **both** supported platforms:
+Windows walks the CIM parent/child graph and POSIX walks `/proc` ppid, and neither can see
+a process that re-parented out of the tree. Closing it needs a mechanism that is not
+parent-based — a cgroup, a pid namespace, or Windows job objects — not a better walk.
+
+So the fix delivers what is deliverable: the tree that *is* visible is now actually
+terminated (previously it was not), recycled pids are not killed, and `cancel()` returns
+`authoritative: false` / `survivorsAreProof: false` with a note, so **no consumer can read
+`survivors: 0` as "nothing survived"**. [#41](https://github.com/SpaceDazher/Veritas/issues/41)
+therefore remains open, correctly: its "false success" symptom is narrowed and labelled,
+not eliminated. A process group (`detached: true`) narrows the window but does not close it
+either, because `setsid` escapes a group too — that is why the field, not the walk, is what
+makes the behaviour honest.

@@ -76,7 +76,12 @@ sandbox control is now recorded as `notRun` / `BLOCKED_SANDBOX` /
 `not_run_controls` count; the oracle and the trial set are scoped consistently; the gate
 rejects negative and non-finite counters and **blocks** on `hardControlNotRun`; and
 `listDescendants` enumerates POSIX descendants from `/proc`, so `cancel()` can no longer
-report `survivors: 0` while descendants live ([#41](https://github.com/SpaceDazher/Veritas/issues/41)).
+report `survivors: 0` while descendants live. After the fix the visible tree is actually terminated and recycled pids are
+re-validated before they are signalled, but a **double-forked** grandchild that re-parents out of the tree is
+invisible to any parent-based walk and still survives, so `cancel()` now returns `authoritative: false` and
+`survivorsAreProof: false`: the count is a count of *visible* survivors, and closing the hole needs a non-parent-based
+mechanism (cgroup, pid namespace, job objects). [#41](https://github.com/SpaceDazher/Veritas/issues/41) is therefore
+narrowed and labelled, **not closed**.
 
 The effect is that a Linux run is now **honest rather than loud**: 283 observations against
 a 283-trial oracle, oracle digest `a5a63dc0…` identical to the committed Windows digest,
