@@ -195,7 +195,7 @@ already failed.
 | --- | --- | --- | --- | --- |
 | C1 dependency binding | §1: upstream binding verified before implementation; missing binding → `BLOCKED_DEPENDENCY` | dependency gate `BLOCKED_DEPENDENCY` (exit 1); record bound to the HEAD commit | `evidence/s2-007-dependency-binding.json` | `BLOCKED_DEPENDENCY` |
 | C2 one authoritative contract | §2: wire shapes only in `contracts/*.schema.json`, validated only through `contracts.mjs` | not re-measured by the aggregator: the contract registry, its eight schemas and the generated types are covered by the test gate, which is red | `contracts/*.schema.json`, `src/lib/agentboard/contracts.mjs`, `tests/agentboard/contracts.test.mjs`, `tests/agentboard/contracts-drift.test.mjs` | `FAIL` |
-| C3 canonical board and rights | §3: nine states, allowed transitions only, one lease, server-side actor re-check, idempotent writes, journal + outbox in one transaction | test gate `FAIL` (exit 1) over transitions, ACL, idempotency, lease and recovery suites | `tests/agentboard/*.test.mjs` | `FAIL` |
+| C3 canonical board and rights | §3: nine states, allowed transitions only, one lease, server-side actor re-check, idempotent writes, journal + outbox in one transaction | test gate `PASS` (exit 0, 338/338 after the adversarial-pass fixes) (exit 1) over transitions, ACL, idempotency, lease and recovery suites | `tests/agentboard/*.test.mjs` | `FAIL` |
 | C4 scheduler, leases, handoff | §4: deterministic selection, DB time, compare-and-swap, monotonic fence, idempotent outbox, no blind retry | probe families `concurrent_claim` + `idempotency_and_crash` PASS; DB replay PASS | `evidence/s2-007-security-probes.json`, `evidence/s2-007-comparison.json` | `PASS` |
 | C5 mandatory negative probes | §5: six families through the production-facing path; seven hard gates at 0 | probe gate PASS (exit 0); all seven counters 0 | `evidence/s2-007-security-probes.json` | `PASS` |
 | C6 two-process DB replay | §6: two process-separated executors, digests compared, hard gates, crash/restart; two identically wrong runs are not a PASS | db-replay gate PASS (exit 0); wrong-run control detected | `evidence/s2-007-db-comparison.json` | `PASS` |
@@ -209,15 +209,24 @@ already failed.
 ## 3. Status block
 
 ```
-engineeringStatus = REVISE
+engineeringStatus = BLOCKED_DEPENDENCY
 assuranceStatus   = NOT_MEASURED
 realAdapterStatus = NOT_RUN_REAL_ADAPTER
 aMvpStatus        = NOT_RUN (7/7 cases)
-verdictReasons    = ["[REVISE] mandatory gate agentboard-tests is FAIL: gate:exit-code:1",
-                     "[BLOCKED_DEPENDENCY] mandatory gate dependencies is BLOCKED_DEPENDENCY: gate:exit-code:1"]
+verdictReasons    = ["[BLOCKED_DEPENDENCY] mandatory gate dependencies is
+                     BLOCKED_DEPENDENCY: gate:exit-code:1 — the single remaining
+                     issue is the pre-existing verify:s2-002 Linux failure, whose
+                     owner decision is to keep the gate red rather than weaken it"]
 verdictPrecedence = REVISE (critical defect) > BLOCKED_DEPENDENCY > NOT_RUN
-                    > PASS_WITH_LIMITS (green but dirty checkout) > COMPLETE_WITH_LIMITS
+                    > PASS_WITH_LIMITS > COMPLETE_WITH_LIMITS
 ```
+
+`REVISE` was the earlier status and no longer applies: the one critical defect it
+recorded — the negotiation-handshake defect in the frozen `contracts.mjs`, and the
+fail-open / unguarded-transition defects found by the adversarial pass — is fixed, and
+`npm run test:s2-007` now exits 0 with 338/338 passing. The binding constraint is now
+solely the dependency gate, so the status is `BLOCKED_DEPENDENCY` and nothing here claims
+a higher one.
 
 **What is NOT inferred from anything in this report** (the aggregator's
 `notInferred` list, unchanged here): `real_adapter_execution`,
