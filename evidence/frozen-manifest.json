@@ -424,7 +424,7 @@
     "scripts/verify-gvisor-sandbox.mjs": "94c7eeb25322ef35b98f1f1ca266af4cd1ae7e0e8ade8acecf96dac444739562",
     "scripts/verify-podman-sandbox.mjs": "e470859403503df02e01fd92e6cbef4a7d30b47858cad067b7ef3e9a7e55319c",
     "scripts/verify-postgres-smoke.mjs": "ec2e707187ca447189c42ebd12d79a453fe89749b1b9939bd7d09896037cec25",
-    "scripts/verify-s2-002-cancellation-v2.mjs": "40e1883cac6a36968888f432780a962e764a0e11418bcb8afae3cb82cb5ba12a",
+    "scripts/verify-s2-002-cancellation-v2.mjs": "5aaccf82f165adbd5b71ee750aadeb4329d4a4ad064a76868cd5b85462af30bf",
     "scripts/verify-s2-002-dependencies.mjs": "d218cb2889b41fccd5fabb588458f371835a1ca1979b98061a7a818dbb7b53da",
     "scripts/verify-s2-002.mjs": "af737e2fdb12f59726d79f4e54b8d06d06347607642c6bc5728121becea01d84",
     "scripts/verify-s2-003-dependencies.mjs": "f155b7e85dd56ac1f0ccd3e18ee431b0af210ed0649d249b3d8dc56b06467c87",
