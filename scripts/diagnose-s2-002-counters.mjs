@@ -34,6 +34,8 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildExpectedCorpusOracle } from './s2-002-run.mjs';
+import { createSandbox } from '../src/lib/identity/sandbox.mjs';
+import { SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const COMMITTED_ORACLE_DIGEST = 'a5a63dc0c53c29bcd10003a31179342bc1f3a2fbe0fb39b6c69dbb5ee3eeb7e0';
@@ -56,6 +58,21 @@ const doAb = args.includes('--ab');
 // moves is timing-dependent, and the two need different fixes.
 const repeatIndex = args.indexOf('--repeat');
 const repeatCount = repeatIndex >= 0 ? Math.max(1, Number.parseInt(args[repeatIndex + 1] ?? '1', 10) || 1) : 1;
+// --settle-sweep answers the question five identical repeats cannot: is the
+// survivor a property of cancellation, or of how long the trial waits before it
+// cancels? The S2-002 cancellation control waits a fixed 500 ms after starting
+// the child. If the child chain has not materialised by then, an enumeration
+// cannot see it, the kill misses it, and the trial reports a survivor - a
+// property of the TRIAL, not of cancellation. Sweeping the wait separates them
+// without touching the corpus, the evidence or the gate.
+const doSweep = args.includes('--settle-sweep');
+const numberAfter = (flag, fallback) => {
+  const i = args.indexOf(flag);
+  return i >= 0 ? Number.parseInt(args[i + 1] ?? String(fallback), 10) || fallback : fallback;
+};
+const sweepWaits = String(process.env.VERITAS_DIAG_WAITS ?? '250,500,1000,2000,4000')
+  .split(',').map((v) => Number.parseInt(v.trim(), 10)).filter((v) => Number.isInteger(v) && v > 0);
+const sweepRepeats = Math.max(1, numberAfter('--sweep-repeats', 3));
 const OUT = process.env.VERITAS_DIAG_OUT
   ?? fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-diag-'));
 
@@ -172,10 +189,189 @@ const fingerprintBefore = canonicalFingerprint();
 console.log(`diagnostic output root: ${OUT}`);
 console.log(`canonical evidence fingerprint: ${fingerprintBefore.size} files (must not change)`);
 
+/**
+ * One cancellation probe with a configurable settle wait, driving the PRODUCTION
+ * adapter with the same child shape the S2-002 cancellation control uses.
+ * Returns the survivor count and any survivor pids so the caller can reap them.
+ */
+/**
+ * Kill everything this probe could have started, using sources independent of the
+ * sandbox's own bookkeeping: the pids the child wrote for itself, the sandbox's
+ * survivor list (advisory only), and — on Windows — a CIM query that is not the
+ * module under test. Returns how many extra pids had to be reaped, which is
+ * itself a datum: a non-zero count means the sandbox did not know about them.
+ */
+function reap(childPid, survivorIds, pidFile) {
+  const extra = new Set();
+  try {
+    for (const line of fs.readFileSync(pidFile, 'utf8').split('\n').map((l) => l.trim()).filter(Boolean)) {
+      const pid = Number.parseInt(line, 10);
+      if (Number.isInteger(pid) && pid > 0) extra.add(pid);
+    }
+  } catch { /* the child may never have written it */ }
+  if (process.platform === 'win32') {
+    // Cleanup-only enumeration, deliberately not the sandbox's implementation.
+    const ps = spawnSync('powershell.exe', [
+      '-NoProfile', '-NonInteractive', '-Command',
+      `(Get-CimInstance Win32_Process | Where-Object { $_.ParentProcessId -eq ${childPid} }).ProcessId`,
+    ], { encoding: 'utf8', windowsHide: true, timeout: 20000 });
+    for (const line of String(ps.stdout ?? '').split(/\s+/).map((l) => l.trim()).filter(Boolean)) {
+      const pid = Number.parseInt(line, 10);
+      if (Number.isInteger(pid) && pid > 0) extra.add(pid);
+    }
+  }
+  // Ground truth, measured independently of the sandbox: of the pids the child
+  // reported, how many were STILL ALIVE after cancel? Comparing that against
+  // `remainingProcessIds` would be wrong - a descendant that was enumerated and
+  // killed is SUPPOSED to be absent from the survivor list. The honest question
+  // is only whether anything survived.
+  const isAlive = (pid) => {
+    try { process.kill(pid, 0); return true; } catch (error) { return error.code === 'EPERM'; }
+  };
+  const expected = [...extra].filter((pid) => Number.isInteger(pid) && pid > 0);
+  const actuallyAlive = expected.filter(isAlive);
+  const all = new Set([Number(childPid), ...survivorIds.map(Number), ...expected].filter((n) => Number.isInteger(n) && n > 0));
+  for (const pid of all) {
+    if (process.platform === 'win32') {
+      spawnSync('taskkill', ['/T', '/F', '/PID', String(pid)], { windowsHide: true, timeout: 20000 });
+    }
+    try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
+  }
+  return {
+    reaped: all.size,
+    expectedChildren: expected.length,
+    actuallyAliveAfterCancel: actuallyAlive.length,
+    stillAlivePids: actuallyAlive,
+  };
+}
+
+async function probeOnce(settleMs, workspaceRoot) {
+  const sandbox = createSandbox({
+    profile: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 8 } },
+    workspaceRoots: [workspaceRoot],
+    artifactRoot: path.join(workspaceRoot, 'artifacts'),
+    secrets: {},
+    now: '2026-09-25T00:00:00.000Z',
+  });
+  // The child records its own pids so the diagnostic can reap the tree
+  // INDEPENDENTLY of the sandbox's own survivor list. Cleanup must never trust
+  // the mechanism it is measuring: that list is exactly what is under test, and
+  // by construction it can be incomplete.
+  const pidFile = path.join(workspaceRoot, `pids-${settleMs}-${Date.now()}.txt`);
+  const child = process.platform === 'win32'
+    ? {
+      command: 'cmd.exe',
+      args: ['/d', '/s', '/c', `start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul & echo %cmdcmdline%`],
+    }
+    // POSIX equivalent: a backgrounded grandchild chain that outlives its parent,
+    // each writing its own pid so cleanup does not depend on the sandbox.
+    : {
+      command: '/bin/sh',
+      args: ['-c', `( sleep 120 & echo $! >> ${pidFile}; sleep 120 & echo $! >> ${pidFile}; wait )`],
+    };
+  let handle;
+  try {
+    handle = sandbox.startForControlProbe({ ...child, timeoutMs: 60000 });
+  } catch (error) {
+    return { ok: false, detail: String(error.message ?? error).slice(0, 120) };
+  }
+  await new Promise((r) => setTimeout(r, settleMs));
+  let cancel;
+  try {
+    cancel = await Promise.race([
+      sandbox.cancel(handle.pid),
+      new Promise((r) => setTimeout(() => r({ timedOut: true }), 15000)),
+    ]);
+  } catch (error) {
+    return { ok: false, detail: `cancel threw: ${String(error.message ?? error).slice(0, 120)}` };
+  }
+  if (cancel.timedOut === true) {
+    return { ok: false, detail: 'cancel did not resolve within 15s' };
+  }
+  const survivors = Number(cancel.survivors ?? 0);
+  const ids = Array.isArray(cancel.remainingProcessIds) ? cancel.remainingProcessIds.slice() : [];
+  const reaped = reap(handle.pid, ids, pidFile);
+  void handle.done;
+  return {
+    ok: true, survivors, ids, reaped, enumeration: cancel.enumeration ?? null, authoritative: cancel.authoritative ?? null,
+  };
+}
+
+async function settleSweep() {
+  console.log(`\n${'='.repeat(78)}\nSETTLE SWEEP — the same child, a different wait before cancel\n${'='.repeat(78)}`);
+  const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-sweep-'));
+  const rows = [];
+  try {
+    for (const wait of sweepWaits) {
+      const counts = [];
+      const details = [];
+      let lastReaped = { reaped: 0, extraBeyondSandboxList: 0 };
+      for (let i = 0; i < sweepRepeats; i += 1) {
+        const result = await probeOnce(wait, workspaceRoot);
+        if (!result.ok) { details.push(`ERR:${result.detail}`); continue; }
+        counts.push(result.survivors);
+        details.push(`${result.enumeration ?? '?'} authoritative=${result.authoritative}`);
+        if (result.survivors > 0 && i === 0) {
+          details[details.length - 1] += ` leaked=${JSON.stringify(result.ids)}`;
+        }
+        lastReaped = result.reaped;
+      }
+      rows.push({ wait, counts, details, reaped: lastReaped });
+    }
+  } finally {
+    fs.rmSync(workspaceRoot, { recursive: true, force: true });
+  }
+  console.log(`  wait(ms)   survivors per repeat      alive(indep)  enumeration`);
+  for (const row of rows) {
+    const alive = row.reaped?.actuallyAliveAfterCancel;
+    console.log(`  ${String(row.wait).padStart(8)}   ${JSON.stringify(row.counts).padEnd(24)}  `
+      + `${String(alive === undefined ? '?' : alive).padStart(12)}  ${row.details[0] ?? ''}`);
+  }
+  const worstAlive = Math.max(0, ...rows.map((r) => r.reaped?.actuallyAliveAfterCancel ?? 0));
+  const worstReported = Math.max(0, ...rows.map((r) => Math.max(...(r.counts.length ? r.counts : [0]))));
+  console.log(`\n  independently observed still-alive children (worst probe): ${worstAlive}`);
+  console.log(`  survivors the sandbox reported      (worst probe): ${worstReported}`);
+  if (worstAlive > worstReported) {
+    console.log('    -> the sandbox UNDERCOUNTS survivors here. Its own count is not a proof, which is');
+    console.log('       exactly what cancel()\'s authoritative:false declares.');
+  } else {
+    console.log('    -> the sandbox\'s own count matched what was independently observed alive.');
+  }
+  const nonZero = rows.filter((r) => r.counts.some((c) => c > 0));
+  const zeroAtSomeWait = rows.some((r) => r.counts.every((c) => c === 0));
+  console.log(`\n  waits leaving a survivor : ${nonZero.map((r) => r.wait).join(', ') || 'none'}`);
+  console.log(`  waits with zero survivors : ${rows.filter((r) => r.counts.every((c) => c === 0)).map((r) => r.wait).join(', ') || 'none'}`);
+  console.log('');
+  if (nonZero.length === 0) {
+    console.log('  VERDICT: no wait left a survivor on this host.');
+  } else if (zeroAtSomeWait) {
+    console.log('  VERDICT: the survivor depends on HOW LONG the trial waited. A longer wait finds');
+    console.log('           nothing left, so the enumeration and the kill are correct and the fixed 500 ms');
+    console.log('           settle in the S2-002 control is what misses the not-yet-materialised child.');
+    console.log('           That is a property of the TRIAL, not of cancellation. Raising the settle is a');
+    console.log('           change to the S2-002 control and belongs to that ticket; it is NOT a relaxation');
+    console.log('           of the counter, and the hard counters keep failing until it is done honestly.');
+  } else {
+    console.log('  VERDICT: every wait left a survivor on this host. Cancellation does not reach the whole');
+    console.log('           child chain here regardless of timing, which points at the host, not the settle.');
+  }
+  return rows;
+}
+
 const oracle = buildExpectedCorpusOracle();
 console.log(`\noracle: ${oracle.trialCount} trials, digest ${oracle.digest}`);
 console.log(`committed oracle digest: ${COMMITTED_ORACLE_DIGEST}`);
 console.log(`oracle MATCHES the committed one: ${oracle.digest === COMMITTED_ORACLE_DIGEST ? 'yes' : 'NO — a finding'}`);
+
+if (doSweep) {
+  await settleSweep();
+  if (!args.some((a) => a === '--repeat' || a === '--ab' || a === '--skip-corpus')) {
+    const fingerprintAfterSweep = canonicalFingerprint();
+    const intact = reportFingerprintChange(fingerprintBefore, fingerprintAfterSweep);
+    console.log(`\ncanonical evidence unchanged by this diagnostic: ${intact ? 'YES' : 'NO'}`);
+    process.exit(intact ? 0 : 1);
+  }
+}
 
 const current = runCorpus('current', ROOT, 'diag-current');
 if (current === null) {
