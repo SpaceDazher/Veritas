@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "1035c8df5597ac3b16859ad1c16b76db61c5278a",
-  "sourceTree": "a2c893daf727ab997c8d3b1efa0a30a490e2ea7d",
-  "trackedFileCount": 769,
-  "manifestFileCount": 764,
-  "payloadManifestSha256": "9c2ba1c910d3a06630ce16e7b919e972b39695bd1301abc8f13c4fc72154e8c6",
-  "fileManifestSha256": "87c69da573aa5d2fd7d86d030afb2538a176004ec425bcec1b37ffe279b5cb5d",
+  "sourceCommit": "a72a45b73f2c789aa47be664dede34abe51c346b",
+  "sourceTree": "fd04f0f7eea06529e53ea8e78ca106f96371fa5b",
+  "trackedFileCount": 770,
+  "manifestFileCount": 765,
+  "payloadManifestSha256": "8b126a169079cea1b18714875efa5153df03cbb964ee3bc6ba7d9565971912e9",
+  "fileManifestSha256": "0f9e1a7029400a5ff27f0a7f4ffa6707c9ad0b565cc6047f93f312cd0b1ed69f",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2043,12 +2043,12 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "1a224197b8f960c8ff7c2ae1bd8b6b2c51984279ba23de06b5e9ca3006414aee",
-      "bytes": 31794
+      "sha256": "9b0fcef0f25b0fce2bca805d285c8400386c54df79b01e1fb9a4eadeacfe5a03",
+      "bytes": 31835
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "805d41d49ea1d1628b603345bf44ce723aa2303b4cc7c1d62c54fb61882ace5c",
+      "sha256": "8f898e02deadfc74ab88e13a7e7fd52ef61e491f3dd90fc02c4fd08e748a5443",
       "bytes": 68051
     },
     {
@@ -2243,7 +2243,7 @@
     },
     {
       "path": "evidence/s2-006-comparison.json",
-      "sha256": "747dc711cb6ba54d0a76bc1be2571b8b832028e70c06e85df1f96cdfd97aed40",
+      "sha256": "95ba9f08e2021b986d7d74214b5f46f6157cea2a368178f115e00c8f5d431159",
       "bytes": 5605
     },
     {
@@ -2278,12 +2278,12 @@
     },
     {
       "path": "evidence/s2-006-run-a.json",
-      "sha256": "2db82f3a2a078b9a48697d25d574154c12c065bdecc57987b163cec821ef483d",
+      "sha256": "4b3efae893b99a72f084c7dd40692bd1c80e04286e3d3589a8559dfffeeac53c",
       "bytes": 12020
     },
     {
       "path": "evidence/s2-006-run-b.json",
-      "sha256": "ffdca6eeed8fdaf370cb6eb09d569dbf843ccba66f3f5f777792e56e954bfe78",
+      "sha256": "81953d2977f0378c22fb3bd93f6b37308509e1bddb81c465c308194fa234762c",
       "bytes": 12020
     },
     {
@@ -2313,18 +2313,18 @@
     },
     {
       "path": "evidence/s2-007-db-comparison.json",
-      "sha256": "36350db9a75cb950bc786d59ec4b0e03d2993e122ada3abab66861ed065330c8",
+      "sha256": "910a29cc82cc89c93ee3b0313529b7e60e86e81a85a49a3f0d8419f224918a74",
       "bytes": 12306
     },
     {
       "path": "evidence/s2-007-db-run-a.json",
-      "sha256": "d8d33bb2b3e337e277cdcd1e1d094769e2f8592b7824fdf6cca5af742b1242bf",
-      "bytes": 26024
+      "sha256": "8627ae45d61afd9452c4156f2969372e1040db5ab760dacd357f0b9b124927bd",
+      "bytes": 26010
     },
     {
       "path": "evidence/s2-007-db-run-b.json",
-      "sha256": "1fd338a9f9c087ec97b7b3ce13773779be57cd0ca58ef9d5a147b4f95e5058c2",
-      "bytes": 26010
+      "sha256": "2a494494a6a4bb32fbd0ba643bdc62607a936d8f6f4b0b4000c6dfcc6f38bcf3",
+      "bytes": 26003
     },
     {
       "path": "evidence/s2-007-dependency-binding.json",
@@ -2672,6 +2672,11 @@
       "bytes": 1925
     },
     {
+      "path": "scripts/diagnose-s2-002-counters.mjs",
+      "sha256": "d518ac161aff73ed5d9fc36abad1e67e9c8f8729475c69548cdd8657d18de558",
+      "bytes": 13694
+    },
+    {
       "path": "scripts/generate-board-types.mjs",
       "sha256": "befa8bd49f4e6516bfb9f0b4f991831fe86f834f2ec8d91c910f0ee7bf242025",
       "bytes": 9583
@@ -2723,8 +2728,8 @@
     },
     {
       "path": "scripts/s2-002-run.mjs",
-      "sha256": "49eb2adb107730c836fe566d13130ce27261766a4944c146408e47d772756695",
-      "bytes": 27008
+      "sha256": "0843e2d030377ed84b448d46e2a0ff69614df6d6bdd64b5d745965dedca52272",
+      "bytes": 28402
     },
     {
       "path": "scripts/s2-003-db-replay.mjs",
@@ -2873,8 +2878,8 @@
     },
     {
       "path": "scripts/verify-s2-002.mjs",
-      "sha256": "97a7cf4951acf9aa1fb175b83edad0940cda1a21ec1ec3445bca3ff4121d3c84",
-      "bytes": 11208
+      "sha256": "1c16d0bb2991b59b1f8dced6ea666838af630120e3cd6448cf15f421acefb8b3",
+      "bytes": 11907
     },
     {
       "path": "scripts/verify-s2-003-dependencies.mjs",
