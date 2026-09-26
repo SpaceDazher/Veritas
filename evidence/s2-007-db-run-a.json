@@ -15,8 +15,8 @@
   "database_engine": "PostgreSQL",
   "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
   "pids": {
-    "contended": 362263,
-    "crash": 362315
+    "contended": 371700,
+    "crash": 371754
   },
   "status": "RECORDED",
   "calls": [
@@ -777,10 +777,10 @@
       "spend_rows": 1
     },
     "digest": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-    "rawDigest": "010882cf90821ddf0b96783e0084c257ab018495ace3e8e76f8d3d63dcbe1299"
+    "rawDigest": "b16174b32df9b47f59021663dc83a38a5bf7aa494fa30f9877eb5c8af28cba99"
   },
   "contended": {
-    "barrierDir": "/tmp/s2-007-db-replay-hyhslh/barrier",
+    "barrierDir": "/tmp/s2-007-db-replay-N7gdAf/barrier",
     "label": "a",
     "contestedClaim": {
       "outcome": "ACCEPT",
@@ -832,7 +832,7 @@
     "exitCode": null,
     "signal": "SIGKILL",
     "diedAsDesigned": true,
-    "pid": 362315,
+    "pid": 371754,
     "executorId": "exec-s2-007-db-a"
   }
 }
