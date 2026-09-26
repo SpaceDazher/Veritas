@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "61f38210bb9d94cd561594986943f671fc569ce1",
-  "sourceTree": "42935dee80bb465b06fc241668117ec03ce04ba8",
+  "sourceCommit": "4fe553e4e5827d25e6f84c8356edc2b121d511f8",
+  "sourceTree": "b0cd8c48ee41419f6a36f5e469fb8bbc9331bec9",
   "trackedFileCount": 720,
   "manifestFileCount": 715,
-  "payloadManifestSha256": "f1208717568a2114424c6c91ef48408b5f199cb7ec1f148b25d2e4abe13cdd3f",
-  "fileManifestSha256": "cad4715f3739c98b9bf24e92d583e68bcf6325f80f09268dff798021d4a1e515",
+  "payloadManifestSha256": "f627c76f778af84820115d90aa513435b265eeb4c04ed46b5243036a576ca68d",
+  "fileManifestSha256": "a7e4db32214814dc554fdb8475a9dae3e3774bb4a055893b63ad27efa15a3ea6",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1903,8 +1903,8 @@
     },
     {
       "path": "docs/security/S2-002-PROCESS-CANCELLATION.md",
-      "sha256": "3f6f25b7948421b2e5a37b45f4248b0a971cc63d0c8a8ac52dad91ef5a6373cc",
-      "bytes": 10688
+      "sha256": "20c2d5eb338a0d3824d86a9074016ce72f764475c7a0fc6db6d947d6b7dfa5fb",
+      "bytes": 11630
     },
     {
       "path": "docs/security/S2-002-SANDBOX-PROFILE.md",
@@ -2028,13 +2028,13 @@
     },
     {
       "path": "evidence/s2-002-cancellation-v2-integrity.json",
-      "sha256": "4fd525fe3ec761cc34a5a05180a764febdd214a2b4e94423190645f4047c233a",
+      "sha256": "e5f4617d484d5781640b2017dd699290d321d5aaa1a6a37426afb8f860283f0c",
       "bytes": 260
     },
     {
       "path": "evidence/s2-002-cancellation-v2.json",
-      "sha256": "4d57c08fabe9f418e740ccf69cc98e9eb4c7df3dc8b5882e5b5f9886e75134c7",
-      "bytes": 4683
+      "sha256": "c47351b91e65ce99c21dc8da909f964a53efee865d902c856ca24ed2bec1e0f7",
+      "bytes": 5308
     },
     {
       "path": "evidence/s2-002-comparison-integrity.json",
@@ -2753,8 +2753,8 @@
     },
     {
       "path": "scripts/verify-s2-002-cancellation-v2.mjs",
-      "sha256": "5aaccf82f165adbd5b71ee750aadeb4329d4a4ad064a76868cd5b85462af30bf",
-      "bytes": 17254
+      "sha256": "ad83b3df577cb3ba84c7201a44d02c7772fdd3966732a86aee2a47a61eff1b85",
+      "bytes": 19353
     },
     {
       "path": "scripts/verify-s2-002-dependencies.mjs",
@@ -3238,8 +3238,8 @@
     },
     {
       "path": "tests/identity/cancellation-process-tree.test.mjs",
-      "sha256": "b89daa9dece0f1a94bc2768098f3d6fecc914d8342e025ded29a3004047ef072",
-      "bytes": 14268
+      "sha256": "317dd8f334ce027fa6fa467f3a860021284f9f8b9ee00ccf2a169b5288f83571",
+      "bytes": 15016
     },
     {
       "path": "tests/identity/contracts.schemas.test.mjs",
