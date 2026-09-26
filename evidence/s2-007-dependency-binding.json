@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007",
+  "title": "Agent Board: canonical orchestration and the execution boundary — dependency binding",
+  "issue": "SpaceDazher/Veritas#7",
+  "scope": "Dependency gate for S2-007 (issue #7 §1). Everything S2-007 builds on is bound here to the bytes of a pinned canonicalization commit in origin/main, to the digest of the S2-007 frozen contract foundation, and to a declarative expectation of what the upstream surfaces must still say. Nothing here is inferred from a previous task's description, from a local PASS, from a dirty worktree or from a matching branch name.",
+  "rule": "A missing, drifted or unverifiable mandatory upstream binding is BLOCKED_DEPENDENCY (gate exit 1). A warning is never a substitute: either the binding is proven from Git bytes, or no S2-007 implementation result may be recorded. Green sub-checks are never inferred from a sibling check, and a check is never renamed to obtain a green status.",
+  "gate": "scripts/verify-s2-007-dependencies.mjs",
+  "base": {
+    "remote": "origin",
+    "ref": "refs/remotes/origin/main",
+    "canonicalizationCommit": "f590d37ea8e861431abf3f89f59e01a889ab903d",
+    "canonicalizationTree": "c15ce47a35987c27a7610d4b8e8847b59f776924",
+    "expectedParents": [
+      "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f",
+      "11940686e3897952878dbb21ef7c4432dac78fd4"
+    ],
+    "parentRoles": {
+      "first": "S2-005 canonical merge; the exact same commit the S2-006 dependency record pins as its own canonicalization merge, so the upstream chain is proven continuous instead of assumed",
+      "second": "S2-006 independent semantic verifier PR #19 branch head"
+    },
+    "upstreamChainAnchor": {
+      "path": "evidence/s2-006-dependency-binding.json",
+      "sha256": "797418d20ecb9da2400a2965e5ebf17ef97dffe4b55358072bf727c3ee646ef9",
+      "blob": "0bc331c66464288f1eccd428f489a6b11eabf31b",
+      "jsonPointer": "s2_005.canonicalMerge",
+      "expectedValue": "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f"
+    },
+    "implementationBaseCommit": "d7ea79fbac357ea17057511044d5235655ee33e1",
+    "implementationBaseRule": "HEAD must descend from the canonicalization commit. An implementation on a branch that does not contain the pinned base is BLOCKED_DEPENDENCY, never a soft warning.",
+    "advancePolicy": "A later advance of origin/main is refused until a reviewed rebind record exists in this file. An ancestor check alone is not a bind: it proves history, not that the protected S2-001/S2-002 surface is unchanged."
+  },
+  "upstreamCanonicalization": {
+    "readRule": "Every path below is read ONLY through `git show <canonicalizationCommit>:<path>`. Its Git blob id, its SHA-256 and its byte length must all match this record. The working tree is never the source of an upstream binding, and a self-generated narrative is never an independent expectation.",
+    "s2_001ProductContract": {
+      "docs/product/PRODUCT_CONTRACT.md": {
+        "blob": "9ed6c0509cbb3f4fe136b2a8e34ebf835b309dcc",
+        "sha256": "639ee3f0dd76e3bb343ba3001345dd9662fd6fcb50e4222e663f03018bb77d7c",
+        "bytes": 8482
+      },
+      "docs/product/AUTONOMY_POLICY.md": {
+        "blob": "6c82915c4133781f5732a00a0e5068aba79b1102",
+        "sha256": "797d499d902a637593d019e3bef9e71264ab26b11c4d1f5c992fa33a2cec6383",
+        "bytes": 2361
+      },
+      "docs/product/HUMAN_APPROVAL_POLICY.md": {
+        "blob": "5df056aefb32c030f8498f3067a25537d9b7ee8a",
+        "sha256": "8b968fde9da0ea6355f2242b3d92182571592cd3400d64ce9259dfbc24817d4e",
+        "bytes": 1706
+      },
+      "docs/product/METRIC_POLICY.md": {
+        "blob": "8efc8b04d4e93b84d3c60f8e910ba76f7fd85c67",
+        "sha256": "ff44761ac715ab0700ab92cfcacf438bf7d72239070aabdf223c07e9fcc29f74",
+        "bytes": 4096
+      },
+      "docs/product/PILOT_PROFILE.md": {
+        "blob": "20bd3ef8df1dbe65cfdef6b9edadc7059437dbcf",
+        "sha256": "9e89d9c0536370cf17a8451fe6e564325c8fa3ce862806c8d268ea77f5981844",
+        "bytes": 2493
+      },
+      "evidence/s2-001-pilot-binding.json": {
+        "blob": "0c2a6a5baf8f0a651ca81652e92ea6f9c323b1a5",
+        "sha256": "44673fcd5543de2e8baa71b726864a55c7f41479eeb128581d67e7085d1668b7",
+        "bytes": 2483
+      },
+      "docs/decisions/S2-001-EVALUATION-REPORT.md": {
+        "blob": "aebe0b20daba8eb74f30bab575433ddfce6bcb1e",
+        "sha256": "072f76699f5d46fb1ea060e9773f2aeed6f2483bdd9d31a1193710a152a4f761",
+        "bytes": 8095
+      },
+      "docs/decisions/S2-001-PILOT-RECONCILIATION.md": {
+        "blob": "5972621e7cbdbfade99f44b720f61621add3c87c",
+        "sha256": "b7d6bd7d7c3f2626c838ee529b9c323e55126a26faa345babb96a1d3c50265b9",
+        "bytes": 1995
+      }
+    },
+    "s2_002PolicyAndSandboxContracts": {
+      "contracts/principal.schema.json": {
+        "blob": "cb63f3419eaac97e88d170246defd5f8dba7eb78",
+        "sha256": "4d536f104a8da2e6d938e284ae98a75e856a56568c5770c7dea2d473fc60b6e1",
+        "bytes": 2590
+      },
+      "contracts/role.schema.json": {
+        "blob": "5030d4cb58cd6f2459ed0bd671daf86ba5add3d4",
+        "sha256": "add5cea9c1a23bc3cbc7a84d407e29c8bc1b90e26d56fade3a7f6dc35b6417ce",
+        "bytes": 1058
+      },
+      "contracts/capability.schema.json": {
+        "blob": "8ff9220f4f1d0442502cf90a2a80569e76829445",
+        "sha256": "b19c9386ec3211b0f47da14345d7af1d39588c8b8136c38b53c0f1b825485d2c",
+        "bytes": 1954
+      },
+      "contracts/grant.schema.json": {
+        "blob": "a4168f31a44bcece78a1113d8385fb795eb556b3",
+        "sha256": "d948c47d1037fbc11e8d73028186fa7d3f2b1216245531777cef2069a5426a8f",
+        "bytes": 2763
+      },
+      "contracts/authorization-decision.schema.json": {
+        "blob": "c8794b22aec2709fd562daace09dbf753f19782d",
+        "sha256": "2c544059102538043505e5bad8f51a5b447ff4d9d69d83256299798fe1f5a974",
+        "bytes": 2356
+      },
+      "contracts/sandbox-profile.schema.json": {
+        "blob": "13b501d8796f2960922de00e52521ab05ac77024",
+        "sha256": "6de0fbf6c43d030b0586748bc01bae9f15efffcd9782ed9730cb75c415789822",
+        "bytes": 4271
+      },
+      "contracts/lease.schema.json": {
+        "blob": "1dab5fd54dd6de4f3bd21764b091fdc41701b7b6",
+        "sha256": "9383387c730d13ca9b959a0dc270a98a1398c1a4cb94bee009d082d0b0eece09",
+        "bytes": 1923
+      },
+      "contracts/workspace.schema.json": {
+        "blob": "f3ee3996e148f50a0fcce9f9d789cf3e94624ebd",
+        "sha256": "2368cb9e2e822dbdc10aa92ed490a38bf60695e0bd8c0e76844b84faec461e3e",
+        "bytes": 2263
+      }
+    },
+    "s2_002EvaluationEvidence": {
+      "evidence/s2-002-dependency-binding.json": {
+        "blob": "59ead1178dc8f1d2f1ade6c600ea9e529e6d4488",
+        "sha256": "dd3f28faa66dbaebdf0e8f189f9b0484578ecd3504ac7006985c9b571f88fd34",
+        "bytes": 4306
+      },
+      "evidence/s2-002-run-a.json": {
+        "blob": "12aec5db6d0b3f21428af3a06c80524ac9a6bf8d",
+        "sha256": "0acc652cced1217f0faa9d36adf722ca39175bde24ee5e0d416682ec6a912982",
+        "bytes": 962
+      },
+      "evidence/s2-002-run-b.json": {
+        "blob": "f8a906783c7ad4a9d5381ed98f60ea652718c4d5",
+        "sha256": "d51adf4fe0952852f0c804f3d7de9d6aab83225ece2b53a8842918b42c9f57d3",
+        "bytes": 960
+      },
+      "evidence/s2-002-comparison.json": {
+        "blob": "4c17aaac9cf1f8c69b984db25ebe787aa204f846",
+        "sha256": "a3b4626a0c189811712159e8a09ac12704b0d9f84a808cf3d89a4add14a52a78",
+        "bytes": 576
+      },
+      "evidence/s2-002-comparison-integrity.json": {
+        "blob": "0e06c216ed232b1d15d8ca70c829e4ddeef7e91d",
+        "sha256": "dd28600f73493f51fff18f5207068b23bf9d31f71a766874f997ad4bd988ff19",
+        "bytes": 394
+      },
+      "evidence/s2-002-security-probes.json": {
+        "blob": "c854d86965bbf63490eecd08f76dd43df67bd39f",
+        "sha256": "3bdd25d9d0a45bd82127b74ca1e759781049f626b1f573344d7d5068d8c9724d",
+        "bytes": 2964
+      },
+      "evidence/s2-002-podman-sandbox.json": {
+        "blob": "73c0ca950858a0307441d483f3613783d094ce4e",
+        "sha256": "5b7a6314edaf2860cc78a2855fd2a82fcd17bee8dc358742404ffc006740bf2c",
+        "bytes": 1390
+      },
+      "evidence/s2-002-gvisor-sandbox.json": {
+        "blob": "fb658cf27673355f0f07f6e3f2109dd39f3d25e0",
+        "sha256": "c5cc3ce34b92f9ec8d2bc0400fde04f8bcc2e93c5656037712e350c60d4540af",
+        "bytes": 1425
+      },
+      "evidence/postgres-smoke.json": {
+        "blob": "329df977856047c696474df4fddfe3d02f741213",
+        "sha256": "37d58a2bdbae5d6a58c4a4f0fc4bc41d073883ff6249a9cbbda39edba69e0c5b",
+        "bytes": 1135
+      },
+      "evidence/clean-checkout.json": {
+        "blob": "17e688d54a01ea715f122881d142b06693e3aa61",
+        "sha256": "cd45909f5bc716f8694a6e7a47d6a4c1af91811bb0e91110124899efb715b7fe",
+        "bytes": 6535
+      },
+      "docs/decisions/S2-002-EVALUATION-REPORT.md": {
+        "blob": "8212885a1312527c5423bed6ec2c187097efc5d6",
+        "sha256": "7c03bf00da9aa26b4551440c3b5b4212a6dcbbc258a705f2263e349993604811",
+        "bytes": 18062
+      },
+      "docs/security/S2-002-SANDBOX-PROFILE.md": {
+        "blob": "04bc684a796b0de5f665b933723c5b5c24a31151",
+        "sha256": "d0c05b9ee18b5808e8eedd4dd1049e994b00f376bf3bbbf22441bc5dfae0b5a2",
+        "bytes": 6757
+      },
+      "docs/security/S2-002-THREAT-MODEL.md": {
+        "blob": "df2840c4aa9182f499e798034f31cc9d67bd6bcf",
+        "sha256": "2a1734852e8cf2b1f352e2809e25606ae4a788e2f023fd40e303dba7c42503b4",
+        "bytes": 6368
+      }
+    }
+  },
+  "independentCrossChecks": {
+    "frozenManifest": {
+      "path": "evidence/frozen-manifest.json",
+      "role": "An expectation authored by an earlier reviewed freeze, read from the canonicalization commit. Where it claims a path below, its SHA-256 must equal this record. Where it does not claim a path, the Git-bytes digest above stays binding and the gap is recorded instead of ignored.",
+      "coveredGroups": [
+        "s2_001ProductContract",
+        "s2_002PolicyAndSandboxContracts",
+        "s2_002EvaluationEvidence"
+      ]
+    },
+    "s2_002ComparisonIntegrity": {
+      "path": "evidence/s2-002-comparison-integrity.json",
+      "role": "Independent digests for the three S2-002 replay payloads (run A, run B, comparison), so their digests are not only self-consistent with this record.",
+      "covers": [
+        "evidence/s2-002-run-a.json",
+        "evidence/s2-002-run-b.json",
+        "evidence/s2-002-comparison.json"
+      ]
+    }
+  },
+  "s2_002EvidencePayload": {
+    "expected": {
+      "cleanCheckoutPassed": true,
+      "cleanCheckoutExitCode": 0,
+      "postgresSmokeStatus": "PASS",
+      "postgresSmokeExitCode": 0,
+      "comparisonOk": true,
+      "mismatchedDecisions": 0,
+      "comparedTrials": 283,
+      "counterViolations": 0,
+      "expectedOracleViolations": 0,
+      "allHardCounters": 0,
+      "hardCounters": {
+        "cross_tenant_success": 0,
+        "authority_expansion": 0,
+        "fs_network_secret_escapes": 0,
+        "survivors_after_cancellation": 0,
+        "allow_after_revocation_commit": 0,
+        "missing_or_censored_trials": 0
+      },
+      "revocationMinTrialsPerRun": 100,
+      "revocationMaxLatencyMs": 5000,
+      "revocationAllowAfterCommit": 0,
+      "probesEscaped": 0,
+      "probesSkipped": 0,
+      "distinctRunIdentities": true,
+      "dbReplayGreen": true
+    }
+  },
+  "reRunGates": [
+    {
+      "id": "verify-s2-002-dependencies",
+      "command": "npm run verify:s2-002-dependencies",
+      "expectedExitCode": 0,
+      "blocking": true,
+      "deferrableStates": [],
+      "mayWriteCanonicalEvidence": [
+        "evidence/s2-002-run-a.json",
+        "evidence/s2-002-run-b.json",
+        "evidence/s2-002-comparison.json",
+        "evidence/s2-002-comparison-integrity.json",
+        "results/s2-002/run-a/observations.json",
+        "results/s2-002/run-a/summary.json",
+        "results/s2-002/run-b/observations.json",
+        "results/s2-002/run-b/summary.json"
+      ]
+    },
+    {
+      "id": "verify-s2-002",
+      "command": "npm run verify:s2-002",
+      "expectedExitCode": 0,
+      "blocking": true,
+      "deferrableStates": [],
+      "mayWriteCanonicalEvidence": [
+        "evidence/s2-002-run-a.json",
+        "evidence/s2-002-run-b.json",
+        "evidence/s2-002-comparison.json",
+        "evidence/s2-002-comparison-integrity.json",
+        "results/s2-002/run-a/observations.json",
+        "results/s2-002/run-a/summary.json",
+        "results/s2-002/run-b/observations.json",
+        "results/s2-002/run-b/summary.json"
+      ]
+    },
+    {
+      "id": "manifest-check",
+      "command": "npm run manifest:check",
+      "expectedExitCode": 0,
+      "blocking": true,
+      "deferrableStates": [
+        "REQUIRES_FINAL_MANIFEST"
+      ],
+      "deferralRule": "The root manifest is regenerated once, at the very end of S2-007, because the S2-007 file inventory is not final while the gate runs. A non-zero exit whose output carries one of `staleManifestSignatures` is recorded as REQUIRES_FINAL_MANIFEST with its REAL exit code. It is never reported as green and never reported as a dependency failure. Any other non-zero exit is a real FAILED_NONZERO and blocks.",
+      "staleManifestSignatures": [
+        "root manifest file records differ from git inventory",
+        "root manifest payload manifest digest differs",
+        "root manifest file manifest digest differs"
+      ],
+      "mayWriteCanonicalEvidence": []
+    }
+  ],
+  "sandboxGate": {
+    "requestedProfileId": "sbx-podman-local-restricted-v1",
+    "requestedTier": "LOCAL_RESTRICTED",
+    "authorityModule": "src/lib/agentboard/constants.mjs",
+    "profileDefinitionModule": "src/lib/identity/sandbox-profiles.mjs",
+    "osControlsEvidencePath": "evidence/s2-002-podman-sandbox.json",
+    "rule": "The internal S2-002 sandbox gate status must ALLOW exactly the profile S2-007 requests. `isExecutableSandboxProfile(requestedProfileId)` must be true AND the profile's `os_controls_evidence` digest must equal the SHA-256 of the Git bytes of the S2-002 sandbox evidence at the canonicalization commit. If the gate does not ALLOW this profile, the LIVE run stays forbidden, the record says so, and the gate is BLOCKED_DEPENDENCY. A NO_EXEC or *_blocked profile can never be a substitute.",
+    "liveRunForbiddenWhenNotAllowed": true
+  },
+  "upstreamVersionedArtifactReferences": {
+    "rule": "S2-003/004/005 may contribute EXPLICIT references to versioned artifacts only. A reference is a path plus a pinned SHA-256 plus, where the artifact carries one, a version anchor that must be a full commit object that exists and is an ancestor of the canonicalization commit. Their CONTENT never becomes a scheduler instruction: the gate asserts that no file under src/lib/agentboard/ names any of these artifact paths, so the board cannot read them at runtime.",
+    "s2_003": [
+      {
+        "path": "evidence/s2-003-dependency-binding.json",
+        "kind": "dependency-binding",
+        "blob": "e1d1f0aebba96d883c6a9d0e5fcf317605809102",
+        "sha256": "30d2d82d9ed98545492714a5952c75adb1304c31198c63a9c14a2198fec8d5b5",
+        "bytes": 4373,
+        "versionAnchor": "s2_002.mergeCommit"
+      },
+      {
+        "path": "contracts/solution-pack.schema.json",
+        "kind": "schema",
+        "blob": "99c3bd84fb2edac7c8ac75f8ae84526255d28de2",
+        "sha256": "8f6cf297e208da489b57941bdbf059e75003ccac15e672c94212eb56d5badbf1",
+        "bytes": 39004,
+        "versionAnchor": "$id"
+      },
+      {
+        "path": "docs/decisions/S2-003-EVALUATION-REPORT.md",
+        "kind": "report",
+        "blob": "44513e829d4697a385edf10d32ff0bb13169a222",
+        "sha256": "870b1b56d5f20be786f352e63de8212a5cb9d2c20a5de6529a424ec8f9d4c05a",
+        "bytes": 19765
+      }
+    ],
+    "s2_004": [
+      {
+        "path": "evidence/s2-004-dependency-binding.json",
+        "kind": "dependency-binding",
+        "blob": "14be7a9ad0479fb14081b02a650d3d314929d8c7",
+        "sha256": "3cba23d92c2f65c57232b84e8d52754e853d25944ad7f17b8809801b36c108da",
+        "bytes": 7012,
+        "versionAnchor": "s2_003.closureCommit"
+      },
+      {
+        "path": "contracts/acceptance-cases.schema.json",
+        "kind": "schema",
+        "blob": "764d526ef039c47355357e5c3a8f0d8626d3bb03",
+        "sha256": "a22f5f0deaea3550d4f0a5c6cf5d981e6bf63bd15cf43c1abeb7953a294a9748",
+        "bytes": 1707,
+        "versionAnchor": "$id"
+      },
+      {
+        "path": "docs/decisions/S2-004-EVALUATION-REPORT.md",
+        "kind": "report",
+        "blob": "8a18bf2aa53e077cc172ae1fd5e808993c9a7a83",
+        "sha256": "87e0373e2c17ba5d3ce34537e6bb713289200b0623f72379bb8e75160054ea56",
+        "bytes": 18056
+      }
+    ],
+    "s2_005": [
+      {
+        "path": "evidence/s2-005-dependency-binding.json",
+        "kind": "dependency-binding",
+        "blob": "5ae8f8c1737d86def9c0c7c2aa5a3349c90729de",
+        "sha256": "cc5092ea484326ad309cbe789031fff56612eea3e2b5e666130f2d994edd1346",
+        "bytes": 7904,
+        "versionAnchor": "s2_004.closureCommit"
+      },
+      {
+        "path": "contracts/s2-005-thresholds.json",
+        "kind": "thresholds",
+        "blob": "3607cd77766004b668c8fbb216ca27e83ad381db",
+        "sha256": "fb4814911576564b4b1770082b79b54ecd2c86ac164554f89a9f3c150b8bfda3",
+        "bytes": 2136,
+        "versionAnchor": "schemaVersion"
+      },
+      {
+        "path": "docs/decisions/S2-005-EVALUATION-REPORT.md",
+        "kind": "report",
+        "blob": "e01740970a3ce369df381658517e8e54efebae59",
+        "sha256": "407093fe5095766a5ac8e6b9ab23aab8b23469a0cf57fab4d36068feaafdf1ce",
+        "bytes": 11585
+      }
+    ]
+  },
+  "s2_006e": {
+    "mandatoryForCore": false,
+    "rule": "S2-006E is NOT a mandatory dependency of the S2-007 core. A verifier-derived signal may be used ONLY as an engineering property, and only when its canonicalization is verified separately. The official S2-006 status NEEDS_INPUT and the absent independent semantic calibration FORBID using such a signal as an automatic Gate for DONE.",
+    "officialStatus": "NEEDS_INPUT",
+    "officialStatusSource": {
+      "path": "docs/decisions/S2-006-EVALUATION-REPORT.md",
+      "sha256": "72a50965f212af80d4e2e24d4530621ef38e8bd22f6d8937fc04aa9d46db0285",
+      "blob": "445dbdcaed67bf5ddbe374edef249815ba8e3412",
+      "requiredVerdictHeading": "## Verdict: NEEDS_INPUT",
+      "forbiddenVerdictHeading": "## Verdict: PASS"
+    },
+    "engineeringClosure": {
+      "path": "docs/decisions/S2-006E-ENGINEERING-CLOSURE.md",
+      "sha256": "814d679e7db19a8f095a7a0291d1b0e26e6891a5b49ee38cfef468b89ffad1ed",
+      "blob": "9d8ed44103ab9484a68207100937799426bad0fc",
+      "status": "COMPLETE_WITH_LIMITS",
+      "doesNotRaiseVerdict": true
+    },
+    "dependencyRecord": {
+      "path": "evidence/s2-006-dependency-binding.json",
+      "sha256": "797418d20ecb9da2400a2965e5ebf17ef97dffe4b55358072bf727c3ee646ef9",
+      "blob": "0bc331c66464288f1eccd428f489a6b11eabf31b"
+    },
+    "admittedProperties": [
+      "deterministic canonical JSON and digest convention (canonical-json-v1)",
+      "contract validation of a verifier payload, when the payload is contract-valid",
+      "the presence of an engineering-complete implementation with recorded engineering evidence"
+    ],
+    "forbiddenUses": [
+      "automatic Gate for DONE",
+      "approval of a task by an uncalibrated semantic verifier",
+      "closure of an unknown external outcome",
+      "any raise of the S2-006 verdict above NEEDS_INPUT"
+    ]
+  },
+  "doneReachabilityAssertion": {
+    "rule": "No code path in src/lib/agentboard/ may reach DONE from a verifier signal. The gate proves this structurally from the frozen transition table and textually from the source tree; a hit is never a warning.",
+    "structural": [
+      "DONE has no outgoing edge in TRANSITIONS",
+      "DONE has exactly one incoming edge, IN_REVIEW -> DONE, guarded by guardInReviewToDone",
+      "guardInReviewToDone calls assertHumanOnlyApproval and assertNotSelfApproved and names no verifier signal"
+    ],
+    "textual": [
+      "no module under src/lib/agentboard/ imports a verifier decision module (../verifier/canonical-json.mjs is the only permitted reuse, and it is a digest convention)",
+      "no line under src/lib/agentboard/ names a verifier signal token and the DONE state without a refusal marker",
+      "the approval actor-kind set is a subset of human_owner, human_reviewer, deterministic_gate"
+    ],
+    "verifierSignalTokens": [
+      "semantic_verification",
+      "semantic-verification",
+      "semanticVerification",
+      "calibration_record",
+      "calibrationRecord",
+      "verifierVerdict",
+      "verifier_verdict",
+      "rubricVerdict",
+      "veritas_verifier",
+      "veritas-verifier",
+      "calibrated"
+    ],
+    "refusalMarkers": [
+      "may not",
+      "cannot",
+      "can never",
+      "forbidden",
+      "never",
+      "not a",
+      "denied",
+      "deny",
+      "refus",
+      "throw",
+      "!==",
+      "== false",
+      "NOT_ALLOWED",
+      "false"
+    ]
+  },
+  "s2_007FrozenFoundation": {
+    "commit": "d7ea79fbac357ea17057511044d5235655ee33e1",
+    "rule": "The eight S2-007 contract schemas, the 0008 migration and the three frozen modules are recorded by SHA-256 and must be byte-identical both in the recorded commit and in the working tree. The frozen foundation is read, never weakened, extended or re-declared by this gate.",
+    "contractSchemas": {
+      "contracts/board-task.schema.json": {
+        "blob": "cd8553332e7ad787f54ed7d92bc36d6d40fa79b0",
+        "sha256": "c8919f918d61f1eba039b50a89d79027e412ad5d0b2705e8ffa260bac1a63983",
+        "bytes": 7742
+      },
+      "contracts/board-transition.schema.json": {
+        "blob": "aa061e38587cda173657d7b8061244b4e52bff25",
+        "sha256": "ea0c4831127aa936566782118a609c5726df96e67c5abd9c0d4eb40eee01e14e",
+        "bytes": 2699
+      },
+      "contracts/adapter-registration.schema.json": {
+        "blob": "ae24d22eebaea0827ec0054d802c4fa4c9c742bc",
+        "sha256": "b00493951c3c8bdeea5a30fa9ff8543ddd2b36b5f6ea4ad7a8a3404b817fa7ce",
+        "bytes": 3223
+      },
+      "contracts/dispatch-decision.schema.json": {
+        "blob": "0cabf4ae87144510f6ca4caece29c647739d3dce",
+        "sha256": "a5d695dca5fa1ff1d8029312e86b3bb86e026beb7784340e2b57c490d247ae02",
+        "bytes": 3982
+      },
+      "contracts/execution-request.schema.json": {
+        "blob": "6e68023cdbcb4b95c0ab86242de2287474cafd72",
+        "sha256": "33b4d9324dba3885a375280c0598f2d629067284c5b08942e54ab8f7c30f6f37",
+        "bytes": 5022
+      },
+      "contracts/execution-event.schema.json": {
+        "blob": "ad446e75e143876335844c22052047403cef1af6",
+        "sha256": "26b4eba1ffd6fd98de64750eec8ff44dcde19269fe242911e498b1f189cfd38b",
+        "bytes": 2333
+      },
+      "contracts/execution-result.schema.json": {
+        "blob": "5415003e61d137d6074efe3ef2c120c16750d39c",
+        "sha256": "8e0211f1d56059a0055a17c85a9145dc4b8fc522bd47aab2f5586def851f291d",
+        "bytes": 4344
+      },
+      "contracts/board-error.schema.json": {
+        "blob": "2fdd064621552fd7634e62f6de72da8d8a8b48e5",
+        "sha256": "dfa6a568d18aab4d2a156be435f34f3bd1b95700f960c18035f28a9e493893c8",
+        "bytes": 2193
+      }
+    },
+    "migration": {
+      "migrations/0008_agent_board.sql": {
+        "blob": "c6ffa8bf6ea281c760cd9cc2af9369bdc7e1c30f",
+        "sha256": "3c021cec4b5b5b9f877d85cdd77065e5fa1d4e8bfc4ff65cde242997cfd4c7d7",
+        "bytes": 20677
+      }
+    },
+    "frozenModules": {
+      "src/lib/agentboard/constants.mjs": {
+        "blob": "bf67c94687a0c61cf1ee4b7256e8678cd6474066",
+        "sha256": "bb87414752d736604300c447ce079123a70d76556a3272c937b1c828314882ff",
+        "bytes": 8290
+      },
+      "src/lib/agentboard/errors.mjs": {
+        "blob": "70abfd4e9db06c394f463202956ec6328b6136c0",
+        "sha256": "6c17faf13d87c06f2b7c415630c9c8bf7e966a80b0fda1db819138ff211b92e1",
+        "bytes": 10760
+      },
+      "src/lib/agentboard/contracts.mjs": {
+        "blob": "6420eb148eda0600e5ec60a7ea6d2727fbe733df",
+        "sha256": "f4a5116712f7a314ac9a650abbd593cfc5d8469e42d3ff8ff5500c667bfe7a47",
+        "bytes": 8352
+      }
+    }
+  },
+  "liveRunRestrictions": [
+    "No real AgentOS/Codex/pi adapter is installed here, so any run without a genuinely different installed adapter is NOT_RUN_REAL_ADAPTER.",
+    "The S2-006 NEEDS_INPUT verdict and the absent independent semantic calibration forbid an automatic verifier Gate for DONE.",
+    "A live run requires the sandbox gate to ALLOW exactly sbx-podman-local-restricted-v1; NO_EXEC and the *_blocked profiles are not substitutes.",
+    "Fixture and replay evidence never upgrade a real-adapter run to PASS and never to A-MVP PASS."
+  ],
+  "consequence": "While this gate is BLOCKED_DEPENDENCY, S2-007 may document and design offline but may not record an implementation result and may not run an executor. A green gate binds S2-007 to the pinned bytes above; it does not authorize live execution, does not upgrade NOT_RUN_REAL_ADAPTER and does not close issue #7.",
+  "resolved": {
+    "gate": "scripts/verify-s2-007-dependencies.mjs",
+    "mode": "FULL_GIT_BYTES",
+    "ok": null,
+    "checkedCount": null,
+    "issueCount": null,
+    "resolvedRefs": {
+      "originMain": null,
+      "canonicalizationCommit": null,
+      "canonicalizationTree": null,
+      "implementationBaseCommit": null
+    },
+    "sandboxGate": {
+      "requestedProfileId": null,
+      "status": null,
+      "liveExecutionAllowed": null
+    },
+    "reRunGates": {
+      "verify-s2-002-dependencies": null,
+      "verify-s2-002": null,
+      "manifest-check": null
+    },
+    "deferred": null,
+    "restoredCanonicalEvidence": null,
+    "writtenOnGreenRunOnly": true
+  }
+}

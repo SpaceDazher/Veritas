@@ -138,9 +138,20 @@ export function boardContractErrors(name, document) {
 const EXECUTION_MAJOR = EXECUTION_CONTRACT_VERSION.split('/')[1].split('.')[0];
 const ADAPTER_MAJOR = ADAPTER_INTERFACE_VERSION.split('/')[1].split('.')[0];
 
+// The version on this boundary is `<interface>/<semver>`, so the semver part
+// must be taken from AFTER the last slash before it is compared. Comparing the
+// whole string against a bare-semver anchor would make the same-major /
+// different-minor (negotiated subset) branch unreachable and report a
+// well-formed `veritas.execution/1.1.0` as "not a semantic version".
+function semverOf(version) {
+  if (typeof version !== 'string') return null;
+  const tail = version.includes('/') ? version.slice(version.lastIndexOf('/') + 1) : version;
+  return /^\d+\.\d+\.\d+$/.test(tail) ? tail : null;
+}
+
 function majorOf(version) {
-  const match = /^\d+\.\d+\.\d+$/.exec(String(version ?? ''));
-  return match ? String(version).split('.')[0] : null;
+  const semver = semverOf(version);
+  return semver === null ? null : semver.split('.')[0];
 }
 
 /**
@@ -159,8 +170,9 @@ export function assertExecutionVersion(document) {
     if (majorOf(version) !== EXECUTION_MAJOR) {
       throw new ContractVersionUnknown(`unsupported execution major version: ${String(version)}`);
     }
-    // Same major, different minor: acceptable only as a negotiated subset.
-    return { minor: String(version).split('.')[1], negotiated: true };
+    // Same major, different minor: acceptable only as a negotiated subset. The
+    // minor is read from the semver tail, not from the prefixed string.
+    return { minor: semverOf(version).split('.')[1], negotiated: true };
   }
   return { minor: '0', negotiated: false };
 }

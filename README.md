@@ -11,8 +11,9 @@ Veritas - исследовательская и инженерная платф�
 | AgentOS Stage 1 | Research closed, `PASS_WITH_LIMITS` | 20 активных тикетов `S1-001...S1-020` закрыты на уровне research; полный индекс перенесён в issues Veritas. |
 | SLOQUAL-001 | `PASS_WITH_LIMITS` | Production-like qualification extension для S1-002; полный SLO authorization не выдан. |
 | Veritas S2-001...S2-006 | Engineering issues closed | Есть контракты, code paths, migrations, тесты и evidence. Это не означает независимую semantic calibration. |
-| Veritas S2-007...S2-012 | Open | SolutionPack harness, web/API, R&D, self-improvement, persistence и pilot acceptance ещё не завершены. |
-| Public board | Synthetic demo | Web, HTTP API и CLI работают с публичной planning fixture; real adapters, auth и private data отключены. |
+| Veritas S2-007 | Engineering boundary implemented, `BLOCKED_DEPENDENCY` | Agent Board: 8 контрактов, store `agentboard_*`, детерминированный scheduler, атомарные leases с fencing, handoff `veritas.execution/1.0.0`, 41/41 негативных проб, все 7 hard-gate счётчиков = 0, двухпроцессный DB replay на реальном PostgreSQL 17.11 с crash-восстановлением, 338/338 тестов, сборка проходит. Открыты: обязательный `verify:s2-007-dependencies` → exit 1, потому что `verify:s2-002` не воспроизводится на Linux (доказано на базовом коммите `f590d37` без единого файла S2-007). `assuranceStatus=NOT_MEASURED`, реальных адаптеров нет, A-MVP-01..07 `NOT_RUN`: это не `COMPLETE_WITH_LIMITS`, не закрытие issue #7 и не `A-MVP PASS`. Отчёт: [S2-007 Evaluation Report](docs/decisions/S2-007-EVALUATION-REPORT.md). |
+| Veritas S2-008...S2-012 | Open | SolutionPack harness, web/API, R&D, self-improvement, persistence и pilot acceptance ещё не завершены. |
+| Public board | Synthetic demo | Web, HTTP API и CLI работают с публичной planning fixture; real adapters, auth и private data отключены. Отдельный закрытый контур `agentboard_*` (живая доска) живёт в своём namespace, не выполняет агентов и требует серверной аутентификации. |
 
 Подробности Stage 1 и ссылка на перенесённые issues: [docs/stages/stage-1.md](docs/stages/stage-1.md).
 
