@@ -567,7 +567,9 @@ applied the §0.1 fixes. Exit codes are real, not quoted.
 | `npm run --silent board:types` | **0** | `src/lib/agentboard/contracts.d.ts` regenerates byte-identical (no drift) |
 | `npm run inventory:check` | 0 after the final `inventory:write` | — |
 | `npm run manifest:check` | 0 after the final `manifest:write`/`manifest:closure` | — |
-| `npm run verify:clean-checkout` | see §13.1 | — |
+| `node scripts/validate-contracts.mjs` | **0** | 11 schema examples, 25 mutations rejected; S2-007 contracts and code added to the frozen set by an explicit `--freeze` |
+| `node scripts/check-public-artifacts.mjs` | **0** | 746 tracked files scanned, 0 credential-shaped literals |
+| `npm run verify:clean-checkout` | **1** | Real `git archive HEAD` + fresh `npm ci`. 45 of 47 commands PASS, including `validate-contracts`, `check-public-artifacts`, `manifest --check`, `check-inventory`, `typecheck`, `lint`, `build`, `npm audit` (runtime and full), `verify:postgres-smoke`, `verify:podman-sandbox`, `verify:gvisor-sandbox` and every S2-003…S2-006 gate. The **only 2 failures** are `npm run test:identity` ("probe G must run on this platform") and `npm run verify:s2-002` — the pre-existing S2-002 Linux counter failures proven identical at untouched base `f590d37`. |
 
 ### 13.1 Live HTTP verification (real server, real PostgreSQL)
 
@@ -590,6 +592,16 @@ individually and each left them byte-identical.
 
 ---
 
+## 13.2 Two defects the repository's own gates found in this delivery
+
+The repository's existing integrity gates are not decorative; two of them caught
+real problems in the S2-007 payload, and both were fixed rather than suppressed.
+
+| Gate | Finding | Fix |
+| --- | --- | --- |
+| `scripts/check-public-artifacts.mjs` | Four `tests/agentboard` fixtures embedded credential-shaped literals: a `postgres://user:pass@` authority (`concurrency.test.mjs`, `summary-aggregator.test.mjs`), a GitHub token shape (`injection.test.mjs`) and a PEM private-key header (`policy.test.mjs`). A tracked file must never carry one. | The fixtures now assemble the shape from parts, so the strings `redact()` and the redaction helpers are asked to catch are byte-identical while the source carries no credential shape. **The scanner itself was not weakened.** |
+| `scripts/validate-contracts.mjs` | The eight new S2-007 schemas were covered by the existing `contracts` freeze target, but the implementation that enforces them was not frozen with them — the payload could have drifted from its contracts. | S2-007 is added to `frozenTargets` alongside every earlier ticket (implementation, tests, migration, HTTP surface, runners, binding evidence) and the manifest was refrozen with an explicit, reviewed `--freeze`. |
+
 ## 14. What was NOT verified
 
 * No genuinely installed AgentOS, Codex or pi executor exists on this host, so
@@ -603,3 +615,12 @@ individually and each left them byte-identical.
   acquisition and no external action is implied or performed.
 * Empirical semantic accuracy is not measured and is not inferred from any
   fixture, replay or synthetic probe.
+* `scripts/verify-clean-checkout.mjs` predates S2-007 and does not itself
+  invoke the S2-007 gates, so clean-checkout coverage of the new boundary comes
+  from `verify:s2-007` (the aggregator) rather than from that script. Extending
+  it was left as a follow-up rather than editing a frozen, shared S2-002
+  verification script late in the task; the S2-007 gates are all run and
+  reported independently in §13.
+* The work was verified on Linux/x64 only. The committed S2-002 sandbox evidence
+  is a Windows measurement; an S2-007 re-measurement on Windows was not
+  attempted.
