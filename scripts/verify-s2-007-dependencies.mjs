@@ -1056,7 +1056,19 @@ export function verifyDependencyBinding(record, io = {}) {
 export function runSubprocessGate(entry) {
   const argv = ['run', '--silent', String(entry.npmScript ?? entry.id)];
   const timeout = RERUN_TIMEOUT_MS[entry.id] ?? 300_000;
-  const result = spawnSync('npm', argv, {
+  // Windows cannot exec npm.cmd with spawnSync(shell:false), and resolving
+  // "npm" there can produce ENOENT even when `npm run` works in PowerShell.
+  // Execute npm's JS entry point with the same Node instead of introducing a
+  // shell (which would also make script names command-injection material).
+  const bundledNpmCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+  const configuredNpmCli = process.env.npm_execpath;
+  const npmCli = process.platform === 'win32'
+    ? (fs.existsSync(bundledNpmCli) ? bundledNpmCli
+      : (configuredNpmCli && path.isAbsolute(configuredNpmCli)
+        && path.basename(configuredNpmCli) === 'npm-cli.js' && fs.existsSync(configuredNpmCli)
+        ? configuredNpmCli : null))
+    : null;
+  const result = spawnSync(npmCli ? process.execPath : 'npm', npmCli ? [npmCli, ...argv] : argv, {
     cwd: ROOT,
     encoding: 'utf8',
     timeout,
@@ -1064,7 +1076,7 @@ export function runSubprocessGate(entry) {
     windowsHide: true,
   });
   const stdout = result.stdout ?? '';
-  const stderr = result.stderr ?? '';
+  const stderr = result.stderr ?? result.error?.message ?? '';
   const timedOut = result.error?.code === 'ETIMEDOUT' || (result.signal === 'SIGTERM' && result.status === null);
   const observed = {
     command: entry.command,
