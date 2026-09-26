@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "5d029c79a9fb2379fe2e99671666183e0f49cd87",
-  "sourceTree": "2e03d7fec617d55187abc365a148dae0f84ead99",
+  "sourceCommit": "a6517fb86ad506683f8e09cdb8d75c3cc5d9dcb5",
+  "sourceTree": "0924fbcfb381467d82fac047182dca88c0f810c8",
   "trackedFileCount": 720,
   "manifestFileCount": 715,
-  "payloadManifestSha256": "1104aa749905244027efc4e0d6b65069100036a7e4fe1a39e45d8aa1c6e3e747",
-  "fileManifestSha256": "1baf1c0f326a51b0fa6cc742c4c561e0d9c5122188ce4e22bcb925432f7aaef0",
+  "payloadManifestSha256": "a64ea2c58a592e7178b44f42809d1631e5ce8de5e3e93e21e81668c674b7d07c",
+  "fileManifestSha256": "4db2e45639807c0592200ef73e815187fc0f693e367b4bc4bf2ad3f22ebe3355",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1903,13 +1903,13 @@
     },
     {
       "path": "docs/security/S2-002-PROCESS-CANCELLATION.md",
-      "sha256": "8171b02f027cbcdf24ffaf6bea094362423b7bce885f558775b8e8dd2bccd155",
-      "bytes": 12056
+      "sha256": "deb009d1b97edbfd387e0d518d7d738413f36445d5dfa174c02a9c787ef97625",
+      "bytes": 13404
     },
     {
       "path": "docs/security/S2-002-SANDBOX-PROFILE.md",
-      "sha256": "c181f6d0fc7b97b2432b4879c2ca58350697ddcdf907fd5ac63c0fe2dcdb551b",
-      "bytes": 9366
+      "sha256": "fa666c47f2a5aae341eaca66e7dded441d242016dd33026e61d3c5c2fa41ddeb",
+      "bytes": 9797
     },
     {
       "path": "docs/security/S2-002-THREAT-MODEL.md",
@@ -2028,13 +2028,13 @@
     },
     {
       "path": "evidence/s2-002-cancellation-v2-integrity.json",
-      "sha256": "e5f4617d484d5781640b2017dd699290d321d5aaa1a6a37426afb8f860283f0c",
+      "sha256": "2b9d6fe22e71d3164a5dce24f7a3aceab0c6bc0a487120f801b302de51b85bbf",
       "bytes": 260
     },
     {
       "path": "evidence/s2-002-cancellation-v2.json",
-      "sha256": "c47351b91e65ce99c21dc8da909f964a53efee865d902c856ca24ed2bec1e0f7",
-      "bytes": 5308
+      "sha256": "792e5422d1001023966dc8ff8d5d5a68c3d36915ac2523dfe3ed61381e5a1e38",
+      "bytes": 5678
     },
     {
       "path": "evidence/s2-002-comparison-integrity.json",
@@ -2753,8 +2753,8 @@
     },
     {
       "path": "scripts/verify-s2-002-cancellation-v2.mjs",
-      "sha256": "ad83b3df577cb3ba84c7201a44d02c7772fdd3966732a86aee2a47a61eff1b85",
-      "bytes": 19353
+      "sha256": "54861978f10648350d202c61039c648ce2fb3eaf87c2814f4d2162946b54b4e7",
+      "bytes": 20392
     },
     {
       "path": "scripts/verify-s2-002-dependencies.mjs",
@@ -2953,8 +2953,8 @@
     },
     {
       "path": "src/lib/identity/process-observer.mjs",
-      "sha256": "316a31efb6aa420a8fcea2a1d33084d0bfba54b3bb86f8386e18f33370294635",
-      "bytes": 12083
+      "sha256": "1dc57a18e15b489d1ae7839cc25f59ee4595df59893fc2646c148a55bd5ec067",
+      "bytes": 12768
     },
     {
       "path": "src/lib/identity/sandbox-profiles.mjs",
@@ -2963,8 +2963,8 @@
     },
     {
       "path": "src/lib/identity/sandbox.mjs",
-      "sha256": "e2280bbdd7bfe5eec0f4c74eddd26b76a7d0bc75167de181ec8b7508ba6e7db7",
-      "bytes": 28921
+      "sha256": "8a965bd19a0a541890efd7879973192a23af6a387f3d6f407ca82d052260e1ad",
+      "bytes": 29775
     },
     {
       "path": "src/lib/ingestion/canonical.mjs",
@@ -3238,8 +3238,8 @@
     },
     {
       "path": "tests/identity/cancellation-process-tree.test.mjs",
-      "sha256": "317dd8f334ce027fa6fa467f3a860021284f9f8b9ee00ccf2a169b5288f83571",
-      "bytes": 15016
+      "sha256": "12e4cce52b99562ac9fa3baaf8641131b8ea48caf5866eb12f7bf960767ba2e8",
+      "bytes": 15445
     },
     {
       "path": "tests/identity/contracts.schemas.test.mjs",
