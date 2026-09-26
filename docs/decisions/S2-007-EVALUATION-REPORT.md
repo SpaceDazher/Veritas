@@ -54,11 +54,30 @@ concluded "not a safety failure". The corrected finding, reproduced on this host
   with `value > limit`, so `-1`, `-9999` and any negative magnitude pass. Only
   `tests/identity/replay-runs.test.mjs` catches it.
 
-Consequence for this ticket: the dependency gate is right to stay red, and **relaxing the
-Linux counters would be the wrong fix** — it would delete the only signal that the tier is
-unprovable here and would let a false pass through. The correct action is to re-measure S2-002
-on Windows. Full analysis, symptom map, the four defects, the reproduction and the
-recommended changes: [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md).
+**The owner's decision (2026-09-25): the Linux gate is NOT weakened**, and S2-002's code,
+gate and frozen evidence are unchanged. Canonical S2-002 was re-measured **on Windows
+with CIM access** — two independent runs over 283 cases, all hard counters `0`, comparison
+`PASS`, which makes the committed Windows measurement *reproducible on the platform it
+claims*, and in a restricted environment without CIM access the same check correctly
+`FAIL`ed. The owner explicitly did **not** claim Linux safety from that, and the
+remediation criterion is concrete: the child is spawned `detached: false`, while a POSIX
+process group in Node requires `detached: true`
+([Node.js `child_process`](https://nodejs.org/api/child_process.html)) — so on a
+non-Windows host either create and signal the group, or refuse cancellation and report the
+tier as blocked, never report `survivors: 0` while descendants live. The sandbox defect is
+tracked as [issue #41](https://github.com/SpaceDazher/Veritas/issues/41) (`bug`), carrying
+the symptom and fix criteria only — no PoC and no raw process data, per the project's
+`ecc:security-review` boundary. The `-1` comparator hole (Defect 4) was confirmed
+separately by the owner.
+
+**Consequence for this ticket: S2-007 stays `BLOCKED_DEPENDENCY`.** The owner does not
+declare this gate green, and this report does not either. That is the correct fail-closed
+outcome. The three harness accounting defects (unhandled `PLATFORM_UNSUPPORTED`, the
+oracle/trial scoping mismatch, the negative sentinel) remain unfixed and belong to S2-002;
+fixing them would make a non-Windows run report `NOT_RUN` honestly, but **would not turn
+the gate green on Linux and must not be used as a reason to relax the counters.** Full
+analysis, symptom map, the four defects, the reproduction and the decision:
+[S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md).
 
 Nothing in S2-002 was changed from inside S2-007: the counter arithmetic, its runner,
 its tests, its evidence and its frozen manifest belong to another ticket, and relaxing

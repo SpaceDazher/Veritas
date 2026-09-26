@@ -1,9 +1,11 @@
 # S2-002 on a non-Windows host: three accounting defects, and one of them fails in the permissive direction
 
-**Status:** analysis for an owner decision. **Nothing in S2-002 was changed.**
+**Status: DECIDED by the owner. Nothing in S2-002 was changed, and the Linux gate is
+deliberately left red.** See §6.
 **Ticket:** [SpaceDazher/Veritas#7](https://github.com/SpaceDazher/Veritas/issues/7) (S2-007 is
 `BLOCKED_DEPENDENCY` on this) and S2-002 itself.
-**Host measured:** Linux/x64, Node v22.23.2, podman 4.9.3. **Date:** 2026-09-25.
+**Sandbox defect:** [SpaceDazher/Veritas#41](https://github.com/SpaceDazher/Veritas/issues/41) (`bug`).
+**Host measured here:** Linux/x64, Node v22.23.2, podman 4.9.3. **Date:** 2026-09-25.
 
 ## 1. What blocks S2-007
 
@@ -149,13 +151,45 @@ investigation the S2-002 runner was executed only with
 `--output-root .bb/chats/…`, and `git status --short results evidence` was verified clean
 afterwards.
 
-## 6. The decision, and the exact change it implies
+## 6. The decision (owner, 2026-09-25)
 
-**Recommendation: re-measure S2-002 on Windows and keep the Linux gate red.** Relaxing
-the Linux counters would delete the only signal that this host cannot support the tier,
-and Defect 3 shows the relaxed result would be a **false pass**.
+**The Linux gate is NOT weakened. S2-002 code, its gate and its frozen evidence are
+unchanged.** The owner re-measured canonical S2-002 on **Windows with CIM access**:
 
-Two things are worth fixing regardless, and neither turns the gate green on Linux:
+* two independent runs over **283** cases each, **all hard counters `0`**, comparison
+  **PASS** — the committed Windows measurement is therefore *reproducible on the platform
+  it claims*, and re-freezing that evidence is **not** required;
+* in a restricted environment **without** CIM access the same check **FAILed**, which is
+  the fail-closed behaviour working as intended, not a defect.
+
+**This does not prove Linux safety, and the owner explicitly did not claim it.** The
+remediation criterion for the sandbox defect is now concrete: in the current code the
+child is spawned with `detached: false`, and on POSIX in Node a new **process group** is
+created only with `detached: true`
+([Node.js `child_process`](https://nodejs.org/api/child_process.html)). Without a process
+group there is nothing for `process.kill(-pid)` to signal, which is exactly the mechanism
+Defect 3 exercises. The fix must either create and signal the group, or refuse
+cancellation and report the tier as blocked — never report `survivors: 0` while
+descendants live. A `detached: true` child also changes reaping and stdio inheritance, so
+that belongs in the fix's own verification, not in this record.
+
+The owner also **confirmed Defect 4 independently**: the comparator accepts
+`survivors_after_cancellation = -1` as PASS.
+
+**Tracked as** [issue #41](https://github.com/SpaceDazher/Veritas/issues/41) (`bug`), which
+under the project's `ecc:security-review` boundary carries the symptom and the fix
+criteria only — deliberately **no PoC and no raw process data** in a public issue.
+
+**Consequence for S2-007: the dependency gate stays red.** Commit `e008b0e` is not
+available in the owner's Windows copy, and the owner therefore does **not** declare that
+gate green. S2-007 remains `engineeringStatus = BLOCKED_DEPENDENCY`, which is the correct
+fail-closed outcome, not a defect to be worked around.
+
+Still unfixed and still untracked by an issue: Defects 1, 2 and 4 — the harness
+accounting defects. They belong to S2-002, so they are the owner's to file or fix. They
+would make a non-Windows run report `NOT_RUN` honestly instead of fabricating a
+violation, and would close the negative-sentinel hole; **none of them turns the gate green
+on Linux**, and fixing them must not be used as a reason to relax the counters:
 
 1. **Give platform-scoped trials a real `NOT_RUN` semantic** instead of scoring them as
    violations: a distinct not-run state, `decision: 'BLOCKED_SANDBOX'`, reason code
@@ -167,12 +201,6 @@ Two things are worth fixing regardless, and neither turns the gate green on Linu
 2. **Scope the oracle and the trial set consistently** (Defect 2) and **close the negative
    sentinel hole** in the gate (Defect 4) — e.g. reject any counter that is not a finite
    non-negative number, rather than comparing it with `>`.
-
-`src/lib/identity/sandbox.mjs`'s non-Windows cancellation behaviour (Defect 3) is a
-real defect in the sandbox itself, not in S2-002's harness, and should be tracked on its
-own: on a non-Windows host either enumerate descendants via the process group (which
-requires spawning the child `detached`) or refuse cancellation and report the tier as
-blocked, rather than reporting `survivors: 0` while descendants live.
 
 ## 7. How to reproduce
 
