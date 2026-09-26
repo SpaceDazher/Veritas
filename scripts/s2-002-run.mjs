@@ -79,6 +79,15 @@ const CAPABILITY_TRIALS = [
   { trialId: 'nonce/export/replay-with-nonce', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
 ];
 
+// Sandbox expectations that assert a CONTAINMENT refusal. A control with one of
+// these expectations that comes back ALLOWED is a genuine filesystem, network,
+// environment or secret escape. Expectations that assert something else (the
+// cancellation survivor count, for instance) are violations, not escapes.
+const SANDBOX_CONTAINMENT_EXPECTATIONS = Object.freeze([
+  'PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE',
+  'DENIED', 'REDACTED', 'FILTERED',
+]);
+
 // The marker a sandbox control returns when this platform cannot exercise it.
 // Declared once so the producer and every consumer agree.
 const NOT_RUN_PLATFORM = 'PLATFORM_UNSUPPORTED';
@@ -332,7 +341,19 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     cross_tenant_success: observations.filter((o) => o.crossTenant && o.decision === 'ALLOW').length,
     authority_expansion: observations.filter((o) => ['DENY', 'BLOCKED_SANDBOX'].includes(o.expected) && o.decision === 'ALLOW' && o.kind !== 'sandbox').length
       + observations.filter((o) => o.kind === 'sandbox' && ['PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE', 'DENIED', 'BLOCKED', 'REDACTED', 'FILTERED', 'SURVIVORS_ZERO'].includes(o.expected) && o.observed === 'ALLOWED').length,
-    fs_network_secret_escapes: observations.filter((o) => o.kind === 'sandbox' && o.match === false).length,
+    // A REAL escape: a filesystem/network/environment/secret control that came
+    // back ALLOWED. Counting every sandbox mismatch here was wrong twice over —
+    // it reported a surviving child process as a "secret escape", and it
+    // double-counted a case `authority_expansion` already carries through the
+    // same narrow expectation list. A counter must state what it measured.
+    fs_network_secret_escapes: observations.filter((o) => o.kind === 'sandbox'
+      && SANDBOX_CONTAINMENT_EXPECTATIONS.includes(o.expected) && o.observed === 'ALLOWED').length,
+    // Every EXERCISED sandbox control that did not behave as expected and is not
+    // an escape — the cancellation control is the live case. Informational here;
+    // the gate blocks on it by deriving the same thing from the observations, so
+    // this counter is a name, not the enforcement point.
+    sandbox_control_violations: observations.filter((o) => o.kind === 'sandbox'
+      && o.match === false && o.notRun !== true).length,
     // `null` when the property was not measured here. The gate requires a
     // finite non-negative number, so an unmeasured survivor count fails closed
     // instead of passing as zero.

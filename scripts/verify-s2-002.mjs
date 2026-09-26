@@ -79,6 +79,15 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
         continue;
       }
       seen.add(observation.trialId);
+      // An EXERCISED sandbox control that did not behave as expected blocks the
+      // gate, under its own name. It is derived from the observations rather
+      // than required as a summary counter, so the committed Windows evidence —
+      // which has every sandbox control matching — still verifies, while a
+      // surviving child process is reported as a violated control instead of
+      // being folded into the filesystem/secret-escape counter.
+      if (observation.kind === 'sandbox' && observation.match === false && observation.notRun !== true) {
+        counterViolations.push(`${label}/sandboxControlViolated=${observation.trialId}:${String(observation.observed)}`);
+      }
       // A hard-counter control that this platform could not exercise is NOT a
       // pass. Without this rule a host could decline the measurement — and the
       // gate would still be green, which is precisely how a false pass reaches

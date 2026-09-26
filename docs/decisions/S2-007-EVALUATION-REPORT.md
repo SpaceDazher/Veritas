@@ -1,113 +1,71 @@
-## Verdict: BLOCKED_DEPENDENCY (engineering layer otherwise measured)
+## Verdict: COMPLETE_WITH_LIMITS (engineering boundary only) — issue #7 NOT closed
 
-`engineeringStatus = BLOCKED_DEPENDENCY`, `assuranceStatus = NOT_MEASURED`.
+`engineeringStatus = COMPLETE_WITH_LIMITS`, `assuranceStatus = NOT_MEASURED`,
+`realAdapterStatus = NOT_RUN_REAL_ADAPTER`, `A-MVP-01..07 = NOT_RUN`.
 
-The deterministic engineering layer of the live Agent Board boundary is built
-and measured: **338 of 338** `tests/agentboard` tests pass, 41 of 41 mandatory
-negative probes are green on a disposable PostgreSQL, the seven hard-gate
-counters are at 0, the two-process PostgreSQL replay returns an identical
-canonical digest, the offline A/B projection matches 118/118 preregistered
-expectations across 11/11 transition guards, `npm run build` succeeds against
-real PostgreSQL 17.11 with all 8 migrations applied, and the aggregator
-classifies 12 tampered evidence copies without missing one.
+**Windows engineering acceptance passed at commit `c922c09`** (x64, CIM available):
 
-It is nevertheless **not** a finished result, for one reason, verified:
+| Acceptance step | Result |
+| --- | --- |
+| `npm run verify:s2-007` | **`COMPLETE_WITH_LIMITS`**, 4/4 mandatory gates |
+| `npm run verify:clean-checkout` | **exit 0, 44/44 commands PASS** |
+| `npm test` | 1194/1194 with PostgreSQL |
 
-* `npm run verify:s2-007-dependencies` exits **1** with internal status
-  `BLOCKED_DEPENDENCY`. Its mandatory re-run `npm run verify:s2-002` exits **1**.
+The blocking condition that this report tracked for the whole ticket is **cleared**.
+The S2-002 dependency gate is green because the cancellation control is now
+exercised and passes on the platform where it can run: five identical
+`SURVIVORS_1` Windows runs had isolated a real cancellation defect, and the
+crash/restart path was fixed by a confirmed handoff plus forced process
+termination (TDD record: the owner's `s2-007-windows-db-replay-crash.tdd.md`).
+An A/B against the three pre-change files had already shown those files were not
+the cause, so the fix belongs where the defect was.
 
-That upstream failure is **pre-existing and host-specific**, proven rather than
-asserted. The committed S2-002 evidence records
-`"platform": "win32/x64 node v22.23.2"` with
-`fs_network_secret_escapes = 0` and `survivors_after_cancellation = 0`. Re-run
-on this Linux host it produces `fs_network_secret_escapes = 1` and
-`survivors_after_cancellation = -1`. Checking out the untouched base commit
-`f590d37ea8e861431abf3f89f59e01a889ab903d` (which contains **zero** S2-007
-files) into a separate worktree and running `npm run verify:s2-002` and
-`tests/identity/replay-runs.test.mjs` there reproduces **exactly the same
-failures**.
+### What this verdict is NOT
 
-**Root cause, established empirically — and it is NOT a single benign bookkeeping nit.**
-An adversarial verification pass refuted the first version of this analysis, which had
-concluded "not a safety failure". The corrected finding, reproduced on this host:
+* **Issue #7 is not closed.** Its scope is the real Codex/pi harness, the
+  configuration comparison, the full SolutionPack and pilot acceptance. None of
+  that is delivered here, and `COMPLETE_WITH_LIMITS` of the engineering boundary
+  is explicitly not a closure of the ticket and not `A-MVP PASS`.
+* No production readiness, no spending authorization, no external action.
+* `assuranceStatus` stays `NOT_MEASURED`: no genuinely installed AgentOS, Codex
+  or pi executor, so every real-adapter status is `NOT_RUN_REAL_ADAPTER` and
+  empirical semantic accuracy is not measured. Fixture, replay and probe
+  evidence never changes a `NOT_RUN` retrospectively.
 
-* **Two** platform-scoping defects in `scripts/s2-002-run.mjs`, not one. Besides the
-  unhandled `PLATFORM_UNSUPPORTED` from the Windows-only trial
-  (`s2-002-run.mjs:186` — produced in one place, handled in zero), the **oracle** excludes
-  `sandbox/fs-junction-escape` on non-Windows (`s2-002-run.mjs:95`) while the runner still
-  **executes** it (`:182-184`). It executes and passes on Linux (`match: true`), yet the
-  oracle never expected it, which is the second, independent
-  `trialCount=283/oracle=282` violation.
-* **Zero** filesystem/network secret escapes were observed here: the `1` is the declined
-  trial, and no other observation contributes. The committed Windows evidence is **not**
-  contradicted — its observation digest matches, and the Linux run's *executed* observations
-  hash to the same digest; it is the Linux *oracle* that diverges.
-* **The serious one: cancellation accounting on a non-Windows host fails in the PERMISSIVE
-  direction.** `listDescendants` returns `[]` off Windows (`src/lib/identity/sandbox.mjs:213`)
-  and the child is spawned with `detached: false` (`:389`), so the process group cannot be
-  signalled and only the direct child dies. Reproduced directly against the production
-  adapter here: `cancel()` returned `{terminated: true, survivors: 0, remainingProcessIds: []}`
-  in 102 ms while **two grandchildren were still running**. So *enabling* the declined trial
-  on this host would have produced a **false pass**. The platform decline is currently the
-  only thing keeping the record from claiming a safety property this host does not have.
-* The `-1` sentinel also **fails open** in the primary gate: `verify:s2-002.mjs` compares
-  with `value > limit`, so `-1`, `-9999` and any negative magnitude pass. Only
-  `tests/identity/replay-runs.test.mjs` catches it.
+### Two things still open
 
-**The owner's decision (2026-09-25): the Linux gate is NOT weakened**, and S2-002's code,
-gate and frozen evidence are unchanged. Canonical S2-002 was re-measured **on Windows
-with CIM access** — two independent runs over 283 cases, all hard counters `0`, comparison
-`PASS`, which makes the committed Windows measurement *reproducible on the platform it
-claims*, and in a restricted environment without CIM access the same check correctly
-`FAIL`ed. The owner explicitly did **not** claim Linux safety from that, and the
-remediation criterion is concrete: the child is spawned `detached: false`, while a POSIX
-process group in Node requires `detached: true`
-([Node.js `child_process`](https://nodejs.org/api/child_process.html)) — so on a
-non-Windows host either create and signal the group, or refuse cancellation and report the
-tier as blocked, never report `survivors: 0` while descendants live. The sandbox defect is
-tracked as [issue #41](https://github.com/SpaceDazher/Veritas/issues/41) (`bug`), carrying
-the symptom and fix criteria only — no PoC and no raw process data, per the project's
-`ecc:security-review` boundary. The `-1` comparator hole (Defect 4) was confirmed
-separately by the owner.
+1. **The accepting commit is not in `origin`.** `c922c09` exists only on the
+   owner's Windows machine; `origin/codex/s2-007-win-acceptance` is still at
+   `6a53358`. The evidence is bound to a commit that cannot be reproduced from
+   the repository until it is pushed. Push, PR and merge remain the owner's
+   decision and were not performed.
+2. **Four temporary containers leak from the S2-003…S2-006 DB replays** after a
+   green clean-checkout. The owner removed them and verified their absence, but
+   the cleanup defect is in frozen scripts and needs its own fix on those
+   tickets. It does not affect this ticket's own replay, which was verified to
+   leave no container behind, and it does not invalidate the acceptance above —
+   the 44/44 run had already completed.
 
-**The four defects have since been fixed, and the gate is STILL red.** An unexercised
-sandbox control is now recorded as `notRun` / `BLOCKED_SANDBOX` /
-`SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM` with `survivors: null` and an informational
-`not_run_controls` count; the oracle and the trial set are scoped consistently; the gate
-rejects negative and non-finite counters and **blocks** on `hardControlNotRun`; and
-`listDescendants` enumerates POSIX descendants from `/proc`, so `cancel()` can no longer
-report `survivors: 0` while descendants live. After the fix the visible tree is actually terminated and recycled pids are
-re-validated before they are signalled, but a **double-forked** grandchild that re-parents out of the tree is
-invisible to any parent-based walk and still survives, so `cancel()` now returns `authoritative: false` and
-`survivorsAreProof: false`: the count is a count of *visible* survivors, and closing the hole needs a non-parent-based
-mechanism (cgroup, pid namespace, job objects). [#41](https://github.com/SpaceDazher/Veritas/issues/41) is therefore
-narrowed and labelled, **not closed**.
+**#41 also remains open**: a double-forked grandchild re-parents out of any
+parent-based cancellation walk and survives, which is why `cancel()` returns
+`authoritative: false` so its count cannot be read as a proof.
 
-The effect is that a Linux run is now **honest rather than loud**: 283 observations against
-a 283-trial oracle, oracle digest `a5a63dc0…` identical to the committed Windows digest,
-`fs_network_secret_escapes = 0` truthfully, and `npm run verify:s2-002` still exiting **1**
-with the precise reason `hardControlNotRun=sandbox/cancellation-survivors` and
-`survivors_after_cancellation=null`. The gate is red because the property is genuinely
-unmeasured on this host — which is the correct fail-closed outcome, not a defect to work
-around. The frozen Windows evidence still verifies from Git bytes, and `tests/identity`
-goes from 149 pass / 6 fail to 157 pass / 0 fail while the full `npm test` reaches
-1181 pass / 0 fail.
+### What the earlier BLOCKED_DEPENDENCY state was
 
-**Consequence for this ticket: S2-007 stays `BLOCKED_DEPENDENCY`.** The owner does not
-declare this gate green, and this report does not either. Full analysis, symptom map, the
-defects, the reproduction, the decision and the fixes:
+This report previously read `BLOCKED_DEPENDENCY` because the mandatory
+`verify:s2-002` re-run could not be satisfied on the development host: its
+cancellation control is Windows-only, and a non-Windows run could not measure
+it. The fix was to make that refusal HONEST — a control that cannot run is
+recorded as `notRun` / `BLOCKED_SANDBOX` /
+`SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM` with `survivors: null`, no negative
+sentinel can pass the counter check, the oracle matches the trial set the runner
+actually builds, and an unexercised hard control BLOCKS the gate instead of
+passing it. The counter was also corrected: a surviving child process was being
+recorded as a filesystem/network secret escape, and it now appears as a violated
+sandbox control under its own name. None of that weakened the gate, and the
+Windows acceptance that followed is the proof. The full analysis, the four
+defects, the A/B isolation and the honest-not-run design:
 [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md).
-
-Nothing in S2-002 was changed from inside S2-007: the counter arithmetic, its runner,
-its tests, its evidence and its frozen manifest belong to another ticket, and relaxing
-them to clear S2-007's own dependency gate is exactly what the issue forbids. The
-dependency gate is right to stay red until the owner records the decision.
-
-Per the issue's own warning, **none of this is a closure of issue #7 and none
-of it is `A-MVP PASS`**. `A-MVP-01..07` remain `NOT_RUN` (§5), no real
-AgentOS/Codex/pi executor is installed on this host, and no production
-deployment, no spending authorization and no external action is implied by any
-statement in this report.
 
 ### 0.1 Defects found and closed during this evaluation
 
@@ -228,14 +186,14 @@ already failed.
 ## 3. Status block
 
 ```
-engineeringStatus = BLOCKED_DEPENDENCY
+engineeringStatus = COMPLETE_WITH_LIMITS   (Windows acceptance, commit c922c09)
 assuranceStatus   = NOT_MEASURED
 realAdapterStatus = NOT_RUN_REAL_ADAPTER
 aMvpStatus        = NOT_RUN (7/7 cases)
-verdictReasons    = ["[BLOCKED_DEPENDENCY] mandatory gate dependencies is
-                     BLOCKED_DEPENDENCY: gate:exit-code:1 — the single remaining
-                     issue is the pre-existing verify:s2-002 Linux failure, whose
-                     owner decision is to keep the gate red rather than weaken it"]
+verdictReasons    = ["verify:s2-007 -> COMPLETE_WITH_LIMITS, 4/4 mandatory gates",
+                     "verify:clean-checkout -> exit 0, 44/44 commands PASS",
+                     "issue #7 itself NOT closed: real adapters and A-MVP-01..07 NOT_RUN",
+                     "accepting commit c922c09 is not yet in origin"]
 verdictPrecedence = REVISE (critical defect) > BLOCKED_DEPENDENCY > NOT_RUN
                     > PASS_WITH_LIMITS > COMPLETE_WITH_LIMITS
 ```
@@ -243,9 +201,10 @@ verdictPrecedence = REVISE (critical defect) > BLOCKED_DEPENDENCY > NOT_RUN
 `REVISE` was the earlier status and no longer applies: the one critical defect it
 recorded — the negotiation-handshake defect in the frozen `contracts.mjs`, and the
 fail-open / unguarded-transition defects found by the adversarial pass — is fixed, and
-`npm run test:s2-007` now exits 0 with 338/338 passing. The binding constraint is now
-solely the dependency gate, so the status is `BLOCKED_DEPENDENCY` and nothing here claims
-a higher one.
+`npm run test:s2-007` now exits 0 with 338/338 passing. At that point the sole
+remaining constraint was the dependency gate, and the status was
+`BLOCKED_DEPENDENCY`. The Windows acceptance at `c922c09` has since cleared it; see
+the Verdict.
 
 **What is NOT inferred from anything in this report** (the aggregator's
 `notInferred` list, unchanged here): `real_adapter_execution`,
@@ -450,8 +409,14 @@ Family totals as recorded: 9/9, 6/6, 7/7, 6/6, 7/7, 6/6 = 41/41 passed,
 
 ## 9. Dependency gate result
 
-`npm run verify:s2-007-dependencies` → **exit 1**, internal status
-**`BLOCKED_DEPENDENCY`**, reported issue `rerun.verify-s2-002:failed_nonzero(exit=1)`.
+**Resolved on Windows.** On the Linux development host this gate read **exit 1**,
+internal status **`BLOCKED_DEPENDENCY`**, sole issue
+`rerun.verify-s2-002:failed_nonzero(exit=1)` — the cancellation control is
+Windows-only and cannot be measured here. On Windows at `c922c09` the same gate
+passes, because the control runs and the crash/restart path now terminates the
+process tree; `verify:s2-007` returned `COMPLETE_WITH_LIMITS` with 4/4 mandatory
+gates. The paragraphs below record the development-host observations that led to
+that resolution and are kept as history, not as the current status.
 
 - Base pinned and re-verified: `origin/main` =
   `f590d37ea8e861431abf3f89f59e01a889ab903d`, tree
@@ -472,8 +437,8 @@ Family totals as recorded: 9/9, 6/6, 7/7, 6/6, 7/7, 6/6 = 41/41 passed,
   `src/lib/agentboard/` line names a verifier signal token and the `DONE` state
   without a refusal marker). The gate reported no issue for this assertion in
   its single run — its only reported issue was the `verify:s2-002` re-run — but
-  the gate as a whole is `BLOCKED_DEPENDENCY`, so no green binding may be read
-  out of it.
+  the gate as a whole was `BLOCKED_DEPENDENCY` on this host, so no green binding
+  was read out of it there. On Windows the gate passed at `c922c09`.
 - Sandbox gate: the requested profile `sbx-podman-local-restricted-v1`
   resolved to `ALLOW` with `liveExecutionAllowed: true`. This is the internal
   S2-002 gate answering, and it authorises a live run **only** if a genuinely
@@ -482,9 +447,10 @@ Family totals as recorded: 9/9, 6/6, 7/7, 6/6, 7/7, 6/6 = 41/41 passed,
 - `manifest:check` inside the gate: exit 1, declared deferral state
   `REQUIRES_FINAL_MANIFEST` (the root manifest is regenerated once at the end of
   the task). It is recorded with its real exit code and is not reported green.
-- Consequence recorded by the gate itself: while it is `BLOCKED_DEPENDENCY`,
-  S2-007 may document and design offline but may not record an implementation
-  result and may not run an executor.
+- Consequence the gate recorded for itself: while it was `BLOCKED_DEPENDENCY` on
+  this host, S2-007 could document and design offline but could not record an
+  implementation result and could not run an executor. No executor was run at any
+  point in this work, on either platform.
 
 ---
 
@@ -571,8 +537,9 @@ a finished solution — in any of the following cases:
    bind. → `BLOCKED_DEPENDENCY`.
 2. The mandatory upstream re-runs (`verify:s2-002-dependencies`,
    `verify:s2-002`) are not green, or their canonical evidence cannot be
-   restored byte-identically. → `BLOCKED_DEPENDENCY` (this is the current
-   state).
+   restored byte-identically. → `BLOCKED_DEPENDENCY`. This WAS the state on
+   the Linux development host throughout this work; on Windows at `c922c09`
+   both re-runs are green, which is what moved the verdict.
 3. The internal S2-002 sandbox gate does not ALLOW **exactly**
    `sbx-podman-local-restricted-v1`. A `NO_EXEC` or `*_blocked` profile is never
    a substitute; the live run stays forbidden and the gate is
@@ -633,12 +600,17 @@ applied the §0.1 fixes. Exit codes are real, not quoted.
 
 | Command | Exit | Result |
 | --- | --- | --- |
+| **Windows acceptance at `c922c09`** | | |
+| `npm run verify:s2-007` (Windows, CIM) | **0** | `COMPLETE_WITH_LIMITS`, 4/4 mandatory gates |
+| `npm run verify:clean-checkout` (Windows, CIM) | **0** | **44/44 commands PASS** |
+| `npm test` (Windows, PostgreSQL) | **0** | 1194/1194 |
+| Linux, this repository | | |
 | `npm run --silent test:s2-007` | **0** | 338 tests, 64 suites, 338 pass, 0 fail, 0 skipped |
 | `npm run --silent test:s2-007-security-probes` | **0** | `PASS`, 41/41 probes, 6/6 families, `notRun: 0`, all 7 counters 0, `databaseTier: podman_disposable` |
 | `npm run --silent s2-007:run` | **0** | `ok: true`; A and B canonical digests equal, identities distinct, 118/118 expectations, 11/11 guards, 0 violations |
 | `npm run --silent verify:s2-007-db-replay` | **0** | `PASS`, PostgreSQL 17.11, 8 migrations × 3 schemas, canonical digest A === B, 7 counters 0, container removal verified |
-| `npm run --silent verify:s2-007-dependencies` | **1** | `BLOCKED_DEPENDENCY`; single issue `rerun.verify-s2-002:failed_nonzero(exit=1)`, proven pre-existing (§ Verdict); `manifest:check` recorded as `REQUIRES_FINAL_MANIFEST` with its real exit 1; sandbox gate `ALLOW` for `sbx-podman-local-restricted-v1`; 13 board files scanned |
-| `npm run --silent verify:s2-007` (aggregator) | **1** | `BLOCKED_DEPENDENCY`, `assuranceStatus NOT_MEASURED`; refuses to certify while the dependency gate is red |
+| `npm run --silent verify:s2-007-dependencies` (Linux dev host) | **1** | `BLOCKED_DEPENDENCY`; sole issue `rerun.verify-s2-002:failed_nonzero(exit=1)`; sandbox gate `ALLOW` for `sbx-podman-local-restricted-v1`; 13 board files scanned. **Windows `c922c09`: exit 0** |
+| `npm run --silent verify:s2-007` (aggregator, Linux dev host) | **1** | refused to certify while that host's dependency gate was red. **Windows `c922c09`: `COMPLETE_WITH_LIMITS`, 4/4 mandatory gates** |
 | `npm run --silent typecheck` | **0** | clean |
 | `npx eslint . --ignore-pattern '.bb/**'` | **0** | clean |
 | `npm run build` | **0** | Next.js 16.3.4, compiled; routes `/api/agent-board`, `/api/agent-board/[...path]`, `/api/board`, `/api/capabilities`, `/api/health` |
@@ -683,6 +655,25 @@ real problems in the S2-007 payload, and both were fixed rather than suppressed.
 | `scripts/check-public-artifacts.mjs` | Four `tests/agentboard` fixtures embedded credential-shaped literals: a PostgreSQL connection authority (user, password and host in one literal), a GitHub token shape (`injection.test.mjs`) and a PEM private-key header (`policy.test.mjs`). A tracked file must never carry one. | The fixtures now assemble the shape from parts, so the strings `redact()` and the redaction helpers are asked to catch are byte-identical while the source carries no credential shape. **The scanner itself was not weakened.** |
 | `scripts/validate-contracts.mjs` | The eight new S2-007 schemas were covered by the existing `contracts` freeze target, but the implementation that enforces them was not frozen with them — the payload could have drifted from its contracts. | S2-007 is added to `frozenTargets` alongside every earlier ticket (implementation, tests, migration, HTTP surface, runners, binding evidence) and the manifest was refrozen with an explicit, reviewed `--freeze`. |
 
+## 13.3 Container cleanup defect in the S2-003…S2-006 replays (found after the green run)
+
+After the 44/44 clean-checkout, four temporary containers from the **older**
+S2-003, S2-004, S2-005 and S2-006 database replays were still present. The owner
+removed them and verified their absence, so the acceptance result above is not
+affected — the run had already completed. But the cleanup itself is defective in
+those frozen scripts, and it is a real finding rather than noise:
+
+* it is reproducible only at the end of a full clean-checkout, so a per-command
+  run never surfaces it;
+* it leaves host state behind after a run that otherwise reports success, which
+  is exactly the shape of an unnoticed leak;
+* the fix belongs to S2-003…S2-006, whose scripts are frozen with their own
+  tickets' evidence, so it cannot be folded into this one.
+
+This ticket's own replay (`verify:s2-007-db-replay`) was verified on every run
+during this work to leave **no** S2-007 container behind, and the S2-007
+probes and run harness provision and remove their own disposable PostgreSQL.
+
 ## 14. What was NOT verified
 
 * No genuinely installed AgentOS, Codex or pi executor exists on this host, so
@@ -693,9 +684,10 @@ real problems in the S2-007 payload, and both were fixed rather than suppressed.
   counter failures were traced to a single, deliberately skipped Windows-only trial
   scored as a control violation — an accounting defect, and a documented
   `NOT_RUN` property, not an observed escape (see the Verdict and
-  [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md)). Until
-  S2-002 records an owner decision, the dependency gate is red and `engineeringStatus`
-  cannot rise above `BLOCKED_DEPENDENCY`.
+  [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md)). That
+  host-side `NOT_RUN` is the reason the dependency gate is red on Linux; the owner
+  decided not to weaken it, and the Windows acceptance cleared the ticket on the
+  platform where the control can actually run.
 * No production deployment, no spending authorization, no credential
   acquisition and no external action is implied or performed.
 * Empirical semantic accuracy is not measured and is not inferred from any
