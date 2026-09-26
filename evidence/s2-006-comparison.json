@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "fail-closed comparator over two pre-sealed process-separated prediction sets (spec §9); the candidate is never re-run after unseal",
-  "testedImplementationCommit": "d0c6a0228982a9d5758b94b73d4b0743fa974117",
+  "testedImplementationCommit": "03a32a4b67734fb5b6a8a3145d2c1e1b9e955f4e",
   "corpus": {
     "manifestId": "anmf-s2006-fixture-corpus",
     "manifestSha256": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
@@ -13,14 +13,14 @@
   "runParameters": {
     "run_a": {
       "executor": "exec-s2-006-a",
-      "pid": 484738,
+      "pid": 297954,
       "clock": "2026-01-15T08:00:00.000Z",
       "nonce": "n-a-7c1e4d90a2b8f3e6",
       "output_root": "results/s2-006/run-a"
     },
     "run_b": {
       "executor": "exec-s2-006-b",
-      "pid": 484746,
+      "pid": 297962,
       "clock": "2026-03-21T23:59:59.999Z",
       "nonce": "n-b-3f9a62d1c5e80b74",
       "output_root": "results/s2-006/run-b"
@@ -31,8 +31,8 @@
     "run_b": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac"
   },
   "runManifestDigests": {
-    "run_a": "aebda770ea6c2370ef4085ed4d638a504388fb610019897772fa568d307beae4",
-    "run_b": "3db3ffd272be66ea2a70fc4a7607f5b038bc59d0cd0c823fb9a215cbd7466a78"
+    "run_a": "7893c2467e278fb33301552e563bd1a83b563d0c83d0db83a485d52d859ca641",
+    "run_b": "55c70cd90a64e24aed75c5992e3d4193d41d22a6737c73fb2b5ee389decc38eb"
   },
   "hardCounters": {
     "run_a": {
@@ -63,8 +63,8 @@
         "runB": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac"
       },
       "runManifestDigests": {
-        "runA": "aebda770ea6c2370ef4085ed4d638a504388fb610019897772fa568d307beae4",
-        "runB": "3db3ffd272be66ea2a70fc4a7607f5b038bc59d0cd0c823fb9a215cbd7466a78"
+        "runA": "7893c2467e278fb33301552e563bd1a83b563d0c83d0db83a485d52d859ca641",
+        "runB": "55c70cd90a64e24aed75c5992e3d4193d41d22a6737c73fb2b5ee389decc38eb"
       },
       "consensusGold": {
         "case-s2006-01": "SUPPORTED",
