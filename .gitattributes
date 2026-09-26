@@ -10,6 +10,7 @@ evidence/external/s1-007/evaluation-record.json -text -diff
 evidence/external/s1-009/evaluation-record.json -text -diff
 *.md text eol=lf
 *.mjs text eol=lf
+*.mts text eol=lf
 *.py text eol=lf
 *.ts text eol=lf
 *.tsx text eol=lf
