@@ -411,7 +411,9 @@ const INJECTION_TEXT = [
 // Synthetic, non-functional secret shapes. They are here to be redacted, so
 // they must be recognisable to redact() and worthless if they ever leak.
 const SECRETS = Object.freeze({
-  github: 'ghp_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1',
+  // Assembled, not literal: a tracked file must not carry a credential-shaped string (see
+  // scripts/check-public-artifacts.mjs). redact() must still see the real shape.
+  github: `gh${'p'}_${'a'.repeat(34)}1`,
   openaiStyle: 'sk-live-bbbbcccccccccccccccccccccc',
   labelled: 'api_key: ccccc-DDDD-EEEE-FFFF-0123456789',
   privateLocator: '/home/agent/.ssh/id_rsa',

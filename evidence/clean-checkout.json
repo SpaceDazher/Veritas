@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "method": "git archive HEAD into an empty temporary directory; npm ci uses an isolated cache and node_modules",
-  "testedImplementationCommit": "842926b1bab87152f4a3f5ccca78fae36d0205f9",
+  "testedImplementationCommit": "03a32a4b67734fb5b6a8a3145d2c1e1b9e955f4e",
   "evidenceContainerResolution": "Resolve externally with: git log -1 --format=%H -- evidence/clean-checkout.json",
-  "sourceCommit": "842926b1bab87152f4a3f5ccca78fae36d0205f9",
-  "sourceTree": "14f5a8fd0a1e2b8dd33314507b1dd69ca5959122",
-  "exitCode": 0,
-  "passed": true,
+  "sourceCommit": "03a32a4b67734fb5b6a8a3145d2c1e1b9e955f4e",
+  "sourceTree": "4b3d179cb410959c566bf0ac915451980dd8f3f4",
+  "exitCode": 1,
+  "passed": false,
   "commands": [
     {
       "id": "archive",
@@ -16,19 +16,19 @@
     },
     {
       "id": "npm-ci",
-      "command": "npm.cmd ci",
+      "command": "npm ci",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-002-dependencies",
-      "command": "npm.cmd run verify:s2-002-dependencies",
+      "command": "npm run verify:s2-002-dependencies",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-003-dependencies",
-      "command": "npm.cmd run verify:s2-003-dependencies",
+      "command": "npm run verify:s2-003-dependencies",
       "exitCode": 0,
       "status": "PASS"
     },
@@ -41,8 +41,9 @@
     {
       "id": "contracts",
       "command": "node scripts/validate-contracts.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "'tests/verifier/fixtures/owner-inputs/threshold-decision.json': '4928d03ae49f69090284493ce0b89753fce472943397f1b760611fcbd5be9626',\n    'tests/verifier/fixtures/owner-inputs/thresholds.json': 'c30b123929302b28574b9dfb8ff0bac8d373b29ebaba2e7d27d1fa51ca6103ee',\n    'tests/verifier/model-pilot.test.mjs': '2c10e8a93d275c43674f55cf4b5fcac3438c7ee2f163d4fe71d124f6a6521308',\n    'tests/verifier/owner-inputs.test.mjs': '93ce2d5194f3118e55a7ed61b3d9d7213ac9ecbd4d415250ab849b8e7f3d7752',\n    'tests/verifier/policy.test.mjs': '4dcb38f30859a3f9650d6e54300a0fcb257d2561cb759fa1be714f17b833d98c',\n    'tests/verifier/review-round3-hardening.test.mjs': '99446e44c544d85d4659ce3ceac64f04d2e5c9ef6ca49ea0fc0f87121127f3ed',\n    'tests/verifier/rubric.test.mjs': '82be4c27c3b13fa8e2215acd6ff7691ea17291afdc59fb723a7327ba5bd54ef1',\n    'tests/verifier/security-probes.test.mjs': '5639244f428fdd8fe3cc03fe310ed49927eb3150c0053a4f4d10fd1190eb9208',\n    'tests/verifier/signature.test.mjs': '7613ab6b84b76a6c7b35c862e74b61715e67005d38cd472ba3bd9e35753c738f',\n    'tests/verifier/store.test.mjs': 'd8faf74d816c88a53d44c7c133beb088e98c20d5268bb4c68bfcfe92788f8d1f'\n  },\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}"
     },
     {
       "id": "synthetic-smoke",
@@ -59,204 +60,207 @@
     {
       "id": "public-artifacts",
       "command": "node scripts/check-public-artifacts.mjs",
-      "exitCode": 0,
-      "status": "PASS"
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "tern: '/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/'\n+   },\n+   {\n+     path: 'tests/agentboard/summary-aggregator.test.mjs',\n+     pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\n+   }\n+ ]\n- []\n\n    at file:///tmp/veritas-clean-checkout-o6tuml/checkout/scripts/check-public-artifacts.mjs:42:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: [\n    {\n      path: 'tests/agentboard/concurrency.test.mjs',\n      pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\n    },\n    {\n      path: 'tests/agentboard/injection.test.mjs',\n      pattern: '/gh[pousr]_[A-Za-z0-9]{30,}/'\n    },\n    {\n      path: 'tests/agentboard/policy.test.mjs',\n      pattern: '/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/'\n    },\n    {\n      path: 'tests/agentboard/summary-aggregator.test.mjs',\n      pattern: '/postgres(?:ql)?:\\\\/\\\\/[^\\\\s/:]+:[^\\\\s@]+@/'\n    }\n  ],\n  expected: [],\n  operator: 'deepStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.23.2"
     },
     {
       "id": "podman-sandbox",
-      "command": "npm.cmd run verify:podman-sandbox",
+      "command": "npm run verify:podman-sandbox",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "gvisor-sandbox",
-      "command": "npm.cmd run verify:gvisor-sandbox",
+      "command": "npm run verify:gvisor-sandbox",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "postgres-smoke",
-      "command": "npm.cmd run verify:postgres-smoke",
+      "command": "npm run verify:postgres-smoke",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "identity-tests",
-      "command": "npm.cmd run test:identity",
-      "exitCode": 0,
-      "status": "PASS"
+      "command": "npm run test:identity",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "      failureType: 'testCodeFailure'\n      error: 'probe G must run on this platform'\n      code: 'ERR_ASSERTION'\n      name: 'AssertionError'\n      expected: 'SKIPPED'\n      actual: 'SKIPPED'\n      operator: 'notStrictEqual'\n      stack: |-\n        TestContext.<anonymous> (file:///tmp/veritas-clean-checkout-o6tuml/checkout/tests/identity/security-probes.test.mjs:48:14)\n        Test.runInAsyncScope (node:async_hooks:214:14)\n        Test.run (node:internal/test_runner/test:1047:25)\n        Suite.processPendingSubtests (node:internal/test_runner/test:744:18)\n        Test.postRun (node:internal/test_runner/test:1173:19)\n        Test.run (node:internal/test_runner/test:1101:12)\n        async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)\n      ...\n    1..13\nnot ok 34 - S2-002 adversarial corpus (production-facing path)\n  ---\n  duration_ms: 3.800051\n  type: 'suite'\n  location: '/tmp/veritas-clean-checkout-o6tuml/checkout/tests/identity/security-probes.test.mjs:26:1'\n  failureType: 'subtestsFailed'\n  error: '2 subtests failed'\n  code: 'ERR_TEST_FAILURE'\n  ...\n1..34\n# tests 156\n# suites 34\n# pass 149\n# fail 6\n# cancelled 0\n# skipped 1\n# todo 0\n# duration_ms 890.064651"
     },
     {
       "id": "sandbox-tests",
-      "command": "npm.cmd run test:sandbox",
+      "command": "npm run test:sandbox",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "security-probes",
-      "command": "npm.cmd run test:security-probes",
+      "command": "npm run test:security-probes",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-003-ingestion-tests",
-      "command": "npm.cmd run test:ingestion",
+      "command": "npm run test:ingestion",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-003-security-probes",
-      "command": "npm.cmd run test:s2-003-security-probes",
+      "command": "npm run test:s2-003-security-probes",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-003-replay",
-      "command": "npm.cmd run verify:s2-003",
+      "command": "npm run verify:s2-003",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-003-db-replay",
-      "command": "npm.cmd run verify:s2-003-db-replay",
+      "command": "npm run verify:s2-003-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-002-replay",
-      "command": "npm.cmd run verify:s2-002",
-      "exitCode": 0,
-      "status": "PASS"
+      "command": "npm run verify:s2-002",
+      "exitCode": 1,
+      "status": "FAIL",
+      "reason": "{\n  \"exitCode\": 1,\n  \"runA\": {\n    \"trials\": 283,\n    \"counters\": {\n      \"cross_tenant_success\": 0,\n      \"authority_expansion\": 0,\n      \"fs_network_secret_escapes\": 1,\n      \"survivors_after_cancellation\": -1,\n      \"allow_after_revocation_commit\": 0,\n      \"missing_or_censored_trials\": 0\n    },\n    \"revocationLatency\": {\n      \"trials\": 100,\n      \"maxMs\": 0.066492,\n      \"meanMs\": 0.011885800000000002,\n      \"allowAfterCommit\": 0\n    }\n  },\n  \"runB\": {\n    \"trials\": 283,\n    \"counters\": {\n      \"cross_tenant_success\": 0,\n      \"authority_expansion\": 0,\n      \"fs_network_secret_escapes\": 1,\n      \"survivors_after_cancellation\": -1,\n      \"allow_after_revocation_commit\": 0,\n      \"missing_or_censored_trials\": 0\n    },\n    \"revocationLatency\": {\n      \"trials\": 100,\n      \"maxMs\": 0.048106,\n      \"meanMs\": 0.0106267,\n      \"allowAfterCommit\": 0\n    }\n  },\n  \"comparison\": {\n    \"comparedTrials\": 283,\n    \"mismatchedDecisions\": 0,\n    \"counterViolations\": [\n      \"run-a/trialCount=283/oracle=282\",\n      \"run-b/trialCount=283/oracle=282\",\n      \"run-a/fs_network_secret_escapes=1\",\n      \"run-b/fs_network_secret_escapes=1\"\n    ]\n  },\n  \"ok\": false\n}"
     },
     {
       "id": "s2-004-dependencies",
-      "command": "npm.cmd run verify:s2-004-dependencies",
+      "command": "npm run verify:s2-004-dependencies",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-004-claims-tests",
-      "command": "npm.cmd run test:claims",
+      "command": "npm run test:claims",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-004-security-probes",
-      "command": "npm.cmd run test:s2-004-security-probes",
+      "command": "npm run test:s2-004-security-probes",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-004-replay",
-      "command": "npm.cmd run verify:s2-004",
+      "command": "npm run verify:s2-004",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-004-db-replay",
-      "command": "npm.cmd run verify:s2-004-db-replay",
+      "command": "npm run verify:s2-004-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-005-types",
-      "command": "npm.cmd run synthesis:types",
+      "command": "npm run synthesis:types",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-005-retrieval-tests",
-      "command": "npm.cmd run test:retrieval",
+      "command": "npm run test:retrieval",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-005-synthesis-tests",
-      "command": "npm.cmd run test:synthesis",
+      "command": "npm run test:synthesis",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-005-security-probes",
-      "command": "npm.cmd run test:s2-005-security-probes",
+      "command": "npm run test:s2-005-security-probes",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-005-replay",
-      "command": "npm.cmd run verify:s2-005",
+      "command": "npm run verify:s2-005",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-005-db-replay",
-      "command": "npm.cmd run verify:s2-005-db-replay",
+      "command": "npm run verify:s2-005-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-006-types",
-      "command": "npm.cmd run verifier:types",
+      "command": "npm run verifier:types",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-006-verifier-tests",
-      "command": "npm.cmd run test:verifier",
+      "command": "npm run test:verifier",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-006-calibration",
-      "command": "npm.cmd run test:s2-006-calibration",
+      "command": "npm run test:s2-006-calibration",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-006-security-probes",
-      "command": "npm.cmd run test:s2-006-security-probes",
+      "command": "npm run test:s2-006-security-probes",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-006-replay",
-      "command": "npm.cmd run verify:s2-006",
+      "command": "npm run verify:s2-006",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "s2-006-db-replay",
-      "command": "npm.cmd run verify:s2-006-db-replay",
+      "command": "npm run verify:s2-006-db-replay",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "typecheck",
-      "command": "npm.cmd run typecheck",
+      "command": "npm run typecheck",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "lint",
-      "command": "npm.cmd run lint",
+      "command": "npm run lint",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "build",
-      "command": "npm.cmd run build",
+      "command": "npm run build",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "runtime-audit",
-      "command": "npm.cmd audit --omit=dev --json",
+      "command": "npm audit --omit=dev --json",
       "exitCode": 0,
       "status": "PASS"
     },
     {
       "id": "tooling-audit",
-      "command": "npm.cmd audit --json",
+      "command": "npm audit --json",
       "exitCode": 0,
       "status": "PASS"
     }

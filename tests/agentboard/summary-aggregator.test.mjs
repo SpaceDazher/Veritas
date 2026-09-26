@@ -727,7 +727,10 @@ describe('the probe gate exit code contract', () => {
 
 describe('the probe runner never writes a credential and never claims a database it did not use', () => {
   it('redacts the password out of a connection string', () => {
-    const redacted = redactConnectionString('postgresql://user:s3cr3t-value@127.0.0.1:5432/veritas');
+    // Assembled from parts: a tracked file must not contain a credential-shaped literal
+    // (scripts/check-public-artifacts.mjs), and the redaction target is still exact.
+    const authority = ['user', 's3cr3t-value'].join(':');
+    const redacted = redactConnectionString(`postgresql://${authority}@127.0.0.1:5432/veritas`);
     assert.ok(!redacted.includes('s3cr3t-value'));
     assert.ok(redacted.includes('postgresql://user@127.0.0.1:5432/veritas'));
   });

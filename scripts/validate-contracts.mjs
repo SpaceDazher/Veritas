@@ -161,6 +161,18 @@ const frozenTargets = [
   'scripts/verify-s2-006-dependencies.mjs',
   'scripts/generate-verifier-types.mjs',
   'evidence/s2-006-dependency-binding.json', 'evidence/s2-006-security-probes.json',
+  // S2-007: the live Agent Board boundary. Contracts are already covered by
+  // the `contracts` target above; the implementation, its tests, the migration,
+  // the HTTP surface, the runner/replay/verifier entry points and the binding
+  // evidence are frozen alongside them, so the eight new schemas and the code
+  // that enforces them move as one reviewed unit.
+  'src/lib/agentboard', 'tests/agentboard',
+  'scripts/s2-007-run.mjs', 'scripts/s2-007-db-replay.mjs',
+  'scripts/s2-007-db-replay-executor.mjs', 'scripts/s2-007-security-probes.mjs',
+  'scripts/verify-s2-007.mjs', 'scripts/verify-s2-007-dependencies.mjs',
+  'scripts/generate-board-types.mjs', 'scripts/veritas-board-cli.mjs',
+  'src/app/api/agent-board',
+  'evidence/s2-007-dependency-binding.json', 'evidence/s2-007-security-probes.json',
 ];
 const walk = (target) => {
   const normalized = target.split(path.sep).join('/');

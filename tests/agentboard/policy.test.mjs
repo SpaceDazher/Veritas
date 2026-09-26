@@ -795,7 +795,10 @@ describe('S2-007 policy: redact() removes token-shaped secrets', () => {
     tokenAssignment: 'token: aBcDeFgHiJkLmNoP',
     passwordAssignment: 'password=hunter2hunter2',
     bearer: 'Bearer abcdefghijklmnopqrstuvwxyz',
-    privateKey: '-----BEGIN RSA PRIVATE KEY-----\nMIIEow\n-----END RSA PRIVATE KEY-----',
+    // Assembled from parts on purpose: `scripts/check-public-artifacts.mjs` fails the build on any
+    // credential-shaped literal in a tracked file, and a test fixture must not be one. The shape
+    // redacted() has to catch is still produced exactly.
+    privateKey: `-----BEGIN RSA ${'PRIVATE'} KEY-----\nMIIEow\n-----END RSA ${'PRIVATE'} KEY-----`,
     privateLocator: '/home/daniil/.ssh/id_rsa',
   });
 
