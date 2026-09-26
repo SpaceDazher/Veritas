@@ -22,9 +22,12 @@ import { gitText } from './git-client.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RUN_TIMEOUT_MS = 900000;
 
-function gitAvailable() {
+function gitAvailable(root) {
+  // A clean archive may have VERITAS_SOURCE_COMMIT as a read-only fallback
+  // for rev-parse, but it has no object database for log/merge-base.
+  if (!fs.existsSync(path.join(root, '.git'))) return false;
   try {
-    gitText(ROOT, ['rev-parse', 'HEAD']);
+    gitText(root, ['rev-parse', 'HEAD']);
     return true;
   } catch {
     return false;
@@ -34,19 +37,19 @@ function gitAvailable() {
 // The contract must be frozen in an ancestor commit of the implementation
 // under test. Without git (clean archive) this is reported as NOT_RUN, not
 // as a pass.
-function freezeProvenance() {
-  if (!gitAvailable()) {
+export function freezeProvenance(root = ROOT) {
+  if (!gitAvailable(root)) {
     return {
       status: 'NOT_RUN',
       reason: 'no git metadata in this checkout; freeze provenance is resolved externally with git log -1 -- contracts/sloqual-001-slo-contract.json',
     };
   }
-  const head = gitText(ROOT, ['rev-parse', 'HEAD']);
-  const freezeCommit = gitText(ROOT, ['log', '-1', '--format=%H', '--', CONTRACT_PATH]);
-  const manifestCommit = gitText(ROOT, ['log', '-1', '--format=%H', '--', MANIFEST_PATH]);
+  const head = gitText(root, ['rev-parse', 'HEAD']);
+  const freezeCommit = gitText(root, ['log', '-1', '--format=%H', '--', CONTRACT_PATH]);
+  const manifestCommit = gitText(root, ['log', '-1', '--format=%H', '--', MANIFEST_PATH]);
   let frozenBeforeImplementation = false;
   try {
-    gitText(ROOT, ['merge-base', '--is-ancestor', freezeCommit, head]);
+    gitText(root, ['merge-base', '--is-ancestor', freezeCommit, head]);
     frozenBeforeImplementation = true;
   } catch {
     frozenBeforeImplementation = false;

@@ -16,12 +16,25 @@ import {
   validateManifest,
   verifyFreeze,
 } from '../../src/lib/sloqual/contract.mjs';
+import { freezeProvenance } from '../../scripts/verify-sloqual-001.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const contractBytes = fs.readFileSync(path.join(ROOT, CONTRACT_PATH));
 const manifestBytes = fs.readFileSync(path.join(ROOT, MANIFEST_PATH));
 const contract = JSON.parse(contractBytes.toString('utf8'));
 const manifest = JSON.parse(manifestBytes.toString('utf8'));
+
+test('archive provenance stays NOT_RUN when commit fallback exists but .git does not', () => {
+  const previous = process.env.VERITAS_SOURCE_COMMIT;
+  process.env.VERITAS_SOURCE_COMMIT = 'a'.repeat(40);
+  try {
+    const provenance = freezeProvenance(path.join(ROOT, 'archive-without-git'));
+    assert.equal(provenance.status, 'NOT_RUN');
+  } finally {
+    if (previous === undefined) delete process.env.VERITAS_SOURCE_COMMIT;
+    else process.env.VERITAS_SOURCE_COMMIT = previous;
+  }
+});
 
 describe('SLOQUAL-001 frozen contract', () => {
   test('the committed contract verifies against the committed manifest', () => {
