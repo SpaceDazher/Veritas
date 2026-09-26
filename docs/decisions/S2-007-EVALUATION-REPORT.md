@@ -25,11 +25,45 @@ on this Linux host it produces `fs_network_secret_escapes = 1` and
 `f590d37ea8e861431abf3f89f59e01a889ab903d` (which contains **zero** S2-007
 files) into a separate worktree and running `npm run verify:s2-002` and
 `tests/identity/replay-runs.test.mjs` there reproduces **exactly the same
-failures**. The S2-002 sandbox evidence therefore does not reproduce on Linux,
-and the dependency gate is right to refuse a green status instead of papering
-over it. The S2-007 canonical evidence of other tickets was restored from the
-pinned commit after every re-run; no S2-007 gate mutates another ticket's
-evidence.
+failures**.
+
+**Root cause, established empirically — and it is NOT a single benign bookkeeping nit.**
+An adversarial verification pass refuted the first version of this analysis, which had
+concluded "not a safety failure". The corrected finding, reproduced on this host:
+
+* **Two** platform-scoping defects in `scripts/s2-002-run.mjs`, not one. Besides the
+  unhandled `PLATFORM_UNSUPPORTED` from the Windows-only trial
+  (`s2-002-run.mjs:186` — produced in one place, handled in zero), the **oracle** excludes
+  `sandbox/fs-junction-escape` on non-Windows (`s2-002-run.mjs:95`) while the runner still
+  **executes** it (`:182-184`). It executes and passes on Linux (`match: true`), yet the
+  oracle never expected it, which is the second, independent
+  `trialCount=283/oracle=282` violation.
+* **Zero** filesystem/network secret escapes were observed here: the `1` is the declined
+  trial, and no other observation contributes. The committed Windows evidence is **not**
+  contradicted — its observation digest matches, and the Linux run's *executed* observations
+  hash to the same digest; it is the Linux *oracle* that diverges.
+* **The serious one: cancellation accounting on a non-Windows host fails in the PERMISSIVE
+  direction.** `listDescendants` returns `[]` off Windows (`src/lib/identity/sandbox.mjs:213`)
+  and the child is spawned with `detached: false` (`:389`), so the process group cannot be
+  signalled and only the direct child dies. Reproduced directly against the production
+  adapter here: `cancel()` returned `{terminated: true, survivors: 0, remainingProcessIds: []}`
+  in 102 ms while **two grandchildren were still running**. So *enabling* the declined trial
+  on this host would have produced a **false pass**. The platform decline is currently the
+  only thing keeping the record from claiming a safety property this host does not have.
+* The `-1` sentinel also **fails open** in the primary gate: `verify:s2-002.mjs` compares
+  with `value > limit`, so `-1`, `-9999` and any negative magnitude pass. Only
+  `tests/identity/replay-runs.test.mjs` catches it.
+
+Consequence for this ticket: the dependency gate is right to stay red, and **relaxing the
+Linux counters would be the wrong fix** — it would delete the only signal that the tier is
+unprovable here and would let a false pass through. The correct action is to re-measure S2-002
+on Windows. Full analysis, symptom map, the four defects, the reproduction and the
+recommended changes: [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md).
+
+Nothing in S2-002 was changed from inside S2-007: the counter arithmetic, its runner,
+its tests, its evidence and its frozen manifest belong to another ticket, and relaxing
+them to clear S2-007's own dependency gate is exactly what the issue forbids. The
+dependency gate is right to stay red until the owner records the decision.
 
 Per the issue's own warning, **none of this is a closure of issue #7 and none
 of it is `A-MVP PASS`**. `A-MVP-01..07` remain `NOT_RUN` (§5), no real
@@ -608,9 +642,13 @@ real problems in the S2-007 payload, and both were fixed rather than suppressed.
   every real-adapter status is `NOT_RUN_REAL_ADAPTER` and `A-MVP-01..07` are
   `NOT_RUN`. Fixture and replay evidence never changes a `NOT_RUN`
   retrospectively.
-* The S2-002 sandbox evidence is Windows-measured and does not reproduce on
-  Linux (§ Verdict). Until S2-002 is re-measured on this host, the dependency
-  gate is red and `engineeringStatus` cannot rise above `BLOCKED_DEPENDENCY`.
+* The S2-002 sandbox evidence is a Windows measurement. On this host the two Linux
+  counter failures were traced to a single, deliberately skipped Windows-only trial
+  scored as a control violation — an accounting defect, and a documented
+  `NOT_RUN` property, not an observed escape (see the Verdict and
+  [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md)). Until
+  S2-002 records an owner decision, the dependency gate is red and `engineeringStatus`
+  cannot rise above `BLOCKED_DEPENDENCY`.
 * No production deployment, no spending authorization, no credential
   acquisition and no external action is implied or performed.
 * Empirical semantic accuracy is not measured and is not inferred from any
