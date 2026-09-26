@@ -15,8 +15,8 @@
   "database_engine": "PostgreSQL",
   "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
   "pids": {
-    "contended": 295733,
-    "crash": 295783
+    "contended": 328545,
+    "crash": 328595
   },
   "status": "RECORDED",
   "calls": [
@@ -777,18 +777,18 @@
       "spend_rows": 1
     },
     "digest": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-    "rawDigest": "2c250a32d4926534d591b0ba6efe41cf8ceaa43a541492bd9fb07bfb29382a1b"
+    "rawDigest": "3133097ad9cb9b2778cec5fd03449b1e7cd9037bdc61216d338561a96efeb6cc"
   },
   "contended": {
-    "barrierDir": "/tmp/s2-007-db-replay-gPYXJK/barrier",
+    "barrierDir": "/tmp/s2-007-db-replay-Bjev6S/barrier",
     "label": "a",
     "contestedClaim": {
-      "outcome": "REFUSE",
-      "code": "REVISION_CONFLICT",
+      "outcome": "ACCEPT",
+      "code": null,
       "typed": true,
       "presented_revision": 2,
-      "lease_id": null,
-      "fencing_token": null
+      "lease_id": "lse-exec-s2-007-db-a-000001",
+      "fencing_token": 1
     },
     "boundedClaim": {
       "task_id": "abt-s2007-db-a",
@@ -798,11 +798,11 @@
     },
     "sharedIdempotency": {
       "idempotency_key": "7a2911f6a7c474db3d00db03596c922093094fc9ea90c7d62c21486be9d1c39d",
-      "outcome": "REFUSE",
+      "outcome": "ACCEPT",
       "replayed": false,
-      "code": "IDEMPOTENCY_CONFLICT",
+      "code": null,
       "typed": true,
-      "revision": null
+      "revision": 1
     },
     "sharedIdempotencySettled": {
       "letter": "a",
@@ -832,7 +832,7 @@
     "exitCode": null,
     "signal": "SIGKILL",
     "diedAsDesigned": true,
-    "pid": 295783,
+    "pid": 328595,
     "executorId": "exec-s2-007-db-a"
   }
 }

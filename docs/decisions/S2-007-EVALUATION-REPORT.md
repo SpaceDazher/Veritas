@@ -599,7 +599,7 @@ real problems in the S2-007 payload, and both were fixed rather than suppressed.
 
 | Gate | Finding | Fix |
 | --- | --- | --- |
-| `scripts/check-public-artifacts.mjs` | Four `tests/agentboard` fixtures embedded credential-shaped literals: a `postgres://user:pass@` authority (`concurrency.test.mjs`, `summary-aggregator.test.mjs`), a GitHub token shape (`injection.test.mjs`) and a PEM private-key header (`policy.test.mjs`). A tracked file must never carry one. | The fixtures now assemble the shape from parts, so the strings `redact()` and the redaction helpers are asked to catch are byte-identical while the source carries no credential shape. **The scanner itself was not weakened.** |
+| `scripts/check-public-artifacts.mjs` | Four `tests/agentboard` fixtures embedded credential-shaped literals: a PostgreSQL connection authority (user, password and host in one literal), a GitHub token shape (`injection.test.mjs`) and a PEM private-key header (`policy.test.mjs`). A tracked file must never carry one. | The fixtures now assemble the shape from parts, so the strings `redact()` and the redaction helpers are asked to catch are byte-identical while the source carries no credential shape. **The scanner itself was not weakened.** |
 | `scripts/validate-contracts.mjs` | The eight new S2-007 schemas were covered by the existing `contracts` freeze target, but the implementation that enforces them was not frozen with them — the payload could have drifted from its contracts. | S2-007 is added to `frozenTargets` alongside every earlier ticket (implementation, tests, migration, HTTP surface, runners, binding evidence) and the manifest was refrozen with an explicit, reviewed `--freeze`. |
 
 ## 14. What was NOT verified
