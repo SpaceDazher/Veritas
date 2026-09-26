@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "a87dd2b205d3b86631a293edc2349671fd26b0aa",
-  "sourceTree": "a3531068a7729553c8fe92e702c372804bf4a2cd",
+  "sourceCommit": "9bfa51aa6148195e991fea1bf935ea05bcbec513",
+  "sourceTree": "c3e78bc0cf4103b5148f6585bc836e1abf4a0227",
   "trackedFileCount": 746,
   "manifestFileCount": 741,
-  "payloadManifestSha256": "352c91b4987898ab3341bc06427a935cc89ca5eaaa76894be96ebd40a43e1b56",
-  "fileManifestSha256": "b4b11c9b4846a7d2111ac92a61a4aa2957e9cf9e38956be6de333d558f0ea915",
+  "payloadManifestSha256": "f7e84f9295183dd89a95f0da680fbaa18a675267a5cc91a685570acab45224ca",
+  "fileManifestSha256": "2d5588241227ae7b4fda5bcbd2c1616f68dcf3e167e5fdb1bc1955581e0dcece",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1878,8 +1878,8 @@
     },
     {
       "path": "docs/decisions/S2-007-EVALUATION-REPORT.md",
-      "sha256": "50c779896023cdf5b0ee5a0be76c9fc2aa5bd2ba8c9a4bdb7f21abd4882323fc",
-      "bytes": 55899
+      "sha256": "2ce1b8faa6854b99cb01d422a374e1efbb2936821151a82ff96c9fa23b51f67c",
+      "bytes": 58585
     },
     {
       "path": "docs/DEVELOPMENT.md",
@@ -2293,18 +2293,18 @@
     },
     {
       "path": "evidence/s2-007-db-comparison.json",
-      "sha256": "2e85aae63cc46dee2d2ddf5c51582849a49bd1fb9d0dcc4b546fa0d3ebfe4c13",
+      "sha256": "1589da2154bdf1308a53079f28294b0d8eb81325c32e98ca52f7c244f03341e2",
       "bytes": 12307
     },
     {
       "path": "evidence/s2-007-db-run-a.json",
-      "sha256": "0ad7ba57b02867dd16a15c3687402d45585e2bb3b94362970482f837e1ccd583",
-      "bytes": 26024
+      "sha256": "5b05f82e29d2b776f784694c6764d948509f6bb3e46e84c4ddc9dcbf3c939289",
+      "bytes": 26010
     },
     {
       "path": "evidence/s2-007-db-run-b.json",
-      "sha256": "daade316b13255de3280c89d0696c7fa118f036af6388742cecd85adea9a83e7",
-      "bytes": 26010
+      "sha256": "3a182aa7b279c66c6476093d00ee41145d8f55ae6abab5aad12a7dba501ca1f8",
+      "bytes": 26024
     },
     {
       "path": "evidence/s2-007-dependency-binding.json",
