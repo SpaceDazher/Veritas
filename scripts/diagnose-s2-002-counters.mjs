@@ -50,6 +50,12 @@ const BASE_REF = '8f6254db1be3eb9a3c886ef41465314bf8e797c8';
 
 const args = process.argv.slice(2);
 const doAb = args.includes('--ab');
+// --repeat N answers the question a single A/B run cannot: is a non-zero
+// counter a persistent property of this host, or does it vary run to run? A
+// counter that is always the same number is a deterministic defect; one that
+// moves is timing-dependent, and the two need different fixes.
+const repeatIndex = args.indexOf('--repeat');
+const repeatCount = repeatIndex >= 0 ? Math.max(1, Number.parseInt(args[repeatIndex + 1] ?? '1', 10) || 1) : 1;
 const OUT = process.env.VERITAS_DIAG_OUT
   ?? fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-diag-'));
 
@@ -177,6 +183,37 @@ if (current === null) {
   process.exit(1);
 }
 const results = [describe('CURRENT TREE (this commit)', current)];
+
+if (repeatCount > 1) {
+  // Distribution over N independent runs of the SAME tree on the SAME host.
+  const series = [];
+  for (let i = 0; i < repeatCount; i += 1) {
+    const run = i === 0 ? current : runCorpus(`repeat-${i + 1}`, ROOT, `diag-repeat-${i + 1}`);
+    if (run === null) continue;
+    series.push({
+      n: i + 1,
+      escapes: run.summary.counters?.fs_network_secret_escapes ?? null,
+      survivors: run.summary.counters?.survivors_after_cancellation ?? null,
+      violations: run.summary.counters?.sandbox_control_violations ?? null,
+      notRun: run.summary.counters?.not_run_controls ?? null,
+      mismatched: run.observations.filter((o) => o.match === false).map((o) => `${o.trialId}=${o.observed}`),
+    });
+  }
+  console.log(`\n${'='.repeat(78)}\nREPEAT ${series.length}x — same tree, same host\n${'='.repeat(78)}`);
+  console.log('  run   escapes  survivors  violations  notRun  mismatched trials');
+  for (const r of series) {
+    console.log(`  ${String(r.n).padStart(3)}   ${String(r.escapes).padStart(7)}  ${String(r.survivors).padStart(9)}  `
+      + `${String(r.violations).padStart(10)}  ${String(r.notRun).padStart(6)}  ${JSON.stringify(r.mismatched)}`);
+  }
+  const distinct = (key) => [...new Set(series.map((r) => JSON.stringify(r[key])))].sort();
+  for (const key of ['escapes', 'survivors', 'violations']) {
+    const values = distinct(key);
+    const verdict = values.length === 1
+      ? 'STABLE — a deterministic property of this host, not a timing artefact'
+      : 'VARIES — timing-dependent; the committed evidence could have caught a lucky run';
+    console.log(`\n  ${key.padEnd(10)} distinct values: ${values.join(', ')}\n             ${verdict}`);
+  }
+}
 
 if (doAb) {
   // Build a throwaway copy of the tree with the three changed files restored to

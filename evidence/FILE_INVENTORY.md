@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 769.
+Generated from `git ls-files`; count: 770.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -539,6 +539,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/check-public-artifacts.mjs`
 - `scripts/cleanup-smoke.ts`
 - `scripts/collect-baseline.py`
+- `scripts/diagnose-s2-002-counters.mjs`
 - `scripts/generate-board-types.mjs`
 - `scripts/generate-claim-types.mjs`
 - `scripts/generate-contracts.py`
