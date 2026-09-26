@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "a8023f2ccebe33dd5725dd6463628cd9d3717ab1",
-  "sourceTree": "52f883a3042e3f2e6d23144d41c19672fbe684a5",
+  "sourceCommit": "1bf50b31f625a560369dd5b9bd4caa919cdbf3d0",
+  "sourceTree": "b6995fbbb604fe04c4b858a9b77cc28d8895d094",
   "trackedFileCount": 772,
   "manifestFileCount": 767,
-  "payloadManifestSha256": "673178e7bf22873a1974308a33373f4b171ccc3bef298dc6f49824f61f652ab2",
-  "fileManifestSha256": "46016d25c778b1645e91dcda1705e538278e480b9b5dbf5c98bea79a7d731cef",
+  "payloadManifestSha256": "d9dddfa71ece5aae39bc05b3b93b495138e0790a6c948181c67f2e09f95e2df3",
+  "fileManifestSha256": "1baea28ccbac1d738154427084655c2a0f88241e16693f72037e9db4d83cc0e8",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1803,8 +1803,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-s2-007-windows-acceptance.md",
-      "sha256": "0ad76168adc19fa7e3154878ced77b8f8b13806620229b0d8e100688869fc8e3",
-      "bytes": 2526
+      "sha256": "c2893ff91a413fa3bee9192091adc1f777ccbd0dd99a73c3578f2a4d9ab74e8c",
+      "bytes": 3779
     },
     {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
@@ -2933,8 +2933,8 @@
     },
     {
       "path": "scripts/verify-sloqual-001.mjs",
-      "sha256": "d53a1d6f82681b6a5b8f562679e89f38d03425013eacfd791b26db7f7cb19300",
-      "bytes": 8290
+      "sha256": "1b220c5f906babb3d71d6975df1ecae16c689b42a611ae1600b7a9ba374d56d1",
+      "bytes": 8523
     },
     {
       "path": "scripts/verify.mjs",
@@ -3608,8 +3608,8 @@
     },
     {
       "path": "tests/sloqual/contract.test.mjs",
-      "sha256": "22f4a56283868866736e598ffd32163d735f35f2aa014c18b0cea2a19434155f",
-      "bytes": 7608
+      "sha256": "4020ec6e81f6765a1e3fc651bd8be588f3a0d1e659bd7ed29a191322839d7a8d",
+      "bytes": 8173
     },
     {
       "path": "tests/sloqual/harness.test.mjs",
