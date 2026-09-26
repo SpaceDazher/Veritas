@@ -261,6 +261,18 @@ describe('S2-007 policy: the workspace ref is relative and contained', () => {
     }));
   });
 
+  test('a Windows realpath admits an inner directory but still refuses a link escape', () => {
+    const root = 'D:\\workspace';
+    const realpath = (target) => {
+      if (target === root) return root;
+      if (target.endsWith('/inner')) return 'D:\\workspace\\inner';
+      if (target.endsWith('/link')) return 'D:\\outside';
+      throw new Error('unexpected path');
+    };
+    allows(() => assertWorkspaceWithin(workspaceRef({ root_ref: 'inner' }), [root], { realpath }));
+    refuses(() => assertWorkspaceWithin(workspaceRef({ root_ref: 'link' }), [root], { realpath }), 'ACL_DENIED');
+  });
+
   test('an unresolvable ref is refused, not assumed safe', () => {
     refuses(() => assertWorkspaceWithin(workspaceRef(), ROOTS, {
       realpath: () => { throw new Error('ENOENT'); },
