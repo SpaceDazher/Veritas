@@ -569,27 +569,56 @@
   "resolved": {
     "gate": "scripts/verify-s2-007-dependencies.mjs",
     "mode": "FULL_GIT_BYTES",
-    "ok": null,
-    "checkedCount": null,
-    "issueCount": null,
+    "ok": true,
+    "checkedCount": 157,
+    "issueCount": 0,
     "resolvedRefs": {
-      "originMain": null,
-      "canonicalizationCommit": null,
-      "canonicalizationTree": null,
-      "implementationBaseCommit": null
+      "originMain": "d23b289644ec5dede164c8707d975ac4792e51d5",
+      "canonicalizationCommit": "d23b289644ec5dede164c8707d975ac4792e51d5",
+      "canonicalizationTree": "de27e5cb6906266ffa46c9465809e3c1da5cf123",
+      "implementationBaseCommit": "cd396e248bbcb67efde947f65a7951b31ce70a23"
+    },
+    "rebaseBinding": {
+      "previousCommit": "f590d37ea8e861431abf3f89f59e01a889ab903d",
+      "verifiedProtectedPaths": 29,
+      "boundPaths": 29
     },
     "sandboxGate": {
-      "requestedProfileId": null,
-      "status": null,
-      "liveExecutionAllowed": null
+      "requestedProfileId": "sbx-podman-local-restricted-v1",
+      "status": "ALLOW",
+      "liveExecutionAllowed": true
     },
     "reRunGates": {
-      "verify-s2-002-dependencies": null,
-      "verify-s2-002": null,
-      "manifest-check": null
+      "verify-s2-002-dependencies": {
+        "exitCode": 0,
+        "status": "GREEN"
+      },
+      "verify-s2-002": {
+        "exitCode": 0,
+        "status": "GREEN"
+      },
+      "manifest-check": {
+        "exitCode": 1,
+        "status": "REQUIRES_FINAL_MANIFEST"
+      }
     },
-    "deferred": null,
-    "restoredCanonicalEvidence": null,
+    "deferred": [
+      {
+        "id": "manifest-check",
+        "command": "npm run manifest:check",
+        "exitCode": 1,
+        "reason": "root manifest is regenerated once at the end of S2-007; the recorded exit code is the real one"
+      }
+    ],
+    "restoredCanonicalEvidence": [
+      "evidence/s2-002-run-a.json",
+      "evidence/s2-002-run-b.json",
+      "evidence/s2-002-comparison-integrity.json",
+      "results/s2-002/run-a/observations.json",
+      "results/s2-002/run-a/summary.json",
+      "results/s2-002/run-b/observations.json",
+      "results/s2-002/run-b/summary.json"
+    ],
     "writtenOnGreenRunOnly": true
   },
   "reviewedDeviations": {
