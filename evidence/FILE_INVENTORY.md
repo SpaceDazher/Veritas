@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 769.
+Generated from `git ls-files`; count: 772.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -360,6 +360,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md`
 - `docs/claims/S2-004-EXPERT-LENS-POLICY.md`
 - `docs/claims/S2-004-INVALIDATION-AND-RETENTION.md`
+- `docs/decisions/2026-09-26-s2-007-windows-acceptance.md`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -686,7 +687,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/agentboard/concurrency.test.mjs`
 - `tests/agentboard/contracts-drift.test.mjs`
 - `tests/agentboard/contracts.test.mjs`
+- `tests/agentboard/dependency-runner.test.mjs`
 - `tests/agentboard/execution-callbacks.test.mjs`
+- `tests/agentboard/fixtures/claim-race-child.mjs`
 - `tests/agentboard/idempotency.test.mjs`
 - `tests/agentboard/injection.test.mjs`
 - `tests/agentboard/lease.test.mjs`
