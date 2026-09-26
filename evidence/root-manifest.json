@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "c13ad930e9ee2b1765ca643dcd063b09d924f55c",
-  "sourceTree": "2745f03b22dfc495d20d4d8fc37b2f1f0c1ea5de",
+  "sourceCommit": "5d029c79a9fb2379fe2e99671666183e0f49cd87",
+  "sourceTree": "2e03d7fec617d55187abc365a148dae0f84ead99",
   "trackedFileCount": 720,
   "manifestFileCount": 715,
-  "payloadManifestSha256": "0c908687a2577a8b2624c2149ff5aba232c0e5f6dd48c97766c621d371e31a83",
-  "fileManifestSha256": "abd0a7f624c518f23fe0c9e1e4a946e9b02cdefb03c09203af37632f5c77541a",
+  "payloadManifestSha256": "1104aa749905244027efc4e0d6b65069100036a7e4fe1a39e45d8aa1c6e3e747",
+  "fileManifestSha256": "1baf1c0f326a51b0fa6cc742c4c561e0d9c5122188ce4e22bcb925432f7aaef0",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1903,8 +1903,8 @@
     },
     {
       "path": "docs/security/S2-002-PROCESS-CANCELLATION.md",
-      "sha256": "20c2d5eb338a0d3824d86a9074016ce72f764475c7a0fc6db6d947d6b7dfa5fb",
-      "bytes": 11630
+      "sha256": "8171b02f027cbcdf24ffaf6bea094362423b7bce885f558775b8e8dd2bccd155",
+      "bytes": 12056
     },
     {
       "path": "docs/security/S2-002-SANDBOX-PROFILE.md",
@@ -1998,7 +1998,7 @@
     },
     {
       "path": "evidence/frozen-manifest.json",
-      "sha256": "c05db6ca57ab016682625aa902793458b9697f64ff4c0fa942a1812bc860ee4f",
+      "sha256": "f41f4371a5d97bf01bf251744de248557fe089dcf4b3f5dd11a4d3aabdd5d88a",
       "bytes": 63577
     },
     {
