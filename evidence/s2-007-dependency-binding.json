@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "ticket": "S2-007",
-  "title": "Agent Board: canonical orchestration and the execution boundary — dependency binding",
+  "title": "Agent Board: canonical orchestration and the execution boundary \u2014 dependency binding",
   "issue": "SpaceDazher/Veritas#7",
-  "scope": "Dependency gate for S2-007 (issue #7 §1). Everything S2-007 builds on is bound here to the bytes of a pinned canonicalization commit in origin/main, to the digest of the S2-007 frozen contract foundation, and to a declarative expectation of what the upstream surfaces must still say. Nothing here is inferred from a previous task's description, from a local PASS, from a dirty worktree or from a matching branch name.",
+  "scope": "Dependency gate for S2-007 (issue #7 \u00a71). Everything S2-007 builds on is bound here to the bytes of a pinned canonicalization commit in origin/main, to the digest of the S2-007 frozen contract foundation, and to a declarative expectation of what the upstream surfaces must still say. Nothing here is inferred from a previous task's description, from a local PASS, from a dirty worktree or from a matching branch name.",
   "rule": "A missing, drifted or unverifiable mandatory upstream binding is BLOCKED_DEPENDENCY (gate exit 1). A warning is never a substitute: either the binding is proven from Git bytes, or no S2-007 implementation result may be recorded. Green sub-checks are never inferred from a sibling check, and a check is never renamed to obtain a green status.",
   "gate": "scripts/verify-s2-007-dependencies.mjs",
   "base": {
@@ -629,6 +629,54 @@
       "severity": "defect-fix",
       "reason": "assertExecutionVersion anchored its semver check to a bare ^\\d+\\.\\d+\\.\\d+$ but was handed the prefixed veritas.execution/1.1.0, so the same-major/different-minor negotiated-subset branch was unreachable and a well-formed minor bump was reported as \"not a semantic version\". RED test tests/agentboard/contracts.test.mjs (\"the same major with another minor is only a negotiated subset\") proved it. The fix reads the semver from after the last slash, which STRENGTHENS the handshake: an unknown major is still rejected before any read, and a non-semver version is still refused.",
       "tests": "tests/agentboard/contracts.test.mjs"
+    },
+    "src/lib/agentboard/constants.mjs": {
+      "commit": "908d8332837241eeef08c30ef9508845383a4252",
+      "blob": "649affde3c34dbbfbbe46c81f9d78532ee6ef538",
+      "sha256": "244a726bc315ac03d85908698e6b4d21d8951f7433e870bdd4b02853582f0e29",
+      "severity": "defect-fix",
+      "reason": "SANDBOX_HOST_UNISOLATED and its two predicates (isHostUnisolatedSandboxProfile, classifySandboxProfile) were added for issue #45. The proven set PROVEN_SANDBOX_PROFILE_IDS is UNCHANGED, so isExecutableSandboxProfile keeps meaning 'this tier has measured OS controls' and assertSandboxExecutable still refuses the floor tier on its own. Nothing is widened: the floor is admitted only through assertLiveExecutionAuthorized, which demands a named human authorisation the server resolves. RED test tests/agentboard/unisolated-authorization.test.mjs ('the floor tier is not an executable sandbox profile') proved the old constant set refused the new tier, and the 432-test board suite passes unchanged. Decision: docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md",
+      "tests": "tests/agentboard/unisolated-authorization.test.mjs, tests/agentboard/real-executor.test.mjs, tests/identity/contracts.schemas.test.mjs"
+    },
+    "src/lib/agentboard/policy.mjs": {
+      "commit": "908d8332837241eeef08c30ef9508845383a4252",
+      "blob": "857005aee88e4da0d733b84c141087ea16bdda22",
+      "sha256": "800fe231badd2341b3c1bf05df8c05101df78291c1af9f775d40a7aaf9228909",
+      "severity": "defect-fix",
+      "reason": "Added assertUnisolatedExecutionAuthorized and assertLiveExecutionAuthorized, and routed the per-edge gate in assertAdapterCoversTask through the live gate. The defect was MEASURED, not argued: policy.assertSandboxExecutable answered BLOCKED_SANDBOX on sbx-host-unisolated-v1, so tasks.claim, tasks.lease.reassign and execution.start were all unreachable on the floor tier and no governed run could exist (results/s2-007r/cell-*/run-record.json, 'claim-refused'). The live gate is STRICTLY STRONGER than the check it replaces: an isolated profile needs nothing and REFUSES a permit, the floor needs a complete one, and every other profile is refused exactly as before. RED tests: tests/agentboard/unisolated-authorization.test.mjs (9 tests, including every single-field mutation of the permit and the window judged against the injected clock).",
+      "tests": "tests/agentboard/unisolated-authorization.test.mjs, tests/agentboard/real-executor.test.mjs, tests/identity/contracts.schemas.test.mjs"
+    },
+    "src/lib/agentboard/scheduler.mjs": {
+      "commit": "908d8332837241eeef08c30ef9508845383a4252",
+      "blob": "a021804cfcd532b286f684a248f410f77414d2b1",
+      "sha256": "9421b6543d4ed25c7d1f8bb4e066b882d2c9be7bd7c9f6a023ea2349ff841b5c",
+      "severity": "defect-fix",
+      "reason": "Two changes under the same measured defect. (1) toInjectedInstant moved to the new src/lib/agentboard/clock.mjs and re-exported here, because policy.mjs had to evaluate the authorisation window and scheduler.mjs already imports policy.mjs; the second copy of a clock parser the two modules shared is the drift this repository forbids. (2) The planning and admission path now consults assertLiveExecutionAuthorized with the same authorisation commands.mjs passes, so a tick and a manual execution.start can no longer disagree about whether a run is allowed. Behaviour for every already-proven profile is unchanged: sandboxProvenFor still returns false for a profile outside the proven set that carries no authorisation. RED test: the same suite, plus the 432-test board suite unchanged.",
+      "tests": "tests/agentboard/unisolated-authorization.test.mjs, tests/agentboard/real-executor.test.mjs, tests/identity/contracts.schemas.test.mjs"
+    },
+    "src/lib/agentboard/commands.mjs": {
+      "commit": "908d8332837241eeef08c30ef9508845383a4252",
+      "blob": "ff133dddfeb641bc45ea81d3f85d89d65c59c6d0",
+      "sha256": "e08d1047087f6b5ebc7e148c924169f8bae6aaa659b694b4e888104cbd4dffbc",
+      "severity": "defect-fix",
+      "reason": "execute() and runSchedulerTick() accept a server-resolved `unisolatedExecutionAuthorization` option, guardContextFor forwards it, execution.start returns the sandboxDecision it admitted, and crossCheckAdapterAgainstTask uses the live gate. The authorisation is deliberately NOT a payload argument: an adapter, a task, an execution event, a skill or a replayed record can neither supply nor widen it, so the confused-deputy rule is unchanged. The defect was measured: commands.mjs:1793 answered BLOCKED_SANDBOX on the claim edge and no lease ever opened. RED tests: tests/agentboard/unisolated-authorization.test.mjs plus the full 432-test board suite.",
+      "tests": "tests/agentboard/unisolated-authorization.test.mjs, tests/agentboard/real-executor.test.mjs, tests/identity/contracts.schemas.test.mjs"
+    },
+    "src/lib/identity/sandbox-profiles.mjs": {
+      "commit": "908d8332837241eeef08c30ef9508845383a4252",
+      "blob": "6630df2ba000b194689c318af831bba929c60d6a",
+      "sha256": "b1f5d24341c7d6aaef120dac25d95175aca0dcbec71652d10a66476bc96541af",
+      "severity": "contract-addition",
+      "reason": "SANDBOX_HOST_UNISOLATED added for issue #45 with os_controls_evidence bound to the digest of evidence/s2-007r-host-unisolated.json, a record of the MEASURED ABSENCE of OS controls: no node/codex/pi in the pinned isolation image, no route under --network=none, and mounts:0 + injectedEnvironment:0 + secret_handles:[] meaning no credential could reach a containerised child. The profile declares network.policy 'unrestricted' and environment.allowlist ['*'] because those are the controls it does not have, and the schema forbids this tier from claiming deny_all, an allowlist or a secret handle. The four existing profiles are untouched. Script: scripts/verify-s2-007r-host-unisolated.mjs (exit 0).",
+      "tests": "tests/agentboard/unisolated-authorization.test.mjs, tests/agentboard/real-executor.test.mjs, tests/identity/contracts.schemas.test.mjs"
+    },
+    "contracts/sandbox-profile.schema.json": {
+      "commit": "908d8332837241eeef08c30ef9508845383a4252",
+      "blob": "8d0732bb40d0d1812df8bb1c0475504d067b85de",
+      "sha256": "550d112ead16bc5c740d78394bcde40c8feb81b7fd9e67b97daceedbc31eb922",
+      "severity": "contract-addition",
+      "reason": "The `HOST_UNISOLATED` tier and the `unrestricted` network policy were added, with the constraint that makes the tier unable to impersonate an isolated one: HOST_UNISOLATED MUST declare unrestricted network and the '*' environment and MUST NOT carry a secret handle, and the mirror rule forbids an isolated tier from declaring unrestricted or a wildcard environment. Additive: no existing document changes validity, because no existing profile uses the new values. RED tests: tests/identity/contracts.schemas.test.mjs, four new cases pinning both directions (40/40 pass).",
+      "tests": "tests/agentboard/unisolated-authorization.test.mjs, tests/agentboard/real-executor.test.mjs, tests/identity/contracts.schemas.test.mjs"
     }
   }
 }
