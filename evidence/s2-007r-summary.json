@@ -4,9 +4,9 @@
   "issue": "SpaceDazher/Veritas#45",
   "role": "verification aggregator for the real-adapter ticket: freshness, internal status, the seven hard-gate counters, the tamper matrices, the re-verified real-adapter claim, the per-case A-MVP table, the seven measurements and the derived verdict",
   "gate": "verify:s2-007r",
-  "commit": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-  "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-  "runId": "s2-007r-verify-35b1502ef7649df2de0f96b5",
+  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
+  "runId": "s2-007r-verify-8d52774a3ff2f963c146d83c",
   "freshnessModel": "Every mandatory gate is re-run by THIS process. An evidence artifact is accepted only when the process exited 0, the bytes on disk hash to the digest the gate reported for the file it just wrote, the record content address matches, the record is bound to the current HEAD commit and, where it carries one, to the current HEAD tree, the internal status and the seven counters say PASS, and — for the real-adapter record — the executor claim survives re-verification from the bytes on disk. A gate whose npm script is absent is NOT_RUN, never PASS: an unavailable mandatory tool and a proven failure are different states, and only the second one is a defect.",
   "gateContracts": {
     "dependencies": {
@@ -69,11 +69,11 @@
         "afterSha256": "1fb4ce01c310e0eca652c78cb3a0587831b2e267eab34b1afb791e2db859b525",
         "rewritten": false,
         "createdByThisRun": false,
-        "commitAnchor": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-        "treeAnchor": "747a57934cfaf2e04c3322cc3d5f649340f80da0"
+        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
       },
       "stderrTail": null,
-      "stdoutTail": "ommit\": \"d55a9bbcd4cb0a65c5300a4e68a55be185c57272\",\n      \"headDescendsFromCanonicalization\": true\n    },\n    \"reRunGates\": {\n      \"verify-s2-002-dependencies\": {\n        \"command\": \"npm run verify:s2-002-dependencies\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 16\n}\n",
+      "stdoutTail": "ommit\": \"34f8e6582ddf0418c0aec8f3c92d6045a882c983\",\n      \"headDescendsFromCanonicalization\": true\n    },\n    \"reRunGates\": {\n      \"verify-s2-002-dependencies\": {\n        \"command\": \"npm run verify:s2-002-dependencies\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 16\n}\n",
       "reportedIssues": [
         "src/lib/agentboard/constants.mjs:frozen-foundation-working-tree-drift"
       ]
@@ -82,15 +82,15 @@
       "command": "npm run --silent s2-007r:real-run",
       "status": "FAIL",
       "expectedStatus": "PASS",
-      "exitCode": 3,
+      "exitCode": 1,
       "reasons": [
-        "gate:exit-code:3"
+        "gate:exit-code:1"
       ],
       "checks": [
         {
           "check": "gate:exit-code",
           "ok": false,
-          "detail": "3"
+          "detail": "1"
         },
         {
           "check": "real-adapter:claim:record-present",
@@ -240,36 +240,61 @@
         "afterSha256": "f8da7b19bf6fdc550187e58eaf540d1b17b931465e4ca62e8b3797c3c131b5fd",
         "rewritten": false,
         "createdByThisRun": false,
-        "commitAnchor": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-        "treeAnchor": "747a57934cfaf2e04c3322cc3d5f649340f80da0"
+        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
       },
       "stderrTail": null,
-      "stdoutTail": "{\n  \"ok\": false,\n  \"verdict\": {\n    \"status\": \"NOT_RUN\",\n    \"exit_code\": 3,\n    \"hard_gates\": [\n      \"NEEDS_INPUT\"\n    ],\n    \"executed_before_the_failure\": 0,\n    \"requested\": null\n  },\n  \"status\": \"NOT_RUN\",\n  \"exit_code\": 3,\n  \"realAdapterStatus\": \"NOT_RUN_REAL_ADAPTER\",\n  \"out\": \"results/s2-007r\",\n  \"written\": [\n    \"/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/run-record.json\"\n  ],\n  \"record_withheld\": null,\n  \"refusal\": {\n    \"code\": \"NEEDS_INPUT\",\n    \"class\": \"NeedsInput\",\n    \"message\": \"PROJECT_REQUIRED\",\n    \"detail\": \"--project <dir> is required: this driver never picks a project for you, and a run without a named project is not a run\",\n    \"retryable\": true\n  },\n  \"runs\": [],\n  \"limitations\": [\n    \"NEEDS_INPUT: PROJECT_REQUIRED\",\n    \"NOT_RUN: this record contains no execution. The boundary was never asked to dispatch an executor, so no real-adapter fact, no usage figure and no status is established by it.\",\n    \"project: never validated, because the run was refused before the fixture was read\",\n    \"transport tree: unresolved\"\n  ]\n}\n",
+      "stdoutTail": "1: the transport did not report signal, error; those fields stay null in this record and are not estimated\",\n    \"run 02: the transport did not report signal, model_id; those fields stay null in this record and are not estimated\",\n    \"no human reviewer exists in this run: every task stops at IN_REVIEW and the DONE edge is structurally unreachable (no principal holds board.review.approve)\",\n    \"configuration: this invocation drove the validated surface \\\"A\\\" (an explicit, required argument of the transport, not a label), so it resolves ONE cell of the axis and difference of nothing. A comparison is a separate aggregation over one project digest and one campaign grant; scripts/s2-007r-measurement-set.mjs is what differences the cells, and it asserts on the NORMALISED argv digest, never on the raw one\",\n    \"run 02: the argv the transport built carried no configuration difference for codex (this provider's configuration A and B select the IDENTICAL argv, so the A label moved nothing and this cell is config_delta none by construction); the cell is config_delta none by construction and is EXCLUDED from the comparison with that reason, not reported as \\\"no difference observed\\\"\"\n  ]\n}\n",
       "reportedIssues": null
     },
     "comparison": {
       "command": "npm run --silent s2-007r:comparison",
-      "status": "NOT_RUN",
+      "status": "FAIL",
       "expectedStatus": "PASS",
       "exitCode": 0,
       "reasons": [
-        "evidence:no-envelope-from-the-gate:the gate printed no report, so this invocation cannot be bound to the artifact it wrote"
+        "freshness:record-digest-matches-this-run:the record content address must equal the one the gate reported"
       ],
       "checks": [
         {
-          "check": "evidence:no-envelope-from-the-gate",
+          "check": "freshness:byte-digest-matches-this-run",
+          "ok": true,
+          "detail": "file=e70f241370c70964 reported=e70f241370c70964"
+        },
+        {
+          "check": "freshness:record-digest-matches-this-run",
           "ok": false,
-          "detail": "the gate printed no report, so this invocation cannot be bound to the artifact it wrote"
+          "detail": "the record content address must equal the one the gate reported"
+        },
+        {
+          "check": "freshness:commit-bound(commit|git.commit_sha|testedImplementationCommit)",
+          "ok": true,
+          "detail": "via commit"
+        },
+        {
+          "check": "freshness:tree-bound(tree|git.tree_sha)",
+          "ok": true,
+          "detail": "via tree"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "comparison:ok",
+          "ok": true,
+          "detail": "comparison.ok=true"
         },
         {
           "check": "comparison:the record states verdict COMPARED",
-          "ok": false,
-          "detail": "verdict=NOT_RUN"
+          "ok": true,
+          "detail": "verdict=COMPARED"
         },
         {
           "check": "comparison:every project_digest in the record is the same value",
           "ok": true,
-          "detail": "distinct=1 \"sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b\""
+          "detail": "distinct=1 \"sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2\""
         },
         {
           "check": "comparison:every budget_grant_id in the record is the same value",
@@ -279,23 +304,23 @@
         {
           "check": "comparison:every cost_basis in the record is the same value",
           "ok": true,
-          "detail": "distinct=1 \"NOT_OBSERVED\""
+          "detail": "distinct=1 \"PROXY_TOKENS_NO_USD_REPORTED\""
         },
         {
           "check": "comparison:the comparison names at least one run set",
           "ok": true,
-          "detail": "run_set_id=rs-s2007r-pilot-c55c3ecbfca6439e"
+          "detail": "run_set_id=rs-s2007r-pilot-a06a3abae86291db"
         }
       ],
       "counters": null,
       "freshness": {
         "evidenceFile": "evidence/s2-007r-comparison.json",
-        "beforeSha256": "117efcbf1b3b441f4194cd78e280b8b422b4928779f69ca96ce009b81f8c1e27",
-        "afterSha256": "117efcbf1b3b441f4194cd78e280b8b422b4928779f69ca96ce009b81f8c1e27",
-        "rewritten": false,
-        "createdByThisRun": false,
-        "commitAnchor": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-        "treeAnchor": "747a57934cfaf2e04c3322cc3d5f649340f80da0"
+        "beforeSha256": "200c84e62f714eb8f5c418d2430de92d610479f5364524ee400f230ab53ef39b",
+        "afterSha256": "e70f241370c70964cdd142478b54c9f6bc11af012362d2f9861c0ec801417ff2",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
       },
       "stderrTail": null,
       "stdoutTail": null,
@@ -311,7 +336,7 @@
         {
           "check": "freshness:byte-digest-matches-this-run",
           "ok": true,
-          "detail": "file=cdb6f7148997fa87 reported=cdb6f7148997fa87"
+          "detail": "file=fb36e0929c26aa93 reported=fb36e0929c26aa93"
         },
         {
           "check": "freshness:record-digest-matches-this-run",
@@ -370,12 +395,12 @@
       },
       "freshness": {
         "evidenceFile": "evidence/s2-007r-security-probes.json",
-        "beforeSha256": "78c4a6bdb955503080005b5762273bcf60d0ea2be386fc1415f190e93434f3dd",
-        "afterSha256": "cdb6f7148997fa8775f0cb9f99e5a4ce6a3ee1191c68702ada1024fa50fa57e7",
+        "beforeSha256": "182cd19335151b5b52b7c9e53bc91805a5bd52bf05665261f0c24855689b5189",
+        "afterSha256": "fb36e0929c26aa9369a2af52357e29d4da4b846cc57d2bfbe738321ecbeb2298",
         "rewritten": true,
         "createdByThisRun": true,
-        "commitAnchor": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-        "treeAnchor": "747a57934cfaf2e04c3322cc3d5f649340f80da0"
+        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
       },
       "stderrTail": null,
       "stdoutTail": null,
@@ -384,7 +409,7 @@
   },
   "realExitCodes": {
     "npm run --silent verify:s2-007-dependencies": 1,
-    "npm run --silent s2-007r:real-run": 3,
+    "npm run --silent s2-007r:real-run": 1,
     "npm run --silent s2-007r:comparison": 0,
     "npm run --silent test:s2-007r-probes": 0
   },
@@ -460,6 +485,7 @@
       "executor_session_id": null,
       "observed_by": null,
       "pid_tree_after_exit": null,
+      "parent_created_group": null,
       "installed_executors_probed": null
     },
     "checks": [
@@ -477,9 +503,15 @@
       "configured": [
         {
           "adapter_id": null,
-          "source": "evidence/s2-007r-pilot.json",
+          "source": "results/s2-007r/cell-pa2/run-record.json (a run with a minted corroboration)",
           "corroborated": false,
           "reason": "NO_RECORD"
+        },
+        {
+          "adapter_id": null,
+          "source": "the driver envelope this invocation produced (published, not classified: an envelope carries no executor block)",
+          "corroborated": false,
+          "reason": "executor:version-present:version=null; executor:version-is-not-a-placeholder:version=null; executor:binary-path-abs:binary_path=null"
         },
         {
           "adapter_id": "codex,pi",
@@ -571,7 +603,7 @@
       {
         "label": "the per-case record is bound to the commit this verification is running at",
         "ok": true,
-        "detail": "record.commit=d55a9bbcd4cb0a65c5300a4e68a55be185c57272 head.commit=d55a9bbcd4cb0a65c5300a4e68a55be185c57272"
+        "detail": "record.commit=34f8e6582ddf0418c0aec8f3c92d6045a882c983 head.commit=34f8e6582ddf0418c0aec8f3c92d6045a882c983"
       },
       {
         "label": "the per-case record states which real-adapter run it observed",
@@ -586,7 +618,7 @@
         "pilotExpected": "PASS",
         "pilotDigest": null,
         "observed": "NOT_RUN",
-        "claimedObserved": "NOT_RUN",
+        "claimedObserved": "PASS",
         "status": "NOT_RUN",
         "checks": [
           {
@@ -799,14 +831,11 @@
   "measurements": {
     "expected": 7,
     "present": 7,
-    "measured": 1,
+    "measured": 4,
     "notMeasured": [
-      "accepted_task_quality",
-      "pass_at_1",
       "intervention_time",
       "cost",
-      "latency",
-      "regression_rate"
+      "skills_authority_expansion"
     ],
     "defects": [],
     "statusVocabulary": [
@@ -821,30 +850,30 @@
     ],
     "statusSource": "src/lib/executors/measure.mjs",
     "rowsSource": "record.measurements",
-    "artefactsPublished": 13,
+    "artefactsPublished": 21,
     "artefactsVerifiedOnDisk": 13,
     "namesSource": "src/lib/executors/measure.mjs",
     "per": [
       {
         "name": "accepted_task_quality",
-        "status": "NOT_MEASURED",
-        "claimedStatus": "NOT_RUN",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
         "claimedStatuses": [
-          "NOT_RUN"
+          "MEASURED"
         ],
         "cells": 1,
-        "value": null,
+        "value": 0,
         "unit": "ratio",
-        "numerator": null,
-        "denominator": 0,
+        "numerator": 0,
+        "denominator": 8,
         "basis": "DETERMINISTIC_ORACLE",
-        "method": "numerator = runs whose collected ExecutionResult.outcome is SUCCEEDED and whose deterministic task oracle (node corpus/s2-007r/project/verify.mjs <task_id>) exits 0 and whose task reached IN_REVIEW; denominator = runs with a collected ExecutionResult. Both sides are read from the run record; a run with no collected result is excluded from the denominator and named, never counted as a rejection.",
+        "method": "numerator = runs with a collected ExecutionResult whose outcome is SUCCEEDED AND whose deterministic oracle exited 0 AND whose task reached IN_REVIEW; denominator = runs with a collected ExecutionResult that are not explicitly excluded; value = numerator/denominator rounded to 6 decimals.",
         "artifact": "results/s2-007r/measurement-plant/SKILL.md",
-        "recomputable": false,
+        "recomputable": true,
         "checks": [
           {
             "label": "a value is present",
-            "ok": false
+            "ok": true
           },
           {
             "label": "the basis is named",
@@ -872,7 +901,7 @@
           },
           {
             "label": "the numerator is a published integer",
-            "ok": false
+            "ok": true
           },
           {
             "label": "the denominator is a published integer",
@@ -880,28 +909,28 @@
           }
         ],
         "defect": false,
-        "why": "status=NOT_RUN and a value is present, the numerator is a published integer"
+        "why": null
       },
       {
         "name": "pass_at_1",
-        "status": "NOT_MEASURED",
-        "claimedStatus": "NOT_RUN",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
         "claimedStatuses": [
-          "NOT_RUN"
+          "MEASURED"
         ],
         "cells": 1,
-        "value": null,
+        "value": 0,
         "unit": "ratio",
-        "numerator": null,
-        "denominator": 0,
+        "numerator": 0,
+        "denominator": 8,
         "basis": "BOARD_TASK_ATTEMPTS_AND_DETERMINISTIC_ORACLE",
-        "method": "numerator = tasks whose board row carries attempts === 1 and whose deterministic oracle passed; denominator = the distinct tasks in the run set. The per-task booleans are published, not only the fraction.",
+        "method": "numerator = distinct task_ids with agentboard_task.attempts === 1 AND a passing deterministic oracle; denominator = distinct task_ids with a collected ExecutionResult in this cell; value = numerator/denominator rounded to 6 decimals.",
         "artifact": "results/s2-007r/measurement-plant/SKILL.md",
-        "recomputable": false,
+        "recomputable": true,
         "checks": [
           {
             "label": "a value is present",
-            "ok": false
+            "ok": true
           },
           {
             "label": "the basis is named",
@@ -929,7 +958,7 @@
           },
           {
             "label": "the numerator is a published integer",
-            "ok": false
+            "ok": true
           },
           {
             "label": "the denominator is a published integer",
@@ -937,7 +966,7 @@
           }
         ],
         "defect": false,
-        "why": "status=NOT_RUN and a value is present, the numerator is a published integer"
+        "why": null
       },
       {
         "name": "intervention_time",
@@ -952,7 +981,7 @@
         "numerator": 0,
         "denominator": 0,
         "basis": "BOARD_INJECTED_CLOCK",
-        "method": "per run, board_ms = terminal_event.emitted_at - accepted_event.emitted_at on the board's own injected clock, and interventions = the count of non-executor commands the runner issued between those two events (which must be 0); the cell value is the upper median.",
+        "method": "per run, board_ms = terminal_event.emitted_at - accepted_event.emitted_at as recorded by the board's injected clock; the cell value is the UPPER MEDIAN of the per-run values and the mean is numerator/denominator = sum(board_ms)/count(board_ms). interventions = the count of non-executor commands whose recorded instant lies in (accepted, terminal].",
         "artifact": "results/s2-007r/measurement-plant/SKILL.md",
         "recomputable": false,
         "checks": [
@@ -999,9 +1028,9 @@
         "value": null,
         "unit": "mixed",
         "numerator": null,
-        "denominator": 0,
-        "basis": "NOT_OBSERVED",
-        "method": "per run, cost_usd_micros = round(usage.cost.total * 1e6) when the executor itself reported a currency figure (basis EXECUTOR_REPORTED_USD); otherwise the unit is a PROXY, not money: proxy_tokens = input + output + reasoning (basis PROXY_TOKENS_NO_USD_REPORTED); a run that reported neither is NOT_OBSERVED and the cell is NOT_RUN. Nothing is ever priced from a published list.",
+        "denominator": null,
+        "basis": "PROXY_TOKENS_NO_USD_REPORTED",
+        "method": "per run, cost_usd_micros = round(usage.cost.total * 1e6) when the executor itself reported a currency figure (cost_basis EXECUTOR_REPORTED_USD), else the unit is a PROXY, not money: proxy_tokens = input_tokens + output_tokens + reasoning_tokens (cost_basis PROXY_TOKENS_NO_USD_REPORTED). A cell value exists only when every run in the cell shares one basis; then value = the cell mean = sum(per-run figure)/count(runs), with the cell total in observation.cell_total. Two bases are not one number, so a mixed cell and a cross-basis comparison are both refused.",
         "artifact": "results/s2-007r/measurement-plant/SKILL.md",
         "recomputable": false,
         "checks": [
@@ -1039,24 +1068,24 @@
       },
       {
         "name": "latency",
-        "status": "NOT_MEASURED",
-        "claimedStatus": "NOT_RUN",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
         "claimedStatuses": [
-          "NOT_RUN"
+          "MEASURED"
         ],
         "cells": 1,
-        "value": null,
+        "value": 8.5,
         "unit": "milliseconds",
-        "numerator": 0,
-        "denominator": 0,
+        "numerator": null,
+        "denominator": 8,
         "basis": "PARENT_MONOTONIC_TIMER",
-        "method": "per run, parent_wall_ms = the parent-side monotonic timer (process.hrtime.bigint) from immediately before the executor spawn to its terminal record; the cell value is the upper median of the per-run values.",
+        "method": "per run, parent_wall_ms = the parent-side monotonic timer (process.hrtime.bigint) from immediately before the executor spawn to its terminal record; the cell value is the UPPER MEDIAN of the per-run values and the mean is numerator/denominator.",
         "artifact": "results/s2-007r/measurement-plant/SKILL.md",
-        "recomputable": false,
+        "recomputable": true,
         "checks": [
           {
             "label": "a value is present",
-            "ok": false
+            "ok": true
           },
           {
             "label": "the basis is named",
@@ -1084,79 +1113,22 @@
           }
         ],
         "defect": false,
-        "why": "status=NOT_RUN and a value is present"
+        "why": null
       },
       {
         "name": "regression_rate",
-        "status": "NOT_MEASURED",
-        "claimedStatus": "NOT_RUN",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
         "claimedStatuses": [
-          "NOT_RUN"
-        ],
-        "cells": 1,
-        "value": null,
-        "unit": "ratio",
-        "numerator": null,
-        "denominator": 0,
-        "basis": "DETERMINISTIC_ORACLE_PRE_AND_POST",
-        "method": "numerator = pre-existing tests passing on the pristine fixture and failing after the run; denominator = pre-existing tests passing before the run; value = numerator/denominator. Both sides are the same deterministic oracle on a pristine copy and on the post-run copy.",
-        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
-        "recomputable": false,
-        "checks": [
-          {
-            "label": "a value is present",
-            "ok": false
-          },
-          {
-            "label": "the basis is named",
-            "ok": true
-          },
-          {
-            "label": "the method is named",
-            "ok": true
-          },
-          {
-            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
-            "ok": true
-          },
-          {
-            "label": "the limitation is stated",
-            "ok": true
-          },
-          {
-            "label": "the status is one of the closed measurement statuses",
-            "ok": true
-          },
-          {
-            "label": "every cell of the comparison reports the same status",
-            "ok": true
-          },
-          {
-            "label": "the numerator is a published integer",
-            "ok": false
-          },
-          {
-            "label": "the denominator is a published integer",
-            "ok": true
-          }
-        ],
-        "defect": false,
-        "why": "status=NOT_RUN and a value is present, the numerator is a published integer"
-      },
-      {
-        "name": "skills_authority_expansion",
-        "status": "PARTIAL",
-        "claimedStatus": "PARTIAL",
-        "claimedStatuses": [
-          "PARTIAL"
+          "MEASURED"
         ],
         "cells": 1,
         "value": 0,
-        "unit": "count",
+        "unit": "ratio",
         "numerator": 0,
-        "denominator": 2,
-        "basis": "BOUNDARY_REFUSALS",
-        "method": "planted = expansion attempts deliberately placed in a workspace (2: one per registered provider); refused = attempts whose observable was a RECORDED typed refusal, i.e. capabilities({claimed}) answered CAPABILITY_MISMATCH/ADAPTER_CLAIM_NOT_REGISTERED and an authority field handed to the same call answered BLOCKED_POLICY/BOUNDARY_ARGUMENT_NOT_CANONICAL, with the attempt in the transport's own expansion ledger as REFUSED; granted = the number of planted items that appeared in the effective tool or capability set afterwards, which is the number this measurement claims is 0. value = granted, unit = count; the refusal rate is refused/planted. This measurement has two sub-observables and they are reported separately: (A) the refusal, measured at the transport boundary, and (B) the argv/request allowlist digest equality, measured only where a record carries both digests. B is NOT_RUN in this run set, so the row is not MEASURED while B is not.",
+        "denominator": 32,
+        "basis": "DETERMINISTIC_ORACLE_PRE_AND_POST",
+        "method": "numerator = the number of pre-existing tests that passed on the pristine fixture and fail after the run, summed over the runs; denominator = the number of pre-existing tests that passed before the run, summed over the same runs; value = numerator/denominator rounded to 6 decimals.",
         "artifact": "results/s2-007r/measurement-plant/SKILL.md",
         "recomputable": true,
         "checks": [
@@ -1199,25 +1171,82 @@
         ],
         "defect": false,
         "why": null
+      },
+      {
+        "name": "skills_authority_expansion",
+        "status": "NOT_MEASURED",
+        "claimedStatus": "NOT_RUN",
+        "claimedStatuses": [
+          "NOT_RUN"
+        ],
+        "cells": 1,
+        "value": null,
+        "unit": "count",
+        "numerator": 0,
+        "denominator": 0,
+        "basis": "BOUNDARY_REFUSALS",
+        "method": "planted = expansion attempts deliberately placed in the run; granted = authority the run actually obtained beyond declared INTERSECT grant, taken as the LARGER of (a) the granted_expansions the record claims and (b) the expansions re-derived from its effective_tools and effective_capabilities against its declared/request allowlists and declared/grant capability lists (the claim is that this is 0); value = granted, unit = count, and the refusal rate is observation.refused/planted. Five independent observations support it: (a) a capabilities() claim carrying a tool or capability outside declared INTERSECT grant must be refused or intersected, (b) the claimed grant and the re-derived one must agree, (c) the child argv tool allowlist digest must equal the request allowed_tools digest, (d) a forged granted_scope/allowed_tools/approved event payload must be refused with a typed BLOCKED_POLICY, (e) no planted tool may appear in the effective tools. Each of the five is reported THREE-valued: true only when its observation really happened, false when it happened and did not hold, and null when its population was empty and there was nothing to look at. A null gate is named in observation.gates_not_measured and in observation.gates_unverifiable_from_the_record, and any null makes the measurement PARTIAL, never MEASURED. planted === 0 makes the measurement NOT_RUN, not PASS.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": false,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": false
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          },
+          {
+            "label": "the numerator is a published integer",
+            "ok": true
+          },
+          {
+            "label": "the denominator is a published integer",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": "status=NOT_RUN and a value is present"
       }
     ],
     "rule": "each measurement is judged on its own: a name from the closed seven, a status from the closed vocabulary read from the producing module, and for anything measured a value, a named basis, a named method, a non-empty stated limitation, a published artefact whose bytes hash to the recorded digest, and — for a ratio or a count — published integer numerator and denominator. A measurement that does not satisfy all of that reads NOT_MEASURED and caps the ticket at PARTIAL. A measurement that reports FAILED_GATE is a FINDING: it is a defect and moves the verdict to REVISE, because a real boundary-refusal result must never be normalised into an unmeasured cell."
   },
   "comparison": {
-    "verdict": "NOT_RUN",
+    "verdict": "COMPARED",
     "fail": false,
-    "ok": false,
+    "ok": true,
     "crossInput": [],
     "checks": [
       {
         "label": "the record states verdict COMPARED",
-        "ok": false,
-        "detail": "verdict=NOT_RUN"
+        "ok": true,
+        "detail": "verdict=COMPARED"
       },
       {
         "label": "every project_digest in the record is the same value",
         "ok": true,
-        "detail": "distinct=1 \"sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b\""
+        "detail": "distinct=1 \"sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2\""
       },
       {
         "label": "every budget_grant_id in the record is the same value",
@@ -1227,12 +1256,12 @@
       {
         "label": "every cost_basis in the record is the same value",
         "ok": true,
-        "detail": "distinct=1 \"NOT_OBSERVED\""
+        "detail": "distinct=1 \"PROXY_TOKENS_NO_USD_REPORTED\""
       },
       {
         "label": "the comparison names at least one run set",
         "ok": true,
-        "detail": "run_set_id=rs-s2007r-pilot-c55c3ecbfca6439e"
+        "detail": "run_set_id=rs-s2007r-pilot-a06a3abae86291db"
       }
     ],
     "rule": "the comparison contract is re-derived, not believed: the record must state verdict COMPARED (an ABSENT verdict is a refusal), and the distinct values of project_digest, budget_grant_id and cost_basis over the record and every cell must be one each. A record naming two projects, two grants or two cost bases is FAIL, whatever verdict string it carries."
@@ -1247,28 +1276,28 @@
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--hand-written-pass.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--hand-written-pass.json"
       },
       {
         "variant": "unanchored-commit",
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--unanchored-commit.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--unanchored-commit.json"
       },
       {
         "variant": "commit-stripped",
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--commit-stripped.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--commit-stripped.json"
       },
       {
         "variant": "claimed-verdict-upgrade",
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--claimed-verdict-upgrade.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--claimed-verdict-upgrade.json"
       }
     ]
   },
@@ -1289,7 +1318,7 @@
   "stopCondition": null,
   "tamperChecks": {
     "ok": true,
-    "checked": 11,
+    "checked": 16,
     "strong": 7,
     "undetected": [],
     "skipped": [
@@ -1306,7 +1335,17 @@
       "real-adapter-run/dep-stale-commit: the variant targets the json-stdout+file gate shape",
       "real-adapter-run/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
       "real-adapter-run/dep-hand-written-green: the variant targets the json-stdout+file gate shape",
-      "comparison: the gate printed no report envelope",
+      "comparison/counter-nonzero: the gate does not carry this field, so the variant is not applicable",
+      "comparison/hardgates-flipped: the gate does not carry this field, so the variant is not applicable",
+      "comparison/omits-hidden: the gate does not carry this field, so the variant is not applicable",
+      "comparison/db-stale-commit: the variant targets the db-replay-report gate shape",
+      "comparison/db-stale-tree: the variant targets the db-replay-report gate shape",
+      "comparison/db-counter-nonzero: the variant targets the db-replay-report gate shape",
+      "comparison/db-status-not-run-db: the variant targets the db-replay-report gate shape",
+      "comparison/db-crash-phase-faked: the variant targets the db-replay-report gate shape",
+      "comparison/dep-stale-commit: the variant targets the json-stdout+file gate shape",
+      "comparison/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
+      "comparison/dep-hand-written-green: the variant targets the json-stdout+file gate shape",
       "probes/comparison-flipped: the gate does not carry this field, so the variant is not applicable",
       "probes/db-stale-commit: the variant targets the db-replay-report gate shape",
       "probes/db-stale-tree: the variant targets the db-replay-report gate shape",
@@ -1322,23 +1361,23 @@
         "gate": "real-adapter-run",
         "variant": "stale-commit",
         "expectedCheck": "freshness:commit-bound",
-        "classifierStatus": "NOT_RUN",
+        "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "NOT_RUN",
+        "baselineStatus": "FAIL",
         "strong": false,
         "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/real-adapter-run--stale-commit.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--stale-commit.json"
       },
       {
         "gate": "real-adapter-run",
         "variant": "stale-tree",
         "expectedCheck": "freshness:tree-bound",
-        "classifierStatus": "NOT_RUN",
+        "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "NOT_RUN",
+        "baselineStatus": "FAIL",
         "strong": false,
         "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/real-adapter-run--stale-tree.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--stale-tree.json"
       },
       {
         "gate": "real-adapter-run",
@@ -1346,10 +1385,10 @@
         "expectedCheck": "internal:status",
         "classifierStatus": "NOT_RUN",
         "detected": true,
-        "baselineStatus": "NOT_RUN",
+        "baselineStatus": "FAIL",
         "strong": false,
         "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/real-adapter-run--status-not-run-db.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--status-not-run-db.json"
       },
       {
         "gate": "real-adapter-run",
@@ -1357,10 +1396,65 @@
         "expectedCheck": "freshness:byte-digest-matches-this-run",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "NOT_RUN",
+        "baselineStatus": "FAIL",
         "strong": false,
         "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/real-adapter-run--hand-written-green.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--hand-written-green.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "stale-commit",
+        "expectedCheck": "freshness:commit-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "FAIL",
+        "strong": false,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=73d59ee7577b475d reported=e70f241370c70964",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--stale-commit.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "stale-tree",
+        "expectedCheck": "freshness:tree-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "FAIL",
+        "strong": false,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=699b3a120579d788 reported=e70f241370c70964",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--stale-tree.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "comparison-flipped",
+        "expectedCheck": "comparison:ok",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "FAIL",
+        "strong": false,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=611720a7b2d28c6b reported=e70f241370c70964",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--comparison-flipped.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "status-not-run-db",
+        "expectedCheck": "internal:status",
+        "classifierStatus": "NOT_RUN",
+        "detected": true,
+        "baselineStatus": "FAIL",
+        "strong": false,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=eeaa399cf7b549a1 reported=e70f241370c70964",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--status-not-run-db.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "hand-written-green",
+        "expectedCheck": "freshness:byte-digest-matches-this-run",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "FAIL",
+        "strong": false,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=e70f241370c70964",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--hand-written-green.json"
       },
       {
         "gate": "probes",
@@ -1370,8 +1464,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=c1480a4585946b0c reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--stale-commit.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=df1edaf1d6f6a2d5 reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--stale-commit.json"
       },
       {
         "gate": "probes",
@@ -1381,8 +1475,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=4c143c31a0efd5ef reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--stale-tree.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c3c75d05719ed561 reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--stale-tree.json"
       },
       {
         "gate": "probes",
@@ -1392,8 +1486,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=85f4a12e99bd3d13 reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--counter-nonzero.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=0df53d745419dfb0 reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--counter-nonzero.json"
       },
       {
         "gate": "probes",
@@ -1403,8 +1497,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=bfa395c124ca53d8 reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--hardgates-flipped.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=a54bd925a63edc27 reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--hardgates-flipped.json"
       },
       {
         "gate": "probes",
@@ -1414,8 +1508,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=7548173b1339be1e reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--status-not-run-db.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=dd1aa7c71efc23ac reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--status-not-run-db.json"
       },
       {
         "gate": "probes",
@@ -1425,8 +1519,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--hand-written-green.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--hand-written-green.json"
       },
       {
         "gate": "probes",
@@ -1436,8 +1530,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=1f2f703719ed0556 reported=cdb6f7148997fa87",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/probes--omits-hidden.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9885a3bf1aaaa807 reported=fb36e0929c26aa93",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--omits-hidden.json"
       }
     ]
   },
@@ -1493,28 +1587,28 @@
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--hand-written-pass.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--hand-written-pass.json"
           },
           {
             "variant": "unanchored-commit",
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--unanchored-commit.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--unanchored-commit.json"
           },
           {
             "variant": "commit-stripped",
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--commit-stripped.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--commit-stripped.json"
           },
           {
             "variant": "claimed-verdict-upgrade",
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-d55a9bbcd4cb/amvp--claimed-verdict-upgrade.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--claimed-verdict-upgrade.json"
           }
         ]
       },
@@ -1528,21 +1622,21 @@
     {
       "criterion": "C1 dependency binding",
       "requirement": "issue §6: the inherited S2-007 dependency binding is verified before any implementation; a blocked binding is BLOCKED, not green",
-      "observation": "dependency gate BLOCKED_DEPENDENCY (exit 1) at HEAD commit d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+      "observation": "dependency gate BLOCKED_DEPENDENCY (exit 1) at HEAD commit 34f8e6582ddf0418c0aec8f3c92d6045a882c983",
       "evidence": "evidence/s2-007-dependency-binding.json",
       "status": "BLOCKED_DEPENDENCY"
     },
     {
       "criterion": "C2 a real executor really crossed the boundary",
       "requirement": "issue §4: a run is a real adapter only with a version string, a binary digest corroborated by a LIVE host probe, a raw log with a digest that is the executor's own log document, and a real exit status — all re-verified from the bytes on disk",
-      "observation": "real-adapter gate FAIL (exit 3); realAdapterStatus NOT_RUN_REAL_ADAPTER; adapters.available 0; executables the live host probe reports installed: adr-codex-local, adr-pi-local, adr-claude-code-local, adr-opencode-local, adr-hermes-local",
+      "observation": "real-adapter gate FAIL (exit 1); realAdapterStatus NOT_RUN_REAL_ADAPTER; adapters.available 0; executables the live host probe reports installed: adr-codex-local, adr-pi-local, adr-claude-code-local, adr-opencode-local, adr-hermes-local",
       "evidence": "evidence/s2-007r-real-adapter-run.json + the live probeRealAdapters fact",
       "status": "NOT_RUN (NOT_RUN_REAL_ADAPTER)"
     },
     {
       "criterion": "C3 a configured adapter is not an available one",
       "requirement": "issue §4: a configured-but-unrun adapter is indistinguishable, in the output, from one that does not exist",
-      "observation": "2 configured adapter entries, 0 corroborated",
+      "observation": "3 configured adapter entries, 0 corroborated",
       "evidence": "evidence/s2-007r-summary.json (realAdapter.adapters)",
       "status": "PASS"
     },
@@ -1556,21 +1650,21 @@
     {
       "criterion": "C5 the comparison is one project and one budget",
       "requirement": "issue §5: two configurations on ONE project digest and ONE grant, or the comparison is REFUSED. Re-derived here: verdict COMPARED present and the distinct project_digest / budget_grant_id / cost_basis over the record and its cells are one each",
-      "observation": "comparison gate NOT_RUN (exit 0); verdict NOT_RUN; cross-input fields none",
+      "observation": "comparison gate FAIL (exit 0); verdict COMPARED; cross-input fields none",
       "evidence": "evidence/s2-007r-comparison.json",
-      "status": "NOT_RUN"
+      "status": "FAIL"
     },
     {
       "criterion": "C6 the seven measurements",
       "requirement": "issue §5: seven measurements, each recomputable by a third party from the record alone; a measurement reporting FAILED_GATE is a finding, not a gap",
-      "observation": "1/7 measured; not measured: accepted_task_quality, pass_at_1, intervention_time, cost, latency, regression_rate; findings: none; artefacts 13/13 verified on disk (record.measurements)",
+      "observation": "4/7 measured; not measured: intervention_time, cost, skills_authority_expansion; findings: none; artefacts 13/21 verified on disk (record.measurements)",
       "evidence": "evidence/s2-007r-comparison.json (cells[].measurements[])",
       "status": "PARTIAL"
     },
     {
       "criterion": "C7 freshness of every result",
       "requirement": "issue §6: each gate is re-run in this invocation and re-classified against tampered copies; a tampered artifact that is accepted fails the run. The real-adapter and per-case matrices are inputs to the verdict, not decoration",
-      "observation": "evidence tamper matrix: 11 variants, none undetected; real-adapter tamper matrix: 0 variants, none undetected (not exercised: no fresh real-adapter record this invocation — UNPROVEN, not passed); per-case A-MVP matrix: 4 variants, none undetected",
+      "observation": "evidence tamper matrix: 16 variants, none undetected; real-adapter tamper matrix: 0 variants, none undetected (not exercised: no fresh real-adapter record this invocation — UNPROVEN, not passed); per-case A-MVP matrix: 4 variants, none undetected",
       "evidence": "evidence/s2-007r-summary.json (tamperChecks, realAdapter.tamperChecks, amvpTamper)",
       "status": "PASS"
     },
@@ -1597,12 +1691,12 @@
     }
   ],
   "verdictReasons": [
-    "[REVISE] mandatory gate real-adapter-run is FAIL: gate:exit-code:3",
+    "[REVISE] mandatory gate real-adapter-run is FAIL: gate:exit-code:1",
+    "[REVISE] mandatory gate comparison is FAIL: freshness:record-digest-matches-this-run:the record content address must equal the one the gate reported",
     "[PARTIAL] mandatory gate dependencies is BLOCKED_DEPENDENCY: gate:exit-code:1 — inherited from the S2-007 dependency binding; this ticket reports it and does not fix it",
-    "[PARTIAL] mandatory gate comparison is NOT_RUN: evidence:no-envelope-from-the-gate:the gate printed no report, so this invocation cannot be bound to the artifact it wrote",
     "[PARTIAL] a mandatory component could not run: comparison_across_projects_or_budgets_refused/a_refused_comparison_writes_no_measurement_block (NEEDS_INPUT) — the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run",
     "[PARTIAL] a mandatory component could not run: skill_authority_expansion_blocked/the_child_argv_allowlist_is_derived_from_the_request (NEEDS_INPUT) — the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow",
-    "[PARTIAL] these measurements are not measured: accepted_task_quality, pass_at_1, intervention_time, cost, latency, regression_rate"
+    "[PARTIAL] these measurements are not measured: intervention_time, cost, skills_authority_expansion"
   ],
   "verdictPrecedence": [
     "REVISE (a defect was found) > BLOCKED (an inherited stop condition) > PARTIAL (a mandatory component could not run) > PASS_WITH_LIMITS (every gate green but the checkout is dirty) > COMPLETE_WITH_LIMITS"
@@ -1610,39 +1704,46 @@
   "checkout": {
     "available": true,
     "clean": false,
-    "changedPathCount": 31,
+    "changedPathCount": 38,
     "changedPaths": [
-      "ontracts/sandbox-profile.schema.json",
-      "ackage.json",
-      "rc/lib/agentboard/commands.mjs",
-      "rc/lib/agentboard/constants.mjs",
-      "rc/lib/agentboard/policy.mjs",
-      "rc/lib/agentboard/scheduler.mjs",
-      "rc/lib/identity/sandbox-profiles.mjs",
-      "ests/identity/contracts.schemas.test.mjs",
-      "corpus/s2-007r/",
-      "docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md",
-      "docs/stages/S2-007R.md",
-      "evidence/s2-007r-amvp-cases.json",
-      "evidence/s2-007r-comparison.json",
-      "evidence/s2-007r-host-unisolated.json",
-      "evidence/s2-007r-pilot.json",
-      "evidence/s2-007r-security-probes.json",
-      "evidence/s2-007r-summary.json",
-      "results/s2-007r/",
-      "scripts/s2-007r-authorization.mjs",
-      "scripts/s2-007r-lifecycle.mjs",
-      "scripts/s2-007r-measure.mjs",
-      "scripts/s2-007r-measurement-set.mjs",
-      "scripts/s2-007r-probes.mjs",
-      "scripts/s2-007r-run.mjs",
-      "scripts/verify-s2-007r-host-unisolated.mjs",
-      "scripts/verify-s2-007r.mjs",
-      "src/lib/agentboard/clock.mjs",
-      "src/lib/executors/",
-      "tests/agentboard/fixtures/real-executor-stub.mjs",
-      "tests/agentboard/real-executor.test.mjs",
-      "tests/agentboard/unisolated-authorization.test.mjs"
+      "orpus/s2-007r/project/verify.mjs",
+      "vidence/s2-007r-amvp-cases.json",
+      "vidence/s2-007r-comparison.json",
+      "vidence/s2-007r-security-probes.json",
+      "vidence/s2-007r-summary.json",
+      "esults/s2-007r/campaign-ledger.json",
+      "esults/s2-007r/cell-pa2/run-01.json",
+      "esults/s2-007r/cell-pa2/run-02.json",
+      "esults/s2-007r/cell-pa2/run-record.json",
+      "esults/s2-007r/cell-pb1/run-01.json",
+      "esults/s2-007r/cell-pb1/run-02.json",
+      "esults/s2-007r/cell-pb1/run-record.json",
+      "esults/s2-007r/cell-pb2/run-01.json",
+      "esults/s2-007r/cell-pb2/run-02.json",
+      "esults/s2-007r/cell-pb2/run-record.json",
+      "esults/s2-007r/cell-pia/run-01.json",
+      "esults/s2-007r/cell-pia/run-02.json",
+      "esults/s2-007r/cell-pia/run-record.json",
+      "esults/s2-007r/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/run-01.json",
+      "cripts/s2-007r-measurement-set.mjs",
+      "cripts/s2-007r-run.mjs",
+      "cripts/verify-s2-007r.mjs",
+      "rc/lib/executors/measure.mjs",
+      "rc/lib/executors/transport.mjs",
+      "ests/agentboard/real-executor.test.mjs",
+      "corpus/s2-007r/project/src/lib/",
+      "results/s2-007r/cell-pa2/campaign-ledger.json",
+      "results/s2-007r/cell-pa2/raw/pilot/",
+      "results/s2-007r/cell-pb1/campaign-ledger.json",
+      "results/s2-007r/cell-pb1/raw/pilot/",
+      "results/s2-007r/cell-pb2/campaign-ledger.json",
+      "results/s2-007r/cell-pb2/raw/pilot/",
+      "results/s2-007r/cell-pia/campaign-ledger.json",
+      "results/s2-007r/cell-pia/raw/pilot/",
+      "results/s2-007r/raw/pilot/run-01-pi/",
+      "results/s2-007r/raw/pilot/run-02-codex/",
+      "results/s2-007r/run-02.json"
     ]
   },
   "finalAcceptance": {
@@ -1683,5 +1784,5 @@
     "evidence": "delete evidence/s2-007r-*.json; every gate is re-runnable from a clean checkout.",
     "verification": "npm run verify:s2-007r (the aggregator will report PARTIAL/BLOCKED/REVISE rather than green until every mandatory gate is green again)."
   },
-  "recordDigest": "e7be16176d81b9585c28ba88ee420dc01265309af768a3b61866f182de5f1fe2"
+  "recordDigest": "eb088de4783a10f39f77a341a562b1ae3dd3878a1865fe2765cec4e4a208f1e0"
 }

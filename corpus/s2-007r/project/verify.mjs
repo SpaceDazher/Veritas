@@ -29,7 +29,18 @@ import { fileURLToPath } from 'node:url';
 // driver computes `project_digest` with exactly this function, so the digest
 // printed here and the digest in a run record are the same string for the same
 // bytes and a third party can compare them without translating anything.
-import { canonicalDigest } from '../../../src/lib/verifier/canonical-json.mjs';
+// THE DIGEST CONVENTION IS VENDORED, NOT RE-IMPLEMENTED.
+// The file below is a byte-identical copy of the repository's
+// src/lib/verifier/canonical-json.mjs. It is vendored rather than imported
+// across the directory boundary because an oracle that only works inside the
+// repository is not recomputable: the run driver runs it on a COPY of this
+// project under /tmp, where `../../../src/lib/verifier` does not exist, and it
+// failed there with a bare module-not-found and no stdout.
+//
+// The copy is bound to its source: scripts/s2-007r-measurement-set.mjs and the
+// unit suite compare the two files byte for byte, so the convention stays
+// single-sourced and any drift is a test failure rather than a second digest.
+import { canonicalDigest } from './src/lib/verifier/canonical-json.mjs';
 
 import { add, sub, mul, sumRange } from './src/calc.js';
 import { parsePairs, renderPairs } from './src/parse.js';
@@ -108,6 +119,22 @@ const DESCRIPTIONS = Object.freeze({
   T2: 'implement parsePairs and renderPairs to the contract in src/parse.js',
   T3: 'refactor src/calc.js with no observable behaviour change; T1 and T2 still hold',
 });
+
+// The CRITERIA TABLE, on demand.
+//
+// The run driver builds each board task's brief from these strings, so the brief
+// the executor reads and the criterion the oracle adjudicates are the SAME text
+// by construction. A driver that hard-coded its own copy of the goal would be a
+// second, drifting statement of what the task was - and a task whose written
+// goal differs from the thing that is measured is not a measurement.
+if (process.argv[2] === '--criteria') {
+  process.stdout.write(`${JSON.stringify({
+    oracle: 's2-007r-project-oracle-v1',
+    tasks: DESCRIPTIONS,
+    checks_per_task: Object.fromEntries(Object.keys(TASKS).map((id) => [id, TASKS[id]().map((row) => row.id)])),
+  })}\n`);
+  process.exit(0);
+}
 
 const taskId = process.argv[2] ?? null;
 if (taskId === null || !Object.prototype.hasOwnProperty.call(TASKS, taskId)) {

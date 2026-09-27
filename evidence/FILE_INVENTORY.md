@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 888.
+Generated from `git ls-files`; count: 912.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -360,6 +360,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-007r/project/README.md`
 - `corpus/s2-007r/project/src/calc.js`
 - `corpus/s2-007r/project/src/calc.test.js`
+- `corpus/s2-007r/project/src/lib/verifier/canonical-json.mjs`
 - `corpus/s2-007r/project/src/parse.js`
 - `corpus/s2-007r/project/src/parse.test.js`
 - `corpus/s2-007r/project/verify.mjs`
@@ -557,23 +558,43 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-006/model-assisted-pilot-pool.json`
 - `results/s2-006/s2-006-db-comparison.json`
 - `results/s2-007r/campaign-ledger.json`
+- `results/s2-007r/cell-pa2/campaign-ledger.json`
 - `results/s2-007r/cell-pa2/raw/pa2/bootstrap/codex/run-bootstrap-codex-pa2/raw/exec-000.log.json`
 - `results/s2-007r/cell-pa2/raw/pa2/bootstrap/pi/run-bootstrap-pi-pa2/raw/exec-000.log.json`
+- `results/s2-007r/cell-pa2/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pa2/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json`
+- `results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json`
 - `results/s2-007r/cell-pa2/run-01.json`
 - `results/s2-007r/cell-pa2/run-02.json`
 - `results/s2-007r/cell-pa2/run-record.json`
+- `results/s2-007r/cell-pb1/campaign-ledger.json`
 - `results/s2-007r/cell-pb1/raw/pb1/bootstrap/codex/run-bootstrap-codex-pb1/raw/exec-000.log.json`
 - `results/s2-007r/cell-pb1/raw/pb1/bootstrap/pi/run-bootstrap-pi-pb1/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb1/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb1/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json`
 - `results/s2-007r/cell-pb1/run-01.json`
 - `results/s2-007r/cell-pb1/run-02.json`
 - `results/s2-007r/cell-pb1/run-record.json`
+- `results/s2-007r/cell-pb2/campaign-ledger.json`
 - `results/s2-007r/cell-pb2/raw/pb2/bootstrap/codex/run-bootstrap-codex-pb2/raw/exec-000.log.json`
 - `results/s2-007r/cell-pb2/raw/pb2/bootstrap/pi/run-bootstrap-pi-pb2/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb2/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb2/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json`
+- `results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json`
 - `results/s2-007r/cell-pb2/run-01.json`
 - `results/s2-007r/cell-pb2/run-02.json`
 - `results/s2-007r/cell-pb2/run-record.json`
+- `results/s2-007r/cell-pia/campaign-ledger.json`
 - `results/s2-007r/cell-pia/raw/pia/bootstrap/codex/run-bootstrap-codex-pia/raw/exec-000.log.json`
 - `results/s2-007r/cell-pia/raw/pia/bootstrap/pi/run-bootstrap-pi-pia/raw/exec-000.log.json`
+- `results/s2-007r/cell-pia/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pia/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json`
+- `results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json`
 - `results/s2-007r/cell-pia/run-01.json`
 - `results/s2-007r/cell-pia/run-02.json`
 - `results/s2-007r/cell-pia/run-record.json`
@@ -618,7 +639,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-007r/raw/pia/bootstrap/pi/run-bootstrap-pi-pia/raw/exec-000.log.json`
 - `results/s2-007r/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json`
 - `results/s2-007r/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json`
+- `results/s2-007r/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json`
+- `results/s2-007r/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json`
 - `results/s2-007r/run-01.json`
+- `results/s2-007r/run-02.json`
 - `results/s2-007r/run-record.json`
 - `results/s2-007r/sql-observations-round3.json`
 - `scripts/acceptance-gate.mjs`

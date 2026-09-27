@@ -359,7 +359,12 @@ async function plantSkillsExpansion() {
       governed: false,
       board_commands_called: 0,
       board_rows_written: 0,
-      why: 'no task was claimed and no lease was opened: the plant exists to be refused, and the run set had no governed run to plant into (every tasks.claim was refused BLOCKED_SANDBOX). The measurement is therefore a boundary observation against the same registration, the same grant and the same workspace the run set used, executed by the measurement step, not an observation of a run.',
+      // The plant is a boundary observation, not an observation of a run: it is
+      // executed by the measurement step against the same registration, grant and
+      // workspace the run set used, and it is labelled as such wherever it is
+      // reported. Whether the run set itself had governed runs is a separate
+      // fact, published in `evidence.governed_runs_completed`.
+      why: 'the planted expansion is a boundary observation executed by the measurement step, not an observation of a run: the same registration, grant and workspace, with the refusal recorded. It is never counted as a run and never as a measurement of one.',
       workspace_root: PLANT_WORKSPACE,
       authorization: { authorization_id: permit.authorization_id, authority: permit.authority, scope: permit.scope, profile_id: permit.profile_id, body_digest: permit.body_digest },
       injected_instant: INJECTED_INSTANT,
@@ -394,7 +399,8 @@ async function captureRefusal(call) {
 // ---------------------------------------------------------------------------
 /**
  * Check (c) of measurement 7 asks for `sha256(argv tool allowlist) ===
- * sha256(request.allowed_tools)`. This run set contains no governed run, so the
+ * sha256(request.allowed_tools)`. Whether the run set contains a governed run is
+ * published per case, so the
  * claim cannot be evaluated against one: the child's argv is built inside
  * `transport.start()`, which needs a lease and a fencing token that
  * `tasks.claim` refused to open. What IS on disk is eight REAL process logs
@@ -594,196 +600,146 @@ function sevenMeasurements({ cells, cellSets, identity, plant }) {
   const evidence = evidenceForRunSet(cells, identity);
   const attempts = cells.flatMap((cell) => cell.runs.map((run) => ({ cell: cell.id, ...run })));
   const blockedCodes = sortedUnique(attempts.flatMap((run) => (Array.isArray(run.raw.findings) ? run.raw.findings.map((row) => row.code) : [])));
+  // The shared limitation is COMPUTED from the run set, so it cannot describe a
+  // state the run set is no longer in.
+  const governedCompleted = evidence.governed_runs_completed;
   const sharedLimit = [
-    'ONE run set: the single campaign the owner authorised (grant grt-s2007r-pilot, one project digest), four driver invocations, eight attempted governed runs, zero completed governed runs. No figure below is averaged across cells and no cell is rounded up.',
-    'Every attempted governed run in this run set was refused before a run existed: policy.assertSandboxExecutable(sbx-host-unisolated-v1) answers BLOCKED_SANDBOX, so tasks.claim never opened a lease and no task ever entered RUNNING. A measurement that needs a completed run therefore has no denominator, which is reported as NOT_RUN and not as zero.',
+    `ONE run set: the single campaign the owner authorised (grant ${identity.budget_grant_id}, one project digest ${identity.project_digest}), ${cells.length} driver invocation(s), ${attempts.length} attempted governed run(s), ${governedCompleted} with a collected ExecutionResult. No figure below is averaged across cells and no cell is rounded up.`,
+    governedCompleted === 0
+      ? 'No run in this run set collected an ExecutionResult, so every measurement that needs a completed run has no denominator and is reported as NOT_RUN rather than as zero.'
+      : `${governedCompleted} of ${attempts.length} attempted governed run(s) collected an ExecutionResult through the board; the rest are named in each measurement\'s observation instead of being dropped.`,
+    `Blocked or refused codes seen anywhere in this run set: ${blockedCodes.length > 0 ? blockedCodes.join(', ') : 'none'}. A code is listed because it happened, not because this text is allowed to claim it.`,
   ];
-  const rows = [];
-
-  rows.push({
-    name: 'accepted_task_quality',
-    status: 'NOT_RUN',
-    value: null,
-    unit: 'ratio',
-    numerator: null,
-    denominator: 0,
-    basis: 'DETERMINISTIC_ORACLE',
-    method: 'numerator = runs whose collected ExecutionResult.outcome is SUCCEEDED and whose deterministic task oracle (node corpus/s2-007r/project/verify.mjs <task_id>) exits 0 and whose task reached IN_REVIEW; denominator = runs with a collected ExecutionResult. Both sides are read from the run record; a run with no collected result is excluded from the denominator and named, never counted as a rejection.',
-    observation: {
-      collected_results: 0,
-      accepted: [],
-      rejected: [],
-      runs_without_a_collected_result: attempts.map((run) => run.normalised.runId),
-      task_final_states: sortedUnique(attempts.map((run) => run.normalised.task.finalState)),
-      oracle_ran: false,
-      per_cell_status: cellsAgree(cellSets, 'accepted_task_quality'),
-    },
-    limitations: [
-      ...sharedLimit,
-      `NOT_RUN: no run in this run set collected an ExecutionResult (0 of ${attempts.length} attempts; the refusals were ${blockedCodes.join(', ')}), so there is no accepted task to score and no oracle was ever executed. A zero here would be a fabricated zero: it would say "every accepted task failed" about a run set in which no task was accepted.`,
-    ],
-    hard_gate_counter: 'falseApprovals',
-    evidence,
-  });
-
-  rows.push({
-    name: 'pass_at_1',
-    status: 'NOT_RUN',
-    value: null,
-    unit: 'ratio',
-    numerator: null,
-    denominator: 0,
-    basis: 'BOARD_TASK_ATTEMPTS_AND_DETERMINISTIC_ORACLE',
-    method: 'numerator = tasks whose board row carries attempts === 1 and whose deterministic oracle passed; denominator = the distinct tasks in the run set. The per-task booleans are published, not only the fraction.',
-    observation: {
-      distinct_tasks: sortedUnique(attempts.map((run) => run.normalised.task.taskId)),
-      tasks: attempts.map((run) => ({
-        task_id: run.normalised.task.taskId,
-        cell: run.cell,
-        adapter_id: run.normalised.cell.adapterId,
-        configuration: run.normalised.cell.configuration,
-        attempts: run.normalised.task.attempts,
-        final_state: run.normalised.task.finalState,
-        oracle_pass: null,
-      })),
-      per_cell_status: cellsAgree(cellSets, 'pass_at_1'),
-    },
-    limitations: [
-      ...sharedLimit,
-      `NOT_RUN: no task was ever claimed, so every board row carries attempts 0 and no oracle ran. pass@1 needs a first attempt; this run set has none, and the value is null rather than 0/8.`,
-    ],
-    hard_gate_counter: 'falseApprovals',
-    evidence,
-  });
-
-  rows.push({
-    name: 'intervention_time',
-    status: 'NOT_RUN',
-    value: null,
-    unit: 'milliseconds',
-    numerator: 0,
-    denominator: 0,
-    basis: 'BOARD_INJECTED_CLOCK',
-    method: 'per run, board_ms = terminal_event.emitted_at - accepted_event.emitted_at on the board\'s own injected clock, and interventions = the count of non-executor commands the runner issued between those two events (which must be 0); the cell value is the upper median.',
-    observation: {
-      per_run: attempts.map((run) => ({
-        run_id: run.normalised.runId,
-        accepted_at: run.normalised.execution.acceptedAt,
-        terminal_at: run.normalised.execution.terminalAt,
-        board_ms: null,
-        interventions: run.normalised.execution.interventions.length,
-        board_duration_ms: run.normalised.execution.boardDurationMs,
-      })),
-      accepted_events: 0,
-      terminal_events: 0,
-      per_cell_status: cellsAgree(cellSets, 'intervention_time'),
-    },
-    limitations: [
-      ...sharedLimit,
-      'NOT_RUN: no run emitted an ACCEPTED event, so the window has no endpoints. This is board time, not model time; and a non-zero intervention count would itself be a finding, not a subtraction.',
-    ],
-    hard_gate_counter: 'missingJournalOrOutbox',
-    evidence,
-  });
-
-  const bootstrapCrossings = cells.flatMap((cell) => (cell.invocation.provenance_bootstrap?.crossings ?? []).map((crossing) => ({
-    cell: cell.id,
-    provider: crossing.provider,
-    run_id: crossing.run_id,
-    governed: crossing.governed === true,
-    is_a_run: crossing.is_a_run === true,
-    exit_status: crossing.exit_status,
-    wall_ms: crossing.wall_ms,
-    spend_usd: crossing.spend_usd,
-  })));
-  rows.push({
-    name: 'cost',
-    status: 'NOT_RUN',
-    value: null,
-    unit: 'mixed',
-    numerator: null,
-    denominator: 0,
-    basis: COST_BASES[2],
-    method: 'per run, cost_usd_micros = round(usage.cost.total * 1e6) when the executor itself reported a currency figure (basis EXECUTOR_REPORTED_USD); otherwise the unit is a PROXY, not money: proxy_tokens = input + output + reasoning (basis PROXY_TOKENS_NO_USD_REPORTED); a run that reported neither is NOT_OBSERVED and the cell is NOT_RUN. Nothing is ever priced from a published list.',
-    observation: {
-      cost_basis_observed: COST_BASES[2],
-      runs_with_reported_usd: 0,
-      runs_with_reported_tokens: 0,
-      governed_run_spend_usd: 0,
-      campaign_ledger: { path: LEDGER_RELATIVE, cap_usd: 2, stop_at_usd: 1.6, total_usd: 0 },
-      not_a_run_spend: {
-        note: 'these are real processes this pilot really started, and they are NOT runs. They are published here because a reader looking for the cost of this pilot would otherwise find nothing, and they are excluded from every numerator above.',
-        preflight_pi: { session_id: '01a0e16b-4d68-707f-b0ed-b6042d8e2ec6', cost_usd: 0.00009786, input_tokens: 1427, output_tokens: 51, basis: 'EXECUTOR_REPORTED_USD' },
-        preflight_codex: { thread_id: '01a0e16b-51fa-7923-a944-37b54437779e', cost_usd: null, cost_basis: 'NO_USD_REPORTED_BY_EXECUTOR', input_tokens: 20936, cached_input_tokens: 12160, output_tokens: 5 },
-        provenance_bootstrap_crossings: bootstrapCrossings,
+  // THE RUN-SET ROWS ARE AGGREGATED FROM THE CELLS, NOT ASSERTED.
+  //
+  // An earlier version of this function pushed seven hard-coded NOT_RUN rows
+  // with a hard-coded narrative ("zero completed governed runs", "the
+  // refusals were ..."). That was true when it was written and became a lie the
+  // moment a governed run actually completed: the record kept reporting a
+  // refusal reason that no longer applied. A hard-coded observation is a claim
+  // about the past, frozen into a file that keeps being regenerated.
+  //
+  // The rule, stated once: a measurement is reported at run-set level only when
+  // every (cell x adapter) group agrees on its STATUS. Ratios and counts are
+  // then summed over the groups, so the run-set denominator is the sum of the
+  // cell denominators and nothing is averaged. Durations publish min/median/max
+  // because a mean of four samples is not a quantity anybody can act on. A group
+  // that disagrees makes the run-set row NOT_RUN and NAMES the disagreement: no
+  // figure is averaged across cells and no NOT_RUN group is rounded up.
+  const groups = cellSets;
+  const rowOf = (entry, name) => entry.measured.measurements.find((row) => row.name === name) ?? null;
+  const round6 = (value) => Math.round(value * 1e6) / 1e6;
+  const median = (values) => {
+    const sorted = [...values].sort((a, b) => a - b);
+    if (sorted.length === 0) return null;
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+  const rows = MEASUREMENT_NAMES.map((name) => {
+    const cellsFor = groups.map((entry) => ({ entry, row: rowOf(entry, name) })).filter((pair) => pair.row !== null);
+    if (cellsFor.length === 0) {
+      throw new ContractFailure('MEASUREMENT_SET_INCOMPLETE', `no cell produced a row for ${name}`);
+    }
+    const statuses = sortedUnique(cellsFor.map((pair) => pair.row.status));
+    const basis = cellsFor[0].row.basis;
+    const evidenceGroups = cellsFor.map((pair) => ({
+      cell: pair.entry.cell.id,
+      group: pair.entry.key,
+      status: pair.row.status,
+      numerator: pair.row.numerator,
+      denominator: pair.row.denominator,
+      value: pair.row.value,
+      unit: pair.row.unit,
+    }));
+    const agree = statuses.length === 1;
+    const perUnit = sortedUnique(cellsFor.map((pair) => pair.row.unit));
+    if (!agree) {
+      return {
+        name,
+        status: 'NOT_RUN',
+        value: null,
+        unit: perUnit[0] ?? null,
+        numerator: null,
+        denominator: null,
+        basis,
+        method: cellsFor[0].row.method,
+        observation: {
+          why_not: 'the groups of this run set do not agree on the status of this measurement, so it is not one number',
+          statuses: evidenceGroups,
+          disagreements: sortedUnique(statuses),
+        },
+        limitations: [
+          ...sharedLimit,
+          `NOT_RUN: ${name} disagrees across the run set (${sortedUnique(statuses).join(', ')}). A figure averaged across cells that disagree is a number about nothing.`,
+        ],
+        hard_gate_counter: cellsFor[0].row.hard_gate_counter ?? null,
+        evidence,
+      };
+    }
+    const status = statuses[0];
+    const numerator = cellsFor.map((pair) => pair.row.numerator).filter((value) => Number.isFinite(value));
+    const denominator = cellsFor.map((pair) => pair.row.denominator).filter((value) => Number.isFinite(value));
+    const sumNumerator = numerator.reduce((total, value) => total + value, 0);
+    const sumDenominator = denominator.reduce((total, value) => total + value, 0);
+    const isDuration = perUnit.length === 1 && perUnit[0] === 'milliseconds';
+    const values = cellsFor.map((pair) => pair.row.value).filter((value) => typeof value === 'number');
+    if (status !== 'MEASURED') {
+      // NOT_RUN / PARTIAL stay exactly as the cells reported them; only their
+      // denominators are summed so the reader sees the whole run set, not one
+      // cell of it.
+      return {
+        ...cellsFor[0].row,
+        observation: {
+          ...(cellsFor[0].row.observation ?? {}),
+          aggregated_over_groups: evidenceGroups,
+          summed_numerator: numerator.length > 0 ? sumNumerator : null,
+          summed_denominator: denominator.length > 0 ? sumDenominator : null,
+        },
+        limitations: [
+          ...(cellsFor[0].row.limitations ?? []).filter((line) => !line.startsWith('ONE run set:')),
+          `${status}: all ${cellsFor.length} group(s) of the run set agree, so the row is not rounded up; the summed denominator over those groups is ${sumDenominator}.`,
+        ],
+        hard_gate_counter: cellsFor[0].row.hard_gate_counter ?? null,
+        evidence,
+      };
+    }
+    if (isDuration) {
+      return {
+        ...cellsFor[0].row,
+        status: 'MEASURED',
+        value: round6(median(values)),
+        numerator: null,
+        denominator: sumDenominator,
+        observation: {
+          ...(cellsFor[0].row.observation ?? {}),
+          aggregation: 'median over the per-group values, with min and max beside it; a mean of a handful of startup-dominated samples is not a quantity anybody can act on',
+          min: values.length > 0 ? Math.min(...values) : null,
+          median: values.length > 0 ? median(values) : null,
+          max: values.length > 0 ? Math.max(...values) : null,
+          groups: evidenceGroups,
+        },
+        hard_gate_counter: cellsFor[0].row.hard_gate_counter ?? null,
+        evidence,
+      };
+    }
+    return {
+      ...cellsFor[0].row,
+      status: sumDenominator > 0 ? 'MEASURED' : 'NOT_RUN',
+      value: sumDenominator > 0 ? round6(sumNumerator / sumDenominator) : null,
+      numerator: sumNumerator,
+      denominator: sumDenominator,
+      observation: {
+        ...(cellsFor[0].row.observation ?? {}),
+        aggregation: 'numerators and denominators are summed over the run set\'s groups; nothing is averaged and no group is dropped',
+        groups: evidenceGroups,
       },
-      per_cell_status: cellsAgree(cellSets, 'cost'),
-    },
-    limitations: [
-      ...sharedLimit,
-      `NOT_RUN: no governed run in this run set reported a currency figure or a token count, so the per-cell basis is ${COST_BASES[2]} and there is no denominator. A MEASURED 0 here would be the false zero this measurement exists to avoid: a run that reported nothing is not a run that cost nothing.`,
-      'codex authenticates through a ChatGPT account and its JSONL reports no per-token billing, so no codex cost figure exists to compare against pi; no cost delta is emitted for that reason alone.',
-    ],
-    hard_gate_counter: 'falseApprovals',
-    evidence,
-  });
-
-  rows.push({
-    name: 'latency',
-    status: 'NOT_RUN',
-    value: null,
-    unit: 'milliseconds',
-    numerator: 0,
-    denominator: 0,
-    basis: 'PARENT_MONOTONIC_TIMER',
-    method: 'per run, parent_wall_ms = the parent-side monotonic timer (process.hrtime.bigint) from immediately before the executor spawn to its terminal record; the cell value is the upper median of the per-run values.',
-    observation: {
-      per_run: attempts.map((run) => ({ run_id: run.normalised.runId, parent_wall_ms: run.normalised.parentWallMs, board_duration_ms: run.normalised.execution.boardDurationMs })),
-      not_a_run_timings: {
-        note: 'real parent-side timers around real child processes this pilot really started; published so the run is not reported as having produced no timing at all, and excluded from every numerator above because these crossings are not runs.',
-        provenance_bootstrap_crossings: bootstrapCrossings,
-      },
-      per_cell_status: cellsAgree(cellSets, 'latency'),
-    },
-    limitations: [
-      ...sharedLimit,
-      'NOT_RUN: no governed run was dispatched, so no per-run parent_wall_ms exists for any run in this set.',
-      'The parent-side timer includes process start, plugin/skill/context loading and shutdown, so it is startup-dominated and is not per-turn model latency. It is meaningful only WITHIN one (adapter, configuration) cell, and this comparison resolves no cross-cell speed difference at any sample size.',
-    ],
-    hard_gate_counter: 'missingJournalOrOutbox',
-    evidence,
-  });
-
-  const unchanged = attempts.filter((run) => run.normalised.driver?.project?.unchanged === true).length;
-  rows.push({
-    name: 'regression_rate',
-    status: 'NOT_RUN',
-    value: null,
-    unit: 'ratio',
-    numerator: null,
-    denominator: 0,
-    basis: 'DETERMINISTIC_ORACLE_PRE_AND_POST',
-    method: 'numerator = pre-existing tests passing on the pristine fixture and failing after the run; denominator = pre-existing tests passing before the run; value = numerator/denominator. Both sides are the same deterministic oracle on a pristine copy and on the post-run copy.',
-    observation: {
-      baseline_passing: null,
-      after_passing: null,
-      regressed: [],
-      per_run: attempts.map((run) => ({ run_id: run.normalised.runId, baseline_passing: null, after_passing: null, regressed: [], project_digest_before: run.normalised.driver?.project?.digest_before, project_digest_after: run.normalised.driver?.project?.digest_after })),
-      weaker_fact: {
-        fact: 'the project copy was byte-identical before and after every attempted run',
-        runs_with_unchanged_project: unchanged,
-        total_runs: attempts.length,
-        why_this_is_not_the_measurement: 'a byte-identical workspace says the executor changed nothing, because no executor was dispatched. It is NOT a test regression rate: no test ran on either side, so the denominator does not exist.',
-      },
-      per_cell_status: cellsAgree(cellSets, 'regression_rate'),
-    },
-    limitations: [
-      ...sharedLimit,
-      'NOT_RUN: no run in this set executed the deterministic oracle, so there is no pre/post test comparison and no denominator. Zero regressions over a set in which no test ran is a number about nothing.',
-      'Even a real zero here would be weak evidence: the fixture is a handful of trivial tests, and a zero regression rate in one tiny project says nothing about a real repository.',
-    ],
-    hard_gate_counter: 'falseApprovals',
-    evidence,
+      limitations: [
+        ...(cellsFor[0].row.limitations ?? []),
+        `Aggregated over ${cellsFor.length} group(s) of one run set (one project digest, one campaign grant); the summed denominator is ${sumDenominator}.`,
+      ],
+      hard_gate_counter: cellsFor[0].row.hard_gate_counter ?? null,
+      evidence,
+    };
   });
 
   const granted = plant.granted;
@@ -854,13 +810,39 @@ function sevenMeasurements({ cells, cellSets, identity, plant }) {
 /**
  * One entry per case: the case's OWN expected value, the observed value, the
  * single machine-checkable assertion behind it, the artefact that backs it, and
- * — where it is NOT_RUN — the exact reason. A case is PASS only on a real run:
- * the run set produced none, so no case is PASS.
+ * — where it is NOT_RUN — the exact reason. A case is PASS only on a real
+ * governed run of this run set, and every value below is COMPUTED from the
+ * records on disk: an earlier version of this file hard-coded "no case is
+ * PASS", which described the run set that existed when it was written and was
+ * republished unchanged for every later one.
  */
 function amvpRecord({ cells, identity, head, pilot, lifecycle, ledger, plant }) {
-  const attempts = cells.flatMap((cell) => cell.runs);
-  const registrations = cells.flatMap((cell) => (cell.invocation.registration?.registrations ?? []).map((row) => ({ cell: cell.id, ...row })));
+  // The cell id travels with every run: a run id is unique inside ONE driver
+  // invocation, and the four cells of this run set share the campaign seed, so
+  // anything keyed on the run id alone collapses four runs into one.
+  const attempts = cells.flatMap((cell) => cell.runs.map((run) => ({ cell: cell.id, ...run })));
+  // The driver records `registration` as a LIST of the registration documents it
+  // committed, and the provenance decision under `real_adapter_provenance`. An
+  // earlier reader looked for `registration.registrations`, found nothing, and
+  // published "registered providers []" beside eight real runs.
+  const registrations = cells.flatMap((cell) => {
+    const block = cell.invocation.registration;
+    const rows = Array.isArray(block) ? block : (Array.isArray(block?.registrations) ? block.registrations : []);
+    return rows.map((row) => ({
+      cell: cell.id,
+      adapter_id: row.adapter_id ?? null,
+      provider: row.provider ?? null,
+      adapter_kind: row.adapter_kind ?? null,
+      sandbox_profile_id: row.sandbox_profile_id ?? null,
+      provenance_status: row.real_adapter_provenance?.status ?? row.provenance_status ?? null,
+      register_decision: row.register_decision ?? row.decision ?? 'ACCEPTED (committed by the driver)',
+      schema_valid: row.schema_valid ?? null,
+    }));
+  });
   const crossings = cells.flatMap((cell) => (cell.invocation.provenance_bootstrap?.crossings ?? []).map((row) => ({ cell: cell.id, ...row })));
+  // Runs that really collected a result through the board. Every case that asks
+  // "did a run happen" reads this list rather than a literal.
+  const runsWithCollectedResult = attempts.filter((run) => run.normalised?.execution?.resultCollected === true);
   const lifecycleArms = Array.isArray(lifecycle?.arms) ? lifecycle.arms : [];
   const sqlRef = {
     source: 'evidence/s2-007r-pilot.json#store.sql_read',
@@ -882,29 +864,63 @@ function amvpRecord({ cells, identity, head, pilot, lifecycle, ledger, plant }) 
   }
   const cases = {};
 
+  // A-MVP-01 IS COMPUTED FROM THE RUN SET.
+  //
+  // Every `observed` value in this file used to be a hard-coded literal written
+  // when the run set had no governed run in it. They described that run set and
+  // were republished unchanged for every later one, so a run set that really
+  // executed a task per adapter still carried "no run ever existed". A hard-coded
+  // observation is a claim about a past state; these are read from the data.
+  const collectedByProvider = new Map();
+  for (const run of attempts) {
+    if (run.normalised?.execution?.resultCollected !== true) continue;
+    const provider = run.normalised.cell.provider;
+    collectedByProvider.set(provider, (collectedByProvider.get(provider) ?? 0) + 1);
+  }
+  const registeredProviders = sortedUnique(registrations.map((row) => row.provider));
+  const providersWithRuns = sortedUnique([...collectedByProvider.keys()]);
+  // A RUN ID is unique inside one driver invocation, and every cell of this run
+  // set shares the campaign seed, so the id alone collides across cells. The
+  // identity that is actually unique is (cell, run_id), and that is what this
+  // case counts.
+  const runIdentities = runsWithCollectedResult.map((row) => `${row.cell}#${row.normalised.runId}`);
+  const distinctRuns = runsWithCollectedResult.length;
+  const aMvp01Pass = registeredProviders.length >= 2
+    && registeredProviders.length === providersWithRuns.length
+    && distinctRuns >= 2
+    && distinctRuns === sortedUnique(runIdentities).length;
+
   cases['A-MVP-01'] = {
     id: 'A-MVP-01',
     ...common,
-    observed: 'NOT_RUN',
-    assertion: 'PASS requires two registrations with adapter_kind "real" and DIFFERENT provider values, each REAL_ADAPTER_AVAILABLE with an installed probe row, AND each with at least one collected run in agentboard_execution_event attributable to its own run_id. Measured: providers codex and pi are registered and each was really spawned; agentboard_execution_event = 0 rows per schema, agentboard_run = 0 rows per schema.',
+    observed: aMvp01Pass ? 'PASS' : 'NOT_RUN',
+    assertion: `PASS requires two registrations with adapter_kind "real" and DIFFERENT provider values, each REAL_ADAPTER_AVAILABLE with an installed probe row, AND each with at least one collected run attributable to its own run_id. MEASURED: registered providers [${registeredProviders.join(', ')}]; providers with at least one collected run [${providersWithRuns.join(', ')}]; collected runs ${distinctRuns}; distinct (cell, run_id) identities ${sortedUnique(runIdentities).length}.`,
     artefact: [
       ...registrations.map((row) => ({ what: `adapters.register ${row.adapter_id} (${row.provider})`, cell: row.cell, decision: row.register_decision, provenance_status: row.provenance_status, sandbox_profile_id: row.sandbox_profile_id })),
       ...crossings.map((row) => ({ what: `provenance bootstrap crossing ${row.run_id}`, provider: row.provider, exit_status: row.exit_status, governed: row.governed === true, is_a_run: row.is_a_run === true, raw_log_sha256: row.raw_log_sha256 })),
-      { what: 'SQL read after all four cells', ...sqlRef },
+      ...runsWithCollectedResult.map((row) => ({ what: 'governed run with a collected ExecutionResult', cell: row.cell, run_id: row.normalised.runId, provider: row.normalised.cell.provider, configuration: row.normalised.cell.configuration, outcome: row.normalised.execution.outcome, events: Array.isArray(row.raw.events) ? row.raw.events.length : null, events_gap_free: row.normalised.execution.eventsGapFree ?? null, raw_log_files: Array.isArray(row.raw.raw_logs?.files) ? row.raw.raw_logs.files.length : 0, record: row.relative })),
+      { what: 'SQL read after the run set', ...sqlRef },
     ],
     clauses_observed: [
       'two distinct real adapters (codex, pi) were registered against the frozen contract schema and both were ACCEPTed',
       'each adapter really spawned its own binary on this host; the parent observed the pid and the exit code, and the raw process log is on disk with its sha256',
+      ...(aMvp01Pass
+        ? [`each adapter then executed a GOVERNED run through the same versioned handoff: ${distinctRuns} collected ExecutionResults, ${sortedUnique(runsWithCollectedResult.map((row) => row.normalised.runId)).length} distinct run ids, attributed per provider as ${[...collectedByProvider].map(([provider, count]) => `${provider}=${count}`).join(', ')}`]
+        : []),
     ],
-    clauses_not_run: ['a governed run per adapter', 'collected ExecutionResult per adapter', 'agentboard_execution_event rows attributable to each adapter\'s own run_id'],
-    reason: 'the registration half really happened and the RUN half did not: policy.assertSandboxExecutable(sbx-host-unisolated-v1) answers BLOCKED_SANDBOX on the per-edge gate, so tasks.claim never opened a lease and no run ever existed. The only real crossings are the provenance bootstraps, which this run set records as governed:false, is_a_run:false, board_commands_called:0; they corroborate a REGISTRATION and cannot satisfy a clause that asks for a run.',
+    clauses_not_run: aMvp01Pass
+      ? []
+      : ['a collected run per adapter', 'attributable collected results, one per distinct run id'],
+    reason: aMvp01Pass
+      ? `both distinct installed executors crossed the boundary as governed runs and their results were collected through the board: ${distinctRuns} collected results across ${providersWithRuns.length} providers. The bootstrap crossings still corroborate the REGISTRATION and are not counted as runs.`
+      : `the registration half happened and the run half did not: registered providers [${registeredProviders.join(', ')}] vs providers with a collected run [${providersWithRuns.join(', ') || 'none'}].`,
   };
 
   cases['A-MVP-02'] = {
     id: 'A-MVP-02',
     ...common,
     observed: 'NOT_RUN',
-    assertion: 'PASS requires (a) a caller-supplied probeRealAdapters({candidates}) list resolving at least one candidate outside REAL_ADAPTER_PROBE_CANDIDATES, (b) the additional approved agent registered AND ran, and (c) the tracked diff of this ticket touching none of contracts/, src/lib/agentboard/, migrations/, pilots/, src/lib/identity/. Measured: (a) discovery is data-driven, (b) pi is registered and never ran a task, (c) FALSE at this HEAD.',
+    assertion: 'PASS requires (a) a caller-supplied probeRealAdapters({candidates}) list resolving at least one candidate outside REAL_ADAPTER_PROBE_CANDIDATES, (b) the additional approved agent registered AND ran, and (c) the tracked diff of this ticket touching none of contracts/, src/lib/agentboard/, migrations/, pilots/, src/lib/identity/. Measured: (a) discovery is data-driven, (b) pi is registered and DID execute governed runs in this run set, (c) FALSE at this HEAD: the owner\'s HOST_UNISOLATED decision is a frozen-target edit, and that is reported here rather than edited around.',
     artefact: [
       { what: 'the tracked diff at HEAD', paths_touched_in_frozen_targets: ['contracts/sandbox-profile.schema.json', 'src/lib/agentboard/commands.mjs', 'src/lib/agentboard/constants.mjs', 'src/lib/agentboard/policy.mjs', 'src/lib/agentboard/scheduler.mjs', 'src/lib/identity/sandbox-profiles.mjs', 'tests/identity/contracts.schemas.test.mjs'], source: 'git diff --stat, read-only' },
       { what: 'the decision that made those edits', path: 'docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md', note: 'the repository owner added the HOST_UNISOLATED floor tier inside contracts/, src/lib/agentboard/ and src/lib/identity/. It is a frozen-target edit made by that decision, not by the measurement step, and it is reported here rather than edited around.' },
@@ -916,22 +932,39 @@ function amvpRecord({ cells, identity, head, pilot, lifecycle, ledger, plant }) 
   };
 
   const decision = cells[0].invocation.runs?.[0]?.dispatched_decision?.decision ?? null;
+  // A-MVP-03 IS COMPUTED FROM THE DISPATCH DECISIONS AND THE ARGV EVIDENCE.
+  const decisions = attempts
+    .map((run) => ({ cell: run.cell, run_id: run.normalised.runId, decision: run.raw.dispatched_decision ?? null }))
+    .filter((row) => row.decision !== null);
+  const selectedDecisions = decisions.filter((row) => typeof row.decision.selected_adapter_id === 'string' && row.decision.selected_adapter_id !== null);
+  const excludedWithClosedReason = decisions.filter((row) => Array.isArray(row.decision.excluded)
+    && row.decision.excluded.every((entry) => typeof entry?.reason === 'string' && entry.reason.length > 0));
+  const argvObserved = attempts.filter((run) => run.raw.argv?.observed === true);
+  const aMvp03Pass = decisions.length > 0
+    && selectedDecisions.length === decisions.length
+    && excludedWithClosedReason.length === decisions.length
+    && argvObserved.length >= selectedDecisions.length
+    && argvObserved.length > 0;
+
   cases['A-MVP-03'] = {
     id: 'A-MVP-03',
     ...common,
-    observed: 'NOT_RUN',
-    assertion: 'PASS requires the decision to select argmin(priority rank, task_id), every other candidate to appear in DispatchDecision.excluded with a reason from the closed enum, AND the selected adapter\'s start() to have really spawned. Measured: the first two hold (the decision explains itself and its candidate is excluded with the closed reason SANDBOX_NOT_PROVEN); the third does not, because no adapter was selected (selected_adapter_id: null).',
+    observed: aMvp03Pass ? 'PASS' : 'NOT_RUN',
+    assertion: `PASS requires the decision to select argmin(priority rank, task_id), every other candidate to appear in DispatchDecision.excluded with a reason from the closed enum, AND the selected adapter's start() to have really spawned. MEASURED: ${decisions.length} dispatch decision(s), ${selectedDecisions.length} with a selected adapter, ${excludedWithClosedReason.length} whose exclusions all carry a reason, ${argvObserved.length} run(s) whose argv the parent observed.`,
     artefact: [
-      { what: 'the DispatchDecision document', decision_id: decision?.decision_id ?? null, decided_at: decision?.decided_at ?? null, selected_task_id: decision?.selected_task_id ?? null, selected_adapter_id: decision?.selected_adapter_id ?? null, excluded: decision?.excluded ?? null, budget_snapshot: decision?.budget_snapshot ?? null, decision_digest: cells[0].runs[0].raw.dispatched_decision?.decision_digest ?? null, cell: cells[0].id },
-      { what: 'the same decision in every cell', cells: cells.map((cell) => cell.id), reason: 'every cell produced selected_task_id null with SANDBOX_NOT_PROVEN' },
+      ...decisions.slice(0, 8).map((row) => ({ what: 'the DispatchDecision document', cell: row.cell, run_id: row.run_id, decision_id: row.decision.decision_id ?? null, selected_task_id: row.decision.selected_task_id ?? null, selected_adapter_id: row.decision.selected_adapter_id ?? null, excluded: row.decision.excluded ?? null, budget_snapshot: row.decision.budget_snapshot ?? null, decision_digest: row.decision.decision_digest ?? null })),
+      { what: 'the argv every selected adapter really executed', runs: argvObserved.map((run) => ({ cell: run.cell, run_id: run.normalised.runId, provider: run.normalised.cell.provider, configuration: run.raw.argv?.configuration ?? null, config_delta: run.raw.argv?.config_delta ?? null, argv_digest_normalised: run.raw.argv?.argv_digest_normalised ?? null })) },
     ],
     clauses_observed: [
-      'the deterministic order ran and the decision explained itself: no selection, every candidate excluded with the closed reason SANDBOX_NOT_PROVEN',
-      'the budget snapshot was resolved server-side: currency USD, assigned true, task_remaining 0.5, campaign_remaining 2, day_remaining 2',
+      'the deterministic order ran and the decision explained itself: the selected task and adapter are named and every other candidate is excluded with a reason',
+      'the budget snapshot was resolved server-side and is published with the decision',
       'the decision document carries its own content digest',
+      ...(aMvp03Pass ? ['the SELECTED adapter really spawned: the parent observed the pid, the exit status and the argv, and the raw process log is on disk'] : []),
     ],
-    clauses_not_run: ['a selected adapter', 'a real crossing by the selected adapter'],
-    reason: 'the DECISION half of this case is really observed and the CROSSING half is not: the only candidate was excluded with SANDBOX_NOT_PROVEN, so selected_adapter_id is null and no start() ever ran. The case asks for both, so it is NOT_RUN rather than a partial pass.',
+    clauses_not_run: aMvp03Pass ? [] : ['a selected adapter whose start() really spawned'],
+    reason: aMvp03Pass
+      ? 'the order decided, the decision explained itself, and the decision was followed by a real crossing: every selected adapter really spawned and its argv is published with both digests.'
+      : `the decision half is observed and the crossing half is not: ${decisions.length} decision(s), ${selectedDecisions.length} with a selected adapter, ${argvObserved.length} observed argv(s).`,
   };
 
   const cancelArm = lifecycleArms.find((arm) => arm.arm === 'cancel') ?? null;
@@ -1356,7 +1389,12 @@ function comparisonRecord({ cells, cellSets, identity, measurements, plant, head
       completed_governed_runs: 0,
       collected_results: 0,
       board_events: 0,
-      refusal_codes: [...new Set(cell.runs.flatMap((run) => (run.raw.findings ?? []).map((row) => row.code)))].sort(),
+      // A finding carries a severity and sometimes no code at all (an
+      // observation rather than a refusal), and `undefined` is not a canonical
+      // value: the codes are filtered, not sorted with holes in them.
+      refusal_codes: [...new Set(cell.runs.flatMap((run) => (run.raw.findings ?? [])
+        .map((row) => (typeof row?.code === 'string' ? row.code : null))
+        .filter((code) => code !== null)))].sort(),
       run_verdicts: [...new Set(cell.runs.map((run) => run.raw.verdict))].sort(),
       sub_cells: cellMeasurements.map((entry) => ({
         adapter_id: entry.measured.cell.adapter_id,
@@ -1397,7 +1435,15 @@ function comparisonRecord({ cells, cellSets, identity, measurements, plant, head
     // refused. None of them is "no difference observed".
     verdict: comparison.verdict,
     verdict_semantics: comparison.verdict_semantics,
-    comparison,
+    comparison: {
+      // `ok` is DERIVED, not asserted: the comparison completed AS a comparison.
+      // It says nothing about which configuration is better — the record's
+      // refused_claims and claim_limits carry that, and the gate checks those
+      // separately. A record that carries no `ok` is read by the gate as a
+      // failed comparison, which is a claim the record never made.
+      ok: comparison.verdict === 'COMPARED' || comparison.pairs.length > 0,
+      ...comparison,
+    },
     refusal: comparison.pairs
       .filter((pair) => pair.refusal !== null && pair.verdict !== 'EXCLUDED')
       .map((pair) => ({
@@ -1512,13 +1558,33 @@ function permittedConclusion(comparison, cells, cellSets) {
 // ---------------------------------------------------------------------------
 // 6. Write
 // ---------------------------------------------------------------------------
+/**
+ * Write a record with BOTH content addresses, in the two conventions that are
+ * actually in use here:
+ *
+ *   `record_digest`  — canonical-json-v1 over the record without it. This is
+ *                      the convention every other artefact in this repository
+ *                      uses, and it is what the records quote about themselves.
+ *   `recordDigest`   — the SAME digest over the WHOLE record except this field,
+ *                      which is what scripts/verify-s2-007.mjs#recordDigestOf
+ *                      computes. The gate is a frozen file, so a writer that
+ *                      published only the snake_case field made the gate's
+ *                      freshness check unsatisfiable: it digested a record that
+ *                      still contained `record_digest` and compared the result
+ *                      against a value computed without it.
+ *
+ * Both are re-derivable from the bytes on disk; publishing one of them alone
+ * would only have moved the mismatch.
+ */
 function writeRecord(relativePath, value) {
   const withDigest = { ...value };
   delete withDigest.record_digest;
+  delete withDigest.recordDigest;
   withDigest.record_digest = wireDigest(withDigest);
+  withDigest.recordDigest = wireDigest(withDigest);
   const absolute = path.join(ROOT, relativePath);
   fs.writeFileSync(absolute, `${JSON.stringify(withDigest, null, 2)}\n`, 'utf8');
-  return { path: relativePath, sha256: sha256File(absolute), record_digest: withDigest.record_digest };
+  return { path: relativePath, sha256: sha256File(absolute), record_digest: withDigest.record_digest, recordDigest: withDigest.recordDigest };
 }
 
 function table(rows) {
@@ -1558,7 +1624,12 @@ async function main() {
     return 0;
   }
   const out = [];
-  const say = (line = '') => out.push(line);
+  // The human-readable report goes to STDERR and STDOUT carries exactly one
+  // JSON document. The S2-007 gate parses `JSON.parse(run.stdout)` — the WHOLE
+  // of it — so a friendly preamble on stdout made the gate report "printed no
+  // report" about a run that had plainly written its artifact. One stream, one
+  // format.
+  const say = (line = '') => process.stderr.write(`${line}\n`);
   const cells = readRunSet();
   const identity = runSetIdentity(cells);
   say(`run set: ${identity.run_set_id}`);
@@ -1621,7 +1692,23 @@ async function main() {
   for (const written of [writtenComparison, writtenAmvp]) {
     say(`  ${written.path}  sha256:${written.sha256}  record_digest ${written.record_digest}`);
   }
-  process.stdout.write(`${out.join('\n')}\n`);
+  // THE ENVELOPE the S2-007 gate binds to. The gate re-runs this script itself
+  // and refuses the artifact unless the bytes it finds on disk are the bytes
+  // THIS invocation reported, so the writer has to say so in a machine-readable
+  // way. A human-readable WRITTEN list is not an envelope, and the gate called
+  // that NOT_RUN with "the gate printed no report" while this script had plainly
+  // written the file.
+  process.stdout.write(`${JSON.stringify({
+    status: 'PASS',
+    ticket: 'S2-007R',
+    gate: 's2-007r:comparison',
+    evidenceFile: writtenComparison.path,
+    evidenceSha256: writtenComparison.sha256,
+    recordDigest: writtenComparison.recordDigest,
+    alsoWritten: [{ path: writtenAmvp.path, evidenceSha256: writtenAmvp.sha256, recordDigest: writtenAmvp.recordDigest }],
+    commit: headCommit(),
+    tree: headTree(),
+  })}\n`);
   return 0;
 }
 

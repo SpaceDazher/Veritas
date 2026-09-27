@@ -1,0 +1,460 @@
+{
+  "contractVersion": "1.0.0",
+  "record_kind": "real-executor-raw-process-log",
+  "executor_version": "s2-007r-real-executor-v1",
+  "run_id": "run-bootstrap-codex-pilot",
+  "executor": {
+    "provider": "codex",
+    "binary_path": "/home/daniil/.local/lib/node_modules/@openai/codex/bin/codex.js",
+    "binary_named_path": "/home/daniil/.local/bin/codex",
+    "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
+  },
+  "invocation": {
+    "argv": [
+      "exec",
+      "--json",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "--sandbox",
+      "read-only",
+      "-C",
+      "/tmp/veritas-s2-007r-ws/pilot/bootstrap",
+      "--output-last-message",
+      "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/last-message.txt",
+      "--model",
+      "veritas-s2-007r-nonexistent/no-such-model",
+      "Reply with exactly one token: PING."
+    ],
+    "argv_carries_prompt_in_cleartext": true,
+    "brief_digest": "sha256:2c4a8fbe5bced6d29a7e16c7c3e4b7a40dd665b113d2b0c824dd56d13b126c93",
+    "cwd": "/tmp/veritas-s2-007r-ws/pilot/bootstrap",
+    "skills": null,
+    "effective_tools": [
+      "tool:fs.read"
+    ],
+    "unbound_effective_tools": [
+      "tool:fs.read"
+    ],
+    "tool_control": "SANDBOX_READ_ONLY_PLUS_NO_TOOL_FLAG",
+    "argv_allowlist": [
+      "exec",
+      "--json",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "--sandbox:read-only",
+      "-C:",
+      "--output-last-message:",
+      "--model:"
+    ],
+    "argv_allowlist_digest": "sha256:fbf360154b342aca785788b3129ecbad5d8defaf092245654c1d304fdacc4dac",
+    "configuration": "A",
+    "configuration_name": "HOST_DEFAULT_CONTEXT_SURFACE",
+    "configuration_surface_flags": [],
+    "configuration_note": "the host default context surface: no suppression flag is passed, so the executor loads whatever the host has installed and the board grants exactly the same tools it grants in configuration B",
+    "configuration_axis": {
+      "axis": "context_surface",
+      "provider": "codex",
+      "configurations": [
+        "A",
+        "B"
+      ],
+      "configuration_a_flags": [],
+      "configuration_b_flags": [],
+      "distinguishable": false,
+      "reason": "codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\".",
+      "measured": {
+        "measured_on": "this host, codex-cli 0.157.1",
+        "evidence": "`codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch",
+        "distinguishable": false
+      },
+      "exclusion": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\"."
+    },
+    "argv_digest_raw": "sha256:36c0848615ffb6db85b0f7c9e739f0419f3880c36491a5709e8086aac4ec2e8c",
+    "argv_digest_normalised": "sha256:6b0130c73fa70ca3ce4f3f517e8da4a309daea4becd9754c6318dc0c26ec3fcb",
+    "argv_normalised": [
+      "exec",
+      "--json",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "--sandbox",
+      "read-only",
+      "-C",
+      "<project_root>",
+      "--output-last-message",
+      "<evidence_dir>/<run_id>/raw/last-message.txt",
+      "--model",
+      "veritas-s2-007r-nonexistent/no-such-model",
+      "Reply with exactly one token: PING."
+    ],
+    "argv_normalisation": {
+      "rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
+      "folds": [
+        {
+          "label": "<project_root>",
+          "kind": "per-run project copy"
+        },
+        {
+          "label": "<evidence_dir>",
+          "kind": "per-invocation evidence root"
+        },
+        {
+          "label": "<workspace_root>",
+          "kind": "injected containment root"
+        },
+        {
+          "label": "<run_id>",
+          "kind": "per-run identity"
+        }
+      ]
+    },
+    "environment_keys": [
+      "PATH",
+      "HOME",
+      "LANG"
+    ]
+  },
+  "isolation": {
+    "requested_profile_id": "sbx-host-unisolated-v1",
+    "profile_tier": "HOST_UNISOLATED",
+    "sandbox_decision": {
+      "tier": "HOST_UNISOLATED",
+      "profile_id": "sbx-host-unisolated-v1",
+      "authorization": {
+        "authorization_id": "aut-hu-s2-007r-01",
+        "authorised_by_principal_id": "prn-s2007r-owner",
+        "authorised_by_label": "SpaceDazher (repository owner, BB thread thr_mgkk7cb5t6)",
+        "authority": "HUMAN_OWNER",
+        "scope": "SINGLE_PILOT_RUN",
+        "profile_id": "sbx-host-unisolated-v1",
+        "issued_at": "2026-09-26T00:00:00.000Z",
+        "expires_at": "2026-09-27T00:00:00.000Z",
+        "body_digest": "sha256:9e7fbcf23fb426af39233b188bf2b21a7e52cb0873fdbdea6206d7f67bddcc54"
+      }
+    },
+    "os_controls_absence_evidence": {
+      "path": "evidence/s2-007r-host-unisolated.json",
+      "sha256": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+      "binds": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+      "note": "this digest is the profile's own os_controls_evidence: the content address of the record that MEASURED that no OS isolation control is available to a model-calling executor on this host. It is quoted here so the run record names the measurement, not just the tier."
+    },
+    "isolation_applied": false,
+    "reason": "THIS_TRANSPORT_SPAWNS_THE_CHILD_DIRECTLY_ON_THE_HOST",
+    "enforcement": "NONE_BY_THIS_TRANSPORT",
+    "declared_network_policy": "unrestricted",
+    "declared_filesystem_roots": [
+      "D:/workspaces"
+    ],
+    "declared_environment_allowlist": [
+      "*"
+    ],
+    "environment_keys_handed_to_child": [
+      "PATH",
+      "HOME",
+      "LANG"
+    ],
+    "requested_read_only_paths": [],
+    "read_only_paths_enforced": false,
+    "cwd": "/tmp/veritas-s2-007r-ws/pilot/bootstrap",
+    "cwd_inside_declared_roots": false,
+    "os_controls_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+    "limit": "a real run on this host is HOST_UNISOLATED; the profile id is the request-side declaration only, and no A-MVP isolation clause may be scored against a run whose own evidence says isolation_applied:false"
+  },
+  "started_at": "2026-09-26T09:00:01.000Z",
+  "ended_at": "2026-09-26T09:00:01.000Z",
+  "budget_grant": {
+    "currency": "USD",
+    "timeout_ms": 600000
+  },
+  "exit_status": 1,
+  "signal": null,
+  "cause": null,
+  "stdout_sha256": "sha256:085a478fa1440b7d326cb93307a8238d923599ed12ee24201bdcddecb68ab85f",
+  "stdout_bytes": 1048,
+  "stderr_sha256": "sha256:1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "stderr_bytes": 39,
+  "output_truncated": false,
+  "assistant_text_sha256": null,
+  "assistant_text_bytes": 0,
+  "provider_error": {
+    "reason": "EXECUTOR_ERROR_RECORD",
+    "message": "Model metadata for `veritas-s2-007r-nonexistent/no-such-model` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.",
+    "credit_limited": false
+  },
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cache_read_tokens": null,
+    "cache_write_tokens": null,
+    "proxy_tokens": null,
+    "cost_usd_micros": null,
+    "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
+    "model_id": null,
+    "tool_calls": 2,
+    "executor_session_id": "01a0e345-7192-7243-bd1f-50516d48b740"
+  },
+  "exit_observed": true,
+  "cancel_proof": null,
+  "event_sequence": [
+    {
+      "sequence": 1,
+      "event_type": "ACCEPTED"
+    },
+    {
+      "sequence": 2,
+      "event_type": "STARTED"
+    },
+    {
+      "sequence": 3,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 4,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 5,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 6,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 7,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 8,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 9,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 10,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 11,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 12,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 13,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 14,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 15,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 16,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 17,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 18,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 19,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 20,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 21,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 22,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 23,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 24,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 25,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 26,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 27,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 28,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 29,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 30,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 31,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 32,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 33,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 34,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 35,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 36,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 37,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 38,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 39,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 40,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 41,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 42,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 43,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 44,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 45,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 46,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 47,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 48,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 49,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 50,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 51,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 52,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 53,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 54,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 55,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 56,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 57,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 58,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 59,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 60,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 61,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 62,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 63,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 64,
+      "event_type": "PROGRESS"
+    },
+    {
+      "sequence": 65,
+      "event_type": "PROGRESS"
+    }
+  ]
+}

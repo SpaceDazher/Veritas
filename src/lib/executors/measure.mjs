@@ -402,13 +402,22 @@ export function normalizeRunRecord(raw, { contentDigest = null, fileSha256 = nul
 
   // A run that collected no ExecutionResult need not have run the oracle; its
   // value is null, and it is excluded from the quality denominator anyway.
-  const oracleExitCode = resultCollected
-    ? needInteger(oracleSource, 'oracleExitCode', `${where}.oracle`)
-    : (Number.isInteger(pick(oracleSource, 'oracleExitCode')) ? pick(oracleSource, 'oracleExitCode') : null);
+  const oracleExitRaw = pick(oracleSource, 'exit_code') ?? pick(oracleSource, 'exitCode') ?? pick(oracleSource, 'oracleExitCode');
+  const oracleExitCode = Number.isInteger(oracleExitRaw) ? oracleExitRaw : null;
+  if (resultCollected && oracleExitCode === null) {
+    throw refusal(`MEASUREMENT_INPUT_MISSING:${where}.oracle.exit_code`);
+  }
   const regressed = needArray(oracleSource, 'regressed', `${where}.oracle`, { required: true });
   for (const entry of regressed) {
     if (typeof entry !== 'string') throw refusal(`MEASUREMENT_INPUT_INVALID:${where}.oracle.regressed`);
   }
+  // Whether the oracle really ran, and whether the criterion really held. Both
+  // are read from the record; a run whose oracle is absent says so instead of
+  // being scored.
+  const oracleObserved = pick(oracleSource, 'observed') === true || pick(oracleSource, 'ran') === true;
+  const oraclePass = oracleObserved
+    ? (pick(oracleSource, 'pass') === true || oracleExitCode === 0)
+    : false;
 
   const planted = needArray(authoritySource, 'plantedExpansions', `${where}.authority`, { required: true });
   for (const entry of planted) {
@@ -533,12 +542,16 @@ export function normalizeRunRecord(raw, { contentDigest = null, fileSha256 = nul
       modelId: str(pick(usageSource, 'modelId')),
     },
     oracle: {
-      observed: oracleSource.observed !== false,
+      // Read from the record, never assumed. An earlier version of this block
+      // defaulted `observed` to true for a record that carried no oracle at
+      // all, which turns a missing measurement into a passing one.
+      observed: oracleObserved || pick(oracleSource, 'observed') === true,
+      reason: typeof pick(oracleSource, 'reason') === 'string' ? String(pick(oracleSource, 'reason')) : null,
       exitCode: oracleExitCode,
-      pass: oracleExitCode === 0,
-      ran: oracleExitCode !== null,
-      baselinePassing: Number.isInteger(pick(oracleSource, 'baselinePassing')) ? pick(oracleSource, 'baselinePassing') : null,
-      afterPassing: Number.isInteger(pick(oracleSource, 'afterPassing')) ? pick(oracleSource, 'afterPassing') : null,
+      pass: oraclePass,
+      ran: oracleObserved,
+      baselinePassing: pick(oracleSource, 'baseline_passing') ?? (Number.isInteger(pick(oracleSource, 'baselinePassing')) ? pick(oracleSource, 'baselinePassing') : null),
+      afterPassing: pick(oracleSource, 'after_passing') ?? (Number.isInteger(pick(oracleSource, 'afterPassing')) ? pick(oracleSource, 'afterPassing') : null),
       regressed: [...regressed].sort(),
       digest: str(oracleSource.stdout_sha256 ?? oracleSource.stdoutSha256 ?? oracleSource.digest),
     },
@@ -706,6 +719,20 @@ export function normalizeRunDriverRecord(raw, { invocation = null, contentDigest
   const project = isPlainObject(raw.project) ? raw.project : {};
   const taskRow = isPlainObject(raw.committed?.task) ? raw.committed.task : {};
   const resultCollected = raw.result?.decision === 'ACCEPT';
+
+  // The driver's own oracle block, read from the record. `oracleSource` here is
+  // the SAME helper as in the other normaliser, but the driver's record has its
+  // own field names, and a normaliser that guessed them would report an
+  // unobserved oracle for a run that really had one.
+  const driverOracleSource = sub(raw, 'oracle');
+  const driverOracleExitRaw = pick(driverOracleSource, 'exit_code') ?? pick(driverOracleSource, 'exitCode');
+  const driverOracleExit = Number.isInteger(driverOracleExitRaw) ? driverOracleExitRaw : null;
+  const driverOracleObserved = pick(driverOracleSource, 'observed') === true || pick(driverOracleSource, 'ran') === true;
+  const driverOraclePass = driverOracleObserved
+    ? (pick(driverOracleSource, 'pass') === true || driverOracleExit === 0)
+    : false;
+  const driverRegressed = (Array.isArray(pick(driverOracleSource, 'regressed')) ? pick(driverOracleSource, 'regressed') : [])
+    .filter((entry) => typeof entry === 'string');
   const resultOutcome = str(raw.result?.outcome);
   if (resultCollected && resultOutcome === null) throw refusal(`MEASUREMENT_INPUT_MISSING:run(${label}).result.outcome`);
   const costReported = usage.costReported === true;
@@ -799,17 +826,30 @@ export function normalizeRunDriverRecord(raw, { invocation = null, contentDigest
       costUsd: costReported ? usage.costUsd : null,
       modelId: str(raw.executor?.reported?.model_id),
     },
+    // THE ORACLE, AS THE DRIVER RECORDED IT. Read from the record, never
+    // assumed: an earlier version of this block hard-coded "the driver runs no
+    // oracle", which was true when it was written and became a lie the moment
+    // the driver grew one. A hard-coded observation is a claim about a past
+    // state that keeps being republished as if it were the present one.
+    //
+    // The record carries both readings — the pristine copy and this run's own
+    // copy — plus the per-check verdicts, so the regression denominator is a
+    // real "before" rather than an assumed one.
     oracle: {
-      // The driver runs no oracle. `observed: false` is the honest record of
-      // that, and the oracle-dependent measurements report NOT_RUN.
-      observed: false,
-      reason: 'scripts/s2-007r-run.mjs records no deterministic task oracle; its task is an inventory report and the project byte-identity it does record is NOT a task oracle, so the oracle-dependent measurements are NOT_RUN rather than zero',
-      exitCode: null,
-      pass: false,
-      ran: false,
-      baselinePassing: null,
-      afterPassing: null,
-      regressed: [],
+      observed: driverOracleObserved,
+      reason: driverOracleObserved
+        ? null
+        : (typeof pick(driverOracleSource, 'reason') === 'string'
+          ? String(pick(driverOracleSource, 'reason'))
+          : 'the run record carries no deterministic task oracle, so the oracle-dependent measurements are NOT_RUN rather than zero'),
+      exitCode: driverOracleExit,
+      pass: driverOraclePass,
+      ran: driverOracleObserved,
+      baselinePassing: pick(driverOracleSource, 'baseline_passing') ?? null,
+      baselineChecksPassing: pick(driverOracleSource, 'baseline_checks_passing') ?? null,
+      afterChecksPassing: pick(driverOracleSource, 'after_checks_passing') ?? null,
+      afterPassing: pick(driverOracleSource, 'after_passing') ?? null,
+      regressed: driverRegressed,
       digest: str(raw.project?.digest_after),
     },
     authority: {
@@ -1250,18 +1290,27 @@ function latency(runs) {
 
 /** 6. regression rate (pre-existing tests that passed before the run and fail after it). */
 function regressionRate(runs) {
+  // THE DENOMINATOR IS THE PRE-EXISTING CHECKS THAT PASSED, not the task's own
+  // criterion. A write task is EXPECTED to leave its own criterion unmet before
+  // the run (that is what makes it a task), so keying the denominator on the
+  // criterion boolean would exclude every run of a real task and report a
+  // regression rate over nothing. The oracle prints a per-check list, and the
+  // count that passed BEFORE the run is the honest denominator; the criterion
+  // boolean is published beside it and is not mixed in.
   const perRun = runs.map((run) => ({
     run_id: run.runId,
+    baseline_checks_passing: Number.isInteger(run.oracle.baselineChecksPassing) ? run.oracle.baselineChecksPassing : null,
+    after_checks_passing: Number.isInteger(run.oracle.afterChecksPassing) ? run.oracle.afterChecksPassing : null,
     baseline_passing: run.oracle.baselinePassing,
     after_passing: run.oracle.afterPassing,
     regressed: run.oracle.regressed,
     oracle_digest: run.oracle.digest,
   }));
-  const usable = perRun.filter((row) => Number.isInteger(row.baseline_passing) && row.baseline_passing > 0);
+  const usable = perRun.filter((row) => Number.isInteger(row.baseline_checks_passing) && row.baseline_checks_passing > 0);
   const numerator = usable.reduce((sum, row) => sum + row.regressed.length, 0);
-  const denominator = usable.reduce((sum, row) => sum + row.baseline_passing, 0);
+  const denominator = usable.reduce((sum, row) => sum + row.baseline_checks_passing, 0);
   const limitations = [
-    'The denominator is the count of PRE-EXISTING tests that passed on the pristine fixture, summed over the runs that recorded it.',
+    'The denominator is the count of pre-existing checks that PASSED on the pristine fixture, summed over the runs that recorded it. The task\'s own criterion is deliberately not in the denominator: a write task is expected to leave it unmet before the run.',
     'A handful of tests in one tiny fixture: a zero regression rate here is not evidence about a real repository.',
     'A run that recorded no baseline_passing is EXCLUDED from both sides and named in observation.excluded_runs, never counted as zero regressions.',
   ];
@@ -1273,7 +1322,7 @@ function regressionRate(runs) {
       name: 'regression_rate', status: 'NOT_RUN', value: null, unit: 'ratio', numerator: null, denominator,
       basis: 'DETERMINISTIC_ORACLE_PRE_AND_POST',
       method: 'numerator = the number of pre-existing tests that passed on the pristine fixture and fail after the run, summed over the runs; denominator = the number of pre-existing tests that passed before the run, summed over the same runs; value = numerator/denominator rounded to 6 decimals.',
-      observation: { per_run: perRun, excluded_runs: perRun.filter((row) => !Number.isInteger(row.baseline_passing)).map((row) => row.run_id), oracle_reasons: sortedUnique(runs.map((run) => run.oracle.reason ?? 'no oracle recorded')) },
+      observation: { per_run: perRun, excluded_runs: perRun.filter((row) => !Number.isInteger(row.baseline_checks_passing)).map((row) => row.run_id), oracle_reasons: sortedUnique(runs.map((run) => run.oracle.reason ?? 'no oracle recorded')) },
       limitations: [
         ...limitations,
         `NOT_RUN: no run in this cell recorded a deterministic oracle, so no pre/post test comparison exists: ${sortedUnique(runs.map((run) => run.oracle.reason ?? 'no oracle recorded')).join(' | ')}`,
@@ -1285,8 +1334,8 @@ function regressionRate(runs) {
       name: 'regression_rate', status: 'NOT_RUN', value: null, unit: 'ratio', numerator: null, denominator: 0,
       basis: 'DETERMINISTIC_ORACLE_PRE_AND_POST',
       method: 'numerator = the number of pre-existing tests that passed on the pristine fixture and fail after the run, summed over the runs; denominator = the number of pre-existing tests that passed before the run, summed over the same runs; value = numerator/denominator rounded to 6 decimals.',
-      observation: { per_run: perRun, excluded_runs: perRun.filter((row) => !Number.isInteger(row.baseline_passing)).map((row) => row.run_id) },
-      limitations: [...limitations, 'NOT_RUN: no run in this cell recorded a pre-run baseline, so there is no denominator.'],
+      observation: { per_run: perRun, excluded_runs: perRun.filter((row) => !Number.isInteger(row.baseline_checks_passing)).map((row) => row.run_id) },
+      limitations: [...limitations, 'NOT_RUN: no run in this cell recorded a pre-run baseline check count, so there is no denominator.'],
     };
   }
   const regressedRuns = perRun.filter((row) => row.regressed.length > 0).map((row) => ({ run_id: row.run_id, regressed: row.regressed }));

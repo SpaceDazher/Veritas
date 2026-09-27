@@ -2428,3 +2428,57 @@ describe('the observed-run mint is not reachable from outside the transport', ()
     assert.match(writer.OBSERVATION_TRUST, /NOT_AN_ADVERSARY_BOUNDARY/);
   });
 });
+
+// The oracle has to be recomputable OUTSIDE this repository, because the run
+// driver executes it on a copy of the project under /tmp. The digest convention
+// it uses is therefore vendored into the fixture, and this test is what keeps
+// the vendored copy from becoming a second, drifting source of truth.
+describe('the S2-007R project oracle is self-contained and single-sourced', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const projectRoot = path.join(repoRoot, 'corpus/s2-007r/project');
+  const vendored = path.join(projectRoot, 'src/lib/verifier/canonical-json.mjs');
+  const source = path.join(repoRoot, 'src/lib/verifier/canonical-json.mjs');
+
+  test('the vendored canonical-json is byte-identical to the repository one', () => {
+    assert.deepEqual(fs.readFileSync(vendored), fs.readFileSync(source),
+      'the vendored copy has drifted from src/lib/verifier/canonical-json.mjs; the digest convention is single-sourced');
+  });
+
+  test('the oracle imports nothing from outside its own project directory', () => {
+    const text = fs.readFileSync(path.join(projectRoot, 'verify.mjs'), 'utf8');
+    const specifiers = [...text.matchAll(/from\s+'([^']+)'/g)].map((match) => match[1]);
+    for (const specifier of specifiers) {
+      if (specifier.startsWith('node:')) continue;
+      assert.ok(
+        specifier.startsWith('./') || specifier.startsWith('../'),
+        `the oracle imports ${specifier} from outside the project: a copy under /tmp cannot resolve it, and a measurement nobody can recompute is not a measurement`,
+      );
+    }
+  });
+
+  // The defect this pins: run on a copy outside the repository, the oracle
+  // failed with a bare module-not-found, exit 1 and EMPTY stdout, and the driver
+  // recorded `checks: null` — which read as "no measurement" rather than as a
+  // broken oracle.
+  test('the oracle produces its machine-readable line from a copy outside the repository', () => {
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-oracle-'));
+    fs.cpSync(projectRoot, outside, { recursive: true });
+    try {
+      const result = spawnSync(process.execPath, ['verify.mjs', 'T1'], {
+        cwd: outside,
+        encoding: 'utf8',
+        timeout: 60_000,
+        env: { PATH: process.env.PATH ?? '', NODE_ENV: 'test' },
+      });
+      assert.equal(result.status, 1, 'T1 is deliberately unmet on the pristine fixture: the off-by-one is the task');
+      const line = String(result.stdout ?? '').trim();
+      assert.ok(line.length > 0, 'the oracle must print its check list even when the criterion is unmet');
+      const parsed = JSON.parse(line);
+      assert.equal(parsed.oracle, 's2-007r-project-oracle-v1');
+      assert.ok(Array.isArray(parsed.checks) && parsed.checks.length >= 4, 'the per-check verdicts the regression rate needs');
+      assert.equal(parsed.checks.filter((row) => row.passed === true).length, parsed.passed);
+    } finally {
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+});

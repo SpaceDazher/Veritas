@@ -1375,15 +1375,29 @@ export function createRealExecutorTransport({
           handoff = nested;
           rawCall = rest;
         }
-        const call = assertCallArgs('start', rawCall);
-        // The run id is a CALL argument when the caller can pass one, and the
-        // out-of-band correlation when it cannot: `driveOutbox` sends exactly
-        // the request payload, so a governed dispatch reaches this method with
-        // no args at all. A missing id with no binding is still a refusal — the
-        // run is never given an id this transport invented.
-        const presentedRunId = call.run_id !== undefined && call.run_id !== null
-          ? requireString(call.run_id, 'run_id')
-          : requireString(state.boundRun?.run_id, 'run_id (no bindRun() correlation and no call argument)');
+        // THE RUN ID: a CALL argument when the caller can pass one, and the
+        // out-of-band correlation when it cannot.
+        //
+        // `driveOutbox` sends exactly the request payload — `send(row.payload)` —
+        // so a governed dispatch reaches this method with NO call arguments at
+        // all, and the run id the board already committed has to come from the
+        // correlation bindRun() took. That has to happen BEFORE the canonical
+        // argument check, because `start` requires run_id: injecting it after
+        // assertCallArgs would be unreachable, which is exactly the
+        // BOUNDARY_ARGUMENT_MISSING:start.run_id escalation round 4 measured.
+        //
+        // Injecting a REQUIRED argument is not the same as accepting a caller's
+        // authority: the value comes from this transport's own state, never from
+        // the payload, and every other check below — request version, lease,
+        // fence, workspace ACL, digests, budget, permit — still runs on the
+        // request the board actually handed over. A missing id with no binding is
+        // still a refusal; the run is never given an id this transport invented.
+        const injectedRunId = rawCall !== null && typeof rawCall === 'object'
+          && rawCall.run_id !== undefined && rawCall.run_id !== null
+          ? null
+          : (state.boundRun?.run_id ?? null);
+        const call = assertCallArgs('start', injectedRunId === null ? rawCall : { ...rawCall, run_id: injectedRunId });
+        const presentedRunId = requireString(call.run_id, 'run_id');
         const document = requireObject(handoff, 'execution request');
         // Version handshake first, then the frozen shape: an unknown major
         // version is rejected before any state changes and before any process

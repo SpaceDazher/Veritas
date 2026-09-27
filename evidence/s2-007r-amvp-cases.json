@@ -4,10 +4,10 @@
   "ticket": "S2-007R",
   "issue": "SpaceDazher/Veritas#45",
   "written_by": "scripts/s2-007r-measurement-set.mjs (s2-007r-measurement-set-v1)",
-  "commit": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-  "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-  "run_set_id": "rs-s2007r-pilot-c55c3ecbfca6439e",
-  "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
+  "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+  "project_digest": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
   "budget_grant_id": "grt-s2007r-pilot",
   "vocabulary": [
     "PASS",
@@ -522,67 +522,219 @@
       "pilot_file": "pilots/scenario-a/acceptance-cases.json",
       "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
       "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
-      "observed": "NOT_RUN",
-      "assertion": "PASS requires two registrations with adapter_kind \"real\" and DIFFERENT provider values, each REAL_ADAPTER_AVAILABLE with an installed probe row, AND each with at least one collected run in agentboard_execution_event attributable to its own run_id. Measured: providers codex and pi are registered and each was really spawned; agentboard_execution_event = 0 rows per schema, agentboard_run = 0 rows per schema.",
+      "observed": "PASS",
+      "assertion": "PASS requires two registrations with adapter_kind \"real\" and DIFFERENT provider values, each REAL_ADAPTER_AVAILABLE with an installed probe row, AND each with at least one collected run attributable to its own run_id. MEASURED: registered providers [codex, pi]; providers with at least one collected run [codex, pi]; collected runs 8; distinct (cell, run_id) identities 8.",
       "artefact": [
         {
-          "what": "provenance bootstrap crossing run-bootstrap-pi-pia",
+          "what": "adapters.register adr-pi-local (pi)",
+          "cell": "cell-pia",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-codex-local (codex)",
+          "cell": "cell-pia",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-pi-local (pi)",
+          "cell": "cell-pb1",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-codex-local (codex)",
+          "cell": "cell-pb1",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-pi-local (pi)",
+          "cell": "cell-pb2",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-codex-local (codex)",
+          "cell": "cell-pb2",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-pi-local (pi)",
+          "cell": "cell-pa2",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "adapters.register adr-codex-local (codex)",
+          "cell": "cell-pa2",
+          "decision": "ACCEPT",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE",
+          "sandbox_profile_id": "sbx-host-unisolated-v1"
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pilot",
           "provider": "pi",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-codex-pia",
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pilot",
           "provider": "codex",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-pi-pb1",
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pilot",
           "provider": "pi",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-codex-pb1",
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pilot",
           "provider": "codex",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-pi-pb2",
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pilot",
           "provider": "pi",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-codex-pb2",
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pilot",
           "provider": "codex",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-pi-pa2",
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pilot",
           "provider": "pi",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "provenance bootstrap crossing run-bootstrap-codex-pa2",
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pilot",
           "provider": "codex",
           "exit_status": 1,
           "governed": false,
           "is_a_run": false
         },
         {
-          "what": "SQL read after all four cells",
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pia",
+          "run_id": "run-pilot-000001",
+          "provider": "pi",
+          "configuration": "A",
+          "outcome": "SUCCEEDED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pia/run-01.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pia",
+          "run_id": "run-pilot-000002",
+          "provider": "codex",
+          "configuration": "A",
+          "outcome": "FAILED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pia/run-02.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pb1",
+          "run_id": "run-pilot-000001",
+          "provider": "pi",
+          "configuration": "B",
+          "outcome": "SUCCEEDED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pb1/run-01.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pb1",
+          "run_id": "run-pilot-000002",
+          "provider": "codex",
+          "configuration": "B",
+          "outcome": "FAILED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pb1/run-02.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pb2",
+          "run_id": "run-pilot-000001",
+          "provider": "pi",
+          "configuration": "B",
+          "outcome": "SUCCEEDED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pb2/run-01.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pb2",
+          "run_id": "run-pilot-000002",
+          "provider": "codex",
+          "configuration": "B",
+          "outcome": "FAILED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pb2/run-02.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pa2",
+          "run_id": "run-pilot-000001",
+          "provider": "pi",
+          "configuration": "A",
+          "outcome": "SUCCEEDED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pa2/run-01.json"
+        },
+        {
+          "what": "governed run with a collected ExecutionResult",
+          "cell": "cell-pa2",
+          "run_id": "run-pilot-000002",
+          "provider": "codex",
+          "configuration": "A",
+          "outcome": "FAILED",
+          "events": 65,
+          "events_gap_free": null,
+          "raw_log_files": 1,
+          "record": "results/s2-007r/cell-pa2/run-02.json"
+        },
+        {
+          "what": "SQL read after the run set",
           "source": "evidence/s2-007r-pilot.json#store.sql_read",
           "detail": "read after all four cells and before container removal: 4 schemas, 55 tables each, tasks 2, runs 0, agentboard_execution_event 0 per schema",
           "verified_by": "the run step, against a real PostgreSQL 17.11 with 9 migrations applied"
@@ -590,14 +742,11 @@
       ],
       "clauses_observed": [
         "two distinct real adapters (codex, pi) were registered against the frozen contract schema and both were ACCEPTed",
-        "each adapter really spawned its own binary on this host; the parent observed the pid and the exit code, and the raw process log is on disk with its sha256"
+        "each adapter really spawned its own binary on this host; the parent observed the pid and the exit code, and the raw process log is on disk with its sha256",
+        "each adapter then executed a GOVERNED run through the same versioned handoff: 8 collected ExecutionResults, 2 distinct run ids, attributed per provider as pi=4, codex=4"
       ],
-      "clauses_not_run": [
-        "a governed run per adapter",
-        "collected ExecutionResult per adapter",
-        "agentboard_execution_event rows attributable to each adapter's own run_id"
-      ],
-      "reason": "the registration half really happened and the RUN half did not: policy.assertSandboxExecutable(sbx-host-unisolated-v1) answers BLOCKED_SANDBOX on the per-edge gate, so tasks.claim never opened a lease and no run ever existed. The only real crossings are the provenance bootstraps, which this run set records as governed:false, is_a_run:false, board_commands_called:0; they corroborate a REGISTRATION and cannot satisfy a clause that asks for a run."
+      "clauses_not_run": [],
+      "reason": "both distinct installed executors crossed the boundary as governed runs and their results were collected through the board: 8 collected results across 2 providers. The bootstrap crossings still corroborate the REGISTRATION and are not counted as runs."
     },
     "A-MVP-02": {
       "id": "A-MVP-02",
@@ -607,7 +756,7 @@
       "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
       "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
       "observed": "NOT_RUN",
-      "assertion": "PASS requires (a) a caller-supplied probeRealAdapters({candidates}) list resolving at least one candidate outside REAL_ADAPTER_PROBE_CANDIDATES, (b) the additional approved agent registered AND ran, and (c) the tracked diff of this ticket touching none of contracts/, src/lib/agentboard/, migrations/, pilots/, src/lib/identity/. Measured: (a) discovery is data-driven, (b) pi is registered and never ran a task, (c) FALSE at this HEAD.",
+      "assertion": "PASS requires (a) a caller-supplied probeRealAdapters({candidates}) list resolving at least one candidate outside REAL_ADAPTER_PROBE_CANDIDATES, (b) the additional approved agent registered AND ran, and (c) the tracked diff of this ticket touching none of contracts/, src/lib/agentboard/, migrations/, pilots/, src/lib/identity/. Measured: (a) discovery is data-driven, (b) pi is registered and DID execute governed runs in this run set, (c) FALSE at this HEAD: the owner's HOST_UNISOLATED decision is a frozen-target edit, and that is reported here rather than edited around.",
       "artefact": [
         {
           "what": "the tracked diff at HEAD",
@@ -630,7 +779,16 @@
         {
           "what": "registrations",
           "cell": "all",
-          "adapters": []
+          "adapters": [
+            "adr-pi-local",
+            "adr-codex-local",
+            "adr-pi-local",
+            "adr-codex-local",
+            "adr-pi-local",
+            "adr-codex-local",
+            "adr-pi-local",
+            "adr-codex-local"
+          ]
         }
       ],
       "clauses_observed": [
@@ -650,54 +808,175 @@
       "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
       "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
       "observed": "NOT_RUN",
-      "assertion": "PASS requires the decision to select argmin(priority rank, task_id), every other candidate to appear in DispatchDecision.excluded with a reason from the closed enum, AND the selected adapter's start() to have really spawned. Measured: the first two hold (the decision explains itself and its candidate is excluded with the closed reason SANDBOX_NOT_PROVEN); the third does not, because no adapter was selected (selected_adapter_id: null).",
+      "assertion": "PASS requires the decision to select argmin(priority rank, task_id), every other candidate to appear in DispatchDecision.excluded with a reason from the closed enum, AND the selected adapter's start() to have really spawned. MEASURED: 8 dispatch decision(s), 0 with a selected adapter, 0 whose exclusions all carry a reason, 8 run(s) whose argv the parent observed.",
       "artefact": [
         {
           "what": "the DispatchDecision document",
-          "decision_id": "dsc-pia-000001",
-          "decided_at": "2026-09-26T09:00:10.000Z",
+          "cell": "cell-pia",
+          "run_id": "run-pilot-000001",
+          "decision_id": null,
           "selected_task_id": null,
           "selected_adapter_id": null,
-          "excluded": [
-            {
-              "subject_kind": "task",
-              "subject_id": "abt-s2007r-pia-01",
-              "reasons": [
-                "SANDBOX_NOT_PROVEN"
-              ]
-            }
-          ],
-          "budget_snapshot": {
-            "currency": "USD",
-            "assigned": true,
-            "task_remaining": 0.5,
-            "campaign_remaining": 2,
-            "day_remaining": 2
-          },
-          "decision_digest": "sha256:f8fdfc91c52b61c83aa4cad9c740278f3175e3b236b4eefdbbfa3902a91f2892",
-          "cell": "cell-pia"
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:f27990354e65b0b295157c035c31f6a281548023f97f19ed501eb04eed78d5c5"
         },
         {
-          "what": "the same decision in every cell",
-          "cells": [
-            "cell-pia",
-            "cell-pb1",
-            "cell-pb2",
-            "cell-pa2"
-          ],
-          "reason": "every cell produced selected_task_id null with SANDBOX_NOT_PROVEN"
+          "what": "the DispatchDecision document",
+          "cell": "cell-pia",
+          "run_id": "run-pilot-000002",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:f897de77bfeedf0b7d206cd290c2be50dabd563736619df6bfe12a5be4903225"
+        },
+        {
+          "what": "the DispatchDecision document",
+          "cell": "cell-pb1",
+          "run_id": "run-pilot-000001",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:f27990354e65b0b295157c035c31f6a281548023f97f19ed501eb04eed78d5c5"
+        },
+        {
+          "what": "the DispatchDecision document",
+          "cell": "cell-pb1",
+          "run_id": "run-pilot-000002",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:76ac2751049ad49679678e2863e05d685478ea2355cd69ef544bfd075ad2ad08"
+        },
+        {
+          "what": "the DispatchDecision document",
+          "cell": "cell-pb2",
+          "run_id": "run-pilot-000001",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:f27990354e65b0b295157c035c31f6a281548023f97f19ed501eb04eed78d5c5"
+        },
+        {
+          "what": "the DispatchDecision document",
+          "cell": "cell-pb2",
+          "run_id": "run-pilot-000002",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:c52362e4a1a8052c268d6813f2bb625a16c6cf70697b3442d062983af2f3596b"
+        },
+        {
+          "what": "the DispatchDecision document",
+          "cell": "cell-pa2",
+          "run_id": "run-pilot-000001",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:f27990354e65b0b295157c035c31f6a281548023f97f19ed501eb04eed78d5c5"
+        },
+        {
+          "what": "the DispatchDecision document",
+          "cell": "cell-pa2",
+          "run_id": "run-pilot-000002",
+          "decision_id": null,
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": null,
+          "budget_snapshot": null,
+          "decision_digest": "sha256:8aee5b10f49bcdbede76d3b6bed3746753ec7f7a74991bf41faa1da7c889a1f2"
+        },
+        {
+          "what": "the argv every selected adapter really executed",
+          "runs": [
+            {
+              "cell": "cell-pia",
+              "run_id": "run-pilot-000001",
+              "provider": "pi",
+              "configuration": "A",
+              "config_delta": "context_surface",
+              "argv_digest_normalised": "sha256:26e262970cc9236aa55bb49d0e7cb95929cb9ca9496e7763457037ffd89afff3"
+            },
+            {
+              "cell": "cell-pia",
+              "run_id": "run-pilot-000002",
+              "provider": "codex",
+              "configuration": "A",
+              "config_delta": "none",
+              "argv_digest_normalised": "sha256:cadecd4b5098ec14deda2c683e5661179cf6621f8f149c884b115b1d6bbd38db"
+            },
+            {
+              "cell": "cell-pb1",
+              "run_id": "run-pilot-000001",
+              "provider": "pi",
+              "configuration": "B",
+              "config_delta": "context_surface",
+              "argv_digest_normalised": "sha256:fe7138c23b0d5e9beec735edc18d4419ae68ce23893950668e709192c8cd4d3f"
+            },
+            {
+              "cell": "cell-pb1",
+              "run_id": "run-pilot-000002",
+              "provider": "codex",
+              "configuration": "B",
+              "config_delta": "none",
+              "argv_digest_normalised": "sha256:cadecd4b5098ec14deda2c683e5661179cf6621f8f149c884b115b1d6bbd38db"
+            },
+            {
+              "cell": "cell-pb2",
+              "run_id": "run-pilot-000001",
+              "provider": "pi",
+              "configuration": "B",
+              "config_delta": "context_surface",
+              "argv_digest_normalised": "sha256:fe7138c23b0d5e9beec735edc18d4419ae68ce23893950668e709192c8cd4d3f"
+            },
+            {
+              "cell": "cell-pb2",
+              "run_id": "run-pilot-000002",
+              "provider": "codex",
+              "configuration": "B",
+              "config_delta": "none",
+              "argv_digest_normalised": "sha256:cadecd4b5098ec14deda2c683e5661179cf6621f8f149c884b115b1d6bbd38db"
+            },
+            {
+              "cell": "cell-pa2",
+              "run_id": "run-pilot-000001",
+              "provider": "pi",
+              "configuration": "A",
+              "config_delta": "context_surface",
+              "argv_digest_normalised": "sha256:26e262970cc9236aa55bb49d0e7cb95929cb9ca9496e7763457037ffd89afff3"
+            },
+            {
+              "cell": "cell-pa2",
+              "run_id": "run-pilot-000002",
+              "provider": "codex",
+              "configuration": "A",
+              "config_delta": "none",
+              "argv_digest_normalised": "sha256:cadecd4b5098ec14deda2c683e5661179cf6621f8f149c884b115b1d6bbd38db"
+            }
+          ]
         }
       ],
       "clauses_observed": [
-        "the deterministic order ran and the decision explained itself: no selection, every candidate excluded with the closed reason SANDBOX_NOT_PROVEN",
-        "the budget snapshot was resolved server-side: currency USD, assigned true, task_remaining 0.5, campaign_remaining 2, day_remaining 2",
+        "the deterministic order ran and the decision explained itself: the selected task and adapter are named and every other candidate is excluded with a reason",
+        "the budget snapshot was resolved server-side and is published with the decision",
         "the decision document carries its own content digest"
       ],
       "clauses_not_run": [
-        "a selected adapter",
-        "a real crossing by the selected adapter"
+        "a selected adapter whose start() really spawned"
       ],
-      "reason": "the DECISION half of this case is really observed and the CROSSING half is not: the only candidate was excluded with SANDBOX_NOT_PROVEN, so selected_adapter_id is null and no start() ever ran. The case asks for both, so it is NOT_RUN rather than a partial pass."
+      "reason": "the decision half is observed and the crossing half is not: 8 decision(s), 0 with a selected adapter, 8 observed argv(s)."
     },
     "A-MVP-04": {
       "id": "A-MVP-04",
@@ -851,7 +1130,10 @@
         },
         {
           "what": "the task states reached",
-          "final_states": []
+          "final_states": [
+            "FAILED",
+            "IN_REVIEW"
+          ]
         }
       ],
       "clauses_observed": [],
@@ -882,9 +1164,7 @@
         },
         {
           "what": "the refusals that preceded the race",
-          "codes": [
-            "BLOCKED_SANDBOX"
-          ]
+          "codes": []
         }
       ],
       "clauses_observed": [
@@ -911,49 +1191,49 @@
           "what": "the only real crossings in this run set",
           "crossings": [
             {
-              "run_id": "run-bootstrap-pi-pia",
+              "run_id": "run-bootstrap-pi-pilot",
               "provider": "pi",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-codex-pia",
+              "run_id": "run-bootstrap-codex-pilot",
               "provider": "codex",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-pi-pb1",
+              "run_id": "run-bootstrap-pi-pilot",
               "provider": "pi",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-codex-pb1",
+              "run_id": "run-bootstrap-codex-pilot",
               "provider": "codex",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-pi-pb2",
+              "run_id": "run-bootstrap-pi-pilot",
               "provider": "pi",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-codex-pb2",
+              "run_id": "run-bootstrap-codex-pilot",
               "provider": "codex",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-pi-pa2",
+              "run_id": "run-bootstrap-pi-pilot",
               "provider": "pi",
               "governed": false,
               "is_a_run": false
             },
             {
-              "run_id": "run-bootstrap-codex-pa2",
+              "run_id": "run-bootstrap-codex-pilot",
               "provider": "codex",
               "governed": false,
               "is_a_run": false
@@ -977,12 +1257,13 @@
     }
   },
   "summary": {
-    "pass": [],
+    "pass": [
+      "A-MVP-01"
+    ],
     "partial": [
       "A-MVP-04"
     ],
     "not_run": [
-      "A-MVP-01",
       "A-MVP-02",
       "A-MVP-03",
       "A-MVP-05",
@@ -1004,7 +1285,7 @@
     "per_case": {
       "A-MVP-01": {
         "expected": "PASS",
-        "observed": "NOT_RUN"
+        "observed": "PASS"
       },
       "A-MVP-02": {
         "expected": "PASS",
@@ -1032,11 +1313,11 @@
       }
     },
     "run_set": {
-      "run_set_id": "rs-s2007r-pilot-c55c3ecbfca6439e",
-      "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+      "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+      "project_digest": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
       "budget_grant_id": "grt-s2007r-pilot"
     },
-    "campaign_spend_usd": 0,
+    "campaign_spend_usd": 0.000361,
     "not_inferred": [
       "real_adapter_execution",
       "human_review",
@@ -1056,7 +1337,7 @@
     "timeout_ms": 600000,
     "authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
     "approval_owner": "issue #12 (S2-012)",
-    "campaign_spend_usd": 0,
+    "campaign_spend_usd": 0.000361,
     "cap_usd": 2,
     "stop_at_usd": 1.6,
     "campaign_cap_never_exceeded": true,
@@ -1095,73 +1376,73 @@
     {
       "path": "results/s2-007r/cell-pia/run-record.json",
       "what": "the cell-pia driver invocation record (A)",
-      "sha256": "26cd444e8766e5d29985eb9a436f5c45dc32e059c55b6c25a3e06393c4ad0735",
+      "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb1/run-record.json",
       "what": "the cell-pb1 driver invocation record (B)",
-      "sha256": "627dfef951dddf303d38f4e49e8fdcaf058939df91f106deca00b26d91a51925",
+      "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb2/run-record.json",
       "what": "the cell-pb2 driver invocation record (B)",
-      "sha256": "9b58c403412adf952feb94dd565373f9fbd92becf3d0c7d1382858ad365e1d59",
+      "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pa2/run-record.json",
       "what": "the cell-pa2 driver invocation record (A)",
-      "sha256": "163ccb380a0674ae0baf167fda54dc2369c3534810ed590bcaaa86d81d94424f",
+      "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pia/run-01.json",
       "what": "one attempted governed run of cell-pia",
-      "sha256": "83420f22d4577f555102dcc28dfed586c0efb74b0ca19a9e359117ebd637ba88",
+      "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pia/run-02.json",
       "what": "one attempted governed run of cell-pia",
-      "sha256": "74c943f14366d6c07bbd99465b2f41f2873dbb98e76cc174577ebb5920347538",
+      "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb1/run-01.json",
       "what": "one attempted governed run of cell-pb1",
-      "sha256": "d53dede1614106f8fa1405d61f25d3cd1f9e8b10fff6885bccde269198cced59",
+      "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb1/run-02.json",
       "what": "one attempted governed run of cell-pb1",
-      "sha256": "a6e5ba91d6f1b9de83578fe3dc7f55ae9baf8a94a85fc48482845ef4f1ca8eec",
+      "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb2/run-01.json",
       "what": "one attempted governed run of cell-pb2",
-      "sha256": "24f5195fc32d089bd49820a12001107b4a8969bb2dd9d430cc9c836f9fd265b1",
+      "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb2/run-02.json",
       "what": "one attempted governed run of cell-pb2",
-      "sha256": "f4b1ff9756bb6201e9d965b1bca0aafe59e3be32109b00173175202d21d7a780",
+      "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pa2/run-01.json",
       "what": "one attempted governed run of cell-pa2",
-      "sha256": "3e8c353d5425e2c0a5d6c0adceb7ca1120c3ccd719b52b350f41d92ba2d6dd0e",
+      "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pa2/run-02.json",
       "what": "one attempted governed run of cell-pa2",
-      "sha256": "e21f75a5eccd61e854fe86a1a499ef67da4e05fb6dfcf93bf908330958a3c8fb",
+      "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
       "present_on_disk": true
     },
     {
@@ -1173,7 +1454,7 @@
     {
       "path": "results/s2-007r/campaign-ledger.json",
       "what": "the campaign ledger the budget row is read from",
-      "sha256": "e59968e334f560a2decef13ffed4b9dde227a31c05c4a054eca1e6dfce14bca4",
+      "sha256": "2c469e8a52960c237e385cca0f29ddb3eaaff0ef5b5548cd6bc6a10bd3be36a4",
       "present_on_disk": true
     },
     {
@@ -1191,7 +1472,7 @@
     {
       "path": "evidence/s2-007r-security-probes.json",
       "what": "the probe gate's own accounting of the same authority refusals",
-      "sha256": "78c4a6bdb955503080005b5762273bcf60d0ea2be386fc1415f190e93434f3dd",
+      "sha256": "fb36e0929c26aa9369a2af52357e29d4da4b846cc57d2bfbe738321ecbeb2298",
       "present_on_disk": true
     },
     {
@@ -1214,5 +1495,6 @@
     "The per-case file is read by the gate only when it is bound to the current commit AND to a corroborated real-adapter run. With no corroborated run, the gate forces every case to NOT_RUN whatever this file claims: that is the fail-closed direction, and it is why the values here agree with what the gate will print."
   ],
   "record_digest_method": "sha256: + canonical-json-v1 over this record with record_digest removed",
-  "record_digest": "sha256:93af6508c7a9703db93b76aed4077f0ce8064891fd9ad02581700114c0e7196b"
+  "record_digest": "sha256:59b36bbfef2632872a1681571be92025c00376e181750bce59a60ab8a344a9c9",
+  "recordDigest": "sha256:ac89ac3c5938f2e73b4b39dfe6e22d3a726a6202a3ce8d36efbf77f8df9a4299"
 }

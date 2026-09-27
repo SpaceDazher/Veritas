@@ -6,8 +6,8 @@
   "gate": "test:s2-007r-probes",
   "probeModule": "scripts/s2-007r-probes.mjs",
   "version": "s2-007r-real-probes-v1",
-  "commit": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
-  "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
   "status": "PASS",
   "ok": true,
   "exitCode": 0,
@@ -527,7 +527,7 @@
         {
           "label": "no S2-007R evidence record was created or modified by the refused write",
           "ok": true,
-          "detail": "scope=/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json before=090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a after=090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a"
+          "detail": "scope=/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json before=02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e after=02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e"
         },
         {
           "label": "this gate's own record (evidence/s2-007r-security-probes.json) was not touched by the refused write either",
@@ -582,8 +582,8 @@
         "module": "src/lib/executors/evidence-writer.mjs",
         "refused_code": "NOT_RUN_REAL_ADAPTER",
         "refused_detail": "REAL_RUN_EVIDENCE_VERSION",
-        "evidenceDirBefore": "090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a",
-        "evidenceDirAfter": "090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a",
+        "evidenceDirBefore": "02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e",
+        "evidenceDirAfter": "02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e",
         "evidenceDirScope": "/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json",
         "gateOutputUnchangedDuringProbe": true,
         "gateOutputExcludedFromDigest": true,
@@ -1059,6 +1059,6 @@
     "A green probe run is evidence about REFUSALS, not about task quality, human review or calibration.",
     "The probes run against the in-memory store. A claim proven here is proven about the command boundary, not about a PostgreSQL transaction; the two-process behaviour is the DB replay gate of the S2-007 ticket."
   ],
-  "runId": "s2-007r-probes-eb0cf8b64071668a3a74f226",
-  "recordDigest": "98d6f1b3a592feb29a0b1e1c5f6bf46d887851982caa277fa176c4ea4fa5d15d"
+  "runId": "s2-007r-probes-c2b8ce3318b54f0831df54da",
+  "recordDigest": "24dc121fdb7ad781215b6e8bd9c90d04a9f158a1cfec9f0671eefb0665fb0c20"
 }

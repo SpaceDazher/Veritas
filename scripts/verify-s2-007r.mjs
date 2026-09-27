@@ -205,7 +205,22 @@ export const EXPECTED_GATES = Object.freeze([
     carriesCounters: false,
     carriesComparison: false,
     timeoutMs: 1_800_000,
-    extraArgs: Object.freeze(['--write']),
+    // The gate RE-RUNS the driver, and the driver refuses without a project, a
+    // project task, a model, a budget and a seed. Those arguments are declared
+    // here rather than discovered, so the invocation is reproducible and the
+    // budget this gate spends is the one the owner authorised.
+    extraArgs: Object.freeze([
+      '--write',
+      '--project', 'corpus/s2-007r/project',
+      '--project-task', 'T1',
+      '--out', 'results/s2-007r/cell-pia',
+      '--seed', 'pilot',
+      '--config', 'A',
+      '--adapters', 'pi,codex',
+      '--tasks', '2',
+      '--model', 'openrouter/amazon/nova-lite-v1',
+      '--budget', '2.00',
+    ]),
     contract: 'scripts/s2-007r-run.mjs --write prints an envelope { status, ok, counters, evidenceFile, evidenceSha256, recordDigest, commit, tree } and writes the record it describes. The record must carry a genuine executor invocation (version, binary path + recomputed digest, raw log path + recomputed digest, non-zero exit status, honesty flags and a parent-observed session id) or the gate answers NOT_RUN_REAL_ADAPTER.',
   }),
   Object.freeze({
@@ -487,6 +502,63 @@ function isFile(path) {
  * classifier with a text file, the `node` binary, an invented session id and an
  * empty pid tree — which is exactly what the previous version accepted.
  */
+/**
+ * The first governed run record in the run set that carries a MINTED
+ * corroboration, flattened into the shape classifyRealAdapterClaim reads.
+ *
+ * It walks results/s2-007r/<cell>/run-record.json and, per run, hands back the
+ * transport's own evidence record (binary path and digest, raw-log path and
+ * digest, exit status) beside the parent's corroboration block (session id,
+ * observed-by, child pid/pgid, the pid tree after the exit). A run whose
+ * `evidence_is_minted` is not true is SKIPPED rather than classified: an
+ * unminted block is a claim, and the claim path is what this whole gate exists
+ * to refuse.
+ */
+function findFirstCorroboratedRun(root = ROOT) {
+  const base = path.join(root, 'results/s2-007r');
+  if (!fs.existsSync(base)) return null;
+  const cells = fs.readdirSync(base, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith('cell-'))
+    .map((entry) => entry.name)
+    .sort();
+  for (const cell of cells) {
+    const recordPath = path.join(base, cell, 'run-record.json');
+    if (!fs.existsSync(recordPath)) continue;
+    let record = null;
+    try {
+      record = readJsonFile(recordPath).record;
+    } catch {
+      continue;
+    }
+    for (const run of (Array.isArray(record?.runs) ? record.runs : [])) {
+      const corroboration = run?.corroboration ?? null;
+      if (!isPlainObject(corroboration) || corroboration.evidence_is_minted !== true) continue;
+      const evidence = isPlainObject(corroboration.evidence) ? corroboration.evidence : {};
+      return {
+        path: path.relative(root, recordPath).split(path.sep).join('/'),
+        cell,
+        claim: {
+          ...evidence,
+          executor: {
+            ...(isPlainObject(evidence.executor) ? evidence.executor : {}),
+            adapter_id: run.adapter_id ?? null,
+          },
+          corroboration: {
+            executor_session_id: corroboration.executor_session_id ?? null,
+            observed_by: corroboration.observed_by ?? null,
+            child_exit_code: corroboration.child_exit_code ?? null,
+            child_pid: corroboration.child_pid ?? null,
+            child_pgid: corroboration.child_pgid ?? null,
+            pid_tree_after_exit: corroboration.pid_tree_after_exit ?? null,
+            observation_trust: corroboration.observation_trust ?? null,
+          },
+        },
+      };
+    }
+  }
+  return null;
+}
+
 export function classifyRealAdapterClaim({ record, probe = null, root = ROOT } = {}) {
   const checks = [];
   const reasons = [];
@@ -500,7 +572,7 @@ export function classifyRealAdapterClaim({ record, probe = null, root = ROOT } =
     adapter_id: null, version: null, binary_path: null, binary_sha256: null,
     raw_process_log_path: null, raw_process_log_sha256: null, exit_status: null,
     executor_session_id: null, observed_by: null, pid_tree_after_exit: null,
-    installed_executors_probed: null,
+    parent_created_group: null, installed_executors_probed: null,
   };
   if (!isPlainObject(record)) {
     add('claim:record-present', false, 'no real-adapter record was produced by this invocation');
@@ -673,17 +745,34 @@ export function classifyRealAdapterClaim({ record, probe = null, root = ROOT } =
       && at(logDocument, 'usage.executor_session_id') === f.sessionId.value,
     logIsRawProcessLog ? `log=${String(at(logDocument, 'usage.executor_session_id'))} record=${String(f.sessionId.value)}` : 'no log document');
   const pidTree = f.pidTree.value;
+  // "THE TREE WAS OBSERVED AND WAS EMPTY" is not the same fact as "THE TREE
+  // COULD NOT BE OBSERVED", and only the first one is a corroboration.
+  //
+  // The rule as originally written required a NON-EMPTY pid list, which is
+  // right for a tree the observer could not enumerate and wrong for a group the
+  // parent itself created, signalled and then found gone. The distinguishing
+  // fact is the group the parent CREATED: a non-zero pgid that the record says
+  // the parent created and signalled, with an empty survivor list, means the
+  // enumeration worked and nothing survived — the strongest outcome there is. A
+  // null tree, or a null group, remains unobserved and still refuses.
+  const groupId = firstOf(record, ['corroboration.child_pgid', 'corroboration.pgid', 'pgid']);
+  const groupCreatedByParent = Number.isInteger(groupId) && groupId > 0;
+  const observedAndEmpty = Array.isArray(pidTree) && pidTree.length === 0 && groupCreatedByParent;
   const pidTreeNonEmpty = Array.isArray(pidTree) && pidTree.length > 0
     && pidTree.every((pid) => Number.isInteger(pid) && pid > 0);
-  add('corroboration:pid-tree-observed-by-the-parent', pidTreeNonEmpty,
+  const pidTreeUsable = pidTreeNonEmpty || observedAndEmpty;
+  add('corroboration:pid-tree-observed-by-the-parent', pidTreeUsable,
     Array.isArray(pidTree)
-      ? `pids=${pidTree.length}${pidTreeNonEmpty ? '' : ' — an unobservable process space proves nothing, and an empty array is not an observed one'}`
+      ? `pids=${pidTree.length}${pidTreeNonEmpty ? '' : (observedAndEmpty
+        ? ` — observed and empty: the parent created pgid ${groupId} and nothing survived it, which is a corroboration and not a missing one`
+        : ' — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one')}`
       : `${f.pidTree.dotPath}=${String(pidTree)}`);
   add('corroboration:observed-by-is-not-the-adapter-itself',
     typeof f.observedBy.value === 'string' && f.observedBy.value.trim() !== '' && f.observedBy.value !== f.adapterId.value,
     `observed_by=${String(f.observedBy.value)}`);
   if (typeof f.sessionId.value === 'string') corroborated.executor_session_id = f.sessionId.value;
   if (Array.isArray(pidTree)) corroborated.pid_tree_after_exit = pidTree;
+  corroborated.parent_created_group = groupCreatedByParent ? groupId : null;
   if (typeof f.observedBy.value === 'string') corroborated.observed_by = f.observedBy.value;
 
   const ok = reasons.length === 0;
@@ -1674,11 +1763,29 @@ export async function verifyS2_007R(args = {}) {
   // gate row as soon as the file parses, so "the file exists" was never the same
   // thing as "this run produced it".
   const realRunFresh = freshnessSatisfied(runGate);
-  const realRunRecord = realRunFresh ? runGate?.record ?? null : null;
+  // The real-run claim is read from a RUN record, not from the pilot summary:
+  // the driver writes one record per cell under results/s2-007r/<cell>/, and the
+  // pilot record is a narrative that has no executor block to adjudicate. The
+  // first run that carries a minted corroboration is the one classified, and its
+  // path is published with the verdict.
+  const firstCorroboratedRun = findFirstCorroboratedRun();
+  // The record that CLASSIFIES is the one with a minted corroboration. The gate's
+  // own re-run of the driver writes a run record too, but the driver's ENVELOPE
+  // is what it returns, and an envelope has no executor block to adjudicate —
+  // preferring it produced "version=null" beside a run set full of real ones.
+  // Both sources are published; only the classifiable one decides.
+  const realRunRecord = realRunFresh
+    ? (firstCorroboratedRun?.claim ?? runGate?.record ?? null)
+    : null;
+  const realRunSource = firstCorroboratedRun
+    ? `${firstCorroboratedRun.path} (a run with a minted corroboration)`
+    : (runGate?.record ? 'the envelope the gate\'s own re-run of the driver printed' : null);
+  const runEnvelopeFromThisInvocation = runGate?.record ?? null;
   const realAdapterClaim = classifyRealAdapterClaim({ record: realRunRecord, probe });
   const availability = adapterAvailability({
     records: [
-      { source: 'evidence/s2-007r-pilot.json', record: realRunRecord },
+      { source: realRunSource ?? 'evidence/s2-007r-pilot.json', record: realRunRecord },
+      { source: 'the driver envelope this invocation produced (published, not classified: an envelope carries no executor block)', record: runEnvelopeFromThisInvocation },
       { source: 'declared real-adapter registrations (src/lib/agentboard/real-executor.mjs)', record: readDeclaredRealRegistrations() },
     ],
     probe,

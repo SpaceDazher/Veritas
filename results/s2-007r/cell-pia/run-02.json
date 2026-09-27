@@ -1,56 +1,748 @@
 {
   "index": 2,
   "label": "02",
-  "task_id": "abt-s2007r-pia-02",
+  "task_id": "abt-s2007r-pilot-02",
   "adapter_id": "adr-codex-local",
   "provider": "codex",
   "configuration": "A",
   "config_delta": "none",
   "argv": {
-    "observed": false,
-    "reason": "this run has not produced a raw process log yet, so the argv it built and the surface it selected are UNOBSERVED by this driver",
+    "observed": true,
+    "reason": null,
     "configuration": "A",
+    "configuration_name": "HOST_DEFAULT_CONTEXT_SURFACE",
+    "configuration_note": "the host default context surface: no suppression flag is passed, so the executor loads whatever the host has installed and the board grants exactly the same tools it grants in configuration B",
+    "configuration_surface_flags": [],
     "config_delta": "none",
-    "configuration_axis": null,
-    "argv_digest_raw": null,
-    "argv_digest_normalised": null,
-    "argv": null
+    "config_delta_reason": "this provider's configuration A and B select the IDENTICAL argv, so the A label moved nothing and this cell is config_delta none by construction",
+    "configuration_axis": {
+      "axis": "context_surface",
+      "provider": "codex",
+      "configurations": [
+        "A",
+        "B"
+      ],
+      "configuration_a_flags": [],
+      "configuration_b_flags": [],
+      "distinguishable": false,
+      "reason": "codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\".",
+      "exclusion": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\"."
+    },
+    "argv_digest_raw": "sha256:9a7ef40a313afc3d479cfcb1ca3dbde5d62722c13d5dabd130b31ab805032be5",
+    "argv_digest_normalised": "sha256:cadecd4b5098ec14deda2c683e5661179cf6621f8f149c884b115b1d6bbd38db",
+    "argv": [
+      "exec",
+      "--json",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "--sandbox",
+      "read-only",
+      "-C",
+      "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
+      "--output-last-message",
+      "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/last-message.txt",
+      "--model",
+      "openrouter/amazon/nova-lite-v1",
+      "You are executing one bounded unit of work for the Veritas Agent Board (S2-007R).\nWorkspace: /tmp/veritas-s2-007r-ws/pilot/run-02/project (the ONLY location you may read or write; every path below is relative to it).\nBoard task: abt-s2007r-pilot-02   Project task: T1\nGoal: fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\nAcceptance criteria:\n1. fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\n2. The deterministic oracle of the project (node verify.mjs T1) exits 0 on the workspace copy after the run.\n3. The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.\n4. The executor process is a real installed CLI, and its own output is recorded as the run record.\nWork on the files named by the goal. You MAY edit them: this is a write task, and a change\nthat makes the goal true is the point. Do not touch any other file, do not add dependencies,\ndo not use the network, and do not read or write anything outside the workspace.\nEnd your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>."
+    ],
+    "argv_normalised": [
+      "exec",
+      "--json",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "--sandbox",
+      "read-only",
+      "-C",
+      "<project_root>",
+      "--output-last-message",
+      "<evidence_dir>/<run_id>/raw/last-message.txt",
+      "--model",
+      "openrouter/amazon/nova-lite-v1",
+      "You are executing one bounded unit of work for the Veritas Agent Board (S2-007R).\nWorkspace: <project_root> (the ONLY location you may read or write; every path below is relative to it).\nBoard task: abt-s2007r-pilot-02   Project task: T1\nGoal: fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\nAcceptance criteria:\n1. fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\n2. The deterministic oracle of the project (node verify.mjs T1) exits 0 on the workspace copy after the run.\n3. The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.\n4. The executor process is a real installed CLI, and its own output is recorded as the run record.\nWork on the files named by the goal. You MAY edit them: this is a write task, and a change\nthat makes the goal true is the point. Do not touch any other file, do not add dependencies,\ndo not use the network, and do not read or write anything outside the workspace.\nEnd your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>."
+    ],
+    "argv_normalisation": {
+      "rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
+      "folds": [
+        {
+          "label": "<project_root>",
+          "kind": "per-run project copy"
+        },
+        {
+          "label": "<evidence_dir>",
+          "kind": "per-invocation evidence root"
+        },
+        {
+          "label": "<workspace_root>",
+          "kind": "injected containment root"
+        },
+        {
+          "label": "<run_id>",
+          "kind": "per-run identity"
+        }
+      ]
+    },
+    "observed_by": "the raw process log the transport wrote, re-read by this driver from the bytes it publishes; the log is the transport's own record of what it handed the OS, and the digests above are the digests of those bytes"
   },
   "findings": [
     {
-      "id": "claim-refused",
-      "code": "BLOCKED_SANDBOX",
-      "message": "BLOCKED_SANDBOX"
+      "id": "project-unmodified",
+      "severity": "defect",
+      "detail": "the task is a write task and the fixture digest is unchanged, so the stated criterion cannot have been met; reported rather than counted as a quiet pass"
     }
   ],
-  "events": [],
-  "raw_logs": null,
-  "verdict": "NOT_RUN",
+  "events": [
+    {
+      "sequence": 1,
+      "event_type": "ACCEPTED",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:50ae007a7abf32e3062b1e92cf586395ac8071c271c64dee089867f2cbba4b1e",
+      "payload_digest": "sha256:2d3d1337a14b5cc714f1186c87c507920c731786920f345e77ac000b4874ca9d"
+    },
+    {
+      "sequence": 2,
+      "event_type": "STARTED",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:6f04cf8268eca101f64dcde84c7bf62f959565b0b663c424bd4ad5dd83e86f44",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 3,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:64eef4e9333f73fff8585da9a73e9a23dcb03062e1281145ba6b55f631331285",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 4,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:77f540c1196855f29b07d143513cdfbe4a605165cb82b1a8a6785329ce2a0001",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 5,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:5227e51209ff9a0074a59d9ead2b1b4655fe6d091cb0ef44f6eb2b80ecf4711a",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 6,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:c6ec9fb24256a2697d5676473251bd8989be87b4d44aeb2088a48b2b1e2bbd38",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 7,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:a68db146c8b8f42a5555baff4ac1664723b2c3896f8ba3bb509d297550740141",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 8,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:ee81afd76e38a175da864ef76ca2e6a65164f1d905fdd0bfb9b1d4de86867faf",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 9,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:a977a130671c23781a5fbfd360a2c73d3c3283fdc48b4ae2cb6046e3b9d895ea",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 10,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:77b1bfa99e9be6296f1b47f5fe7e93eef5305a598d8bc173d5fdbb5f2e2241b2",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 11,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:7000c7cac5356f3070ce01e88c9a233fb6f8ee8e46e5b76f5fe991e7623c8c38",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 12,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:9cdcffa57f0b82ef16506340ccb5a1a849fa9df35c8f5d199c665b33e3b515ad",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 13,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:be342f80f1675735bc4b9aab151c6c6c71ac2c44ce8fe2f9ba6d1f98ecbde602",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 14,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:9bf6721e649414f57e329e483b71868c4ad710ba81df2967f409ab38f30d5a42",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 15,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:a9523c74c455a96ed799c609d66dd5e15c7f197a3a68f62074132459606dcaee",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 16,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:fca5ac9ace0ef91ed8f5ada0f6f221caef77385d93269779a2a43b075873cf28",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 17,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:4c04064f7ef42b51e3a0da0394df4219423c5defa4cd5c11c5e7f623af9ff8ae",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 18,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:90e583225dde544794f7afbade922a05b961c6cd7a79d30b7cb3a284a6c686c4",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 19,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:ea3d73b1801809c26888b838c34c15ce91637ae4d55b0d9084bb219a67c43d86",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 20,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:1d8d69b93f1100a0a8d274a8a921164931b41974647618da10dedb4f11a62df0",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 21,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:52f51e9b56daabb745f9d6f4f8de75fe6850c0f47dab8a32d1f4e3b9948a5394",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 22,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:c23aa0b2f40ebad3da944fe3313ee1e82868177986cd1d073e71ac0ac64159d7",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 23,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:d1cf6750a6566bdfc5253fbf0befb316c8dde10e2711768e3892c43f5b06c4ef",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 24,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:5112f1fc75e4ebb59e7b209741fbe78bd35ff101fc6b9cd002049525c3e100c7",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 25,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:af5c99e2333554ed41f54473956fd0c4e4ef72263f1c54c292c77d40e8d8d4ba",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 26,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:ca6dd96e8ecd3e5ad7e7d677f380d83219eeee13fd6a0f1770d3e15567502902",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 27,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:9846f823ff6dcc5a3bd3b92b90e57a17b13884a0fce12cd1001479ac8bc428f2",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 28,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:2397839898946dee3e7c2f9bf6bfe6d9da31b81a25f83577871eb816b2e3622c",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 29,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:824c9f49138f038d99b0a09d59cf77da2eb8d75a6c10878d2807693b82d907dc",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 30,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:0023d67658a44ed33896945fe3e84a6da5946d8e1fb6c8a521e38a4c2b76ade0",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 31,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:a827acd92e7c9b7969b2f67098308218eb16789474598b62de687485cea45cff",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 32,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:4fcd683a61436548ecb6a60aa42d0ecdd35ae4c4e029f46f7f59b08bb0e8a202",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 33,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:64f0ba8fe1157e2c597f927ce42d736fca9cb92b20fbd3d58b28b49b7deebe32",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 34,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:d61d4aa79d4425c839c45270afe74edec1854ad57f72ba3361ee82190c25e014",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 35,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:dfaf1e625fa0c7bd3ea73c6d54c3c75cef29232d1f43ca2a60677b4768b3a72b",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 36,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:b2abad6e172f48d4733c6e250a9b7cdf28e5289db63c5c610e2c4c0e8c81c499",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 37,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:dba2178a764e7134f15a4b99af326f480dc94217f7c69b7924c6aa713506f24d",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 38,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:1141a1d638441e57bbe3bd3540340ca1ded9b238a0acfce0f2fb35c1efdedaca",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 39,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:05d5912bbb88cc665b5398058c512113bdfede32367da179d1d09d8f93bac208",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 40,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:69d4d8a18a24da37d36217c234f730d75821e6d444bdccb951af5f78c8fd83a2",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 41,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:bd454c54164f30140b95ee494429cd9c1fbf02fa3c51dd45298231b994dd5a33",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 42,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:22be172ca4f21834396b1cbfa00e768f3c3dbbe44a9cdf59f0f752c684467495",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 43,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:3bc1fcdfa3e092b10685998f35c31a28ee13ce8818da29a3d4fbddac32960e87",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 44,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:f9f485f73a456f54835ceceeb3cead509a3e3fce463de3860faea1c1aa3d06c9",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 45,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:45b8a7b8c1a52823b0e51be55714cf8bda85b3d0bc119a8ac8a298b217fe1cd6",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 46,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:364bd6e2a1ec8afbe335cf6a138037fd8dc88a2cf1b08204948e5ed64eed252b",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 47,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:ec7d076d2dd3c2004cbfb047aa833ba3b8dbb6b665091ea96a9d1c55ec77fc14",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 48,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:d199244d97deaff16d68f04023ebbe0fb69eb23a14a830744f78038a8062ca22",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 49,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:dc66ba32f67778ecf3b4b4608a3980a711c07265b5a7ac1bac5688be070ccf37",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 50,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:8493518c9e0b2fe7056a5a2e4f7bd78f254ef596833bd54f2551e2bfd022681a",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 51,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:353edaf7434838d7fed103b4d86ffb59b695c53f8353e60df5c98ee01a17189c",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 52,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:3df83aedc07ccce2f27ec4a1aecc5f62cf8230f4633f911c2fe668edb382d40c",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 53,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:0693177175c231e39d948f738787119ebd5c90a1ba1d3905b4c530dfc6ea3c9e",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 54,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:1183c09792b9050736c4ad6a8c6c2e00d18aa945b7ae5749702ef4188188e1f6",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 55,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:18d8c2011ca64ba97fb662c0d6bf1bc5cb07f57bc9a09b64aade07b2e488019c",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 56,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:84d51a8735048bc42a9036b85b7523fb2652729a4e7328738e2b3241d6f233da",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 57,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:c080cd2a482f75e5eff779348ca1b7178454223e6c9b14913c6397615170c113",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 58,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:80ff19bf334f90ea77cc52568304827146c940c5e98422c563dd9812d9e68a47",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 59,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:7b05e4742a0791d39cb48372c0bdb51d52e1052c7a14947bedd23ecca71206fc",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 60,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:e366a9967e99154895846474be83b3a937e0c4777e414797200ed9df5e4da8d3",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 61,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:607b3e34585594ff3fee9c532d76ea37551a8492d8c453d1a532aca79c82670e",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 62,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:81ffa1c11d7e4a14552624a7338d0ef13d77865de0359d46d9f7f3ac301022ac",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 63,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:01088319c8dd6b429f6dde164af683dd5f8f9804514b0f5b67e278f0c578ca5d",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 64,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:4bab3cfd7981967ec9b4f5c132cac36823dd3faa3d1773b6d91b3354abbce971",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    },
+    {
+      "sequence": 65,
+      "event_type": "PROGRESS",
+      "outcome": null,
+      "decision": "ACCEPT",
+      "code": null,
+      "digest": "sha256:427ccf9ba60f6a8789f4abdbb9532e681dfdc6c744d0420cc99bb5bdc5228dfc",
+      "payload_digest": "sha256:389844984ef3ef11dc68c74ca476ce7da53dd2fde70ff88918f977c877497d04"
+    }
+  ],
+  "raw_logs": {
+    "directory": "results/s2-007r/cell-pia/raw/pilot/run-02-codex",
+    "files": [
+      {
+        "file": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+        "bytes": 16552,
+        "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc"
+      }
+    ],
+    "withheld": []
+  },
+  "verdict": "RUN_TERMINAL_NOT_REVIEW",
   "project": {
     "source": "corpus/s2-007r/project",
     "source_realpath": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/corpus/s2-007r/project",
     "workspace_root_ref": "run-02/project",
-    "workspace_root_absolute": "/tmp/veritas-s2-007r-ws/pia/run-02/project",
+    "workspace_root_absolute": "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
     "workspace_root_source": "INJECTED_NOT_REGISTRY",
     "workspace_root_note": "the S2-002 workspace registry holds Windows roots only (src/lib/identity/principals.mjs), so containment came from the documented execute({workspaceRoots, realpath}) injection point; the registry did not authorise this root",
-    "digest_before": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
-    "file_count": 7,
-    "total_bytes": 12694
+    "digest_before": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
+    "file_count": 8,
+    "total_bytes": 18715,
+    "digest_after": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
+    "unchanged": true
   },
-  "task_document_digest": "sha256:fa5592f1b383add9d09d564f067b14ad63e71753c261a5ed42ab104ff59e7556",
+  "project_task": {
+    "project_task_id": "T1",
+    "goal": "fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10",
+    "checks": [
+      "calc:add",
+      "calc:sub",
+      "calc:mul",
+      "calc:sumRange_inclusive",
+      "calc:sumRange_empty"
+    ],
+    "source": "the project oracle itself (node verify.mjs --criteria); the driver holds no second copy of the goal"
+  },
+  "task_document_digest": "sha256:d422bef46af4f8d1dbdda2d7967bbf7c15a68877b8287bffbdfa0e0564e8b763",
   "budget": {
     "grant_id": "grt-s2007r-pilot-02",
-    "one_budget_number": 0.5,
+    "one_budget_number": 2,
     "currency": "USD",
-    "task_limit": 0.5,
-    "campaign_limit": 0.5,
-    "day_limit": 0.5,
+    "task_limit": 2,
+    "campaign_limit": 2,
+    "day_limit": 2,
     "timeout_ms": 600000,
     "authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
     "approval_owner": "issue #12 (S2-012)",
     "grant_scope": "TASK_SCOPED_ROW",
     "grant_scope_reason": "store.createRun resolves the grant by task_id and refuses a workspace-scoped row (BUDGET_NOT_ASSIGNED), so one task needs one grant row; every row carries the identical --budget number",
-    "grant_digest": "sha256:da5f2bf0d8e9844940f6874aec477a835b82f1d2ffca067f30d87867cae4e461"
+    "grant_digest": "sha256:7cdf9fb47f8fe67ccafc8bd657fc49e8711c741e3c29bd7cc4204eb1251009d3",
+    "request_view": {
+      "currency": "USD",
+      "task_limit": 2,
+      "campaign_limit": 2,
+      "day_limit": 2,
+      "timeout_ms": 600000,
+      "granted_by": "prn-s2007r-owner",
+      "granted_at": "2026-09-26T09:01:20.000Z"
+    },
+    "settle": {
+      "decision": "ACCEPT",
+      "code": null,
+      "amount": 0,
+      "currency": "USD"
+    }
   },
   "dispatched_decision": {
     "derived_by": "dispatch.plan (the scheduler's own deterministic order)",
@@ -58,7 +750,7 @@
     "reason_not_followed": "selectAdapter sorts registered adapters by adapter_id ascending, so the derived decision can only ever reach adr-codex-local; the requested adapter is bound explicitly on the claim edge instead",
     "decision": {
       "contractVersion": "1.0.0",
-      "decision_id": "dsc-pia-000002",
+      "decision_id": "dsc-pilot-000002",
       "workspace_id": "ws-s2007r-project",
       "max_concurrency": 1,
       "selected_task_id": null,
@@ -67,15 +759,16 @@
       "selected_fencing_token": null,
       "candidates": [
         {
-          "task_id": "abt-s2007r-pia-01",
+          "task_id": "abt-s2007r-pilot-01",
           "priority": "HIGH",
           "eligible": false,
           "exclusion_reasons": [
+            "STATE_NOT_READY",
             "SANDBOX_NOT_PROVEN"
           ]
         },
         {
-          "task_id": "abt-s2007r-pia-02",
+          "task_id": "abt-s2007r-pilot-02",
           "priority": "HIGH",
           "eligible": false,
           "exclusion_reasons": [
@@ -86,14 +779,15 @@
       "excluded": [
         {
           "subject_kind": "task",
-          "subject_id": "abt-s2007r-pia-01",
+          "subject_id": "abt-s2007r-pilot-01",
           "reasons": [
+            "STATE_NOT_READY",
             "SANDBOX_NOT_PROVEN"
           ]
         },
         {
           "subject_kind": "task",
-          "subject_id": "abt-s2007r-pia-02",
+          "subject_id": "abt-s2007r-pilot-02",
           "reasons": [
             "SANDBOX_NOT_PROVEN"
           ]
@@ -103,13 +797,704 @@
       "budget_snapshot": {
         "currency": "USD",
         "assigned": true,
-        "task_remaining": 0.5,
-        "campaign_remaining": 2,
-        "day_remaining": 2
+        "task_remaining": 1.999878,
+        "campaign_remaining": 1.999878,
+        "day_remaining": 1.999878
       },
-      "decided_at": "2026-09-26T09:00:18.000Z"
+      "decided_at": "2026-09-26T09:01:30.000Z"
     },
-    "decision_digest": "sha256:3801df038d35edcec7330585fbf5fd6e324d01b87c172362df7d68368d61d19c",
+    "decision_digest": "sha256:f897de77bfeedf0b7d206cd290c2be50dabd563736619df6bfe12a5be4903225",
     "refusal": null
+  },
+  "lease": {
+    "lease_id": "lse-pilot-000002",
+    "fencing_token": 2,
+    "ttl_ms": 600000,
+    "claimed_by": "prn-s2007r-scheduler",
+    "actor_kind": "scheduler"
+  },
+  "transport": {
+    "module": "src/lib/executors",
+    "factory": "codex transport factory of executors-tree",
+    "source": "src/lib/executors#createRealExecutorTransport(provider=codex)",
+    "adapter_interface_verified": true,
+    "interface_checked_on": "the observing wrapper the boundary receives (not the raw transport)",
+    "configuration": "A",
+    "model_requested": "openrouter/amazon/nova-lite-v1",
+    "model_pin_source": "operator flag --model",
+    "run_correlation": "bound from execution.start by request.idempotency_key (never guessed)"
+  },
+  "prompt": {
+    "text_digest": "sha256:9f5da9b9b7fd342e737311fdf64402054f8ed6af467b1bf8fa9ac0139ab5e744",
+    "bytes": 1172,
+    "text": "You are executing one bounded unit of work for the Veritas Agent Board (S2-007R).\nWorkspace: /tmp/veritas-s2-007r-ws/pilot/run-02/project (the ONLY location you may read or write; every path below is relative to it).\nBoard task: abt-s2007r-pilot-02   Project task: T1\nGoal: fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\nAcceptance criteria:\n1. fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\n2. The deterministic oracle of the project (node verify.mjs T1) exits 0 on the workspace copy after the run.\n3. The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.\n4. The executor process is a real installed CLI, and its own output is recorded as the run record.\nWork on the files named by the goal. You MAY edit them: this is a write task, and a change\nthat makes the goal true is the point. Do not touch any other file, do not add dependencies,\ndo not use the network, and do not read or write anything outside the workspace.\nEnd your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>."
+  },
+  "run_id": "run-pilot-000002",
+  "sandbox_decision": {
+    "tier": "HOST_UNISOLATED",
+    "profile_id": "sbx-host-unisolated-v1",
+    "authorization": {
+      "authorization_id": "aut-hu-s2-007r-01",
+      "authorised_by_principal_id": "prn-s2007r-owner",
+      "authorised_by_label": "SpaceDazher (repository owner, BB thread thr_mgkk7cb5t6)",
+      "authority": "HUMAN_OWNER",
+      "scope": "SINGLE_PILOT_RUN",
+      "profile_id": "sbx-host-unisolated-v1",
+      "issued_at": "2026-09-26T00:00:00.000Z",
+      "expires_at": "2026-09-27T00:00:00.000Z",
+      "body_digest": "sha256:9e7fbcf23fb426af39233b188bf2b21a7e52cb0873fdbdea6206d7f67bddcc54"
+    }
+  },
+  "sandbox_decision_agrees_with_permit": true,
+  "request": {
+    "request_id": "xer-481bc9ec1ed983a9",
+    "idempotency_key": "a13a3e26ff3ff1b605a7ad254b41c10fef9fd9ead9e207da7d6e98a69d4aec6a",
+    "contract_version": "veritas.execution/1.0.0",
+    "granted_scope": [
+      "task.read",
+      "artifact.write"
+    ],
+    "allowed_tools": [
+      "tool:fs.read"
+    ],
+    "budget_grant": {
+      "currency": "USD",
+      "task_limit": 2,
+      "campaign_limit": 2,
+      "day_limit": 2,
+      "timeout_ms": 600000,
+      "granted_by": "prn-s2007r-owner",
+      "granted_at": "2026-09-26T09:01:20.000Z"
+    },
+    "principal_id": "prn-s2007r-producer",
+    "request_digest": "sha256:8f73c541fc5f17f441c93900c67c581af21d58d0ca64549be8204eb1c6c1582d",
+    "allowed_tools_digest": "sha256:5b4cbe0db38ec0d46dc776c4edf3d75cf3d2c187c0b100f0eee78719df4e05b1"
+  },
+  "outbox": {
+    "summary": {
+      "now": "2026-09-26T09:01:36.000Z",
+      "actor": "prn-s2007r-scheduler",
+      "inspected": 1,
+      "intentRecorded": 1,
+      "acked": 1,
+      "escalated": 0,
+      "failed": 0,
+      "externalEffectsIssued": 1,
+      "rows": [
+        {
+          "outbox_id": "obx-pilot-000002",
+          "event_type": "board.execution.request",
+          "task_id": "abt-s2007r-pilot-02",
+          "run_id": "run-pilot-000002",
+          "external_effect_issued": true,
+          "dispatch_state": "ACKED"
+        }
+      ]
+    },
+    "refusal": null,
+    "parent_wall_ms": 9
+  },
+  "observed_by_driver": {
+    "kind": "PARENT_SIDE_MEASUREMENT",
+    "note": "the wall clock and the process observation below were taken by THIS driver, around the outbox dispatch; the executor argv, exit code and usage are reported by the transport, which is the executor's own parent, and are labelled as reported",
+    "wall_clock_source": "process.hrtime.bigint() (monotonic); the board clock is the injected counter and is never read from the process",
+    "process_observer": {
+      "id": "platform:linux",
+      "what_this_is": "the DRIVER liveness and the driver process tree, NOT the executor. The executor is observed separately, by its own parent, in `executor`.",
+      "driver_pid": 173058,
+      "driver_alive_before": true,
+      "driver_alive_after": true,
+      "identity_supported": true,
+      "descendant_enumeration": {
+        "attempted": true,
+        "observable": false,
+        "reason": "SBX_PROCESS_GROUP_NOT_ISOLATED",
+        "descendants": 0,
+        "note": "the driver itself is not an isolated process-group leader, so the shipped observer refuses to sweep its group; a zero here is NOT a survivor count"
+      }
+    }
+  },
+  "dispatch_return_captured": true,
+  "result": {
+    "decision": "ACCEPT",
+    "code": null,
+    "replayed": false,
+    "outcome": "FAILED",
+    "sequence": 66,
+    "digest": "sha256:1157f286eb7ce8c0cab0b03677e67907dc4665fe3eaa79880bac7c5991d1556c",
+    "error": {
+      "contractVersion": "1.0.0",
+      "code": "PROVIDER_FAILURE",
+      "message": "PROVIDER_FAILURE",
+      "retryable": true,
+      "detail": "recorded terminal outcome FAILED",
+      "occurred_at": "2026-09-26T09:02:41.000Z"
+    },
+    "measurements": {
+      "duration_ms": 65000,
+      "spend": 0,
+      "currency": "USD",
+      "model_id": null,
+      "tool_calls": 2
+    },
+    "checkpoints": 0,
+    "artifact_hashes": 0,
+    "reconciliation_required": false
+  },
+  "cost": {
+    "settled_amount": 0,
+    "currency": "USD",
+    "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR",
+    "note": "this executor reported no monetary cost in its own output; the board is settled with 0 and no cost figure is estimated, published or priced from a list"
+  },
+  "committed": {
+    "task": {
+      "task_id": "abt-s2007r-pilot-02",
+      "state": "FAILED",
+      "revision": 5,
+      "attempts": 1,
+      "active_lease_id": null,
+      "fencing_token": null,
+      "assigned_adapter_id": "adr-codex-local",
+      "history_digest": "sha256:ba445c064358824488646ea8f878f75733de4b9899bd9bbafb699e7baab307be",
+      "brief_validated_observed": "sha256:d4e6659251556ddb7441b16a6a62d27495f993541b5d2f092a7cc8b29f9881f4"
+    },
+    "run": {
+      "run_id": "run-pilot-000002",
+      "run_state": "FAILED",
+      "last_sequence": 65,
+      "spend": 0,
+      "request_digest": "sha256:8f73c541fc5f17f441c93900c67c581af21d58d0ca64549be8204eb1c6c1582d",
+      "result_digest": "sha256:1157f286eb7ce8c0cab0b03677e67907dc4665fe3eaa79880bac7c5991d1556c"
+    },
+    "events": [
+      {
+        "sequence": 1,
+        "event_type": "ACCEPTED",
+        "outcome": null
+      },
+      {
+        "sequence": 2,
+        "event_type": "STARTED",
+        "outcome": null
+      },
+      {
+        "sequence": 3,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 4,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 5,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 6,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 7,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 8,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 9,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 10,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 11,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 12,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 13,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 14,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 15,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 16,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 17,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 18,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 19,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 20,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 21,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 22,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 23,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 24,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 25,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 26,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 27,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 28,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 29,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 30,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 31,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 32,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 33,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 34,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 35,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 36,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 37,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 38,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 39,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 40,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 41,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 42,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 43,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 44,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 45,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 46,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 47,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 48,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 49,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 50,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 51,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 52,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 53,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 54,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 55,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 56,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 57,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 58,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 59,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 60,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 61,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 62,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 63,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 64,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      {
+        "sequence": 65,
+        "event_type": "PROGRESS",
+        "outcome": null
+      }
+    ],
+    "events_gap_free": true,
+    "outbox": [
+      {
+        "outbox_id": "obx-pilot-000002",
+        "event_type": "board.execution.request",
+        "dispatch_state": "ACKED",
+        "attempts": 1,
+        "last_error": null,
+        "payload_digest": "sha256:8f73c541fc5f17f441c93900c67c581af21d58d0ca64549be8204eb1c6c1582d"
+      }
+    ],
+    "grant": {
+      "grant_id": "grt-s2007r-pilot-02",
+      "task_id": "abt-s2007r-pilot-02",
+      "task_limit": 2,
+      "campaign_limit": 2,
+      "day_limit": 2,
+      "currency": "USD",
+      "granted_by": "prn-s2007r-owner"
+    },
+    "spend": {
+      "grant_id": "grt-s2007r-pilot-02",
+      "day_key": "2026-09-26",
+      "spent_task": 0,
+      "spent_campaign": 0,
+      "spent_day": 0,
+      "currency": "USD"
+    }
+  },
+  "oracle": {
+    "task_id": "T1",
+    "command": "node verify.mjs T1",
+    "run_by": "the run driver (the parent), never the executor",
+    "exit_code": 1,
+    "pass": false,
+    "observed": true,
+    "reason": null,
+    "baseline_passing": false,
+    "baseline_observed": true,
+    "baseline_reason": null,
+    "after_passing": false,
+    "baseline_checks_passing": 4,
+    "after_checks_passing": 4,
+    "regressed": [],
+    "detail": {
+      "baseline": {
+        "observed": true,
+        "reason": null,
+        "exit_code": 1,
+        "pass": false,
+        "checks": [
+          {
+            "id": "calc:add",
+            "passed": true
+          },
+          {
+            "id": "calc:sub",
+            "passed": true
+          },
+          {
+            "id": "calc:mul",
+            "passed": true
+          },
+          {
+            "id": "calc:sumRange_inclusive",
+            "passed": false
+          },
+          {
+            "id": "calc:sumRange_empty",
+            "passed": true
+          }
+        ],
+        "checks_passing": 4,
+        "wall_ms": 58.871,
+        "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 1451
+      },
+      "after": {
+        "observed": true,
+        "reason": null,
+        "exit_code": 1,
+        "pass": false,
+        "checks": [
+          {
+            "id": "calc:add",
+            "passed": true
+          },
+          {
+            "id": "calc:sub",
+            "passed": true
+          },
+          {
+            "id": "calc:mul",
+            "passed": true
+          },
+          {
+            "id": "calc:sumRange_inclusive",
+            "passed": false
+          },
+          {
+            "id": "calc:sumRange_empty",
+            "passed": true
+          }
+        ],
+        "checks_passing": 4,
+        "wall_ms": 35.865,
+        "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 1451
+      }
+    }
+  },
+  "executor": {
+    "available": true,
+    "reason": null,
+    "reported": {
+      "argv": [
+        "exec",
+        "--json",
+        "--skip-git-repo-check",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
+        "--output-last-message",
+        "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/last-message.txt",
+        "--model",
+        "openrouter/amazon/nova-lite-v1",
+        "You are executing one bounded unit of work for the Veritas Agent Board (S2-007R).\nWorkspace: /tmp/veritas-s2-007r-ws/pilot/run-02/project (the ONLY location you may read or write; every path below is relative to it).\nBoard task: abt-s2007r-pilot-02   Project task: T1\nGoal: fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\nAcceptance criteria:\n1. fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\n2. The deterministic oracle of the project (node verify.mjs T1) exits 0 on the workspace copy after the run.\n3. The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.\n4. The executor process is a real installed CLI, and its own output is recorded as the run record.\nWork on the files named by the goal. You MAY edit them: this is a write task, and a change\nthat makes the goal true is the point. Do not touch any other file, do not add dependencies,\ndo not use the network, and do not read or write anything outside the workspace.\nEnd your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>."
+      ],
+      "bin": "/home/daniil/.local/bin/codex",
+      "cwd": "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
+      "env_names": [
+        "PATH",
+        "HOME",
+        "LANG"
+      ],
+      "exit_code": 1,
+      "exit_code_agreement": "the live process observation and the published log carry the same exit status",
+      "signal": null,
+      "pid": 173686,
+      "pgid": 173686,
+      "session_id": "01a0e355-7305-7a92-b791-93b0baf46d2a",
+      "model_id": null,
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_tokens": null,
+        "cache_read_tokens": null,
+        "cache_write_tokens": null,
+        "proxy_tokens": null,
+        "cost_usd_micros": null,
+        "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
+        "model_id": null,
+        "tool_calls": 2,
+        "executor_session_id": "01a0e355-7305-7a92-b791-93b0baf46d2a"
+      },
+      "stdout_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+      "raw_logs": [
+        {
+          "path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+          "sha256": "sha256:e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
+          "bytes": 16552
+        }
+      ],
+      "error": "{\"reason\":\"EXECUTOR_ERROR_RECORD\",\"message\":\"Model metadata for `openrouter/amazon/nova-lite-v1` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.\",\"credit_limited\":false}",
+      "observed_by": {
+        "process_observation": "the transport's parent-side view of the child (pid, pgid, exit code, signal)",
+        "raw_process_log": "re-read by this driver from the bytes it publishes, with the digest it records"
+      }
+    },
+    "missing": [
+      "signal",
+      "model_id"
+    ]
+  },
+  "corroboration": {
+    "evidence": {
+      "run_id": "run-pilot-000002",
+      "executor": {
+        "version": "s2-007r-real-executor-v1",
+        "provider": "codex",
+        "binary_path": "/home/daniil/.local/bin/codex",
+        "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
+      },
+      "raw_process_log_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+      "raw_process_log_sha256": "sha256:e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
+      "exit_status": 1,
+      "exit_observed": true,
+      "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
+    },
+    "evidence_is_minted": true,
+    "observed_by": "the run driver (the parent process of the executor), never the executor itself",
+    "executor_session_id": "01a0e355-7305-7a92-b791-93b0baf46d2a",
+    "model_id": null,
+    "child_exit_code": 1,
+    "child_pid": 173686,
+    "child_pgid": 173686,
+    "pid_tree_after_exit": [],
+    "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
   }
 }

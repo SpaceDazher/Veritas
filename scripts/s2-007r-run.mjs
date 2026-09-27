@@ -318,6 +318,10 @@ const USAGE_TEXT = [
   '  --adapters codex,pi    which installed executors to drive',
   '  --tasks <n>            how many tasks, each a real run',
   '  --model <provider/id>  an explicit model pin; pi is never left on a default',
+  '  --project-task <id>    REQUIRED: which task of the PROJECT\'s own table this run',
+  '                         executes. The goal is read out of `node verify.mjs',
+  '                         --criteria`, so the brief the executor reads and the',
+  '                         criterion the oracle adjudicates are the same text.',
   '  --postgres <url>       a DATABASE_URL, otherwise the rootless-podman recipe provisions one',
   '',
   'It SPAWNS REAL EXECUTORS and can spend real money. Exit codes: 0 pass, 1 fail, 3 not run.',
@@ -1229,32 +1233,192 @@ function isPlainRecord(value) {
 }
 
 /** Raw logs this driver is about to publish: bytes, digest, and a credential scan. */
+/**
+ * The raw process logs of a run, scanned RECURSIVELY.
+ *
+ * Why recursive: the transport writes each crossing under
+ * <raw>/<provider>/<run-label>/<run_id>/raw/exec-NNN.log.json, and a
+ * one-level scan reported "no raw log published" for a run that really had one
+ * on disk — the hard gate NO_RAW_PROCESS_LOG_PUBLISHED was a BOOKKEEPING defect
+ * in this driver, not a missing artefact. A gate that cries wolf is worse than
+ * no gate, so the walk follows the real layout and the record names every file
+ * it published.
+ *
+ * The credential scan is unchanged and still runs on every file's bytes: a raw
+ * artefact that trips it is withheld, not published and not rewritten.
+ */
+/**
+ * THE DETERMINISTIC ORACLE, run by the PARENT on the run's own copy of the
+ * project.
+ *
+ * WHY IT LIVES HERE AND NOT IN THE EXECUTOR
+ * `corpus/s2-007r/project/verify.mjs <task_id>` exits 0 when the task's stated
+ * criterion is met. It is run by this process, on the copy the executor actually
+ * worked in, AFTER the run settled, with no credential, no network and no
+ * stored fixture: a third party with a clean checkout can recompute every number
+ * that depends on it. An executor that graded its own work would be worth
+ * nothing, and a grader that could not be re-run would not be evidence.
+ *
+ * The BASELINE is the same oracle on a pristine copy of the same project, so the
+ * regression rate has a real "before" instead of an assumed one.
+ */
+function runProjectOracle({ copyRoot, pristineRoot, taskId, label }) {
+  const execute = (root, tag) => {
+    const verify = path.join(root, 'verify.mjs');
+    if (!fs.existsSync(verify)) {
+      return { observed: false, reason: `no oracle at ${displayPath(verify)} in the ${tag} copy`, exit_code: null, pass: null };
+    }
+    const started = process.hrtime.bigint();
+    const result = spawnSync(process.execPath, [verify, taskId], {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 4 * 1024 * 1024,
+      shell: false,
+      timeout: 120_000,
+      // The oracle reads the project and nothing else: a minimal environment
+      // keeps a stray variable from changing a verdict.
+      env: { PATH: process.env.PATH ?? '', NODE_ENV: 'test' },
+    });
+    const wallMs = Number((process.hrtime.bigint() - started) / 1000n) / 1000;
+    if (result.error) {
+      return { observed: false, reason: `the ${tag} oracle could not be executed: ${String(result.error.code ?? result.error.message).slice(0, 120)}`, exit_code: null, pass: null, checks: null };
+    }
+    const exitCode = Number(result.status);
+    // The oracle prints one machine-readable JSON line. It is PARSED, not
+    // pattern-matched: a per-check verdict the regression rate needs cannot be
+    // read out of an exit code, and a measurement whose numerator comes from a
+    // regular expression over prose is not a measurement.
+    let checks = null;
+    try {
+      const line = String(result.stdout ?? '').split('\n').map((row) => row.trim()).filter(Boolean).pop();
+      const parsed = JSON.parse(line);
+      if (Array.isArray(parsed?.checks)) {
+        checks = parsed.checks.map((row) => ({ id: String(row.id), passed: row.passed === true }));
+      }
+    } catch {
+      checks = null;
+    }
+    return {
+      observed: true,
+      reason: checks === null ? 'the oracle printed no machine-readable check list' : null,
+      exit_code: exitCode,
+      pass: exitCode === 0,
+      checks,
+      checks_passing: checks === null ? null : checks.filter((row) => row.passed).length,
+      wall_ms: Math.round(wallMs * 1000) / 1000,
+      stdout_sha256: createHash('sha256').update(String(result.stdout ?? '')).digest('hex'),
+      stderr_sha256: createHash('sha256').update(String(result.stderr ?? '')).digest('hex'),
+      stdout_bytes: String(result.stdout ?? '').length,
+    };
+  };
+  const baseline = execute(pristineRoot, 'pristine');
+  const after = execute(copyRoot, 'post-run');
+  // THE REGRESSION SET: a check the PRISTINE copy passed and the post-run copy
+  // does not. A task's own criterion failing is a REJECTION, not a regression,
+  // so only a check that already held can regress — which is why the pristine
+  // baseline is read instead of assumed.
+  const regressed = [];
+  if (Array.isArray(baseline.checks) && Array.isArray(after.checks)) {
+    for (const row of baseline.checks) {
+      if (!row.passed) continue;
+      const counterpart = after.checks.find((candidate) => candidate.id === row.id);
+      if (counterpart && !counterpart.passed) regressed.push(row.id);
+    }
+  }
+  return {
+    oracle: {
+      task_id: taskId,
+      command: `node verify.mjs ${taskId}`,
+      run_by: 'the run driver (the parent), never the executor',
+      exit_code: after.observed ? after.exit_code : null,
+      pass: after.pass,
+      observed: after.observed,
+      reason: after.reason,
+      baseline_passing: baseline.observed ? baseline.pass : null,
+      baseline_observed: baseline.observed,
+      baseline_reason: baseline.reason,
+      after_passing: after.observed ? after.pass : null,
+      baseline_checks_passing: baseline.checks_passing,
+      after_checks_passing: after.checks_passing,
+      regressed,
+      detail: { baseline, after },
+    },
+    label,
+  };
+}
+
+/**
+ * THE PROJECT'S OWN TASK TABLE, read from its oracle.
+ *
+ * The brief the executor reads and the criterion the oracle adjudicates are the
+ * same text by construction: the driver asks the fixture which tasks exist and
+ * what each one means, and builds the goal from the answer. A driver that
+ * hard-coded its own copy of the goal would be a second, drifting statement of
+ * what the task was, and a task whose written goal differs from the thing that
+ * gets measured is not a measurement at all.
+ *
+ * An unreadable table is a refusal, not a default goal.
+ */
+function readProjectTasks(projectRoot) {
+  const oracle = path.join(projectRoot, 'verify.mjs');
+  if (!fs.existsSync(oracle)) {
+    throw new NeedsInput('PROJECT_ORACLE_ABSENT', `${displayPath(oracle)} does not exist, so the brief cannot be built from the project's own task table`);
+  }
+  const result = spawnSync(process.execPath, [oracle, '--criteria'], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    maxBuffer: 4 * 1024 * 1024,
+    shell: false,
+    timeout: 120_000,
+    env: { PATH: process.env.PATH ?? '', NODE_ENV: 'test' },
+  });
+  if (result.error || result.status !== 0) {
+    throw new NeedsInput(
+      'PROJECT_ORACLE_UNREADABLE',
+      `the project oracle did not print its task table (exit ${String(result.status)}): ${String(result.stderr ?? '').slice(0, 200)}`,
+    );
+  }
+  const parsed = JSON.parse(String(result.stdout ?? '').trim());
+  if (!isPlainRecord(parsed?.tasks) || Object.keys(parsed.tasks).length === 0) {
+    throw new NeedsInput('PROJECT_ORACLE_UNREADABLE', 'the project oracle printed no task table');
+  }
+  return { tasks: parsed.tasks, checks_per_task: isPlainRecord(parsed.checks_per_task) ? parsed.checks_per_task : {} };
+}
+
 function describeRawLogs(rawDir) {
   if (!fs.existsSync(rawDir)) return { directory: displayPath(rawDir), files: [], withheld: [] };
   const files = [];
   const withheld = [];
-  for (const name of fs.readdirSync(rawDir).sort()) {
-    const absolute = path.join(rawDir, name);
-    if (!fs.statSync(absolute).isFile()) continue;
-    const buffer = fs.readFileSync(absolute);
-    const text = buffer.toString('utf8');
-    const hit = CREDENTIAL_PATTERNS.findIndex((pattern) => pattern.test(text));
-    if (hit >= 0) {
-      // The bytes are NOT published and NOT rewritten: a raw artefact that
-      // trips the repository's own credential scan is withheld with the exact
-      // reason, and the run is reported non-zero.
-      fs.rmSync(absolute, { force: true });
-      withheld.push({
-        file: name,
-        pattern_index: hit,
-        pattern: CREDENTIAL_PATTERNS[hit].toString(),
-        bytes: buffer.length,
-        reason: 'credential-shaped literal detected by the same patterns scripts/check-public-artifacts.mjs scans; the raw bytes were withheld, not published and not rewritten',
-      });
-      continue;
+  const walk = (directory) => {
+    for (const name of fs.readdirSync(directory).sort()) {
+      const absolute = path.join(directory, name);
+      const stat = fs.statSync(absolute);
+      if (stat.isDirectory()) {
+        walk(absolute);
+        continue;
+      }
+      if (!stat.isFile()) continue;
+      const buffer = fs.readFileSync(absolute);
+      const text = buffer.toString('utf8');
+      const hit = CREDENTIAL_PATTERNS.findIndex((pattern) => pattern.test(text));
+      if (hit >= 0) {
+        // The bytes are NOT published and NOT rewritten: a raw artefact that
+        // trips the repository's own credential scan is withheld with the exact
+        // reason, and the run is reported non-zero.
+        fs.rmSync(absolute, { force: true });
+        withheld.push({
+          file: displayPath(absolute),
+          pattern_index: hit,
+          pattern: CREDENTIAL_PATTERNS[hit].toString(),
+          bytes: buffer.length,
+          reason: 'credential-shaped literal detected by the same patterns scripts/check-public-artifacts.mjs scans; the raw bytes were withheld, not published and not rewritten',
+        });
+        continue;
+      }
+      files.push({ file: displayPath(absolute), bytes: buffer.length, sha256: createHash('sha256').update(buffer).digest('hex') });
     }
-    files.push({ file: name, bytes: buffer.length, sha256: createHash('sha256').update(buffer).digest('hex') });
-  }
+  };
+  walk(rawDir);
   return { directory: displayPath(rawDir), files, withheld };
 }
 
@@ -1703,13 +1867,30 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
   };
 
   // --- 1. the task, through the command boundary ---------------------------
-  const goal = 'Inventory the project in the workspace and report its files with their line counts.';
+  // The goal and the criteria are the PROJECT's own words, read from its oracle
+  // (see readProjectTasks): the brief and the measurement cannot disagree.
+  if (typeof run.options.projectTask !== 'string' || run.options.projectTask.length === 0) {
+    throw new NeedsInput('PROJECT_TASK_REQUIRED', '--project-task <id> is required: this driver never chooses the criterion for you, and a run with no stated criterion has nothing to measure');
+  }
+  const projectTasks = readProjectTasks(source.realpath);
+  const projectTaskId = run.options.projectTask;
+  const goal = projectTasks.tasks[projectTaskId];
+  if (typeof goal !== 'string' || goal.length === 0) {
+    throw new NeedsInput('PROJECT_TASK_UNKNOWN', `the project has no task ${projectTaskId}; it has ${Object.keys(projectTasks.tasks).join(', ')}`);
+  }
   const createdAt = run.instant();
   const acceptanceCriteria = [
-    'A file inventory of the workspace is reported as the run result.',
-    'No file in the workspace is modified: the project digest before and after the run is identical.',
+    goal,
+    'The deterministic oracle of the project (node verify.mjs ' + projectTaskId + ') exits 0 on the workspace copy after the run.',
+    'The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.',
     'The executor process is a real installed CLI, and its own output is recorded as the run record.',
   ];
+  record.project_task = {
+    project_task_id: projectTaskId,
+    goal,
+    checks: projectTasks.checks_per_task[projectTaskId] ?? [],
+    source: 'the project oracle itself (node verify.mjs --criteria); the driver holds no second copy of the goal',
+  };
   const taskDocument = {
     contractVersion: '1.0.0',
     task_id: taskId,
@@ -1892,7 +2073,7 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
     record.findings.push({ id: 'transport-factory-absent', detail: `${run.executors.dir} exports no transport factory for ${spec.provider}` });
     return record;
   }
-  const prompt = buildPrompt({ taskId, goal, acceptanceCriteria, copy, spec, run });
+  const prompt = buildPrompt({ taskId, projectTaskId, goal, acceptanceCriteria, copy, spec, run });
   // The option bag carries BOTH naming conventions: the SPEC §2 tree takes
   // `projectRoot`/`workspaceRoot`/`allowedTools`, the single-module transport
   // takes `executorPath`/`evidenceDir`/`workspaceRoots`/`realpath`/`toolBindings`.
@@ -2078,15 +2259,20 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
     // string is the only place the transport's own refusal appears. Reading it
     // back is the difference between "it failed" and "it failed because X".
     let outboxRows = null;
+    let outboxShape = null;
     try {
       const listed = await run.call('outbox.list', 'outbox.list', { workspace_id: WORKSPACE_ID, limit: 8 }, {
         principal: run.principal.owner,
       });
-      const payload = listed?.data ?? null;
+      // Whatever the envelope is, the rows are somewhere in it; the shape is
+      // discovered rather than assumed, and an unrecognised shape is REPORTED
+      // instead of being read as "no rows".
+      const payload = listed?.data ?? listed ?? null;
       const rows = Array.isArray(payload) ? payload
         : Array.isArray(payload?.outbox) ? payload.outbox
           : Array.isArray(payload?.rows) ? payload.rows
             : null;
+      outboxShape = { recognised: rows !== null, keys: payload && typeof payload === 'object' ? Object.keys(payload) : null };
       if (Array.isArray(rows)) {
         outboxRows = rows.map((row) => ({
           outbox_id: row.outbox_id ?? null,
@@ -2107,6 +2293,8 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
       message: dispatch.message,
       detail: dispatch.detail ?? null,
       outbox_rows: outboxRows,
+      outbox_shape: outboxShape,
+      transport_error: capture.transportError ?? null,
     });
     record.raw_logs = describeRawLogs(rawLogDir);
     return record;
@@ -2290,11 +2478,49 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
   };
   record.project.digest_after = projectAfter.digest;
   record.project.unchanged = projectAfter.digest === copy.digest;
-  if (!record.project.unchanged) {
-    record.findings.push({ id: 'project-modified', severity: 'defect', detail: 'the executor changed the fixture bytes; the task forbade it and the change is reported, not hidden' });
-  }
+  // The task is a WRITE task (it asks for an off-by-one fixed), so a changed
+  // digest is the expected outcome and is published as an observation. It is
+  // still a defect if the digest did NOT change, because then the criterion
+  // cannot possibly have been met and the run would be reporting an
+  // unexplained success.
+  record.findings.push(record.project.unchanged
+    ? { id: 'project-unmodified', severity: 'defect', detail: 'the task is a write task and the fixture digest is unchanged, so the stated criterion cannot have been met; reported rather than counted as a quiet pass' }
+    : { id: 'project-modified', severity: 'observation', detail: 'the executor changed the fixture, which is what the task asked for; both digests and the oracle\'s per-check verdicts are published beside it' });
+
+  // The oracle, run here on BOTH copies: the pristine one for the baseline and
+  // this run's own copy for the after. `copy` is the directory the executor
+  // worked in, so the "after" reading is of the bytes the run really produced.
+  record.oracle = runProjectOracle({
+    copyRoot: copy.realpath,
+    pristineRoot: source.realpath,
+    taskId: projectTaskId,
+    label,
+  }).oracle;
 
   record.executor = extractExecutorObservation(transport);
+  // THE CORROBORATION BLOCK: the transport's OWN evidence record, the object
+  // assertRealRunEvidence adjudicates, published under the field names the gate
+  // reads. It is the only place the binary digest, the raw-log digest and the
+  // parent-observed exit status travel together, and it is the same object a
+  // later verifier can re-adjudicate against the bytes on disk.
+  const evidenceRecord = typeof transport.evidenceRecord === 'function' ? transport.evidenceRecord() : null;
+  record.corroboration = {
+    evidence: evidenceRecord,
+    evidence_is_minted: isPlainRecord(evidenceRecord) && evidenceRecord.run_id === record.run_id,
+    observed_by: 'the run driver (the parent process of the executor), never the executor itself',
+    executor_session_id: record.executor?.reported?.session_id ?? null,
+    model_id: record.executor?.reported?.model_id ?? null,
+    child_exit_code: record.executor?.reported?.exit_code ?? null,
+    child_pid: record.executor?.reported?.pid ?? null,
+    child_pgid: record.executor?.reported?.pgid ?? null,
+    // The pid tree the parent observed AFTER the exit. An empty array is an
+    // UNOBSERVABLE process space, not an observed one, and it is published as
+    // null rather than as [] so nobody reads it as "the tree was empty".
+    pid_tree_after_exit: isPlainRecord(transport.processObservation) && Array.isArray(transport.processObservation.observed_pids)
+      ? transport.processObservation.observed_pids
+      : null,
+    observation_trust: isPlainRecord(evidenceRecord) ? (evidenceRecord.observation_trust ?? null) : null,
+  };
   publishArgvEvidence(record, transport, run.options.configuration);
   record.raw_logs = describeRawLogs(rawLogDir);
 
@@ -2306,17 +2532,18 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
   return record;
 }
 
-function buildPrompt({ taskId, goal, acceptanceCriteria, copy, spec, run }) {
+function buildPrompt({ taskId, projectTaskId, goal, acceptanceCriteria, copy, spec, run }) {
   return [
     `You are executing one bounded unit of work for the Veritas Agent Board (${TICKET}).`,
-    `Workspace: ${copy.realpath} (the only location you may read or write).`,
-    `Task: ${taskId}`,
+    `Workspace: ${copy.realpath} (the ONLY location you may read or write; every path below is relative to it).`,
+    `Board task: ${taskId}   Project task: ${projectTaskId}`,
     `Goal: ${goal}`,
     'Acceptance criteria:',
     ...acceptanceCriteria.map((item, index) => `${index + 1}. ${item}`),
-    'Report every regular file in the workspace (paths relative to it) with its line count,',
-    'then state in one line whether you modified any file (you must not).',
-    'Do not read or write anything outside the workspace. Do not use the network.',
+    'Work on the files named by the goal. You MAY edit them: this is a write task, and a change',
+    'that makes the goal true is the point. Do not touch any other file, do not add dependencies,',
+    'do not use the network, and do not read or write anything outside the workspace.',
+    'End your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>.',
   ].join('\n');
 }
 
@@ -2343,12 +2570,28 @@ function observingTransport(transport, capture) {
   const wrapper = {
     ...transport,
     async dispatch(payload) {
-      const answer = typeof transport.dispatch === 'function'
-        ? await transport.dispatch(payload)
-        : await transport.start(payload);
-      capture.dispatchReturn = answer;
-      capture.dispatchPath = typeof transport.dispatch === 'function' ? 'dispatch' : 'start';
-      return answer;
+      // The transport's own refusal is the CAUSE; the boundary's
+      // RECONCILIATION_REQUIRED is the consequence. `driveOutbox` records the
+      // consequence on the outbox row and hands the caller nothing, so the
+      // cause is captured here where it can still be named.
+      try {
+        const answer = typeof transport.dispatch === 'function'
+          ? await transport.dispatch(payload)
+          : await transport.start(payload);
+        capture.dispatchReturn = answer;
+        capture.dispatchPath = typeof transport.dispatch === 'function' ? 'dispatch' : 'start';
+        capture.transportError = null;
+        return answer;
+      } catch (error) {
+        capture.transportError = {
+          name: error?.name ?? 'Untyped',
+          code: error?.code ?? null,
+          message: String(error?.message ?? error).slice(0, 400),
+          detail: error?.detail === undefined ? null : String(error.detail).slice(0, 400),
+          retryable: error?.retryable ?? null,
+        };
+        throw error;
+      }
     },
   };
   for (const name of ['identify', 'capabilities', 'health', 'claim', 'start', 'status', 'checkpoint', 'cancel', 'collect_result', 'release', 'bindRun']) {
@@ -2448,6 +2691,10 @@ async function main() {
     dayLimit: value(args['day-limit']),
     campaignLedger: value(args['campaign-ledger']),
     provenanceBootstrap: value(args['provenance-bootstrap']),
+    // Which task of the PROJECT's own table this run executes. Resolved from the
+    // same parsed bag as every other option and passed through as a REQUIRED
+    // value: the driver never picks a criterion for the operator.
+    projectTask: value(args['project-task']),
   };
 
   try {
@@ -2586,7 +2833,17 @@ async function main() {
     });
 
     const run = new RealRun({
-      options: { ...options, seedSlug: options.seed, tasks: taskCount, configuration: options.configuration, model: options.model },
+      options: {
+        ...options,
+        seedSlug: options.seed,
+        // A project task id is REQUIRED, never defaulted: a run whose criterion
+        // nobody chose is a run with no measurable outcome, so the driver
+        // refuses rather than picking one.
+        projectTask: options.projectTask ?? null,
+        tasks: taskCount,
+        configuration: options.configuration,
+        model: options.model,
+      },
       store: storeHandle.backend,
       executors,
       adapterKeys,
