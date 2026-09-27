@@ -1,9 +1,9 @@
 // S2-007 LIVE AGENT BOARD — shared Next.js transport core.
 //
 // ONE implementation, TWO mount points. The library's `HTTP_ROUTES` table
-// declares eighteen routes (discovery, ACL-checked reads and idempotency-keyed
+// declares nineteen routes (discovery, ACL-checked reads and idempotency-keyed
 // mutations). A single App Router `route.ts` matches ONLY its exact path, so
-// without a catch-all mount seventeen of those routes would 404 in the
+// without a catch-all mount eighteen of those routes would 404 in the
 // framework before `handleRequest` ever saw them — the route table would be
 // unreachable over HTTP and only the CLI and the negative probes would exercise
 // it. `route.ts` (the mount point itself) and `[...path]/route.ts` (one or more

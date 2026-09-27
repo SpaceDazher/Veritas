@@ -945,6 +945,94 @@ describe('S2-007 lease: a stale fencing token is refused on every mutating opera
 // ===========================================================================
 
 describe('S2-007 lease: expiry follows the database clock and never requeues a task by itself', () => {
+  test('the sweep is scoped to one workspace and never required to be unscoped', async () => {
+    // A sweep is a WRITE. Every other write path in this store refuses a
+    // cross-workspace target (`cross_workspace_claim_denied`,
+    // `cross_workspace_run_denied`, `cross_workspace_adapter_denied`, and an
+    // absolute refusal in `_assertVisible`), so a sweep that walked every
+    // `agentboard_lease` row in the installation would have been the single
+    // path able to withdraw another tenant's right. Two workspaces, one
+    // store, one clock past both expiries: workspace A's sweep must move
+    // nothing in workspace B.
+    const FOREIGN = 'ws-lease-foreign';
+    const FOREIGN_TASK = 'abt-lease-foreign-1';
+    const FOREIGN_ADAPTER = 'adr-lease-foreign';
+    const store = makeStore();
+    await readyToClaim(store);
+    const mine = await claim(store, { ttlMs: 60_000 });
+
+    const foreign = taskDocument({
+      task_id: FOREIGN_TASK,
+      workspace_id: FOREIGN,
+      workspace_ref: {
+        workspace_id: FOREIGN,
+        root_ref: 'projects/beta',
+        isolation_profile_id: PROFILE,
+        sandbox_profile_digest: digest('a'),
+        read_only_paths: ['vendor'],
+      },
+    });
+    await createTask(store, foreign);
+    const foreignReady = await store.transitionTask({
+      taskId: FOREIGN_TASK,
+      toState: 'READY',
+      expectedRevision: 1,
+      actor: OWNER,
+      actorKind: 'human_owner',
+      reason: 'fixture: the second tenant is ready',
+      idempotencyKey: key('tasks.transition', { task_id: FOREIGN_TASK, to: 'READY' }, OWNER),
+      argsDigest: key('tasks.transition', { task_id: FOREIGN_TASK, to: 'READY' }, OWNER),
+    });
+    const foreignRegistration = { ...adapterRegistration(FOREIGN_ADAPTER, PRODUCER), workspace_id: FOREIGN };
+    const foreignAdapterKey = key('adapters.register', { adapter_id: FOREIGN_ADAPTER }, OWNER);
+    await store.registerAdapter({ registration: foreignRegistration, actor: OWNER, idempotencyKey: foreignAdapterKey, argsDigest: foreignAdapterKey });
+    const theirs = await store.claimTask({
+      taskId: FOREIGN_TASK,
+      workspaceId: FOREIGN,
+      adapterId: FOREIGN_ADAPTER,
+      ttlMs: 60_000,
+      expectedRevision: foreignReady.revision,
+      actor: SCHEDULER,
+      actorKind: 'scheduler',
+      idempotencyKey: key('tasks.claim', { task_id: FOREIGN_TASK, adapter_id: FOREIGN_ADAPTER }, SCHEDULER),
+      argsDigest: key('tasks.claim', { task_id: FOREIGN_TASK, adapter_id: FOREIGN_ADAPTER }, SCHEDULER),
+    });
+
+    // The other tenant's committed state, as one digest, before the sweep.
+    const foreignBefore = canonicalDigest({
+      lease: await store.readLease(theirs.lease_id),
+      task: await store.getTask(FOREIGN_TASK, { workspaceId: FOREIGN, principalId: OWNER }),
+    });
+
+    store.setNow('2026-09-25T12:05:00.000Z');
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId: WORKSPACE });
+
+    assert.deepEqual(swept.expired.map((row) => row.lease_id), [mine.lease_id], 'the sweep expired exactly the one lease it owns');
+    assert.equal(swept.workspace_id, WORKSPACE, 'the result names the workspace it was asked to sweep');
+    assert.equal(
+      canonicalDigest({
+        lease: await store.readLease(theirs.lease_id),
+        task: await store.getTask(FOREIGN_TASK, { workspaceId: FOREIGN, principalId: OWNER }),
+      }),
+      foreignBefore,
+      "another workspace's lease and task are byte-identical after this tenant's sweep",
+    );
+    assert.equal((await store.readLease(theirs.lease_id)).lease_state, 'ACTIVE', "the other tenant's right is untouched");
+
+    // And the scope is not optional: an unscoped sweep is a refusal, not a
+    // privileged global operation.
+    await expectRefusal(
+      store.expireLeases({ actor: SCHEDULER }),
+      ['NEEDS_INPUT'],
+      'an unscoped lease sweep',
+    );
+    assert.equal(
+      (await store.readLease(theirs.lease_id)).lease_state,
+      'ACTIVE',
+      'the refused sweep wrote nothing anywhere',
+    );
+  });
+
   test('a sweep before the expiry observes nothing and changes nothing', async () => {
     const store = makeStore();
     await readyToClaim(store);
@@ -954,7 +1042,7 @@ describe('S2-007 lease: expiry follows the database clock and never requeues a t
     const before = await stateDigest(store, { includeLedger: false });
     const journalBefore = (await store.listTransitions(TASK_ID, { workspaceId: WORKSPACE, principalId: OWNER })).length;
     store.setNow('2026-09-25T12:00:30.000Z');
-    const swept = await store.expireLeases({ actor: SCHEDULER, now: '2026-09-25T12:00:30.000Z' });
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId: WORKSPACE, now: '2026-09-25T12:00:30.000Z' });
 
     assert.deepEqual(swept.expired, [], 'nothing is due before expires_at');
     assert.equal(
@@ -976,7 +1064,7 @@ describe('S2-007 lease: expiry follows the database clock and never requeues a t
     const claimed = await claim(store, { ttlMs: 60_000 });
 
     store.setNow('2026-09-25T12:05:00.000Z');
-    const swept = await store.expireLeases({ actor: SCHEDULER });
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId: WORKSPACE });
 
     assert.equal(swept.expired.length, 1, 'exactly the one due lease');
     assert.equal(swept.expired[0].lease_id, claimed.lease_id);
@@ -1022,7 +1110,7 @@ describe('S2-007 lease: expiry follows the database clock and never requeues a t
     assert.equal(running.task.state, 'RUNNING');
 
     store.setNow('2026-09-25T13:00:00.000Z');
-    const swept = await store.expireLeases({ actor: SCHEDULER });
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId: WORKSPACE });
     assert.equal(swept.expired.length, 1, 'the RUNNING task lease expired too');
 
     const task = await store.getTask(TASK_ID, { workspaceId: WORKSPACE, principalId: OWNER });

@@ -19,12 +19,17 @@ if (missing.length > 0) {
   process.exit(70);
 }
 
+// Ids are primary keys, so they are namespaced by the run as well as by the
+// participant: a second run of the parent test against the same database must
+// not collide with the ids this child minted the first time. The tag is the
+// child's own pid; the participant label already separates the two children
+// from each other and from the parent store.
 function deterministicIds(namespace) {
   const counters = new Map();
   return (kind) => {
     const next = (counters.get(kind) ?? 0) + 1;
     counters.set(kind, next);
-    return `${kind}-${namespace}-${next.toString(36).padStart(6, '0')}`;
+    return `${kind}-${namespace}-r${process.pid}-${next.toString(36).padStart(6, '0')}`;
   };
 }
 

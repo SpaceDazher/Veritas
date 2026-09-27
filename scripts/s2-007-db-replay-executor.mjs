@@ -338,8 +338,10 @@ const VOLATILE_COLUMNS = Object.freeze([
 //   2. the outbox send intent key (operation `outbox.dispatch`): it binds that
 //      request digest, so the clock enters the ledger key by construction;
 //   3. the lease-expiry sweep (operation `board.lease.expire` and the
-//      `lease_rebind` transition it appends): the sweep keys on the observed
-//      instant BY DESIGN — "a sweep is a distinct operation per instant".
+//      transition it appends, whose payload carries `expired_at` and whose
+//      `payload_digest` therefore digests a database-clock instant): the sweep
+//      keys on the observed instant BY DESIGN — "a sweep is a distinct
+//      operation per instant".
 //
 // The claim is falsifiable, which is the only thing that makes it honest: run
 // the same harness twice and these three classes are the ONLY values that move.
@@ -409,7 +411,17 @@ function normalizeTableRows(table, rows) {
     const record = normalizeDigests(timed, REQUEST_DIGEST_KEYS);
     // 3. the two operations the database clock keys by design, plus the
     //    transition the sweep appends.
-    if (table === 'agentboard_transition' && record.payload?.kind === 'lease_rebind' && record.payload.expired_at !== undefined) {
+    //
+    //    The sweep's transition is identified by the PRESENCE OF `expired_at`
+    //    in its payload, not by the literal `payload.kind`. A reassignment
+    //    rebind carries `previous_fencing_token` and `new_fencing_token` and
+    //    no `expired_at`; the expiry carries `expired_at` and no new fence,
+    //    because an expiry issues nothing. So the field separates the two
+    //    classes exactly — and matching the field instead of the kind means
+    //    renaming the kind cannot silently turn a normalized digest into a
+    //    compared one, which is how a false "canonical digest mismatch" is
+    //    produced by a rename that changed nothing about the clock.
+    if (table === 'agentboard_transition' && record.payload?.expired_at !== undefined) {
       record.idempotency_key = DB_CLOCK_DIGEST;
       record.payload_digest = DB_CLOCK_DIGEST;
     }
@@ -1071,7 +1083,7 @@ async function phaseScenario(executor) {
   const preSweep = new PostgresAgentBoardStore({
     pool: executor.pool, clock: fixedClock('1970-01-01T00:00:00.000Z'), ids: executor.storeIds, seed: executor.store.seed,
   });
-  const sweep = await preSweep.expireLeases({ actor: P.sweeper, now: '1970-01-01T00:00:00.000Z' });
+  const sweep = await preSweep.expireLeases({ actor: P.sweeper, workspaceId: WS.scenario, now: '1970-01-01T00:00:00.000Z' });
   const expiredRow = (await executor.pool.query(
     `SELECT lease_state FROM ${executor.schema}.agentboard_lease WHERE lease_id = $1`, [expiredLease],
   )).rows[0];
@@ -1109,7 +1121,7 @@ async function phaseScenario(executor) {
   const futureSweepStore = new PostgresAgentBoardStore({
     pool: executor.pool, clock: fixedClock('2099-01-01T00:00:00.000Z'), ids: executor.storeIds, seed: executor.store.seed,
   });
-  const futureSweep = await futureSweepStore.expireLeases({ actor: P.sweeper, now: '2099-01-01T00:00:00.000Z' });
+  const futureSweep = await futureSweepStore.expireLeases({ actor: P.sweeper, workspaceId: WS.scenario, now: '2099-01-01T00:00:00.000Z' });
   const liveRow = (await executor.pool.query(
     `SELECT lease_state FROM ${executor.schema}.agentboard_lease WHERE lease_id = $1`, [cancelledLease],
   )).rows[0];

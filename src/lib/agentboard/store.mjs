@@ -1088,6 +1088,10 @@ export class AgentBoardStoreBase {
         order: 'task_priority',
         limit: max,
       });
+      // ONE pass per task, not three: the ACL row is read once and reused for
+      // the visibility decision AND for the wire document, and the birth
+      // record is read alongside it. At `limit: 200` the previous shape cost
+      // 600 round trips for one list, on the hot path the live board polls.
       const visible = [];
       for (const row of rows) {
         const acl = await tx.selectRow('agentboard_acl', { where: { task_id: row.task_id } });
@@ -1100,18 +1104,15 @@ export class AgentBoardStoreBase {
         const ok = policy && typeof policy.isVisible === 'function'
           ? policy.isVisible(subject, principalId) === true
           : fallbackIsVisible(subject, workspaceId);
-        if (ok) visible.push(row);
-      }
-      const out = [];
-      for (const row of visible) {
+        if (!ok) continue;
         const create = await tx.selectRow('agentboard_audit', {
           where: { task_id: row.task_id, operation: 'board.task.create' },
           order: 'audit_occurred',
           limit: 1,
         });
-        out.push(buildTaskWire({ row, aclRow: await tx.selectRow('agentboard_acl', { where: { task_id: row.task_id } }), createDetail: create?.detail ?? null }));
+        visible.push({ row, acl, createDetail: create?.detail ?? null });
       }
-      return out;
+      return visible.map(({ row, acl, createDetail }) => buildTaskWire({ row, aclRow: acl, createDetail }));
     });
   }
 
@@ -2095,21 +2096,38 @@ export class AgentBoardStoreBase {
    * still live on that lease the outcome is unknown, so the run becomes
    * RECONCILIATION_REQUIRED and an outbox row asks for an authorized decision:
    * never a blind retry.
+   *
+   * WHY `workspaceId` IS REQUIRED
+   * The sweep is a WRITE, and an unscoped write across every `agentboard_lease`
+   * row in the installation would be the one path in this file that ignores the
+   * tenancy rule every other path enforces: `claimTask` refuses
+   * `cross_workspace_claim_denied`, `createRun` refuses
+   * `cross_workspace_run_denied`, and `_assertVisible` refuses a cross-workspace
+   * read absolutely. A caller holding a handle to this store in workspace A
+   * could otherwise withdraw every lease in workspace B.
+   *
+   * It also has to be in the scope for a non-security reason: a sweep reads
+   * `lease_state = 'ACTIVE'` and no lease, so a caller that had a global view
+   * would mutate rows it never enumerated and could not attribute. `workspaceId`
+   * bounds both the decision and the journal, and it is part of the ledger key
+   * so two workspaces swept at the same database instant are two operations
+   * rather than one operation replayed into the wrong workspace.
    */
-  async expireLeases({ actor, now: requestedAt = undefined } = {}) {
+  async expireLeases({ actor, workspaceId, now: requestedAt = undefined } = {}) {
     const operation = 'board.lease.expire';
     requireActor(actor);
+    const workspace = requireText(workspaceId, 'expireLeases workspaceId', { max: 64 });
     const marker = requestedAt === undefined || requestedAt === null ? null : toIsoMs(requestedAt, 'now');
     return this._write(async (tx) => {
       const now = await tx.now();
       // The ledger key is derived from the observed database time, so a sweep
       // is a distinct operation per instant and a re-sweep cannot double-spend.
-      const key = canonicalDigest({ operation, actor, now });
-      const idem = { key, digest: canonicalDigest({ operation, actor, now }) };
+      const key = canonicalDigest({ operation, actor, workspace, now });
+      const idem = { key, digest: canonicalDigest({ operation, actor, workspace, now }) };
       const replay = await this._replay(tx, idem, { operation });
       if (replay) return replay;
       const due = await tx.selectRows('agentboard_lease', {
-        where: { lease_state: 'ACTIVE' },
+        where: { lease_state: 'ACTIVE', workspace_id: workspace },
         order: 'lease_id',
       });
       const expired = [];
@@ -2117,6 +2135,10 @@ export class AgentBoardStoreBase {
         if (Date.parse(lease.expires_at) > Date.parse(now)) continue;
         const task = await tx.selectRow('agentboard_task', { where: { task_id: lease.task_id }, forUpdate: true });
         if (!task) continue;
+        // Defence in depth: the row filter already bounds the sweep to one
+        // workspace, and a lease whose task row names a different one is a
+        // corrupt pair that this sweep must not act on.
+        if (task.workspace_id !== workspace) continue;
         const stillActive = await tx.selectRow('agentboard_lease', { where: { lease_id: lease.lease_id, lease_state: 'ACTIVE' }, forUpdate: true });
         if (!stillActive) continue;
         await tx.updateRows('agentboard_lease', {
@@ -2137,8 +2159,12 @@ export class AgentBoardStoreBase {
           leaseId: lease.lease_id,
           fencingToken: Number(lease.fencing_token),
           revision,
+          // Withdrawn, not rebound. A rebind is the reassign case (a new lease
+          // carries a strictly greater fence); an expiry issues nothing, so
+          // filing it under `lease_rebind` would make the journal unable to
+          // tell "somebody else took over" from "the right simply ran out".
           payload: {
-            kind: 'lease_rebind',
+            kind: 'lease_expire',
             expired_at: lease.expires_at,
             observed_at: now,
             previous_fencing_token: Number(lease.fencing_token),
@@ -2146,12 +2172,19 @@ export class AgentBoardStoreBase {
           now,
         });
         const historyDigest = await this._historyDigest(tx, task.task_id);
-        await tx.updateRows('agentboard_task', {
+        const taskUpdated = await tx.updateRows('agentboard_task', {
           where: { task_id: task.task_id, revision: Number(task.revision) },
           sets: { active_lease_id: null, fencing_token: null, history_digest: historyDigest, updated_at: now },
           bump: 'revision',
           limit: 1,
         });
+        // Unreachable while the row lock is held, and a hard failure if it
+        // ever is: the whole point of a sweep is that it is unattended, so a
+        // silently skipped revision bump would leave the journal claiming a
+        // revision the task row never reached.
+        if (taskUpdated.length === 0) {
+          throw new RevisionConflict('REVISION_CONFLICT', `task ${task.task_id} changed under the expiry sweep`);
+        }
         let runId = null;
         // A task may own SEVERAL historical runs, so the live one cannot be
         // assumed to be the oldest: every run of the task is examined and the
@@ -2222,10 +2255,10 @@ export class AgentBoardStoreBase {
           run_id: runId,
         });
       }
-      const result = { expired, now, requested_at: marker };
+      const result = { expired, now, requested_at: marker, workspace_id: workspace };
       await tx.insertRow('agentboard_operation', {
         idempotency_key: idem.key,
-        workspace_id: expired[0] ? (await tx.selectRow('agentboard_task', { where: { task_id: expired[0].task_id } })).workspace_id : `ws-sweep-${canonicalDigest({ operation, now }).slice(0, 12)}`,
+        workspace_id: workspace,
         operation,
         args_digest: idem.digest,
         result_payload: result,
@@ -2815,11 +2848,17 @@ export class AgentBoardStoreBase {
         }
       }
       const evidenceRefs = task.evidence_refs.includes(run.run_id) ? task.evidence_refs : [...task.evidence_refs, run.run_id];
-      await tx.updateRows('agentboard_task', {
+      const taskUpdated = await tx.updateRows('agentboard_task', {
         where: { task_id: task.task_id },
         sets: { artifacts, evidence_refs: evidenceRefs, updated_at: now },
         limit: 1,
       });
+      // The accumulators are the only record that a result was ever produced.
+      // A silently skipped write would leave the task with no evidence ref
+      // while the run says COLLECTED, which is a claim nobody can check.
+      if (taskUpdated.length === 0) {
+        throw new NeedsInput('REFERENCED_ROW_MISSING', `task ${task.task_id} vanished under the collector`);
+      }
       const resultRow = { run: buildRunWire(updated[0]), run_id: run.run_id, run_state: runState, outcome: document.outcome };
       const outbox = outboxEvent === undefined ? null : {
         workspace_id: run.workspace_id,
@@ -2857,6 +2896,25 @@ export class AgentBoardStoreBase {
    * day) is checked BEFORE the accumulators are updated. Two parallel settles
    * therefore cannot both observe headroom: the second one waits for the first
    * and then sees the new totals.
+   *
+   * WHAT `operationId` DOES AND DOES NOT BUY
+   * `operation_id` is a canonical argument of the `budget.settle` command, so
+   * it is part of the canonical `argsDigest` the ledger stores. The dedup is
+   * therefore exact for the intended use — a caller that derives its
+   * `idempotency_key` from the operation:
+   *
+   *   same key + same operation_id  -> the prior committed result is replayed,
+   *                                    nothing is written, nothing is spent;
+   *   same key + different operation_id -> IdempotencyConflict, nothing spent;
+   *   different key                  -> a DIFFERENT operation, and it spends.
+   *
+   * The last line is the honest limit and it is a caller contract, not a store
+   * bug: minting a fresh key per attempt is how a caller asks for two spends.
+   * The row's own `operation_id` column records the operation that CREATED
+   * that (grant, day) bucket — the primary key is (grant_id, day_key), so it
+   * holds one value and is deliberately NOT a uniqueness constraint on
+   * operations. Nothing in this method may be read as "operation_id
+   * deduplicates": the ledger does, and only for a key the caller reuses.
    */
   async settleBudget({ grantId, operationId, taskId, amount, currency, dayKey, actor, idempotencyKey, argsDigest }) {
     const operation = 'board.budget.settle';
@@ -3561,11 +3619,6 @@ class PostgresUnitOfWork {
       this._day = result.rows[0].day;
     }
     return this._now;
-  }
-
-  async dayKey() {
-    await this.now();
-    return this._day;
   }
 
   async nextFencingToken() {

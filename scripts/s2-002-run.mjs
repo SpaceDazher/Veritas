@@ -79,19 +79,6 @@ const CAPABILITY_TRIALS = [
   { trialId: 'nonce/export/replay-with-nonce', principalId: 'prn-agent-carol', workspaceId: 'ws-carol-private', action: 'artifact.export', resource: { type: 'artifact', id: 'artifact:final-1' }, args: { artifact_id: 'artifact:final-1', destination: 'export:local' }, expected: 'DENY' },
 ];
 
-// Sandbox expectations that assert a CONTAINMENT refusal. A control with one of
-// these expectations that comes back ALLOWED is a genuine filesystem, network,
-// environment or secret escape. Expectations that assert something else (the
-// cancellation survivor count, for instance) are violations, not escapes.
-const SANDBOX_CONTAINMENT_EXPECTATIONS = Object.freeze([
-  'PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE',
-  'DENIED', 'REDACTED', 'FILTERED',
-]);
-
-// The marker a sandbox control returns when this platform cannot exercise it.
-// Declared once so the producer and every consumer agree.
-const NOT_RUN_PLATFORM = 'PLATFORM_UNSUPPORTED';
-
 const SANDBOX_EXPECTATIONS = Object.freeze([
   ['sandbox/fs-traversal', 'PATH_ESCAPE'],
   ['sandbox/fs-absolute-outside', 'ROOT_VIOLATION'],
@@ -116,6 +103,35 @@ const SANDBOX_EXPECTATIONS = Object.freeze([
   ['sandbox/fs-junction-escape', 'LINK_ESCAPE'],
   ['sandbox/cancellation-survivors', 'SURVIVORS_ZERO'],
 ]);
+// Every sandbox expectation, as one set. Used by the authority counter so it
+// cannot fall behind the oracle: it used to be a third literal list of the
+// same values, and a new sandbox control added to SANDBOX_EXPECTATIONS would
+// have moved no counter until somebody remembered to edit all three.
+const SANDBOX_EXPECTED_VALUES = Object.freeze([...new Set(SANDBOX_EXPECTATIONS.map(([, expected]) => expected))]);
+
+// Sandbox expectations that assert a CONTAINMENT refusal. A control with one of
+// these expectations that comes back ALLOWED is a genuine filesystem, network,
+// environment or secret escape. Expectations that assert something else (the
+// cancellation survivor count, for instance) are violations, not escapes.
+//
+// The list is derived from `SANDBOX_EXPECTATIONS` rather than written out
+// again. It used to be a second literal list, and the second one was missing
+// `BLOCKED`: if the no-exec tier had ever started SPAWNING, that trial would
+// have satisfied neither this counter nor the `authority_expansion` list, so a
+// blocked tier quietly executing would have moved no hard counter at all. A
+// second list is exactly the drift this repository's gates are built to
+// prevent, so containment is now a PROPERTY of the expectation set and the
+// counters read it from one place.
+const NON_CONTAINMENT_EXPECTATIONS = Object.freeze(['INSIDE', 'RECORDED', 'SURVIVORS_ZERO']);
+const SANDBOX_CONTAINMENT_EXPECTATIONS = Object.freeze(
+  SANDBOX_EXPECTED_VALUES.filter((expected) => !NON_CONTAINMENT_EXPECTATIONS.includes(expected)).sort(),
+);
+
+// The marker a sandbox control returns when this platform cannot exercise it.
+// Declared once so the producer and every consumer agree.
+const NOT_RUN_PLATFORM = 'PLATFORM_UNSUPPORTED';
+
+
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -340,7 +356,7 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     not_run_controls: observations.filter((o) => o.notRun === true).length,
     cross_tenant_success: observations.filter((o) => o.crossTenant && o.decision === 'ALLOW').length,
     authority_expansion: observations.filter((o) => ['DENY', 'BLOCKED_SANDBOX'].includes(o.expected) && o.decision === 'ALLOW' && o.kind !== 'sandbox').length
-      + observations.filter((o) => o.kind === 'sandbox' && ['PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE', 'DENIED', 'BLOCKED', 'REDACTED', 'FILTERED', 'SURVIVORS_ZERO'].includes(o.expected) && o.observed === 'ALLOWED').length,
+      + observations.filter((o) => o.kind === 'sandbox' && SANDBOX_EXPECTED_VALUES.includes(o.expected) && o.observed === 'ALLOWED').length,
     // A REAL escape: a filesystem/network/environment/secret control that came
     // back ALLOWED. Counting every sandbox mismatch here was wrong twice over —
     // it reported a surviving child process as a "secret escape", and it

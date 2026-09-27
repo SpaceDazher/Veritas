@@ -30,7 +30,7 @@ const COUNTER_LIMITS = Object.freeze({
 // The sandbox trials that back a hard counter. If one of these cannot be
 // exercised on the current platform, the run has not proven the property and
 // the gate must say so instead of passing on an absent measurement.
-const HARD_COUNTER_TRIALS = Object.freeze(new Set(['sandbox/cancellation-survivors']));
+export const HARD_COUNTER_TRIALS = Object.freeze(new Set(['sandbox/cancellation-survivors']));
 
 const REVOCATION_MIN_TRIALS = 100;
 const REVOCATION_MAX_MS = 5000;

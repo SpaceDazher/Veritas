@@ -1265,7 +1265,7 @@ async function probeStaleFenceAfterExpiry(context) {
 
   instant = PROBE_LATER;
   world.now = PROBE_LATER;
-  const sweep = await world.store.expireLeases({ actor: 'prn-system-sweeper', now: PROBE_LATER });
+  const sweep = await world.store.expireLeases({ actor: 'prn-system-sweeper', workspaceId: world.workspaceId, now: PROBE_LATER });
   r.note('sweep', { expired: (sweep?.expired ?? []).length, now: sweep?.now ?? null });
   r.check('the sweep expired the lease', (sweep?.expired ?? []).length === 1, json(sweep).slice(0, 200));
   const leases = await world.store.listLeases({ workspaceId: world.workspaceId, taskId: 'abt-probe-expiry' });

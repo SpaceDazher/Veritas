@@ -49,7 +49,8 @@
 // This file answers the mount point itself (`/api/agent-board`). The routes
 // declared in `HTTP_ROUTES` live BELOW it (`/capabilities`, `/tasks`,
 // `/tasks/:task_id/transition`, ...), and an App Router `route.ts` matches only
-// its exact path, so those seventeen routes would 404 in the framework before
+// its exact path, so those eighteen routes BELOW the mount point would 404 in
+// the framework before
 // the library ever saw them. `[...path]/route.ts` mounts them. Both files
 // delegate to the SAME `src/lib/agentboard/next-transport.ts` core, so the two
 // mounts cannot drift into two different transports with two different rules.

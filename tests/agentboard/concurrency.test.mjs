@@ -73,6 +73,36 @@ const ROOT = path.resolve(HERE, '../..');
 // two real processes as the author's local chat workspace.
 const RACE_CHILD = path.join(HERE, 'fixtures', 'claim-race-child.mjs');
 
+// WHY EVERY IDENTIFIER HERE IS NAMESPACE-PER-PROCESS
+// `agentboard_task.task_id` and `agentboard_adapter.adapter_id` are PRIMARY
+// KEYs, so they are global: a fixed `abt-race-proc` collides with the row the
+// PREVIOUS run committed. A second run against the same database then measured
+// a leftover CLAIMED task instead of the property under test, and five
+// assertions failed with an off-by-one revision — a green gate that only holds
+// on a virgin database is not reproducible evidence.
+//
+// The disposable-container path hid this, because it starts empty every time.
+// The path that matters is the one that REUSES a database the developer
+// supplies (VERITAS_S2_007_TEST_DATABASE_URL, then DATABASE_URL), which is
+// what `npm test` and the Windows acceptance use.
+//
+// The tag is a pid, not a clock and not a random value: no assertion depends
+// on its value, the parent passes the namespaced ids to its children through
+// the environment, and every comparison is still against what the database
+// actually committed.
+//
+// The SAME tag has to reach the ids the STORE mints (`audit`, `outbox`,
+// `transition`, `lease`, `run`, event): those are primary keys too, and
+// `deterministicIds` namespaces them per store INSTANCE, which says nothing
+// about a second RUN of the same instance seed against the same database. That
+// was the second half of the failure — `AUDIT_ID_REUSED` on the very first
+// insert of the second run.
+//
+// A reused pid would surface as exactly that typed conflict, which is the
+// correct direction: a stale run is refused, never silently merged.
+const RUN = `r${process.pid}`;
+const ns = (id) => `${id}-${RUN}`;
+
 // The image is pinned by digest (spec §5): a floating tag would make this test
 // depend on whatever the registry served today.
 const PINNED_POSTGRES = 'docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73';
@@ -164,14 +194,15 @@ function adapterRegistration(adapterId, workspaceId, now) {
  * `agentboard_audit`, `agentboard_outbox` and `agentboard_transition` are
  * keyed by their own id alone, so two store instances sharing one database
  * must never mint the same one — that would be a spurious IDEMPOTENCY_CONFLICT
- * that has nothing to do with the property under test.
+ * that has nothing to do with the property under test. The process tag does
+ * the same job for two RUNS of the same instance seed against one database.
  */
 function deterministicIds(namespace) {
   const counters = new Map();
   return (kind) => {
     const next = (counters.get(kind) ?? 0) + 1;
     counters.set(kind, next);
-    return `${kind}-${namespace}-${next.toString(36).padStart(6, '0')}`;
+    return `${kind}-${namespace}-${RUN}-${next.toString(36).padStart(6, '0')}`;
   };
 }
 
@@ -339,8 +370,10 @@ async function countRows(pool, table, workspaceId) {
 describe('S2-007 concurrency: two INDEPENDENT processes racing for one task', () => {
   test('exactly one lease exists and the loser receives a typed error', async (t) => {
     assert.ok(existsSync(RACE_CHILD), `the race helper ${RACE_CHILD} is missing; the cross-process claim cannot be faked`);
-    const workspaceId = 'ws-race-proc';
-    const taskId = 'abt-race-proc';
+    const workspaceId = ns('ws-race-proc');
+    const taskId = ns('abt-race-proc');
+    const adapterA = ns('adr-race-a');
+    const adapterB = ns('adr-race-b');
     const now = new Date().toISOString().replace(/\.\d{3}Z$/, '.000Z');
     const store = new PostgresAgentBoardStore({
       connectionString: shared.connectionString,
@@ -351,7 +384,7 @@ describe('S2-007 concurrency: two INDEPENDENT processes racing for one task', ()
     t.after(async () => { await store.close(); });
 
     const task = await seedReadyTask(store, {
-      taskId, workspaceId, now, adapters: ['adr-race-a', 'adr-race-b'],
+      taskId, workspaceId, now, adapters: [adapterA, adapterB],
     });
     const expectedRevision = task.revision;
 
@@ -385,8 +418,8 @@ describe('S2-007 concurrency: two INDEPENDENT processes racing for one task', ()
     };
 
     const children = [
-      start('alpha', 'adr-race-a'),
-      start('beta', 'adr-race-b'),
+      start('alpha', adapterA),
+      start('beta', adapterB),
     ];
     // Bounded wait for both markers, then release them together.
     for (const label of ['alpha', 'beta']) {
@@ -446,15 +479,16 @@ describe('S2-007 concurrency: two INDEPENDENT processes racing for one task', ()
     // reported success but was rolled back would be a lie.
     const lease = await store.readLease(winners[0].lease_id, { workspaceId, principalId: OWNER });
     assert.equal(lease.fencing_token, winners[0].fencing_token);
-    assert.equal(lease.adapter_id, winners[0].label === 'alpha' ? 'adr-race-a' : 'adr-race-b');
+    assert.equal(lease.adapter_id, winners[0].label === 'alpha' ? adapterA : adapterB);
   });
 
   test('two concurrent sessions in ONE process are serialized by the same rule', async (t) => {
     // Same invariant, same database, no child processes: two store instances
     // over two pools are two real sessions, and the row lock plus the
     // compare-and-swap must decide between them exactly as it did above.
-    const workspaceId = 'ws-race-session';
-    const taskId = 'abt-race-session';
+    const workspaceId = ns('ws-race-session');
+    const taskId = ns('abt-race-session');
+    const adapterId = ns('adr-race-session');
     const now = new Date().toISOString().replace(/\.\d{3}Z$/, '.000Z');
     const makeStore = (seed, namespace) => new PostgresAgentBoardStore({
       connectionString: shared.connectionString, max: 2, seed, ids: deterministicIds(namespace),
@@ -463,11 +497,11 @@ describe('S2-007 concurrency: two INDEPENDENT processes racing for one task', ()
     const second = makeStore('s2-007-session-2', 'session-2');
     t.after(async () => { await first.close(); await second.close(); });
 
-    await seedReadyTask(first, { taskId, workspaceId, now, adapters: ['adr-race-session'] });
+    await seedReadyTask(first, { taskId, workspaceId, now, adapters: [adapterId] });
     const revision = (await first.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
 
     const attempt = (store, label) => claimCall({
-      taskId, workspaceId, adapterId: 'adr-race-session', expectedRevision: revision, label,
+      taskId, workspaceId, adapterId, expectedRevision: revision, label,
     })(store).then((result) => ({ label, ok: true, result }), (error) => ({ label, ok: false, error }));
 
     const outcomes = await Promise.all([attempt(first, 'one'), attempt(second, 'two')]);
@@ -492,12 +526,12 @@ describe('S2-007 concurrency: two INDEPENDENT processes racing for one task', ()
 
 describe('S2-007 concurrency: the in-memory twin does not admit two live claims either', () => {
   test('two concurrent claimTask calls yield one winner, one typed refusal and one ACTIVE lease', async () => {
-    const workspaceId = 'ws-race-twin';
-    const taskId = 'abt-race-twin';
+    const workspaceId = ns('ws-race-twin');
+    const taskId = ns('abt-race-twin');
     const now = '2026-09-25T12:00:00.000Z';
     const store = new InMemoryAgentBoardStore({ clock: fixedClock(now), ids: deterministicIds('twin'), seed: 's2-007-race-twin' });
 
-    await seedReadyTask(store, { taskId, workspaceId, now, adapters: ['adr-race-twin-a', 'adr-race-twin-b'] });
+    await seedReadyTask(store, { taskId, workspaceId, now, adapters: [ns('adr-race-twin-a'), ns('adr-race-twin-b')] });
     const revision = (await store.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
 
     const attempt = (label, adapterId) => claimCall({
@@ -505,8 +539,8 @@ describe('S2-007 concurrency: the in-memory twin does not admit two live claims 
     })(store).then((result) => ({ label, ok: true, lease_id: result.lease_id, fencing_token: result.fencing_token }), (error) => ({ label, ok: false, error }));
 
     const outcomes = await Promise.all([
-      attempt('one', 'adr-race-twin-a'),
-      attempt('two', 'adr-race-twin-b'),
+      attempt('one', ns('adr-race-twin-a')),
+      attempt('two', ns('adr-race-twin-b')),
     ]);
 
     const winners = outcomes.filter((entry) => entry.ok);
@@ -550,8 +584,8 @@ describe('S2-007 concurrency: the in-memory twin does not admit two live claims 
 
 describe('S2-007 concurrency: expiry follows the DATABASE clock, not the process clock', () => {
   test('a store whose injected clock says 2099 expires nothing while the database says the lease is live', async (t) => {
-    const workspaceId = 'ws-clock-future';
-    const taskId = 'abt-clock-future';
+    const workspaceId = ns('ws-clock-future');
+    const taskId = ns('abt-clock-future');
     const store = new PostgresAgentBoardStore({
       connectionString: shared.connectionString,
       max: 2,
@@ -564,12 +598,12 @@ describe('S2-007 concurrency: expiry follows the DATABASE clock, not the process
     t.after(async () => { await store.close(); });
 
     const now = await store.dbNow();
-    await seedReadyTask(store, { taskId, workspaceId, now, adapters: ['adr-clock-future'] });
+    await seedReadyTask(store, { taskId, workspaceId, now, adapters: [ns('adr-clock-future')] });
     const revision = (await store.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
-    const claimed = await claimCall({ taskId, workspaceId, adapterId: 'adr-clock-future', expectedRevision: revision, label: 'future', ttlMs: 600_000 })(store);
+    const claimed = await claimCall({ taskId, workspaceId, adapterId: ns('adr-clock-future'), expectedRevision: revision, label: 'future', ttlMs: 600_000 })(store);
     assert.equal(claimed.lease.lease_state, 'ACTIVE');
 
-    const swept = await store.expireLeases({ actor: SCHEDULER });
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId });
     assert.deepEqual(
       swept.expired.map((entry) => entry.lease_id),
       [],
@@ -579,8 +613,8 @@ describe('S2-007 concurrency: expiry follows the DATABASE clock, not the process
   });
 
   test('a store whose injected clock says 1970 still expires a lease the database has passed', async (t) => {
-    const workspaceId = 'ws-clock-past';
-    const taskId = 'abt-clock-past';
+    const workspaceId = ns('ws-clock-past');
+    const taskId = ns('abt-clock-past');
     const store = new PostgresAgentBoardStore({
       connectionString: shared.connectionString,
       max: 2,
@@ -593,16 +627,16 @@ describe('S2-007 concurrency: expiry follows the DATABASE clock, not the process
     t.after(async () => { await store.close(); });
 
     const now = await store.dbNow();
-    await seedReadyTask(store, { taskId, workspaceId, now, adapters: ['adr-clock-past'] });
+    await seedReadyTask(store, { taskId, workspaceId, now, adapters: [ns('adr-clock-past')] });
     const revision = (await store.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
-    const claimed = await claimCall({ taskId, workspaceId, adapterId: 'adr-clock-past', expectedRevision: revision, label: 'past', ttlMs: 1 })(store);
+    const claimed = await claimCall({ taskId, workspaceId, adapterId: ns('adr-clock-past'), expectedRevision: revision, label: 'past', ttlMs: 1 })(store);
     assert.ok(
       Date.parse(claimed.lease.expires_at) > Date.parse(now),
       'the lease window is computed from the database clock, not from the injected 1970 clock',
     );
 
     await delay(400);
-    const swept = await store.expireLeases({ actor: SCHEDULER });
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId });
     assert.deepEqual(
       swept.expired.map((entry) => entry.lease_id),
       [claimed.lease_id],
@@ -618,20 +652,20 @@ describe('S2-007 concurrency: expiry follows the DATABASE clock, not the process
 
 describe('S2-007 concurrency: a late callback after expiry, after cancel and after a restart mutates nothing', () => {
   test('after an expiry the withdrawn fence writes no journal row and no outbox row', async (t) => {
-    const workspaceId = 'ws-late-expiry';
-    const taskId = 'abt-late-expiry';
+    const workspaceId = ns('ws-late-expiry');
+    const taskId = ns('abt-late-expiry');
     const now = new Date().toISOString().replace(/\.\d{3}Z$/, '.000Z');
     const store = new PostgresAgentBoardStore({
       connectionString: shared.connectionString, max: 2, seed: 's2-007-late-expiry', ids: deterministicIds('late-expiry'),
     });
     t.after(async () => { await store.close(); });
 
-    await seedReadyTask(store, { taskId, workspaceId, now, adapters: ['adr-late-expiry'] });
+    await seedReadyTask(store, { taskId, workspaceId, now, adapters: [ns('adr-late-expiry')] });
     const revision = (await store.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
-    const claimed = await claimCall({ taskId, workspaceId, adapterId: 'adr-late-expiry', expectedRevision: revision, label: 'late', ttlMs: 1 })(store);
+    const claimed = await claimCall({ taskId, workspaceId, adapterId: ns('adr-late-expiry'), expectedRevision: revision, label: 'late', ttlMs: 1 })(store);
 
     await delay(400);
-    const swept = await store.expireLeases({ actor: SCHEDULER });
+    const swept = await store.expireLeases({ actor: SCHEDULER, workspaceId });
     assert.equal(swept.expired.length, 1, 'the lease expired before the late callback arrives');
 
     const before = await databaseDigest(shared.pool, workspaceId);
@@ -672,17 +706,17 @@ describe('S2-007 concurrency: a late callback after expiry, after cancel and aft
   });
 
   test('after a cancel the withdrawn fence writes no journal row and no outbox row', async (t) => {
-    const workspaceId = 'ws-late-cancel';
-    const taskId = 'abt-late-cancel';
+    const workspaceId = ns('ws-late-cancel');
+    const taskId = ns('abt-late-cancel');
     const now = new Date().toISOString().replace(/\.\d{3}Z$/, '.000Z');
     const store = new PostgresAgentBoardStore({
       connectionString: shared.connectionString, max: 2, seed: 's2-007-late-cancel', ids: deterministicIds('late-cancel'),
     });
     t.after(async () => { await store.close(); });
 
-    await seedReadyTask(store, { taskId, workspaceId, now, adapters: ['adr-late-cancel'] });
+    await seedReadyTask(store, { taskId, workspaceId, now, adapters: [ns('adr-late-cancel')] });
     const revision = (await store.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
-    const claimed = await claimCall({ taskId, workspaceId, adapterId: 'adr-late-cancel', expectedRevision: revision, label: 'cancel' })(store);
+    const claimed = await claimCall({ taskId, workspaceId, adapterId: ns('adr-late-cancel'), expectedRevision: revision, label: 'cancel' })(store);
 
     // Issue §4: the right is withdrawn FIRST, and only then is the task
     // cancelled. A cancel that leaves an ACTIVE lease behind is not a cancel.
@@ -741,8 +775,8 @@ describe('S2-007 concurrency: a late callback after expiry, after cancel and aft
   });
 
   test('after a RESTART a brand new store instance over the same contents still refuses the late callback', async (t) => {
-    const workspaceId = 'ws-late-restart';
-    const taskId = 'abt-late-restart';
+    const workspaceId = ns('ws-late-restart');
+    const taskId = ns('abt-late-restart');
     const now = new Date().toISOString().replace(/\.\d{3}Z$/, '.000Z');
     const before = new PostgresAgentBoardStore({
       connectionString: shared.connectionString, max: 2, seed: 's2-007-restart-before', ids: deterministicIds('restart-before'),
@@ -758,12 +792,12 @@ describe('S2-007 concurrency: a late callback after expiry, after cancel and aft
     };
     t.after(closeBefore);
 
-    await seedReadyTask(before, { taskId, workspaceId, now, adapters: ['adr-late-restart'] });
+    await seedReadyTask(before, { taskId, workspaceId, now, adapters: [ns('adr-late-restart')] });
     const revision = (await before.getTask(taskId, { workspaceId, principalId: OWNER })).revision;
-    const claimed = await claimCall({ taskId, workspaceId, adapterId: 'adr-late-restart', expectedRevision: revision, label: 'restart', ttlMs: 1 })(before);
+    const claimed = await claimCall({ taskId, workspaceId, adapterId: ns('adr-late-restart'), expectedRevision: revision, label: 'restart', ttlMs: 1 })(before);
 
     await delay(400);
-    const swept = await before.expireLeases({ actor: SCHEDULER });
+    const swept = await before.expireLeases({ actor: SCHEDULER, workspaceId });
     assert.equal(swept.expired.length, 1);
 
     // The restart: a NEW store object, a NEW pool, the SAME committed contents.

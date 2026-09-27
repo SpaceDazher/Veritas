@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runCorpus } from '../../scripts/s2-002-run.mjs';
-import { compareRuns } from '../../scripts/verify-s2-002.mjs';
+import { compareRuns, HARD_COUNTER_TRIALS } from '../../scripts/verify-s2-002.mjs';
 
 const REQUIRED_COUNTERS = [
   'cross_tenant_success',
@@ -160,20 +160,44 @@ describe('S2-002 independent replay: corpus runner', () => {
     // to Windows while the runner executed the link-escape trial on POSIX too.
     assert.equal(comparison.mismatchedDecisions, 0);
     assert.equal(comparison.comparedTrials, runA.summary.trialCount);
-    assert.deepEqual(comparison.expectedOracleViolations, []);
 
-    const notRunIds = runA.observations.filter((o) => o.notRun === true).map((o) => o.trialId);
-    const expectedViolations = notRunIds.length === 0 ? [] : [
-      ...notRunIds.flatMap((id) => [`run-a/hardControlNotRun=${id}`, `run-b/hardControlNotRun=${id}`]),
-      ...notRunIds.flatMap(() => [
-        'run-a/survivors_after_cancellation=null',
-        'run-b/survivors_after_cancellation=null',
-      ]),
-    ];
-    assert.deepEqual(
-      [...comparison.counterViolations].sort(), [...expectedViolations].sort(),
-      'the only permitted violations are the honest not-run ones',
+    // WHICH violations are permitted depends on WHICH controls this host
+    // could not exercise, so both sets are derived from the run instead of
+    // being asserted as a fixed list. The previous shape hard-coded
+    // `expectedOracleViolations === []` while, two lines below, allowing
+    // NOT_RUN_ON_THIS_PLATFORM entries — so a host that also failed to create
+    // the junction (a Windows account without the privilege, a container
+    // without CAP_SYS_ADMIN) failed this test for a reason that has nothing to
+    // do with the property under test.
+    const notRunIds = new Set(
+      [...runA.observations, ...runB.observations].filter((o) => o.notRun === true).map((o) => o.trialId),
     );
+    const expectedOracleViolations = [...notRunIds]
+      .filter((id) => !HARD_COUNTER_TRIALS.has(id))
+      .flatMap((id) => ['run-a', 'run-b'].map((run) => ({ run, trialId: id, reason: 'NOT_RUN_ON_THIS_PLATFORM' })));
+    assert.deepEqual(
+      comparison.expectedOracleViolations.map(({ run, trialId, reason }) => ({ run, trialId, reason })),
+      expectedOracleViolations,
+      'the only permitted oracle violations are the controls this platform declined to run',
+    );
+
+    // Every violation that remains must be NAMED as a not-run one, on the run
+    // that declined it. Anything else is a real finding and must not be
+    // waved through by this test.
+    const survivors = comparison.counterViolations.filter(
+      (violation) => !/^run-[ab]\/(hardControlNotRun=|survivors_after_cancellation=null)/.test(violation),
+    );
+    assert.deepEqual(survivors, [], `unexplained counter violations: ${JSON.stringify(survivors)}`);
+    for (const [label, run] of [['run-a', runA], ['run-b', runB]]) {
+      for (const id of new Set(run.observations.filter((o) => o.notRun === true).map((o) => o.trialId))) {
+        if (HARD_COUNTER_TRIALS.has(id)) {
+          assert.ok(
+            comparison.counterViolations.includes(`${label}/hardControlNotRun=${id}`),
+            `the unexercised hard control must block the gate under its own name: ${id}`,
+          );
+        }
+      }
+    }
   });
 
   test('runner persists raw observations and summary to the output root', () => {

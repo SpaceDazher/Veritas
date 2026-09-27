@@ -2,7 +2,7 @@
 //
 // `route.ts` matches only `/api/agent-board`; this catch-all matches one or more
 // segments below it (`/api/agent-board/capabilities`, `/api/agent-board/tasks/
-// abt-x/transition`, ...), which is what makes the library's eighteen declared
+// abt-x/transition`, ...), which is what makes the library's nineteen declared
 // HTTP routes actually reachable over HTTP instead of only through the CLI and
 // the negative probes.
 //
