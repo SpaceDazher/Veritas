@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 842.
+Generated from `git ls-files`; count: 848.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -497,7 +497,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008/corpus/cases/dev.json`
 - `evidence/s2-008/corpus/cases/holdout.json`
 - `evidence/s2-008/corpus/manifest.json`
+- `evidence/s2-008/corpus/preregistration-superseded.json`
+- `evidence/s2-008/corpus/preregistration-supersession.json`
 - `evidence/s2-008/corpus/preregistration.json`
+- `evidence/s2-008/corpus/supersession-ledger.json`
 - `evidence/sloqual-001-comparison.json`
 - `evidence/sloqual-001-integrity.json`
 - `evidence/sloqual-001-run-a.json`
@@ -688,6 +691,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
+- `src/lib/research/campaign-expectation.mjs`
 - `src/lib/research/causality.mjs`
 - `src/lib/research/comparator.mjs`
 - `src/lib/research/constants.mjs`
@@ -792,9 +796,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/fixtures/fixture-temp-base.mjs`
 - `tests/research/fixtures/index.mjs`
 - `tests/research/fixtures/README.md`
+- `tests/research/gate-semantics.test.mjs`
 - `tests/research/harness.test.mjs`
 - `tests/research/registry-prereg.test.mjs`
 - `tests/research/replay-two-run.test.mjs`
+- `tests/research/triage-hardening.test.mjs`
 - `tests/sloqual/comparator.test.mjs`
 - `tests/sloqual/contract.test.mjs`
 - `tests/sloqual/harness.test.mjs`
