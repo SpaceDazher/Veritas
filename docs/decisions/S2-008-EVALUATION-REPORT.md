@@ -45,7 +45,7 @@ fabricated POSITIVE looks legitimate.*
 | Library | `src/lib/research/*.mjs` | contracts, closed vocabulary, causality guard, preregistration (+ amendment, + supersession), corpus reader, ledger, frozen table, campaign derivation, fail-closed comparator, negative controls, six probes, policy, deterministic transport, run engine, public surface |
 | Corpus | `evidence/s2-008/corpus/` | 8 observational cases (PRIMARY + HOLDOUT), `manifest.json`, `preregistration.json` (in force), `preregistration-superseded.json` (the first delivery, preserved whole), `preregistration-supersession.json` (the pointer between them) |
 | Entry points | `scripts/s2-008-{build-corpus,harness,replay,run,security-probes}.mjs`, `scripts/verify-s2-008{,-dependencies}.mjs` | build/check the corpus, one run, the two-run cross-process replay with the crash/restart phase, the six probes and controls, and the two gates |
-| Tests | `tests/research/*.test.mjs` | 8 files (`gate-semantics.test.mjs` and `triage-hardening.test.mjs` were added by the repair and the triage round) plus a fixtures directory; `node --test` reports **11 suites, 256 tests, 256 pass, 0 fail** (246 after the repair; +10 in the soundness round of §0.5c) |
+| Tests | `tests/research/*.test.mjs` | 8 files (`gate-semantics.test.mjs` and `triage-hardening.test.mjs` were added by the repair and the triage round) plus a fixtures directory; `node --test` reports **11 suites, 256 tests, 256 pass, 0 fail** (246 after the repair, 250 after the third step, 256 after the soundness round of §0.5c) |
 | Evidence | `evidence/s2-008-*.json` (10 records) | `security-probes`, `probes`, `controls`, `harness`, `run-a`, `run-b`, `comparison`, `replay`, `dependency-binding`, `summary` |
 
 The fail-closed comparator, the six probes, the ledger chain, the preregistration
@@ -397,12 +397,15 @@ the aggregator’s trust model, and a child’s account of itself is untrusted i
    its contract (`chain_run.flag_seen false` in the committed record), and the
    aggregator owns the presence of the records it wrote — which it already enforced.
 
-**Ten negative tests hold the trust model in place** in
-`tests/research/gate-semantics.test.mjs` (the suite is 256 tests now, up from 250
-after the repair; the vacuity proof is in the chat artifact: the same suite run
-against the pre-fix bytes fails the soundness section). Each case spawns the real
-chain in a throwaway clone and reads the process exit code; none of them asserts
-about a mock.
+**Six negative tests hold the trust model in place** in
+`tests/research/gate-semantics.test.mjs` — the `A3` stub, the `A1a` no-op probes, the
+doctored harness record, the partially untracked track, the first-run-on-a-clean-base
+bootstrap, and one case that bundles the three controls this round must not break (a
+fabricated `POSITIVE`, a wholly untracked track, and a check run that does not launder
+what it judges). The suite is 256 tests now, 250 before this round and 246 before the
+third step; the vacuity proof is in the chat artifact — the same suite run against the
+pre-fix bytes fails the soundness section. Each case spawns the real chain in a
+throwaway clone and reads the process exit code; none of them asserts about a mock.
 
 **The working-tree boundary, stated and not closed (B-low).** A doctored
 `evidence/s2-008-summary.json` **in the working tree** survives both
