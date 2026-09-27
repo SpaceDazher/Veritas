@@ -1,0 +1,303 @@
+{
+  "ticket": "S2-008",
+  "gate": "scripts/verify-s2-008.mjs",
+  "role": "verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the freshness refusal, and the derived status",
+  "status": "FAIL",
+  "ok": false,
+  "exitCode": 1,
+  "base": {
+    "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+    "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 0,
+    "track_tracked": false
+  },
+  "gates": {
+    "dependency": {
+      "status": "BLOCKED_DEPENDENCY",
+      "exitCode": 1,
+      "source": "scripts/verify-s2-008-dependencies.mjs",
+      "issues": [
+        "index.mjs-absent-at-commit"
+      ],
+      "bindings": [
+        "S2-002:BOUND",
+        "S2-006:BOUND",
+        "S2-007:BOUND",
+        "S1-004:BOUND",
+        "S1-011:BOUND"
+      ],
+      "track_files_tracked": 0
+    },
+    "probes": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "scripts/s2-008-security-probes.mjs",
+      "counters": {
+        "holdoutPeek": 0,
+        "seedSubstitution": 0,
+        "hypothesisRewrite": 0,
+        "budgetOpacity": 0,
+        "causalUpgrade": 0,
+        "missingEvaluator": 0
+      },
+      "totals": {
+        "families": 6,
+        "probes": 6,
+        "probes_ran": 6,
+        "passed": 6,
+        "failed": 0,
+        "not_run": 0,
+        "broken": 0,
+        "controls_declared": 6,
+        "controls_extra_declared": 1,
+        "controls_extra_ids": [
+          "ledger_spelling_holdout_peek"
+        ],
+        "controls_ran": 7,
+        "controls_flipped": 7,
+        "controls_unaccounted": [],
+        "corruption_variants_declared": [
+          "trial_status_skip",
+          "counter_nudge",
+          "metric_altered",
+          "provenance_field"
+        ],
+        "corruption_variants_injected": [
+          "trial_status_skip",
+          "counter_nudge",
+          "metric_altered",
+          "provenance_field"
+        ],
+        "corruption_variants_unproductive": [],
+        "sensitivity": {
+          "comparator": "PROVEN: every control mutates a trial and reads resolveTrialVerdict back, so allFlipped is a measurement of the comparator",
+          "pipeline": {
+            "runs_examined": 2,
+            "mutations": [
+              {
+                "letter": "a",
+                "control": "holdout_peek",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "seed_substitution",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "budget_opacity",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "missing_evaluator",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:trial_status_skip",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:counter_nudge",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 12,
+                "detected": true
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:metric_altered",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:provenance_field",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "holdout_peek",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "seed_substitution",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "budget_opacity",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "missing_evaluator",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:trial_status_skip",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:counter_nudge",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 12,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:metric_altered",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:provenance_field",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              }
+            ],
+            "any_run_sensitive": true,
+            "note": "comparator-level sensitivity is demonstrated for all six controls; at RUN level the frozen corruption classes changed the findings 8 time(s) out of 8, and the trial-binding mutations changed them 0 time(s) out of 8 — a binding mutation is caught by the COMPARATOR, not by the expected-value table, and the record now says which is which",
+            "detected_at_run_level": 8,
+            "detected_at_comparator_level_only": 8
+          }
+        }
+      },
+      "reasons": []
+    },
+    "replay": {
+      "status": "FAIL",
+      "exitCode": 1,
+      "stale": false,
+      "reason": "the replay process exited 1 (FAIL)",
+      "source": "scripts/s2-008-replay.mjs",
+      "overall": "FAIL",
+      "properties": [
+        "A3:FAILED",
+        "A5:FAILED"
+      ],
+      "freshness": {
+        "observed_at": "2026-09-27T11:07:56.187Z",
+        "finished_at": "2026-09-27T11:07:58.259Z",
+        "source": "wall_clock",
+        "decides": false,
+        "excluded_from_repeatability": true
+      }
+    },
+    "harness": {
+      "status": "FAIL",
+      "exitCode": 1,
+      "source": "scripts/s2-008-harness.mjs",
+      "overall": "FAIL",
+      "verdict": "FAIL",
+      "properties": [
+        "A1:HELD",
+        "A2:HELD",
+        "A3:HELD",
+        "A4:HELD",
+        "A5:FAILED"
+      ],
+      "reason": null
+    }
+  },
+  "defects": [
+    "dependency gate: BLOCKED_DEPENDENCY (index.mjs-absent-at-commit)",
+    "replay gate: FAIL (the replay process exited 1 (FAIL))",
+    "harness gate: FAIL (FAIL)"
+  ],
+  "notRun": [
+    "NOT_RUN: the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
+    "NOT_RUN: the track's own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git",
+    "NOT_RUN: the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
+  ],
+  "blockingGates": [
+    "dependency",
+    "replay",
+    "harness"
+  ],
+  "notRunGates": [],
+  "freshness": {
+    "observed_at": "2026-09-27T11:07:51.356Z",
+    "window_ms": 21600000,
+    "head_tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "replay_finished_at": "2026-09-27T11:07:58.259Z"
+  },
+  "track_status": "FAIL",
+  "authoritative": {
+    "a3": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
+    "a5": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
+    "harness_a3_is": "TABLE_DERIVED_NOT_A_MEASUREMENT",
+    "cross_record_agreement": {
+      "verdict": "NOT_COMPARABLE_DISCLOSED",
+      "issues": [],
+      "note": "the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one",
+      "harness_findings": {
+        "findingsA": 0,
+        "findingsB": 0
+      },
+      "replay_findings": {
+        "findingsA": 3,
+        "findingsB": 3
+      }
+    }
+  },
+  "ticket_preconditions_not_met": [
+    "the track's own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git",
+    "the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
+  ],
+  "engineering_status": "BLOCKED_DEPENDENCY",
+  "assurance_status": "NOT_MEASURED",
+  "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
+  "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
+  "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
+  "observedAtIso": "2026-09-27T11:07:51.356Z"
+}

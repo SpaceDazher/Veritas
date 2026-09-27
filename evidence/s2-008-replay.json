@@ -1,0 +1,1245 @@
+{
+  "ticket": "S2-008",
+  "kind": "REPLAY",
+  "version": "s2-008-replay-v1",
+  "gate": "scripts/s2-008-replay.mjs",
+  "owned_properties": [
+    "A3",
+    "A5"
+  ],
+  "evidence_eligible": true,
+  "write_evidence": true,
+  "base": {
+    "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+    "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 0,
+    "track_tracked": false
+  },
+  "corpus": {
+    "dir": "evidence/s2-008/corpus",
+    "preregistration_digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
+    "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62"
+  },
+  "children": {
+    "a": {
+      "label": "a",
+      "argv": [
+        "scripts/s2-008-run.mjs",
+        "--label",
+        "a",
+        "--corpus",
+        "evidence/s2-008/corpus",
+        "--write"
+      ],
+      "pid": 217020,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "stderr": "",
+      "exit_semantics": "FAIL"
+    },
+    "b": {
+      "label": "b",
+      "argv": [
+        "scripts/s2-008-run.mjs",
+        "--label",
+        "b",
+        "--corpus",
+        "evidence/s2-008/corpus",
+        "--write"
+      ],
+      "pid": 217032,
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false,
+      "stderr": "",
+      "exit_semantics": "FAIL"
+    }
+  },
+  "evidence": {
+    "a": {
+      "path": "evidence/s2-008-run-a.json",
+      "artefact_bound": true,
+      "digest": "64371343007a7c408e55f2f71f36bc75100e2ed1bb999fa6c2014310aedab119",
+      "readable": true,
+      "child_pid": 217020,
+      "record_pid": 217020,
+      "pid_bound": true,
+      "pid_binding_reason": null
+    },
+    "b": {
+      "path": "evidence/s2-008-run-b.json",
+      "artefact_bound": true,
+      "digest": "06dd9be7ed0bbc991d4ee8d059b837c09db81e2a83f8c834020e6f67628b7d9b",
+      "readable": true,
+      "child_pid": 217032,
+      "record_pid": 217032,
+      "pid_bound": true,
+      "pid_binding_reason": null
+    }
+  },
+  "separation": {
+    "fields": [
+      "raw_run_id",
+      "nonce",
+      "executor_id",
+      "pid",
+      "output_root"
+    ],
+    "raw_run_id": {
+      "a": "s2-008-run-a-0-p217020",
+      "b": "s2-008-run-b-0-p217032"
+    },
+    "nonce": {
+      "a": "n-a-1a3cc5c34ad49129",
+      "b": "n-b-fafff7489aff6dff"
+    },
+    "executor_id": {
+      "a": "exec-s2-008-a-0-p217020",
+      "b": "exec-s2-008-b-0-p217032"
+    },
+    "pid": {
+      "a": 217020,
+      "b": 217032
+    },
+    "output_root": {
+      "a": ".bb/s2-008/run/out-a-0",
+      "b": ".bb/s2-008/run/out-b-0"
+    },
+    "children_are_separate_processes": true,
+    "fields_absent": [],
+    "ok": true
+  },
+  "controls": {
+    "allFlipped": true,
+    "gate": {
+      "ok": true,
+      "failures": []
+    },
+    "record": {
+      "version": "s2-008-negative-controls-v1",
+      "controls": [
+        {
+          "id": "holdout_peek",
+          "probe": "P1",
+          "mechanism": "comparator",
+          "injects": "the holdout_peek condition stated in the binding's own content",
+          "before": "ALLOW",
+          "after": "VIOLATION",
+          "before_verdict": "ALLOW",
+          "after_verdict": "VIOLATION",
+          "flipped": true
+        },
+        {
+          "id": "seed_substitution",
+          "probe": "P2",
+          "mechanism": "comparator",
+          "injects": "the seed_substitution condition stated in the binding's own content",
+          "before": "ALLOW",
+          "after": "VIOLATION",
+          "before_verdict": "ALLOW",
+          "after_verdict": "VIOLATION",
+          "flipped": true
+        },
+        {
+          "id": "budget_opacity",
+          "probe": "P4",
+          "mechanism": "comparator",
+          "injects": "the budget_opacity condition stated in the binding's own content",
+          "before": "ALLOW",
+          "after": "VIOLATION",
+          "before_verdict": "ALLOW",
+          "after_verdict": "VIOLATION",
+          "flipped": true
+        },
+        {
+          "id": "label_substitution",
+          "probe": "P5",
+          "mechanism": "guard",
+          "injects": "an observational label swapped to causal",
+          "before": "ADMITTED",
+          "after": "REFUSED",
+          "before_refusal": null,
+          "after_refusal": "CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE",
+          "mutated_field": "proposed_relation.causal_assertion",
+          "flipped": true
+        },
+        {
+          "id": "missing_evaluator",
+          "probe": "P6",
+          "mechanism": "comparator",
+          "injects": "the missing_evaluator condition stated in the binding's own content",
+          "before": "ALLOW",
+          "after": "VIOLATION",
+          "before_verdict": "ALLOW",
+          "after_verdict": "VIOLATION",
+          "flipped": true
+        },
+        {
+          "id": "corrupted_data",
+          "probe": "A2",
+          "mechanism": "table",
+          "injects": "the same corrupted trial in BOTH runs, once per frozen corruption variant, so their digests stay equal",
+          "before": "no_findings",
+          "after": "findings_non_empty",
+          "per_run": [
+            {
+              "letter": "a",
+              "variants": [
+                {
+                  "variant": "trial_status_skip",
+                  "corrupted": {
+                    "field": "trials[0].status",
+                    "from": "RESOLVED",
+                    "to": "SKIPPED",
+                    "variant": "trial_status_skip"
+                  },
+                  "findings": 4
+                },
+                {
+                  "variant": "counter_nudge",
+                  "corrupted": {
+                    "field": "trials[0].counters.holdoutPeek",
+                    "from": 0,
+                    "to": 1,
+                    "variant": "counter_nudge"
+                  },
+                  "findings": 9
+                },
+                {
+                  "variant": "metric_altered",
+                  "corrupted": {
+                    "field": "trials[0].numerator",
+                    "from": 7,
+                    "to": 8,
+                    "variant": "metric_altered"
+                  },
+                  "findings": 4
+                },
+                {
+                  "variant": "provenance_field",
+                  "corrupted": {
+                    "field": "trials[0].provenance.raw_run_id",
+                    "from": "s2-008-run-a-0-p217020",
+                    "to": "run-forged",
+                    "variant": "provenance_field"
+                  },
+                  "findings": 4
+                }
+              ]
+            },
+            {
+              "letter": "b",
+              "variants": [
+                {
+                  "variant": "trial_status_skip",
+                  "corrupted": {
+                    "field": "trials[0].status",
+                    "from": "RESOLVED",
+                    "to": "SKIPPED",
+                    "variant": "trial_status_skip"
+                  },
+                  "findings": 4
+                },
+                {
+                  "variant": "counter_nudge",
+                  "corrupted": {
+                    "field": "trials[0].counters.holdoutPeek",
+                    "from": 0,
+                    "to": 1,
+                    "variant": "counter_nudge"
+                  },
+                  "findings": 9
+                },
+                {
+                  "variant": "metric_altered",
+                  "corrupted": {
+                    "field": "trials[0].numerator",
+                    "from": 7,
+                    "to": 8,
+                    "variant": "metric_altered"
+                  },
+                  "findings": 4
+                },
+                {
+                  "variant": "provenance_field",
+                  "corrupted": {
+                    "field": "trials[0].provenance.raw_run_id",
+                    "from": "s2-008-run-b-0-p217032",
+                    "to": "run-forged",
+                    "variant": "provenance_field"
+                  },
+                  "findings": 4
+                }
+              ]
+            }
+          ],
+          "coverage": {
+            "variants_declared": [
+              "trial_status_skip",
+              "counter_nudge",
+              "metric_altered",
+              "provenance_field"
+            ],
+            "variants_injected": [
+              "trial_status_skip",
+              "counter_nudge",
+              "metric_altered",
+              "provenance_field"
+            ],
+            "variants_unproductive": [],
+            "note": "a corruption class the control never injects is a class whose detection the control does not demonstrate; the list is itemised in the record rather than left implicit"
+          },
+          "flipped": true
+        },
+        {
+          "id": "ledger_spelling_holdout_peek",
+          "mechanism": "comparator",
+          "injects": "the holdout binding spelled the way registry.mjs#recordHoldoutRead plans the ACCESS payload (decision_point)",
+          "before": "ALLOW",
+          "after": "VIOLATION",
+          "mutated_field": "holdoutBinding.decision_point",
+          "flipped": true
+        }
+      ],
+      "allFlipped": true,
+      "sensitivity": {
+        "comparator": "PROVEN: every control mutates a trial and reads resolveTrialVerdict back, so allFlipped is a measurement of the comparator",
+        "pipeline": {
+          "runs_examined": 2,
+          "mutations": [
+            {
+              "letter": "a",
+              "control": "holdout_peek",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "a",
+              "control": "seed_substitution",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "a",
+              "control": "budget_opacity",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "a",
+              "control": "missing_evaluator",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "a",
+              "control": "corrupted_data:trial_status_skip",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 4,
+              "detected": true
+            },
+            {
+              "letter": "a",
+              "control": "corrupted_data:counter_nudge",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 9,
+              "detected": true
+            },
+            {
+              "letter": "a",
+              "control": "corrupted_data:metric_altered",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 4,
+              "detected": true
+            },
+            {
+              "letter": "a",
+              "control": "corrupted_data:provenance_field",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 4,
+              "detected": true
+            },
+            {
+              "letter": "b",
+              "control": "holdout_peek",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "b",
+              "control": "seed_substitution",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "b",
+              "control": "budget_opacity",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "b",
+              "control": "missing_evaluator",
+              "layer": "TRIAL_BINDING",
+              "findings_before": 3,
+              "findings_after": 3,
+              "detected": false
+            },
+            {
+              "letter": "b",
+              "control": "corrupted_data:trial_status_skip",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 4,
+              "detected": true
+            },
+            {
+              "letter": "b",
+              "control": "corrupted_data:counter_nudge",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 9,
+              "detected": true
+            },
+            {
+              "letter": "b",
+              "control": "corrupted_data:metric_altered",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 4,
+              "detected": true
+            },
+            {
+              "letter": "b",
+              "control": "corrupted_data:provenance_field",
+              "layer": "RUN_RECORD",
+              "findings_before": 3,
+              "findings_after": 4,
+              "detected": true
+            }
+          ],
+          "any_run_sensitive": true,
+          "note": "comparator-level sensitivity is demonstrated for all six controls; at RUN level the frozen corruption classes changed the findings 8 time(s) out of 8, and the trial-binding mutations changed them 0 time(s) out of 8 — a binding mutation is caught by the COMPARATOR, not by the expected-value table, and the record now says which is which",
+          "detected_at_run_level": 8,
+          "detected_at_comparator_level_only": 8
+        }
+      },
+      "notRun": [],
+      "digest": "5a57be4b5edee66d68a669cf10baed77ab31cf29874de95681a39c62c6b84be8"
+    },
+    "notRun": [],
+    "error": null,
+    "attached_before_comparison": true
+  },
+  "comparison": {
+    "failures": [
+      {
+        "code": "table_disagreement",
+        "detail": "runA: #0 trials[0].outcome: expected=\"POSITIVE\" observed=\"UNRESOLVED\""
+      },
+      {
+        "code": "table_disagreement",
+        "detail": "runA: #1 trials[1].outcome: expected=\"NULL\" observed=\"UNRESOLVED\""
+      },
+      {
+        "code": "table_disagreement",
+        "detail": "runA: #2 trials[2].outcome: expected=\"NEGATIVE\" observed=\"UNRESOLVED\""
+      },
+      {
+        "code": "table_disagreement",
+        "detail": "runB: #0 trials[0].outcome: expected=\"POSITIVE\" observed=\"UNRESOLVED\""
+      },
+      {
+        "code": "table_disagreement",
+        "detail": "runB: #1 trials[1].outcome: expected=\"NULL\" observed=\"UNRESOLVED\""
+      },
+      {
+        "code": "table_disagreement",
+        "detail": "runB: #2 trials[2].outcome: expected=\"NEGATIVE\" observed=\"UNRESOLVED\""
+      },
+      {
+        "code": "trial_violation",
+        "detail": "runA trial trl-s2-008-04: VIOLATION (TRIAL_NOT_RESOLVED:INFRA_ERROR)"
+      },
+      {
+        "code": "metric_not_measured",
+        "detail": "runA: 1 trial(s) were not measured and are excluded from the metric, not counted as failures of it"
+      },
+      {
+        "code": "decision_unresolved",
+        "detail": "runA: interval_straddles_null_outside_noise_band; an undecided measurement is not a pass"
+      },
+      {
+        "code": "trial_violation",
+        "detail": "runB trial trl-s2-008-04: VIOLATION (TRIAL_NOT_RESOLVED:INFRA_ERROR)"
+      },
+      {
+        "code": "metric_not_measured",
+        "detail": "runB: 1 trial(s) were not measured and are excluded from the metric, not counted as failures of it"
+      },
+      {
+        "code": "decision_unresolved",
+        "detail": "runB: interval_straddles_null_outside_noise_band; an undecided measurement is not a pass"
+      }
+    ],
+    "limits": [
+      {
+        "code": "frozen_rule_cannot_reject",
+        "detail": "runA: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
+        "proof": "never_rejects"
+      },
+      {
+        "code": "latency_observed",
+        "detail": "runA: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
+        "proof": "latency_recorded"
+      },
+      {
+        "code": "frozen_rule_cannot_reject",
+        "detail": "runB: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
+        "proof": "never_rejects"
+      },
+      {
+        "code": "latency_observed",
+        "detail": "runB: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
+        "proof": "latency_recorded"
+      }
+    ],
+    "proofStatus": [
+      {
+        "id": "base_binding",
+        "status": "SATISFIED",
+        "evidence": {
+          "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+          "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+          "resolved_commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+          "resolved_tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0"
+        },
+        "missing": []
+      },
+      {
+        "id": "process_separation",
+        "status": "SATISFIED",
+        "evidence": {
+          "fields": [
+            "raw_run_id",
+            "nonce",
+            "executor_id",
+            "pid",
+            "output_root"
+          ]
+        },
+        "missing": []
+      },
+      {
+        "id": "preregistration_bound",
+        "status": "SATISFIED",
+        "evidence": {
+          "digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479"
+        },
+        "missing": []
+      },
+      {
+        "id": "table_agreement",
+        "status": "UNMET",
+        "evidence": {
+          "findings_a": 3,
+          "findings_b": 3,
+          "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62"
+        },
+        "missing": [
+          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "TRIAL_FIELD_DIVERGES_FROM_TABLE"
+        ]
+      },
+      {
+        "id": "seed_set_complete",
+        "status": "SATISFIED",
+        "evidence": {
+          "preregistered": [
+            101,
+            202,
+            303,
+            404,
+            505
+          ],
+          "run_a": [
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ],
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ],
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ],
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ]
+          ],
+          "run_b": [
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ],
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ],
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ],
+            [
+              101,
+              202,
+              303,
+              404,
+              505
+            ]
+          ]
+        },
+        "missing": []
+      },
+      {
+        "id": "all_trials_resolved",
+        "status": "UNMET",
+        "evidence": {
+          "run_a": 1,
+          "run_b": 1
+        },
+        "missing": [
+          "trl-s2-008-04",
+          "trl-s2-008-04"
+        ]
+      },
+      {
+        "id": "negative_controls",
+        "status": "SATISFIED",
+        "evidence": {
+          "run_a": {
+            "allFlipped": true,
+            "count": 7
+          },
+          "run_b": {
+            "allFlipped": true,
+            "count": 7
+          }
+        },
+        "missing": []
+      },
+      {
+        "id": "metric_decision_run_a",
+        "status": "NOT_MEASURED",
+        "evidence": {
+          "decision": "UNRESOLVED",
+          "estimate": {
+            "metric": "case_agreement_rate",
+            "numerator": 18,
+            "denominator": 24,
+            "outcomeCounts": {
+              "UNRESOLVED": 3,
+              "INFRA": 1
+            },
+            "notMeasured": 1,
+            "basis": "POOLED_TRIAL_COUNTS"
+          },
+          "interval": {
+            "lower": 0.551006,
+            "upper": 0.880006,
+            "confidence": 0.95,
+            "method": "wilson_score"
+          },
+          "correction": null
+        },
+        "missing": [
+          "interval_straddles_null_outside_noise_band"
+        ]
+      },
+      {
+        "id": "metric_decision_run_b",
+        "status": "NOT_MEASURED",
+        "evidence": {
+          "decision": "UNRESOLVED",
+          "estimate": {
+            "metric": "case_agreement_rate",
+            "numerator": 18,
+            "denominator": 24,
+            "outcomeCounts": {
+              "UNRESOLVED": 3,
+              "INFRA": 1
+            },
+            "notMeasured": 1,
+            "basis": "POOLED_TRIAL_COUNTS"
+          },
+          "interval": {
+            "lower": 0.551006,
+            "upper": 0.880006,
+            "confidence": 0.95,
+            "method": "wilson_score"
+          },
+          "correction": null
+        },
+        "missing": [
+          "interval_straddles_null_outside_noise_band"
+        ]
+      }
+    ],
+    "digestsEqual": true,
+    "findingsA": [
+      {
+        "field": "trials[0].outcome",
+        "expected": "POSITIVE",
+        "observed": "UNRESOLVED",
+        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+        "index": 0
+      },
+      {
+        "field": "trials[1].outcome",
+        "expected": "NULL",
+        "observed": "UNRESOLVED",
+        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+        "index": 1
+      },
+      {
+        "field": "trials[2].outcome",
+        "expected": "NEGATIVE",
+        "observed": "UNRESOLVED",
+        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+        "index": 2
+      }
+    ],
+    "findingsB": [
+      {
+        "field": "trials[0].outcome",
+        "expected": "POSITIVE",
+        "observed": "UNRESOLVED",
+        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+        "index": 0
+      },
+      {
+        "field": "trials[1].outcome",
+        "expected": "NULL",
+        "observed": "UNRESOLVED",
+        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+        "index": 1
+      },
+      {
+        "field": "trials[2].outcome",
+        "expected": "NEGATIVE",
+        "observed": "UNRESOLVED",
+        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+        "index": 2
+      }
+    ],
+    "identicalWrongFindings": {
+      "findings_a": [
+        {
+          "field": "trials[0].outcome",
+          "expected": "POSITIVE",
+          "observed": "UNRESOLVED",
+          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "index": 0
+        },
+        {
+          "field": "trials[1].outcome",
+          "expected": "NULL",
+          "observed": "UNRESOLVED",
+          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "index": 1
+        },
+        {
+          "field": "trials[2].outcome",
+          "expected": "NEGATIVE",
+          "observed": "UNRESOLVED",
+          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "index": 2
+        }
+      ],
+      "findings_b": [
+        {
+          "field": "trials[0].outcome",
+          "expected": "POSITIVE",
+          "observed": "UNRESOLVED",
+          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "index": 0
+        },
+        {
+          "field": "trials[1].outcome",
+          "expected": "NULL",
+          "observed": "UNRESOLVED",
+          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "index": 1
+        },
+        {
+          "field": "trials[2].outcome",
+          "expected": "NEGATIVE",
+          "observed": "UNRESOLVED",
+          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+          "index": 2
+        }
+      ],
+      "findings_a_count": 3,
+      "findings_b_count": 3,
+      "digests_still_equal": true,
+      "both_non_empty": true,
+      "conclusion": "the frozen table is load-bearing: identical decision digests, non-empty findings"
+    },
+    "version": "s2-008-comparator-v1",
+    "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "runs": {
+      "a": {
+        "label": "runA",
+        "raw_run_id": "s2-008-run-a-0-p217020",
+        "nonce": "n-a-1a3cc5c34ad49129",
+        "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+        "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+        "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
+        "trials": 4,
+        "metric": {
+          "metric": "case_agreement_rate",
+          "numerator": 18,
+          "denominator": 24,
+          "outcomeCounts": {
+            "UNRESOLVED": 3,
+            "INFRA": 1
+          },
+          "notMeasured": 1,
+          "basis": "POOLED_TRIAL_COUNTS"
+        },
+        "interval": {
+          "lower": 0.551006,
+          "upper": 0.880006,
+          "confidence": 0.95,
+          "method": "wilson_score"
+        },
+        "decision": "UNRESOLVED",
+        "correction": null,
+        "rule_feasibility": {
+          "rejection_floor": 0.016667,
+          "max_p_bound": 0.05,
+          "never_rejects": true,
+          "can_only_answer": "NULL_OR_UNRESOLVED",
+          "feasible": false,
+          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+        },
+        "latency": {
+          "samples": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "interval": {
+            "pointEstimate": 0,
+            "lower": 0,
+            "upper": 0,
+            "method": "percentile_bootstrap",
+            "resamples": 2000,
+            "confidence": 0.95,
+            "seed": 20260801,
+            "samples": 4
+          },
+          "decides": false,
+          "parameters": {
+            "seed": 20260801,
+            "resamples": 2000,
+            "p": 0.95,
+            "confidence": 0.95,
+            "preregistered": true
+          }
+        },
+        "decides_on_latency": false
+      },
+      "b": {
+        "label": "runB",
+        "raw_run_id": "s2-008-run-b-0-p217032",
+        "nonce": "n-b-fafff7489aff6dff",
+        "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+        "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+        "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
+        "trials": 4,
+        "metric": {
+          "metric": "case_agreement_rate",
+          "numerator": 18,
+          "denominator": 24,
+          "outcomeCounts": {
+            "UNRESOLVED": 3,
+            "INFRA": 1
+          },
+          "notMeasured": 1,
+          "basis": "POOLED_TRIAL_COUNTS"
+        },
+        "interval": {
+          "lower": 0.551006,
+          "upper": 0.880006,
+          "confidence": 0.95,
+          "method": "wilson_score"
+        },
+        "decision": "UNRESOLVED",
+        "correction": null,
+        "rule_feasibility": {
+          "rejection_floor": 0.016667,
+          "max_p_bound": 0.05,
+          "never_rejects": true,
+          "can_only_answer": "NULL_OR_UNRESOLVED",
+          "feasible": false,
+          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+        },
+        "latency": {
+          "samples": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "interval": {
+            "pointEstimate": 0,
+            "lower": 0,
+            "upper": 0,
+            "method": "percentile_bootstrap",
+            "resamples": 2000,
+            "confidence": 0.95,
+            "seed": 20260801,
+            "samples": 4
+          },
+          "decides": false,
+          "parameters": {
+            "seed": 20260801,
+            "resamples": 2000,
+            "p": 0.95,
+            "confidence": 0.95,
+            "preregistered": true
+          }
+        },
+        "decides_on_latency": false
+      }
+    }
+  },
+  "comparison_error": null,
+  "table_findings_a": [
+    {
+      "field": "trials[0].outcome",
+      "expected": "POSITIVE",
+      "observed": "UNRESOLVED",
+      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+      "index": 0
+    },
+    {
+      "field": "trials[1].outcome",
+      "expected": "NULL",
+      "observed": "UNRESOLVED",
+      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+      "index": 1
+    },
+    {
+      "field": "trials[2].outcome",
+      "expected": "NEGATIVE",
+      "observed": "UNRESOLVED",
+      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
+      "index": 2
+    }
+  ],
+  "ledger_shape": {
+    "a": [],
+    "b": [],
+    "expected": [
+      {
+        "kind": "PREREGISTRATION_RECORDED",
+        "required": true,
+        "count": 1,
+        "note": "recorded before trial one"
+      },
+      {
+        "kind": "BUDGET_RESERVATION",
+        "required": true,
+        "count": 1,
+        "note": "taken before the run, never at the spend"
+      },
+      {
+        "kind": "ACCESS",
+        "required": true,
+        "count": 1,
+        "note": "exactly one holdout open, journalled before the bytes are returned"
+      },
+      {
+        "kind": "TRIAL_RESULT",
+        "required": true,
+        "count": 4,
+        "note": "one per enumerated trial, including the infra one"
+      }
+    ]
+  },
+  "ledger_shape_ok": true,
+  "identical_wrong": {
+    "injected": {
+      "field": "trials[0].status",
+      "from": "RESOLVED",
+      "to": "SKIPPED",
+      "variant": "trial_status_skip"
+    },
+    "findings_a": 4,
+    "findings_b": 4,
+    "digests_still_equal": true,
+    "both_non_empty": true,
+    "conclusion": "the frozen table is load-bearing: identical decision digests, non-empty findings",
+    "note": "A === B is reported as an additional condition only: the same corruption in both runs keeps their digests equal, so only the frozen table can produce findings here."
+  },
+  "crash_restart": {
+    "phase1": {
+      "pid": 217044,
+      "exitCode": null,
+      "signal": "SIGKILL",
+      "killed": true
+    },
+    "phase2": {
+      "pid": 217061,
+      "exitCode": 0,
+      "document": {
+        "ticket": "S2-008",
+        "kind": "CRASH_RESTART",
+        "phase": 2,
+        "label": "crash",
+        "base": {
+          "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+          "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+          "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+          "worktree_dirty": true,
+          "tracked_files_of_this_track": 0,
+          "track_tracked": false
+        },
+        "provenance": {
+          "version": "s2-008-runner-v1",
+          "commit": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+          "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+          "run_id": "s2-008-run-crash-restart-p217061",
+          "label": "crash",
+          "executor_id": "exec-s2-008-crash-restart-p217061",
+          "pid": 217061,
+          "nonce": "n-crash-090c7903658a41ec",
+          "clock": "2026-01-01T01:00:00.000Z",
+          "started_at": "2026-01-01T01:00:00.000Z"
+        },
+        "registry_root": ".bb/s2-008/replay/crash",
+        "purge_performed": false,
+        "chain_verified": true,
+        "journal_kinds": [
+          "ACCESS",
+          "PREREGISTRATION_RECORDED",
+          "BUDGET_RESERVATION"
+        ],
+        "row_count": 3,
+        "saw_preregistration_row": true,
+        "saw_reservation_row": true,
+        "trials_executed_by_the_restart": 0,
+        "reconciliation": {
+          "record_kind": "RECONCILIATION",
+          "reconciliation_id": "rec-0d766c14f0afe660",
+          "run_id": "s2-008-run-crash-restart-p217061",
+          "nonce": "n-crash-090c7903658a41ec",
+          "trial_index": 0,
+          "trial": "trl-s2-008-01",
+          "resolution": "EFFECT_UNDETERMINED",
+          "allowed_resolutions": [
+            "OBSERVED_NO_EFFECT",
+            "OBSERVED_EFFECT_COMPLETED",
+            "OBSERVED_EFFECT_UNDONE",
+            "EFFECT_UNDETERMINED"
+          ],
+          "decider_kind": "human_owner",
+          "decided": false,
+          "reason_code": "RUN_INTERRUPTED_MID_TRIAL",
+          "preregistration_digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
+          "reservation_id": "rsv-s2-008-01",
+          "created_at": "2026-01-01T01:00:00.000Z",
+          "detail": "the process was killed between taking the preregistered reservation and executing the first trial; the effect of the interrupted trial is undetermined"
+        },
+        "crashed_run_id": "s2-008-run-crash-crash-p217044",
+        "blind_retry": false,
+        "retry_attempted": false,
+        "implicit_zero": false,
+        "first_settle": {
+          "outcome": "SETTLED",
+          "replayed": false,
+          "spent_units": 1
+        },
+        "settle_key_replay": {
+          "outcome": "SETTLED",
+          "replayed": true,
+          "spent_units": 1
+        },
+        "settle_key_replayed_without_second_charge": true,
+        "expired_reservation": {
+          "outcome": "REFUSED",
+          "code": "RECONCILIATION_REQUIRED",
+          "class": "ReconciliationRequired",
+          "detail": "BUDGET_RESERVATION_EXPIRED",
+          "at": "2026-01-01T02:01:00.000Z",
+          "spend_rows_before": 1,
+          "spend_rows_after": 1,
+          "spend_advanced": false
+        }
+      },
+      "classified": {
+        "status": "PASS",
+        "exitCode": 0,
+        "reason": "the restart saw the interrupted state, opened a reconciliation for it and neither retried it nor charged a zero"
+      }
+    },
+    "interrupted_trial_is_a_reconciliation": true
+  },
+  "repeatability": {
+    "cross_process": {
+      "projection": "runner.mjs verdictProjection minus trials[].*settle_key (the key embeds the raw run id)",
+      "decision_projections_equal": true,
+      "artefact_digests_differ": true,
+      "differing_paths_after_masking": [
+        "raw_run_id",
+        "nonce",
+        "executor_id",
+        "output_root",
+        "run.label",
+        "ledger.snapshot_digest"
+      ],
+      "ok": true
+    },
+    "in_process": {
+      "equivalent": true,
+      "decision_projections_equal": true,
+      "artefact_digests_differ": true,
+      "source": "scripts/s2-008-run.mjs --repeat (one process, two attempts, two raw run ids)"
+    },
+    "child": {
+      "exitCode": 1,
+      "attempts": 0
+    }
+  },
+  "verdict": "FAIL",
+  "properties": [
+    {
+      "id": "A3",
+      "statement": "two process-separated runs with different ids and nonces agree with the FROZEN expected-value table; A === B is additional only",
+      "ok": false,
+      "evidence": "records_produced=true pid_bound_a=true pid_bound_b=true separation=true separate_pids=true findingsA=3 findingsB=3 digestsEqual=true identical_wrong_both_non_empty=true",
+      "status": "FAILED"
+    },
+    {
+      "id": "A5",
+      "statement": "every artefact is bound to a commit SHA, a tree SHA and a raw run id, and survives a repeat run on the same base",
+      "ok": false,
+      "evidence": "bound_a=true bound_b=true pid_bound_a=true pid_bound_b=true track_tracked=false cross_process=true in_process_repeat=true reconciliation=true crash_classified=PASS crash_classified_reason=the restart saw the interrupted state, opened a reconciliation for it and neither retried it nor charged a zero expired_reservation=REFUSED/RECONCILIATION_REQUIRED",
+      "status": "FAILED"
+    }
+  ],
+  "exitCode": 1,
+  "overall": "FAIL",
+  "overall_terms": {
+    "every_property_held": false,
+    "held": 0,
+    "total": 2,
+    "verdict_is_pass": false,
+    "verdict": "FAIL",
+    "ledger_shape_matches_table": true,
+    "ledger_shape_findings": 0
+  },
+  "child_binding": [
+    {
+      "letter": "a",
+      "path": "evidence/s2-008-run-a.json",
+      "pid": 217020,
+      "exitCode": 1,
+      "readable": true,
+      "pid_bound": true,
+      "ran_to_a_report": true,
+      "produced": true,
+      "pid_binding_reason": null,
+      "not_produced_reason": null
+    },
+    {
+      "letter": "b",
+      "path": "evidence/s2-008-run-b.json",
+      "pid": 217032,
+      "exitCode": 1,
+      "readable": true,
+      "pid_bound": true,
+      "ran_to_a_report": true,
+      "produced": true,
+      "pid_binding_reason": null,
+      "not_produced_reason": null
+    }
+  ],
+  "not_run": [],
+  "harness_findings": {
+    "a": [
+      {
+        "code": "TRACK_UNTRACKED",
+        "detail": "git ls-files reports 0 tracked file(s) of this track, so no artefact of this run is bound to a base in any sense a reader can check",
+        "where": "git ls-files (read-only)"
+      }
+    ],
+    "b": [
+      {
+        "code": "TRACK_UNTRACKED",
+        "detail": "git ls-files reports 0 tracked file(s) of this track, so no artefact of this run is bound to a base in any sense a reader can check",
+        "where": "git ls-files (read-only)"
+      }
+    ]
+  },
+  "freshness": {
+    "observed_at": "2026-09-27T11:07:56.187Z",
+    "finished_at": "2026-09-27T11:07:58.259Z",
+    "source": "wall_clock",
+    "decides": false,
+    "excluded_from_repeatability": true
+  },
+  "written": null
+}

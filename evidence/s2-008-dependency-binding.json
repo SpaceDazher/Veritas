@@ -1,0 +1,505 @@
+{
+  "ticket": "S2-008",
+  "gate": "scripts/verify-s2-008-dependencies.mjs",
+  "mode": "FULL_GIT_BYTES",
+  "byte_sources": {
+    "frozen_contracts": "git blob at HEAD + the working tree, both compared",
+    "frozen_targets": "git blob at HEAD + the working tree, both compared",
+    "dependency_bindings": "git blob at HEAD, with the working tree compared for drift",
+    "modules": "the working tree (reachability and exports are facts about the tree in front of the reader)",
+    "evidence_presence": "the working tree (a file is either there or not)"
+  },
+  "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
+  "head": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+  "contracts": [
+    {
+      "id": "hypothesis-card",
+      "path": "contracts/hypothesis-card.schema.json",
+      "issue_digest": "43b9c81620737b81a589d8e1577b0dc89e8b19fe1ed011edb3514f893b141e97",
+      "frozen_manifest_digest": "43b9c81620737b81a589d8e1577b0dc89e8b19fe1ed011edb3514f893b141e97",
+      "commit_digest": "43b9c81620737b81a589d8e1577b0dc89e8b19fe1ed011edb3514f893b141e97",
+      "working_tree_digest": "43b9c81620737b81a589d8e1577b0dc89e8b19fe1ed011edb3514f893b141e97",
+      "issues": [],
+      "ok": true
+    },
+    {
+      "id": "research-dossier",
+      "path": "contracts/research-dossier.schema.json",
+      "issue_digest": "fdffd1c0a75f0483a5ab7244ed5463a9786fec4c23daaae8c7b5242167183773",
+      "frozen_manifest_digest": "fdffd1c0a75f0483a5ab7244ed5463a9786fec4c23daaae8c7b5242167183773",
+      "commit_digest": "fdffd1c0a75f0483a5ab7244ed5463a9786fec4c23daaae8c7b5242167183773",
+      "working_tree_digest": "fdffd1c0a75f0483a5ab7244ed5463a9786fec4c23daaae8c7b5242167183773",
+      "issues": [],
+      "ok": true
+    },
+    {
+      "id": "calibration-record",
+      "path": "contracts/calibration-record.schema.json",
+      "issue_digest": "8c7507ebe2f216a46f4c70f7a43e4713ef84f85ac0c14d97e550f953f1b7408d",
+      "frozen_manifest_digest": "8c7507ebe2f216a46f4c70f7a43e4713ef84f85ac0c14d97e550f953f1b7408d",
+      "commit_digest": "8c7507ebe2f216a46f4c70f7a43e4713ef84f85ac0c14d97e550f953f1b7408d",
+      "working_tree_digest": "8c7507ebe2f216a46f4c70f7a43e4713ef84f85ac0c14d97e550f953f1b7408d",
+      "issues": [],
+      "ok": true
+    }
+  ],
+  "frozen_targets": {
+    "pinned_paths": 610,
+    "verified": 610,
+    "issues": [],
+    "untracked_in_frozen_trees": [],
+    "track_files_tracked": 0,
+    "track_files_untracked": [
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-dependency-binding.json",
+      "evidence/s2-008-harness.json",
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-security-probes.json",
+      "evidence/s2-008-summary.json",
+      "evidence/s2-008/corpus/cases/dev.json",
+      "evidence/s2-008/corpus/cases/holdout.json",
+      "evidence/s2-008/corpus/manifest.json",
+      "evidence/s2-008/corpus/preregistration.json",
+      "scripts/s2-008-build-corpus.mjs",
+      "scripts/s2-008-harness.mjs",
+      "scripts/s2-008-replay.mjs",
+      "scripts/s2-008-run.mjs",
+      "scripts/s2-008-security-probes.mjs",
+      "scripts/verify-s2-008-dependencies.mjs",
+      "scripts/verify-s2-008.mjs",
+      "src/lib/research/causality.mjs",
+      "src/lib/research/comparator.mjs",
+      "src/lib/research/constants.mjs",
+      "src/lib/research/contracts.mjs",
+      "src/lib/research/dataset.mjs",
+      "src/lib/research/executor.mjs",
+      "src/lib/research/expected-values.mjs",
+      "src/lib/research/index.mjs",
+      "src/lib/research/negative-controls.mjs",
+      "src/lib/research/policy.mjs",
+      "src/lib/research/preregistration.mjs",
+      "src/lib/research/probes.mjs",
+      "src/lib/research/registry.mjs",
+      "src/lib/research/runner.mjs",
+      "tests/research/comparator-probes.test.mjs",
+      "tests/research/comparator.test.mjs",
+      "tests/research/dataset.test.mjs",
+      "tests/research/fixtures/README.md",
+      "tests/research/fixtures/fixture-corrupted-variants.mjs",
+      "tests/research/fixtures/fixture-digest.mjs",
+      "tests/research/fixtures/fixture-expected-values.mjs",
+      "tests/research/fixtures/fixture-fixed-clock.mjs",
+      "tests/research/fixtures/fixture-measurement-set.mjs",
+      "tests/research/fixtures/fixture-preregistration.mjs",
+      "tests/research/fixtures/fixture-run-identity.mjs",
+      "tests/research/fixtures/fixture-temp-base.mjs",
+      "tests/research/fixtures/index.mjs",
+      "tests/research/harness.test.mjs",
+      "tests/research/registry-prereg.test.mjs",
+      "tests/research/replay-two-run.test.mjs"
+    ],
+    "track_files_modified": [],
+    "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
+    "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
+  },
+  "bindings": [
+    {
+      "id": "S2-002",
+      "kind": "record",
+      "artefact": "evidence/s2-002-dependency-binding.json",
+      "issues": [],
+      "evidence": {
+        "schema_version": 2,
+        "dependencies": 4,
+        "tickets": [
+          "S2-001:BOUND",
+          "S1-007:BOUND_PASS_WITH_LIMITS",
+          "S1-008:BOUND_PASS_WITH_LIMITS",
+          "S1-010:BOUND_PASS_WITH_LIMITS"
+        ],
+        "pinned_commit": "259d9afe16495aa780f834d0b1b903d5451e158a",
+        "dependencies_source": "https://github.com/SpaceDazher/AgentOS/tree/main/research/tickets/stage-1",
+        "evidence_files_named": 1,
+        "evidence_files_readable": 1,
+        "consequence": "All four listed dependencies are now bound to recorded, digest-addressed evidence. The dependency gate no longer caps the verdict; remaining limits are the ones declared in docs/decisions/S2-002-EVALUATION-REPORT.md (no kernel sandbox, no production authentication, in-memory enforcement state)."
+      },
+      "source": "GIT_BLOB_AT_HEAD",
+      "commit_sha256": "dd3f28faa66dbaebdf0e8f189f9b0484578ecd3504ac7006985c9b571f88fd34",
+      "commit_bytes": 4306,
+      "working_tree_sha256": "dd3f28faa66dbaebdf0e8f189f9b0484578ecd3504ac7006985c9b571f88fd34",
+      "working_tree_bytes": 4306,
+      "drift": false,
+      "ok": true
+    },
+    {
+      "id": "S2-006",
+      "kind": "record",
+      "artefact": "evidence/s2-006-dependency-binding.json",
+      "issues": [],
+      "evidence": {
+        "resolved_ok": true,
+        "checked": 75
+      },
+      "source": "GIT_BLOB_AT_HEAD",
+      "commit_sha256": "797418d20ecb9da2400a2965e5ebf17ef97dffe4b55358072bf727c3ee646ef9",
+      "commit_bytes": 14266,
+      "working_tree_sha256": "797418d20ecb9da2400a2965e5ebf17ef97dffe4b55358072bf727c3ee646ef9",
+      "working_tree_bytes": 14266,
+      "drift": false,
+      "ok": true
+    },
+    {
+      "id": "S2-007",
+      "kind": "record",
+      "artefact": "evidence/s2-007-dependency-binding.json",
+      "issues": [],
+      "evidence": {
+        "canonicalization_commit": "d23b289644ec5dede164c8707d975ac4792e51d5",
+        "descends_from_head": true,
+        "declared_parents": 1,
+        "actual_parents": [
+          "143fa8de9f64122758622738e9309ee42e144ccb"
+        ],
+        "foundation_paths": 12,
+        "foundation_verified": 12,
+        "resolved_ok": true
+      },
+      "source": "GIT_BLOB_AT_HEAD",
+      "commit_sha256": "1fb4ce01c310e0eca652c78cb3a0587831b2e267eab34b1afb791e2db859b525",
+      "commit_bytes": 32840,
+      "working_tree_sha256": "1fb4ce01c310e0eca652c78cb3a0587831b2e267eab34b1afb791e2db859b525",
+      "working_tree_bytes": 32840,
+      "drift": false,
+      "ok": true
+    },
+    {
+      "id": "S1-004",
+      "kind": "documentary",
+      "artefact": "docs/stages/stage-1.md",
+      "issues": [],
+      "evidence": {
+        "status": "DOCUMENTARY_NO_TRACKED_EVALUATION_RECORD",
+        "issue": "#23(https://github.com/SpaceDazher/Veritas/issues/23)",
+        "wave": "W1",
+        "owner": "formal",
+        "verdict": "PASS_WITH_LIMITS",
+        "note": "the authoritative S1-004 evaluation record is not tracked in this repository; this row is a claim about it, not a check of it"
+      },
+      "source": "GIT_BLOB_AT_HEAD",
+      "commit_sha256": "adee0d41a62935ab79ce40000765ef42403a97ca6c15da9f0c1695bb0a2c5830",
+      "commit_bytes": 11719,
+      "working_tree_sha256": "adee0d41a62935ab79ce40000765ef42403a97ca6c15da9f0c1695bb0a2c5830",
+      "working_tree_bytes": 11719,
+      "drift": false,
+      "ok": true
+    },
+    {
+      "id": "S1-011",
+      "kind": "record",
+      "artefact": "evidence/external/s1-011/evaluation-record.json",
+      "issues": [],
+      "evidence": {
+        "expected_sha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+        "working_tree_sha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+        "commit_sha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+        "expected_bytes": 17897,
+        "fields": {
+          "ticket_id": "S1-011",
+          "result": "pass_with_limits",
+          "evaluation_id": "reval_94X52VCQDV30J84Z01M1MSPWRD"
+        }
+      },
+      "source": "GIT_BLOB_AT_HEAD",
+      "commit_sha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+      "commit_bytes": 17897,
+      "working_tree_sha256": "b353fd35bc7c8bd0950bffbf149d4e81e495baefc8826b3e145b91e783a2fcbc",
+      "working_tree_bytes": 17897,
+      "drift": false,
+      "ok": true
+    }
+  ],
+  "modules": {
+    "modules": 14,
+    "importers": {
+      "src/lib/research/causality.mjs": [
+        "src/lib/research/comparator.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/negative-controls.mjs",
+        "src/lib/research/probes.mjs",
+        "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-harness.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/dataset.test.mjs",
+        "tests/research/fixtures/fixture-corrupted-variants.mjs"
+      ],
+      "src/lib/research/comparator.mjs": [
+        "src/lib/research/index.mjs",
+        "src/lib/research/negative-controls.mjs",
+        "src/lib/research/probes.mjs",
+        "src/lib/research/runner.mjs",
+        "scripts/s2-006-run.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/verify-sloqual-001.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/fixtures/fixture-measurement-set.mjs",
+        "tests/research/replay-two-run.test.mjs"
+      ],
+      "src/lib/research/constants.mjs": [
+        "src/lib/research/comparator.mjs",
+        "src/lib/research/dataset.mjs",
+        "src/lib/research/executor.mjs",
+        "src/lib/research/expected-values.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/registry.mjs",
+        "src/lib/research/runner.mjs",
+        "scripts/s2-007-db-replay-executor.mjs",
+        "scripts/s2-007-db-replay.mjs",
+        "scripts/s2-007-run.mjs",
+        "scripts/s2-008-run.mjs",
+        "scripts/verify-s2-007-dependencies.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/fixtures/fixture-measurement-set.mjs",
+        "tests/research/replay-two-run.test.mjs"
+      ],
+      "src/lib/research/contracts.mjs": [
+        "src/lib/research/causality.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/probes.mjs",
+        "src/lib/research/registry.mjs",
+        "src/lib/research/runner.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/validate-contracts.mjs",
+        "scripts/verify-clean-checkout.mjs",
+        "scripts/verify-s2-007.mjs",
+        "scripts/verify.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/dataset.test.mjs",
+        "tests/research/registry-prereg.test.mjs"
+      ],
+      "src/lib/research/dataset.mjs": [
+        "src/lib/research/index.mjs",
+        "src/lib/research/probes.mjs",
+        "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-run.mjs",
+        "tests/research/dataset.test.mjs"
+      ],
+      "src/lib/research/executor.mjs": [
+        "src/lib/research/comparator.mjs",
+        "scripts/s2-007-db-replay.mjs",
+        "scripts/s2-008-run.mjs",
+        "scripts/validate-contracts.mjs",
+        "tests/research/comparator-probes.test.mjs"
+      ],
+      "src/lib/research/expected-values.mjs": [
+        "src/lib/research/comparator.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/negative-controls.mjs",
+        "src/lib/research/runner.mjs",
+        "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/s2-008-run.mjs",
+        "scripts/s2-008-security-probes.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/fixtures/fixture-corrupted-variants.mjs",
+        "tests/research/fixtures/fixture-expected-values.mjs",
+        "tests/research/fixtures/fixture-measurement-set.mjs",
+        "tests/research/fixtures/fixture-preregistration.mjs",
+        "tests/research/fixtures/index.mjs",
+        "tests/research/harness.test.mjs",
+        "tests/research/replay-two-run.test.mjs"
+      ],
+      "src/lib/research/index.mjs": [
+        "scripts/sloqual-freeze.mjs",
+        "scripts/sloqual-run.mjs",
+        "scripts/verify-s2-008-dependencies.mjs",
+        "scripts/verify-sloqual-001.mjs"
+      ],
+      "src/lib/research/negative-controls.mjs": [
+        "src/lib/research/index.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/s2-008-security-probes.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/harness.test.mjs"
+      ],
+      "src/lib/research/policy.mjs": [
+        "src/lib/research/runner.mjs",
+        "scripts/policy-probes.mjs",
+        "scripts/s2-003-run.mjs",
+        "scripts/s2-003-security-probes.mjs",
+        "scripts/s2-007-db-replay-executor.mjs",
+        "scripts/synthetic-smoke.mjs",
+        "scripts/validate-contracts.mjs"
+      ],
+      "src/lib/research/preregistration.mjs": [
+        "src/lib/research/comparator.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/probes.mjs",
+        "src/lib/research/runner.mjs",
+        "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/s2-008-run.mjs",
+        "scripts/s2-008-security-probes.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/dataset.test.mjs",
+        "tests/research/fixtures/fixture-corrupted-variants.mjs",
+        "tests/research/fixtures/fixture-measurement-set.mjs",
+        "tests/research/fixtures/fixture-preregistration.mjs",
+        "tests/research/fixtures/index.mjs",
+        "tests/research/registry-prereg.test.mjs"
+      ],
+      "src/lib/research/probes.mjs": [
+        "src/lib/research/index.mjs",
+        "scripts/s2-005-security-probes.mjs",
+        "scripts/s2-006-run.mjs",
+        "scripts/s2-007-run.mjs",
+        "scripts/s2-007-security-probes.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-security-probes.mjs",
+        "scripts/synthetic-smoke.mjs",
+        "scripts/validate-contracts.mjs",
+        "scripts/verify-s2-005.mjs",
+        "scripts/verify-s2-007.mjs",
+        "scripts/verify-s2-008.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/harness.test.mjs"
+      ],
+      "src/lib/research/registry.mjs": [
+        "src/lib/research/dataset.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/probes.mjs",
+        "src/lib/research/runner.mjs",
+        "scripts/s2-003-run.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-run.mjs",
+        "scripts/security-probes.mjs",
+        "tests/research/dataset.test.mjs",
+        "tests/research/registry-prereg.test.mjs"
+      ],
+      "src/lib/research/runner.mjs": [
+        "scripts/s2-008-replay.mjs",
+        "scripts/s2-008-run.mjs",
+        "tests/research/replay-two-run.test.mjs"
+      ]
+    },
+    "barrel": "src/lib/research/index.mjs",
+    "barrel_exports": 87,
+    "barrel_exports_at_commit": false,
+    "issues": [
+      "index.mjs-absent-at-commit"
+    ]
+  },
+  "syntax": {
+    "modules": 31,
+    "parsed": 31,
+    "issues": [],
+    "note": "node --check proves the file PARSES; it is not type checking, and tsconfig.json excludes .mjs from `tsc` entirely"
+  },
+  "evidence": [
+    {
+      "path": "evidence/s2-008-probes.json",
+      "required": true,
+      "present": true,
+      "bytes": 25770,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-controls.json",
+      "required": true,
+      "present": true,
+      "bytes": 7028,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-comparison.json",
+      "required": true,
+      "present": true,
+      "bytes": 29150,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-security-probes.json",
+      "required": true,
+      "present": true,
+      "bytes": 27896,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-run-a.json",
+      "required": true,
+      "present": true,
+      "bytes": 38304,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-run-b.json",
+      "required": true,
+      "present": true,
+      "bytes": 38304,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-replay.json",
+      "required": true,
+      "present": true,
+      "bytes": 38155,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008/corpus/manifest.json",
+      "required": true,
+      "present": true,
+      "bytes": 1662,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008/corpus/preregistration.json",
+      "required": true,
+      "present": true,
+      "bytes": 5517,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-summary.json",
+      "required": false,
+      "present": true,
+      "bytes": 10600,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-harness.json",
+      "required": false,
+      "present": true,
+      "bytes": 69441,
+      "issues": []
+    },
+    {
+      "path": "evidence/s2-008-negative-controls.json",
+      "required": false,
+      "present": false,
+      "bytes": null,
+      "issues": []
+    }
+  ],
+  "root_manifest_readable": true,
+  "issues": [
+    "index.mjs-absent-at-commit"
+  ],
+  "checked": 23,
+  "ok": false,
+  "status": "BLOCKED_DEPENDENCY"
+}

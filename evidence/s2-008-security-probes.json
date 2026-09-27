@@ -1,0 +1,1041 @@
+{
+  "ticket": "S2-008",
+  "gate": "test:s2-008-security-probes",
+  "script": "scripts/s2-008-security-probes.mjs",
+  "version": "s2-008-probes-v1",
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0,
+  "reasons": [],
+  "base": {
+    "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+    "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 0,
+    "track_tracked": false
+  },
+  "corpus": "evidence/s2-008/corpus",
+  "hardGates": {
+    "counters": {
+      "holdoutPeek": 0,
+      "seedSubstitution": 0,
+      "hypothesisRewrite": 0,
+      "budgetOpacity": 0,
+      "causalUpgrade": 0,
+      "missingEvaluator": 0
+    },
+    "names": [
+      "holdoutPeek",
+      "seedSubstitution",
+      "hypothesisRewrite",
+      "budgetOpacity",
+      "causalUpgrade",
+      "missingEvaluator"
+    ],
+    "ok": true,
+    "moved": []
+  },
+  "totals": {
+    "families": 6,
+    "probes": 6,
+    "probes_ran": 6,
+    "passed": 6,
+    "failed": 0,
+    "not_run": 0,
+    "broken": 0,
+    "controls_declared": 6,
+    "controls_extra_declared": 1,
+    "controls_extra_ids": [
+      "ledger_spelling_holdout_peek"
+    ],
+    "controls_ran": 7,
+    "controls_flipped": 7,
+    "controls_unaccounted": [],
+    "corruption_variants_declared": [
+      "trial_status_skip",
+      "counter_nudge",
+      "metric_altered",
+      "provenance_field"
+    ],
+    "corruption_variants_injected": [
+      "trial_status_skip",
+      "counter_nudge",
+      "metric_altered",
+      "provenance_field"
+    ],
+    "corruption_variants_unproductive": [],
+    "sensitivity": {
+      "comparator": "PROVEN: every control mutates a trial and reads resolveTrialVerdict back, so allFlipped is a measurement of the comparator",
+      "pipeline": {
+        "runs_examined": 2,
+        "mutations": [
+          {
+            "letter": "a",
+            "control": "holdout_peek",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "a",
+            "control": "seed_substitution",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "a",
+            "control": "budget_opacity",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "a",
+            "control": "missing_evaluator",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "a",
+            "control": "corrupted_data:trial_status_skip",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 7,
+            "detected": true
+          },
+          {
+            "letter": "a",
+            "control": "corrupted_data:counter_nudge",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 12,
+            "detected": true
+          },
+          {
+            "letter": "a",
+            "control": "corrupted_data:metric_altered",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 7,
+            "detected": true
+          },
+          {
+            "letter": "a",
+            "control": "corrupted_data:provenance_field",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 7,
+            "detected": true
+          },
+          {
+            "letter": "b",
+            "control": "holdout_peek",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "b",
+            "control": "seed_substitution",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "b",
+            "control": "budget_opacity",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "b",
+            "control": "missing_evaluator",
+            "layer": "TRIAL_BINDING",
+            "findings_before": 6,
+            "findings_after": 6,
+            "detected": false
+          },
+          {
+            "letter": "b",
+            "control": "corrupted_data:trial_status_skip",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 7,
+            "detected": true
+          },
+          {
+            "letter": "b",
+            "control": "corrupted_data:counter_nudge",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 12,
+            "detected": true
+          },
+          {
+            "letter": "b",
+            "control": "corrupted_data:metric_altered",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 7,
+            "detected": true
+          },
+          {
+            "letter": "b",
+            "control": "corrupted_data:provenance_field",
+            "layer": "RUN_RECORD",
+            "findings_before": 6,
+            "findings_after": 7,
+            "detected": true
+          }
+        ],
+        "any_run_sensitive": true,
+        "note": "comparator-level sensitivity is demonstrated for all six controls; at RUN level the frozen corruption classes changed the findings 8 time(s) out of 8, and the trial-binding mutations changed them 0 time(s) out of 8 — a binding mutation is caught by the COMPARATOR, not by the expected-value table, and the record now says which is which",
+        "detected_at_run_level": 8,
+        "detected_at_comparator_level_only": 8
+      }
+    }
+  },
+  "purged": {
+    "base": ".bb/s2-008/probes/probes",
+    "removed": 6,
+    "removed_roots": [
+      "holdout_peek/holdout_read_before_decision_point",
+      "seed_substitution/best_seed_reported_instead_of_the_preregistered_set",
+      "hypothesis_rewrite/test_design_edited_after_the_result",
+      "budget_opacity/spend_beyond_the_reservation",
+      "causal_upgrade/observational_label_swapped_to_causal",
+      "missing_evaluator/evaluator_removed_between_reservation_and_comparison"
+    ],
+    "roots": 6
+  },
+  "familiesAttempted": [
+    {
+      "family": "holdout_peek",
+      "probes": [
+        "holdout_read_before_decision_point"
+      ],
+      "status": "pass"
+    },
+    {
+      "family": "seed_substitution",
+      "probes": [
+        "best_seed_reported_instead_of_the_preregistered_set"
+      ],
+      "status": "pass"
+    },
+    {
+      "family": "hypothesis_rewrite",
+      "probes": [
+        "test_design_edited_after_the_result"
+      ],
+      "status": "pass"
+    },
+    {
+      "family": "budget_opacity",
+      "probes": [
+        "spend_beyond_the_reservation"
+      ],
+      "status": "pass"
+    },
+    {
+      "family": "causal_upgrade",
+      "probes": [
+        "observational_label_swapped_to_causal"
+      ],
+      "status": "pass"
+    },
+    {
+      "family": "missing_evaluator",
+      "probes": [
+        "evaluator_removed_between_reservation_and_comparison"
+      ],
+      "status": "pass"
+    }
+  ],
+  "probes": {
+    "results": [
+      {
+        "probe": "holdout_read_before_decision_point",
+        "family": "holdout_peek",
+        "status": "pass",
+        "passed": true,
+        "counter": "holdoutPeek",
+        "counted": 0,
+        "detail": "a HOLDOUT read presenting a forged unseal digest is refused by a typed policy refusal; a refused HOLDOUT read returns no case data; a HOLDOUT read BEFORE the decision point is refused with HOLDOUT_READ_BEFORE_DECISION_POINT; a HOLDOUT read presenting the PREREGISTERED one-shot digest is admitted; a replayed HOLDOUT read is refused with HOLDOUT_UNSEAL_DIGEST_REPLAYED; a second open of the same partition is refused with HOLDOUT_OPEN_BUDGET_EXCEEDED; re-presenting the same digest for the SAME trial",
+        "evidence": {
+          "probe": "holdout_read_before_decision_point",
+          "family": "holdout_peek",
+          "counter": "holdoutPeek",
+          "status": "pass",
+          "checks": [
+            {
+              "label": "a HOLDOUT read presenting a forged unseal digest is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY typed=true"
+            },
+            {
+              "label": "a refused HOLDOUT read returns no case data",
+              "ok": true,
+              "detail": "leaked=false"
+            },
+            {
+              "label": "a HOLDOUT read BEFORE the decision point is refused with HOLDOUT_READ_BEFORE_DECISION_POINT",
+              "ok": true,
+              "detail": "code=HOLDOUT_READ_BEFORE_DECISION_POINT"
+            },
+            {
+              "label": "a HOLDOUT read presenting the PREREGISTERED one-shot digest is admitted",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a replayed HOLDOUT read is refused with HOLDOUT_UNSEAL_DIGEST_REPLAYED",
+              "ok": true,
+              "detail": "code=HOLDOUT_UNSEAL_DIGEST_REPLAYED"
+            },
+            {
+              "label": "a second open of the same partition is refused with HOLDOUT_OPEN_BUDGET_EXCEEDED",
+              "ok": true,
+              "detail": "code=HOLDOUT_OPEN_BUDGET_EXCEEDED"
+            },
+            {
+              "label": "re-presenting the same digest for the SAME trial is an idempotent replay, not a counted second open",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a HOLDOUT read by an actor kind the preregistration did not release is refused with HOLDOUT_ACCESS_NOT_RELEASED",
+              "ok": true,
+              "detail": "code=HOLDOUT_ACCESS_NOT_RELEASED"
+            },
+            {
+              "label": "a HOLDOUT read by a RELEASED actor kind is admitted, so the rule is a decision and not a blanket refusal",
+              "ok": true,
+              "detail": "actor=EVALUATOR code=none"
+            },
+            {
+              "label": "the PRIMARY partition is readable without an unseal digest",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "control_flips: holdout_peek flips ALLOW -> VIOLATION",
+              "ok": true,
+              "detail": "reasons after injection: UNSATISFIED_HOLDOUT_BINDING"
+            }
+          ],
+          "id": "P1",
+          "subject": "readCorpus + the ledger ACCESS record (dataset.mjs, registry.mjs)",
+          "expectation": "a HOLDOUT read before the trial's decision point, or with a forged or replayed unseal digest, is refused by a typed policy refusal and returns no case data",
+          "verdict_forced": "VIOLATION",
+          "finding_produced": "the refusal code, whether any case data escaped the refusal, and the journal state around it",
+          "probes_version": "s2-008-probes-v1",
+          "world": {
+            "family": "holdout_peek",
+            "probe": "holdout_read_before_decision_point",
+            "clock_source": "probe_default_fixed",
+            "id_source": "probe_default_slug_scoped",
+            "purge": true,
+            "purge_refusal": null,
+            "deferred": {}
+          },
+          "observed_case_id_source": "corpus_index",
+          "observed_open_budget_reachability": {
+            "through_read_corpus": "NOT_REACHABLE: the committed corpus publishes one unseal digest, so a second open through dataset.mjs either replays that digest or presents a forged one",
+            "through_record_holdout_read": "REACHABLE and refused with HOLDOUT_OPEN_BUDGET_EXCEEDED"
+          },
+          "observed_holdout_journal": {
+            "readable": true,
+            "records": 1,
+            "chain_ok": true,
+            "first_refusal": null
+          },
+          "observed_baseline_trial": {
+            "trial": "trl-s2-008-probe",
+            "status": "RESOLVED",
+            "verdict": "ALLOW",
+            "reasons": []
+          },
+          "control": {
+            "id": "holdout_peek",
+            "mechanism": "comparator",
+            "injects": "a trial that opened the HOLDOUT before its decision point",
+            "mutation_source": "built_in",
+            "before": "ALLOW",
+            "after": "VIOLATION",
+            "must_flip_to": "VIOLATION",
+            "flipped": true
+          }
+        }
+      },
+      {
+        "probe": "best_seed_reported_instead_of_the_preregistered_set",
+        "family": "seed_substitution",
+        "status": "pass",
+        "passed": true,
+        "counter": "seedSubstitution",
+        "counted": 0,
+        "detail": "the preregistered seed set is admitted on every trial; a seed set with one seed substituted is refused by a typed policy refusal; a report containing only the best seed is refused by a typed policy refusal; control_flips: seed_substitution flips ALLOW -> VIOLATION",
+        "evidence": {
+          "probe": "best_seed_reported_instead_of_the_preregistered_set",
+          "family": "seed_substitution",
+          "counter": "seedSubstitution",
+          "status": "pass",
+          "checks": [
+            {
+              "label": "the preregistered seed set is admitted on every trial",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a seed set with one seed substituted is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "a report containing only the best seed is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "control_flips: seed_substitution flips ALLOW -> VIOLATION",
+              "ok": true,
+              "detail": "reasons after injection: UNSATISFIED_SEED_BINDING"
+            }
+          ],
+          "id": "P2",
+          "subject": "assertSeedSetFrozen (preregistration.mjs) + the trial seed binding",
+          "expectation": "a seed set that is not the preregistered one is refused on every trial, so \"the best seed\" is never a statistic the verdict may use",
+          "verdict_forced": "VIOLATION",
+          "finding_produced": "the refusal codes and which preregistration field the seed set was read from",
+          "probes_version": "s2-008-probes-v1",
+          "world": {
+            "family": "seed_substitution",
+            "probe": "best_seed_reported_instead_of_the_preregistered_set",
+            "clock_source": "probe_default_fixed",
+            "id_source": "probe_default_slug_scoped",
+            "purge": true,
+            "purge_refusal": null,
+            "deferred": {}
+          },
+          "observed_seed_field": "seed_rule.seeds",
+          "observed_baseline_trial": {
+            "trial": "trl-s2-008-probe",
+            "status": "RESOLVED",
+            "verdict": "ALLOW",
+            "reasons": []
+          },
+          "control": {
+            "id": "seed_substitution",
+            "mechanism": "comparator",
+            "injects": "a report whose seed binding names only the best seed",
+            "mutation_source": "built_in",
+            "before": "ALLOW",
+            "after": "VIOLATION",
+            "must_flip_to": "VIOLATION",
+            "flipped": true
+          }
+        }
+      },
+      {
+        "probe": "test_design_edited_after_the_result",
+        "family": "hypothesis_rewrite",
+        "status": "pass",
+        "passed": true,
+        "counter": "hypothesisRewrite",
+        "counted": 0,
+        "detail": "a post-result test_design edit keeps the same card_id; the post-result rewrite moves the preregistration digest; the preregistration in force is complete; an unedited preregistration is admitted as the decision basis after a result; a hypothesis edited after a result is refused by a typed policy refusal; the lawful path after a result is a new AMENDMENT document; the amendment is refused when presented as a decision basis; the same amendment is admitted when it is only journalled; an amendment t",
+        "evidence": {
+          "probe": "test_design_edited_after_the_result",
+          "family": "hypothesis_rewrite",
+          "counter": "hypothesisRewrite",
+          "status": "pass",
+          "checks": [
+            {
+              "label": "a post-result test_design edit keeps the same card_id",
+              "ok": true,
+              "detail": "hyc-s2-008-probe-observational vs hyc-s2-008-probe-observational"
+            },
+            {
+              "label": "the post-result rewrite moves the preregistration digest",
+              "ok": true,
+              "detail": "the digest is the only detector"
+            },
+            {
+              "label": "the preregistration in force is complete",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "an unedited preregistration is admitted as the decision basis after a result",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a hypothesis edited after a result is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "the lawful path after a result is a new AMENDMENT document",
+              "ok": true,
+              "detail": "kind=AMENDMENT code=none"
+            },
+            {
+              "label": "the amendment is refused when presented as a decision basis",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "the same amendment is admitted when it is only journalled",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "an amendment that reuses the amended card_id is refused",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "control_flips: post_result_rewrite flips ADMITTED -> REFUSED",
+              "ok": true,
+              "detail": "injected digest 4ab7a0b53aa244e8321979f code=BLOCKED_POLICY"
+            }
+          ],
+          "id": "P3",
+          "subject": "assertNoPostResultRewrite + preregistrationDigest + createAmendment (preregistration.mjs)",
+          "expectation": "a test_design edited after a result is refused, even though the card_id is unchanged and the frozen schema still accepts the document; the lawful path is a new AMENDMENT that is itself refused as a decision basis",
+          "verdict_forced": "VIOLATION",
+          "finding_produced": "the moved digest, the refusal codes, and that the rewrite is still contract-valid with the same card_id",
+          "probes_version": "s2-008-probes-v1",
+          "world": {
+            "family": "hypothesis_rewrite",
+            "probe": "test_design_edited_after_the_result",
+            "clock_source": "probe_default_fixed",
+            "id_source": "probe_default_slug_scoped",
+            "purge": true,
+            "purge_refusal": null,
+            "deferred": {}
+          },
+          "observed_rewrite_before_any_result": {
+            "refused": true,
+            "code": "REVISION_CONFLICT"
+          },
+          "control": {
+            "id": "post_result_rewrite",
+            "mechanism": "guard",
+            "injects": "a frozen preregistration mutated after run 1",
+            "mutation_source": "built_in",
+            "before": "ADMITTED",
+            "after": "REFUSED",
+            "must_flip_to": "REFUSED",
+            "flipped": true
+          }
+        }
+      },
+      {
+        "probe": "spend_beyond_the_reservation",
+        "family": "budget_opacity",
+        "status": "pass",
+        "passed": true,
+        "counter": "budgetOpacity",
+        "counted": 0,
+        "detail": "a live reservation covering the request is granted; a spend beyond the reservation is refused as a budget refusal; an expired reservation is a reconciliation, not a zero and not a grant; a budget reservation is journalled before any spend; a settle within the reservation is journalled; the ledger holds a record before the refusal is measured; a settle against a reservation that was never granted is refused, not a zero; a settle beyond the reservation is refused as a budget refusal; a refused set",
+        "evidence": {
+          "probe": "spend_beyond_the_reservation",
+          "family": "budget_opacity",
+          "counter": "budgetOpacity",
+          "status": "pass",
+          "checks": [
+            {
+              "label": "a live reservation covering the request is granted",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a spend beyond the reservation is refused as a budget refusal",
+              "ok": true,
+              "detail": "code=BUDGET_EXCEEDED"
+            },
+            {
+              "label": "an expired reservation is a reconciliation, not a zero and not a grant",
+              "ok": true,
+              "detail": "code=RECONCILIATION_REQUIRED"
+            },
+            {
+              "label": "a budget reservation is journalled before any spend",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a settle within the reservation is journalled",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "the ledger holds a record before the refusal is measured",
+              "ok": true,
+              "detail": "records=2"
+            },
+            {
+              "label": "a settle against a reservation that was never granted is refused, not a zero",
+              "ok": true,
+              "detail": "code=BUDGET_EXCEEDED"
+            },
+            {
+              "label": "a settle beyond the reservation is refused as a budget refusal",
+              "ok": true,
+              "detail": "code=BUDGET_EXCEEDED"
+            },
+            {
+              "label": "a refused settle leaves the ledger byte-identical",
+              "ok": true,
+              "detail": "sha256:ab59973ee1e999c5 vs sha256:ab59973ee1e999c5"
+            },
+            {
+              "label": "a settle against an expired reservation is refused on the LEDGER as a reconciliation, not a grant",
+              "ok": true,
+              "detail": "code=BUDGET_RESERVATION_EXPIRED"
+            },
+            {
+              "label": "the refused expired settle committed a RECONCILIATION row to the journal",
+              "ok": true,
+              "detail": "rows=1 records_before=2 records_after=3"
+            },
+            {
+              "label": "the expired reservation was NOT released and NOT zeroed: the reconciliation is the only thing the refusal added",
+              "ok": true,
+              "detail": "before=2 after=3 reconciliation_rows=1"
+            },
+            {
+              "label": "control_flips: budget_opacity flips ALLOW -> VIOLATION",
+              "ok": true,
+              "detail": "reasons after injection: UNSATISFIED_BUDGET_BINDING"
+            }
+          ],
+          "id": "P4",
+          "subject": "assertBudgetReservation + recordSpend (preregistration.mjs, registry.mjs)",
+          "expectation": "a spend beyond the reservation is BudgetExceeded and leaves the ledger byte-identical; an expired reservation is a ReconciliationRequired, never a zero and never a silent release",
+          "verdict_forced": "VIOLATION",
+          "finding_produced": "the refusal codes and whether a refused spend changed the snapshot digest",
+          "probes_version": "s2-008-probes-v1",
+          "world": {
+            "family": "budget_opacity",
+            "probe": "spend_beyond_the_reservation",
+            "clock_source": "probe_default_fixed",
+            "id_source": "probe_default_slug_scoped",
+            "purge": true,
+            "purge_refusal": null,
+            "deferred": {}
+          },
+          "observed_refused_spend": {
+            "code": "BUDGET_EXCEEDED",
+            "journal_after": {
+              "readable": true,
+              "records": 2,
+              "chain_ok": true,
+              "first_refusal": null
+            }
+          },
+          "observed_expired_reservation": {
+            "code": "BUDGET_RESERVATION_EXPIRED",
+            "reconciliation_rows": 1,
+            "retry_attempted": false,
+            "implicit_zero": false
+          },
+          "observed_baseline_trial": {
+            "trial": "trl-s2-008-probe",
+            "status": "RESOLVED",
+            "verdict": "ALLOW",
+            "reasons": []
+          },
+          "control": {
+            "id": "budget_opacity",
+            "mechanism": "comparator",
+            "injects": "a run whose spend exceeds the reservation",
+            "mutation_source": "built_in",
+            "before": "ALLOW",
+            "after": "VIOLATION",
+            "must_flip_to": "VIOLATION",
+            "flipped": true
+          }
+        }
+      },
+      {
+        "probe": "observational_label_swapped_to_causal",
+        "family": "causal_upgrade",
+        "status": "pass",
+        "passed": true,
+        "counter": "causalUpgrade",
+        "counted": 0,
+        "detail": "a causal claim over observational ground truth is still valid against the frozen schema; an observational card claiming no causal relation is admitted; a causal claim on observational ground truth is refused by a typed policy refusal; the always-on simulation guard refuses the same card; the classification reports the swapped card inadmissible with a refusal code; a RESOLVED trial that CLAIMS causality over correlation evidence is a VIOLATION, never an ALLOW; the same causal claim under a RENAME",
+        "evidence": {
+          "probe": "observational_label_swapped_to_causal",
+          "family": "causal_upgrade",
+          "counter": "causalUpgrade",
+          "status": "pass",
+          "checks": [
+            {
+              "label": "a causal claim over observational ground truth is still valid against the frozen schema",
+              "ok": true,
+              "detail": "the card schema has no allOf: the rule lives in code"
+            },
+            {
+              "label": "an observational card claiming no causal relation is admitted",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "a causal claim on observational ground truth is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "the always-on simulation guard refuses the same card",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "the classification reports the swapped card inadmissible with a refusal code",
+              "ok": true,
+              "detail": "admissible=false code=CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE"
+            },
+            {
+              "label": "a RESOLVED trial that CLAIMS causality over correlation evidence is a VIOLATION, never an ALLOW",
+              "ok": true,
+              "detail": "verdict=VIOLATION reasons=CAUSAL_CLAIM_UNSUPPORTED:CORRELATION_EVIDENCE"
+            },
+            {
+              "label": "the same causal claim under a RENAMED card member and a RENAMED label member is still a VIOLATION",
+              "ok": true,
+              "detail": "verdict=VIOLATION reasons=CAUSAL_CLAIM_UNSUPPORTED:no_relation_strength"
+            },
+            {
+              "label": "control_flips: label_substitution flips ADMITTED -> REFUSED",
+              "ok": true,
+              "detail": "label guard refusal code BLOCKED_POLICY"
+            }
+          ],
+          "id": "P5",
+          "subject": "assertCausalDiscipline + assertNoCausalFromSimulation + classifyCardRelation (causality.mjs, contracts.mjs)",
+          "expectation": "an observational card whose label is swapped to causal is refused by a policy refusal while the un-swapped card is admitted; the refusal must be the label guard and not a schema rejection",
+          "verdict_forced": "VIOLATION",
+          "finding_produced": "the refusal code, the classification of the swapped card, and that both cards satisfy the frozen contract",
+          "probes_version": "s2-008-probes-v1",
+          "world": {
+            "family": "causal_upgrade",
+            "probe": "observational_label_swapped_to_causal",
+            "clock_source": "probe_default_fixed",
+            "id_source": "probe_default_slug_scoped",
+            "purge": true,
+            "purge_refusal": null,
+            "deferred": {}
+          },
+          "observed_classification": {
+            "relation_strength": "CORRELATION_EVIDENCE",
+            "causal_assertion": true,
+            "refusal_code": "CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE"
+          },
+          "control": {
+            "id": "label_substitution",
+            "mechanism": "guard",
+            "injects": "an observational label swapped to causal",
+            "mutation_source": "built_in",
+            "before": "ADMITTED",
+            "after": "REFUSED",
+            "must_flip_to": "REFUSED",
+            "flipped": true
+          }
+        }
+      },
+      {
+        "probe": "evaluator_removed_between_reservation_and_comparison",
+        "family": "missing_evaluator",
+        "status": "pass",
+        "passed": true,
+        "counter": "missingEvaluator",
+        "counted": 0,
+        "detail": "an independent evaluator is admitted; an absent evaluator is refused by a typed policy refusal; an evaluator that is not blind to the producer is refused by a typed policy refusal; a NOT_MEASURED trial resolves to VIOLATION, never ALLOW; a trial whose calibration declares a non-independent evaluator is a VIOLATION, never an ALLOW; control_flips: missing_evaluator flips ALLOW -> VIOLATION",
+        "evidence": {
+          "probe": "evaluator_removed_between_reservation_and_comparison",
+          "family": "missing_evaluator",
+          "counter": "missingEvaluator",
+          "status": "pass",
+          "checks": [
+            {
+              "label": "an independent evaluator is admitted",
+              "ok": true,
+              "detail": "code=none"
+            },
+            {
+              "label": "an absent evaluator is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "an evaluator that is not blind to the producer is refused by a typed policy refusal",
+              "ok": true,
+              "detail": "code=BLOCKED_POLICY"
+            },
+            {
+              "label": "a NOT_MEASURED trial resolves to VIOLATION, never ALLOW",
+              "ok": true,
+              "detail": "verdict=VIOLATION reasons=TRIAL_NOT_RESOLVED:NOT_MEASURED"
+            },
+            {
+              "label": "a trial whose calibration declares a non-independent evaluator is a VIOLATION, never an ALLOW",
+              "ok": true,
+              "detail": "verdict=VIOLATION reasons=EVALUATOR_NOT_INDEPENDENT:BLOCKED_POLICY"
+            },
+            {
+              "label": "control_flips: missing_evaluator flips ALLOW -> VIOLATION",
+              "ok": true,
+              "detail": "reasons after injection: MISSING_EVALUATOR_BINDING; EVALUATOR_NOT_INDEPENDENT:BLOCKED_POLICY"
+            }
+          ],
+          "id": "P6",
+          "subject": "assertEvaluatorPresent (comparator.mjs) + the trial evaluator binding",
+          "expectation": "an absent or non-independent evaluator is refused, and the resulting NOT_MEASURED trial is a VIOLATION — never ALLOW and never a silent zero",
+          "verdict_forced": "VIOLATION",
+          "finding_produced": "the refusal codes and the verdict the NOT_MEASURED trial resolved to",
+          "probes_version": "s2-008-probes-v1",
+          "world": {
+            "family": "missing_evaluator",
+            "probe": "evaluator_removed_between_reservation_and_comparison",
+            "clock_source": "probe_default_fixed",
+            "id_source": "probe_default_slug_scoped",
+            "purge": true,
+            "purge_refusal": null,
+            "deferred": {}
+          },
+          "observed_baseline_trial": {
+            "trial": "trl-s2-008-probe",
+            "status": "RESOLVED",
+            "verdict": "ALLOW",
+            "reasons": []
+          },
+          "control": {
+            "id": "missing_evaluator",
+            "mechanism": "comparator",
+            "injects": "the evaluator removed between reservation and comparison",
+            "mutation_source": "built_in",
+            "before": "ALLOW",
+            "after": "VIOLATION",
+            "must_flip_to": "VIOLATION",
+            "flipped": true
+          }
+        }
+      }
+    ],
+    "notRun": [],
+    "broken": []
+  },
+  "controls": {
+    "allFlipped": true,
+    "gate": {
+      "ok": true,
+      "failures": []
+    },
+    "notRun": [],
+    "records": [
+      {
+        "id": "holdout_peek",
+        "probe": "P1",
+        "mechanism": "comparator",
+        "injects": "the holdout_peek condition stated in the binding's own content",
+        "before": "ALLOW",
+        "after": "VIOLATION",
+        "before_verdict": "ALLOW",
+        "after_verdict": "VIOLATION",
+        "flipped": true
+      },
+      {
+        "id": "seed_substitution",
+        "probe": "P2",
+        "mechanism": "comparator",
+        "injects": "the seed_substitution condition stated in the binding's own content",
+        "before": "ALLOW",
+        "after": "VIOLATION",
+        "before_verdict": "ALLOW",
+        "after_verdict": "VIOLATION",
+        "flipped": true
+      },
+      {
+        "id": "budget_opacity",
+        "probe": "P4",
+        "mechanism": "comparator",
+        "injects": "the budget_opacity condition stated in the binding's own content",
+        "before": "ALLOW",
+        "after": "VIOLATION",
+        "before_verdict": "ALLOW",
+        "after_verdict": "VIOLATION",
+        "flipped": true
+      },
+      {
+        "id": "label_substitution",
+        "probe": "P5",
+        "mechanism": "guard",
+        "injects": "an observational label swapped to causal",
+        "before": "ADMITTED",
+        "after": "REFUSED",
+        "before_refusal": null,
+        "after_refusal": "CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE",
+        "mutated_field": "proposed_relation.causal_assertion",
+        "flipped": true
+      },
+      {
+        "id": "missing_evaluator",
+        "probe": "P6",
+        "mechanism": "comparator",
+        "injects": "the missing_evaluator condition stated in the binding's own content",
+        "before": "ALLOW",
+        "after": "VIOLATION",
+        "before_verdict": "ALLOW",
+        "after_verdict": "VIOLATION",
+        "flipped": true
+      },
+      {
+        "id": "corrupted_data",
+        "probe": "A2",
+        "mechanism": "table",
+        "injects": "the same corrupted trial in BOTH runs, once per frozen corruption variant, so their digests stay equal",
+        "before": "no_findings",
+        "after": "findings_non_empty",
+        "per_run": [
+          {
+            "letter": "a",
+            "variants": [
+              {
+                "variant": "trial_status_skip",
+                "corrupted": {
+                  "field": "trials[0].status",
+                  "from": "RESOLVED",
+                  "to": "SKIPPED",
+                  "variant": "trial_status_skip"
+                },
+                "findings": 7
+              },
+              {
+                "variant": "counter_nudge",
+                "corrupted": {
+                  "field": "trials[0].counters.holdoutPeek",
+                  "from": 0,
+                  "to": 1,
+                  "variant": "counter_nudge"
+                },
+                "findings": 12
+              },
+              {
+                "variant": "metric_altered",
+                "corrupted": {
+                  "field": "trials[0].numerator",
+                  "from": 7,
+                  "to": 8,
+                  "variant": "metric_altered"
+                },
+                "findings": 7
+              },
+              {
+                "variant": "provenance_field",
+                "corrupted": {
+                  "field": "trials[0].provenance.raw_run_id",
+                  "from": null,
+                  "to": "run-forged",
+                  "variant": "provenance_field"
+                },
+                "findings": 7
+              }
+            ]
+          },
+          {
+            "letter": "b",
+            "variants": [
+              {
+                "variant": "trial_status_skip",
+                "corrupted": {
+                  "field": "trials[0].status",
+                  "from": "RESOLVED",
+                  "to": "SKIPPED",
+                  "variant": "trial_status_skip"
+                },
+                "findings": 7
+              },
+              {
+                "variant": "counter_nudge",
+                "corrupted": {
+                  "field": "trials[0].counters.holdoutPeek",
+                  "from": 0,
+                  "to": 1,
+                  "variant": "counter_nudge"
+                },
+                "findings": 12
+              },
+              {
+                "variant": "metric_altered",
+                "corrupted": {
+                  "field": "trials[0].numerator",
+                  "from": 7,
+                  "to": 8,
+                  "variant": "metric_altered"
+                },
+                "findings": 7
+              },
+              {
+                "variant": "provenance_field",
+                "corrupted": {
+                  "field": "trials[0].provenance.raw_run_id",
+                  "from": null,
+                  "to": "run-forged",
+                  "variant": "provenance_field"
+                },
+                "findings": 7
+              }
+            ]
+          }
+        ],
+        "coverage": {
+          "variants_declared": [
+            "trial_status_skip",
+            "counter_nudge",
+            "metric_altered",
+            "provenance_field"
+          ],
+          "variants_injected": [
+            "trial_status_skip",
+            "counter_nudge",
+            "metric_altered",
+            "provenance_field"
+          ],
+          "variants_unproductive": [],
+          "note": "a corruption class the control never injects is a class whose detection the control does not demonstrate; the list is itemised in the record rather than left implicit"
+        },
+        "flipped": true
+      },
+      {
+        "id": "ledger_spelling_holdout_peek",
+        "mechanism": "comparator",
+        "injects": "the holdout binding spelled the way registry.mjs#recordHoldoutRead plans the ACCESS payload (decision_point)",
+        "before": "ALLOW",
+        "after": "VIOLATION",
+        "mutated_field": "holdoutBinding.decision_point",
+        "flipped": true
+      }
+    ],
+    "digest": "5cb6df0e83f109de6953332c21bc4dc004d924934f374331c08cad78e2706fc5"
+  },
+  "control_fixtures": {
+    "trial": "synthetic: one ALLOW trial with four satisfied bindings",
+    "run": "synthetic: projected from EXPECTED_TRIAL_DECISIONS"
+  }
+}
