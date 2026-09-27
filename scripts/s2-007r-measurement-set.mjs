@@ -1097,8 +1097,17 @@ function amvpRecord({ cells, identity, head, pilot, lifecycle, ledger, plant }) 
       pass: A_MVP_IDS.filter((id) => cases[id].observed === 'PASS'),
       partial: A_MVP_IDS.filter((id) => cases[id].observed === 'PARTIAL'),
       not_run: A_MVP_IDS.filter((id) => cases[id].observed === 'NOT_RUN'),
-      pass_count: 0,
-      note: 'zero PASS written. A-MVP-05 is NOT_RUN by construction (no authenticated human reviewer). A-MVP-02 carries a condition that is false at this HEAD because of the owner\'s D3 decision.',
+      // COUNTED FROM THE CASES, never asserted. This used to be the literal 0,
+      // written when no case could pass — and it kept saying zero after
+      // A-MVP-01 went to PASS, so the record contradicted its own case table.
+      // A counter that does not read its data is a claim, not a measurement.
+      pass_count: Object.values(cases).filter((entry) => entry.observed === 'PASS').length,
+      observed_counts: A_MVP_IDS.reduce((acc, id) => {
+        const observed = String(cases[id]?.observed ?? 'ABSENT');
+        acc[observed] = (acc[observed] ?? 0) + 1;
+        return acc;
+      }, {}),
+      note: 'the pass count is the number of cases whose own observed value is PASS, counted here rather than asserted. A-MVP-05 is NOT_RUN by construction (no authenticated human reviewer) and A-MVP-02 carries a condition that is false at this HEAD because of the owner\'s HOST_UNISOLATED decision.',
     },
     status_table: statusTable(cases, identity, ledger),
     budget: {

@@ -4,8 +4,8 @@
   "ticket": "S2-007R",
   "issue": "SpaceDazher/Veritas#45",
   "written_by": "scripts/s2-007r-measurement-set.mjs (s2-007r-measurement-set-v1)",
-  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
+  "commit": "445970eb7d66198305abddaf45599cfd724ed164",
+  "tree": "9a0dc28cb296e00e4e08039dd260c5d61fc05e48",
   "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
   "run_set_composition": [
     {
@@ -3607,6 +3607,6 @@
     "The comparison is COMPARED: pi COMPARED, codex REFUSED. A provider whose two ends select the identical normalised argv is EXCLUDED with that reason and is never reported as \"no difference observed\".",
     "Measurement 7 is a boundary observation performed by the measurement step, not an observation of a run. It is labelled is_a_run:false, governed:false, board_commands_called:0 in the arms and in the measurement row."
   ],
-  "record_digest": "sha256:d40a9bd9777734f72e46851c96243eb00d494392a6922aca378cdd7d4139801e",
-  "recordDigest": "sha256:1f4e5bbd81f1245aba1d1b9a3ec677fd4f7027373e78950cd0e91369fdc88998"
+  "record_digest": "sha256:74520d1b8fec64373c153a51bcad80299655ef1933a67722ae409846fe08c4f5",
+  "recordDigest": "sha256:99d9a68b8dc7cb51d43b9f9cbc36ff7fd894465dece8ab90f331266aa000af78"
 }

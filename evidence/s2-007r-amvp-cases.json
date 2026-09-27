@@ -4,8 +4,8 @@
   "ticket": "S2-007R",
   "issue": "SpaceDazher/Veritas#45",
   "written_by": "scripts/s2-007r-measurement-set.mjs (s2-007r-measurement-set-v1)",
-  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
+  "commit": "445970eb7d66198305abddaf45599cfd724ed164",
+  "tree": "9a0dc28cb296e00e4e08039dd260c5d61fc05e48",
   "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
   "project_digest": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
   "budget_grant_id": "grt-s2007r-pilot",
@@ -1270,8 +1270,13 @@
       "A-MVP-06",
       "A-MVP-07"
     ],
-    "pass_count": 0,
-    "note": "zero PASS written. A-MVP-05 is NOT_RUN by construction (no authenticated human reviewer). A-MVP-02 carries a condition that is false at this HEAD because of the owner's D3 decision."
+    "pass_count": 1,
+    "observed_counts": {
+      "PASS": 1,
+      "NOT_RUN": 5,
+      "PARTIAL": 1
+    },
+    "note": "the pass count is the number of cases whose own observed value is PASS, counted here rather than asserted. A-MVP-05 is NOT_RUN by construction (no authenticated human reviewer) and A-MVP-02 carries a condition that is false at this HEAD because of the owner's HOST_UNISOLATED decision."
   },
   "status_table": {
     "engineeringStatus": "PARTIAL",
@@ -1472,7 +1477,7 @@
     {
       "path": "evidence/s2-007r-security-probes.json",
       "what": "the probe gate's own accounting of the same authority refusals",
-      "sha256": "fb36e0929c26aa9369a2af52357e29d4da4b846cc57d2bfbe738321ecbeb2298",
+      "sha256": "eb9efcdfc6820b3e937e1aef2c2dfa497de135a60f38821eced54d47ae422aea",
       "present_on_disk": true
     },
     {
@@ -1495,6 +1500,6 @@
     "The per-case file is read by the gate only when it is bound to the current commit AND to a corroborated real-adapter run. With no corroborated run, the gate forces every case to NOT_RUN whatever this file claims: that is the fail-closed direction, and it is why the values here agree with what the gate will print."
   ],
   "record_digest_method": "sha256: + canonical-json-v1 over this record with record_digest removed",
-  "record_digest": "sha256:59b36bbfef2632872a1681571be92025c00376e181750bce59a60ab8a344a9c9",
-  "recordDigest": "sha256:ac89ac3c5938f2e73b4b39dfe6e22d3a726a6202a3ce8d36efbf77f8df9a4299"
+  "record_digest": "sha256:6c290f68c6441d36b886a129210b8d385b09acf010c01dbce3927dbcd1c961cc",
+  "recordDigest": "sha256:03df397614dac04b4c4cf95ddf0ade9d4fac40ffe6c3aa57f30b93173dd652ac"
 }
