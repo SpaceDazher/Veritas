@@ -49,7 +49,7 @@ import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { BlockedPolicy, MalformedResult, NeedsInput } from '../../src/lib/agentboard/errors.mjs';
 import {
   bestSeedDisclosure, COMPARATOR_VERSION, compareParallelTrack, decisionFromInterval, injectCorruption,
-  latencyRecorded, metricsSummary, resolveCampaignVerdict, resolveTrialVerdict,
+  latencyRecorded, metricsSummary, resolveCampaignVerdict, resolveTrialVerdict, ruleFeasibility,
 } from '../../src/lib/research/comparator.mjs';
 import {
   assertNoCausalClaim, assertUsableAsResult, claimAssertsCausality, EXECUTOR_DISPOSITIONS,
@@ -802,15 +802,49 @@ describe('the frozen noise / CI / multiplicity rule drives the decision', () => 
   });
 
   test('a rule that CAN reject says POSITIVE, and the same effect the other way says NEGATIVE', () => {
-    // The committed constants (alpha 0.05, confidence 0.95, three declared
-    // comparisons) give a p bound of 1 - 0.95 = 0.05 against a floor of
-    // 0.05 / 4, so the published rule can never reject. Raising the PUBLISHED
-    // confidence is what makes it rejectable, and that is a preregistration
-    // change, not a comparator one.
-    const committed = decisionFromInterval({ observed: 0.9, lower: 0.8, upper: 0.95, noiseBand: 0.02, rule: rule() });
-    assert.equal(committed.correction.never_rejects, true, 'the published rule should be reported as unable to reject');
-    assert.equal(committed.decision, 'UNRESOLVED');
-    assert.equal(committed.reason, 'not_significant_after_multiplicity_correction');
+    // R-A, THE WHOLE OF IT, IN ONE ASSERTION BLOCK. The rule this test reads
+    // from the FROZEN preregistration is now the derived one:
+    // `confidence = 1 - alpha / family_size` over the three declared
+    // comparisons, so its bound `1 - c` lands ON `alpha / m` and the rule can
+    // reject. `ruleFeasibility` is the track's own arithmetic, not a
+    // hand-written `1 - c <= alpha / m`: the derived value `1 - (1 - 0.05/3)`
+    // is 5.2e-17 ABOVE `0.05/3` in IEEE-754 (relative 3.1e-15), so a test that
+    // compared the two itself would fail on the rounding artefact of the very
+    // value that makes the rule self-consistent.
+    //
+    // `rule()` below sets a `subject` that is NOT one of the declared
+    // comparisons, so the subject JOINS the family and the effective family is
+    // m = 4 — a legitimate, correctly-reported second family in which the very
+    // same published confidence cannot reject. Both halves are asserted below,
+    // because "the published rule can never reject" was TRUE of the first
+    // delivery and is false now, and a reader of this file must not be left
+    // believing the old sentence.
+    const declared = ruleFeasibility({
+      alpha: MULTIPLICITY.alpha, confidence: MULTIPLICITY.confidence, familySize: family().length,
+    });
+    assert.equal(declared.never_rejects, false, 'the frozen rule must be able to reject at its declared family of ' + String(family().length));
+    assert.equal(declared.can_only_answer, 'ANY_OUTCOME');
+    // The published confidence is DERIVED, not chosen: it must be exactly
+    // `1 - alpha / family_size`, so a return to a round 0.95 fails here.
+    assert.equal(MULTIPLICITY.confidence, 1 - MULTIPLICITY.alpha / family().length);
+
+    // At m = 4 — the subject joined the family — the same published level
+    // correctly cannot reject, and the comparison reports that rather than
+    // silently deciding.
+    const widened = decisionFromInterval({ observed: 0.9, lower: 0.8, upper: 0.95, noiseBand: 0.02, rule: rule() });
+    assert.equal(widened.correction.comparisons, family().length + 1, 'the subject did not join the family, so this test is not testing what its comment claims');
+    assert.equal(widened.correction.never_rejects, true, 'a family of m+1 exceeds the bound the published confidence inherits');
+    assert.equal(widened.decision, 'UNRESOLVED');
+    assert.equal(widened.reason, 'not_significant_after_multiplicity_correction');
+
+    // At the declared family of 3 the very same effect is POSITIVE, which is
+    // the property R-A bought: the rule can now reject.
+    const pooled = decisionFromInterval({ observed: 0.9, lower: 0.8, upper: 0.95, noiseBand: 0.02, rule: rule({ subject_is_pooled_aggregate: true }) });
+    assert.equal(pooled.correction.comparisons, family().length, 'the pooled aggregate widened the family it belongs to');
+    assert.equal(pooled.correction.never_rejects, false);
+    assert.equal(pooled.decision, 'POSITIVE');
+    assert.equal(pooled.reason, 'clears_noise_and_clears_corrected_null');
+    assert.equal(pooled.correction.rejected, true);
 
     const powered = decisionFromInterval({ observed: 0.9, lower: 0.8, upper: 0.95, noiseBand: 0.02, rule: rule({ confidence: 0.99 }) });
     assert.equal(powered.correction.never_rejects, false);

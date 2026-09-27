@@ -4,17 +4,20 @@
     "metric": "case_agreement_rate",
     "baseline": 0.75,
     "noise_band": 0.02,
-    "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "inference_mode": "ASSOCIATIONAL",
     "interval_method": "wilson",
-    "confidence": 0.95
+    "confidence": 0.9833333333333333,
+    "multiplicity_alpha": 0.05,
+    "multiplicity_family_size": 3
   },
   "base": {
-    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 39,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|evidence/s2-008/) — the TRACK sources and the corpus, without the s2-008 evidence records and without the verify-s2-008* aggregator scripts",
     "track_tracked": true
   },
   "comparison": {
@@ -46,19 +49,9 @@
     ],
     "limits": [
       {
-        "code": "frozen_rule_cannot_reject",
-        "detail": "runA: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
-        "proof": "never_rejects"
-      },
-      {
         "code": "latency_observed",
         "detail": "runA: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
         "proof": "latency_recorded"
-      },
-      {
-        "code": "frozen_rule_cannot_reject",
-        "detail": "runB: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
-        "proof": "never_rejects"
       },
       {
         "code": "latency_observed",
@@ -71,10 +64,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-          "resolved_commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "resolved_tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587"
+          "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+          "resolved_commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "resolved_tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa"
         },
         "missing": []
       },
@@ -96,7 +89,7 @@
         "id": "preregistration_bound",
         "status": "SATISFIED",
         "evidence": {
-          "digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479"
+          "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207"
         },
         "missing": []
       },
@@ -106,7 +99,7 @@
         "evidence": {
           "findings_a": 0,
           "findings_b": 0,
-          "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62"
+          "table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63"
         },
         "missing": []
       },
@@ -221,18 +214,16 @@
             "numerator": 18,
             "denominator": 24,
             "outcomeCounts": {
-              "POSITIVE": 1,
-              "NULL": 1,
-              "NEGATIVE": 1,
+              "UNRESOLVED": 3,
               "INFRA": 1
             },
             "notMeasured": 1,
             "basis": "POOLED_TRIAL_COUNTS"
           },
           "interval": {
-            "lower": 0.551006,
-            "upper": 0.880006,
-            "confidence": 0.95,
+            "lower": 0.505681,
+            "upper": 0.897936,
+            "confidence": 0.9833333333333333,
             "method": "wilson_score"
           },
           "correction": null
@@ -251,18 +242,16 @@
             "numerator": 18,
             "denominator": 24,
             "outcomeCounts": {
-              "POSITIVE": 1,
-              "NULL": 1,
-              "NEGATIVE": 1,
+              "UNRESOLVED": 3,
               "INFRA": 1
             },
             "notMeasured": 1,
             "basis": "POOLED_TRIAL_COUNTS"
           },
           "interval": {
-            "lower": 0.551006,
-            "upper": 0.880006,
-            "confidence": 0.95,
+            "lower": 0.505681,
+            "upper": 0.897936,
+            "confidence": 0.9833333333333333,
             "method": "wilson_score"
           },
           "correction": null
@@ -285,44 +274,42 @@
       "conclusion": "the runs agree with the frozen table; agreement alone is not a pass and the controls must still flip"
     },
     "version": "s2-008-comparator-v1",
-    "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "runs": {
       "a": {
         "label": "runA",
         "raw_run_id": "s2-008-run-a",
         "nonce": "n-a-0123456789abcdef",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "digest": "2d8bebe074824b64f1b4160273234d1d5659e26fb280c4279481e835681e102e",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
           "metric": "case_agreement_rate",
           "numerator": 18,
           "denominator": 24,
           "outcomeCounts": {
-            "POSITIVE": 1,
-            "NULL": 1,
-            "NEGATIVE": 1,
+            "UNRESOLVED": 3,
             "INFRA": 1
           },
           "notMeasured": 1,
           "basis": "POOLED_TRIAL_COUNTS"
         },
         "interval": {
-          "lower": 0.551006,
-          "upper": 0.880006,
-          "confidence": 0.95,
+          "lower": 0.505681,
+          "upper": 0.897936,
+          "confidence": 0.9833333333333333,
           "method": "wilson_score"
         },
         "decision": "UNRESOLVED",
         "correction": null,
         "rule_feasibility": {
           "rejection_floor": 0.016667,
-          "max_p_bound": 0.05,
-          "never_rejects": true,
-          "can_only_answer": "NULL_OR_UNRESOLVED",
-          "feasible": false,
-          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+          "max_p_bound": 0.016667,
+          "never_rejects": false,
+          "can_only_answer": "ANY_OUTCOME",
+          "feasible": true,
+          "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
         },
         "latency": {
           "samples": [
@@ -337,7 +324,7 @@
             "upper": 0,
             "method": "percentile_bootstrap",
             "resamples": 2000,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "seed": 20260801,
             "samples": 4
           },
@@ -346,7 +333,7 @@
             "seed": 20260801,
             "resamples": 2000,
             "p": 0.95,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "preregistered": true
           }
         },
@@ -356,38 +343,36 @@
         "label": "runB",
         "raw_run_id": "s2-008-run-b",
         "nonce": "n-b-0123456789abcdef",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "digest": "2d8bebe074824b64f1b4160273234d1d5659e26fb280c4279481e835681e102e",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
           "metric": "case_agreement_rate",
           "numerator": 18,
           "denominator": 24,
           "outcomeCounts": {
-            "POSITIVE": 1,
-            "NULL": 1,
-            "NEGATIVE": 1,
+            "UNRESOLVED": 3,
             "INFRA": 1
           },
           "notMeasured": 1,
           "basis": "POOLED_TRIAL_COUNTS"
         },
         "interval": {
-          "lower": 0.551006,
-          "upper": 0.880006,
-          "confidence": 0.95,
+          "lower": 0.505681,
+          "upper": 0.897936,
+          "confidence": 0.9833333333333333,
           "method": "wilson_score"
         },
         "decision": "UNRESOLVED",
         "correction": null,
         "rule_feasibility": {
           "rejection_floor": 0.016667,
-          "max_p_bound": 0.05,
-          "never_rejects": true,
-          "can_only_answer": "NULL_OR_UNRESOLVED",
-          "feasible": false,
-          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+          "max_p_bound": 0.016667,
+          "never_rejects": false,
+          "can_only_answer": "ANY_OUTCOME",
+          "feasible": true,
+          "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
         },
         "latency": {
           "samples": [
@@ -402,7 +387,7 @@
             "upper": 0,
             "method": "percentile_bootstrap",
             "resamples": 2000,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "seed": 20260801,
             "samples": 4
           },
@@ -411,7 +396,7 @@
             "seed": 20260801,
             "resamples": 2000,
             "p": 0.95,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "preregistered": true
           }
         },
@@ -464,19 +449,9 @@
     ],
     "limits": [
       {
-        "code": "frozen_rule_cannot_reject",
-        "detail": "runA: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
-        "proof": "never_rejects"
-      },
-      {
         "code": "latency_observed",
         "detail": "runA: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
         "proof": "latency_recorded"
-      },
-      {
-        "code": "frozen_rule_cannot_reject",
-        "detail": "runB: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
-        "proof": "never_rejects"
       },
       {
         "code": "latency_observed",
@@ -489,10 +464,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-          "resolved_commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "resolved_tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587"
+          "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+          "resolved_commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "resolved_tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa"
         },
         "missing": []
       },
@@ -514,7 +489,7 @@
         "id": "preregistration_bound",
         "status": "SATISFIED",
         "evidence": {
-          "digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479"
+          "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207"
         },
         "missing": []
       },
@@ -524,7 +499,7 @@
         "evidence": {
           "findings_a": 1,
           "findings_b": 1,
-          "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62"
+          "table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63"
         },
         "missing": [
           "TRIAL_FIELD_DIVERGES_FROM_TABLE",
@@ -644,18 +619,16 @@
             "numerator": 11,
             "denominator": 16,
             "outcomeCounts": {
-              "POSITIVE": 1,
-              "NULL": 1,
-              "NEGATIVE": 1,
+              "UNRESOLVED": 3,
               "INFRA": 1
             },
             "notMeasured": 2,
             "basis": "POOLED_TRIAL_COUNTS"
           },
           "interval": {
-            "lower": 0.444044,
-            "upper": 0.858353,
-            "confidence": 0.95,
+            "lower": 0.394934,
+            "upper": 0.881168,
+            "confidence": 0.9833333333333333,
             "method": "wilson_score"
           },
           "correction": null
@@ -674,18 +647,16 @@
             "numerator": 11,
             "denominator": 16,
             "outcomeCounts": {
-              "POSITIVE": 1,
-              "NULL": 1,
-              "NEGATIVE": 1,
+              "UNRESOLVED": 3,
               "INFRA": 1
             },
             "notMeasured": 2,
             "basis": "POOLED_TRIAL_COUNTS"
           },
           "interval": {
-            "lower": 0.444044,
-            "upper": 0.858353,
-            "confidence": 0.95,
+            "lower": 0.394934,
+            "upper": 0.881168,
+            "confidence": 0.9833333333333333,
             "method": "wilson_score"
           },
           "correction": null
@@ -740,44 +711,42 @@
       "conclusion": "the frozen table is load-bearing: identical decision digests, non-empty findings"
     },
     "version": "s2-008-comparator-v1",
-    "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "runs": {
       "a": {
         "label": "runA",
         "raw_run_id": "s2-008-run-a",
         "nonce": "n-a-0123456789abcdef",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "digest": "3a12a0c90daf458d0b042311b515f05387d05492df19218718560221282244dd",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "digest": "18cf76db7fa654d8aa56a619a4be69fc35027f0b3537334a6cb6fdfaef76c727",
         "trials": 4,
         "metric": {
           "metric": "case_agreement_rate",
           "numerator": 11,
           "denominator": 16,
           "outcomeCounts": {
-            "POSITIVE": 1,
-            "NULL": 1,
-            "NEGATIVE": 1,
+            "UNRESOLVED": 3,
             "INFRA": 1
           },
           "notMeasured": 2,
           "basis": "POOLED_TRIAL_COUNTS"
         },
         "interval": {
-          "lower": 0.444044,
-          "upper": 0.858353,
-          "confidence": 0.95,
+          "lower": 0.394934,
+          "upper": 0.881168,
+          "confidence": 0.9833333333333333,
           "method": "wilson_score"
         },
         "decision": "UNRESOLVED",
         "correction": null,
         "rule_feasibility": {
           "rejection_floor": 0.016667,
-          "max_p_bound": 0.05,
-          "never_rejects": true,
-          "can_only_answer": "NULL_OR_UNRESOLVED",
-          "feasible": false,
-          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+          "max_p_bound": 0.016667,
+          "never_rejects": false,
+          "can_only_answer": "ANY_OUTCOME",
+          "feasible": true,
+          "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
         },
         "latency": {
           "samples": [
@@ -792,7 +761,7 @@
             "upper": 0,
             "method": "percentile_bootstrap",
             "resamples": 2000,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "seed": 20260801,
             "samples": 4
           },
@@ -801,7 +770,7 @@
             "seed": 20260801,
             "resamples": 2000,
             "p": 0.95,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "preregistered": true
           }
         },
@@ -811,38 +780,36 @@
         "label": "runB",
         "raw_run_id": "s2-008-run-b",
         "nonce": "n-b-0123456789abcdef",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "digest": "3a12a0c90daf458d0b042311b515f05387d05492df19218718560221282244dd",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "digest": "18cf76db7fa654d8aa56a619a4be69fc35027f0b3537334a6cb6fdfaef76c727",
         "trials": 4,
         "metric": {
           "metric": "case_agreement_rate",
           "numerator": 11,
           "denominator": 16,
           "outcomeCounts": {
-            "POSITIVE": 1,
-            "NULL": 1,
-            "NEGATIVE": 1,
+            "UNRESOLVED": 3,
             "INFRA": 1
           },
           "notMeasured": 2,
           "basis": "POOLED_TRIAL_COUNTS"
         },
         "interval": {
-          "lower": 0.444044,
-          "upper": 0.858353,
-          "confidence": 0.95,
+          "lower": 0.394934,
+          "upper": 0.881168,
+          "confidence": 0.9833333333333333,
           "method": "wilson_score"
         },
         "decision": "UNRESOLVED",
         "correction": null,
         "rule_feasibility": {
           "rejection_floor": 0.016667,
-          "max_p_bound": 0.05,
-          "never_rejects": true,
-          "can_only_answer": "NULL_OR_UNRESOLVED",
-          "feasible": false,
-          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+          "max_p_bound": 0.016667,
+          "never_rejects": false,
+          "can_only_answer": "ANY_OUTCOME",
+          "feasible": true,
+          "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
         },
         "latency": {
           "samples": [
@@ -857,7 +824,7 @@
             "upper": 0,
             "method": "percentile_bootstrap",
             "resamples": 2000,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "seed": 20260801,
             "samples": 4
           },
@@ -866,7 +833,7 @@
             "seed": 20260801,
             "resamples": 2000,
             "p": 0.95,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "preregistered": true
           }
         },
@@ -900,7 +867,7 @@
       "ok": true,
       "agreement_source": "TABLE_DERIVED_RUN_RECORDS",
       "measurement_of_agreement": "scripts/s2-008-replay.mjs",
-      "evidence": "separated=true findingsA=0 findingsB=0 digestsEqual=true identical_wrong_both_non_empty=true runA_metrics=18/24 notMeasured=1 rule_can_only_answer=NULL_OR_UNRESOLVED agreement_source=TABLE_DERIVED_RUN_RECORDS (not a measurement; see verify:s2-008-replay)"
+      "evidence": "separated=true findingsA=0 findingsB=0 digestsEqual=true identical_wrong_both_non_empty=true runA_metrics=18/24 notMeasured=1 rule_can_only_answer=ANY_OUTCOME agreement_source=TABLE_DERIVED_RUN_RECORDS (not a measurement; see verify:s2-008-replay)"
     },
     {
       "id": "A4",
@@ -947,7 +914,7 @@
   "crash_restart": {
     "root": ".bb/s2-008/harness/crash-restart",
     "snapshot_before": "sha256:5ff16825c1ebedc92d07b046f0d9a3f2d94e6e09153bb8268e158e3fb70e223f",
-    "snapshot_after_phase1": "sha256:0f48b9ed6589b6a7fcd59e9f1f6e774f11f4ec16d4f738b32556adce861c7885",
+    "snapshot_after_phase1": "sha256:9f1f69a68fae74d2bd2ff0443834940203f70126b45ad3a3bd1f5659771842e3",
     "phase1_rows": 2,
     "reservation_committed": "rsv-s2-008-01",
     "revision_after_phase1": 2,
@@ -973,5 +940,65 @@
       "status": "PASS",
       "reason": "the interrupted state reconciled, was not retried and was not zeroed"
     }
+  },
+  "ledger_shape": {
+    "a": [],
+    "b": [],
+    "expected": [
+      {
+        "kind": "PREREGISTRATION_RECORDED",
+        "required": true,
+        "count": 1,
+        "note": "recorded before trial one"
+      },
+      {
+        "kind": "BUDGET_RESERVATION",
+        "required": true,
+        "count": 1,
+        "note": "taken before the run, never at the spend"
+      },
+      {
+        "kind": "ACCESS",
+        "required": true,
+        "count": 1,
+        "note": "exactly one holdout open, journalled before the bytes are returned"
+      },
+      {
+        "kind": "TRIAL_RESULT",
+        "required": true,
+        "count": 4,
+        "note": "one per enumerated trial, including the infra one"
+      }
+    ],
+    "observed_record_kinds": [
+      "PREREGISTRATION_RECORDED",
+      "BUDGET_RESERVATION",
+      "ACCESS",
+      "TRIAL_RESULT",
+      "TRIAL_RESULT",
+      "TRIAL_RESULT",
+      "TRIAL_RESULT"
+    ],
+    "expected_record_kinds": [
+      "PREREGISTRATION_RECORDED",
+      "BUDGET_RESERVATION",
+      "ACCESS",
+      "TRIAL_RESULT",
+      "TRIAL_RESULT",
+      "TRIAL_RESULT",
+      "TRIAL_RESULT"
+    ],
+    "rows": {
+      "a": 7,
+      "b": 7
+    },
+    "chain_verified": true,
+    "error": null
+  },
+  "campaign": {
+    "expected_decision": "UNRESOLVED",
+    "observed_decision": "UNRESOLVED",
+    "agrees_with_table": true,
+    "findings": []
   }
 }

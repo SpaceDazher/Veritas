@@ -2,15 +2,16 @@
   "ticket": "S2-008",
   "gate": "scripts/verify-s2-008.mjs",
   "role": "verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the freshness refusal, and the derived status",
-  "status": "FAIL",
+  "status": "NOT_RUN",
   "ok": false,
-  "exitCode": 1,
+  "exitCode": 3,
   "base": {
-    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 51,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "gates": {
@@ -27,6 +28,14 @@
         "S1-011:BOUND"
       ],
       "track_files_tracked": 51
+    },
+    "corpus": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "scripts/s2-008-build-corpus.mjs --check",
+      "drift": null,
+      "refusal": null,
+      "reads": "the working tree, re-derived from tests/research/fixtures/**"
     },
     "probes": {
       "status": "PASS",
@@ -213,30 +222,38 @@
       "reasons": []
     },
     "replay": {
-      "status": "FAIL",
-      "exitCode": 1,
+      "status": "PASS",
+      "exitCode": 0,
       "stale": false,
-      "reason": "the replay process exited 1 (FAIL)",
+      "reason": null,
       "source": "scripts/s2-008-replay.mjs",
-      "overall": "FAIL",
+      "overall": "PASS",
+      "campaign_verdict": "FAIL",
+      "expected_campaign_decision": "UNRESOLVED",
+      "observed_campaign_decision": "UNRESOLVED",
       "properties": [
-        "A3:FAILED",
+        "A3:HELD",
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-27T11:10:20.731Z",
-        "finished_at": "2026-09-27T11:10:22.643Z",
+        "observed_at": "2026-09-27T13:39:41.765Z",
+        "finished_at": "2026-09-27T13:39:44.083Z",
         "source": "wall_clock",
         "decides": false,
-        "excluded_from_repeatability": true
+        "excluded_from_repeatability": true,
+        "age_ms": 8
       }
     },
     "harness": {
-      "status": "FAIL",
-      "exitCode": 1,
+      "status": "PASS",
+      "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "overall": "FAIL",
+      "observed_at": "2026-09-27T13:39:44.600Z",
+      "overall": "PASS",
       "verdict": "FAIL",
+      "expected_campaign_decision": "UNRESOLVED",
+      "observed_campaign_decision": "UNRESOLVED",
+      "decision_agrees_with_table": true,
       "properties": [
         "A1:HELD",
         "A2:HELD",
@@ -247,26 +264,23 @@
       "reason": null
     }
   },
-  "defects": [
-    "replay gate: FAIL (the replay process exited 1 (FAIL))",
-    "harness gate: FAIL (FAIL)"
-  ],
+  "defects": [],
   "notRun": [
     "NOT_RUN: the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
     "NOT_RUN: the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
   ],
-  "blockingGates": [
-    "replay",
-    "harness"
-  ],
+  "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-27T11:10:16.108Z",
+    "observed_at": "2026-09-27T13:39:44.600Z",
+    "started_at": "2026-09-27T13:39:35.115Z",
+    "replay_judged_at": "2026-09-27T13:39:44.091Z",
+    "harness_judged_at": "2026-09-27T13:39:44.600Z",
     "window_ms": 21600000,
-    "head_tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-    "replay_finished_at": "2026-09-27T11:10:22.643Z"
+    "head_tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+    "replay_finished_at": "2026-09-27T13:39:44.083Z"
   },
-  "track_status": "FAIL",
+  "track_status": "NOT_RUN",
   "authoritative": {
     "a3": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
     "a5": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
@@ -280,8 +294,8 @@
         "findingsB": 0
       },
       "replay_findings": {
-        "findingsA": 3,
-        "findingsB": 3
+        "findingsA": 0,
+        "findingsB": 0
       }
     }
   },
@@ -293,5 +307,6 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-27T11:10:16.108Z"
+  "observedAtIso": "2026-09-27T13:39:44.600Z",
+  "startedAtIso": "2026-09-27T13:39:35.115Z"
 }

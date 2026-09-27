@@ -73,6 +73,7 @@ import {
   expectedCounters,
 } from './fixture-measurement-set.mjs';
 import {
+  EXPECTED_TRIAL_DECISIONS,
   EXPECTED_VALUE_TABLE,
   withExpectedRow,
 } from './fixture-expected-values.mjs';
@@ -159,10 +160,14 @@ export const CORRUPTED_CAMPAIGN_VERDICT = 'FAIL';
 
 // Hand-written, NOT the output of the statistics module. A corruption that
 // looked exactly like an honest re-run would be indistinguishable from one,
-// and a reader could not see the damage. The numbers are internally consistent
+// and a reader could not see the damage. The NUMBERS are internally consistent
 // (3 agreements over the same 8 cases, with the interval those 3 give), so the
 // record is not trivially malformed: it is subtly, plausibly wrong, which is
-// the hard case.
+// the hard case. The LEVEL is not hand-written: `confidence` is the campaign's
+// own published level, read from the preregistration, because a second literal
+// level here would be a second spelling of the rule the run is scored against
+// — and a stale one, which is precisely the defect this repair removed from the
+// preregistration (a hard-coded 0.95 that no longer matched any rule).
 const CORRUPTED_MEASUREMENT = Object.freeze({
   trial_index: 0,
   numerator: 3,
@@ -171,7 +176,7 @@ const CORRUPTED_MEASUREMENT = Object.freeze({
   lower: 0.09670791409424857,
   upper: 0.7752932281125462,
   method: 'wilson_score',
-  confidence: 0.95,
+  confidence: PREREGISTRATION.noise_rule.confidence,
 });
 
 /**
@@ -207,6 +212,9 @@ export function corruptMeasurement(run = CLEAN_RUNS.a) {
  * The corruption: trial 0's expected outcome becomes NULL in the published
  * table, and the runs are re-bound to the digest of THAT table so the mismatch
  * is the thing under test rather than the binding.
+ * The corruption is `table.trials[0].expectedOutcome` moved to `NULL`, which is a
+ * DIFFERENT declared outcome from whatever the table pins for row 0 — read from the
+ * frozen row, so the corruption stays a corruption if the table is ever re-derived.
  * @type {{trial: number, expectedOutcome: string}}
  */
 export const CORRUPTED_EXPECTED_ROW = Object.freeze({ trial: 0, expectedOutcome: 'NULL' });
@@ -565,7 +573,12 @@ export const EXPECTED_FLIPS = Object.freeze({
     control_id: 'corrupted_data',
     corruption_class: 'expectation',
     corrupts: 'table.trials[0].expectedOutcome, and the run records expected_table_digest',
-    from: Object.freeze({ expectedOutcome: 'POSITIVE', expected_table_digest: expectedTableDigest() }),
+    // The `from` state is READ from the frozen table, never typed. It used to carry
+    // the literal `expectedOutcome: 'POSITIVE'`, which described the DESIGN the first
+    // delivery pinned rather than the table that is in force; after R-B re-derived
+    // the measured rows from the frozen measurements, that literal was a second
+    // spelling of a number the table already carries, and a stale one.
+    from: Object.freeze({ expectedOutcome: EXPECTED_TRIAL_DECISIONS[0].expectedOutcome, expected_table_digest: expectedTableDigest() }),
     to: Object.freeze({ expectedOutcome: CORRUPTED_EXPECTED_ROW.expectedOutcome, expected_table_digest: corruptedTableDigest() }),
     must_flip: true,
     expected_flip: Object.freeze({

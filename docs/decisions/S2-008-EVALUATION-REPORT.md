@@ -1,4 +1,523 @@
+## 0. The repair of 2026-09-27 — the first delivery was RED; this section is the current state
+
+> **Read this section first.** Everything below §0 is the **pre-repair measurement**,
+> taken at base `bd0e2f5` and again at `813f5be`, and it is left exactly as it was
+> taken, for the same reason the "Delivery update" and "Supersession" notes below
+> leave theirs: a reader must be able to see what was measured, when, and against
+> which tree. Where §0 and the body disagree, **§0 is the current state and the body
+> is history.** The body also contains a `SUPERSEDED by the repair of 2026-09-27`
+> banner on §7.3; that banner stays, because §0.12 below states the same thing in
+> the current vocabulary.
+
+Section map, in the order the history has to be read: §0.1 what was asked · §0.2 what
+was built · §0.3 the first delivery was red, and the three root causes · §0.4 the
+repair · §0.5 the new gate condition · §0.6 acceptance table A1..A5 · §0.7 the six
+negative probes · §0.8 the `A === B` rule and the frozen table · §0.9 the two
+process-separated runs · §0.10 the honest campaign outcome · §0.11 the limits ·
+§0.12 what remains blocked behind #45 · §0.13 VERDICT.
+
+### 0.1 What was asked
+
+Issue [`SpaceDazher/Veritas#8`](https://github.com/SpaceDazher/Veritas/issues/8) asked
+for an R&D experiment cycle: preregistration before the first trial, a frozen metric
+and baseline, frozen seeds, a budget reservation, a **fail-closed** decision layer, six
+negative probes, a frozen expected-value table, two process-separated runs, a
+cross-process replay, and evidence that survives a repeat on the same base. Read
+literally, a cycle also means a campaign on a real project, with real spend, and the
+task quality of a live executor; that part stays behind
+[#45](https://github.com/SpaceDazher/Veritas/issues/45) and is **not** attempted here
+(§0.12).
+
+The owner recorded the first delivery as **red** and asked for a repair under four
+frozen decisions (R-A the rule must be self-consistent, R-B the campaign must be
+well-posed, R-C the gate becomes property-and-expectation based, R-D the evidence and
+this report state the history plainly), with one anti-goal stated explicitly: *the
+repair must not make the stage green by moving the goalposts of the fixtures until a
+fabricated POSITIVE looks legitimate.*
+
+### 0.2 What was built
+
+| Contour | Path | What it is |
+| --- | --- | --- |
+| Library | `src/lib/research/*.mjs` | contracts, closed vocabulary, causality guard, preregistration (+ amendment, + supersession), corpus reader, ledger, frozen table, campaign derivation, fail-closed comparator, negative controls, six probes, policy, deterministic transport, run engine, public surface |
+| Corpus | `evidence/s2-008/corpus/` | 8 observational cases (PRIMARY + HOLDOUT), `manifest.json`, `preregistration.json` (in force), `preregistration-superseded.json` (the first delivery, preserved whole), `preregistration-supersession.json` (the pointer between them) |
+| Entry points | `scripts/s2-008-{build-corpus,harness,replay,run,security-probes}.mjs`, `scripts/verify-s2-008{,-dependencies}.mjs` | build/check the corpus, one run, the two-run cross-process replay with the crash/restart phase, the six probes and controls, and the two gates |
+| Tests | `tests/research/*.test.mjs` | 8 files (`gate-semantics.test.mjs` and `triage-hardening.test.mjs` were added by the repair and the triage round) plus a fixtures directory; `node --test` reports **11 suites, 246 tests, 246 pass, 0 fail** |
+| Evidence | `evidence/s2-008-*.json` (10 records) | `security-probes`, `probes`, `controls`, `harness`, `run-a`, `run-b`, `comparison`, `replay`, `dependency-binding`, `summary` |
+
+The fail-closed comparator, the six probes, the ledger chain, the preregistration
+seal, the label guard and the crash/restart reconciliation are unchanged by the
+repair. The repair changed a **document** (R-A), a **corpus composition** (R-B) and a
+**gate condition** (R-C) — nothing else, and nothing under `contracts/`.
+
+### 0.3 THE FIRST DELIVERY WAS RED
+
+The owner's own record at base `813f5be`:
+
+```text
+npm run test:research                 -> exit 0 (205 pass)
+npm run s2-008:check-corpus           -> exit 0
+npm run test:s2-008-security-probes   -> exit 0
+npm run verify:s2-008-dependencies    -> exit 0
+npm run s2-008:harness                -> exit 1  RESULT properties_held=5/5 verdict=FAIL overall=FAIL
+npm run verify:s2-008-replay          -> exit 1  RESULT properties_held=1/2 verdict=FAIL overall=FAIL
+npm run verify:s2-008                 -> exit 1  blockingGates [replay, harness]
+```
+
+The committed evidence agreed with the owner rather than with a green summary:
+`git show HEAD:evidence/s2-008-summary.json` printed `status FAIL`, `exitCode 1`,
+`blockingGates ["replay","harness"]`, with `replay=FAIL/exit 1` and
+`harness=FAIL/exit 1` in `gates`. **There was no green-washing to clean up**: the
+implementation failed loudly, which is the only reason the repair was possible.
+
+**Root cause 1 — the frozen multiplicity rule could not reject anything.**
+`tests/research/fixtures/fixture-preregistration.mjs:434` published
+`noise_rule.confidence: 0.95` and `:466` published the same `0.95` into
+`multiplicity_rule`, over `alpha: 0.05` (`:465`), `kind: 'HOLM_BONFERRONI'` (`:463`)
+and `family_size: measuredTrials.length = 3` (`:472`). A comparison inherits the
+bound `1 - c` from a `c`-level interval, and `1 - 0.95 = 0.05 > 0.05/3 = 0.016667`,
+so the rule could reject **nothing**, whatever was measured. The comparator already
+said so: `src/lib/research/comparator.mjs:1734` emits the limit
+`frozen_rule_cannot_reject`, and its own comment at `:1720-1723` says *"Fixing it is a
+PREREGISTRATION change (the confidence has to rise to `1 - alpha / m`), never a
+comparator change."* The comparator was right; the document was wrong.
+
+**Root cause 2 — the measured campaign was not well-posed.**
+`tests/research/fixtures/fixture-preregistration.mjs:267` declares
+`trl-s2-008-04` with `designed_outcome: 'INFRA'`, and the frozen table counted all
+four rows in the campaign tally while pinning `metrics.notMeasured` to `1`
+(`src/lib/research/expected-values.mjs:332-333` at `813f5be`). The comparator is
+fail-closed, so an unresolved trial is a `VIOLATION` on **every** run:
+`trl-s2-008-04: VIOLATION (TRIAL_NOT_RESOLVED:INFRA_ERROR)`, plus
+`metric_not_measured` and `decision_unresolved` — the three entries that are still in
+`evidence/s2-008-harness.json` → `comparison.failures` today. The default campaign was
+therefore **FAIL by construction**, for a reason that had nothing to do with whether
+the mechanics work.
+
+**Root cause 3 — the gate counted `verdict_is_pass`.**
+`scripts/verify-s2-008.mjs:289` (at `813f5be`) gated on
+`terms.verdict_is_pass !== true`, and `scripts/s2-008-harness.mjs:844` computed
+`verdict_is_pass: verdict === 'PASS'` from the campaign verdict. With eight synthetic
+cases the honest campaign answer is a null, so requiring `ALLOW` was satisfiable only
+by tuning the fixtures until a fabricated effect looked legitimate — the anti-goal
+above, and the thing this ticket's own negative probes exist to prevent.
+
+### 0.4 The repair — a redesign of a SYNTHETIC corpus, made BEFORE any new measurement of it
+
+| # | Decision | What landed, and where |
+| --- | --- | --- |
+| **R-A** | the frozen rule must be self-consistent, and the change is a documented supersession, never an edit | `tests/research/fixtures/fixture-preregistration.mjs`: `PREREGISTRATION_ALPHA = 0.05`, `MEASURED_FAMILY_SIZE = PREREGISTERED_MEASURED_TRIALS.length` = 3 (**counted**, from the predicate that excludes `designed_outcome === 'INFRA'`), and `CORRECTED_CONFIDENCE = 1 - PREREGISTRATION_ALPHA / MEASURED_FAMILY_SIZE` = `0.9833333333333333` — **derived in code**, not typed, and assigned to **both** `noise_rule` and `multiplicity_rule` (a split pair is the comparator's `self_reported_interval_divergence` finding). `RULE_FEASIBILITY` is the track's own `ruleFeasibility(...)` over those constants, so a test asserts a boolean instead of re-deriving IEEE-754 by hand: `1 - (1 - 0.05/3)` is 5.2e-17 **above** `0.05/3`. Observed: `{"rejection_floor":0.016667,"max_p_bound":0.016667,"never_rejects":false,"can_only_answer":"ANY_OUTCOME","feasible":true}` — the rule can reject. |
+| **R-B** | the measured campaign must be well-posed, and the table is re-derived **by the rule** | `trl-s2-008-04` leaves the measured set and therefore the multiplicity family, while **keeping** its table row (`expectedStatus INFRA_ERROR`, `expectedOutcome INFRA`, `expectedVerdict VIOLATION`), its reconciliation duty, and its `TRIAL_RESULT` slot in `EXPECTED_LEDGER_SHAPE` (count 4). It is exercised as INFRA where INFRA was already exercised: P6's missing evaluator, the replay's crash/restart phase, `INFRA_RECONCILIATION`. The three measured rows now declare what the frozen rule **derives** from the counts they publish, and `src/lib/research/campaign-expectation.mjs` (new, 186 lines) re-derives the campaign through the comparator's own `decisionFromInterval` and refuses a declaration the rule does not produce. |
+| **R-C** | the gate becomes property-and-expectation based | `verdict_is_pass` is **removed** at all four coupled sites. `scripts/s2-008-replay.mjs` defines the rule **once** (`ledgerShapeIssues`, `frozenCampaignDecision`, `campaignDecisionAgreement`) and `scripts/verify-s2-008.mjs` and `scripts/s2-008-harness.mjs` **call** it. See §0.5 for the condition in words. |
+| **R-D** | the evidence and this report state the history plainly | This section, the superseded document preserved below, and the status blocks in `docs/stages/S2-008.md`, `tasks/S2-008_RD_EXPERIMENT_CYCLE.md` and `README.md`. |
+
+**The eight synthetic cases are byte-identical to the first delivery** —
+`git diff --name-only HEAD -- evidence/s2-008/corpus/cases/` reports **0** files, and
+`npm run s2-008:check-corpus` → exit **0** re-derives the whole committed corpus from
+the fixture and finds no drift (the integration log additionally records two
+independent builds producing identical digests). No measurement was re-tuned; the only
+thing that changed is the *interval* those same cases are summarised at.
+
+**This is not a hypothesis rewritten after a scientific result, because nothing
+scientific was measured.** The distinction the ticket cares about is a document kind,
+and it is enforced in code rather than promised here: a hypothesis edited **after a
+result** is an `AMENDMENT`, and `P3` proves the track refuses it
+(`HYPOTHESIS_REWRITE_AFTER_RESULT`, `PREREGISTRATION_MUTATED_IN_PLACE`,
+`AMENDMENT_AS_DECISION_BASIS`, `AMENDMENT_SAME_CARD_ID`). What the repair did instead
+is a **new document kind** — a `SUPERSESSION` — carrying the reason and **both**
+states' published values, sitting **beside** the document it replaces. Nothing
+measured was re-tuned: the eight cases are the same bytes, the baseline is the same
+`0.75`, the band is the same `0.02`, the seeds are the same five, the budget is the
+same reservation. The campaign had not been run against a repaired rule when the rule
+was repaired; the only numbers that moved are the interval bounds, which are a
+function of the published confidence, and the design (`POSITIVE` / `NULL` /
+`NEGATIVE` / `INFRA`) is still published separately as `designed_outcome` so the
+design and the rule's answer can be compared instead of being collapsed into one
+name.
+
+**The superseded document is preserved whole, with its old digests quoted.**
+`src/lib/research/preregistration.mjs` gained `SUPERSESSION_KIND` with
+`createSupersession` / `assertSupersession`; it is not an amendment (an amendment
+replaces a card, this replaces a rule) and it is not a result (`assertPreregistration`
+refuses `supersedes` on a preregistration, so the pointer lives beside its target).
+The corpus carries all three documents:
+
+```text
+evidence/s2-008/corpus/preregistration.json              digest b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207  confidence 0.9833333333333333  table 8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63  IN_FORCE
+evidence/s2-008/corpus/preregistration-superseded.json   digest 8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479  confidence 0.95               table 9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62  SUPERSEDED
+evidence/s2-008/corpus/preregistration-supersession.json
+                                                   id spr-f5a6bf11a57e9cd01d1fa6e0, supersedes 8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479,
+                                                   supersedes_confidence 0.95, supersedes_expected_table_digest 9aad76e1…, replaced_by_confidence 0.9833333333333333
+```
+
+**Preservation is verified, not claimed.**
+`diff <(git show HEAD:evidence/s2-008/corpus/preregistration.json) evidence/s2-008/corpus/preregistration-superseded.json`
+produces **no output**, and both files hash to
+`sha256 7d4e396ca39b64a13bee9b1e190aa4d2c8702cce816691c63256da230ef9a64e`. The
+first delivery stays readable, and `scripts/s2-008-build-corpus.mjs` refuses to write
+a reconstruction that does not reproduce it
+(`S2_008_CORPUS_SUPERSEDED_SEAL_DRIFT`, `S2_008_CORPUS_SUPERSEDED_CONFIDENCE_DRIFT`).
+The reason travels with the document: *"the published confidence 0.95 gave
+1 - c = 0.05 > alpha/m = 0.016667, so the rule could never reject; the confidence is
+now derived as 1 - alpha/family_size, and the redesign was made before any new
+measurement of the synthetic corpus"*.
+
+### 0.5 The new gate condition, in plain words
+
+A gate is green when **six independent things** are true, and the campaign verdict is
+not one of them:
+
+1. **every acceptance property held** (`every_property_held`, `held == total`);
+2. **the comparator's decision equals the decision the frozen table declares** —
+   `expected_campaign_decision == observed_campaign_decision` *and* the table itself
+   produces no campaign finding (`decision_agrees_with_table`);
+3. **the ledger shape matches the table** (`ledger_shape_matches_table`, a measurement
+   over the journal each run actually wrote — 7 rows per run, chain verified);
+4. **every negative control flipped its verdict** (`controls_all_flipped`);
+5. **`not_run == 0` and `broken == 0`**;
+6. **every comparator failure the run record carries is one the frozen table declares**
+   (`comparator_failures_match_frozen_expectation`, with the unmatched list in
+   `unexpected_comparator_findings`) — added by the triage round, see §0.5a.
+
+The terms are written into the record by the run itself. Observed verbatim in
+`evidence/s2-008-harness.json` → `overall_terms`:
+
+```json
+{"every_property_held":true,"held":5,"total":5,
+ "expected_campaign_decision":"UNRESOLVED","observed_campaign_decision":"UNRESOLVED",
+ "decision_agrees_with_table":true,"campaign_findings":[],"controls_all_flipped":true,
+ "controls_not_run":0,"comparator_failures_match_frozen_expectation":true,
+ "unexpected_comparator_findings":[],"ledger_shape_matches_table":true,
+ "ledger_shape_findings":0,"not_run_zero":true,"not_run_count":0,"broken_zero":true,
+ "broken_count":0,"verdict":"FAIL"}
+```
+
+`verdict` stays a member, with the comment `// REPORTED, NOT A TERM.` in the source.
+
+**What the gate no longer demands: `ALLOW`.** It no longer requires the campaign to
+pass, to be positive, to clear the noise band, or to produce a decided outcome at all.
+A `NULL` or `UNMET` campaign is an **answer**, and agreement with it is the success
+case. On this corpus the honest campaign answer is `UNRESOLVED`, the frozen
+expectation is `UNRESOLVED`, and that agreement is what the green means.
+
+**What the gate still refuses — all three re-proved on the final tree:**
+
+| Refusal | How it was re-proved | Observed |
+| --- | --- | --- |
+| **an unresolved trial is still a `VIOLATION`** | `trl-s2-008-04` keeps its row, its `INFRA_ERROR` status and its `VIOLATION` verdict, and the campaign comparison still emits all three failure codes | `evidence/s2-008-harness.json` → `comparison.failures`: `trial_violation (TRIAL_NOT_RESOLVED:INFRA_ERROR)`, `metric_not_measured`, `decision_unresolved` — and `tests/research/gate-semantics.test.mjs` → *"R-B a SKIPPED, UNRESOLVED, INFRA_ERROR or NOT_MEASURED trial is still a VIOLATION under the new gate"*; `npm run test:research` → **exit 0**, 246/246 |
+| **a fabricated decision must still FAIL the gate** | durable: `tests/research/gate-semantics.test.mjs` → *"R-C a fabricated POSITIVE is a table FINDING in the frozen table, not only in the gate"* and *"R-C the anti-goal twin: a record whose decision diverges from the table is refused — even when it CLAIMS to agree"*. Observed now with a throwaway driver run out of the gitignored chat workspace (`tmp/`, a scratch driver, not an artefact, deliberately not committed — the two cases named on the left are the durable pins) | **exit 0** — `UNRESOLVED` → `agrees true`, `table_issues []`; `POSITIVE` → `agrees false`, `CAMPAIGN_DECISION_DIVERGES_FROM_FROZEN_TABLE` **plus** 2 table findings; `NEGATIVE` → same; an absent decision → `CAMPAIGN_DECISION_ABSENT`; a hand-edited declaration → `BLOCKED_POLICY: EXPECTED_CAMPAIGN_DIVERGES_FROM_RULE` |
+| **a stale evidence file must still be refused** | durable: `tests/research/gate-semantics.test.mjs` → *"R-C a stale evidence file is refused: the tree sha must be the tree the gate ran on, and the commit must be named"* and *"a hand-edited evidence file is refused by its bytes, whatever the record inside it claims"*. Observed now with `freshnessVerdict(...)` — the aggregator's own exported check — applied to the committed replay record, judged 1 000 ms after that record's own `finished_at` | node exit **0**; `windowMs: 0` → `{"ok":false,"issues":["stale-run-timestamp"],"age_ms":1000}`; `windowMs: 6h` → `{"ok":true,"issues":[],"age_ms":1000}`; a tampered `headTreeSha` → `{"ok":false,"issues":["stale-tree-sha"]}`. The aggregator end-to-end refusal is the integration log's `S2_008_FRESHNESS_WINDOW_MS=0 node scripts/verify-s2-008.mjs --no-write` → **exit 1**, `status FAIL`, `blockingGates ["replay"]`, `stale evidence: stale-run-timestamp` |
+
+An **absent** expectation is not agreement: it is a named refusal,
+`EXPECTED_CAMPAIGN_ABSENT` / `CAMPAIGN_DECISION_ABSENT`, so a gate with no expectation
+is not green. The comparator itself was **not** weakened: no threshold widened, no
+negative probe or control deleted, no evidence file hand-edited, nothing under
+`contracts/` touched.
+
+### 0.5a What the triage round added on top of the repair (2026-09-27, second round)
+
+An independent triage reproduced seven ways to reach a green aggregator without a
+correct measurement. All seven are now closed by something mechanical, and this
+section records the three changes that alter what the gates read, so the sections
+below can be read against the current tree.
+
+| Change | Where | What it does |
+| --- | --- | --- |
+| a **sixth** gate term, `comparator_failures_match_frozen_expectation` | `scripts/s2-008-replay.mjs:727,744,758` and `scripts/s2-008-harness.mjs:993,1014,1035`; re-read by the aggregator at `scripts/verify-s2-008.mjs:348`, which no longer trusts the child's own verdict | a run record that **carries** a comparator failure the frozen table does not declare is now a gate term (`UNEXPECTED_CODE`), not only a recorded verdict. The honest campaign's own three failures per run **are** declared, so the fail-closed record is still the green one |
+| a fifth gate, **`corpus`** | `scripts/verify-s2-008.mjs` (the gate list is in the summary record's `gates`) | re-derives the corpus from `tests/research/fixtures/**` **on disk**, so a working-tree tamper is a FAIL with the drifted file named. The root `manifest:check` cannot see it: that gate reads `git show HEAD:<file>` |
+| a third **supersession ledger** entry | `src/lib/research/preregistration.mjs` (`assertSourceLedger`), declared as literals in `tests/research/fixtures/fixture-preregistration.mjs`, sealed into `evidence/s2-008/corpus/supersession-ledger.json` | the F1 declaration above moved the table digest to `8062bc85…` (`spr-f5a6bf11a57e9cd01d1fa6e0`). A change to the frozen sources is now refused until an entry is appended with a reason and both old digests |
+
+**What this gate is and is not.** It is a self-consistency gate plus an enumerated
+change counter, *not* an immutability gate: a **recorded** change to the frozen
+sources is a supersession, which is what R-A asked for. The eight synthetic cases
+did not change in either round (`git diff --name-only HEAD -- evidence/s2-008/corpus/cases/`
+→ 0 files), and `FROZEN_CASES_DIGEST` is byte-identical across all three ledger
+entries, which is the point of the anchor covering both digests.
+
+### 0.6 Acceptance table A1..A5 → observation → evidence path
+
+`HELD` means a check ran on this tree and passed. `FAILED` would mean a check ran and
+did not hold. `NOT_RUN` is not used for a property anywhere in the current evidence.
+
+| # | Criterion | Status | Observation, from the named record | Evidence path |
+| --- | --- | --- | --- | --- |
+| **A1** | the registry covers all six negative probes | **HELD** | `totals: {families: 6, probes: 6, probes_ran: 6, passed: 6, failed: 0, not_run: 0, broken: 0, controls_declared: 6, controls_extra_declared: 1, controls_ran: 7, controls_flipped: 7}`; all six hard-gate counters `0`, `hardGates.ok: true`, `moved: []`; `familiesAttempted` lists all six families `pass` | `evidence/s2-008-security-probes.json` → `totals`, `hardGates`, `familiesAttempted`; `evidence/s2-008-probes.json` → `results` |
+| **A2** | a skipped or unresolved trial is a `VIOLATION`, and every negative control flips the verdict | **HELD** | `controls=7 (six frozen + 1 named extra) notRun=0 gate_ok=true infra_trial_verdict=VIOLATION comparator_controls_before=ALLOW`; all four declared corruption variants injected, `corruption_variants_unproductive: []`; `controlsFlipVerdict.allFlipped: true` | `evidence/s2-008-harness.json` → `properties[1]`; `evidence/s2-008-controls.json` → `controls.allFlipped`, `controls.gate` |
+| **A3** | two process-separated runs with different ids and nonces agree with the **frozen** expected-value table; `A === B` is additional only | **HELD** (was `FAILED` before the repair) | `records_produced=true pid_bound_a=true pid_bound_b=true separation=true separate_pids=true findingsA=0 findingsB=0 digestsEqual=true identical_wrong_both_non_empty=true`; `rule_can_only_answer=ANY_OUTCOME`. The harness's own A3 line carries `agreement_source=TABLE_DERIVED_RUN_RECORDS` and names the replay as the measurement | `evidence/s2-008-replay.json` → `properties[0]`, `separation`, `comparison`, `table_findings_a`; `evidence/s2-008-harness.json` → `properties[2]` |
+| **A4** | an observational result cannot be read as causal: substituting the label MUST fail | **HELD** | `labels_flipped: 8`, `seal_held_on_clean_labels: true`, `seal_broke_on_substituted_labels: true`, clean digest `9ff4511e…` vs substituted `f4c216f2…`, `swapped_card.refusal = CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE` | `evidence/s2-008-harness.json` → `label_substitution`; `evidence/s2-008-controls.json` → `label_substitution` |
+| **A5** | every artefact is bound to a commit SHA, a tree SHA and a raw run id, and survives a repeat run on the same base | **HELD** (was `FAILED` before delivery) | `bound_a=true bound_b=true track_tracked=true cross_process=true in_process_repeat=true reconciliation=true crash_classified=PASS`; the interrupted state produced **one** reconciliation row, `blind_retry: false`, `implicit_zero: false`, `spend_advanced: false`; `base.commit_sha 813f5be…`, `base.tree_sha 504f0a19…` (the tree of `HEAD`) | `evidence/s2-008-replay.json` → `properties[1]`, `evidence`, `repeatability`, `crash_restart`; `evidence/s2-008-harness.json` → `crash_restart` |
+
+**A3 is measured by the replay, not by the harness.** Where the two records differ,
+the cross-process replay is the measurement and the harness line is the derived view;
+the aggregator enforces it — a harness record claiming a measurement it did not make
+is a **defect**, and a table-derived one is reported as
+`NOT_COMPARABLE_DISCLOSED` with the replay's A3 named authoritative
+(`evidence/s2-008-summary.json` → `authoritative`).
+
+### 0.7 The six negative probes
+
+Read from the committed record; "checks" is the number of assertions the probe
+actually executed through the production-facing path.
+
+| # | Family | Probe | Checks | Counter | Evidence path |
+| --- | --- | --- | --- | --- | --- |
+| P1 | `holdout_peek` | `holdout_read_before_decision_point` | 11 | `holdoutPeek` = 0 | `evidence/s2-008-security-probes.json` → `probes.results[0]` |
+| P2 | `seed_substitution` | `best_seed_reported_instead_of_the_preregistered_set` | 4 | `seedSubstitution` = 0 | same → `probes.results[1]` |
+| P3 | `hypothesis_rewrite` | `test_design_edited_after_the_result` | 10 | `hypothesisRewrite` = 0 | same → `probes.results[2]` |
+| P4 | `budget_opacity` | `spend_beyond_the_reservation` | 13 | `budgetOpacity` = 0 | same → `probes.results[3]` |
+| P5 | `causal_upgrade` | `observational_label_swapped_to_causal` | 8 | `causalUpgrade` = 0 | same → `probes.results[4]` |
+| P6 | `missing_evaluator` | `evaluator_removed_between_reservation_and_comparison` | 6 | `missingEvaluator` = 0 | same → `probes.results[5]` |
+
+**6/6 pass, 0 failed, 0 `not_run`, 0 `broken`.** All six hard-gate counters are `0`,
+and that is correct rather than reassuring: a counter moves only when an attack
+*succeeded*. Seven controls ran and seven flipped — the six frozen ones plus the named
+extra `ledger_spelling_holdout_peek`. The per-probe mechanisms, the refusal codes each
+probe produces, and the corrupted-run controls are in §5, §8 and §9 of the body, which
+remain accurate for the mechanisms and now read against the current digests.
+
+### 0.8 The `A === B` rule and the frozen expected-value table
+
+**The rule.** The pass criterion is agreement with a table declared **before** the
+run. `A === B` is reported and is explicitly additional. The two clean runs in
+`evidence/s2-008-replay.json` have `digestsEqual: true` **and** `findingsA: []` /
+`findingsB: []` — they agree with each other *and* with the table — while the
+identical-wrong control still produces findings on **both** sides with their digests
+equal. Agreement is necessary and is not sufficient.
+
+**The table**, declared in `src/lib/research/expected-values.mjs` and sealed by the
+preregistration's `expected_table_digest`:
+
+| Member | Value now |
+| --- | --- |
+| `expectedTableDigest()` | `8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63` — the value the in-force preregistration seals (`evidence/s2-008-harness.json` → `preregistration`) |
+| `EXPECTED_METRIC` | `case_agreement_rate`, unit `ratio`, `noiseBand 0.02`, baseline `0.75`, `inferenceMode ASSOCIATIONAL`, `direction HIGHER_IS_BETTER` |
+| `EXPECTED_TRIAL_DECISIONS` | 4 rows, read **by index**: `trl-s2-008-01` 7/8 `UNRESOLVED`, `-02` 6/8 `UNRESOLVED`, `-03` 5/8 `UNRESOLVED`, `-04` `INFRA_ERROR` / `INFRA` / `VIOLATION` with `numerator: null` |
+| measured family | `MEASURED_FAMILY_SIZE = 3`, **counted** from the rows that publish an integer numerator and denominator |
+| the rule | `alpha 0.05`, `family_size 3`, `confidence 1 - alpha/m = 0.9833333333333333` — derived on **both** sides and bound member by member by `assertTableFrozen` (`EXPECTED_RULE_DIVERGES_FROM_TABLE`, `FROZEN_RULE_NOT_SELF_CONSISTENT`) |
+| pooled | `EXPECTED_POOLED_NUMERATOR = 18` over `8 × 3 = 24`, `notMeasured 1`, basis `POOLED_TRIAL_COUNTS` |
+| `EXPECTED_LEDGER_SHAPE` | `PREREGISTRATION_RECORDED ×1`, `BUDGET_RESERVATION ×1`, `ACCESS ×1`, `TRIAL_RESULT ×4` — measured at 7 rows per run, `chain_verified: true` |
+| `EXPECTED_CAMPAIGN` | a **table member**, therefore inside `expectedTableDigest()`: `decision UNRESOLVED`, `decisionStatus NOT_MEASURED`, `decisionReason interval_straddles_null_outside_noise_band`, and it is re-derived in source by `src/lib/research/campaign-expectation.mjs`, which the corpus builder and the harness both call |
+
+**The re-derivation is not a number written to reach a verdict.** The three measured
+rows declare what the frozen rule *derives* from the counts they publish, and
+`assertFrozenCampaignDerivable` refuses a declaration the rule does not produce
+(`EXPECTED_CAMPAIGN_DIVERGES_FROM_RULE`, `EXPECTED_CAMPAIGN_REASON_DIVERGES_FROM_RULE`).
+The cost of that choice is stated in §0.13 and §0.11 rather than argued away: the
+per-trial `outcome` field no longer discriminates on its own; the per-trial **status**,
+**verdict**, **numerator/denominator**, **provenance** and **hard-gate counters** still
+do, the identical-wrong control still flips both runs, and the run is a real
+two-process execution.
+
+### 0.9 The two process-separated runs
+
+From the committed record `evidence/s2-008-replay.json` → `separation` (five identity
+fields must differ, `children_are_separate_processes: true`, `ok: true`):
+
+| field | run A | run B |
+| --- | --- | --- |
+| `raw_run_id` | `s2-008-run-a-0-p27459` | `s2-008-run-b-0-p27471` |
+| `nonce` | `n-a-0629bcd15c73aec2` | `n-b-1bb29c41e21ae00b` |
+| `executor_id` | `exec-s2-008-a-0-p27459` | `exec-s2-008-b-0-p27471` |
+| `pid` | 27459 | 27471 |
+| `output_root` | `.bb/s2-008/run/out-a-0` | `.bb/s2-008/run/out-b-0` |
+
+Both runs carry the same `base` (`commit_sha 813f5be…`, `tree_sha 504f0a19…`), the same
+`preregistration_digest b3ae2a63…` and the same `expected_table_digest 8062bc85…`.
+Measured per trial, identically on both sides: **7/8, 6/8, 5/8, INFRA**;
+pooled **18/24** with `notMeasured 1`; `table_finding_count 0` on each;
+`ledger.chain_verified true`, 11 record kinds per run. `A === B` is reported
+(`digestsEqual: true`) and is additional only.
+
+I re-ran the replay against a **copy** of the committed corpus in a scratch
+directory, which the script refuses to treat as evidence (`evidence_eligible=false`,
+the children write into its own scratch), so the current tree answers the same two
+properties without touching a byte of `evidence/`:
+`node scripts/s2-008-replay.mjs --corpus <scratch copy of evidence/s2-008/corpus>` →
+**exit 0**, `RESULT properties_held=2/2 not_run=0 verdict=FAIL overall=PASS`,
+`overall_terms.decision_agrees_with_table = true`,
+`overall_terms.controls_all_flipped = true`,
+`overall_terms.ledger_shape_matches_table = true`.
+
+### 0.10 The honest campaign outcome, as recorded
+
+It is a **null**, and it is recorded as a null:
+
+```json
+"campaign": {"expected_decision":"UNRESOLVED","observed_decision":"UNRESOLVED",
+             "agrees_with_table":true,"findings":[],"verdict":"FAIL","verdict_is_a_gate_term":false}
+```
+
+* the campaign measured **18 agreements over 24 cases** (7/8 + 6/8 + 5/8), pooled
+  `POOLED_TRIAL_COUNTS`;
+* at the derived confidence `1 - 0.05/3 = 0.9833333333333333` the Wilson interval is
+  `[0.5056812707446809, 0.8979359805263918]`, which **covers** the frozen `0.75`
+  baseline **outside** the `0.02` band, so the rule derives `UNRESOLVED` /
+  `interval_straddles_null_outside_noise_band` — for the campaign and for each of the
+  three measured trials (`[0.453625, 0.983339]`, `[0.347079, 0.944230]`,
+  `[0.255737, 0.889917]`);
+* `ruleFeasibility` at the declared family says `never_rejects: false`,
+  `can_only_answer: "ANY_OUTCOME"` — the rule **can** reject; this campaign is simply
+  not rejected;
+* the comparator still **names the campaign `FAIL`**, because the INFRA row is a
+  `VIOLATION` and nothing was decided. That `FAIL` is **recorded beside** the decision
+  and is **counted by nothing**;
+* `decisionStatus` is `NOT_MEASURED` — an undecided campaign is recorded as having
+  measured nothing, which is a different statement from a met expectation.
+
+**Eight synthetic cases cannot resolve a 0.02 band at 98.33 % confidence.** That is the
+answer, and the report states it instead of claiming an effect the corpus does not
+carry. The expected-value table was **re-derived from these counts by the rule**; it
+was not written to produce this answer, and a hand-edited declaration is refused
+(§0.5).
+
+### 0.11 The limits
+
+1. **The transport is deterministic and offline, and no causal claim is made or is
+   supportable.** `inferenceMode ASSOCIATIONAL` in the preregistration, the table and
+   the transport; a causal assertion over observational ground truth is refused
+   `CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE` and the label-substitution
+   control proves the refusal flips. The track proves **governance** properties — that
+   a peek, a seed substitution, a post-result rewrite, an opaque budget, a causal
+   upgrade and a missing evaluator are refused — and it **cannot** prove that any R&D
+   campaign improves any metric.
+2. **The corpus is eight hand-authored cases.** The card's own `scope.domain_limits`
+   says so: *"the eight hand-authored fixture cases only; no production span stream was
+   measured"*. `n = 8` per trial is why the honest answer is `UNRESOLVED`; a larger `n`
+   is the other honest way out of that, and it is not this track's to choose.
+3. **The per-trial `outcome` field no longer discriminates on its own** (§0.8, §0.13).
+   The status, verdict, counts, provenance and hard-gate counters still do, the
+   identical-wrong control still flips both runs, and the run is a real two-process
+   execution — but a reader must not treat the three `UNRESOLVED` rows as three
+   independent detections.
+4. **The harness's A3 is a construction, not a measurement**, and says so in its own
+   record (`agreement_source: TABLE_DERIVED_RUN_RECORDS`). The replay's A3 is the
+   measurement.
+5. **Wall-clock latency is measured and decides nothing** (`decides: false`,
+   `excluded_from_repeatability: true`); every instant the decision reads is a frozen
+   literal. See §13.2.
+6. **The `INFRA` outcome still opens no reconciliation row** (body D2, §11.3).
+   `evidence/s2-008-run-a.json` → `reconciliations []`, `run_counters.reconciliations
+   0`, `codes ["MEASUREMENT_ABSENT"]`, while the preregistration's
+   `stopping_rule.on_infra` is `RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO`. The
+   reconciliation duty for an INFRA outcome is exercised by the crash/restart phase
+   and by P6, not by the campaign's own infra row. The sibling defect D1 — the
+   missing `ACCESS` row in the published ledger — **is** closed: the journal now
+   begins with `ACCESS` and the ledger-shape check reports 0 issues at 7 rows per run.
+7. **`tsconfig.json` sets `allowJs: false`**, so `tsc --noEmit` exits 0 without
+   type-checking this track's `.mjs` files. `npm run typecheck` → exit 0 and
+   `npm run lint` → exit 0 are therefore not type coverage of the track.
+8. **One name, two meanings, in the evidence.** `compareParallelTrack` returns a member
+   called `identicalWrongFindings` carrying the **clean** comparison's findings (`[]`),
+   while the harness's real control returns a member of the **same name** carrying the
+   **corrupted** run's findings. A reader must read `identical_wrong`, not
+   `comparison.identicalWrongFindings`. Pre-existing, in `comparator.mjs`, reported and
+   not renamed because renaming it would be an edit in another owner's file.
+9. **Claimed nowhere:** an effect size, a calibration percentage, a semantic accuracy, a
+   cost, a production latency, an `A-MVP` case, a causal effect, or any statement that
+   this harness improves any real metric. The track's own calibration record is carried
+   as `NOT_MEASURED` with `not_measured_reason: "outcome_not_defined"`.
+
+### 0.12 What remains blocked behind #45
+
+* **The ticket's own acceptance — a campaign on a real project — is `NOT_RUN` and
+  stays so.** This track measured eight hand-authored fixture cases; no production span
+  stream was measured, no real spend occurred, no really installed adapter ran, and no
+  live executor's task quality was observed.
+* The four status fields are separate and none of them is derived from this gate:
+  `engineeringStatus = BLOCKED_DEPENDENCY`, `assuranceStatus = NOT_MEASURED`,
+  `realAdapterStatus = NOT_RUN_REAL_ADAPTER`,
+  `aMvpStatus = NOT_RUN (A-MVP-01..07, behind #45)`. The aggregator says it in its own
+  record: *"engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from
+  this gate and never are: a green deterministic track does not convert the ticket's
+  own scope into done."*
+* **A larger `n`** (or a wider band) as a preregistered amendment decided before the
+  next run remains the other honest way out of `UNRESOLVED`.
+* **The delivery mechanics are the Seal worker's**: commit, then
+  `npm run manifest:write` with the closure binding, then `npm run manifest:check`
+  (`manifest:write` seals at `HEAD` while `manifest:check` pins the commit recorded in
+  `evidence/closure-record.json`, so on a dirty tree `--write` breaks `--check`).
+
+### 0.13 VERDICT
+
+**Planned — in the owner's frozen decisions, and implemented:**
+
+- R-A the rule is derived and self-consistent (`never_rejects: false`), the superseded
+  document is preserved whole with its old digests, and the supersession is its own
+  document kind.
+- R-B the campaign is well-posed: the `INFRA` trial is out of the measured set and out
+  of the family, keeps its row, and the table is re-derived by the rule.
+- R-C the gate is property-and-expectation based; `verdict_is_pass` is removed; the
+  three refusals still fire.
+- R-D this section, the stage doc, the task record and `README.md` state the same
+  honest status, including the red first delivery and the exit-3 terminal state.
+
+**Reported in chat — read from the integration log, not re-run by this pass:**
+
+| command | reported exit | reported output |
+| --- | --- | --- |
+| `npm run s2-008:harness` | 0 | `RESULT properties_held=5/5 not_run=0 broken=0 verdict=FAIL overall=PASS` |
+| `npm run verify:s2-008-replay` | 0 | `RESULT properties_held=2/2 not_run=0 verdict=FAIL overall=PASS` |
+| `npm run verify:s2-008` | **3** | `status NOT_RUN`, `ok false`, `exitCode 3`; all five gates `PASS(exit=0)` (`dependency`, `corpus`, `probes`, `replay`, `harness`); `blockingGates []`, `notRunGates []`, `defects []` |
+| `npm test` | 0 | `# tests 1469  # pass 1462  # fail 0  # skipped 7` |
+| `npm run inventory:write` / `inventory:check` | 0 / 0 | `trackedFiles 842`; `listedFiles 842`, `missingFromInventory []`, `missingFromGit []` |
+| `S2_008_FRESHNESS_WINDOW_MS=0 node scripts/verify-s2-008.mjs --no-write` | 1 | `status FAIL`, `blockingGates ["replay"]`, `stale evidence: stale-run-timestamp` |
+
+The committed aggregator record is the artifact of those runs:
+`evidence/s2-008-summary.json` → `status NOT_RUN`, `exitCode 3`, `blockingGates []`,
+`defects []`, with both `NOT_RUN` disclosures — the table-derived harness A3, and the
+campaign behind [#45](https://github.com/SpaceDazher/Veritas/issues/45).
+
+**Verified now — by this documentation pass, each with its observed exit code:**
+
+| command | observed exit | observed output |
+| --- | --- | --- |
+| `npm run test:research` | **0** | `# tests 246  # suites 11  # pass 246  # fail 0` |
+| `npm run s2-008:check-corpus` | **0** | `preregistration_digest b3ae2a63…`, `expected_table_digest 8062bc85…`, `superseded_preregistration_digest 8fab7e83…`, `supersession_id spr-f5a6bf11a57e9cd01d1fa6e0`, `expected_campaign_decision UNRESOLVED`, interval `[0.5056812707446809, 0.8979359805263918]` at `0.9833333333333333` |
+| `npm run test:s2-008-security-probes` | **0** | `RESULT status=PASS exit_code=0 reasons=[]` — 6 families, 6 probes, 6 passed, 0 failed, 0 `not_run`, 0 `broken`, 7 controls flipped |
+| `node scripts/verify-s2-008-dependencies.mjs --no-write` | **0** | 5 bindings `BOUND` (`S2-002`, `S2-006`, `S2-007`, `S1-004`, `S1-011`) |
+| `node scripts/s2-008-harness.mjs --no-write` | **0** | `RESULT properties_held=5/5 not_run=0 broken=0 verdict=FAIL overall=PASS`; `overall_terms.decision_agrees_with_table = true`; four evidence files reported `not written (--no-write)` |
+| `node scripts/s2-008-replay.mjs --corpus <scratch copy of evidence/s2-008/corpus>` | **0** | `RESULT properties_held=2/2 not_run=0 verdict=FAIL overall=PASS`; `not written to evidence/: evidence_eligible=false` |
+| `node scripts/s2-008-replay.mjs --no-write` | **3** | **not a gate result** — `--no-write` also stops the two children from writing, so the replay finds no run records: `RUN_RECORD_ABSENT: a=no record b=no record`, `not_run=5`, `PROPERTY_A3_NOT_RUN`, `PROPERTY_A5_NOT_RUN`. It is recorded here so nobody reads it as a red gate |
+| `node scripts/verify-s2-008.mjs --no-write --corpus <scratch copy of evidence/s2-008/corpus>` | **1** | **not a gate result either** — pointed at a non-committed corpus the aggregator reads the committed record and cannot match a digest: `replay gate: FAIL (the replay reported no evidence digest…)`, `blockingGates ["replay"]`. The refusal working, not the track failing |
+| a throwaway driver in the gitignored chat workspace (`tmp/`, not an artefact; the durable pins are the `gate-semantics` cases named in §0.5) | **0** | `UNRESOLVED` agrees with 0 table issues; `POSITIVE`, `NEGATIVE` and an absent decision are all refused; a hand-edited declaration → `BLOCKED_POLICY: EXPECTED_CAMPAIGN_DIVERGES_FROM_RULE` |
+| `diff <(git show HEAD:evidence/s2-008/corpus/preregistration.json) evidence/s2-008/corpus/preregistration-superseded.json` | **0** | no output — the first delivery's document is byte-identical to its preserved copy |
+| `git diff --name-only HEAD -- evidence/s2-008/corpus/cases/ \| wc -l` | **0** | `0` — the eight synthetic cases are unchanged, so no measurement was re-tuned |
+| `npm run lint` | **0** | `eslint .` clean |
+| `npm run typecheck` | **0** | `tsc --noEmit` clean (and it does not cover `.mjs` — see §0.11 item 7) |
+
+**The commands deliberately NOT run by this pass**, because they mutate evidence
+records owned by the integration and Seal workers:
+`npm run verify:s2-008` (its replay child writes `evidence/s2-008-run-{a,b}.json` and
+`evidence/s2-008-replay.json`), `npm run s2-008:harness` and
+`npm run verify:s2-008-replay` without `--no-write`, and every `manifest:*` command.
+The evidence digests were identical before and after every command in this table
+(`sha256sum -c` over the fourteen S2-008 records: 0 differing lines).
+
+**Not verified, and not claimed:** that a campaign on a real project will produce a
+decided answer. That measurement has not been run, and nothing here predicts it. The
+246/246 suite and the two `overall: PASS` records prove the **gates** are load-bearing
+on a synthetic corpus; they do not convert the ticket's scope into done.
+
+**One disagreement this repair overrode, recorded rather than hidden.** Body §7.3
+argued the table's outcome rows must **not** be rewritten to `UNRESOLVED`, because
+deriving the expectation with the same rule that produces the answer *"would replace the
+oracle with a tautology and destroy the A3 control's ability to discriminate"*. That
+argument has force and the owner took the opposite decision (R-B). The cost is stated
+in §0.8 and §0.11 item 3 rather than argued away.
+
+---
+
 ## Verdict: TRACK_REJECTED_AS_ACCEPTED — the machinery is real, three of five criteria hold, two do not, and the ticket stays `BLOCKED_DEPENDENCY` behind #45
+
+> **Repair update (2026-09-27, §0.13).** The headline above and the status table
+> under it are the **pre-repair snapshot at `813f5be`**, and they are left as they
+> were measured. The repair moved three facts: the two blocking gates are gone
+> (`blockingGates []`, `defects []`), all five acceptance properties hold, and the
+> aggregator's status is **`NOT_RUN` with `exitCode 3`** — the two `NOT_RUN`
+> disclosures are the table-derived harness A3 and **the campaign behind #45**, both
+> of which were already in this summary. The current verdict, the current command
+> log and the limits are in **§0**; the table below is history. Nothing below §0 is
+> quoted as a current result.
 
 > **Delivery update (2026-09-27, §20).** The headline above and the status table
 > under it are the **pre-commit snapshot** at base `bd0e2f5`, and they are left as
@@ -150,9 +669,9 @@ is intact.
 
 ## 2. What was built
 
-### 2.1 Library — `src/lib/research/`, 14 modules, 603 763 bytes
+### 2.1 Library — `src/lib/research/`, 15 modules, 718 632 bytes
 
-Named by the dependency gate's own module census (`modules: 14`, with the importer
+Named by the dependency gate's own module census (`modules: 15`, with the importer
 graph for each). The five that the superseded body found as `NOT_IMPLEMENTED` stubs
 (`constants.mjs`, `causality.mjs`, `dataset.mjs`, `expected-values.mjs`,
 `negative-controls.mjs`) are implemented and are the ones carrying A1, A2, A3 and A4.
@@ -170,19 +689,24 @@ graph for each). The five that the superseded body found as `NOT_IMPLEMENTED` st
 | `verify-s2-008-dependencies.mjs` | the binding gate | 0 / 1 |
 | `verify-s2-008.mjs` | the aggregator: dependency, probes, the replay it spawns itself, freshness, derived status | 0 / 1 / 3 |
 
-### 2.3 Tests — `tests/research/`, 6 suites, 205 tests
+### 2.3 Tests — `tests/research/`, 11 suites, 246 tests
 
-`npm run test:research` → **205 tests, 205 pass, 0 fail, 0 skipped, exit 0** (§17).
-The suite covers the comparator's fail-closedness, the corpus drift test, the
-preregistration/registry, the two-run replay, and pins the committed evidence records
-(`tests/research/harness.test.mjs` asserts that every committed record names its base
-and is scored against `expectedTableDigest()`).
+`npm run test:research` → **246 tests, 246 pass, 0 fail, 0 skipped, exit 0** after the
+repair of 2026-09-27 (it was 205 before it; the repair added the gate-semantics suite
+and the self-consistency and supersession cases). The suite covers the comparator's
+fail-closedness, the corpus drift test, the preregistration/registry, the two-run
+replay, the new gate semantics (`tests/research/gate-semantics.test.mjs`), and pins the
+committed evidence records (`tests/research/harness.test.mjs` asserts that every
+committed record names its base and is scored against `expectedTableDigest()`).
 
-### 2.4 Evidence — ten records plus the four-file corpus
+### 2.4 Evidence — ten records plus the six-file corpus
 
-`evidence/s2-008/corpus/{manifest.json,preregistration.json,cases/dev.json,cases/holdout.json}`,
-digested in §1.1. `evidence/s2-008-negative-controls.json` is listed by the dependency
-gate as `required: false, present: false`; the controls live in
+`evidence/s2-008/corpus/{manifest.json,preregistration.json,preregistration-superseded.json,preregistration-supersession.json,cases/dev.json,cases/holdout.json}`,
+digested in §1.1. The two preregistration documents and the supersession between them
+were added by the repair of 2026-09-27 (§0.4): the corpus is where the superseded rule
+is preserved, so that the first delivery stays readable.
+`evidence/s2-008-negative-controls.json` is listed by the dependency gate as
+`required: false, present: false`; the controls live in
 `evidence/s2-008-controls.json` instead, which is present and is the one this report
 quotes.
 
@@ -190,8 +714,29 @@ quotes.
 
 ## 3. Status block
 
+**After the repair of 2026-09-27 (current; see §0.6 for the measurements):**
+
+```text
+trackStatus        = NOT_RUN          (no blocking gate, no defect; two disclosures remain, one of them #45)
+engineeringStatus  = BLOCKED_DEPENDENCY   (this ticket, not this track)
+assuranceStatus    = NOT_MEASURED
+realAdapterStatus  = NOT_RUN_REAL_ADAPTER
+aMvpStatus         = NOT_RUN (A-MVP-01..07, behind #45)
+aggregator         = NOT_RUN, exit 3  (evidence/s2-008-summary.json; gates all PASS, blockingGates [])
+campaignVerdict    = FAIL (recorded, not a gate term)   campaignDecision = UNRESOLVED, decisionStatus = NOT_MEASURED
+notInferred        = [real_adapter_execution, human_review, empirical_semantic_accuracy,
+                      A_MVP_PASS, production_readiness, any causal effect]
+```
+
+**Before the repair (the block this section originally carried), for the record:**
+
 ```text
 trackStatus        = FAIL            (A3 and A5 do not hold; evidence/s2-008-harness.json -> verdict FAIL)
+aggregator         = FAIL, exit 1     (evidence/s2-008-summary.json)
+verdictReasons     = ["dependency gate BLOCKED_DEPENDENCY (exit 1): index.mjs-absent-at-commit",
+                      "replay gate FAIL (exit 1): A3 findingsA=3 findingsB=3; A5 track_tracked=false",
+                      "probes gate PASS (exit 0): 6/6 probes, 6/6 controls flipped, six counters 0"]
+```
 engineeringStatus  = BLOCKED_DEPENDENCY   (this ticket, not this track)
 assuranceStatus    = NOT_MEASURED
 realAdapterStatus  = NOT_RUN_REAL_ADAPTER
@@ -211,6 +756,20 @@ deterministic track would not convert the ticket's scope into done; it would onl
 the machinery that would later carry it.
 
 ### 3.1 The three gate results, with real exit codes
+
+**After the repair of 2026-09-27 (current):** all five gates `PASS`, `blockingGates: []`,
+`defects: []`, aggregator exit **3** (`NOT_RUN`, for the two disclosures named in
+§0.6 — not because a gate failed). One real defect was found and fixed on the way, in
+the aggregator itself rather than in the track: `verify-s2-008.mjs` sampled its own
+clock **once, at the top of `verify()`**, before the dependency gate, the probes gate
+and the cross-process replay had run. The replay writes its record's `finished_at`
+after all of that, so every record the aggregator judged was reported as
+`record-from-the-future` — on a record the same process had just produced. The window
+was **not** widened; the reading is now taken at the point of judgement, and the
+summary publishes every instant it sampled (`started_at`, `replay_judged_at`,
+`harness_judged_at`, `observed_at`).
+
+**Before the repair, as measured then:**
 
 `evidence/s2-008-summary.json` → `gates`:
 
@@ -232,9 +791,9 @@ the machinery that would later carry it.
 | --- | --- | --- | --- | --- |
 | **A1** | the registry covers all six negative probes | **CLOSED** | `totals: {families: 6, probes: 6, probes_ran: 6, passed: 6, failed: 0, not_run: 0, broken: 0, controls_declared: 6, controls_ran: 6, controls_flipped: 6}`; `familiesAttempted` lists all six families `pass`; all six hard-gate counters `0`; `purged.removed: 6` of 6 roots before the run; a read before the decision point, a forged unseal digest and a second open of the same partition are each refused `BLOCKED_POLICY`. | `evidence/s2-008-security-probes.json`, `evidence/s2-008-probes.json` |
 | **A2** | a skipped or unresolved trial is a `VIOLATION`, never `ALLOW`; a negative control injects corrupted data and MUST flip the verdict | **CLOSED** | Measured again in this pass (§8.1): `RESOLVED` + four bindings → `ALLOW`; `SKIPPED`, `UNRESOLVED`, `INFRA_ERROR`, `NOT_MEASURED`, absent and `{}` → `VIOLATION`; each of the four bindings individually load-bearing. All six controls flip: three `ALLOW→VIOLATION`, one `ADMITTED→REFUSED`, `no_findings→findings_non_empty`, and `missing_evaluator` with two reasons. `controlsFlipVerdict.gate.ok: true`, `notRun: []`. | `evidence/s2-008-controls.json`, `evidence/s2-008-security-probes.json` → `hardGates` |
-| **A3** | two process-separated runs, different ids and nonces, agreeing with a **frozen** expected-value table; `A === B` additional only | **FAILED** | Separation holds completely: distinct `raw_run_id`, `nonce`, `executor_id`, `pid` and `output_root`, `fields_absent: []`, `children_are_separate_processes: true`. `digestsEqual: true` is reported as additional. But `findingsA: 3`, `findingsB: 3` — the run's per-trial `outcome` cannot be derived from the corpus at the preregistered band, while the frozen table declares `POSITIVE/NULL/NEGATIVE`. | `evidence/s2-008-replay.json` → `separation`, `comparison`, `table_findings_a`, `properties[0]` |
+| **A3** | two process-separated runs, different ids and nonces, agreeing with a **frozen** expected-value table; `A === B` additional only | **FAILED (pre-repair) → HELD (current)** | Pre-repair: `findingsA: 3`, `findingsB: 3` — the run's per-trial `outcome` cannot be derived from the corpus at the preregistered band, while the frozen table declared `POSITIVE/NULL/NEGATIVE`. **Current:** `findingsA: []`, `findingsB: []`, `digestsEqual: true` reported as additional, `identical_wrong` still producing non-empty findings on both sides, `rule_feasibility.never_rejects: false`, and the campaign decision `UNRESOLVED` agreeing with the frozen declaration. The re-derivation that closed it, and the discrimination it costs, are in §0.5 and §0.7. | `evidence/s2-008-replay.json` → `separation`, `comparison`, `table_findings_a`, `properties[0]` |
 | **A4** | an observational result cannot be read as causal; a label-substituting control MUST fail | **CLOSED** | The label seal holds on the committed labels and breaks on the substituted ones: `labels_flipped: 8`, `seal_held_on_clean_labels: true`, `seal_broke_on_substituted_labels: true`, clean digest `9ff4511e…` vs substituted `f4c216f2…`. The swapped card is inadmissible with `CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE`; the always-on simulation guard refuses the same card; the classification reports `admissible: false`. | `evidence/s2-008-controls.json` → `label_substitution`, `evidence/s2-008-harness.json` → `label_substitution` |
-| **A5** | every artefact bound to a commit SHA, a tree SHA and a raw run id, and survives a repeat run on the same base | **FAILED on one member** | `bound_a=true`, `bound_b=true`, `cross_process=true`, `in_process_repeat=true`, `reconciliation=true`, `track_tracked=false`. Every member of the conjunction is satisfied except the tree-trackedness fact, which is a delivery step. | `evidence/s2-008-replay.json` → `properties[1]`, `evidence`, `repeatability` |
+| **A5** | every artefact bound to a commit SHA, a tree SHA and a raw run id, and survives a repeat run on the same base | **HELD (current)** | `bound_a=true`, `bound_b=true`, `cross_process=true`, `in_process_repeat=true`, `reconciliation=true`, `track_tracked=true`. Pre-repair this criterion failed on exactly one member, `track_tracked=false`, which only `git add` could fix; the delivery commit fixed it and the repair did not touch it. | `evidence/s2-008-replay.json` → `properties[1]`, `evidence`, `repeatability` |
 
 ---
 
@@ -344,7 +903,12 @@ NOT_MEASURED`, `missing: ["interval_straddles_null_outside_noise_band"]`.
 `EXPECTED_TRIAL_DECISIONS`, and 18/24 is exactly `EXPECTED_POOLED_NUMERATOR`. What
 diverges is the *derived outcome*, in all three resolved trials.
 
-### 7.3 Why A3 fails, and what would fix it
+### 7.3 Why A3 failed, and what would fix it — SUPERSEDED by the repair of 2026-09-27
+
+> **This section is history.** The owner decided (R-B) to re-derive the table's
+> expectation from the frozen measurements instead of leaving the divergence in place.
+> Read §0 for what happened and §0.7 for the cost this choice carries. What is kept
+> below is the measurement, because it is what made the decision possible.
 
 The preregistered rule reads a decision off the interval against the frozen
 `noiseBand 0.02` around `baseline 0.75`: `POSITIVE` needs the whole interval clear of
@@ -354,11 +918,11 @@ the band, `NULL` needs it inside. At n = 8 no binomial interval is anywhere near
 `POSITIVE/NULL/NEGATIVE`. That is the recorded reason the design does not resolve its
 own band at this sample size.
 
-Three things were **not** done, deliberately: the band was not widened, the table's
+Three things were **not** done **at that time**, deliberately: the band was not widened, the table's
 outcome rows were not rewritten to `UNRESOLVED` (that would replace the oracle with a
 tautology and destroy the A3 control's ability to discriminate), and no threshold was
-loosened. The divergence is reported as three
-`TRIAL_FIELD_DIVERGES_FROM_TABLE` findings per run and the gate exits 1.
+loosened. The divergence was reported as three
+`TRIAL_FIELD_DIVERGES_FROM_TABLE` findings per run and the gate exited 1.
 
 **This is a design decision for the ticket owner, not a code fix:** either a corpus
 whose `n` resolves its own band, or a band that matches the metric's sampling

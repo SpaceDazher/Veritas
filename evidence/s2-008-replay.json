@@ -10,17 +10,18 @@
   "evidence_eligible": true,
   "write_evidence": true,
   "base": {
-    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 51,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "corpus": {
     "dir": "evidence/s2-008/corpus",
-    "preregistration_digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
-    "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62"
+    "preregistration_digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63"
   },
   "children": {
     "a": {
@@ -33,12 +34,12 @@
         "evidence/s2-008/corpus",
         "--write"
       ],
-      "pid": 220580,
-      "exitCode": 1,
+      "pid": 25899,
+      "exitCode": 0,
       "signal": null,
       "timedOut": false,
       "stderr": "",
-      "exit_semantics": "FAIL"
+      "exit_semantics": "PASS"
     },
     "b": {
       "label": "b",
@@ -50,32 +51,32 @@
         "evidence/s2-008/corpus",
         "--write"
       ],
-      "pid": 220596,
-      "exitCode": 1,
+      "pid": 25911,
+      "exitCode": 0,
       "signal": null,
       "timedOut": false,
       "stderr": "",
-      "exit_semantics": "FAIL"
+      "exit_semantics": "PASS"
     }
   },
   "evidence": {
     "a": {
       "path": "evidence/s2-008-run-a.json",
       "artefact_bound": true,
-      "digest": "449fae0d0fb27a9d0468958eef8a742d28fc17e8932255ea3d64799813e7d6ad",
+      "digest": "eb673d3562a90506a3255ccd40b68dbadf630a0202822669e5d5ddd31d5f1bc2",
       "readable": true,
-      "child_pid": 220580,
-      "record_pid": 220580,
+      "child_pid": 25899,
+      "record_pid": 25899,
       "pid_bound": true,
       "pid_binding_reason": null
     },
     "b": {
       "path": "evidence/s2-008-run-b.json",
       "artefact_bound": true,
-      "digest": "d3f40b1ae0debdc1228c63982e5f110b480d4d91f02f34911e2f2aa687c28560",
+      "digest": "9987c9283059c295d3879f6f4dff7fc29464b2aa1211b8c1c0c76997f076915c",
       "readable": true,
-      "child_pid": 220596,
-      "record_pid": 220596,
+      "child_pid": 25911,
+      "record_pid": 25911,
       "pid_bound": true,
       "pid_binding_reason": null
     }
@@ -89,20 +90,20 @@
       "output_root"
     ],
     "raw_run_id": {
-      "a": "s2-008-run-a-0-p220580",
-      "b": "s2-008-run-b-0-p220596"
+      "a": "s2-008-run-a-0-p25899",
+      "b": "s2-008-run-b-0-p25911"
     },
     "nonce": {
-      "a": "n-a-76ffec4b7340e763",
-      "b": "n-b-861ccdce5c491461"
+      "a": "n-a-c5ba3f8a51da0cea",
+      "b": "n-b-4868a2257c57612a"
     },
     "executor_id": {
-      "a": "exec-s2-008-a-0-p220580",
-      "b": "exec-s2-008-b-0-p220596"
+      "a": "exec-s2-008-a-0-p25899",
+      "b": "exec-s2-008-b-0-p25911"
     },
     "pid": {
-      "a": 220580,
-      "b": 220596
+      "a": 25899,
+      "b": 25911
     },
     "output_root": {
       "a": ".bb/s2-008/run/out-a-0",
@@ -196,7 +197,7 @@
                     "to": "SKIPPED",
                     "variant": "trial_status_skip"
                   },
-                  "findings": 4
+                  "findings": 1
                 },
                 {
                   "variant": "counter_nudge",
@@ -206,7 +207,7 @@
                     "to": 1,
                     "variant": "counter_nudge"
                   },
-                  "findings": 9
+                  "findings": 6
                 },
                 {
                   "variant": "metric_altered",
@@ -216,17 +217,17 @@
                     "to": 8,
                     "variant": "metric_altered"
                   },
-                  "findings": 4
+                  "findings": 1
                 },
                 {
                   "variant": "provenance_field",
                   "corrupted": {
                     "field": "trials[0].provenance.raw_run_id",
-                    "from": "s2-008-run-a-0-p220580",
+                    "from": "s2-008-run-a-0-p25899",
                     "to": "run-forged",
                     "variant": "provenance_field"
                   },
-                  "findings": 4
+                  "findings": 1
                 }
               ]
             },
@@ -241,7 +242,7 @@
                     "to": "SKIPPED",
                     "variant": "trial_status_skip"
                   },
-                  "findings": 4
+                  "findings": 1
                 },
                 {
                   "variant": "counter_nudge",
@@ -251,7 +252,7 @@
                     "to": 1,
                     "variant": "counter_nudge"
                   },
-                  "findings": 9
+                  "findings": 6
                 },
                 {
                   "variant": "metric_altered",
@@ -261,17 +262,17 @@
                     "to": 8,
                     "variant": "metric_altered"
                   },
-                  "findings": 4
+                  "findings": 1
                 },
                 {
                   "variant": "provenance_field",
                   "corrupted": {
                     "field": "trials[0].provenance.raw_run_id",
-                    "from": "s2-008-run-b-0-p220596",
+                    "from": "s2-008-run-b-0-p25911",
                     "to": "run-forged",
                     "variant": "provenance_field"
                   },
-                  "findings": 4
+                  "findings": 1
                 }
               ]
             }
@@ -314,128 +315,128 @@
               "letter": "a",
               "control": "holdout_peek",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "a",
               "control": "seed_substitution",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "a",
               "control": "budget_opacity",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "a",
               "control": "missing_evaluator",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "a",
               "control": "corrupted_data:trial_status_skip",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 4,
+              "findings_before": 0,
+              "findings_after": 1,
               "detected": true
             },
             {
               "letter": "a",
               "control": "corrupted_data:counter_nudge",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 9,
+              "findings_before": 0,
+              "findings_after": 6,
               "detected": true
             },
             {
               "letter": "a",
               "control": "corrupted_data:metric_altered",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 4,
+              "findings_before": 0,
+              "findings_after": 1,
               "detected": true
             },
             {
               "letter": "a",
               "control": "corrupted_data:provenance_field",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 4,
+              "findings_before": 0,
+              "findings_after": 1,
               "detected": true
             },
             {
               "letter": "b",
               "control": "holdout_peek",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "b",
               "control": "seed_substitution",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "b",
               "control": "budget_opacity",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "b",
               "control": "missing_evaluator",
               "layer": "TRIAL_BINDING",
-              "findings_before": 3,
-              "findings_after": 3,
+              "findings_before": 0,
+              "findings_after": 0,
               "detected": false
             },
             {
               "letter": "b",
               "control": "corrupted_data:trial_status_skip",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 4,
+              "findings_before": 0,
+              "findings_after": 1,
               "detected": true
             },
             {
               "letter": "b",
               "control": "corrupted_data:counter_nudge",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 9,
+              "findings_before": 0,
+              "findings_after": 6,
               "detected": true
             },
             {
               "letter": "b",
               "control": "corrupted_data:metric_altered",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 4,
+              "findings_before": 0,
+              "findings_after": 1,
               "detected": true
             },
             {
               "letter": "b",
               "control": "corrupted_data:provenance_field",
               "layer": "RUN_RECORD",
-              "findings_before": 3,
-              "findings_after": 4,
+              "findings_before": 0,
+              "findings_after": 1,
               "detected": true
             }
           ],
@@ -446,7 +447,7 @@
         }
       },
       "notRun": [],
-      "digest": "301e9e2adf5c35e880fea1ab5976ad6b940b385078fe20505bdd0f9f88aa93c9"
+      "digest": "68fce4c9d245bb013d0f7ec33ceaea013545ccf6553b612e87e6f82a029c1c71"
     },
     "notRun": [],
     "error": null,
@@ -454,30 +455,6 @@
   },
   "comparison": {
     "failures": [
-      {
-        "code": "table_disagreement",
-        "detail": "runA: #0 trials[0].outcome: expected=\"POSITIVE\" observed=\"UNRESOLVED\""
-      },
-      {
-        "code": "table_disagreement",
-        "detail": "runA: #1 trials[1].outcome: expected=\"NULL\" observed=\"UNRESOLVED\""
-      },
-      {
-        "code": "table_disagreement",
-        "detail": "runA: #2 trials[2].outcome: expected=\"NEGATIVE\" observed=\"UNRESOLVED\""
-      },
-      {
-        "code": "table_disagreement",
-        "detail": "runB: #0 trials[0].outcome: expected=\"POSITIVE\" observed=\"UNRESOLVED\""
-      },
-      {
-        "code": "table_disagreement",
-        "detail": "runB: #1 trials[1].outcome: expected=\"NULL\" observed=\"UNRESOLVED\""
-      },
-      {
-        "code": "table_disagreement",
-        "detail": "runB: #2 trials[2].outcome: expected=\"NEGATIVE\" observed=\"UNRESOLVED\""
-      },
       {
         "code": "trial_violation",
         "detail": "runA trial trl-s2-008-04: VIOLATION (TRIAL_NOT_RESOLVED:INFRA_ERROR)"
@@ -505,19 +482,9 @@
     ],
     "limits": [
       {
-        "code": "frozen_rule_cannot_reject",
-        "detail": "runA: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
-        "proof": "never_rejects"
-      },
-      {
         "code": "latency_observed",
         "detail": "runA: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
         "proof": "latency_recorded"
-      },
-      {
-        "code": "frozen_rule_cannot_reject",
-        "detail": "runB: the published rule cannot reject any measurement — 1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED; this rule can only answer NULL or UNRESOLVED, and raising the published confidence is a preregistration change",
-        "proof": "never_rejects"
       },
       {
         "code": "latency_observed",
@@ -530,10 +497,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-          "resolved_commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "resolved_tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587"
+          "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+          "resolved_commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "resolved_tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa"
         },
         "missing": []
       },
@@ -555,26 +522,19 @@
         "id": "preregistration_bound",
         "status": "SATISFIED",
         "evidence": {
-          "digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479"
+          "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207"
         },
         "missing": []
       },
       {
         "id": "table_agreement",
-        "status": "UNMET",
+        "status": "SATISFIED",
         "evidence": {
-          "findings_a": 3,
-          "findings_b": 3,
-          "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62"
+          "findings_a": 0,
+          "findings_b": 0,
+          "table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63"
         },
-        "missing": [
-          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "TRIAL_FIELD_DIVERGES_FROM_TABLE"
-        ]
+        "missing": []
       },
       {
         "id": "seed_set_complete",
@@ -694,9 +654,9 @@
             "basis": "POOLED_TRIAL_COUNTS"
           },
           "interval": {
-            "lower": 0.551006,
-            "upper": 0.880006,
-            "confidence": 0.95,
+            "lower": 0.505681,
+            "upper": 0.897936,
+            "confidence": 0.9833333333333333,
             "method": "wilson_score"
           },
           "correction": null
@@ -722,9 +682,9 @@
             "basis": "POOLED_TRIAL_COUNTS"
           },
           "interval": {
-            "lower": 0.551006,
-            "upper": 0.880006,
-            "confidence": 0.95,
+            "lower": 0.505681,
+            "upper": 0.897936,
+            "confidence": 0.9833333333333333,
             "method": "wilson_score"
           },
           "correction": null
@@ -735,114 +695,26 @@
       }
     ],
     "digestsEqual": true,
-    "findingsA": [
-      {
-        "field": "trials[0].outcome",
-        "expected": "POSITIVE",
-        "observed": "UNRESOLVED",
-        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-        "index": 0
-      },
-      {
-        "field": "trials[1].outcome",
-        "expected": "NULL",
-        "observed": "UNRESOLVED",
-        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-        "index": 1
-      },
-      {
-        "field": "trials[2].outcome",
-        "expected": "NEGATIVE",
-        "observed": "UNRESOLVED",
-        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-        "index": 2
-      }
-    ],
-    "findingsB": [
-      {
-        "field": "trials[0].outcome",
-        "expected": "POSITIVE",
-        "observed": "UNRESOLVED",
-        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-        "index": 0
-      },
-      {
-        "field": "trials[1].outcome",
-        "expected": "NULL",
-        "observed": "UNRESOLVED",
-        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-        "index": 1
-      },
-      {
-        "field": "trials[2].outcome",
-        "expected": "NEGATIVE",
-        "observed": "UNRESOLVED",
-        "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-        "index": 2
-      }
-    ],
+    "findingsA": [],
+    "findingsB": [],
     "identicalWrongFindings": {
-      "findings_a": [
-        {
-          "field": "trials[0].outcome",
-          "expected": "POSITIVE",
-          "observed": "UNRESOLVED",
-          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "index": 0
-        },
-        {
-          "field": "trials[1].outcome",
-          "expected": "NULL",
-          "observed": "UNRESOLVED",
-          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "index": 1
-        },
-        {
-          "field": "trials[2].outcome",
-          "expected": "NEGATIVE",
-          "observed": "UNRESOLVED",
-          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "index": 2
-        }
-      ],
-      "findings_b": [
-        {
-          "field": "trials[0].outcome",
-          "expected": "POSITIVE",
-          "observed": "UNRESOLVED",
-          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "index": 0
-        },
-        {
-          "field": "trials[1].outcome",
-          "expected": "NULL",
-          "observed": "UNRESOLVED",
-          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "index": 1
-        },
-        {
-          "field": "trials[2].outcome",
-          "expected": "NEGATIVE",
-          "observed": "UNRESOLVED",
-          "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-          "index": 2
-        }
-      ],
-      "findings_a_count": 3,
-      "findings_b_count": 3,
+      "findings_a": [],
+      "findings_b": [],
+      "findings_a_count": 0,
+      "findings_b_count": 0,
       "digests_still_equal": true,
-      "both_non_empty": true,
-      "conclusion": "the frozen table is load-bearing: identical decision digests, non-empty findings"
+      "both_non_empty": false,
+      "conclusion": "the runs agree with the frozen table; agreement alone is not a pass and the controls must still flip"
     },
     "version": "s2-008-comparator-v1",
-    "table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "runs": {
       "a": {
         "label": "runA",
-        "raw_run_id": "s2-008-run-a-0-p220580",
-        "nonce": "n-a-76ffec4b7340e763",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+        "raw_run_id": "s2-008-run-a-0-p25899",
+        "nonce": "n-a-c5ba3f8a51da0cea",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -857,20 +729,20 @@
           "basis": "POOLED_TRIAL_COUNTS"
         },
         "interval": {
-          "lower": 0.551006,
-          "upper": 0.880006,
-          "confidence": 0.95,
+          "lower": 0.505681,
+          "upper": 0.897936,
+          "confidence": 0.9833333333333333,
           "method": "wilson_score"
         },
         "decision": "UNRESOLVED",
         "correction": null,
         "rule_feasibility": {
           "rejection_floor": 0.016667,
-          "max_p_bound": 0.05,
-          "never_rejects": true,
-          "can_only_answer": "NULL_OR_UNRESOLVED",
-          "feasible": false,
-          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+          "max_p_bound": 0.016667,
+          "never_rejects": false,
+          "can_only_answer": "ANY_OUTCOME",
+          "feasible": true,
+          "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
         },
         "latency": {
           "samples": [
@@ -885,7 +757,7 @@
             "upper": 0,
             "method": "percentile_bootstrap",
             "resamples": 2000,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "seed": 20260801,
             "samples": 4
           },
@@ -894,7 +766,7 @@
             "seed": 20260801,
             "resamples": 2000,
             "p": 0.95,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "preregistered": true
           }
         },
@@ -902,10 +774,10 @@
       },
       "b": {
         "label": "runB",
-        "raw_run_id": "s2-008-run-b-0-p220596",
-        "nonce": "n-b-861ccdce5c491461",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+        "raw_run_id": "s2-008-run-b-0-p25911",
+        "nonce": "n-b-4868a2257c57612a",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -920,20 +792,20 @@
           "basis": "POOLED_TRIAL_COUNTS"
         },
         "interval": {
-          "lower": 0.551006,
-          "upper": 0.880006,
-          "confidence": 0.95,
+          "lower": 0.505681,
+          "upper": 0.897936,
+          "confidence": 0.9833333333333333,
           "method": "wilson_score"
         },
         "decision": "UNRESOLVED",
         "correction": null,
         "rule_feasibility": {
           "rejection_floor": 0.016667,
-          "max_p_bound": 0.05,
-          "never_rejects": true,
-          "can_only_answer": "NULL_OR_UNRESOLVED",
-          "feasible": false,
-          "note": "1 - c = 0.05 > alpha/m = 0.016667 with m=3; no measurement can clear the corrected level, so this rule can only answer NULL or UNRESOLVED"
+          "max_p_bound": 0.016667,
+          "never_rejects": false,
+          "can_only_answer": "ANY_OUTCOME",
+          "feasible": true,
+          "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
         },
         "latency": {
           "samples": [
@@ -948,7 +820,7 @@
             "upper": 0,
             "method": "percentile_bootstrap",
             "resamples": 2000,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "seed": 20260801,
             "samples": 4
           },
@@ -957,7 +829,7 @@
             "seed": 20260801,
             "resamples": 2000,
             "p": 0.95,
-            "confidence": 0.95,
+            "confidence": 0.9833333333333333,
             "preregistered": true
           }
         },
@@ -966,29 +838,71 @@
     }
   },
   "comparison_error": null,
-  "table_findings_a": [
-    {
-      "field": "trials[0].outcome",
-      "expected": "POSITIVE",
-      "observed": "UNRESOLVED",
-      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-      "index": 0
+  "campaign": {
+    "expected_decision": "UNRESOLVED",
+    "observed_decision": "UNRESOLVED",
+    "agrees_with_table": true,
+    "findings": [],
+    "verdict": "FAIL",
+    "verdict_is_a_gate_term": false
+  },
+  "comparator_failures": {
+    "declared_per_run": {
+      "per_run": {
+        "trial_violation": 1,
+        "metric_not_measured": 1,
+        "decision_unresolved": 1
+      },
+      "per_run_limits": {
+        "latency_observed": 1
+      },
+      "why": "the delivered campaign is UNRESOLVED because one of four trials produced no measurement (R-B kept that row and its VIOLATION), so the honest comparison raises exactly one trial_violation, one metric_not_measured and one decision_unresolved per run, plus one latency limit; any OTHER failure, or a different count of these, is a record the table does not describe and a gate term fails on it"
     },
-    {
-      "field": "trials[1].outcome",
-      "expected": "NULL",
-      "observed": "UNRESOLVED",
-      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-      "index": 1
-    },
-    {
-      "field": "trials[2].outcome",
-      "expected": "NEGATIVE",
-      "observed": "UNRESOLVED",
-      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-      "index": 2
-    }
-  ],
+    "observed_failures": [
+      {
+        "code": "trial_violation",
+        "detail": "runA trial trl-s2-008-04: VIOLATION (TRIAL_NOT_RESOLVED:INFRA_ERROR)"
+      },
+      {
+        "code": "metric_not_measured",
+        "detail": "runA: 1 trial(s) were not measured and are excluded from the metric, not counted as failures of it"
+      },
+      {
+        "code": "decision_unresolved",
+        "detail": "runA: interval_straddles_null_outside_noise_band; an undecided measurement is not a pass"
+      },
+      {
+        "code": "trial_violation",
+        "detail": "runB trial trl-s2-008-04: VIOLATION (TRIAL_NOT_RESOLVED:INFRA_ERROR)"
+      },
+      {
+        "code": "metric_not_measured",
+        "detail": "runB: 1 trial(s) were not measured and are excluded from the metric, not counted as failures of it"
+      },
+      {
+        "code": "decision_unresolved",
+        "detail": "runB: interval_straddles_null_outside_noise_band; an undecided measurement is not a pass"
+      }
+    ],
+    "observed_limits": [
+      {
+        "code": "latency_observed",
+        "detail": "runA: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
+        "proof": "latency_recorded"
+      },
+      {
+        "code": "latency_observed",
+        "detail": "runB: p50=0ms p95=0ms over 4 samples; measured, decides nothing",
+        "proof": "latency_recorded"
+      }
+    ],
+    "unexpected": [],
+    "is_a_gate_term": true
+  },
+  "expected_campaign_decision": "UNRESOLVED",
+  "observed_campaign_decision": "UNRESOLVED",
+  "decision_agrees_with_table": true,
+  "table_findings_a": [],
   "ledger_shape": {
     "a": [],
     "b": [],
@@ -1027,8 +941,8 @@
       "to": "SKIPPED",
       "variant": "trial_status_skip"
     },
-    "findings_a": 4,
-    "findings_b": 4,
+    "findings_a": 1,
+    "findings_b": 1,
     "digests_still_equal": true,
     "both_non_empty": true,
     "conclusion": "the frozen table is load-bearing: identical decision digests, non-empty findings",
@@ -1036,13 +950,13 @@
   },
   "crash_restart": {
     "phase1": {
-      "pid": 220620,
+      "pid": 25923,
       "exitCode": null,
       "signal": "SIGKILL",
       "killed": true
     },
     "phase2": {
-      "pid": 220637,
+      "pid": 25940,
       "exitCode": 0,
       "document": {
         "ticket": "S2-008",
@@ -1050,22 +964,23 @@
         "phase": 2,
         "label": "crash",
         "base": {
-          "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+          "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
           "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
           "worktree_dirty": true,
           "tracked_files_of_this_track": 51,
+          "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
           "track_tracked": true
         },
         "provenance": {
           "version": "s2-008-runner-v1",
-          "commit": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-          "tree": "64f7c99ba376cb400225cce1868b3cffd430c587",
-          "run_id": "s2-008-run-crash-restart-p220637",
+          "commit": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+          "tree": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+          "run_id": "s2-008-run-crash-restart-p25940",
           "label": "crash",
-          "executor_id": "exec-s2-008-crash-restart-p220637",
-          "pid": 220637,
-          "nonce": "n-crash-0f56057794d1cc82",
+          "executor_id": "exec-s2-008-crash-restart-p25940",
+          "pid": 25940,
+          "nonce": "n-crash-f5a9005276861920",
           "clock": "2026-01-01T01:00:00.000Z",
           "started_at": "2026-01-01T01:00:00.000Z"
         },
@@ -1083,9 +998,9 @@
         "trials_executed_by_the_restart": 0,
         "reconciliation": {
           "record_kind": "RECONCILIATION",
-          "reconciliation_id": "rec-197c3a9776ffdba0",
-          "run_id": "s2-008-run-crash-restart-p220637",
-          "nonce": "n-crash-0f56057794d1cc82",
+          "reconciliation_id": "rec-9707d1ad6ee7018d",
+          "run_id": "s2-008-run-crash-restart-p25940",
+          "nonce": "n-crash-f5a9005276861920",
           "trial_index": 0,
           "trial": "trl-s2-008-01",
           "resolution": "EFFECT_UNDETERMINED",
@@ -1098,12 +1013,12 @@
           "decider_kind": "human_owner",
           "decided": false,
           "reason_code": "RUN_INTERRUPTED_MID_TRIAL",
-          "preregistration_digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
+          "preregistration_digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
           "reservation_id": "rsv-s2-008-01",
           "created_at": "2026-01-01T01:00:00.000Z",
           "detail": "the process was killed between taking the preregistered reservation and executing the first trial; the effect of the interrupted trial is undetermined"
         },
-        "crashed_run_id": "s2-008-run-crash-crash-p220620",
+        "crashed_run_id": "s2-008-run-crash-crash-p25923",
         "blind_retry": false,
         "retry_attempted": false,
         "implicit_zero": false,
@@ -1159,7 +1074,7 @@
       "source": "scripts/s2-008-run.mjs --repeat (one process, two attempts, two raw run ids)"
     },
     "child": {
-      "exitCode": 1,
+      "exitCode": 0,
       "attempts": 0
     }
   },
@@ -1168,9 +1083,9 @@
     {
       "id": "A3",
       "statement": "two process-separated runs with different ids and nonces agree with the FROZEN expected-value table; A === B is additional only",
-      "ok": false,
-      "evidence": "records_produced=true pid_bound_a=true pid_bound_b=true separation=true separate_pids=true findingsA=3 findingsB=3 digestsEqual=true identical_wrong_both_non_empty=true",
-      "status": "FAILED"
+      "ok": true,
+      "evidence": "records_produced=true pid_bound_a=true pid_bound_b=true separation=true separate_pids=true findingsA=0 findingsB=0 digestsEqual=true identical_wrong_both_non_empty=true",
+      "status": "HELD"
     },
     {
       "id": "A5",
@@ -1180,23 +1095,32 @@
       "status": "HELD"
     }
   ],
-  "exitCode": 1,
-  "overall": "FAIL",
+  "exitCode": 0,
+  "overall": "PASS",
   "overall_terms": {
-    "every_property_held": false,
-    "held": 1,
+    "every_property_held": true,
+    "held": 2,
     "total": 2,
-    "verdict_is_pass": false,
-    "verdict": "FAIL",
+    "expected_campaign_decision": "UNRESOLVED",
+    "observed_campaign_decision": "UNRESOLVED",
+    "decision_agrees_with_table": true,
+    "campaign_findings": [],
+    "controls_all_flipped": true,
+    "controls_not_run": 0,
+    "comparator_failures_match_frozen_expectation": true,
+    "unexpected_comparator_findings": [],
     "ledger_shape_matches_table": true,
-    "ledger_shape_findings": 0
+    "ledger_shape_findings": 0,
+    "not_run_zero": true,
+    "not_run_count": 0,
+    "verdict": "FAIL"
   },
   "child_binding": [
     {
       "letter": "a",
       "path": "evidence/s2-008-run-a.json",
-      "pid": 220580,
-      "exitCode": 1,
+      "pid": 25899,
+      "exitCode": 0,
       "readable": true,
       "pid_bound": true,
       "ran_to_a_report": true,
@@ -1207,8 +1131,8 @@
     {
       "letter": "b",
       "path": "evidence/s2-008-run-b.json",
-      "pid": 220596,
-      "exitCode": 1,
+      "pid": 25911,
+      "exitCode": 0,
       "readable": true,
       "pid_bound": true,
       "ran_to_a_report": true,
@@ -1223,8 +1147,8 @@
     "b": []
   },
   "freshness": {
-    "observed_at": "2026-09-27T11:10:20.731Z",
-    "finished_at": "2026-09-27T11:10:22.643Z",
+    "observed_at": "2026-09-27T13:39:41.765Z",
+    "finished_at": "2026-09-27T13:39:44.083Z",
     "source": "wall_clock",
     "decides": false,
     "excluded_from_repeatability": true

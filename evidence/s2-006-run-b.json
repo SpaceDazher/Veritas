@@ -4,11 +4,11 @@
   "role": "candidate sealed prediction set (labels, adjudications and thresholds never read before unseal)",
   "runId": "s2-006-run-b",
   "executorId": "exec-s2-006-b",
-  "pid": 120584,
+  "pid": 31096,
   "nonce": "n-b-3f9a62d1c5e80b74",
   "clock": "2026-03-21T23:59:59.999Z",
   "outputRoot": "results/s2-006/run-b",
-  "testedImplementationCommit": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+  "testedImplementationCommit": "813f5be66d8ddd936e925cca491063c6409ff7c3",
   "corpus": {
     "manifestId": "anmf-s2006-fixture-corpus",
     "corpusVersion": "1.0.0",
@@ -318,7 +318,7 @@
     }
   },
   "predictionSetDigest": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac",
-  "runManifestDigest": "a1be09bd29586789b71f4b4a2867a3d737a93272fe205f32b1de4a8e20960c6d",
+  "runManifestDigest": "3802a6de1c425d97384245e47f2d0ce5c2acaaa79338fdac9335f3eb0eb2d1b0",
   "hardCounters": {
     "unauthorizedLeakageEvents": 0,
     "lockedLabelAccessEvents": 0,

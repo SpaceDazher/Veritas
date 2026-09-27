@@ -6,28 +6,29 @@
   "evidence_eligible": true,
   "corpus": "evidence/s2-008/corpus",
   "base": {
-    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 51,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "provenance": {
     "version": "s2-008-runner-v1",
-    "commit": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree": "64f7c99ba376cb400225cce1868b3cffd430c587",
-    "run_id": "s2-008-run-a-0-p220580",
+    "commit": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+    "tree": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+    "run_id": "s2-008-run-a-0-p25899",
     "label": "a",
-    "executor_id": "exec-s2-008-a-0-p220580",
-    "pid": 220580,
-    "nonce": "n-a-76ffec4b7340e763",
+    "executor_id": "exec-s2-008-a-0-p25899",
+    "pid": 25899,
+    "nonce": "n-a-c5ba3f8a51da0cea",
     "clock": "2026-01-01T01:00:00.000Z",
     "started_at": "2026-01-01T01:00:00.000Z"
   },
   "preregistration": {
-    "digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
-    "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "metric_name": "case_agreement_rate",
     "seed_count": 5,
     "trial_count": 4
@@ -67,14 +68,14 @@
   },
   "harness_findings": [],
   "version": "s2-008-runner-v1",
-  "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-  "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-  "raw_run_id": "s2-008-run-a-0-p220580",
-  "nonce": "n-a-76ffec4b7340e763",
-  "executor_id": "exec-s2-008-a-0-p220580",
+  "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+  "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+  "raw_run_id": "s2-008-run-a-0-p25899",
+  "nonce": "n-a-c5ba3f8a51da0cea",
+  "executor_id": "exec-s2-008-a-0-p25899",
   "output_root": ".bb/s2-008/run/out-a-0",
-  "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
-  "preregistration_digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
+  "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
+  "preregistration_digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
   "run": {
     "version": "s2-008-runner-v1",
     "ticket": "S2-008",
@@ -92,8 +93,8 @@
     }
   },
   "preregistration_in_force": {
-    "digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
-    "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "seed_count": 5,
     "trial_count": 4,
     "stopping_rule": {
@@ -111,7 +112,7 @@
     "decision_rule": {
       "alpha": 0.05,
       "method": "holm_bonferroni",
-      "confidence": 0.95,
+      "confidence": 0.9833333333333333,
       "direction": "increase",
       "null_value": 0.75,
       "null_value_source": "frozen_baseline.value (the preregistered noise rule names the baseline as its reference point)",
@@ -152,10 +153,10 @@
       "reason_codes": [],
       "observed": 0.875,
       "interval": {
-        "lower": 0.5291120380276508,
-        "upper": 0.9775824891780278,
+        "lower": 0.45362450010939603,
+        "upper": 0.9833385697376568,
         "method": "wilson_score",
-        "confidence": 0.95
+        "confidence": 0.9833333333333333
       },
       "noise_band": 0.02,
       "decision": {
@@ -192,7 +193,7 @@
           "granted_units": 8,
           "spent_units": 1,
           "units": 1,
-          "settle_key": "e3b937c5c7c3ca518aefac55cb086eb085b3831d3be9f592311c809a362d515a",
+          "settle_key": "3b739fcaf56d92d41fa104d722f30fb109b7b98cf443b48cec6beaed7b1b9931",
           "replayed": false
         },
         "evaluator": {
@@ -345,15 +346,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p220580",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "nonce": "n-a-76ffec4b7340e763",
-        "executor_id": "exec-s2-008-a-0-p220580"
+        "raw_run_id": "s2-008-run-a-0-p25899",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "nonce": "n-a-c5ba3f8a51da0cea",
+        "executor_id": "exec-s2-008-a-0-p25899"
       },
       "budget": {
         "units": 1,
-        "settle_key": "e3b937c5c7c3ca518aefac55cb086eb085b3831d3be9f592311c809a362d515a",
+        "settle_key": "3b739fcaf56d92d41fa104d722f30fb109b7b98cf443b48cec6beaed7b1b9931",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -384,10 +385,10 @@
       "reason_codes": [],
       "observed": 0.75,
       "interval": {
-        "lower": 0.4092756148941955,
-        "upper": 0.9285207365762568,
+        "lower": 0.3470789962265127,
+        "upper": 0.9442297170048558,
         "method": "wilson_score",
-        "confidence": 0.95
+        "confidence": 0.9833333333333333
       },
       "noise_band": 0.02,
       "decision": {
@@ -424,7 +425,7 @@
           "granted_units": 8,
           "spent_units": 2,
           "units": 1,
-          "settle_key": "cce605301b7ed584f67ab3f3ad03d2ada1c39a53c54446b46a2338ee1fcf4248",
+          "settle_key": "d023df8e00ed97f63c1b8e5d521a6da51b50eeba06b7911c55681910022e7eda",
           "replayed": false
         },
         "evaluator": {
@@ -577,15 +578,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p220580",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "nonce": "n-a-76ffec4b7340e763",
-        "executor_id": "exec-s2-008-a-0-p220580"
+        "raw_run_id": "s2-008-run-a-0-p25899",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "nonce": "n-a-c5ba3f8a51da0cea",
+        "executor_id": "exec-s2-008-a-0-p25899"
       },
       "budget": {
         "units": 1,
-        "settle_key": "cce605301b7ed584f67ab3f3ad03d2ada1c39a53c54446b46a2338ee1fcf4248",
+        "settle_key": "d023df8e00ed97f63c1b8e5d521a6da51b50eeba06b7911c55681910022e7eda",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -616,10 +617,10 @@
       "reason_codes": [],
       "observed": 0.625,
       "interval": {
-        "lower": 0.3057425455637159,
-        "upper": 0.8631556301715102,
+        "lower": 0.2557372163157952,
+        "upper": 0.8899171402998891,
         "method": "wilson_score",
-        "confidence": 0.95
+        "confidence": 0.9833333333333333
       },
       "noise_band": 0.02,
       "decision": {
@@ -656,7 +657,7 @@
           "granted_units": 8,
           "spent_units": 3,
           "units": 1,
-          "settle_key": "f28e88c5ca74c99ad9ebb9593078ed1de8e4753306dd6506feb34ff9a3e4e3fa",
+          "settle_key": "7fbd6bdc334506ffc088fa4ed91a670d58f75392f6f31aa2deed646f0ed5ae91",
           "replayed": false
         },
         "evaluator": {
@@ -809,15 +810,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p220580",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "nonce": "n-a-76ffec4b7340e763",
-        "executor_id": "exec-s2-008-a-0-p220580"
+        "raw_run_id": "s2-008-run-a-0-p25899",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "nonce": "n-a-c5ba3f8a51da0cea",
+        "executor_id": "exec-s2-008-a-0-p25899"
       },
       "budget": {
         "units": 1,
-        "settle_key": "f28e88c5ca74c99ad9ebb9593078ed1de8e4753306dd6506feb34ff9a3e4e3fa",
+        "settle_key": "7fbd6bdc334506ffc088fa4ed91a670d58f75392f6f31aa2deed646f0ed5ae91",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -879,7 +880,7 @@
           "granted_units": 8,
           "spent_units": 4,
           "units": 1,
-          "settle_key": "60f773bf1b96f1339841f22c1dd1f9725533dc02c5f7e031f8662c547b3f50c9",
+          "settle_key": "2ad0b26dcb57385a6d874c2514eb035bb1b97a65b728049183d665a3ec38cccd",
           "replayed": false
         },
         "evaluator": {
@@ -1032,15 +1033,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p220580",
-        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
-        "nonce": "n-a-76ffec4b7340e763",
-        "executor_id": "exec-s2-008-a-0-p220580"
+        "raw_run_id": "s2-008-run-a-0-p25899",
+        "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+        "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+        "nonce": "n-a-c5ba3f8a51da0cea",
+        "executor_id": "exec-s2-008-a-0-p25899"
       },
       "budget": {
         "units": 1,
-        "settle_key": "60f773bf1b96f1339841f22c1dd1f9725533dc02c5f7e031f8662c547b3f50c9",
+        "settle_key": "2ad0b26dcb57385a6d874c2514eb035bb1b97a65b728049183d665a3ec38cccd",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -1082,7 +1083,7 @@
       "upper": 0,
       "method": "percentile_bootstrap",
       "resamples": 2000,
-      "confidence": 0.95,
+      "confidence": 0.9833333333333333,
       "seed": 20260801,
       "samples": 4
     },
@@ -1091,7 +1092,7 @@
       "seed": 20260801,
       "resamples": 2000,
       "p": 0.95,
-      "confidence": 0.95,
+      "confidence": 0.9833333333333333,
       "preregistered": true
     }
   },
@@ -1127,7 +1128,7 @@
   },
   "ledger": {
     "chain_verified": true,
-    "snapshot_digest": "sha256:305650de03ad0353e8dc1b2a617e750ffbfa186f0168ea2e55ae9e72c77cd364",
+    "snapshot_digest": "sha256:9c5a4499c44e31ec9d299ea3905ae6ebcdfec4d378d59bb2d692d86f7bec4560",
     "record_kinds": [
       "ACCESS",
       "PREREGISTRATION_RECORDED",
@@ -1143,43 +1144,21 @@
     ],
     "record_count": 11
   },
-  "table_findings": [
-    {
-      "field": "trials[0].outcome",
-      "expected": "POSITIVE",
-      "observed": "UNRESOLVED",
-      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-      "index": 0
-    },
-    {
-      "field": "trials[1].outcome",
-      "expected": "NULL",
-      "observed": "UNRESOLVED",
-      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-      "index": 1
-    },
-    {
-      "field": "trials[2].outcome",
-      "expected": "NEGATIVE",
-      "observed": "UNRESOLVED",
-      "code": "TRIAL_FIELD_DIVERGES_FROM_TABLE",
-      "index": 2
-    }
-  ],
-  "table_finding_count": 3,
+  "table_findings": [],
+  "table_finding_count": 0,
   "derived_rows": [
     {
       "index": 0,
       "trial": "trl-s2-008-01",
-      "table_says": "POSITIVE",
+      "table_says": "UNRESOLVED",
       "rule_derived": "UNRESOLVED",
-      "agrees": false,
+      "agrees": true,
       "observed": 0.875,
       "interval": {
-        "lower": 0.5291120380276508,
-        "upper": 0.9775824891780278,
+        "lower": 0.45362450010939603,
+        "upper": 0.9833385697376568,
         "method": "wilson_score",
-        "confidence": 0.95
+        "confidence": 0.9833333333333333
       },
       "decision_reason": "interval_straddles_null_outside_noise_band",
       "status": "RESOLVED",
@@ -1188,15 +1167,15 @@
     {
       "index": 1,
       "trial": "trl-s2-008-02",
-      "table_says": "NULL",
+      "table_says": "UNRESOLVED",
       "rule_derived": "UNRESOLVED",
-      "agrees": false,
+      "agrees": true,
       "observed": 0.75,
       "interval": {
-        "lower": 0.4092756148941955,
-        "upper": 0.9285207365762568,
+        "lower": 0.3470789962265127,
+        "upper": 0.9442297170048558,
         "method": "wilson_score",
-        "confidence": 0.95
+        "confidence": 0.9833333333333333
       },
       "decision_reason": "interval_straddles_null_outside_noise_band",
       "status": "RESOLVED",
@@ -1205,15 +1184,15 @@
     {
       "index": 2,
       "trial": "trl-s2-008-03",
-      "table_says": "NEGATIVE",
+      "table_says": "UNRESOLVED",
       "rule_derived": "UNRESOLVED",
-      "agrees": false,
+      "agrees": true,
       "observed": 0.625,
       "interval": {
-        "lower": 0.3057425455637159,
-        "upper": 0.8631556301715102,
+        "lower": 0.2557372163157952,
+        "upper": 0.8899171402998891,
         "method": "wilson_score",
-        "confidence": 0.95
+        "confidence": 0.9833333333333333
       },
       "decision_reason": "interval_straddles_null_outside_noise_band",
       "status": "RESOLVED",
@@ -1232,6 +1211,6 @@
       "verdict": "VIOLATION"
     }
   ],
-  "decision_digest": "9630862127ee0ff9eb68dff257fd58142c92a65ce98d95bdd5c40cbd897f5e05",
-  "artefact_digest": "449fae0d0fb27a9d0468958eef8a742d28fc17e8932255ea3d64799813e7d6ad"
+  "decision_digest": "dfee1bf2de505f54fa5137f474d9e9e762180f55c89ed623131b990cfa5ee12e",
+  "artefact_digest": "eb673d3562a90506a3255ccd40b68dbadf630a0202822669e5d5ddd31d5f1bc2"
 }

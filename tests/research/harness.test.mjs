@@ -19,8 +19,12 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
+import { createHash } from 'node:crypto';
+
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import * as expectedValues from '../../src/lib/research/expected-values.mjs';
 import { EXPECTED_TRIAL_DECISIONS, expectedTableDigest } from '../../src/lib/research/expected-values.mjs';
+import { classifyCurrentReplay } from '../../scripts/verify-s2-008.mjs';
 import { EXTRA_CONTROL_IDS, NEGATIVE_CONTROLS } from '../../src/lib/research/negative-controls.mjs';
 
 /** A plain-object test, used by the assertions that re-derive the harness's own
@@ -146,16 +150,19 @@ test('A5 the crash/restart phase left a reconciliation, not a silent zero and no
   assert.notEqual(crash.snapshot_before, crash.snapshot_after_phase1, 'the first phase wrote nothing');
 });
 
-test('the campaign verdict is reported as it came out, and `overall` counts it (EV2/S6)', () => {
-  const { verdict, properties, overall, overall_terms: terms } = evidence('s2-008-harness.json');
-  // One of the four trials is INFRA, the pooled interval straddles the null
-  // outside the noise band, and the PREREGISTERED RULE CANNOT REJECT ANY
-  // MEASUREMENT (alpha 0.05, confidence 0.95, three declared comparisons gives
-  // 1 - c = 0.05 > 0.05/3). All of that is real, so the campaign verdict is a
-  // real answer and the report says which of the five properties each half
-  // belongs to.
+test('the campaign decision is a recorded OUTCOME and `overall` gates on AGREEMENT with the frozen table (R-C)', () => {
+  const { verdict, properties, overall, overall_terms: terms, ledger_shape: shape } = evidence('s2-008-harness.json');
+  // One of the four trials is INFRA and the pooled interval of the other three
+  // (18/24) straddles the null outside the 0.02 noise band, so the campaign
+  // answer is UNRESOLVED at the DERIVED confidence `1 - alpha/m = 1 - 0.05/3`
+  // (the frozen rule is self-consistent: `1 - c <= alpha/m`; the pre-repair
+  // published 0.95 made `1 - c = 0.05 > 0.016667` and the rule could not reject
+  // anything). UNRESOLVED is an ANSWER. R-C therefore makes the gate green on
+  // AGREEMENT with the frozen expectation, never on ALLOW, and keeps the
+  // campaign verdict in the record as the honest outcome beside it.
   assert.equal(typeof verdict, 'string');
   assert.ok(['PASS', 'PASS_WITH_LIMITS', 'FAIL'].includes(verdict), verdict);
+  assert.equal(verdict, 'FAIL', 'the campaign verdict is still FAIL — the INFRA row is a VIOLATION and the pooled interval is UNRESOLVED — and it must be RECORDED, not hidden');
   assert.equal(properties.length, 5);
   const held = properties.filter((property) => property.ok).map((property) => property.id);
   // The tripwire, re-pinned to the DELIVERED state. It read
@@ -167,33 +174,145 @@ test('the campaign verdict is reported as it came out, and `overall` counts it (
   assert.deepEqual(held, ['A1', 'A2', 'A3', 'A4', 'A5'], 'the A-property set changed; re-read the report before trusting this test');
   const a5 = properties.find((property) => property.id === 'A5');
   assert.match(a5.evidence, /track_tracked=true/, `A5 is held for another reason than the committed track: ${a5.evidence}`);
-  // `overall` is FAIL while all five properties hold, because the campaign
-  // verdict is delegated to `resolveCampaignVerdict` over the two runs against
-  // the frozen table, and A3's table findings make that verdict FAIL. The
-  // report must keep saying so rather than passing on held-count alone.
-  assert.equal(overall, 'FAIL', 'every property held but the campaign verdict did not decide it; the report must say so');
-  // EV2 / S6: the campaign verdict is a TERM of `overall`. It used to be
-  // computed, printed in the same RESULT line, and left out of the decision, so
-  // the unmutated harness reported `properties_held=5/5 … verdict=FAIL
-  // overall=PASS` and exited 0. The three terms are itemised and each is
-  // re-derivable from the record.
+  // `overall` is PASS while the campaign verdict is FAIL: the five properties
+  // hold, the comparator's decision is the decision the frozen table declares,
+  // the ledger shape matches, every control flipped, and nothing was NOT_RUN
+  // or BROKEN. A NULL/UNMET campaign is an ANSWER, recorded as such, and the
+  // gate is green on AGREEMENT with it.
+  assert.equal(overall, 'PASS', 'the properties hold and the decision agrees with the frozen table; the gate must be green on agreement, not on ALLOW');
+  // R-C: the terms `overall` is the conjunction of, each itemised and each
+  // re-derivable from the record. `verdict_is_pass` is GONE: with eight
+  // synthetic cases the honest campaign answer is a null, and requiring ALLOW
+  // was unsatisfiable without tuning the fixtures until a fabricated effect
+  // looked legitimate. The verdict stays a REPORTED member, never a term.
   assert.ok(isPlainObject(terms), 'overall_terms is absent; the decision cannot be re-derived');
   assert.equal(terms.total, 5);
   assert.equal(terms.every_property_held, held.length === 5);
-  assert.equal(terms.verdict, verdict);
-  assert.equal(terms.verdict_is_pass, verdict === 'PASS');
+  assert.equal('verdict_is_pass' in terms, false, 'verdict_is_pass is a gate term again; R-C removes it at every coupled site');
+  assert.equal(terms.verdict, verdict, 'the verdict is reported next to the decision, not counted by it');
+  assert.equal(terms.expected_campaign_decision, 'UNRESOLVED');
+  assert.equal(terms.observed_campaign_decision, 'UNRESOLVED');
+  assert.equal(terms.decision_agrees_with_table, true);
+  assert.deepEqual([...(terms.campaign_findings ?? [])], [], 'the honest campaign decision diverges from the frozen expectation');
+  assert.equal(terms.controls_all_flipped, true);
+  assert.equal(terms.ledger_shape_matches_table, true);
   assert.equal(terms.not_run_zero, true);
   assert.equal(terms.broken_zero, true);
   const expectedOverall = terms.not_run_zero && terms.broken_zero
-    ? (terms.every_property_held && terms.verdict_is_pass ? 'PASS' : 'FAIL')
+    ? (terms.every_property_held
+      && terms.decision_agrees_with_table
+      && terms.controls_all_flipped
+      && terms.ledger_shape_matches_table ? 'PASS' : 'FAIL')
     : 'NOT_RUN';
   assert.equal(overall, expectedOverall, '`overall` is not the conjunction of the terms it reports');
+  // The ledger-shape term is a MEASUREMENT over a real journal, not a default.
+  // The harness's own run ledger holds the four frozen kinds at the frozen
+  // counts, read back with `readJournal`; an absent journal reads `false` with
+  // the observed counts named.
+  assert.ok(isPlainObject(shape), 'the record carries no ledger-shape measurement');
+  for (const letter of ['a', 'b']) {
+    assert.deepEqual(shape[letter] ?? [], [], `run ${letter}: the journal diverges from the frozen ledger shape`);
+    assert.ok(Number.isInteger(shape.rows?.[letter]), `run ${letter}: the journal row count was not measured`);
+  }
+  assert.deepEqual(shape.observed_record_kinds, shape.expected_record_kinds, 'the observed journal is not the frozen shape');
+  assert.equal(shape.chain_verified, true);
+});
+
+test('R-C a fabricated POSITIVE campaign against the frozen non-positive expectation is refused (the anti-goal)', () => {
+  // THE ANTI-GOAL, EXECUTED. The gate must not be satisfiable by making a
+  // fabricated positive look legitimate: a replay record that claims every
+  // term is true, claims `overall: PASS`, exits 0 and carries a FRESH
+  // timestamp — and whose campaign decision is `POSITIVE` against the frozen
+  // `UNRESOLVED` expectation — is refused. Every refusal path that is not the
+  // campaign one is neutralised first, so the refusal can only come from the
+  // campaign decision.
+  const expectation = expectedValues.EXPECTED_CAMPAIGN ?? null;
+  assert.ok(isPlainObject(expectation), 'EXPECTED_CAMPAIGN is absent from src/lib/research/expected-values.mjs; there is no frozen campaign decision to agree with');
+  assert.notEqual(expectation.decision, 'POSITIVE', 'the frozen campaign expectation is a POSITIVE; the anti-goal case needs a non-positive one to fabricate against');
+
+  // The bytes the aggregator hashes are the ones on disk, so the record under
+  // test is the committed one with the members a forger would set. It is built
+  // to satisfy EVERY term the pre-R-C gate read — `verdict_is_pass: true`
+  // included — so the only thing left that can catch it is the campaign
+  // decision, and a red result here cannot be a side effect of some other
+  // refusal path.
+  const bytes = readFileSync(path.join(EVIDENCE, 's2-008-replay.json'));
+  const onDisk = createHash('sha256').update(bytes).digest('hex');
+  const executed = { exitCode: 0, stdout: `REPLAY_EVIDENCE_SHA256 ${onDisk}\n` };
+  const real = JSON.parse(bytes.toString('utf8'));
+  const forged = structuredClone(real);
+  forged.verdict = 'PASS';
+  forged.overall = 'PASS';
+  forged.exitCode = 0;
+  forged.ledger_shape_ok = true;
+  forged.observed_campaign_decision = 'POSITIVE';
+  forged.expected_campaign_decision = 'UNRESOLVED';
+  forged.decision_agrees_with_table = true;
+  forged.properties = forged.properties.map((property) => ({ ...property, ok: true, status: 'HELD' }));
+  forged.overall_terms = {
+    every_property_held: true,
+    held: forged.properties.length,
+    total: forged.properties.length,
+    verdict: 'PASS',
+    verdict_is_pass: true,
+    expected_campaign_decision: 'UNRESOLVED',
+    observed_campaign_decision: 'POSITIVE',
+    decision_agrees_with_table: true,
+    campaign_findings: [],
+    controls_all_flipped: true,
+    ledger_shape_matches_table: true,
+    ledger_shape_findings: 0,
+    not_run_zero: true,
+  };
+  const classified = classifyCurrentReplay(executed, forged, {
+    headTreeSha: real.base.tree_sha,
+    observedAtIso: real.freshness.finished_at,
+  });
+  assert.equal(classified.gate.status, 'FAIL', 'a fabricated POSITIVE campaign was accepted; the gate is green-washable');
+  assert.match(String(classified.gate.reason), /CAMPAIGN_DECISION_DIVERGES_FROM_FROZEN_TABLE/, classified.gate.reason);
+});
+
+test('R-C the committed replay record is accepted on AGREEMENT, with its FAIL verdict recorded (not on ALLOW)', () => {
+  // The success case, and the one that must stay true: a record whose campaign
+  // decision is the decision the frozen table declares is ACCEPTED while its
+  // campaign verdict is FAIL. This is what "green on agreement" means, and it
+  // is pinned against the committed bytes.
+  const bytes = readFileSync(path.join(EVIDENCE, 's2-008-replay.json'));
+  const onDisk = createHash('sha256').update(bytes).digest('hex');
+  const real = JSON.parse(bytes.toString('utf8'));
+  const classified = classifyCurrentReplay({ exitCode: real.exitCode, stdout: `REPLAY_EVIDENCE_SHA256 ${onDisk}\n` }, structuredClone(real), {
+    headTreeSha: real.base.tree_sha,
+    observedAtIso: real.freshness.finished_at,
+  });
+  if (classified.gate.status !== 'PASS') {
+    assert.fail(`the committed replay record is not green on agreement (${String(classified.gate.reason)}). If evidence/s2-008-replay.json is the PRE-repair record, regenerate it: run 'npm run verify:s2-008-replay' BEFORE 'npm run test:research', because the test reads the committed bytes and does not re-derive them`);
+  }
+  assert.equal(real.verdict, 'FAIL', 'the campaign verdict is the honest answer and is recorded beside the decision');
+  assert.equal('verdict_is_pass' in real.overall_terms, false, 'the replay still counts verdict_is_pass as a gate term');
+  assert.equal(real.overall_terms.decision_agrees_with_table, true);
+  assert.equal(real.overall_terms.observed_campaign_decision, 'UNRESOLVED');
+  assert.equal(real.overall_terms.expected_campaign_decision, 'UNRESOLVED');
+  assert.equal(real.overall_terms.controls_all_flipped, true);
+  assert.equal(real.overall_terms.ledger_shape_matches_table, true);
+  assert.equal(real.overall_terms.every_property_held, true);
 });
 
 test('the frozen table the evidence was scored against is the one in code', () => {
   const { preregistration } = evidence('s2-008-harness.json');
   assert.equal(preregistration.expected_table_digest, expectedTableDigest());
   assert.equal(EXPECTED_TRIAL_DECISIONS.length, 4, 'the frozen table changed shape; the report and this test both need re-reading');
+});
+
+test('R-C the frozen campaign expectation is the one the comparator answers with', () => {
+  // The gate compares the comparator's decision with a FROZEN expectation, so
+  // the expectation has to exist, has to be non-positive for this corpus, and
+  // has to be bound by the table digest the evidence records carry.
+  const expectation = expectedValues.EXPECTED_CAMPAIGN ?? null;
+  assert.ok(isPlainObject(expectation), 'EXPECTED_CAMPAIGN is absent; the gate has nothing to agree with');
+  assert.equal(expectation.decision, 'UNRESOLVED', 'the frozen campaign decision moved; re-derive it with decisionFromInterval before editing it');
+  assert.equal(expectation.decisionStatus, 'NOT_MEASURED');
+  const { config } = evidence('s2-008-harness.json');
+  assert.equal(config.expected_table_digest, expectedTableDigest(), 'the campaign expectation is not bound by the digest the record carries');
 });
 
 test('E2 the committed evidence digests re-derive from the committed bytes', () => {

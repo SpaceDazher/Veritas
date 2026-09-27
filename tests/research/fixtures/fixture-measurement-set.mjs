@@ -33,33 +33,64 @@
 //
 // WHAT THE DESIGN IS, AND WHAT THE FROZEN RULE ACTUALLY DERIVES
 // The corpus is DESIGNED so trial 1 sits above the frozen baseline, trial 2
-// sits on it and trial 3 sits below it. That design is what the table pins.
+// sits on it and trial 3 sits below it. That design is `designed_outcome`, and
+// it is not what the table scores.
 //
-// It is NOT what a 95% interval can resolve at this corpus size, and the
-// fixture says so instead of hiding it: with eight cases the Wilson interval on
-// 7/8 is [0.529, 0.978], on 6/8 [0.409, 0.929] and on 5/8 [0.306, 0.863] — all
-// three straddle the frozen 0.75 baseline outside the 0.02 band, so
-// `decisionFromInterval` derives UNRESOLVED for all three. Every trial record
-// therefore carries BOTH `outcome` (the design the table scores) and
-// `derived_outcome` + `derived_reason` (what the frozen rule derived from the
-// interval computed here), and `FIXTURE_DERIVED_DISAGREEMENTS` names every
-// trial where the two differ. `scripts/s2-008-harness.mjs` records the same
+// It is not what an eight-case interval can resolve either, and the fixture says
+// so instead of hiding it: at the DERIVED confidence (1 - alpha/m =
+// 0.98333..., never a chosen 0.95) the Wilson interval on 7/8 is
+// [0.453625, 0.983339], on 6/8 [0.347079, 0.944230] and on 5/8
+// [0.255737, 0.889917] — all three straddle the frozen 0.75 baseline outside
+// the 0.02 band, and the pooled campaign's 18/24 gives [0.505681, 0.897936] —
+// so `decisionFromInterval` derives `UNRESOLVED` /
+// `interval_straddles_null_outside_noise_band` for all three and for the
+// campaign (observed, exit 0). Every trial record therefore carries BOTH
+// `outcome` (what the frozen table scores against) and `derived_outcome` +
+// `derived_reason` (what the frozen rule derived HERE, from the interval these
+// same samples produce), and `FIXTURE_DERIVED_DISAGREEMENTS` names every trial
+// where the two differ. `scripts/s2-008-harness.mjs` records the same
 // disagreement in the run evidence; a fixture that hid it would be the one
 // artefact in the track where an UNRESOLVED result was laundered into a
 // designed one.
+//
+// THE S2-008 REPAIR RE-DERIVED THE EXPECTATION, NOT THE MEASUREMENT
+// `FIXTURE_DERIVED_DISAGREEMENTS` was NOT empty before it: the table scored the
+// three measured rows POSITIVE / NULL / NEGATIVE while the frozen rule derived
+// UNRESOLVED for each of them, which is why a clean run carried three
+// `TRIAL_FIELD_DIVERGES_FROM_TABLE` findings. Two repairs were possible and only
+// one of them is honest: re-tune the eight per-case labels until the designed
+// effect clears a 0.02 band at 98.33 % confidence — which is fabricating a
+// finding — or re-derive the published EXPECTATION from the frozen
+// measurements. The second one was taken, so the record is empty and the
+// campaign answer is UNRESOLVED. A non-empty record here after the repair would
+// mean the table and the rule disagree again, and that is worth failing on.
 //
 // WHAT THE NULL TRIAL IS NOT
 // The null trial's POINT ESTIMATE is the frozen baseline itself: 6/8 = 0.75,
 // not "a small positive effect that happens to look small". It is a null by
 // construction rather than by a threshold applied after the fact.
 //
-// WHAT THE INFRA TRIAL IS NOT
+// WHAT THE INFRA TRIAL IS NOT, AND WHERE IT LIVES NOW
 // It is NOT a zero, NOT a skip and NOT a null. It produced no measurement at
 // all: `samples: null`, `numerator: null`, `denominator: null`, and a
 // reconciliation row that says what must happen next. `not_measured: true` sits
 // next to the row precisely so that a consumer cannot read `numerator: 0` off
 // it. The stopping rule calls for a reconciliation and forbids the blind
 // retry.
+//
+// It is also NOT inside the MEASURED campaign any more. `FIXTURE_MEASURED_TRIALS`
+// below is the set the pooled metric is computed from and the set the
+// multiplicity family is declared over, and this trial is not in it: an
+// unresolved trial inside the measured set is a VIOLATION on every run for a
+// reason that has nothing to do with whether the mechanics work, which makes the
+// default campaign undecidable by construction. The trial is still ENUMERATED,
+// still carries its row in the frozen table with `expectedVerdict: 'VIOLATION'`,
+// still carries `INFRA` as a first-class outcome and its `INFRA_ERROR` reason
+// code, and still owes `INFRA_RECONCILIATION` — it belongs to
+// `FIXTURE_RECONCILIATION_TRIALS`, alongside the other places INFRA is
+// exercised (P6's missing evaluator, the replay's crash/restart phase). The
+// registry does not learn a new outcome kind; the measured campaign stops
+// counting an unresolvable trial as a measurement.
 //
 // LATENCY
 // `latency_ms` is a per-trial SYNTHETIC wall-clock sample, flagged as such in
@@ -253,10 +284,11 @@ export function assertMeasurementAgreesWithTable(trial) {
  * recorded, never asserted as the design.
  *
  * `decisionFromInterval` is the only place an outcome may be named, so the
- * fixture calls it and copies the answer out. With eight cases the 95% interval
- * cannot separate 7/8, 6/8 and 5/8 from the frozen baseline, so this returns
- * UNRESOLVED for all three measured trials: the honest reading of a corpus this
- * size, and the reason `FIXTURE_DERIVED_DISAGREEMENTS` is not empty.
+ * fixture calls it and copies the answer out. With eight cases the interval at
+ * the derived confidence cannot separate 7/8, 6/8 and 5/8 from the frozen
+ * baseline, so this returns UNRESOLVED for all three measured trials: the
+ * honest reading of a corpus this size, and what the frozen table's measured
+ * rows now declare.
  * @param {string} trial A member of the preregistered trial list.
  * @returns {Readonly<object>} `{trial, observed, lower, upper, derived_outcome, derived_reason}`.
  */
@@ -497,10 +529,36 @@ function buildTrial(entry) {
 export const FIXTURE_TRIALS = Object.freeze(PREREGISTERED_TRIALS.map(buildTrial));
 
 /**
+ * The MEASURED campaign: the trial records that produced a measurement, derived
+ * from the records themselves rather than from the trial list, so the set the
+ * pooled metric is computed over and the set the multiplicity family is declared
+ * over cannot disagree about what was measured.
+ * @type {ReadonlyArray<Readonly<object>>}
+ */
+export const FIXTURE_MEASURED_TRIALS = Object.freeze(
+  FIXTURE_TRIALS.filter((trial) => trial.measured === true),
+);
+
+/**
+ * The RECONCILIATION corpus: the enumerated trials that produced no measurement.
+ * INFRA is a first-class outcome, not an absence, so every one of these keeps
+ * its row, its reason codes and its reconciliation record.
+ * @type {ReadonlyArray<Readonly<object>>}
+ */
+export const FIXTURE_RECONCILIATION_TRIALS = Object.freeze(
+  FIXTURE_TRIALS.filter((trial) => trial.not_measured === true),
+);
+
+/**
  * Every trial where the frozen RULE derived an outcome other than the design
- * the frozen table pins. Published rather than hidden: with eight cases a 95%
- * interval cannot separate 7/8, 6/8 and 5/8 from the frozen baseline, and the
- * only honest thing a fixture can do with that fact is name it.
+ * the frozen table pins. Published rather than hidden, and now EMPTY: with the
+ * expectation re-derived from the frozen measurements at the derived
+ * confidence, the table's `expectedOutcome` and the rule's `derived_outcome` are
+ * the same string for all three measured trials. The record is kept because
+ * "empty" is the signal — a non-empty list is the fixture saying the published
+ * expectation and the frozen rule have drifted apart again, and it is empty
+ * because the expectation was re-derived, NOT because anything was tuned until
+ * it agreed.
  * @type {ReadonlyArray<Readonly<object>>}
  */
 export const FIXTURE_DERIVED_DISAGREEMENTS = Object.freeze(
@@ -512,7 +570,6 @@ export const FIXTURE_DERIVED_DISAGREEMENTS = Object.freeze(
       rule_derived: trial.derived_outcome,
       reason: trial.derived_reason,
       corpus_cases: trial.denominator,
-      corpus_limitation: 'eight cases cannot resolve a 0.02 noise band at 95% confidence; the disagreement is a property of the corpus, not of the rule',
     })),
 );
 
@@ -596,23 +653,24 @@ export const CLEAN_LEDGER = Object.freeze({
 });
 
 /**
- * The pooled case counts and their interval, computed from the trials rather
- * than written: 7 + 6 + 5 agreements over 3 x 8 cases, which is the frozen
- * 18/24 `POOLED_TRIAL_COUNTS` the table pins, and exactly the frozen baseline
- * 0.75. The infra trial contributes to NEITHER count: it is reported in
- * `notMeasured` and never as a zero.
+ * The pooled case counts and their interval, computed from the MEASURED trials
+ * rather than written: 7 + 6 + 5 agreements over 3 x 8 cases, which is the
+ * frozen 18/24 `POOLED_TRIAL_COUNTS` the table pins, and exactly the frozen
+ * baseline 0.75. The infra trial is in NEITHER count — it is in
+ * `FIXTURE_RECONCILIATION_TRIALS` — and it is reported in `notMeasured` and
+ * never as a zero.
  * @type {{successes: number, trials: number, notMeasured: number}}
  */
 export const POOLED_COUNTS = Object.freeze({
-  successes: FIXTURE_TRIALS.reduce(
+  successes: FIXTURE_MEASURED_TRIALS.reduce(
     (total, trial) => total + (typeof trial.numerator === 'number' ? trial.numerator : 0),
     0,
   ),
-  trials: FIXTURE_TRIALS.reduce(
+  trials: FIXTURE_MEASURED_TRIALS.reduce(
     (total, trial) => total + (typeof trial.denominator === 'number' ? trial.denominator : 0),
     0,
   ),
-  notMeasured: FIXTURE_TRIALS.filter((trial) => trial.status !== 'RESOLVED').length,
+  notMeasured: FIXTURE_RECONCILIATION_TRIALS.length,
 });
 
 /** The Wilson interval over `POOLED_COUNTS`, from the frozen statistics module. @type {Readonly<object>} */
@@ -702,9 +760,21 @@ export function buildCleanRun(label) {
     // `notMeasured` reported separately and never folded into a zero.
     metrics: Object.freeze({
       ...metricsSummary(FIXTURE_TRIALS),
-      // Negative, null and infra outcomes are counted as themselves. None of
-      // them is merged into another and none is a zero.
-      outcome_counts: Object.freeze({ POSITIVE: 1, NULL: 1, NEGATIVE: 1, INFRA: 1 }),
+      // The outcome tally IS the comparator's own tally
+      // (`metricsSummary(FIXTURE_TRIALS).outcomeCounts`), copied rather than
+      // written. The previous version hand-wrote
+      // `{POSITIVE:1, NULL:1, NEGATIVE:1, INFRA:1}`, which was a second
+      // spelling of a number the trials already carry and which therefore
+      // agreed only for as long as nobody re-derived the table: after the
+      // repair it reads `{UNRESOLVED:3, INFRA:1}` and the hand-written literal
+      // would have been a claim the run does not support. Two spellings of one
+      // count is the same defect class as the metric name this file's header
+      // already describes.
+      //
+      // The spelling stays `outcome_counts` (and not `metricsSummary`'s
+      // `outcomeCounts`) because `tests/research/replay-two-run.test.mjs:650`
+      // reads this member by that name. The VALUE is the comparator's.
+      outcome_counts: Object.freeze(metricsSummary(FIXTURE_TRIALS).outcomeCounts),
       inference_mode: 'ASSOCIATIONAL',
     }),
     // The pooled counts the campaign reports, and the interval over them,
@@ -721,10 +791,13 @@ export function buildCleanRun(label) {
       tree_sha: PLACEHOLDER_PROVENANCE.tree_sha,
     }),
     provenance: Object.freeze({ ...PLACEHOLDER_PROVENANCE, run_label: label, recorded_at: FIXED_INSTANT_ISO }),
-    // The campaign verdict this run is expected to resolve to. Declared here so
-    // a test has one place to read it, and NOT computed by calling the
-    // comparator: an expectation produced by the code under test is a tautology.
-    expected_campaign_verdict: 'PASS',
+    // A fixture must not declare the campaign verdict it expects: the campaign
+    // verdict is `resolveCampaignVerdict`'s to name, and a literal `PASS` here
+    // was a claim no script and no test ever read — grep found exactly one
+    // occurrence in the tree, the line that wrote it. With a rule that could not
+    // reject, an unresolved pooled interval and an INFRA row, the campaign
+    // verdict is FAIL, and the honest arrangement is to let the comparator say
+    // so and let the gate compare that answer with the frozen expectation.
     allowed_process_differences: ALLOWED_PROCESS_DIFFERENCES,
     // A2: the six controls, reported as the state a completed campaign reaches
     // — every one flipped. `scoreRun` reads this block and turns a missing or

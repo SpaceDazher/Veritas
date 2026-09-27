@@ -19,7 +19,8 @@ import {
 } from '../../src/lib/research/comparator.mjs';
 import {
   EXPECTED_CODES, EXPECTED_CONTROLS, EXPECTED_COUNTERS, EXPECTED_LEDGER_SHAPE, EXPECTED_METRIC, EXPECTED_TRIAL_DECISIONS,
-  assertTableFrozen, expectedTableDigest, expectedValueIssues,
+  assertTableFrozen, assertFrozenTableSelfConsistent, expectedTableDigest, expectedValueIssues,
+  EXPECTED_CAMPAIGN, EXPECTED_COMPARATOR_FAILURES,
 } from '../../src/lib/research/expected-values.mjs';
 import { controlsFlipVerdict, EXTRA_CONTROL_IDS, NEGATIVE_CONTROLS, runNegativeControls } from '../../src/lib/research/negative-controls.mjs';
 import { runAllProbes, PROBE_FAMILIES, PROBE_NAMES } from '../../src/lib/research/probes.mjs';
@@ -474,6 +475,16 @@ test('A3 the table digest moves when the table moves', () => {
     EXPECTED_LEDGER_SHAPE,
     EXPECTED_METRIC,
     EXPECTED_CONTROLS,
+    // R-C: the frozen CAMPAIGN decision is a table member and is inside the
+    // digest, so a campaign declaration edited after the preregistration was
+    // sealed is a change the seal can see. The reproducibility property is
+    // unchanged — the digest is still exactly these constants.
+    EXPECTED_CAMPAIGN,
+    // F1: the declaration of WHICH comparator failures the honest campaign
+    // carries is a table member too, so it is inside the digest for the same
+    // reason: it is a frozen expectation, and an expectation edited after the
+    // seal is a change the seal can see.
+    EXPECTED_COMPARATOR_FAILURES,
   }));
   // The digest is taken over the CONSTANTS, so re-deriving it from the same
   // objects is the reproducibility check; a table edited after publication
@@ -483,6 +494,20 @@ test('A3 the table digest moves when the table moves', () => {
 
 test('A3 the preregistration seals the table, and a moved table is a refusal', () => {
   assert.equal(assertTableFrozen(CONFIGURED_PREREG), expectedTableDigest());
+  // R-A: the table is SELF-CONSISTENT, and `assertTableFrozen` says so about
+  // the SEALED document rather than only about the code. The first delivery
+  // published `confidence: 0.95` against `alpha = 0.05` over a family of 3, so
+  // the bound it inherited was above the corrected level and no measurement
+  // could ever have been rejected. Nothing about that was a drift, which is why
+  // it survived a digest check: the check is now about the constants too.
+  assert.deepEqual(assertFrozenTableSelfConsistent(), {
+    never_rejects: false,
+    bound: 1 - EXPECTED_CAMPAIGN.confidence,
+    corrected_level: EXPECTED_CAMPAIGN.alpha / EXPECTED_CAMPAIGN.family_size,
+    family_size: EXPECTED_CAMPAIGN.family_size,
+    measured_rows: 3,
+    unresolved_rows: 1,
+  });
   assert.throws(
     () => assertTableFrozen({ ...CONFIGURED_PREREG, expected_table_digest: 'f'.repeat(64) }),
     (error) => String(error?.message ?? '').startsWith('EXPECTED_TABLE_DRIFT'),
@@ -490,6 +515,15 @@ test('A3 the preregistration seals the table, and a moved table is a refusal', (
   assert.throws(
     () => assertTableFrozen({ ...CONFIGURED_PREREG, expected_table_digest: undefined, table_digest: undefined }),
     (error) => String(error?.message ?? '').startsWith('EXPECTED_TABLE_DIGEST_ABSENT'),
+  );
+  // The pre-repair rule is refused BY NAME, and not as a digest drift: a
+  // preregistration whose own seal is intact but whose published confidence
+  // makes the campaign undecidable is the defect this repair removed, and the
+  // refusal has to say which of the two it is.
+  const preRepair = { ...CONFIGURED_PREREG, noise_rule: { ...CONFIGURED_PREREG.noise_rule, confidence: 0.95 } };
+  assert.throws(
+    () => assertTableFrozen(preRepair),
+    (error) => String(error?.message ?? '').startsWith('FROZEN_RULE_NOT_SELF_CONSISTENT'),
   );
 });
 

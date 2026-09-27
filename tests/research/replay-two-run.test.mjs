@@ -642,13 +642,38 @@ test('A2 an infra outcome is a first-class outcome: never "no effect", never a p
 
   // The pooled metric counts the MEASURED trials only. An infra trial folded in
   // as a zero would change 18/24 into 18/32 and would report nothing unmeasured.
+  //
+  // The outcome tally is DERIVED from the frozen table's rows, member for
+  // member, because the second spelling of it is exactly what this repair
+  // removed: the literal `{POSITIVE:1, NULL:1, NEGATIVE:1, INFRA:1}` described
+  // the DESIGN each trial was authored for, and after R-B re-derived the three
+  // measured rows from the frozen measurements the rule derives UNRESOLVED for
+  // all of them. The tally a run records is the comparator's own
+  // `metricsSummary` over the outcomes the run recorded, so a hand-written
+  // tally here is a claim about the corpus rather than a check of it — and
+  // "none of them is merged into another and none is a zero" is the property,
+  // spelled as "every declared outcome appears with its own count".
+  const declaredTally = EXPECTED_TRIAL_DECISIONS.reduce(
+    (tally, row) => ({ ...tally, [row.expectedOutcome]: (tally[row.expectedOutcome] ?? 0) + 1 }),
+    {},
+  );
   for (const artefact of [artefactA, artefactB]) {
     assert.equal(artefact.metrics.numerator, 18);
     assert.equal(artefact.metrics.denominator, 24, 'the infra trial was folded into the denominator');
     assert.equal(artefact.metrics.notMeasured, 1, 'the unmeasured trial is not reported as unmeasured');
     assert.equal(artefact.metrics.basis, 'POOLED_TRIAL_COUNTS');
-    assert.deepEqual(artefact.metrics.outcome_counts, { POSITIVE: 1, NULL: 1, NEGATIVE: 1, INFRA: 1 }, 'the four outcomes are not counted as themselves');
+    assert.deepEqual(artefact.metrics.outcome_counts, declaredTally, 'the outcomes are not counted as themselves');
+    assert.deepEqual(
+      Object.keys(artefact.metrics.outcome_counts).sort(),
+      Object.keys(declaredTally).sort(),
+      'the run invented an outcome the table does not declare, or dropped one it does',
+    );
   }
+  // The DELIVERED tally, pinned: three measured rows the frozen rule could not
+  // resolve on eight cases, and one INFRA row that is counted as itself rather
+  // than as a zero. A different shape here means the table moved, and the
+  // report has to be re-read before the assertion is touched.
+  assert.deepEqual(declaredTally, { UNRESOLVED: 3, INFRA: 1 }, 'the frozen table is not the re-derived one; re-read docs/stages/S2-008.md before changing this');
   assert.equal(artefactA.metrics.numerator / artefactA.metrics.denominator, FROZEN_BASELINE);
 
   // THE NEGATIVE CONTROL, IN A PROCESS: the same run with the infra trial

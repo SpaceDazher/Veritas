@@ -194,6 +194,11 @@ export function resolveBase() {
     branch: git('rev-parse', '--abbrev-ref', 'HEAD'),
     worktree_dirty: git('status', '--porcelain').length > 0,
     tracked_files_of_this_track: mine.length,
+    // M1: the SCOPE, published with the count. This glob is the harness's plus
+    // `scripts/verify-s2-008*` and the `evidence/s2-008-*.json` records, so the
+    // two records published 51 and 39 under the same key; the numbers are
+    // unchanged and now say what they count.
+    tracked_files_scope: 'git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records',
     track_tracked: mine.length > 0,
   };
 }

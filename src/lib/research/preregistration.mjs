@@ -202,6 +202,24 @@ const AMENDMENT_KEYS = Object.freeze([
 ]);
 
 /**
+ * The closed key set of a SUPERSESSION document.
+ *
+ * A supersession is a THIRD document kind, not an amendment with a longer
+ * reason: an amendment replaces a card, and this one replaces a RULE. The
+ * distinction is what keeps the two apart in a reader's head, and the closed set
+ * is what keeps a supersession from being used as a decision input (see
+ * `assertSupersessionNotDecisionBasis`).
+ * @type {ReadonlyArray<string>}
+ */
+const SUPERSESSION_KEYS = Object.freeze([
+  'kind', 'supersession_id', 'supersedes', 'supersedes_confidence', 'supersedes_expected_table_digest',
+  'replaced_by_confidence', 'replaced_by_expected_table_digest', 'reason', 'supersession_digest',
+]);
+
+/** `spr-<24 hex>`: derived from the content, so the same supersession always has the same id. @type {RegExp} */
+const SUPERSESSION_ID_RE = /^spr-[0-9a-f]{24}$/;
+
+/**
  * Keys that would mean the document carries a RESULT. A preregistration is frozen
  * before trial one, so a result in it can only have been put there after one
  * existed. Refused by name rather than ignored, so the composition error is visible
@@ -642,6 +660,29 @@ export const PREREGISTRATION_KIND = 'PREREGISTRATION';
 export const AMENDMENT_KIND = 'AMENDMENT';
 
 /**
+ * The document kind of a SUPERSESSION: a frozen rule that was replaced before
+ * any new measurement, with the reason and BOTH states' published values in it.
+ *
+ * WHY IT EXISTS (R-A, S2-008 repair). The first delivery of this track published
+ * a rule that could not reject anything: `alpha = 0.05` with `confidence: 0.95`
+ * over a family of 3 gives a bound of `0.05` against a corrected level of
+ * `0.05/3 = 0.016667`, so no measurement could ever have been rejected. The fix
+ * is a change to the PREREGISTRATION — the comparator says so in its own comment
+ * on `frozen_rule_cannot_reject` — and a rule that is edited in place leaves
+ * nobody able to read what was published the first time. So the superseded
+ * document is preserved WHOLE, as a document of its own kind, beside the one in
+ * force, and the reason travels with it.
+ *
+ * It is not an AMENDMENT: an amendment carries a new `card_id` and is refused as
+ * a decision basis, while a supersession carries the published CONSTANTS of both
+ * states and no card. It is not a RESULT either — `assertPreregistration` refuses
+ * `supersedes` / `superseded_by` on a preregistration, so the pointer lives here
+ * and never inside the document it points at.
+ * @type {string}
+ */
+export const SUPERSESSION_KIND = 'SUPERSESSION';
+
+/**
  * The frozen rule string of this surface, for the evidence record. Mirrors
  * `FREEZE_RULE` in src/lib/sloqual/contract.mjs:29: a document that declares
  * `rule` must declare THIS value.
@@ -1080,6 +1121,167 @@ export function assertAmendmentNotDecisionBasis(amendment, prereg) {
 }
 
 /**
+ * Build the SUPERSESSION document for a frozen rule that was replaced before any
+ * new measurement (R-A).
+ *
+ * The document preserves the superseded state in the two forms a reader needs to
+ * check the claim that something changed: the superseded document's own digest
+ * (`supersedes`, `preregistrationDigest` of the document in force before), and
+ * the published constant that changed (`supersedes_confidence`), beside the one
+ * that replaced it. The frozen-TABLE digests travel too, because the table is
+ * sealed inside the preregistration and a re-derived rule moves it.
+ *
+ * `replacedBy` is REQUIRED, not optional. A supersession that names what it
+ * replaced and nothing about what replaced it is a deletion with a reason
+ * attached, and the whole point of the document kind is that the first delivery
+ * stays readable.
+ *
+ * @param {{superseded: object, replacedBy: object, reason: string}} args
+ * @param {object} args.superseded The preregistration that WAS in force, whole
+ *   and unedited. It is validated as a preregistration, so a supersession can
+ *   never point at a document that was not one.
+ * @param {object} args.replacedBy The preregistration now in force, also
+ *   validated. It must be a DIFFERENT document: a supersession of a
+ *   preregistration by itself is a no-op with a digest on it.
+ * @param {string} args.reason Why the rule was replaced, in one bounded,
+ *   secret-free line. The same rules an amendment reason obeys, for the same
+ *   reason: it is hashed into a permanent document.
+ * @returns {{kind: string, supersession_id: string, supersedes: string,
+ *   supersedes_confidence: number, supersedes_expected_table_digest: string,
+ *   replaced_by_confidence: number, replaced_by_expected_table_digest: string,
+ *   reason: string, supersession_digest: string}} The supersession document,
+ *   with exactly these nine keys.
+ * @throws {import('../agentboard/errors.mjs').MalformedResult} when either
+ *   document is not an admissible preregistration, when the reason is absent,
+ *   empty, over-long, multi-line or secret-shaped, or when the confidence /
+ *   expected-table digest a document carries is unusable.
+ * @throws {import('../agentboard/errors.mjs').BlockedPolicy}
+ *   'SUPERSESSION_REPLACES_NOTHING' when the two documents are the same one, and
+ *   'SUPERSESSION_CHANGES_NOTHING' when they are different documents that
+ *   publish the same confidence and the same frozen-table digest — a
+ *   supersession that records no change is a document that misleads.
+ */
+export function createSupersession({ superseded, replacedBy, reason } = {}) {
+  const before = assertPreregistration(superseded);
+  const after = assertPreregistration(replacedBy);
+  const supersedes = preregistrationDigest(before);
+  const replaces = preregistrationDigest(after);
+  if (supersedes === replaces) {
+    throw new BlockedPolicy('SUPERSESSION_REPLACES_NOTHING', `preregistration ${supersedes} supersedes itself; a rule that replaces nothing records nothing`);
+  }
+  if (typeof reason !== 'string') throw malformed('SUPERSESSION_REASON_REQUIRED', `reason must be a string, got ${typeName(reason)}`);
+  const bounded = reason.trim();
+  if (bounded.length === 0) throw malformed('SUPERSESSION_REASON_REQUIRED', 'reason must not be empty');
+  if (bounded.length > MAX_REASON) throw malformed('SUPERSESSION_REASON_TOO_LONG', `reason exceeds ${MAX_REASON} characters`);
+  if (/[\r\n]/.test(bounded)) throw malformed('SUPERSESSION_REASON_NOT_ONE_LINE', 'reason must be one line: a supersession record is a single bounded sentence');
+  if (redact(bounded) !== bounded) throw malformed('SUPERSESSION_REASON_SECRET_SHAPED', 'reason is secret-shaped under the repository redaction list; name the variable and its location instead');
+  const beforeConfidence = before.multiplicity_rule?.confidence;
+  const afterConfidence = after.multiplicity_rule?.confidence;
+  const beforeTableDigest = before.expected_table_digest ?? null;
+  const afterTableDigest = after.expected_table_digest ?? null;
+  if (!Number.isFinite(beforeConfidence) || !Number.isFinite(afterConfidence)) {
+    throw malformed('SUPERSESSION_CONFIDENCE_ABSENT', 'a supersession needs both documents to publish a multiplicity confidence; a rule with no published level cannot be shown to have changed');
+  }
+  if (beforeTableDigest === null || afterTableDigest === null) {
+    throw malformed('SUPERSESSION_TABLE_DIGEST_ABSENT', 'a supersession needs both documents to seal the frozen table; a table published after the run is not the table that ran');
+  }
+  if (beforeConfidence === afterConfidence && beforeTableDigest === afterTableDigest) {
+    throw new BlockedPolicy('SUPERSESSION_CHANGES_NOTHING', `both documents publish confidence ${String(afterConfidence)} and table digest ${String(afterTableDigest)}; a supersession that records no change misleads the reader it exists for`);
+  }
+  const body = {
+    kind: SUPERSESSION_KIND,
+    supersedes,
+    supersedes_confidence: beforeConfidence,
+    supersedes_expected_table_digest: String(beforeTableDigest),
+    replaced_by_confidence: afterConfidence,
+    replaced_by_expected_table_digest: String(afterTableDigest),
+    reason: bounded,
+  };
+  const supersession_id = `spr-${canonicalDigest(body).slice(0, 24)}`;
+  return {
+    kind: SUPERSESSION_KIND,
+    supersession_id,
+    supersedes: body.supersedes,
+    supersedes_confidence: body.supersedes_confidence,
+    supersedes_expected_table_digest: body.supersedes_expected_table_digest,
+    replaced_by_confidence: body.replaced_by_confidence,
+    replaced_by_expected_table_digest: body.replaced_by_expected_table_digest,
+    reason: bounded,
+    supersession_digest: canonicalDigest({ ...body, supersession_id }),
+  };
+}
+
+/**
+ * Assert a supersession document is internally consistent AND that the
+ * preregistration it points at is the one it names.
+ *
+ * Three checks, all of them about a reader being able to trust the record: the
+ * closed key set (a supersession is a record, never a decision input), the id
+ * and digest recomputing from the content (an edited supersession with a
+ * recomputed id is still an edited supersession, and the recomputation is what
+ * makes that visible), and the two states being DISTINCT (a supersession whose
+ * two states are the same document is a deletion wearing a digest).
+ *
+ * @param {object} supersession A document produced by `createSupersession`.
+ * @param {object} superseded The superseded preregistration, whole.
+ * @returns {object} The same document, unchanged.
+ * @throws {import('../agentboard/errors.mjs').BlockedPolicy}
+ *   'SUPERSESSION_AS_DECISION_BASIS' when the document carries a key beyond the
+ *   closed set, and 'SUPERSESSION_SUPERSEDES_MISMATCH' when it does not name
+ *   this preregistration.
+ * @throws {import('../agentboard/errors.mjs').MalformedResult} when the document
+ *   is not a SUPERSESSION, when its id or digest does not recompute, or when it
+ *   names the same state twice.
+ */
+export function assertSupersession(supersession, superseded) {
+  if (!isPlainObject(supersession)) throw malformed('SUPERSESSION_NOT_AN_OBJECT', `expected a supersession object, got ${typeName(supersession)}`);
+  if (supersession.kind !== SUPERSESSION_KIND) throw malformed('SUPERSESSION_KIND_UNEXPECTED', `kind must be ${SUPERSESSION_KIND}, got ${String(supersession.kind)}`);
+  const extra = Object.keys(supersession).filter((key) => !SUPERSESSION_KEYS.includes(key)).sort();
+  if (extra.length > 0) throw new BlockedPolicy('SUPERSESSION_AS_DECISION_BASIS', `supersession carries ${extra.join(', ')}: a supersession is a record of what changed, never an input to a verdict`);
+  if (typeof supersession.supersession_id !== 'string' || !SUPERSESSION_ID_RE.test(supersession.supersession_id)) {
+    throw malformed('SUPERSESSION_ID_INVALID', `supersession_id must match ${SUPERSESSION_ID_RE.source}`);
+  }
+  if (typeof supersession.reason !== 'string' || supersession.reason.trim().length === 0 || supersession.reason.length > MAX_REASON) {
+    throw malformed('SUPERSESSION_REASON_INVALID', `supersession reason must be one non-empty line of at most ${MAX_REASON} characters`);
+  }
+  const {
+    kind, supersedes, supersedes_confidence: beforeConfidence, supersedes_expected_table_digest: beforeTable,
+    replaced_by_confidence: afterConfidence, replaced_by_expected_table_digest: afterTable, reason, supersession_id: id,
+  } = supersession;
+  for (const name of ['supersedes', 'supersedes_expected_table_digest', 'replaced_by_expected_table_digest']) {
+    requireDigest(supersession[name], `supersession.${name}`);
+  }
+  for (const [name, value] of [['supersedes_confidence', beforeConfidence], ['replaced_by_confidence', afterConfidence]]) {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0 || value >= 1) {
+      throw malformed('SUPERSESSION_CONFIDENCE_INVALID', `${name} must be a confidence in (0, 1), got ${typeName(value)}`);
+    }
+  }
+  if (beforeConfidence === afterConfidence && beforeTable === afterTable) {
+    throw new BlockedPolicy('SUPERSESSION_CHANGES_NOTHING', `both states publish confidence ${String(afterConfidence)} and table digest ${String(afterTable)}`);
+  }
+  const body = {
+    kind,
+    supersedes,
+    supersedes_confidence: beforeConfidence,
+    supersedes_expected_table_digest: beforeTable,
+    replaced_by_confidence: afterConfidence,
+    replaced_by_expected_table_digest: afterTable,
+    reason,
+  };
+  const recomputedId = `spr-${canonicalDigest(body).slice(0, 24)}`;
+  if (recomputedId !== id) throw malformed('SUPERSESSION_ID_MISMATCH', `supersession_id ${id} does not match its content (${recomputedId})`);
+  const recomputedDigest = canonicalDigest({ ...body, supersession_id: id });
+  if (requireDigest(supersession.supersession_digest, 'supersession.supersession_digest') !== recomputedDigest) {
+    throw malformed('SUPERSESSION_DIGEST_MISMATCH', `supersession_digest does not match its content (${recomputedDigest})`);
+  }
+  const base = assertPreregistration(superseded);
+  if (supersedes !== preregistrationDigest(base)) {
+    throw new BlockedPolicy('SUPERSESSION_SUPERSEDES_MISMATCH', `supersession names ${supersedes}, this preregistration is ${preregistrationDigest(base)}`);
+  }
+  return supersession;
+}
+
+/**
  * P4: budget opacity is refused by making the reservation explicit and checked
  * against an INJECTED clock. `Date.now()` is never called; an ISO-8601 `now` is
  * parsed, never sampled. Without an injected clock there is no budget decision at
@@ -1169,4 +1371,177 @@ export function stoppingRuleOf(prereg) {
   if (!isPlainObject(prereg)) throw malformed('PREREGISTRATION_NOT_AN_OBJECT', `expected a preregistration object, got ${typeName(prereg)}`);
   const trialIds = prereg.trial_list === undefined || prereg.trial_list === null ? null : trialIdsOf(prereg);
   return assertStoppingRule(prereg.stopping_rule, trialIds);
+}
+
+// --- THE SUPERSESSION LEDGER (A3) -------------------------------------------
+//
+// WHAT IT IS, AND WHY IT IS NOT A FOURTH DOCUMENT KIND
+// A SUPERSESSION (above) records that a frozen RULE was replaced, with the two
+// documents' published constants. It says nothing about the frozen MEASUREMENT
+// SOURCES: the eight synthetic cases and the frozen expected-value table, which
+// is where a real rewrite of a synthetic campaign would land. The ledger is the
+// monotone, CHAINED record of those two digests, one entry per change, with the
+// reason next to it — the same history a supersession records for the rule, at
+// the level of the data.
+//
+// THE GAP IT CLOSES, IN THE WORDS THE REPRODUCTION USED
+// `assertFrozenCampaignDerivable` accepts any SELF-CONSISTENT rewrite by
+// construction: rewrite the fixture to 8/8, rewrite the table's rows to 8/8,
+// rewrite `EXPECTED_CAMPAIGN` to what the rule then derives, re-seal, and the
+// chain is green. That attack touches two sources and one seal, and the seal
+// moves with them, so no in-corpus check can tell it from a legitimate
+// supersession. What it could not do was APPEND here: the ledger's last entry
+// carries the table digest and the cases digest as LITERALS, and a chain that
+// does not end at the digests the current sources produce is refused. So the
+// property this file can actually establish, and the one the report must claim,
+// is exact:
+//
+//   AN UNRECORDED CHANGE OF THE FROZEN SOURCES IS REFUSED. A RECORDED ONE IS A
+//   SUPERSESSION, which is what R-A asked for: a document kind of its own, with
+//   a reason and both old digests. Immutability of a committed corpus is git's
+//   job, and `npm run manifest:check` is the other half of it; this is the
+//   third, and it is the one that runs inside the acceptance chain.
+//
+// IT IS NOT A DECISION BASIS
+// `assertSourceLedger` returns the ledger for publication and takes no part in
+// any verdict. The same closed-key rule the supersession obeys applies here: the
+// ledger is a record of what changed, never an input to what is decided.
+
+/** The document kind of a supersession ledger. @type {string} */
+export const SOURCE_LEDGER_KIND = 'SUPERSESSION_LEDGER/1';
+
+/** The closed key set of a ledger entry. @type {ReadonlyArray<string>} */
+const SOURCE_LEDGER_ENTRY_KEYS = Object.freeze([
+  'index', 'previous_anchor_digest', 'anchor_digest', 'cases_digest',
+  'expected_table_digest', 'reason',
+]);
+
+/** The closed key set of a ledger. @type {ReadonlyArray<string>} */
+const SOURCE_LEDGER_KEYS = Object.freeze(['kind', 'entries', 'entry_count', 'last_anchor_digest']);
+
+/**
+ * The anchor digest over the two frozen sources a rewrite would move: the
+ * corpus's own cases and the frozen expected-value table. ONE digest over BOTH
+ * because a change to either is the same event — the frozen synthetic
+ * measurement moved — and two digests would let an attacker move one and leave
+ * the other as a coincidence.
+ *
+ * @param {{cases_digest: string, expected_table_digest: string}} anchor
+ * @returns {string} `sha256:<64 hex>` over the canonical form of the pair.
+ */
+export function sourceAnchorDigest({ cases_digest: casesDigest, expected_table_digest: tableDigest } = {}) {
+  requireDigest(casesDigest, 'ledger.cases_digest');
+  requireDigest(tableDigest, 'ledger.expected_table_digest');
+  return canonicalDigest({ cases_digest: String(casesDigest), expected_table_digest: String(tableDigest) });
+}
+
+/**
+ * Build a ledger entry for one change to the frozen sources.
+ *
+ * @param {{index?: number, previous?: object|null, cases_digest: string, expected_table_digest: string, reason: string}} args
+ * @param {number} args.index The entry's position, 0-based and contiguous.
+ * @param {object|null} args.previous The entry before this one, or null for the
+ *   first. The chain is `previous_anchor_digest = previous.anchor_digest`, so an
+ *   entry that is not appended after the one before it cannot be written.
+ * @param {string} args.cases_digest The corpus cases' canonical digest, as a
+ *   LITERAL of the change being recorded.
+ * @param {string} args.expected_table_digest The frozen table's digest, as a
+ *   literal of the change being recorded.
+ * @param {string} args.reason Why, in one bounded secret-free line — the same
+ *   rule a supersession reason obeys, for the same reason: the text is hashed
+ *   into a permanent document.
+ * @returns {Readonly<object>} The entry, frozen, with exactly the closed key set.
+ * @throws {import('../agentboard/errors.mjs').MalformedResult} on an unusable
+ *   index, a missing or multi-line or secret-shaped reason, a previous entry
+ *   that is not one, or an anchor whose digests do not recompute.
+ */
+export function createSourceLedgerEntry({ index = 0, previous = null, cases_digest: casesDigest, expected_table_digest: tableDigest, reason } = {}) {
+  if (!Number.isInteger(index) || index < 0) throw malformed('LEDGER_INDEX_INVALID', `index must be a non-negative integer, got ${typeName(index)}`);
+  if (index === 0 && previous !== null) throw malformed('LEDGER_FIRST_ENTRY_HAS_A_PARENT', 'the first ledger entry has no parent; a chain that starts in the middle records nothing about what came before');
+  if (index > 0 && !isPlainObject(previous)) throw malformed('LEDGER_CHAIN_BROKEN', `entry ${index} needs the entry it follows; the ledger is a chain, not a list`);
+  if (typeof reason !== 'string') throw malformed('LEDGER_REASON_REQUIRED', `reason must be a string, got ${typeName(reason)}`);
+  const bounded = reason.trim();
+  if (bounded.length === 0) throw malformed('LEDGER_REASON_REQUIRED', 'reason must not be empty');
+  if (bounded.length > MAX_REASON) throw malformed('LEDGER_REASON_TOO_LONG', `reason exceeds ${MAX_REASON} characters`);
+  if (/[\r\n]/.test(bounded)) throw malformed('LEDGER_REASON_NOT_ONE_LINE', 'reason must be one line: a ledger entry is a single bounded sentence');
+  if (redact(bounded) !== bounded) throw malformed('LEDGER_REASON_SECRET_SHAPED', 'reason is secret-shaped under the repository redaction list; name the variable and its location instead');
+  const anchor = sourceAnchorDigest({ cases_digest: casesDigest, expected_table_digest: tableDigest });
+  const previousAnchor = index === 0 ? null : sourceAnchorDigest({
+    cases_digest: previous.cases_digest,
+    expected_table_digest: previous.expected_table_digest,
+  });
+  if (index > 0 && previousAnchor === anchor) {
+    throw new BlockedPolicy('LEDGER_RECORDS_NO_CHANGE', `entry ${index} repeats the anchor of the entry it follows; an entry that records no change makes the count a lie`);
+  }
+  return Object.freeze({
+    index,
+    previous_anchor_digest: previousAnchor,
+    anchor_digest: anchor,
+    cases_digest: String(casesDigest),
+    expected_table_digest: String(tableDigest),
+    reason: bounded,
+  });
+}
+
+/**
+ * Assert a supersession ledger is a well-formed chain AND that it ENDS at the
+ * digests the frozen sources actually produce right now.
+ *
+ * The last check is the one that matters, and it is the one that refuses the
+ * wholesale-rewrite attack: a fixture or table whose bytes moved without an
+ * appended entry is a `BlockedPolicy`, not a warning, and it is raised by the
+ * corpus builder before anything is sealed and therefore before any run is
+ * scored.
+ *
+ * @param {ReadonlyArray<object>} entries The ledger's entries, in order.
+ * @param {{cases_digest: string, expected_table_digest: string}} current What the
+ *   frozen sources hash to right now, as the caller re-derives them.
+ * @returns {Readonly<{kind: string, entries: ReadonlyArray<object>, entry_count: number, last_anchor_digest: string, matches_current: true}>}
+ *   The ledger, for publication.
+ * @throws {import('../agentboard/errors.mjs').MalformedResult} on a malformed
+ *   chain: no entries, a non-contiguous index, a broken `previous_anchor_digest`
+ *   link, an entry carrying a key outside the closed set, or a reason that is
+ *   not one bounded line.
+ * @throws {import('../agentboard/errors.mjs').BlockedPolicy}
+ *   'FROZEN_SOURCES_CHANGED_WITHOUT_SUPERSESSION' when the chain's last anchor
+ *   is not the digest the current sources produce.
+ */
+export function assertSourceLedger(entries, current) {
+  if (!Array.isArray(entries) || entries.length === 0) {
+    throw malformed('LEDGER_EMPTY', 'a supersession ledger with no entries records nothing; the first entry is the first delivery of the frozen sources');
+  }
+  const built = [];
+  for (const [position, entry] of entries.entries()) {
+    if (!isPlainObject(entry)) throw malformed('LEDGER_ENTRY_NOT_AN_OBJECT', `entry ${position} is ${typeName(entry)}`);
+    const extra = Object.keys(entry).filter((key) => !SOURCE_LEDGER_ENTRY_KEYS.includes(key)).sort();
+    if (extra.length > 0) throw new BlockedPolicy('LEDGER_AS_DECISION_BASIS', `ledger entry ${position} carries ${extra.join(', ')}: a ledger is a record of what changed, never an input to a verdict`);
+    const rebuilt = createSourceLedgerEntry({
+      index: position,
+      previous: built[position - 1] ?? null,
+      cases_digest: entry.cases_digest,
+      expected_table_digest: entry.expected_table_digest,
+      reason: entry.reason,
+    });
+    if (entry.index !== position) throw malformed('LEDGER_INDEX_DISCONTINUOUS', `entry ${position} declares index ${String(entry.index)}`);
+    if (entry.anchor_digest !== rebuilt.anchor_digest) throw malformed('LEDGER_ANCHOR_MISMATCH', `entry ${position} anchors ${String(entry.anchor_digest)} but its digests hash to ${rebuilt.anchor_digest}`);
+    if ((entry.previous_anchor_digest ?? null) !== rebuilt.previous_anchor_digest) {
+      throw malformed('LEDGER_CHAIN_BROKEN', `entry ${position} names the previous anchor ${String(entry.previous_anchor_digest)} but the entry before it anchors ${String(rebuilt.previous_anchor_digest)}`);
+    }
+    built.push(rebuilt);
+  }
+  const observed = sourceAnchorDigest(current);
+  const last = built[built.length - 1];
+  if (last.anchor_digest !== observed) {
+    throw new BlockedPolicy(
+      'FROZEN_SOURCES_CHANGED_WITHOUT_SUPERSESSION',
+      `the frozen sources now hash to ${observed} (cases ${String(current?.cases_digest)}, table ${String(current?.expected_table_digest)}) while the ledger's last of ${String(built.length)} entr${built.length === 1 ? 'y' : 'ies'} ends at ${last.anchor_digest} (cases ${last.cases_digest}, table ${last.expected_table_digest}); a change to the frozen synthetic corpus or to the frozen table is a supersession with a reason and both old digests, never a re-seal`,
+    );
+  }
+  return Object.freeze({
+    kind: SOURCE_LEDGER_KIND,
+    entries: Object.freeze(built),
+    entry_count: built.length,
+    last_anchor_digest: observed,
+    matches_current: true,
+  });
 }

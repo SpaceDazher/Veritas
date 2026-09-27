@@ -4,17 +4,20 @@
     "metric": "case_agreement_rate",
     "baseline": 0.75,
     "noise_band": 0.02,
-    "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
     "inference_mode": "ASSOCIATIONAL",
     "interval_method": "wilson",
-    "confidence": 0.95
+    "confidence": 0.9833333333333333,
+    "multiplicity_alpha": 0.05,
+    "multiplicity_family_size": 3
   },
   "base": {
-    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 39,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|evidence/s2-008/) — the TRACK sources and the corpus, without the s2-008 evidence records and without the verify-s2-008* aggregator scripts",
     "track_tracked": true
   },
   "controls": [

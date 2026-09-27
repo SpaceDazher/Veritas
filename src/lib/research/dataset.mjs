@@ -130,14 +130,89 @@ function loadPartition(partition, corpusDir) {
   if (requireHex64(declared.digest, 'CORPUS_DIGEST_MALFORMED', `manifest.partitions.${partition}.digest`) !== actual) {
     throw new MalformedResult('CORPUS_DIGEST_MISMATCH', `the ${partition} cases hash to ${actual}, the manifest says ${String(declared.digest)}`);
   }
+  // F2: the PER-CASE digests the manifest publishes are verified HERE, at read
+  // time, and they used to be a dead seal: nothing in this module read
+  // `case_digests`, so editing a partition's manifest entry passed
+  // `readCorpus` and the whole run chain while `s2-008:check-corpus` (a
+  // SEPARATE command) was the only thing that noticed. Three refusals, all
+  // fail-closed and all naming what was found:
+  //   * a case the manifest does not seal individually — the partition digest
+  //     could still agree if the map were simply incomplete, so the map is
+  //     required to cover the partition, not merely to exist;
+  //   * a case whose sealed digest is not the digest its own record hashes to;
+  //   * a seal count that disagrees with `case_count`, which is how a case
+  //     removed from both the file and the map would present as intact.
+  //
+  // THE KEY IS `<partition>:<case_id>`, and it has to be: this corpus gives the
+  // dev and the holdout partition the SAME case ids, so a map keyed by the bare
+  // id could seal only one of the two records and a PRIMARY read would be
+  // checked against the holdout record's digest. Partitioning the key is what
+  // makes the per-case seal say anything at all.
+  const sealed = isPlainObject(manifest.case_digests) ? manifest.case_digests : null;
+  if (sealed === null) {
+    throw new MalformedResult('CORPUS_CASE_SEAL_ABSENT', `the manifest seals no per-case digests; a partition whose bytes are sealed only in aggregate cannot name the case that moved`);
+  }
+  let sealedHere = 0;
   const labels = {};
   for (const [index, entry] of cases.entries()) {
     if (!isPlainObject(entry) || typeof entry.case_id !== 'string' || entry.case_id === '') {
       throw new MalformedResult('CORPUS_CASE_MALFORMED', `${PARTITION_FILES[partition]}[${index}] names no case_id`);
     }
+    const key = `${partition}:${entry.case_id}`;
+    if (!Object.hasOwn(sealed, key)) {
+      throw new MalformedResult('CORPUS_CASE_DIGEST_ABSENT', `the manifest seals no digest for ${key}; every case this loader returns must be sealed on its own`);
+    }
+    const expectedCase = requireHex64(sealed[key], 'CORPUS_CASE_DIGEST_MALFORMED', `manifest.case_digests.${key}`);
+    const actualCase = caseDigest(entry);
+    if (expectedCase !== actualCase) {
+      throw new MalformedResult('CORPUS_CASE_DIGEST_MISMATCH', `${key} hashes to ${actualCase}, the manifest seals ${String(sealed[key])}`);
+    }
+    sealedHere += 1;
     labels[entry.case_id] = entry.label ?? null;
   }
+  if (sealedHere !== declared.case_count) {
+    throw new MalformedResult('CORPUS_CASE_SEAL_COUNT_MISMATCH', `the manifest declares ${String(declared.case_count)} ${partition} cases and ${String(sealedHere)} of them are sealed on their own`);
+  }
+  // A3: the manifest NAMES the supersession ledger of the frozen sources, and a
+  // name is worth nothing on its own: the ledger FILE beside it has to end at
+  // the anchor the manifest published. Two committed files that disagree is a
+  // corpus whose history was edited on one side only, and the check is a pure
+  // string comparison — it reads no digest function and re-derives nothing, so
+  // it cannot become a tautology the way a re-computed seal would.
+  assertLedgerBinding(manifest, root);
   return { partition, cases: Object.freeze(cases), labels: Object.freeze(labels), digest: actual, root };
+}
+
+/**
+ * The manifest/ledger binding (A3). Split out of `loadPartition` because it is
+ * a property of the CORPUS, not of one partition, and because it reads one more
+ * file — a file whose absence must be a refusal and not a skipped check.
+ * @param {object} manifest The committed manifest.
+ * @param {string} root The corpus root.
+ * @returns {void}
+ * @throws {import('../agentboard/errors.mjs').MalformedResult} when the
+ *   manifest names no ledger, the ledger file is unreadable, or the ledger's
+ *   last entry does not anchor where the manifest says.
+ */
+function assertLedgerBinding(manifest, root) {
+  const declared = isPlainObject(manifest.source_ledger) ? manifest.source_ledger : null;
+  if (declared === null || typeof declared.file !== 'string' || declared.file === '') {
+    throw new MalformedResult('CORPUS_SOURCE_LEDGER_UNDECLARED', `the manifest names no supersession ledger; a corpus whose frozen sources have no recorded history cannot say how many times they were changed`);
+  }
+  const ledger = readJson(path.join(root, declared.file), `${root}/${declared.file}`);
+  if (!Array.isArray(ledger.entries) || ledger.entries.length === 0) {
+    throw new MalformedResult('CORPUS_SOURCE_LEDGER_EMPTY', `${declared.file} carries no entries`);
+  }
+  const last = ledger.entries[ledger.entries.length - 1];
+  if (!isPlainObject(last) || typeof last.anchor_digest !== 'string') {
+    throw new MalformedResult('CORPUS_SOURCE_LEDGER_MALFORMED', `${declared.file} names no last anchor digest`);
+  }
+  if (declared.entry_count !== ledger.entries.length) {
+    throw new MalformedResult('CORPUS_SOURCE_LEDGER_COUNT_MISMATCH', `the manifest declares ${String(declared.entry_count)} ledger entr${declared.entry_count === 1 ? 'y' : 'ies'} and ${declared.file} holds ${String(ledger.entries.length)}`);
+  }
+  if (declared.last_anchor_digest !== last.anchor_digest) {
+    throw new MalformedResult('CORPUS_SOURCE_LEDGER_ANCHOR_MISMATCH', `the manifest's last ledger anchor is ${String(declared.last_anchor_digest)} while ${declared.file} ends at ${last.anchor_digest}; the recorded history of the frozen sources was edited on one side only`);
+  }
 }
 
 /**

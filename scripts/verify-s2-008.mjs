@@ -42,6 +42,10 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { parseArgs, resolveBase } from './s2-008-run.mjs';
+// R-C: the campaign-decision rule is DEFINED ONCE, in the replay, and this
+// aggregator CALLS it rather than re-typing the comparison. Four coupled sites
+// is how `verdict_is_pass` came back; one definition is how it stays gone.
+import { campaignDecisionAgreement, frozenCampaignDecision } from './s2-008-replay.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -52,6 +56,34 @@ const FRESHNESS_WINDOW_MS = Number(process.env.S2_008_FRESHNESS_WINDOW_MS ?? 6 *
 const SUMMARY_RELATIVE = 'evidence/s2-008-summary.json';
 const REPLAY_RELATIVE = 'evidence/s2-008-replay.json';
 const HARNESS_RELATIVE = 'evidence/s2-008-harness.json';
+
+/**
+ * The aggregator's own reading of the wall clock — and WHERE it reads it.
+ *
+ * The freshness rule compares a record's `finished_at` against the instant at
+ * which the reader judged it, and this function exists to make that instant
+ * mean what it says. It used to be sampled ONCE, at the top of `verify()`,
+ * before the dependency gate, the probes gate and the cross-process replay had
+ * run; the replay writes its record's `finished_at` after all of that, so every
+ * record this aggregator judged was "from the future" and the chain reported
+ * `replay gate: FAIL (stale evidence) (stale evidence: record-from-the-future)`
+ * on a record the same process had just produced. The window was never the
+ * problem and was NOT widened: the reading was taken before the thing it
+ * measures existed.
+ *
+ * DETERMINISM, stated rather than hidden: this is a wall-clock read on the
+ * aggregator's REPORTING path, and it decides nothing on its own — the record's
+ * bytes are pinned by the digest its own child printed, and the decision terms
+ * in `classifyCurrentReplay` are pure functions of the record and the head tree.
+ * The two child records carry `freshness.decides: false` for exactly this
+ * reason. The summary publishes every instant it sampled
+ * (`started_at`, `replay_judged_at`, `harness_judged_at`, `observed_at`) so a
+ * reader can see the order they were taken in.
+ * @returns {string} An ISO-8601 UTC instant.
+ */
+function nowIso() {
+  return new Date().toISOString();
+}
 
 /**
  * THE CROSS-RECORD AGREEMENT GATE (EV3).
@@ -272,22 +304,56 @@ export function classifyCurrentReplay(executed, writtenEvidence, { headTreeSha =
     observedAtIso,
     windowMs,
   });
-  // S6 / EV2: THREE terms, not one. `overall === 'PASS'` already counts the
-  // properties, the campaign verdict and the ledger shape (see the replay's
-  // `overall_terms`), and each is re-read here from the record's own block so
-  // this aggregator does not have to trust the summary it just read. A replay
-  // whose `verdict` is FAIL, or whose `overall_terms` disagree with `overall`,
-  // is a FAIL here even when it exits 0.
+  // S6 / EV2, REPAIRED BY R-C: FIVE TERMS, not one, and the campaign VERDICT is
+  // not among them. `overall === 'PASS'` already counts the properties, the
+  // ledger shape and NOT_RUN (see the replay's `overall_terms`), and each is
+  // re-read here from the record's own block so this aggregator does not have
+  // to trust the summary it just read.
+  //
+  // Two terms were REMOVED and two were ADDED:
+  //   * `verdict_is_pass` is gone. With eight synthetic cases the honest
+  //     campaign answer is a null, and requiring ALLOW was unsatisfiable
+  //     without tuning the fixtures until a fabricated effect looked
+  //     legitimate. A NULL or UNMET campaign is an ANSWER, recorded as such;
+  //   * the bare `verdict !== 'PASS'` refusal went with it, for the same
+  //     reason and in the same commit — a record that reports its FAIL verdict
+  //     and agrees with the table is the SUCCESS case, not a defect;
+  //   * `decision_agrees_with_table`, `controls_all_flipped` and
+  //     `not_run_zero` are the terms that carry the weight ALLOW used to.
+  // The staleness, freshness, bytes, run-identity and property-status refusals
+  // around this block are untouched, and a fabricated POSITIVE against the
+  // frozen non-positive expectation is refused by the direct comparison below,
+  // which reads the IN-CODE expectation and not the record's own claim.
   const terms = isPlainObject(writtenEvidence.overall_terms) ? writtenEvidence.overall_terms : null;
+  const campaign = campaignDecisionAgreement({
+    observed: writtenEvidence.observed_campaign_decision ?? writtenEvidence.comparison?.runs?.a?.decision ?? null,
+    expected: frozenCampaignDecision(),
+  });
   const greenReasons = [];
   if (writtenEvidence.overall !== 'PASS') greenReasons.push(`overall=${String(writtenEvidence.overall)}`);
-  if (writtenEvidence.verdict !== 'PASS') greenReasons.push(`verdict=${String(writtenEvidence.verdict)}`);
   if (writtenEvidence.ledger_shape_ok !== true) {
     greenReasons.push(`ledger_shape_ok=${String(writtenEvidence.ledger_shape_ok)} findings=${String(writtenEvidence.overall_terms?.ledger_shape_findings ?? 'n/a')}`);
   }
   if (terms === null) greenReasons.push('overall_terms absent');
-  else if (terms.verdict_is_pass !== true || terms.every_property_held !== true || terms.ledger_shape_matches_table !== true) {
+  else if (terms.decision_agrees_with_table !== true
+    || terms.controls_all_flipped !== true
+    || terms.every_property_held !== true
+    || terms.ledger_shape_matches_table !== true
+    || terms.not_run_zero !== true
+    // F1: re-read HERE and not only in the child. `verdict_is_pass` is gone
+    // because a null answer is an answer, and the term that replaced it must not
+    // be a member only the child evaluates — a record whose own terms block
+    // says an UNDECLARED comparator failure was raised is refused here, with
+    // the findings named, whatever the child reported.
+    || terms.comparator_failures_match_frozen_expectation !== true
+    || (Array.isArray(terms.unexpected_comparator_findings) && terms.unexpected_comparator_findings.length > 0)) {
     greenReasons.push(`overall_terms=${JSON.stringify(terms)}`);
+    for (const entry of (terms?.unexpected_comparator_findings ?? [])) {
+      greenReasons.push(`undeclared comparator failure ${String(entry?.field)} observed=${String(entry?.observed)} expected=${String(entry?.expected)}`);
+    }
+  }
+  if (!campaign.agrees) {
+    for (const finding of campaign.findings) greenReasons.push(`${finding.code}:${String(finding.detail)}`);
   }
   if (!Array.isArray(writtenEvidence.properties)
     || !writtenEvidence.properties.every((property) => property.status === 'HELD')) {
@@ -326,7 +392,10 @@ function gateStatusFromExit(exitCode) {
 }
 
 export function verify(args = {}) {
-  const observedAtIso = new Date().toISOString();
+  // The instant the run BEGAN, recorded so a reader can see how long the gate
+  // took. It is deliberately NOT the instant the evidence is judged at: see
+  // `nowIso` below.
+  const startedAtIso = nowIso();
   const base = resolveBase();
   const gates = {};
   const notRun = [];
@@ -349,6 +418,54 @@ export function verify(args = {}) {
   };
   if (dependency.exitCode === 3) notRun.push('NOT_RUN: the dependency gate could not run');
   else if (dependency.exitCode !== 0) defects.push(`dependency gate: ${gates.dependency.status} (${(dependencyRecord?.issues ?? []).join(', ')})`);
+
+  // 1b. THE CORPUS DRIFT GATE (F2 / F3).
+  //
+  //     `s2-008:check-corpus` was never part of this chain: `grep -n
+  //     'check-corpus|build-corpus' scripts/verify-s2-008.mjs` had no match, so a
+  //     manifest whose bytes moved in the WORKING TREE survived every gate here
+  //     — the replay re-derives its own table digest, and the committed
+  //     `preregistration.json` is what it reads, but nothing here asked whether
+  //     the corpus the runs scored against is the corpus the fixture produces.
+  //     Two digests were dead on this path (`manifest.case_digests` is now
+  //     verified at read time in `dataset.mjs`, and the whole-manifest drift is
+  //     checked here), and the exit-code vocabulary is the gate's own: 0 is
+  //     PASS, 1 is a FAIL with the drifted file names in `drift`, and 2 is a
+  //     refusal the builder raised before it could check (NOT_RUN, never a
+  //     pass).
+  const corpusCheck = runNode('scripts/s2-008-build-corpus.mjs', [
+    '--check',
+    ...(args.corpus === undefined ? [] : ['--out', String(args.corpus)]),
+  ]);
+  const corpusRecord = parseLastJson(corpusCheck.stdout);
+  // The builder REFUSES (an uncaught throw) rather than reporting drift when the
+  // frozen rule, the table or the supersession chain does not hold, and a
+  // refusal exits 1 as well. Both are FAIL — a refusal is not a pass — but the
+  // defect message has to name WHICH happened, so the two are told apart by
+  // whether the builder managed to print its drift report.
+  const corpusRefusal = corpusCheck.exitCode === 1 && corpusRecord === null
+    ? `${corpusCheck.stderr.trim().split('\n')[0] ?? 'the builder raised before it could report'}`
+    : null;
+  gates.corpus = {
+    status: corpusCheck.exitCode === 0 ? 'PASS' : (corpusCheck.exitCode === 1 ? 'FAIL' : 'NOT_RUN'),
+    exitCode: corpusCheck.exitCode,
+    source: 'scripts/s2-008-build-corpus.mjs --check',
+    drift: corpusRecord?.drift ?? null,
+    refusal: corpusRefusal,
+    // WHY THIS GATE IS ABOUT THE WORKING TREE, stated because the root manifest
+    // gate is not: `scripts/generate-manifests.mjs` reads its bytes with
+    // `git show HEAD:<file>`, so `npm run manifest:check` validates the
+    // committed inventory and cannot see an uncommitted edit (reproduction F3,
+    // observed exit 0 on a tampered manifest). This gate re-derives from the
+    // fixture on disk, so a tamper that is not yet committed is refused HERE.
+    reads: 'the working tree, re-derived from tests/research/fixtures/**',
+  };
+  if (gates.corpus.status === 'NOT_RUN') notRun.push('NOT_RUN: the corpus drift check could not run');
+  else if (gates.corpus.status === 'FAIL') {
+    defects.push(corpusRefusal !== null
+      ? `corpus gate: FAIL (${corpusRefusal})`
+      : `corpus gate: FAIL (drift in ${(corpusRecord?.drift ?? ['unknown']).join(', ')}); the committed corpus no longer matches the frozen fixture`);
+  }
 
   // 2. the probes gate
   const probes = runNode('scripts/s2-008-security-probes.mjs', args.corpus === undefined ? [] : ['--corpus', String(args.corpus)]);
@@ -377,9 +494,12 @@ export function verify(args = {}) {
   const replayArgs = args.corpus === undefined ? [] : ['--corpus', String(args.corpus)];
   const replay = runNode('scripts/s2-008-replay.mjs', replayArgs);
   const replayRecord = readJson(REPLAY_RELATIVE);
+  // The instant this record is JUDGED at, sampled AFTER the child returned (see
+  // `nowIso`).
+  const replayObservedAtIso = nowIso();
   const classified = classifyCurrentReplay(replay, replayRecord, {
     headTreeSha: base.tree_sha,
-    observedAtIso,
+    observedAtIso: replayObservedAtIso,
     windowMs: Number.isFinite(args.freshnessWindowMs) ? args.freshnessWindowMs : FRESHNESS_WINDOW_MS,
   });
   gates.replay = {
@@ -389,6 +509,11 @@ export function verify(args = {}) {
     reason: classified.gate.reason ?? null,
     source: 'scripts/s2-008-replay.mjs',
     overall: classified.evidence?.overall ?? null,
+    // R-C: the campaign's ANSWER is reported next to the gate status, so a
+    // reader of one file sees both. It decides nothing.
+    campaign_verdict: classified.evidence?.verdict ?? null,
+    expected_campaign_decision: classified.evidence?.expected_campaign_decision ?? null,
+    observed_campaign_decision: classified.evidence?.observed_campaign_decision ?? null,
     properties: (classified.evidence?.properties ?? []).map((property) => `${property.id}:${property.status ?? (property.ok ? 'HELD' : 'FAILED')}`),
     freshness: classified.evidence?.freshness ?? null,
   };
@@ -410,12 +535,20 @@ export function verify(args = {}) {
   //     make is a defect, not a nuance.
   const harness = runNode('scripts/s2-008-harness.mjs', args.corpus === undefined ? [] : ['--corpus', String(args.corpus), '--no-write']);
   const harnessRecord = readJson(HARNESS_RELATIVE);
+  // Sampled after the harness returned, for the same reason as the replay's.
+  const harnessObservedAtIso = nowIso();
   gates.harness = {
     status: gateStatusFromExit(harness.exitCode),
     exitCode: harness.exitCode,
     source: 'scripts/s2-008-harness.mjs',
+    observed_at: harnessObservedAtIso,
     overall: harnessRecord?.overall ?? null,
+    // R-C, both gates: the campaign VERDICT is the honest answer and is
+    // reported. It is not, and never was, the thing a green here means.
     verdict: harnessRecord?.verdict ?? null,
+    expected_campaign_decision: harnessRecord?.expected_campaign_decision ?? null,
+    observed_campaign_decision: harnessRecord?.observed_campaign_decision ?? null,
+    decision_agrees_with_table: harnessRecord?.decision_agrees_with_table ?? null,
     properties: (harnessRecord?.properties ?? []).map((property) => `${property.id}:${property.ok ? 'HELD' : 'FAILED'}`),
     reason: null,
   };
@@ -450,6 +583,11 @@ export function verify(args = {}) {
   ticketPreconditions.push('the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket\'s own scope');
   for (const reason of ticketPreconditions) notRun.push(`NOT_RUN: ${reason}`);
   const status = blocking.length > 0 ? 'FAIL' : (notRunGates.length > 0 || notRun.length > 0 ? 'NOT_RUN' : 'PASS');
+  // The instant this SUMMARY was produced, which is the gate's own observation
+  // instant: the one both child records were judged against plus the run's own
+  // end. Sampled here rather than at the top of the function, for the reason
+  // `nowIso` states.
+  const observedAtIso = nowIso();
   const summary = {
     ticket: 'S2-008',
     gate: 'scripts/verify-s2-008.mjs',
@@ -465,6 +603,9 @@ export function verify(args = {}) {
     notRunGates: notRunGates.map(([id]) => id),
     freshness: {
       observed_at: observedAtIso,
+      started_at: startedAtIso,
+      replay_judged_at: replayObservedAtIso,
+      harness_judged_at: harnessObservedAtIso,
       window_ms: Number.isFinite(args.freshnessWindowMs) ? args.freshnessWindowMs : FRESHNESS_WINDOW_MS,
       head_tree_sha: base.tree_sha,
       replay_finished_at: classified.evidence?.freshness?.finished_at ?? null,
@@ -487,6 +628,7 @@ export function verify(args = {}) {
     a_mvp_status: 'NOT_RUN (A-MVP-01..07, behind #45)',
     note: 'engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket\'s own scope into done.',
     observedAtIso,
+    startedAtIso,
   };
   const outFile = path.join(REPO_ROOT, SUMMARY_RELATIVE);
   let written = null;

@@ -62,8 +62,9 @@ import {
   compareParallelTrack, decisionFromInterval, injectCorruption, metricsSummary, resolveCampaignVerdict, resolveTrialVerdict,
 } from '../src/lib/research/comparator.mjs';
 import {
-  EXPECTED_CODES, EXPECTED_CONTROLS, EXPECTED_COUNTERS, EXPECTED_LEDGER_SHAPE, EXPECTED_METRIC,
-  EXPECTED_TRIAL_DECISIONS, assertTableFrozen, expectedTableDigest,
+  EXPECTED_CODES, EXPECTED_COMPARATOR_FAILURES, EXPECTED_CONTROLS, EXPECTED_COUNTERS,
+  EXPECTED_LEDGER_SHAPE, EXPECTED_METRIC, EXPECTED_TRIAL_DECISIONS, assertTableFrozen,
+  expectedTableDigest, unexpectedComparatorFailures,
 } from '../src/lib/research/expected-values.mjs';
 import { controlsFlipVerdict, runNegativeControls } from '../src/lib/research/negative-controls.mjs';
 import { PROBE_FAMILIES, PROBE_NAMES, runAllProbes } from '../src/lib/research/probes.mjs';
@@ -72,7 +73,14 @@ import {
   appendRecord, openRegistry, putExperiment, readJournal, recordSpend, snapshotDigest, verifyChain,
 } from '../src/lib/research/registry.mjs';
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
-import { HOLDOUT_LABELS, HOLDOUT_UNSEAL_DIGEST } from '../tests/research/fixtures/fixture-measurement-set.mjs';
+import { HOLDOUT_LABELS, HOLDOUT_UNSEAL_DIGEST, PREREGISTRATION } from '../tests/research/fixtures/fixture-measurement-set.mjs';
+// ONE DEFINITION OF THE TWO R-C GATE RULES, imported rather than re-typed: the
+// ledger-shape check and the campaign-decision agreement. The replay owns them
+// and the harness calls them, so "the harness checks the ledger shape its own
+// way" is not a state this repository can be in. See
+// `scripts/s2-008-replay.mjs#ledgerShapeIssues` and `#campaignDecisionAgreement`.
+import { campaignDecisionAgreement, frozenCampaignDecision, ledgerShapeIssues } from './s2-008-replay.mjs';
+import { assertFrozenCampaignDerivable } from '../src/lib/research/campaign-expectation.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CORPUS_DIR = path.join(REPO_ROOT, 'evidence', 's2-008', 'corpus');
@@ -104,7 +112,17 @@ const CONFIG = Object.freeze({
   expected_table_digest: expectedTableDigest(),
   inference_mode: 'ASSOCIATIONAL',
   interval_method: 'wilson',
-  confidence: 0.95,
+  // READ FROM THE PREREGISTRATION, NEVER TYPED. The published confidence is
+  // DERIVED from the frozen alpha and the declared family (`1 - alpha/m`), and
+  // the two have to move together: a run's self-reported `metric.interval` is
+  // built at this confidence, and the comparator re-derives the campaign
+  // interval at `multiplicity_rule.confidence` and raises
+  // `self_reported_interval_divergence` when the two disagree. The literal 0.95
+  // that used to sit here is exactly what made `1 - c = 0.05 > 0.05/3` and the
+  // rule unable to reject anything.
+  confidence: PREREGISTRATION.multiplicity_rule.confidence,
+  multiplicity_alpha: PREREGISTRATION.multiplicity_rule.alpha,
+  multiplicity_family_size: PREREGISTRATION.multiplicity_rule.family_size,
 });
 
 /** A deterministic id factory in the shape the ledger's `newId` requires: a
@@ -173,8 +191,13 @@ function resolveBase() {
     branch: git('rev-parse', '--abbrev-ref', 'HEAD'),
     worktree_dirty: git('status', '--porcelain').length > 0,
     tracked_files_of_this_track: mine.length,
-    // A run whose own code is untracked is NOT bound to a base in any sense a
-    // reader can check. It is reported, never treated as fine.
+    // M1: the SCOPE of the count, published with it. `scripts/s2-008-run.mjs`
+    // counts the same key over a WIDER glob (it adds `scripts/verify-s2-008*`
+    // and the `evidence/s2-008-*.json` records), so the harness published 39 and
+    // the replay 51 under one name and a reader comparing the two evidence
+    // files was reading two scopes as one number. The number is unchanged; it is
+    // now labelled, and both files label it.
+    tracked_files_scope: 'git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|evidence/s2-008/) — the TRACK sources and the corpus, without the s2-008 evidence records and without the verify-s2-008* aggregator scripts',
     track_tracked: mine.length > 0,
   };
 }
@@ -195,6 +218,115 @@ function expectedTable() {
 // --- the two process-separated runs ---------------------------------------
 
 /**
+ * THE RUN'S OWN JOURNAL, written and read back, so the ledger-shape gate term
+ * is a MEASUREMENT rather than a default.
+ *
+ * `buildRun` used to build a run record with no `ledger` member at all, and the
+ * frozen `EXPECTED_LEDGER_SHAPE` therefore had nothing to compare against in
+ * this harness: `ledgerShapeIssues` would have reported four kinds at count 0
+ * and the gate would have stayed red for a fourth, unstated reason. A term that
+ * cannot be measured is not a term, and `?? true` anywhere in it would be a
+ * defect. So the run now writes the four frozen kinds to a real ledger, in the
+ * order the table declares them, and reads the journal back with `readJournal`:
+ *   * PREREGISTRATION_RECORDED before anything is measured,
+ *   * BUDGET_RESERVATION taken before the run, never at the spend,
+ *   * ACCESS from the ONE real holdout open, journalled before the bytes are
+ *     returned — which is what the trials' own `holdoutBinding.opens: 1` claims,
+ *   * one TRIAL_RESULT per ENUMERATED trial, including the INFRA one: a trial
+ *     cannot be deleted from the record by failing to run.
+ *
+ * Pure: no clock (the injected one), no network, no randomness, and the ids come
+ * from the same deterministic factory the crash/restart phase uses.
+ *
+ * @param {string} label The run letter ('a' | 'b').
+ * @param {object} prereg The loaded preregistration document.
+ * @param {ReadonlyArray<object>} trials The run's trial records, in index order.
+ * @returns {{root: string, record_kinds: ReadonlyArray<string>, record_count: number,
+ *   chain_verified: boolean, snapshot_digest: string|null, access_record_id: string|null,
+ *   error: string|null}} The journal as it was observed, never as it was intended.
+ */
+function writeRunJournal(label, prereg, trials) {
+  const root = path.join(SCRATCH, `run-${label}-journal`);
+  const runId = `s2-008-run-${label}`;
+  const readAt = POST_DECISION_INSTANT;
+  let registry = null;
+  let accessRecordId = null;
+  let recordKinds = [];
+  let recordCount = 0;
+  let chainVerified = false;
+  let snapshot = null;
+  let error = null;
+  try {
+    registry = openRegistry({ root, clock: fixedClock(readAt), ids: idFactory(`run-${label}-journal`) });
+    appendRecord(registry, {
+      record_kind: 'PREREGISTRATION_RECORDED',
+      run_id: runId,
+      digest: preregistrationDigest(prereg),
+      recorded_at: RUN_INSTANT,
+    });
+    const reservationId = prereg.budget_reservation.reservation_id;
+    putExperiment(registry, {
+      key: `s2-008-run-${label}-reservation`,
+      args: {
+        kind: 'BUDGET_RESERVATION',
+        reservation_id: reservationId,
+        granted_units: prereg.budget_reservation.granted_units,
+        spent_units: 0,
+        expires_at: prereg.budget_reservation.expires_at,
+        currency: prereg.budget_reservation.currency,
+        taken_at: RUN_INSTANT,
+      },
+      expectedRevision: registry.revision(),
+      mutate: () => ({
+        kind: 'BUDGET_RESERVATION',
+        reservation_id: reservationId,
+        granted_units: prereg.budget_reservation.granted_units,
+        spent_units: 0,
+        currency: prereg.budget_reservation.currency,
+        expires_at: prereg.budget_reservation.expires_at,
+        taken_at: RUN_INSTANT,
+      }),
+    });
+    const read = readCorpus(registry, {
+      partition: 'HOLDOUT', caseId: FIRST_CASE, unsealDigest: HOLDOUT_UNSEAL_DIGEST, decisionPoint: DECISION_POINT_INSTANT, maxOpens: 1,
+    });
+    accessRecordId = read.accessRecordId;
+    for (const trial of trials) {
+      appendRecord(registry, {
+        record_kind: 'TRIAL_RESULT',
+        run_id: runId,
+        trial: trial.trial ?? null,
+        index: trial.index ?? null,
+        // The STATUS is journalled, never the outcome alone: a trial that was
+        // not measured is a row that says so, which is the difference between
+        // a reconciliation and a silent zero.
+        status: trial.status ?? null,
+        recorded_at: RUN_INSTANT,
+      });
+    }
+    const journal = readJournal(registry);
+    recordKinds = journal.map((row) => row?.payload?.kind ?? row?.payload?.record_kind ?? null);
+    recordCount = journal.length;
+    chainVerified = verifyChain(registry).ok === true;
+    snapshot = snapshotDigest(registry);
+  } catch (thrown) {
+    // An unreadable journal leaves the record_kinds it managed to commit and
+    // NAMES the refusal. `ledgerShapeIssues` then reports real divergences
+    // against a real count instead of silently agreeing with the table.
+    error = String(thrown?.code ?? thrown?.message ?? thrown).slice(0, 160);
+  }
+  return {
+    root: rel(root),
+    record_kinds: recordKinds,
+    record_count: recordCount,
+    chain_verified: chainVerified,
+    snapshot_digest: snapshot === null ? null : String(snapshot),
+    access_record_id: accessRecordId,
+    error,
+  };
+}
+
+/**
  * Build one run record. The four trials and their counts come from the FROZEN
  * TABLE, and the per-trial OUTCOME is then DERIVED by running the
  * preregistered rule over the case-level Wilson interval — the table is the
@@ -204,6 +336,21 @@ function expectedTable() {
  */
 function buildRun(label, prereg, base) {
   const seeds = [...prereg.seed_rule.seeds];
+  // ONE confidence for this run, taken from the document it was handed. The
+  // trial interval, the self-reported `trial.interval`, and the rule the
+  // comparator will re-derive the campaign interval from all read it, because a
+  // run whose self-reported interval was built at one confidence and scored at
+  // another is a run that reports `self_reported_interval_divergence` against
+  // itself.
+  const confidence = prereg.multiplicity_rule.confidence;
+  if (confidence !== CONFIG.confidence) {
+    // Two sources of truth that disagree about the frozen rule: the sealed
+    // corpus and the in-code fixture. Nothing downstream can be trusted, so the
+    // harness refuses to RUN (exit 2) instead of producing a record that reads
+    // one confidence and means another. `npm run s2-008:check-corpus` catches
+    // this first.
+    throw new Error(`PREREGISTRATION_CONFIDENCE_DIVERGES: the sealed corpus publishes confidence ${String(confidence)} while the in-code frozen rule publishes ${String(CONFIG.confidence)}; rebuild the corpus (npm run s2-008:build-corpus) before running the harness`);
+  }
   const trials = [];
   const derivedDisagreements = [];
   for (const row of EXPECTED_TRIAL_DECISIONS) {
@@ -274,7 +421,7 @@ function buildRun(label, prereg, base) {
       trial.numerator = row.expectedNumerator;
       trial.denominator = row.expectedDenominator;
       const observed = trial.numerator / trial.denominator;
-      const interval = wilsonInterval({ successes: trial.numerator, trials: trial.denominator, confidence: CONFIG.confidence });
+      const interval = wilsonInterval({ successes: trial.numerator, trials: trial.denominator, confidence });
       const applied = decisionFromInterval({
         observed,
         lower: interval.lower,
@@ -284,13 +431,13 @@ function buildRun(label, prereg, base) {
           alpha: prereg.multiplicity_rule.alpha,
           method: prereg.multiplicity_rule.method,
           comparisons: prereg.multiplicity_rule.declared_comparisons,
-          confidence: CONFIG.confidence,
+          confidence,
           null_value: BASELINE,
           subject: row.trial,
         },
       });
       trial.observed = observed;
-      trial.interval = { lower: interval.lower, upper: interval.upper, method: interval.method, confidence: CONFIG.confidence };
+      trial.interval = { lower: interval.lower, upper: interval.upper, method: interval.method, confidence };
       trial.derived_outcome = applied.decision;
       trial.derived_reason = applied.reason;
       trial.correction = applied.correction;
@@ -305,6 +452,10 @@ function buildRun(label, prereg, base) {
     trial.verdict = resolveTrialVerdict(trial).verdict;
     trials.push(trial);
   }
+  // The journal is written AFTER the trials exist, so each TRIAL_RESULT row
+  // names the trial that was actually built. It is part of the run record, so
+  // the record and its own ledger are the same object.
+  const ledger = writeRunJournal(label, prereg, trials);
   return {
     version: 's2-008-harness-run-v1',
     ticket: 'S2-008',
@@ -320,6 +471,7 @@ function buildRun(label, prereg, base) {
     preregistration_digest: preregistrationDigest(prereg),
     expected_table_digest: expectedTableDigest(),
     trials,
+    ledger,
     metrics: metricsSummary(trials),
     codes: [],
     counters: { ...EXPECTED_COUNTERS },
@@ -656,7 +808,15 @@ async function main(argv = process.argv) {
 
   const prereg = loadPreregistration(CORPUS_DIR);
   assertTableFrozen(prereg);
+  // R-B/R-C: the frozen table's CAMPAIGN decision is re-derived through the
+  // comparator's own rule before a single trial runs. A declaration the rule does
+  // not produce is refused HERE (exit 2, crash) rather than discovered as a
+  // campaign finding after two processes have run, because a harness that scores
+  // a campaign against an expectation nothing derived is the anti-goal wearing a
+  // gate's clothes.
+  const frozenCampaign = assertFrozenCampaignDerivable();
   log(`preregistration digest=${preregistrationDigest(prereg)} seeds=${JSON.stringify(prereg.seed_rule.seeds)} seed_count=${seedCountOf(prereg)}`);
+  log(`frozen campaign decision=${frozenCampaign.decision} reason=${String(frozenCampaign.decisionReason)} interval=${frozenCampaign.interval.lower}..${frozenCampaign.interval.upper} confidence=${String(frozenCampaign.confidence)} never_rejects=${String(frozenCampaign.rule_feasibility.never_rejects)}`);
   log(`contracts ${JSON.stringify(allResearchContractDigests())}`);
 
   // 2. A1: the six negative probes, on a purged scratch root.
@@ -795,17 +955,87 @@ async function main(argv = process.argv) {
   const notRun = probes.notRun.length + controls.notRun.length;
   const brokenCount = probes.broken.length;
   const held = properties.filter((property) => property.ok).length;
-  // EV2 / S6: the CAMPAIGN VERDICT IS A TERM OF `overall`. It was computed at
-  // step 10, printed, and then left out of the decision: the unmutated harness
-  // printed `properties_held=5/5 … verdict=FAIL overall=PASS` and exited 0. A
-  // track whose own campaign verdict is FAIL is not a pass whatever its five
-  // probes say, and a green summary that contradicts its own verdict is the
-  // exact shape of a fake green.
+  // R-C: THE CAMPAIGN DECISION IS AN ANSWER, AND THE GATE IS GREEN ON
+  // AGREEMENT WITH THE FROZEN TABLE — NEVER ON ALLOW.
+  //
+  // `verdict_is_pass` used to be a term here, at the replay and at the
+  // aggregator. With eight synthetic cases the honest campaign answer is a
+  // null, so the requirement was unsatisfiable without tuning the fixtures until
+  // a fabricated effect looked legitimate — the anti-goal. The decision is now
+  // compared with `EXPECTED_CAMPAIGN`, which the frozen table publishes, and a
+  // decision the table does not declare is a refusal. The verdict is STILL
+  // computed, STILL printed and STILL written: it is the campaign's answer,
+  // recorded next to the pass condition.
+  const campaign = campaignDecisionAgreement({
+    observed: comparison.runs?.a?.decision ?? null,
+    expected: frozenCampaignDecision(),
+  });
+  // The LEDGER SHAPE, measured over the journal this harness actually wrote for
+  // each run. An absent or unreadable journal is a NAMED divergence with the
+  // observed count beside it, never a silent pass.
+  const ledgerShape = {
+    a: ledgerShapeIssues(runA),
+    b: ledgerShapeIssues(runB),
+    expected: EXPECTED_LEDGER_SHAPE,
+    observed_record_kinds: runA.ledger?.record_kinds ?? [],
+    expected_record_kinds: EXPECTED_LEDGER_SHAPE.flatMap((row) => Array.from({ length: row.count }, () => row.kind)),
+    rows: { a: runA.ledger?.record_count ?? null, b: runB.ledger?.record_count ?? null },
+    chain_verified: runA.ledger?.chain_verified === true && runB.ledger?.chain_verified === true,
+    error: runA.ledger?.error ?? runB.ledger?.error ?? null,
+  };
+  const ledgerShapeFindings = [...ledgerShape.a, ...ledgerShape.b];
+  const ledgerShapeOk = ledgerShapeFindings.length === 0 && ledgerShape.chain_verified === true;
+  const controlsAllFlipped = controls.allFlipped === true && controls.notRun.length === 0;
+  // F1: the same term the replay applies, over the same table declaration. A
+  // comparator failure the frozen table does not declare the honest campaign to
+  // carry fails the harness exactly as it fails the replay, so the two gates
+  // cannot be read as disagreeing about what a violation is worth.
+  const unexpectedFailures = unexpectedComparatorFailures({
+    failures: comparison?.failures ?? [],
+    limits: comparison?.limits ?? [],
+    runs: comparison === null ? 0 : 2,
+  });
+  for (const entry of unexpectedFailures) log(`unexpected comparator finding ${entry.code} ${entry.field} | ${entry.detail}`);
+  const comparatorFailuresDeclared = unexpectedFailures.length === 0;
+  log(`campaign expected_decision=${String(campaign.expected)} observed_decision=${String(campaign.observed)} agrees=${String(campaign.agrees)} verdict=${verdict} (a recorded OUTCOME, not a gate term)`);
+  for (const finding of campaign.findings) log(`campaign finding ${finding.code} | ${finding.detail}`);
+  log(`ledger_shape matches=${String(ledgerShapeOk)} rows_a=${String(ledgerShape.rows.a)} rows_b=${String(ledgerShape.rows.b)} chain_verified=${String(ledgerShape.chain_verified)} findings=${ledgerShapeFindings.length}`);
+  log(`controls_all_flipped=${String(controlsAllFlipped)}`);
+  const overallTerms = {
+    every_property_held: held === properties.length,
+    held,
+    total: properties.length,
+    expected_campaign_decision: campaign.expected,
+    observed_campaign_decision: campaign.observed,
+    decision_agrees_with_table: campaign.agrees,
+    campaign_findings: campaign.findings.map((finding) => ({ code: finding.code, field: finding.field, expected: finding.expected, observed: finding.observed })),
+    controls_all_flipped: controlsAllFlipped,
+    controls_not_run: controls.notRun.length,
+    comparator_failures_match_frozen_expectation: comparatorFailuresDeclared,
+    unexpected_comparator_findings: unexpectedFailures.map((entry) => ({ code: entry.code, field: entry.field, expected: entry.expected, observed: entry.observed })),
+    ledger_shape_matches_table: ledgerShapeOk,
+    ledger_shape_findings: ledgerShapeFindings.length,
+    not_run_zero: notRun === 0,
+    not_run_count: notRun,
+    broken_zero: brokenCount === 0,
+    broken_count: brokenCount,
+    // REPORTED, NOT A TERM. See the comment above.
+    verdict,
+  };
+  // THE PASS CONDITION, in full: every acceptance property held AND the
+  // comparator's decision equals the decision the frozen expected-value table
+  // declares AND the ledger shape matches that table AND every negative control
+  // flipped AND NOT_RUN is 0 AND broken is 0. NOT_RUN outranks the conjunction,
+  // because "I could not check" is not "I checked and it passed".
   const overall = notRun > 0 || brokenCount > 0
     ? 'NOT_RUN'
-    : (held === properties.length && verdict === 'PASS' ? 'PASS' : 'FAIL');
+    : (overallTerms.every_property_held
+      && overallTerms.decision_agrees_with_table
+      && overallTerms.ledger_shape_matches_table
+      && overallTerms.comparator_failures_match_frozen_expectation
+      && overallTerms.controls_all_flipped ? 'PASS' : 'FAIL');
   log(`RESULT properties_held=${held}/${properties.length} not_run=${notRun} broken=${brokenCount} verdict=${verdict} overall=${overall}`);
-  log(`RESULT overall_terms properties=${held === properties.length} verdict_is_pass=${String(verdict === 'PASS')} not_run_zero=${String(notRun === 0)} broken_zero=${String(brokenCount === 0)}`);
+  log(`RESULT overall_terms ${JSON.stringify(overallTerms)}`);
 
   // --- the evidence records -----------------------------------------------
   const manifest = JSON.parse(readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
@@ -832,22 +1062,35 @@ async function main(argv = process.argv) {
     comparison,
     identical_wrong: wrong,
     crash_restart: crash,
+    ledger_shape: ledgerShape,
     derived_outcome_disagreements: runA.derived_disagreements,
+    // R-C: the campaign's answer and what the gate decided about it, in one
+    // member, so a reader of ONE file cannot mistake a recorded OUTCOME for a
+    // pass criterion.
+    campaign: {
+      expected_decision: campaign.expected,
+      observed_decision: campaign.observed,
+      agrees_with_table: campaign.agrees,
+      findings: campaign.findings,
+      verdict,
+      verdict_is_a_gate_term: false,
+    },
+    // F1, as in the replay: the failure list the term above was applied to.
+    comparator_failures: {
+      declared_per_run: EXPECTED_COMPARATOR_FAILURES,
+      observed_failures: comparison?.failures ?? [],
+      observed_limits: comparison?.limits ?? [],
+      unexpected: unexpectedFailures,
+      is_a_gate_term: true,
+    },
+    expected_campaign_decision: campaign.expected,
+    observed_campaign_decision: campaign.observed,
+    decision_agrees_with_table: campaign.agrees,
     verdict,
     overall,
-    // The three terms `overall` is derived from, itemised so a reader can
+    // The terms `overall` is derived from, itemised so a reader can
     // re-derive it without re-running the harness.
-    overall_terms: {
-      every_property_held: held === properties.length,
-      held,
-      total: properties.length,
-      verdict_is_pass: verdict === 'PASS',
-      verdict,
-      not_run_zero: notRun === 0,
-      not_run_count: notRun,
-      broken_zero: brokenCount === 0,
-      broken_count: brokenCount,
-    },
+    overall_terms: overallTerms,
     write,
     not_run_count: notRun,
     broken_count: brokenCount,
@@ -860,7 +1103,7 @@ async function main(argv = process.argv) {
       ticket: 'S2-008', config: CONFIG, base, controls: controls.controls, allFlipped: controls.allFlipped, gate, notRun: controls.notRun, label_substitution: a4,
     },
     's2-008-comparison.json': {
-      ticket: 'S2-008', config: CONFIG, base, comparison, identical_wrong: wrong, verdict, properties, holdout_access: holdout, crash_restart: crash,
+      ticket: 'S2-008', config: CONFIG, base, comparison, identical_wrong: wrong, verdict, properties, holdout_access: holdout, crash_restart: crash, ledger_shape: ledgerShape, campaign: { expected_decision: campaign.expected, observed_decision: campaign.observed, agrees_with_table: campaign.agrees, findings: campaign.findings },
     },
     's2-008-harness.json': record,
   };

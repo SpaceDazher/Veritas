@@ -10,7 +10,7 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+  "head": "813f5be66d8ddd936e925cca491063c6409ff7c3",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -49,15 +49,45 @@
     "issues": [],
     "untracked_in_frozen_trees": [],
     "track_files_tracked": 51,
-    "track_files_untracked": [],
+    "track_files_untracked": [
+      "evidence/s2-008/corpus/preregistration-superseded.json",
+      "evidence/s2-008/corpus/preregistration-supersession.json",
+      "evidence/s2-008/corpus/supersession-ledger.json",
+      "src/lib/research/campaign-expectation.mjs",
+      "tests/research/gate-semantics.test.mjs",
+      "tests/research/triage-hardening.test.mjs"
+    ],
     "track_files_modified": [
       "evidence/s2-008-comparison.json",
       "evidence/s2-008-controls.json",
+      "evidence/s2-008-dependency-binding.json",
       "evidence/s2-008-harness.json",
       "evidence/s2-008-probes.json",
+      "evidence/s2-008-replay.json",
       "evidence/s2-008-run-a.json",
       "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json"
+      "evidence/s2-008-summary.json",
+      "evidence/s2-008/corpus/manifest.json",
+      "evidence/s2-008/corpus/preregistration.json",
+      "scripts/s2-008-build-corpus.mjs",
+      "scripts/s2-008-harness.mjs",
+      "scripts/s2-008-replay.mjs",
+      "scripts/s2-008-run.mjs",
+      "scripts/s2-008-security-probes.mjs",
+      "scripts/verify-s2-008.mjs",
+      "src/lib/research/dataset.mjs",
+      "src/lib/research/expected-values.mjs",
+      "src/lib/research/index.mjs",
+      "src/lib/research/preregistration.mjs",
+      "tests/research/comparator-probes.test.mjs",
+      "tests/research/comparator.test.mjs",
+      "tests/research/fixtures/README.md",
+      "tests/research/fixtures/fixture-corrupted-variants.mjs",
+      "tests/research/fixtures/fixture-expected-values.mjs",
+      "tests/research/fixtures/fixture-measurement-set.mjs",
+      "tests/research/fixtures/fixture-preregistration.mjs",
+      "tests/research/harness.test.mjs",
+      "tests/research/replay-two-run.test.mjs"
     ],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
@@ -179,8 +209,15 @@
     }
   ],
   "modules": {
-    "modules": 14,
+    "modules": 15,
     "importers": {
+      "src/lib/research/campaign-expectation.mjs": [
+        "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/s2-008-security-probes.mjs",
+        "tests/research/triage-hardening.test.mjs"
+      ],
       "src/lib/research/causality.mjs": [
         "src/lib/research/comparator.mjs",
         "src/lib/research/index.mjs",
@@ -194,6 +231,7 @@
         "tests/research/fixtures/fixture-corrupted-variants.mjs"
       ],
       "src/lib/research/comparator.mjs": [
+        "src/lib/research/campaign-expectation.mjs",
         "src/lib/research/index.mjs",
         "src/lib/research/negative-controls.mjs",
         "src/lib/research/probes.mjs",
@@ -205,6 +243,8 @@
         "tests/research/comparator-probes.test.mjs",
         "tests/research/comparator.test.mjs",
         "tests/research/fixtures/fixture-measurement-set.mjs",
+        "tests/research/fixtures/fixture-preregistration.mjs",
+        "tests/research/gate-semantics.test.mjs",
         "tests/research/replay-two-run.test.mjs"
       ],
       "src/lib/research/constants.mjs": [
@@ -245,7 +285,8 @@
         "scripts/s2-008-build-corpus.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-run.mjs",
-        "tests/research/dataset.test.mjs"
+        "tests/research/dataset.test.mjs",
+        "tests/research/triage-hardening.test.mjs"
       ],
       "src/lib/research/executor.mjs": [
         "src/lib/research/comparator.mjs",
@@ -255,6 +296,7 @@
         "tests/research/comparator-probes.test.mjs"
       ],
       "src/lib/research/expected-values.mjs": [
+        "src/lib/research/campaign-expectation.mjs",
         "src/lib/research/comparator.mjs",
         "src/lib/research/index.mjs",
         "src/lib/research/negative-controls.mjs",
@@ -271,8 +313,10 @@
         "tests/research/fixtures/fixture-measurement-set.mjs",
         "tests/research/fixtures/fixture-preregistration.mjs",
         "tests/research/fixtures/index.mjs",
+        "tests/research/gate-semantics.test.mjs",
         "tests/research/harness.test.mjs",
-        "tests/research/replay-two-run.test.mjs"
+        "tests/research/replay-two-run.test.mjs",
+        "tests/research/triage-hardening.test.mjs"
       ],
       "src/lib/research/index.mjs": [
         "scripts/sloqual-freeze.mjs",
@@ -315,7 +359,9 @@
         "tests/research/fixtures/fixture-measurement-set.mjs",
         "tests/research/fixtures/fixture-preregistration.mjs",
         "tests/research/fixtures/index.mjs",
-        "tests/research/registry-prereg.test.mjs"
+        "tests/research/gate-semantics.test.mjs",
+        "tests/research/registry-prereg.test.mjs",
+        "tests/research/triage-hardening.test.mjs"
       ],
       "src/lib/research/probes.mjs": [
         "src/lib/research/index.mjs",
@@ -332,7 +378,8 @@
         "scripts/verify-s2-008.mjs",
         "tests/research/comparator-probes.test.mjs",
         "tests/research/comparator.test.mjs",
-        "tests/research/harness.test.mjs"
+        "tests/research/harness.test.mjs",
+        "tests/research/triage-hardening.test.mjs"
       ],
       "src/lib/research/registry.mjs": [
         "src/lib/research/dataset.mjs",
@@ -353,13 +400,13 @@
       ]
     },
     "barrel": "src/lib/research/index.mjs",
-    "barrel_exports": 87,
+    "barrel_exports": 103,
     "barrel_exports_at_commit": true,
     "issues": []
   },
   "syntax": {
-    "modules": 31,
-    "parsed": 31,
+    "modules": 34,
+    "parsed": 34,
     "issues": [],
     "note": "node --check proves the file PARSES; it is not type checking, and tsconfig.json excludes .mjs from `tsc` entirely"
   },
@@ -368,21 +415,21 @@
       "path": "evidence/s2-008-probes.json",
       "required": true,
       "present": true,
-      "bytes": 25770,
+      "bytes": 26097,
       "issues": []
     },
     {
       "path": "evidence/s2-008-controls.json",
       "required": true,
       "present": true,
-      "bytes": 7028,
+      "bytes": 7355,
       "issues": []
     },
     {
       "path": "evidence/s2-008-comparison.json",
       "required": true,
       "present": true,
-      "bytes": 29149,
+      "bytes": 28677,
       "issues": []
     },
     {
@@ -396,49 +443,49 @@
       "path": "evidence/s2-008-run-a.json",
       "required": true,
       "present": true,
-      "bytes": 38064,
+      "bytes": 37907,
       "issues": []
     },
     {
       "path": "evidence/s2-008-run-b.json",
       "required": true,
       "present": true,
-      "bytes": 38063,
+      "bytes": 37907,
       "issues": []
     },
     {
       "path": "evidence/s2-008-replay.json",
       "required": true,
       "present": true,
-      "bytes": 38155,
+      "bytes": 35963,
       "issues": []
     },
     {
       "path": "evidence/s2-008/corpus/manifest.json",
       "required": true,
       "present": true,
-      "bytes": 1662,
+      "bytes": 3731,
       "issues": []
     },
     {
       "path": "evidence/s2-008/corpus/preregistration.json",
       "required": true,
       "present": true,
-      "bytes": 5517,
+      "bytes": 5545,
       "issues": []
     },
     {
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 10600,
+      "bytes": 11001,
       "issues": []
     },
     {
       "path": "evidence/s2-008-harness.json",
       "required": false,
       "present": true,
-      "bytes": 69439,
+      "bytes": 71089,
       "issues": []
     },
     {

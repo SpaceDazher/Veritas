@@ -145,8 +145,11 @@ export const EXPECTED_CONTROLS = Object.freeze(FROZEN_CONTROLS.map((control) => 
  * reasons a reviewer can check the interval against. `expectedStatus`,
  * `expectedOutcome`, `expectedVerdict`, `expectedNumerator` and
  * `expectedDenominator` are READ from the frozen table; the derived block below
- * is what this fixture measured, and the two are reported side by side because
- * at eight cases they do not agree.
+ * is what this fixture MEASURED and what the frozen rule DERIVED from it, and
+ * the two are reported side by side so agreement is visible rather than assumed.
+ * After the S2-008 repair the measured rows agree: the table declares the
+ * outcome the rule derived (UNRESOLVED at 1 - alpha/m on an eight-case corpus),
+ * and `FIXTURE_DERIVED_DISAGREEMENTS` is the record that would say otherwise.
  * @type {ReadonlyArray<Readonly<object>>}
  */
 export const EXPECTED_TRIAL_DECISIONS = Object.freeze(FROZEN_TRIAL_DECISIONS.map((row) => {
@@ -172,6 +175,20 @@ export const EXPECTED_TRIAL_DECISIONS = Object.freeze(FROZEN_TRIAL_DECISIONS.map
       POSITIVE: 'the designed corpus sits above the frozen baseline: 7 of 8 cases agree',
       NULL: 'the designed corpus sits ON the frozen baseline: 6 of 8 cases agree, which is 0.75 exactly',
       NEGATIVE: 'the designed corpus sits below the frozen baseline: 5 of 8 cases agree',
+      // The row every MEASURED trial now carries, and the reason is the frozen
+      // rule's own answer rather than a comment about it: at the derived
+      // confidence the eight-case interval straddles the frozen 0.75 baseline
+      // OUTSIDE the 0.02 band, so `decisionFromInterval` returns
+      // `interval_straddles_null_outside_noise_band` for 7/8, 6/8 and 5/8
+      // alike (observed, exit 0). An eight-case corpus cannot resolve a 0.02
+      // band at 98.33 % confidence, and the row says that instead of claiming an
+      // effect the corpus does not carry.
+      //
+      // The key is derived from what the rule can answer, not typed for the
+      // current table: with the key absent, every measured row published
+      // `reason: undefined` after the re-derivation, which is a row that looks
+      // explained and is not.
+      UNRESOLVED: 'the eight-case interval straddles the frozen baseline outside the preregistered 0.02 band, so the frozen rule derives UNRESOLVED (interval_straddles_null_outside_noise_band) at the derived confidence 1 - alpha/family_size',
       INFRA: 'the trial produced no measurement; a reconciliation row is owed and no interval exists to compare',
     }[row.expectedOutcome],
     // Named so a test can assert the table was not edited to match a result.
@@ -255,8 +272,11 @@ export const EXPECTED_VALUE_TABLE = Object.freeze({
   control_level_counters_not_run_counters: CONTROL_LEVEL_COUNTERS,
   runs: EXPECTED_RUNS,
   assert_table_frozen: 'OK_while_the_derived_document_matches_the_frozen_table',
-  // Published, not hidden: the design the table pins and the decision the
-  // frozen rule derives from an eight-case corpus are not the same thing.
+  // Published, not hidden: the design each trial was authored for, the outcome
+  // the frozen table pins, and the decision the frozen rule derives from the
+  // interval the same labels produce are three different things and all three
+  // are named. The record is empty when the expectation was re-derived from the
+  // measurements, and non-empty when they drift apart.
   derived_disagreements: FIXTURE_DERIVED_DISAGREEMENTS,
   latency: Object.freeze({ decides: false, source: 'FIXTURE_SYNTHETIC' }),
 });

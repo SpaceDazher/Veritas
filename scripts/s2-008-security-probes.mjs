@@ -47,7 +47,8 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
-import { EXPECTED_CONTROLS, EXPECTED_TRIAL_DECISIONS, EXPECTED_METRIC } from '../src/lib/research/expected-values.mjs';
+import { EXPECTED_CAMPAIGN, EXPECTED_CONTROLS, EXPECTED_TRIAL_DECISIONS, EXPECTED_METRIC } from '../src/lib/research/expected-values.mjs';
+import { assertFrozenCampaignDerivable } from '../src/lib/research/campaign-expectation.mjs';
 import { CORRUPTION_VARIANTS_INJECTED, controlsFlipVerdict, EXTRA_CONTROL_IDS, runNegativeControls } from '../src/lib/research/negative-controls.mjs';
 import { HARD_GATE_COUNTERS, PROBE_FAMILIES, PROBE_NAMES, runAllProbes } from '../src/lib/research/probes.mjs';
 import { loadPreregistration } from '../src/lib/research/preregistration.mjs';
@@ -184,7 +185,7 @@ function controlRun(prereg, base) {
  *   counters: Record<string, number>}} input
  * @returns {{exitCode: number, status: string, reasons: string[]}}
  */
-export function gateExitCode({ expectedProbes, results, notRun, broken, controls, controlsNotRun, counters }) {
+export function gateExitCode({ expectedProbes, results, notRun, broken, controls, controlsNotRun, counters, comparatorIntegrityOk = true }) {
   const movedCounters = Object.entries(counters ?? {}).filter(([, value]) => value !== 0).map(([name, value]) => `${name}=${value}`);
   const failedProbes = (results ?? []).filter((entry) => entry.status === 'failed').map((entry) => entry.probe);
   const didNotFlip = (controls ?? []).filter((entry) => entry.flipped !== true).map((entry) => entry.id);
@@ -213,6 +214,13 @@ export function gateExitCode({ expectedProbes, results, notRun, broken, controls
     if (missing.length > 0) reasons.push(`corruption-variant-never-injected:${missing.join(',')}`);
   }
   if (movedCounters.length > 0) reasons.push(`hard-gate-counter:${movedCounters.join(',')}`);
+  // F4: the comparator's decision arithmetic. A comparator that cannot
+  // reproduce the frozen campaign decision is a broken instrument, and a
+  // broken instrument produces green probes: the six families attack the RUN's
+  // integrity and would not notice a decision function that always answers
+  // POSITIVE. It is a FAILURE, not a NOT_RUN: the check ran, and it did not
+  // hold.
+  if (comparatorIntegrityOk !== true) reasons.push('comparator-decision-arithmetic:the frozen campaign decision is not what the comparator derives');
   if (reasons.length === 0) return { exitCode: EXIT_PASS, status: 'PASS', reasons };
   // "Every counter is 0 but something mandatory did not run" is its own exit
   // code: the defence is unproven, which is neither a pass nor a failure.
@@ -222,6 +230,45 @@ export function gateExitCode({ expectedProbes, results, notRun, broken, controls
     || reasons.some((reason) => reason.startsWith('corruption-variant-') || reason.startsWith('control-id-unaccounted'));
   const exitCode = countersClean && somethingNotRun ? EXIT_NOT_RUN : EXIT_SAFETY;
   return { exitCode, status: exitCode === EXIT_NOT_RUN ? 'NOT_RUN' : 'BLOCKED_SAFETY', reasons };
+}
+
+/**
+ * The comparator-integrity check the probes gate now raises (F4), as its own
+ * exported function so a test can reach it without a probe run.
+ *
+ * PURE and fail-closed, and it is a CALL rather than a copy: the derivation is
+ * `assertFrozenCampaignDerivable` from `campaign-expectation.mjs`, the same
+ * function `scripts/s2-008-build-corpus.mjs` and both acceptance gates use. A
+ * second copy of the arithmetic here would be exactly the "two independently
+ * editable payload forms" failure the header of this file exists to prevent,
+ * and it would keep passing after the real comparator was rewired.
+ *
+ * @returns {{ok: boolean, decision: string|null, declared: string, reason: string|null, refusal: string|null}}
+ *   `ok` is false when the comparator derives a decision the frozen table does
+ *   not declare, or when the derivation raises at all — a comparator that
+ *   throws is not a comparator that passed.
+ */
+export function comparatorIntegrity() {
+  const declared = String(EXPECTED_CAMPAIGN?.decision ?? 'ABSENT');
+  try {
+    const derived = assertFrozenCampaignDerivable();
+    const ok = derived.decision === declared;
+    return {
+      ok,
+      decision: derived.decision,
+      declared,
+      reason: derived.decisionReason,
+      refusal: ok ? null : `the comparator derives ${derived.decision} while the frozen table declares ${declared}`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      decision: null,
+      declared,
+      reason: null,
+      refusal: `the frozen campaign decision could not be re-derived: ${String(error?.code ?? 'REFUSED')} ${String(error?.message ?? error).slice(0, 200)}`,
+    };
+  }
 }
 
 export async function runSecurityProbes(args = {}) {
@@ -250,6 +297,29 @@ export async function runSecurityProbes(args = {}) {
   }
   for (const failure of gate.failures ?? []) log(`A2 gate failure ${failure}`);
 
+  // 2b. F4: THE COMPARATOR'S DECISION ARITHMETIC IS A GATE HERE TOO.
+  //
+  //     The six probe families are holdout peek, seed-set freeze, post-result
+  //     rewrite, budget, causal label and evaluator independence. None of them
+  //     calls `decisionFromInterval`, and none of them needs to: they are
+  //     attacks on the RUN's integrity, not on the DECISION rule. The measured
+  //     consequence is a real one — a comparator whose first statement was
+  //     `return {decision: 'POSITIVE'}` left this gate at exit 0 with 6/6
+  //     probes passed (reproduction F4), and the honest answer on this corpus is
+  //     UNRESOLVED, so a comparator that cannot say UNRESOLVED is not
+  //     fail-closed, it is just wrong.
+  //
+  //     The check re-derives the frozen campaign decision through the
+  //     comparator's own rule from the frozen table's own counts — the SAME
+  //     function the corpus builder and both gates call, never a second
+  //     arithmetic copy — and compares it with the declaration. It is a
+  //     REFUSAL this gate raises, so a comparator that always answers POSITIVE,
+  //     always answers NULL, or throws a verdict out of a constant is exit 1
+  //     here instead of exit 0 with six green probes.
+  const integrity = comparatorIntegrity();
+  log(`A3 comparator_integrity ok=${String(integrity.ok)} decision=${String(integrity.decision)} declared=${String(integrity.declared)} reason=${integrity.refusal ?? 'agrees'}`);
+  if (!integrity.ok) log(`A3 comparator_integrity REFUSED ${JSON.stringify(integrity)}`);
+
   // 3. The exit code, derived from the two records and nothing else.
   const gate_ = gateExitCode({
     expectedProbes: probeCount,
@@ -259,6 +329,9 @@ export async function runSecurityProbes(args = {}) {
     controls: controls.controls,
     controlsNotRun: controls.notRun,
     counters: probes.counters,
+    // F4: a comparator whose decision arithmetic does not reproduce the frozen
+    // declaration is a failure, and it is counted as one next to the probes.
+    comparatorIntegrityOk: integrity.ok,
   });
   const { exitCode, status, reasons } = gate_;
 
@@ -328,6 +401,11 @@ export async function runSecurityProbes(args = {}) {
     },
     // The control fixtures, named so nobody reads them as results.
     control_fixtures: { trial: 'synthetic: one ALLOW trial with four satisfied bindings', run: 'synthetic: projected from EXPECTED_TRIAL_DECISIONS' },
+    // F4: the comparator-integrity member, published with the probes it did not
+    // replace. The six families are unchanged, the sixth negative control is
+    // unchanged, and the gate additionally refuses a comparator that cannot
+    // re-derive the frozen campaign decision.
+    comparator_integrity: integrity,
   };
   log(`RESULT status=${status} exit_code=${exitCode} reasons=${JSON.stringify(reasons)}`);
 

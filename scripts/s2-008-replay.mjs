@@ -63,9 +63,19 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import {
-  EXPECTED_CODES, EXPECTED_CONTROLS, EXPECTED_COUNTERS, EXPECTED_LEDGER_SHAPE, EXPECTED_METRIC,
-  EXPECTED_TRIAL_DECISIONS, assertTableFrozen, expectedTableDigest,
+  EXPECTED_CODES, EXPECTED_COMPARATOR_FAILURES, EXPECTED_CONTROLS, EXPECTED_COUNTERS,
+  EXPECTED_LEDGER_SHAPE, EXPECTED_METRIC, EXPECTED_TRIAL_DECISIONS, assertTableFrozen,
+  expectedTableDigest, unexpectedComparatorFailures,
 } from '../src/lib/research/expected-values.mjs';
+// A NAMESPACE import, on purpose. The frozen CAMPAIGN decision
+// (`EXPECTED_CAMPAIGN`) is the R-C agreement target, and the two gates that read
+// it (this replay, the harness) must not stop LOADING when the member is
+// absent: a gate that crashes on import reports a crash, never a red gate. The
+// absence is therefore a NAMED refusal — `frozenCampaignDecision()` returns
+// null and `campaignDecisionAgreement` emits `EXPECTED_CAMPAIGN_ABSENT`, which
+// is not agreement. Fail-closed, and the module still loads.
+import * as expectedValues from '../src/lib/research/expected-values.mjs';
+import { assertFrozenCampaignDerivable } from '../src/lib/research/campaign-expectation.mjs';
 import {
   compareParallelTrack, injectCorruption, resolveCampaignVerdict,
 } from '../src/lib/research/comparator.mjs';
@@ -198,8 +208,19 @@ function readEvidence(relativePath, child = null) {
  * A ledger-shape check against the frozen `EXPECTED_LEDGER_SHAPE`, read from
  * the run record's own journal. The table declares the shape; nothing in the
  * track consumed it before, so the declaration had no teeth.
+ *
+ * EXPORTED (R-C): the ledger-shape gate term is one rule with one definition,
+ * used by the replay over the real engine's journal and by the harness over its
+ * own run journal. A second implementation would be a second opinion about the
+ * same table, which is the exact shape of drift this table exists to catch.
+ *
+ * @param {object} runRecord A run record carrying `ledger.record_kinds`.
+ * @returns {ReadonlyArray<object>} Empty when the journal matches the table.
+ *   A run record with NO readable `record_kinds` reports all four kinds as
+ *   `observed: 0`, never as a pass: an absent journal is a missing
+ *   measurement, not a satisfied one.
  */
-function ledgerShapeIssues(runRecord) {
+export function ledgerShapeIssues(runRecord) {
   const observed = Array.isArray(runRecord?.ledger?.record_kinds) ? runRecord.ledger.record_kinds : [];
   const issues = [];
   for (const row of EXPECTED_LEDGER_SHAPE) {
@@ -209,6 +230,74 @@ function ledgerShapeIssues(runRecord) {
     }
   }
   return issues;
+}
+
+/**
+ * The frozen CAMPAIGN decision the track is scored against, read from
+ * `EXPECTED_CAMPAIGN` in src/lib/research/expected-values.mjs.
+ * @returns {string|null} The declared decision, or null when the module
+ *   publishes no campaign expectation. Null is NOT "anything agrees": it is the
+ *   input to a named refusal.
+ */
+export function frozenCampaignDecision() {
+  const declared = expectedValues.EXPECTED_CAMPAIGN;
+  return isPlainObject(declared) && typeof declared.decision === 'string' && declared.decision !== ''
+    ? declared.decision
+    : null;
+}
+
+/**
+ * R-C: THE GATE CHECKS AGREEMENT WITH THE FROZEN CAMPAIGN DECISION, NEVER
+ * `ALLOW`.
+ *
+ * With eight synthetic cases the honest campaign answer is a null, so a
+ * `verdict_is_pass` requirement is unsatisfiable without tuning the fixtures
+ * until a fabricated effect looked legitimate. This is the one place the
+ * condition is DEFINED, and all three gates (replay, harness, aggregator) call
+ * it, so "four coupled sites" cannot drift apart again. A `POSITIVE` observed
+ * against a non-positive frozen expectation is a refusal, not a pass: that is
+ * the anti-goal, executed.
+ *
+ * @param {{observed?: string|null, expected?: string|null}} args
+ * @returns {{expected: string|null, observed: string|null, agrees: boolean,
+ *   findings: ReadonlyArray<object>}} `agrees` is true only when BOTH are
+ *   strings and they are equal.
+ */
+export function campaignDecisionAgreement({ observed = null, expected = null } = {}) {
+  const observedDecision = typeof observed === 'string' && observed !== '' ? observed : null;
+  const expectedDecision = typeof expected === 'string' && expected !== '' ? expected : null;
+  const findings = [];
+  if (expectedDecision === null) {
+    findings.push({
+      code: 'EXPECTED_CAMPAIGN_ABSENT',
+      field: 'expected_campaign_decision',
+      expected: 'a frozen campaign decision in EXPECTED_CAMPAIGN',
+      observed: expectedDecision,
+      detail: 'src/lib/research/expected-values.mjs publishes no EXPECTED_CAMPAIGN, so the campaign decision has nothing to agree with; a gate with no expectation is not green',
+    });
+  } else if (observedDecision === null) {
+    findings.push({
+      code: 'CAMPAIGN_DECISION_ABSENT',
+      field: 'observed_campaign_decision',
+      expected: expectedDecision,
+      observed: observedDecision,
+      detail: 'the comparator produced no campaign decision, so nothing was measured to agree with',
+    });
+  } else if (observedDecision !== expectedDecision) {
+    findings.push({
+      code: 'CAMPAIGN_DECISION_DIVERGES_FROM_FROZEN_TABLE',
+      field: 'observed_campaign_decision',
+      expected: expectedDecision,
+      observed: observedDecision,
+      detail: `the campaign decided ${observedDecision} while the frozen expected-value table declares ${expectedDecision}; a decision the table does not declare is not a pass`,
+    });
+  }
+  return Object.freeze({
+    expected: expectedDecision,
+    observed: observedDecision,
+    agrees: findings.length === 0,
+    findings: Object.freeze(findings),
+  });
 }
 
 /** The identical-wrong control, run through the SAME comparator call on the
@@ -275,6 +364,12 @@ async function replay(args = {}) {
   const base = resolveBase();
   const prereg = loadPreregistration(corpusDir);
   const tableDigest = assertTableFrozen(prereg);
+  // R-B/R-C: the frozen CAMPAIGN decision is re-derived through the comparator's
+  // own rule before the two children are spawned, and the derivation is printed
+  // with the run log. A replay that compared a campaign against an expectation
+  // the rule does not produce would be a green gate for a wrong question, so the
+  // divergence is a refusal here rather than a finding three steps later.
+  const frozenCampaign = assertFrozenCampaignDerivable();
   const observedAt = new Date().toISOString();
 
   // 0. Purge the replay's OWN scratch. The children purge their own roots too;
@@ -285,6 +380,7 @@ async function replay(args = {}) {
   log('# s2-008 cross-process replay');
   log(`config corpus=${rel(corpusDir)} evidence_eligible=${String(evidenceEligible)} write_evidence=${String(writeChildren && evidenceEligible)} table_digest=${tableDigest} metric=${EXPECTED_METRIC.name} noise_band=${String(EXPECTED_METRIC.noiseBand)}`);
   log(`base commit=${base.commit_sha} tree=${base.tree_sha} branch=${base.branch} track_tracked=${String(base.track_tracked)} tracked_files_of_this_track=${base.tracked_files_of_this_track}`);
+  log(`frozen campaign decision=${frozenCampaign.decision} reason=${String(frozenCampaign.decisionReason)} interval=${frozenCampaign.interval.lower}..${frozenCampaign.interval.upper} confidence=${String(frozenCampaign.confidence)} never_rejects=${String(frozenCampaign.rule_feasibility.never_rejects)}`);
 
   // 2. The two process-separated runs.
   // On the committed corpus the children write `evidence/s2-008-run-<letter>.json`
@@ -592,26 +688,76 @@ async function replay(args = {}) {
     }
   }
   const held = properties.filter((property) => property.status === 'HELD').length;
-  // EV2 / S6: `overall` COUNTS THREE TERMS, and every one of them is printed.
+  // EV2 / S6, REPAIRED BY R-C. `overall` COUNTS THE TERMS, AND THE VERDICT IS
+  // NOT ONE OF THEM.
   //
   // It used to count ONE — the properties — while the campaign `verdict` was
   // computed three lines above, printed in the same RESULT line, and left out of
   // the decision, and the ledger shape was written to the record and read by
-  // nobody. A replay that measured nothing decided UNRESOLVED and reported
-  // `overall: PASS` with exit code 0. The unmutated instance of that defect is
-  // in the evidence: `verdict: FAIL` beside `overall: PASS`.
+  // nobody. Then it was repaired the other way: the verdict became a TERM, and
+  // `verdict_is_pass` made the gate unsatisfiable on a corpus whose honest
+  // campaign answer is a null — an ALLOW was reachable only by tuning the
+  // fixtures until a fabricated effect looked legitimate, which is the
+  // anti-goal. The five decision terms below are the whole decision, each of
+  // them a named fact, and the campaign DECISION is compared with the frozen
+  // table rather than with a desired verdict. The verdict is still printed,
+  // still written, and still visible in the record: a recorded OUTCOME beside
+  // the pass condition, never a hidden one and never a term.
+  const campaign = campaignDecisionAgreement({
+    observed: comparison === null ? null : comparison.runs?.a?.decision ?? null,
+    expected: frozenCampaignDecision(),
+  });
+  log(`campaign expected_decision=${String(campaign.expected)} observed_decision=${String(campaign.observed)} agrees=${String(campaign.agrees)} verdict=${verdict} (a recorded OUTCOME, not a gate term)`);
+  for (const finding of campaign.findings) log(`campaign finding ${finding.code} | ${finding.detail}`);
+  const controlsAllFlipped = controls !== null && controls.allFlipped === true && controls.notRun.length === 0;
+  // F1: EVERY COMPARATOR FAILURE IS A DECISION TERM, or the ones the frozen
+  // table does not declare are not. R-C's enumerated pass condition named table
+  // divergence, moved counters, NOT_RUN and control flips, and a run record that
+  // CARRIES a comparator failure which is none of those was recorded, printed
+  // and gated by nothing — `best_seed_undisclosed` reproduces it end to end.
+  //
+  // The declaration lives in the table (`EXPECTED_COMPARATOR_FAILURES`, derived
+  // from its own rows), so this term asks one question: is every failure the
+  // comparator raised one the frozen table declares the honest campaign to
+  // carry? An undeclared code, or a declared code raised a different number of
+  // times, fails the term. The comparator is NOT weakened: it still raises
+  // everything it raised before, and the honest campaign still carries its
+  // `trial_violation` / `metric_not_measured` / `decision_unresolved` — those
+  // are DECLARED, so the fail-closed record is still the green one.
+  const unexpectedFailures = unexpectedComparatorFailures({
+    failures: comparison?.failures ?? [],
+    limits: comparison?.limits ?? [],
+    runs: comparison === null ? 0 : 2,
+  });
+  for (const entry of unexpectedFailures) log(`unexpected comparator finding ${entry.code} ${entry.field} | ${entry.detail}`);
+  const comparatorFailuresDeclared = unexpectedFailures.length === 0;
   const overallTerms = {
     every_property_held: held === properties.length,
     held,
     total: properties.length,
-    verdict_is_pass: verdict === 'PASS',
-    verdict,
+    expected_campaign_decision: campaign.expected,
+    observed_campaign_decision: campaign.observed,
+    decision_agrees_with_table: campaign.agrees,
+    campaign_findings: campaign.findings.map((finding) => ({ code: finding.code, field: finding.field, expected: finding.expected, observed: finding.observed })),
+    controls_all_flipped: controlsAllFlipped,
+    controls_not_run: controls === null ? null : controls.notRun.length,
+    comparator_failures_match_frozen_expectation: comparatorFailuresDeclared,
+    unexpected_comparator_findings: unexpectedFailures.map((entry) => ({ code: entry.code, field: entry.field, expected: entry.expected, observed: entry.observed })),
     ledger_shape_matches_table: ledgerShapeOk,
     ledger_shape_findings: ledgerShapeFindings.length,
+    not_run_zero: notRun.length === 0,
+    not_run_count: notRun.length,
+    // REPORTED, NOT A TERM. See the comment above.
+    verdict,
   };
   const overall = notRun.length > 0
     ? 'NOT_RUN'
-    : (overallTerms.every_property_held && overallTerms.verdict_is_pass && overallTerms.ledger_shape_matches_table ? 'PASS' : 'FAIL');
+    : (overallTerms.every_property_held
+      && overallTerms.decision_agrees_with_table
+      && overallTerms.controls_all_flipped
+      && overallTerms.comparator_failures_match_frozen_expectation
+      && overallTerms.ledger_shape_matches_table
+      ? 'PASS' : 'FAIL');
   // EV5: the exit code the process WILL exit with is part of the record. The
   // aggregator's `green-with-nonzero-exit` rule reads `record.exitCode`, and the
   // replay never wrote one, so the rule was dead code: `node -e "'exitCode' in
@@ -649,6 +795,27 @@ async function replay(args = {}) {
     controls: { allFlipped: controls.allFlipped, gate, record: controls, notRun: controls.notRun, error: controlsError, attached_before_comparison: true },
     comparison,
     comparison_error: comparisonError,
+    // R-C: the campaign decision beside the pass condition, so a reader of ONE
+    // file sees both the answer and what the gate decided about it.
+    campaign: {
+      expected_decision: campaign.expected,
+      observed_decision: campaign.observed,
+      agrees_with_table: campaign.agrees,
+      findings: campaign.findings,
+      verdict,
+      verdict_is_a_gate_term: false,
+    },
+    // F1: the comparator's own failure list, next to the terms that gate on it.
+    comparator_failures: {
+      declared_per_run: EXPECTED_COMPARATOR_FAILURES,
+      observed_failures: comparison?.failures ?? [],
+      observed_limits: comparison?.limits ?? [],
+      unexpected: unexpectedFailures,
+      is_a_gate_term: true,
+    },
+    expected_campaign_decision: campaign.expected,
+    observed_campaign_decision: campaign.observed,
+    decision_agrees_with_table: campaign.agrees,
     table_findings_a: tableFindingsA,
     ledger_shape: ledgerShape,
     ledger_shape_ok: ledgerShapeOk,

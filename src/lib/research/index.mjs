@@ -68,6 +68,7 @@ export {
 export {
   PREREGISTRATION_KIND,
   AMENDMENT_KIND,
+  SUPERSESSION_KIND,
   PREREGISTRATION_RULE,
   preregistrationDigest,
   loadPreregistration,
@@ -77,6 +78,14 @@ export {
   assertNoPostResultRewrite,
   createAmendment,
   assertAmendmentNotDecisionBasis,
+  createSupersession,
+  assertSupersession,
+  // A3: the supersession ledger — the monotone, chained record of the frozen
+  // MEASUREMENT sources, and the refusal of an unrecorded change to them.
+  SOURCE_LEDGER_KIND,
+  sourceAnchorDigest,
+  createSourceLedgerEntry,
+  assertSourceLedger,
   assertBudgetReservation,
   seedCountOf,
   stoppingRuleOf,
@@ -114,8 +123,15 @@ export {
   EXPECTED_LEDGER_SHAPE,
   EXPECTED_METRIC,
   EXPECTED_CONTROLS,
+  EXPECTED_CAMPAIGN,
+  EXPECTED_CAMPAIGN_METRIC,
+  EXPECTED_RULE,
+  MEASURED_FAMILY_SIZE,
   expectedValueIssues,
+  expectedCampaignIssues,
   expectedTableDigest,
+  frozenRuleFeasibility,
+  assertFrozenTableSelfConsistent,
   assertTableFrozen,
 } from './expected-values.mjs';
 

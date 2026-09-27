@@ -47,8 +47,8 @@ plain data module; none of them decides anything.
 | `fixture-digest.mjs` | the ONE digest convention — `canonicalDigest` in wire form, plus a byte-identity assert | everything, and any test that wants to compare two fixture values |
 | `fixture-fixed-clock.mjs` | the one injected instant (`FIXED_CLOCK`, `FIXED_INSTANT_ISO`, `FIXED_CLOCK_NOW_NS`) and a self-check that the two agree | any test that needs "now" without reading the process clock |
 | `fixture-run-identity.mjs` | the two A3 run identities (distinct ids, nonces, executors), `ALLOWED_PROCESS_DIFFERENCES` (A5), and a check that the two really are separated | A3, A5 |
-| `fixture-preregistration.mjs` | `HYPOTHESIS_CARD` (observational, contract-valid), `PREREGISTERED_*`, `BUDGET_RESERVATION`, `CALIBRATIONS`, `buildPreregistration()` (self-sealing, table digest sealed) | P1–P4, A4, `assertTableFrozen` |
-| `fixture-measurement-set.mjs` | `FIXTURE_CASES` (8 cases, per-case agreement labels), `FIXTURE_TRIALS` (4 trials in the shape the table and the comparator read), `CLEAN_RUNS.a` / `.b`, `POOLED_COUNTS`, `FIXTURE_DERIVED_DISAGREEMENTS` | A2, A3, A4 |
+| `fixture-preregistration.mjs` | `HYPOTHESIS_CARD` (observational, contract-valid), `PREREGISTERED_*`, `BUDGET_RESERVATION`, `CALIBRATIONS`, `buildPreregistration()` (self-sealing, table digest sealed); and the R-A rule triple `PREREGISTRATION_ALPHA` / `MEASURED_FAMILY_SIZE` (COUNTED from `PREREGISTERED_MEASURED_TRIALS`) / `CORRECTED_CONFIDENCE = 1 - alpha / family_size`, with `RULE_FEASIBILITY` the track's own `ruleFeasibility` over them | P1–P4, A4, `assertTableFrozen` |
+| `fixture-measurement-set.mjs` | `FIXTURE_CASES` (8 cases, per-case agreement labels), `FIXTURE_TRIALS` (4 trials in the shape the table and the comparator read; each carries its `designed_outcome` AND the `derived_outcome` the rule produced), `CLEAN_RUNS.a` / `.b`, `POOLED_COUNTS`, `FIXTURE_DERIVED_DISAGREEMENTS` | A2, A3, A4 |
 | `fixture-expected-values.mjs` | the published document `EXPECTED_VALUE_TABLE` and the object `compareParallelTrack` reads, `EXPECTED_TABLE_ARGUMENT`; `assertFixtureTableMatchesFrozenTable()` runs at import | A2, A3 |
 | `fixture-corrupted-variants.mjs` | one builder per corruption class, `EXPECTED_FLIPS` (the before/after a test asserts), `buildIdenticallyWrongControl()` (A3) | A2, A3, A4 |
 | `fixture-temp-base.mjs` | `createTempBase()` / `purgeTempBase()` / `writeTempFile()`: a per-(label, step) scratch base, purged before the run, refusing anything it cannot prove it created | A5 |
@@ -58,16 +58,23 @@ plain data module; none of them decides anything.
 1. **A clean pair is `ALLOW` per trial and `FAIL` per campaign, and both are correct.** The
    frozen table pins trial 3 as `INFRA_ERROR`/`VIOLATION` and pins exactly one unmeasured trial, so
    `scoreRun` always raises `trial_violation` and `scoreMetric` always raises `metric_not_measured`;
-   with eight cases the 95% interval also derives UNRESOLVED, so `decision_unresolved` is the third.
+   at the derived confidence the pooled 18/24 interval also derives UNRESOLVED, so
+   `decision_unresolved` is the third.
    `evidence/s2-008-harness.json` reports the same `FAIL` with the same three codes. A test therefore
    asserts the **axes that move** — table findings, per-trial verdicts, and the failure codes
    `compareParallelTrack` adds — and `CLEAN_CAMPAIGN_VERDICT` says `FAIL` rather than the `PASS` an
-   earlier version of this directory wished for.
-2. **The design and the derived decision are different, on purpose.** The corpus is designed
-   7/8, 6/8, 5/8 (a known effect, a known null on the frozen baseline, a known negative) and the
-   table pins that design; the 95% Wilson interval on eight cases derives UNRESOLVED for all three.
-   Both are recorded (`outcome` and `derived_outcome` on every trial,
-   `FIXTURE_DERIVED_DISAGREEMENTS` in the table document), and neither is presented as the other.
+   earlier version of this directory wished for. A `FAIL` campaign that AGREES with the frozen
+   table is the success case: since R-C the gate counts agreement, not `ALLOW`.
+2. **The design and the derived decision are different, on purpose — and since R-B the table pins
+   the DERIVED one.** The corpus is designed 7/8, 6/8, 5/8 (a known effect, a known null on the
+   frozen baseline, a known negative), and every row still records that `designed_outcome`. What
+   the table now pins is what the frozen rule DERIVES from those same counts: at
+   `CORRECTED_CONFIDENCE = 1 - alpha/family_size` the Wilson interval on eight cases straddles the
+   frozen 0.75 baseline outside the 0.02 band, so all three measured rows read `UNRESOLVED` /
+   `interval_straddles_null_outside_noise_band`, and `FIXTURE_DERIVED_DISAGREEMENTS` is empty.
+   The eight cases are byte-identical to the pre-repair corpus; only the interval level changed.
+   `FIXTURE_DERIVED_DISAGREEMENTS` is the record that would say otherwise, which is why it is worth
+   reading rather than assuming.
 
 ## Naming and shape
 

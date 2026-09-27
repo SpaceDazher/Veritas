@@ -28,18 +28,67 @@
 // empty rather than merely "unset".
 //
 // WHAT `designed_outcome` IS AND IS NOT
-// `designed_outcome` is the fixture's DESIGN INTENT and it is the value the
-// FROZEN TABLE carries in `expectedOutcome`
-// (`src/lib/research/expected-values.mjs`). It is NOT an observation, and it is
-// not derivable from the interval: with eight cases a 95% Wilson interval on
-// 7/8, 6/8 and 5/8 all straddle the frozen baseline, so `decisionFromInterval`
-// derives UNRESOLVED for all three (measured, see the `derived_outcome` and
-// `derived_disagreements` blocks in `fixture-measurement-set.mjs`, which record
-// that instead of hiding it). The fixture therefore pins TWO different things
-// and names both: the DESIGN the table scores against, and the decision the
-// frozen rule actually derives from the interval it computes. Collapsing them
-// into one name is how a fixture ends up asserting that whatever came out was
+// `designed_outcome` is the fixture's DESIGN INTENT — the position each trial
+// was AUTHORED to sit in relative to the frozen baseline. It is NOT an
+// observation and it is not what the table scores: the table's
+// `expectedOutcome` is the outcome `decisionFromInterval` DERIVES from the
+// interval the frozen measurements produce. Both are published side by side
+// (`derived_outcome` / `FIXTURE_DERIVED_DISAGREEMENTS` in
+// `fixture-measurement-set.mjs`) rather than collapsed into one name, because
+// collapsing them is how a fixture ends up asserting that whatever came out was
 // expected.
+//
+// WITH EIGHT CASES THE RULE DERIVES `UNRESOLVED`, AND THAT IS THE ANSWER
+// At the derived confidence the Wilson interval on 7/8 is [0.453625, 0.983339],
+// on 6/8 [0.347079, 0.944230] and on 5/8 [0.255737, 0.889917], and the pooled
+// campaign's 18/24 gives [0.505681, 0.897936] — all four straddle the frozen
+// 0.75 baseline OUTSIDE the 0.02 band, so `decisionFromInterval` returns
+// `UNRESOLVED` / `interval_straddles_null_outside_noise_band` for every one of
+// them (observed, `node --input-type=module`, exit 0). The delivered table
+// nevertheless scored the three measured rows as POSITIVE / NULL / NEGATIVE, so
+// `FIXTURE_DERIVED_DISAGREEMENTS` was NOT empty and a clean run carried three
+// `TRIAL_FIELD_DIVERGES_FROM_TABLE` findings. That disagreement was published
+// rather than hidden, which is the only reason this repair was possible: the
+// expectation and the frozen rule could be seen to disagree. The repair
+// re-derived the EXPECTATION from the frozen measurements. It did NOT re-tune a
+// measurement until a designed effect looked legitimate, and the campaign answer
+// stayed UNRESOLVED.
+//
+// THE PUBLISHED CONFIDENCE IS DERIVED, NEVER CHOSEN
+// `CORRECTED_CONFIDENCE = 1 - alpha / family_size`, written once and assigned to
+// BOTH rules. It was a hard-coded 0.95 before, and a rule that publishes
+// `1 - c = 0.05` against a corrected level of `alpha/m = 0.05/3 = 0.016667` can
+// NEVER reject, whatever is measured: `ruleFeasibility` reported
+// `never_rejects: true` and the comparator raised the limit
+// `frozen_rule_cannot_reject` on every campaign. The comparator was right and
+// its own comment said the fix is a PREREGISTRATION change; this file is the
+// preregistration, so this is where it is fixed. The two members move TOGETHER
+// on purpose: `scoreRun` reads `multiplicity_rule.confidence` for the interval
+// it computes while the run record's self-reported `metric.interval` is built
+// at `noise_rule.confidence`, and a disagreement between the two is the
+// comparator's `self_reported_interval_divergence` finding. One derived
+// constant, two assignments, no typed decimal.
+//
+// THE PUBLISHED FAMILY IS THE THREE DECLARED COMPARISONS — NOT `declared + subject`
+// `family_size` is `PREREGISTERED_MEASURED_TRIALS.length` = 3, and the family's
+// members are exactly those three trial ids. A unit-test call whose SUBJECT
+// JOINS the family (as `tests/research/comparator-probes.test.mjs` does, so the
+// subject is matched by id) legitimately widens the effective family to m = 4,
+// where `1 - c = 0.016667 > 0.05/4 = 0.0125` and `never_rejects` is `true` AGAIN
+// — correctly, because at m = 4 that rule really cannot reject. So
+// `never_rejects: true` at m = 4 is not a regression and must not be "fixed" by
+// touching those assertions: the fixture's own constants report
+// `never_rejects: false` at m = 3 (see `RULE_FEASIBILITY` below), and the two
+// numbers are about two different families.
+//
+// `RULE_FEASIBILITY` IS THE TRACK'S OWN ARITHMETIC, NOT A FIXTURE CLAIM
+// It is `ruleFeasibility(...)` from `src/lib/research/comparator.mjs` called on
+// this file's frozen constants, so a test asserts a boolean instead of
+// re-deriving IEEE-754 by hand: `1 - (1 - 0.05/3)` is 5.2e-17 ABOVE `0.05/3`
+// (relative 3.1e-15), and the comparator compares with its own `DECISION_EPSILON`
+// tolerance. A hand-written `1 - confidence <= alpha / family_size` in a test
+// fails on that rounding artefact; `RULE_FEASIBILITY.never_rejects` is the
+// statement that means what it says.
 //
 // WHY THE METRIC IS NAMED `case_agreement_rate`
 // It is the frozen table's `EXPECTED_METRIC.name`, read from
@@ -52,6 +101,7 @@
 // A metric name is an identifier, and an identifier is one thing.
 import { fixtureDigest } from './fixture-digest.mjs';
 import { FIXED_INSTANT_ISO } from './fixture-fixed-clock.mjs';
+import { ruleFeasibility } from '../../../src/lib/research/comparator.mjs';
 import { PREREGISTRATION_RULE, preregistrationDigest } from '../../../src/lib/research/preregistration.mjs';
 import { EXPECTED_METRIC as FROZEN_METRIC, expectedTableDigest } from '../../../src/lib/research/expected-values.mjs';
 
@@ -272,6 +322,183 @@ export const PREREGISTERED_TRIALS = Object.freeze([
 // baseline chosen to suit the result.
 
 /**
+ * The MEASURED campaign: the preregistered trials that produce a measurement,
+ * DERIVED from the trial list by the one predicate that says what "measured"
+ * means here. The INFRA trial is not in it, and being out of the family is not
+ * being dropped: it keeps its row in the frozen table, it keeps its
+ * reconciliation row, and an unresolved trial is still scored as a VIOLATION.
+ * The multiplicity correction runs over exactly these three ids.
+ * @type {ReadonlyArray<Readonly<object>>}
+ */
+export const PREREGISTERED_MEASURED_TRIALS = Object.freeze(
+  PREREGISTERED_TRIALS.filter((entry) => entry.designed_outcome !== 'INFRA'),
+);
+
+/**
+ * The RECONCILIATION corpus: the enumerated trials that are NOT measured. INFRA
+ * is already exercised there — P6's missing evaluator, the replay's
+ * crash/restart phase and `INFRA_RECONCILIATION` — so an unmeasured trial
+ * belongs with the other places an unmeasured trial is exercised rather than
+ * inside the measured campaign it cannot contribute to.
+ * @type {ReadonlyArray<Readonly<object>>}
+ */
+export const PREREGISTERED_RECONCILIATION_TRIALS = Object.freeze(
+  PREREGISTERED_TRIALS.filter((entry) => entry.designed_outcome === 'INFRA'),
+);
+
+/**
+ * The family-wise alpha the correction runs at. NAMED once, because the
+ * corrected confidence below is derived FROM it and a second spelling of alpha
+ * would let the two drift apart and produce exactly the undecidable rule this
+ * file used to publish.
+ * @type {number}
+ */
+export const PREREGISTRATION_ALPHA = 0.05;
+
+/**
+ * `m`: the size of the DECLARED family the Holm-Bonferroni correction runs over,
+ * counted from the measured trials rather than typed. `assertMultiplicityRule`
+ * refuses a `family_size` that disagrees with `declared_comparisons.length`, so
+ * a typed 3 would be a third copy of a number the list already carries.
+ * @type {number}
+ */
+export const MEASURED_FAMILY_SIZE = PREREGISTERED_MEASURED_TRIALS.length;
+
+/**
+ * The confidence the rule publishes, DERIVED: `1 - alpha / family_size`.
+ *
+ * The self-consistency a multiplicity rule must have is `1 - c <= alpha / m`: a
+ * comparison bound inherited from a `c`-level interval is `1 - c`, so a family of
+ * `m` members whose bound exceeds the corrected level can never reject, whatever
+ * is measured. At `m = 3` and `alpha = 0.05` the corrected level is
+ * `0.05/3 = 0.016667`, so the published confidence is `1 - 0.05/3 =
+ * 0.98333...` and the bound lands ON the level rather than above it.
+ *
+ * Chosen rather than derived, the previous value was 0.95 — a round number that
+ * reads like a convention and made the campaign undecidable by construction.
+ * @type {number}
+ */
+export const CORRECTED_CONFIDENCE = 1 - PREREGISTRATION_ALPHA / MEASURED_FAMILY_SIZE;
+
+/**
+ * What the frozen rule COULD EVER DECIDE, computed by the track's own pure
+ * helper over the constants above, so a test can assert the rule's feasibility
+ * without re-doing the arithmetic (and without tripping over the 5.2e-17 by which
+ * `1 - (1 - alpha/m)` sits above `alpha/m` in IEEE-754).
+ * @type {{rejection_floor: number, max_p_bound: number, never_rejects: boolean, can_only_answer: string, feasible: boolean, note: string}}
+ */
+export const RULE_FEASIBILITY = Object.freeze(ruleFeasibility({
+  alpha: PREREGISTRATION_ALPHA,
+  confidence: CORRECTED_CONFIDENCE,
+  familySize: MEASURED_FAMILY_SIZE,
+}));
+
+// --- the SUPERSEDED rule, preserved -----------------------------------------
+//
+// R-A: the pre-repair preregistration is preserved as a document of its own,
+// with the reason and the digests of both states. Deleting it, or editing it in
+// place, would leave the repair looking like a rule that was always able to
+// reject — which is the specific dishonesty the supersession exists to prevent:
+// nobody could afterwards read what the first delivery actually published.
+//
+// These three values are the WHOLE of the supersession's factual content. They
+// are literals because they are HISTORY: 0.95 is what the first delivery
+// published, and `9aad76e1...` is what `expectedTableDigest()` returned before
+// the frozen table was re-derived. Neither is a claim about the rule in force.
+
+/** The confidence the PRE-REPAIR preregistration published in BOTH rules. @type {number} */
+export const SUPERSEDED_CONFIDENCE = 0.95;
+
+/**
+ * The frozen-table digest the pre-repair document sealed — the value
+ * `npm run s2-008:check-corpus` reported (exit 0) and the value the committed
+ * `evidence/s2-008/corpus/preregistration.json` carried before this repair.
+ * @type {string}
+ */
+export const SUPERSEDED_EXPECTED_TABLE_DIGEST = '9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62';
+
+/**
+ * Why the pre-repair rule is superseded, in one line. It is a fact about the
+ * published constants (`1 - 0.95 = 0.05 > 0.05/3`), and the redesign happened
+ * BEFORE any new measurement of the synthetic corpus: the per-case labels are
+ * the same eight cases with the same agreement values, and the only measurement
+ * that changed is the INTERVAL those same labels are summarised at.
+ *
+ * It is kept inside `MAX_REASON` (240 characters, the bound
+ * `createSupersession` enforces for the same reason `createAmendment` enforces
+ * it: the text is hashed into a permanent, journalled document). A reason too
+ * long for the bound is refused rather than truncated, because a truncated
+ * reason is a reason that no longer says what it said.
+ * @type {string}
+ */
+export const SUPERSESSION_REASON = 'the published confidence 0.95 gave 1 - c = 0.05 > alpha/m = 0.016667, so the rule could never reject; the confidence is now derived as 1 - alpha/family_size, and the redesign was made before any new measurement of the synthetic corpus';
+
+/**
+ * The corpus's own case digest, as a LITERAL (A3).
+ *
+ * The eight synthetic cases are the other half of what a wholesale rewrite of
+ * this track would move, and this literal is what makes the ledger able to
+ * notice: `scripts/s2-008-build-corpus.mjs` re-derives it and refuses a corpus
+ * whose cases no longer hash to this. It is the digest
+ * `evidence/s2-008/corpus/manifest.json` sealed as
+ * `partitions.HOLDOUT.digest` in the FIRST delivery and in every one since — the
+ * per-case agreement values were never re-tuned, only the interval they are
+ * summarised at moved.
+ * @type {string}
+ */
+export const FROZEN_CASES_DIGEST = '654631a483c581ee734caaea2ff052f18b18955aecd19c7cf25442f7fc143043';
+
+/**
+ * THE SUPERSESSION LEDGER OF THE FROZEN SOURCES (A3).
+ *
+ * Three entries, in order, each one a change to the pair
+ * `(cases_digest, expected_table_digest)`:
+ *
+ *   0. THE FIRST DELIVERY. `9aad76e1…` is the table digest the pre-repair tree
+ *      sealed, and it is the last state in which the multiplicity rule could
+ *      reject nothing.
+ *   1. THE R-A RULE REDESIGN. The confidence became `1 - alpha / m`, the INFRA
+ *      trial left the multiplicity family (R-B) and the campaign expectation was
+ *      added to the table (R-C) — so the table digest moved. No case changed:
+ *      `cases_digest` is unchanged across all three entries, and that is the
+ *      point of the anchor covering both.
+ *   2. THE F1 DECLARATION. The table gained the declaration of WHICH comparator
+ *      failures the honest campaign carries, so its digest moved again. No case
+ *      and no measurement changed here either.
+ *
+ * WHY THE DIGESTS ARE LITERALS AND NOT COMPUTED HERE
+ * A ledger entry that recomputed its anchor from the current sources would
+ * re-anchor itself on every edit, and the chain would then be satisfied by any
+ * rewrite — which is the gap the reproduction named. A literal is history: each
+ * entry states the state that was true WHEN it was written, and
+ * `assertSourceLedger` refuses a chain that does not end where the sources now
+ * are. The price is the honest one: a future change to the frozen sources is
+ * refused until an entry is appended here, with a reason. That is the design,
+ * not a nuisance.
+ * @type {ReadonlyArray<Readonly<{index: number, cases_digest: string, expected_table_digest: string, reason: string}>>}
+ */
+export const SUPERSESSION_LEDGER = Object.freeze([
+  Object.freeze({
+    index: 0,
+    cases_digest: FROZEN_CASES_DIGEST,
+    expected_table_digest: SUPERSEDED_EXPECTED_TABLE_DIGEST,
+    reason: 'the first delivery: confidence 0.95 against alpha/m = 0.016667, a table without a campaign expectation, and the same eight cases',
+  }),
+  Object.freeze({
+    index: 1,
+    cases_digest: FROZEN_CASES_DIGEST,
+    expected_table_digest: '02d4fb926b6737790b016ec28c1080745f7a0fb2f9581390f56c69a75acf9144',
+    reason: 'R-A/R-B/R-C: the confidence is derived as 1 - alpha/m, the INFRA trial left the multiplicity family, and the table declares the campaign decision; the eight cases and their agreement values are byte-identical',
+  }),
+  Object.freeze({
+    index: 2,
+    cases_digest: FROZEN_CASES_DIGEST,
+    expected_table_digest: '8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63',
+    reason: 'F1: the table also declares WHICH comparator failures the honest campaign carries, so an undeclared one is a gate term; no case and no measurement changed',
+  }),
+]);
+
+/**
  * The holdout commitment: the one-shot unseal digest a holdout read must
  * present. Naming it in the preregistration is what makes a peek detectable —
  * a read with no matching digest is refused and counted (P1).
@@ -388,10 +615,63 @@ export const CALIBRATIONS = Object.freeze({
  *   in wire form.
  */
 export function buildPreregistration({ holdoutUnsealDigest } = {}) {
+  return buildPreregistrationDocument({
+    holdoutUnsealDigest,
+    confidence: CORRECTED_CONFIDENCE,
+    tableDigest: expectedTableDigest(),
+  });
+}
+
+/**
+ * The pre-repair preregistration, preserved whole.
+ *
+ * The same document builder as the rule in force, with the ONE published
+ * confidence and the ONE frozen-table digest the first delivery carried, so the
+ * two documents are the same SHAPE and differ only where the repair changed
+ * something. `preregistrationDigest(...)` over this document is
+ * `8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479` — the
+ * value the committed corpus carried before the repair, and the proof that this
+ * is a reconstruction of the first delivery rather than a new document that
+ * happens to look old.
+ *
+ * It carries no `supersedes` pointer: `assertPreregistration` refuses a
+ * preregistration that carries a result or a supersession pointer
+ * (`RESULT_CARRYING_KEYS`), so the pointer lives in the supersession document
+ * beside it, not inside the document it supersedes.
+ *
+ * @param {{holdoutUnsealDigest: string}} args The same input as the rule in force.
+ * @returns {Readonly<object>} The superseded document, self-sealed.
+ * @throws {Error} `FIXTURE_PREREGISTRATION_INPUT_INVALID` on a malformed digest.
+ */
+export function buildSupersededPreregistration({ holdoutUnsealDigest } = {}) {
+  return buildPreregistrationDocument({
+    holdoutUnsealDigest,
+    confidence: SUPERSEDED_CONFIDENCE,
+    tableDigest: SUPERSEDED_EXPECTED_TABLE_DIGEST,
+  });
+}
+
+/**
+ * The one document builder both published rules go through.
+ *
+ * PRIVATE ON PURPOSE: `confidence` is a parameter rather than a public option
+ * because a caller-supplied confidence is a way to rebuild a rule that cannot
+ * reject by accident. The two reachable documents are the two named builders
+ * above, and both pass a value this file derives or freezes — never one a caller
+ * chose.
+ *
+ * @param {{holdoutUnsealDigest: string, confidence: number, tableDigest: string}} args
+ * @param {string} args.holdoutUnsealDigest `sha256:<64 hex>` over the label map.
+ * @param {number} args.confidence The published confidence, derived or superseded.
+ * @param {string} args.tableDigest The frozen-table digest this document seals.
+ * @returns {Readonly<object>} A self-sealed preregistration document.
+ * @throws {Error} `FIXTURE_PREREGISTRATION_INPUT_INVALID` when the digest is not
+ *   in wire form.
+ */
+function buildPreregistrationDocument({ holdoutUnsealDigest, confidence, tableDigest }) {
   if (typeof holdoutUnsealDigest !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(holdoutUnsealDigest)) {
     throw new Error(`FIXTURE_PREREGISTRATION_INPUT_INVALID: holdoutUnsealDigest must be sha256:<64 hex>, got ${String(holdoutUnsealDigest)}`);
   }
-  const measuredTrials = PREREGISTERED_TRIALS.filter((entry) => entry.designed_outcome !== 'INFRA');
   const document = {
     kind: FIXTURE_PREREGISTRATION_KIND,
     preregistration_id: 'xpr-s2-008-01',
@@ -431,7 +711,13 @@ export function buildPreregistration({ holdoutUnsealDigest } = {}) {
     }),
     noise_rule: Object.freeze({
       band: PREREGISTERED_METRIC.noiseBand,
-      confidence: 0.95,
+      // The SAME derived value `multiplicity_rule.confidence` carries. They move
+      // together because `scoreRun` computes the campaign interval at the
+      // multiplicity confidence while the run record's self-reported
+      // `metric.interval` is built at this one; two spellings of the level make
+      // the comparator report `self_reported_interval_divergence` against every
+      // run.
+      confidence,
       // The METRIC interval is a Wilson score interval over the per-case
       // agreement labels, because the metric is a proportion and the frozen
       // statistics module ships `wilsonInterval` for exactly that. The
@@ -462,25 +748,30 @@ export function buildPreregistration({ holdoutUnsealDigest } = {}) {
     multiplicity_rule: Object.freeze({
       kind: 'HOLM_BONFERRONI',
       method: 'holm_bonferroni',
-      alpha: 0.05,
-      confidence: 0.95,
+      alpha: PREREGISTRATION_ALPHA,
+      // DERIVED, never chosen: `1 - alpha / family_size`. See
+      // `CORRECTED_CONFIDENCE` above for why a published 0.95 made every
+      // campaign undecidable.
+      confidence,
       // R6: the correction runs over the DECLARED family of TRIAL IDS, and
       // every one of them is in `trial_list`. `assertMultiplicityRule` refuses
       // a comparison that is not a declared trial, so the family cannot be
       // "the comparisons that happened to be significant".
-      declared_comparisons: Object.freeze(measuredTrials.map((entry) => entry.trial)),
-      family_size: measuredTrials.length,
+      declared_comparisons: Object.freeze(PREREGISTERED_MEASURED_TRIALS.map((entry) => entry.trial)),
+      family_size: MEASURED_FAMILY_SIZE,
       // The direction the hypothesis expects, frozen HERE so the comparator
       // reads a preregistered direction rather than a default (finding
       // S2-008-SD-04: the direction was never in any document, so a real
       // improvement could be scored as the wrong answer).
       direction: 'increase',
       // The infra trial is excluded from the multiplicity family with a
-      // reason. Excluded is not dropped: it still has a table row and its row
-      // says VIOLATION.
-      excluded: Object.freeze([
-        Object.freeze({ trial: 'trl-s2-008-04', reason: 'INFRA_OUTCOME_NO_INTERVAL_TO_CORRECT' }),
-      ]),
+      // reason, and the list is DERIVED from the reconciliation set rather than
+      // typed, so the family and its complement cannot disagree. Excluded is not
+      // dropped: it still has a table row and its row says VIOLATION.
+      excluded: Object.freeze(PREREGISTERED_RECONCILIATION_TRIALS.map((entry) => Object.freeze({
+        trial: entry.trial,
+        reason: 'INFRA_OUTCOME_NO_INTERVAL_TO_CORRECT',
+      }))),
     }),
     inference_mode: 'ASSOCIATIONAL',
     budget_reservation: BUDGET_RESERVATION,
@@ -493,7 +784,7 @@ export function buildPreregistration({ holdoutUnsealDigest } = {}) {
     // once a caller remembers a line is a fixture that is easy to get wrong.
     // It is NOT one of the twelve digest-projected members, so recording it
     // cannot change the preregistration digest it is published beside.
-    expected_table_digest: expectedTableDigest(),
+    expected_table_digest: tableDigest,
     holdout_access: Object.freeze({
       partition: 'HOLDOUT',
       one_shot: true,
