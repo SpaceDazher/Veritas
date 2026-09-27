@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "208c0b77a86833701ccfad21addee2262006a0a8",
-  "sourceTree": "c03df54381de388777e806b415e1f0baa0c791f8",
+  "sourceCommit": "ac3fbec30c1c0090800cc7744df47eaf9f7cfbe2",
+  "sourceTree": "8932a8c4e4fa62810ad66f6b2be39067a721d0e0",
   "trackedFileCount": 774,
   "manifestFileCount": 769,
-  "payloadManifestSha256": "47f5f8c582a9463e5045ef6c859252c3c465b29ec0d0c648903ce521ff72d86c",
-  "fileManifestSha256": "a200428840af0b71c2b43cba01bf0e38e4294c8c43a188efaf80a28eb95886f9",
+  "payloadManifestSha256": "6f15ca24234225132fa3d11874d40aa4c7b8096115464337c8c465064ffa7ad5",
+  "fileManifestSha256": "2693552883638ab7d40d244db922e7b80c5f84d33cbee2dbd9e271f7d8e6b862",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1843,8 +1843,8 @@
     },
     {
       "path": "docs/decisions/S2-002-NON-WINDOWS-HOST-ANALYSIS.md",
-      "sha256": "598d63eacacaf3af2c250023d6265b0af2b5008c19d8a47b7e29873019bdc4f7",
-      "bytes": 16423
+      "sha256": "9911f92c707be20dd121ae709f216c4d04d13261cff7e47004188f270d40b8bf",
+      "bytes": 16984
     },
     {
       "path": "docs/decisions/S2-002-TEST-REVIEW-LOG.md",
@@ -1898,8 +1898,8 @@
     },
     {
       "path": "docs/decisions/S2-007-EVALUATION-REPORT.md",
-      "sha256": "7ffd0b9e7353c10b2d1e93984d0bf124d14e3128a2a5c45cb4cc3fdeaeddd8a7",
-      "bytes": 69849
+      "sha256": "2c14d811d053d04ade2171069db6ed7d92287d9468b45c59f88ed4e0ee6b1ed1",
+      "bytes": 72609
     },
     {
       "path": "docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md",
@@ -2888,8 +2888,8 @@
     },
     {
       "path": "scripts/verify-s2-002.mjs",
-      "sha256": "63c0caca491da517c02161895ab2eddd924c44b36b5925694c6936d713a58726",
-      "bytes": 11914
+      "sha256": "699615bc49be8e60b73e569f28ccf5c5a2497a9a295239e0ef782c9c2daf2680",
+      "bytes": 12061
     },
     {
       "path": "scripts/verify-s2-003-dependencies.mjs",
@@ -3173,8 +3173,8 @@
     },
     {
       "path": "src/lib/identity/sandbox.mjs",
-      "sha256": "9eb96b9cd35e1556c35b49b3816cd6c44e22cb7b8ffb7b5ddd09165635b39611",
-      "bytes": 28642
+      "sha256": "9e4b648ac1ada3a3e4197f261977f60fff75ea5b4dbd539bfb050912dbbf5611",
+      "bytes": 19147
     },
     {
       "path": "src/lib/ingestion/canonical.mjs",
@@ -3538,13 +3538,13 @@
     },
     {
       "path": "tests/identity/replay-runs.test.mjs",
-      "sha256": "32320a42bf9eb18a225f192bd39b1419611e6ea66845de4a1316c7662f4c6b3b",
-      "bytes": 13552
+      "sha256": "b9de90794912f4fc651b13fd2514aed44d718a4bdb2d434b3cbd7e94683450c1",
+      "bytes": 12755
     },
     {
       "path": "tests/identity/sandbox.test.mjs",
-      "sha256": "d6d5fa824851f47ee72bc6400e16c508eee5ce8d1454e3dbfbb28c567760ecb6",
-      "bytes": 17364
+      "sha256": "c2c8dd07a6a6943af30478d8442de4d97012defa85dbda237c8239eccf53fe3c",
+      "bytes": 13010
     },
     {
       "path": "tests/identity/security-probes.test.mjs",
