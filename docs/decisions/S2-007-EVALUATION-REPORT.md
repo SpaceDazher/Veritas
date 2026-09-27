@@ -674,6 +674,79 @@ This ticket's own replay (`verify:s2-007-db-replay`) was verified on every run
 during this work to leave **no** S2-007 container behind, and the S2-007
 probes and run harness provision and remove their own disposable PostgreSQL.
 
+## 13.4 Defects an independent code review found in this delivery
+
+A review of this branch before merge found one blocking defect, one that made
+the evidence non-reproducible, and a set of smaller ones. None of them is
+cosmetic: each one either breaks tenancy, breaks re-runnability, or lets a
+counter that is supposed to move stay still. All are fixed on the branch
+rather than deferred, except where a note says otherwise.
+
+### The lease sweep was a cross-tenant write
+
+`store.expireLeases({ actor, now })` selected every `lease_state = 'ACTIVE'`
+row in the installation. It was the only write path in `store.mjs` that did
+not refuse a cross-workspace target — `claimTask` raises
+`cross_workspace_claim_denied`, `createRun` raises
+`cross_workspace_run_denied`, `reassignLease` raises
+`cross_workspace_adapter_denied`, and `_assertVisible` refuses a
+cross-workspace read absolutely. A caller holding a store handle in workspace
+A could therefore withdraw workspace B's leases, bump their task revisions and
+journal the change under A's sweep.
+
+Two things hid it. The disposable-container path in the probe suite starts
+empty, so no other tenant was ever present. And in a single-workspace
+installation the sweep behaves identically, so the expected-value table in the
+DB replay does not change.
+
+The sweep is now workspace-scoped, the scope is part of the idempotency key so
+two workspaces swept at the same database instant are two operations rather
+than one replayed into the wrong workspace, and a lease whose task row names a
+different workspace is skipped rather than acted on.
+`tests/agentboard/lease.test.mjs` seeds two workspaces and asserts that A's
+sweep moves nothing in B and that an unscoped sweep is a typed refusal; the
+test was confirmed to fail when the filter is removed.
+
+### The database-backed tests only passed on a pristine database
+
+`tests/agentboard/concurrency.test.mjs` used fixed `task_id` and `adapter_id`
+values. Both are PRIMARY KEYs, so both are global, and the file's
+`deterministicIds(namespace)` namespaced the store-minted ids per store
+INSTANCE — which says nothing about a second run of the same instance seed
+against the same database.
+
+The podman path started a fresh container and hid it. The path that matters is
+the one that reuses a developer-supplied `DATABASE_URL`, which is what
+`npm test` and the Windows acceptance use. On the second run against one
+database, five of the file's tests failed, and they failed *misleadingly*: the
+"exactly one committed state change" assertion compared a freshly read revision
+against a task the previous run had already claimed, so the invariant under
+test was never measured.
+
+Every identifier the file creates is now scoped per process, in the ids the
+store mints as well as in the task and adapter names. `npm test` is green four
+consecutive times against one database.
+
+### Smaller findings, all fixed
+
+| Finding | Fix |
+| --- | --- |
+| `listTasks` re-read the ACL row it had just loaded, and read it a third time for the wire document: three round trips per task, 600 at `limit: 200`. | One pass per task; the ACL row is loaded once and reused for the visibility decision and the document. |
+| `expireLeases` and `collectResult` ignored the result of `updateRows`, so a silently skipped write was possible. The sweep is unattended, and the accumulator is the only record that a result was produced. | Both now treat an empty result as a typed hard failure, as every other write in the file already did. |
+| A lease expiry was journalled with `payload.kind = 'lease_rebind'`, the same kind a reassignment uses. A consumer of the journal could not tell "somebody else took over" from "the right ran out". | Now `lease_expire`. The DB-replay projection identifies that transition by the presence of `expired_at` in its payload rather than by the kind string, so a rename cannot silently turn a normalized digest into a compared one. |
+| The two sandbox escape counters were separate literal lists that had drifted. The containment list was missing `BLOCKED`, so if the no-exec tier had begun spawning, that trial would have moved neither counter. | Both are derived from the oracle's expectation set. Adding a sandbox control now necessarily moves the counters that watch it. |
+| `settleBudget` accepted a required `operation_id` whose dedup behaviour was unstated. It is the operation that CREATED the `(grant_id, day_key)` bucket; the ledger is what dedups, and only for a key the caller reuses. | Stated in the method, with the three cases written out, so a caller cannot read the column as a uniqueness guarantee it never was. |
+| The route documentation said seventeen and eighteen routes; `HTTP_ROUTES` has nineteen. | Corrected in all three headers. |
+| `README.md` had the `S2-008…S2-012` row merged into the `S2-007` cell by a stray `||`, two `S2-007` rows from two commits on the branch, and a claim that the clean-checkout was green when the committed evidence records 36 PASS / 8 FAIL. | Table split, duplicate removed, and the clean-checkout line now matches `evidence/clean-checkout.json`. |
+
+`migrations/0009_agent_board_hardening.sql` adds the index the workspace-scoped
+sweep reads. 0008 is frozen by digest — `apply-migrations.mjs` refuses to
+continue on `MIGRATION_DRIFT` — so the change follows the existing 0007-over-0005
+precedent rather than editing a migration an installation has already applied.
+The file also records, next to the tables, why `agentboard_task.active_lease_id`
+and `agentboard_outbox.run_id` deliberately carry no foreign key, so the next
+reader does not "fix" a decision.
+
 ## 14. What was NOT verified
 
 * No genuinely installed AgentOS, Codex or pi executor exists on this host, so
@@ -692,6 +765,17 @@ probes and run harness provision and remove their own disposable PostgreSQL.
   acquisition and no external action is implied or performed.
 * Empirical semantic accuracy is not measured and is not inferred from any
   fixture, replay or synthetic probe.
+* The code review in §13.4 changed the store, so **every S2-007 artifact in
+  this tree is bound to a commit that is not the merge commit**: the two-run
+  comparison, the DB-replay record and the security-probe record. That is not
+  a defect in the records — it is what the records are for — but it means the
+  acceptance has to be re-run after the merge. `verify:s2-007` refuses a record
+  whose commit is not HEAD, and `verify:clean-checkout` additionally has to be
+  re-run on the Windows host, because the sandbox and PostgreSQL steps in it
+  shell out to `wsl.exe` unconditionally and cannot run elsewhere. The
+  committed `evidence/clean-checkout.json` is red (36 PASS / 8 FAIL) and this
+  change set does not make it green; the README now says so instead of
+  claiming otherwise.
 * `scripts/verify-clean-checkout.mjs` predates S2-007 and does not itself
   invoke the S2-007 gates, so clean-checkout coverage of the new boundary comes
   from `verify:s2-007` (the aggregator) rather than from that script. Extending
