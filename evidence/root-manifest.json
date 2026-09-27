@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "a676b8d79e4639fc72319e85288f10a9203072b8",
-  "sourceTree": "59b85fe1119e16834070781f6f8b54227daf3e4d",
-  "trackedFileCount": 788,
-  "manifestFileCount": 783,
-  "payloadManifestSha256": "510e41e3442147385ed40c04db97e855d7b999141b427c7388bbefc0a66526b2",
-  "fileManifestSha256": "56a0a693905e4707b3b48fbecce4a4d465c6dfbe2270a784bef72717e7cded38",
+  "sourceCommit": "ccd7affa65a8d81b54c71c92c2d43d3abe24d880",
+  "sourceTree": "bd2eee528399258ef03e56dad3de5d139d7ed943",
+  "trackedFileCount": 842,
+  "manifestFileCount": 837,
+  "payloadManifestSha256": "dd6cdfade61a77729355b602891ade3fa283518b3e42162c5d3d892676f0bf36",
+  "fileManifestSha256": "0ce4d22cdbd966accfde9634e713720ab4d5f408ab8270e4bf5283a19bde3b6c",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1902,6 +1902,11 @@
       "bytes": 76521
     },
     {
+      "path": "docs/decisions/S2-008-EVALUATION-REPORT.md",
+      "sha256": "e486299abd708f3a7bd31fdc6c9a3bce2c9233db84dd2db12c8fb3db07e5ef58",
+      "bytes": 92616
+    },
+    {
       "path": "docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md",
       "sha256": "c451d2744cf43f52af8cfc2e3a417ea1d220000d292d1dc7b57d70fb1114a578",
       "bytes": 7489
@@ -1975,6 +1980,11 @@
       "path": "docs/stages/S2-007.md",
       "sha256": "be4d87d84d1951787a1bd6da5e13ef3e86abbb89f396ba9f7c8903d8b777afad",
       "bytes": 13458
+    },
+    {
+      "path": "docs/stages/S2-008.md",
+      "sha256": "d57dde14ccb0b8411996f7d955ec996d2f250121ee97a8da6b119cfbe28b6b90",
+      "bytes": 49727
     },
     {
       "path": "docs/stages/stage-1.md",
@@ -2053,8 +2063,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "200ee38ec882a580d316c078c7589203b3b09cd5123d6aded9e609f1768dc22f",
-      "bytes": 32683
+      "sha256": "059ad058b924486b2a56bef101cfb5d7a49f5e23b1b2b99551a0f98fde5d9bd2",
+      "bytes": 34799
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -2278,8 +2288,8 @@
     },
     {
       "path": "evidence/s2-006-comparison.json",
-      "sha256": "a408439ac8f5e63a58f792ea3cefdd0f2d33689e9aa485add29bce1096aa87e7",
-      "bytes": 5603
+      "sha256": "80f8878f7ee6bad0bd4288b0def8d60e54f7e372b6f100b4676b0a996d5b8ea4",
+      "bytes": 5605
     },
     {
       "path": "evidence/s2-006-db-comparison.json",
@@ -2313,13 +2323,13 @@
     },
     {
       "path": "evidence/s2-006-run-a.json",
-      "sha256": "18eb7352f007e47a4a14002be734a20fe601b7491dbe8e474beb3f6400714e39",
-      "bytes": 12019
+      "sha256": "de2e502378edc9fcf24cfff1fc8d3eeac08a870b018b111c92b6fc784cd8847c",
+      "bytes": 12020
     },
     {
       "path": "evidence/s2-006-run-b.json",
-      "sha256": "a898ebcd18bb430b763f0e88c7c251f2bea88d197b306294f9bbf2eed2f1cf86",
-      "bytes": 12019
+      "sha256": "3350692a564be46e3074eae47e18273f93650f9bb2c2c2ad6c6c17ec847f4e1f",
+      "bytes": 12020
     },
     {
       "path": "evidence/s2-006-security-probes.json",
@@ -2385,6 +2395,76 @@
       "path": "evidence/s2-007-summary.json",
       "sha256": "a9f26024636a1000db06a08977e92e4cff2c74aa3543eba79aab38979efd75a7",
       "bytes": 39787
+    },
+    {
+      "path": "evidence/s2-008-comparison.json",
+      "sha256": "70e41b54095ee166e5b13f393edc580b1cacf59a7652912a54b197382ba7a43d",
+      "bytes": 29149
+    },
+    {
+      "path": "evidence/s2-008-controls.json",
+      "sha256": "7e5820a9252ad409a03c81c1e1976361e5294b1558b93cba2a382d10ff846163",
+      "bytes": 7028
+    },
+    {
+      "path": "evidence/s2-008-dependency-binding.json",
+      "sha256": "20d263bd46c7cd43cb9d7de7c53c23712c75e47f22c439d5221803887f61b55c",
+      "bytes": 17070
+    },
+    {
+      "path": "evidence/s2-008-harness.json",
+      "sha256": "49e8a354abffb2103137f1d0556b5563290c105ebe2b24c88c03edc81ff1d5c4",
+      "bytes": 69439
+    },
+    {
+      "path": "evidence/s2-008-probes.json",
+      "sha256": "4ca4f9712c5c19ba852fd8243a476c6522b009fbbdd5253cdab05563b9ea855e",
+      "bytes": 25770
+    },
+    {
+      "path": "evidence/s2-008-replay.json",
+      "sha256": "36f321d0d37f9266ed43b94a8a63c883e34d9fe59a5c543ac492ef77dacb2a7b",
+      "bytes": 37645
+    },
+    {
+      "path": "evidence/s2-008-run-a.json",
+      "sha256": "44a351cc0838125b64e1439d93bf6d1d679332e7a6b68fc466ede3cf78ea0620",
+      "bytes": 38063
+    },
+    {
+      "path": "evidence/s2-008-run-b.json",
+      "sha256": "65828269e7018ef4f7adf172b476efff21d23d764ef63565df352fa18a5ad880",
+      "bytes": 38063
+    },
+    {
+      "path": "evidence/s2-008-security-probes.json",
+      "sha256": "02e5c76cdde2644ca007d3fcdc4058bdab2f87d0e3e0ba611cdf6eee39ecb232",
+      "bytes": 39907
+    },
+    {
+      "path": "evidence/s2-008-summary.json",
+      "sha256": "2aee7e00364e36e2f61645898712b4f77ec3da7fe67e7b3491fa83379482523c",
+      "bytes": 10114
+    },
+    {
+      "path": "evidence/s2-008/corpus/cases/dev.json",
+      "sha256": "740e4b3f57befba82855d028d6f9da811de50f7e3cd381a695bd7309f770a417",
+      "bytes": 1402
+    },
+    {
+      "path": "evidence/s2-008/corpus/cases/holdout.json",
+      "sha256": "80e0e657f9d36e5edb65d9e343b78558099054a9ce16984fc32c437c903d9c10",
+      "bytes": 2018
+    },
+    {
+      "path": "evidence/s2-008/corpus/manifest.json",
+      "sha256": "0f8293d20798f2406e25f4f52be09292507f20489f73a5dc06655a920c1b24c2",
+      "bytes": 1662
+    },
+    {
+      "path": "evidence/s2-008/corpus/preregistration.json",
+      "sha256": "7d4e396ca39b64a13bee9b1e190aa4d2c8702cce816691c63256da230ef9a64e",
+      "bytes": 5517
     },
     {
       "path": "evidence/sloqual-001-comparison.json",
@@ -2478,8 +2558,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "cd8c118d56c4c0bcc7e7dd6b26f5260dd3bb250eb985627017fa6895eb885895",
-      "bytes": 5767
+      "sha256": "d54b2b677028989ffb0a49bdcf5c4fa5b1ff8072ec202d06a4f4db6a986008f1",
+      "bytes": 6518
     },
     {
       "path": "pilots/pilot-profile.json",
@@ -2543,8 +2623,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "10fff9f1715caf07c4b5b27e013f12805089fa15c6e91653e56727f5655ecfdc",
-      "bytes": 12014
+      "sha256": "d67a7f5813343fe3fc7dd39c3ad9ffe01724144c11c5626e53f2dd9a0b44b381",
+      "bytes": 14592
     },
     {
       "path": "results/s2-002/run-a/observations.json",
@@ -2857,6 +2937,31 @@
       "bytes": 21620
     },
     {
+      "path": "scripts/s2-008-build-corpus.mjs",
+      "sha256": "80b85a623d50040d67e166f95eff57aae411dd7140d62f9e9c708333614c73d6",
+      "bytes": 9888
+    },
+    {
+      "path": "scripts/s2-008-harness.mjs",
+      "sha256": "a5f35b0a0356a050c22ee3d68bfde041453739df4095bdfbefb3723c2619c306",
+      "bytes": 45899
+    },
+    {
+      "path": "scripts/s2-008-replay.mjs",
+      "sha256": "cf198cf012fd11889d31fefb11abe01bd039432ae02d3e027edde0ab6ec8de1d",
+      "bytes": 42832
+    },
+    {
+      "path": "scripts/s2-008-run.mjs",
+      "sha256": "bd45343cdf2c4e03060255c59d23c9c526991ebc556e9573e38edf668e43ada7",
+      "bytes": 63099
+    },
+    {
+      "path": "scripts/s2-008-security-probes.mjs",
+      "sha256": "c69e0b91bd21a72c32b89e9c766c5b475750dd422677aafbb7a51b09a8d2c93d",
+      "bytes": 20142
+    },
+    {
       "path": "scripts/security-probes.mjs",
       "sha256": "b14a92359cebc352fa0b211aea09b9f1d09cfedfa8430f4c4c7bbb668d672cce",
       "bytes": 25383
@@ -2980,6 +3085,16 @@
       "path": "scripts/verify-s2-007.mjs",
       "sha256": "cdaccb4e40bc493dd377359aea72079218008e1b0199f8079526b14c09843605",
       "bytes": 79787
+    },
+    {
+      "path": "scripts/verify-s2-008-dependencies.mjs",
+      "sha256": "eeda7b71cfa59a3de273f48aa757611db08488e592fbf286780259a09ec7b6cd",
+      "bytes": 36751
+    },
+    {
+      "path": "scripts/verify-s2-008.mjs",
+      "sha256": "d4b750efb2bfd514e02affeea6134982b3c78eb8d9301f03efcff8f7d60a0214",
+      "bytes": 28913
     },
     {
       "path": "scripts/verify-sloqual-001.mjs",
@@ -3302,6 +3417,76 @@
       "bytes": 3196
     },
     {
+      "path": "src/lib/research/causality.mjs",
+      "sha256": "707b593cdbeb648a7c4bbf3da00aaa1edd746c07d2256e7bf2b24fff949cafff",
+      "bytes": 13737
+    },
+    {
+      "path": "src/lib/research/comparator.mjs",
+      "sha256": "baedd781869984ac732d7b67bbe1923db35c6b6ab65608fb025475850b3aaf27",
+      "bytes": 106829
+    },
+    {
+      "path": "src/lib/research/constants.mjs",
+      "sha256": "390a3436f82c6ec3890e01f971195553216ed370fa820cca0296cad3e53df92d",
+      "bytes": 9482
+    },
+    {
+      "path": "src/lib/research/contracts.mjs",
+      "sha256": "f54e7ca2ca997b1146169c27501122a50c68a7ac605522100e6b26ed1332d01c",
+      "bytes": 22435
+    },
+    {
+      "path": "src/lib/research/dataset.mjs",
+      "sha256": "8e03a95bf8e2cd8de5d7caecd0f0770ab78733b25128c955bb9337b048f45a7d",
+      "bytes": 22261
+    },
+    {
+      "path": "src/lib/research/executor.mjs",
+      "sha256": "09abd814d29eb42e15aae5a7a69d07b7ee3a78ae01209ed3060ba29e4a4f2101",
+      "bytes": 64239
+    },
+    {
+      "path": "src/lib/research/expected-values.mjs",
+      "sha256": "daa5500e59f62df44b6d3ae4029373f2d0bf356a4b18259c11acfaf5061a04ad",
+      "bytes": 23316
+    },
+    {
+      "path": "src/lib/research/index.mjs",
+      "sha256": "df3b3e0ba4b14fca596ff329a009775e0b9049e8136e84e65bc4a5298b064f5a",
+      "bytes": 4081
+    },
+    {
+      "path": "src/lib/research/negative-controls.mjs",
+      "sha256": "d5de19e2b81fd58823ad349a5e093876b313baacbecf68cad177a23a239b1fdf",
+      "bytes": 22060
+    },
+    {
+      "path": "src/lib/research/policy.mjs",
+      "sha256": "64033b8a2fd5b67be04ca8d51aeb92ee85a5ae1478f51e0bbe2871fc7bb1ae8b",
+      "bytes": 4118
+    },
+    {
+      "path": "src/lib/research/preregistration.mjs",
+      "sha256": "1436859085d430db7a4412da3d978982818bd880f0c8482e01e7f8641ec66052",
+      "bytes": 68054
+    },
+    {
+      "path": "src/lib/research/probes.mjs",
+      "sha256": "e2ae978e3b7b154ead1f7007ee7a96e52044875b7d29ce2871816fa25b2325d4",
+      "bytes": 87943
+    },
+    {
+      "path": "src/lib/research/registry.mjs",
+      "sha256": "6f7bc94ac1bc66109d7010cc03ebca9df09ab692dc0315ce2d8c17eb67749cfd",
+      "bytes": 78269
+    },
+    {
+      "path": "src/lib/research/runner.mjs",
+      "sha256": "38c515636ef316e745f769b606439ed4a63c6ad769ee79307f8b1b6d7abc9aad",
+      "bytes": 121219
+    },
+    {
       "path": "src/lib/sloqual/comparator.mjs",
       "sha256": "b13e67c22fa732ba88fad45c359050c5366497df48715d6c578062ca8e612487",
       "bytes": 15956
@@ -3455,6 +3640,11 @@
       "path": "tasks/S2-006M_MODEL_ASSISTED_PILOT.md",
       "sha256": "6121be67aa958d0593084dbb06e932d9151220d015b33858749203c4f7910225",
       "bytes": 10465
+    },
+    {
+      "path": "tasks/S2-008_RD_EXPERIMENT_CYCLE.md",
+      "sha256": "a81203bc943bcb53cbf36c1aa019853bbbd4e655e672f1b67f87ca3db35c1e71",
+      "bytes": 9356
     },
     {
       "path": "tasks/SLOQUAL-001_SLO_QUALIFICATION.md",
@@ -3680,6 +3870,86 @@
       "path": "tests/ingestion/transactional-audit.test.mjs",
       "sha256": "e4f1589df9a8b1884aeea0946bf61ce7ae3c68a5a45acd962e9f0c70ab575cc7",
       "bytes": 4360
+    },
+    {
+      "path": "tests/research/comparator-probes.test.mjs",
+      "sha256": "65dd43c344a710d7b551f4ce4cfb5fa425aa590cd9b2e13ad99a978ea3e157ed",
+      "bytes": 77785
+    },
+    {
+      "path": "tests/research/comparator.test.mjs",
+      "sha256": "5accc821702170d66f43dcc748912599a6cdb21a238b98cce8db2a5474771b3f",
+      "bytes": 33212
+    },
+    {
+      "path": "tests/research/dataset.test.mjs",
+      "sha256": "a7935d7ca084bcdb33d5fe4895558e14eb3f006e5cabf7b8f7d4727e0eb8cb1b",
+      "bytes": 19017
+    },
+    {
+      "path": "tests/research/fixtures/fixture-corrupted-variants.mjs",
+      "sha256": "54ff83140f55fe7439e41ade22186f68907caab40d9599eac478f751a88c49bc",
+      "bytes": 54347
+    },
+    {
+      "path": "tests/research/fixtures/fixture-digest.mjs",
+      "sha256": "00b95cde0da623f2c867517e98f3ddb6d10ff0979ab14b43092ce66498069baf",
+      "bytes": 2680
+    },
+    {
+      "path": "tests/research/fixtures/fixture-expected-values.mjs",
+      "sha256": "a98b1c3b2ee7a1bcbab0de3d73245ae9e10ac73402a93a99dc83c64cc190202a",
+      "bytes": 17049
+    },
+    {
+      "path": "tests/research/fixtures/fixture-fixed-clock.mjs",
+      "sha256": "bd79c9f2aa234a32d0d5fca39c0fe5f93aee78ad4a4b30aa7f1ecd6124eea410",
+      "bytes": 4302
+    },
+    {
+      "path": "tests/research/fixtures/fixture-measurement-set.mjs",
+      "sha256": "21975256276c3a8fbf22002ef9d34aeb762f4387127086342d0bbcdef2a70385",
+      "bytes": 38067
+    },
+    {
+      "path": "tests/research/fixtures/fixture-preregistration.mjs",
+      "sha256": "a6268429a8e1d8153b70f535c5644120eccecd00056a444b421c6d438cffc098",
+      "bytes": 27788
+    },
+    {
+      "path": "tests/research/fixtures/fixture-run-identity.mjs",
+      "sha256": "aa5fc01e7c81f695b2576fd5465ab2267b05774b715e816ccbaa026c5ac259c2",
+      "bytes": 5786
+    },
+    {
+      "path": "tests/research/fixtures/fixture-temp-base.mjs",
+      "sha256": "239099119dcdd25786b373447047bff5a2bd3136d2362255dbe5ea0b96f39f0c",
+      "bytes": 14904
+    },
+    {
+      "path": "tests/research/fixtures/index.mjs",
+      "sha256": "37883f80addd62571a7fd7c92f2cad0b036789e1b606ba7e02e49ab59e74dc18",
+      "bytes": 4412
+    },
+    {
+      "path": "tests/research/fixtures/README.md",
+      "sha256": "7daa80866cfcdab0e70edd91ead2f34aaee37ecd86e91402d8874c38c30fb2a4",
+      "bytes": 11548
+    },
+    {
+      "path": "tests/research/harness.test.mjs",
+      "sha256": "29fc58cf60fc39c89e81ceba6c39438ed381052f807e9a743fb0b68198a7a260",
+      "bytes": 11560
+    },
+    {
+      "path": "tests/research/registry-prereg.test.mjs",
+      "sha256": "30ed016a7e1e0f14802237b2bbf64b27699c091f480bd14130043a03d7dabb20",
+      "bytes": 101959
+    },
+    {
+      "path": "tests/research/replay-two-run.test.mjs",
+      "sha256": "a4427454fbf3a307f47c22bd19786c3bc0e23f3c412d7165d0ac51640c95532c",
+      "bytes": 47953
     },
     {
       "path": "tests/sloqual/comparator.test.mjs",
