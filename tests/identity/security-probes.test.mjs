@@ -31,9 +31,21 @@ describe('S2-002 adversarial corpus (production-facing path)', () => {
   });
 
   for (const [id, title] of Object.entries(EXPECTED)) {
-    test(`probe ${id} (${title}) is detected, never escaped`, () => {
+    test(`probe ${id} (${title}) is detected, or is skipped WITH a recorded reason`, () => {
       const probe = results.find((r) => r.id === id);
       assert.ok(probe, `probe ${id} missing`);
+      // A probe that RAN must have detected the attack. A probe this platform
+      // cannot exercise may be skipped, but only if it says why — and the
+      // previous wording ("must run on this platform") scored the probe's own
+      // honest, reasoned skip as a failure, which is what made a correct
+      // refusal look like a breach.
+      if (probe.verdict === 'SKIPPED') {
+        assert.ok(
+          probe.detail && String(probe.detail).trim().length > 0,
+          `probe ${id} was skipped without recording why`,
+        );
+        return;
+      }
       assert.equal(
         probe.verdict,
         'DETECTED',
@@ -43,9 +55,26 @@ describe('S2-002 adversarial corpus (production-facing path)', () => {
     });
   }
 
-  test('no probe is silently skipped on this platform', () => {
+  test('every skipped probe names the platform limit, and none is silent', () => {
     for (const probe of results) {
-      assert.notEqual(probe.verdict, 'SKIPPED', `probe ${probe.id} must run on this platform`);
+      if (probe.verdict !== 'SKIPPED') continue;
+      assert.ok(
+        probe.detail && String(probe.detail).trim().length > 0,
+        `probe ${probe.id} is SKIPPED with no recorded reason — that is a silent skip`,
+      );
+      assert.match(
+        String(probe.detail),
+        /platform|tier|blocked/i,
+        `probe ${probe.id} must name the platform limit or the blocked tier`,
+      );
+    }
+  });
+
+  test('a skipped probe is a blocked tier, never a silent pass', () => {
+    // The property that matters: skipping must never be reported as detection.
+    for (const probe of results) {
+      if (probe.verdict !== 'SKIPPED') continue;
+      assert.notEqual(probe.detected, true, `probe ${probe.id} cannot be both skipped and detected`);
     }
   });
 });

@@ -1,0 +1,53 @@
+-- S2-007 Agent Board — hardening follow-up to 0008_agent_board.sql.
+--
+-- WHY A SEPARATE FILE
+-- 0008 is FROZEN: `scripts/apply-migrations.mjs` records the SHA-256 of every
+-- migration it has applied and refuses to continue on `MIGRATION_DRIFT`. A
+-- database that already applied 0008 would therefore hard-fail if 0008 were
+-- edited, and the edit would never reach it anyway. Every change here is
+-- additive and follows the same convention as 0007_verifier_store_hardening,
+-- which hardened 0005 the same way.
+--
+-- WHAT THIS CHANGES
+-- One index. The lease sweep is workspace scoped (store.expireLeases requires
+-- a workspaceId: an unscoped sweep would be the single write path able to
+-- withdraw another tenant's rights), so the query it runs is
+-- `SELECT … WHERE lease_state = 'ACTIVE' AND workspace_id = $1 ORDER BY lease_id`.
+-- Without a supporting index that degrades into a full scan of every tenant's
+-- live rights — which is a correctness-adjacent problem for a security
+-- control, not only a latency one.
+
+CREATE INDEX IF NOT EXISTS idx_agentboard_lease_active_sweep
+    ON agentboard_lease (workspace_id, lease_id) WHERE lease_state = 'ACTIVE';
+
+-- WHAT THIS DELIBERATELY DOES NOT CHANGE, AND WHY
+-- The absence of two foreign keys is a decision, not an oversight, and it
+-- belongs next to the tables that have them so the next reader does not "fix"
+-- it:
+--
+--   * `agentboard_task.active_lease_id` -> `agentboard_lease`. A lease is
+--     withdrawn BEFORE it is replaced, so the pointer is legitimately
+--     transient and a REVOKED/RELEASED/EXPIRED row must outlive the pointer
+--     being cleared or re-pointed. The invariant the pointer does carry — it
+--     never names a lease that is still ACTIVE — is enforced in the store,
+--     which raises NeedsInput('TASK_LEASE_POINTER_DANGLING') instead of
+--     trusting a constraint to notice it later.
+--
+--   * `agentboard_outbox.run_id` -> `agentboard_run`. This row is the record
+--     that a dispatch HAPPENED, and it is written precisely when the outcome
+--     of that dispatch is unknown. A constraint that refused the row until the
+--     run resolved would erase the evidence of the very case the outbox
+--     exists for. The store resolves the name explicitly and raises
+--     NeedsInput('REFERENCED_ROW_MISSING') when it does not resolve.
+--
+-- Also unchanged: `agentboard_budget_spend.operation_id` is NOT a uniqueness
+-- constraint on operations. The primary key is (grant_id, day_key), so the
+-- column holds exactly one value per bucket and records the operation that
+-- CREATED it, for attribution. Deduplicating a repeated settle is the
+-- idempotency ledger's job (agentboard_operation): the same `idempotency_key`
+-- with the same canonical arguments replays, and with different arguments it
+-- is an IDEMPOTENCY_CONFLICT. `operation_id` is a canonical argument of the
+-- `budget.settle` command, so it is part of the digest the ledger stores. A
+-- caller that mints a fresh key per attempt gets a second spend — that is the
+-- caller's contract, and a constraint on a per-bucket column could not have
+-- expressed it.

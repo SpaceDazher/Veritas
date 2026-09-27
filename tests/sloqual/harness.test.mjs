@@ -9,12 +9,13 @@
 // `npm run verify:sloqual-001`, not this suite.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { MANIFEST_PATH } from '../../src/lib/sloqual/contract.mjs';
 import { buildRequestPlan, executeScenarioSeed, REVOCATION_PROBE } from '../../src/lib/sloqual/measure.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, MANIFEST_PATH), 'utf8'));
 const clock = manifest.policyEngine.fixedClock;
 const scenarioById = new Map(manifest.scenarios.map((scenario) => [scenario.id, scenario]));

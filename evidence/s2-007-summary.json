@@ -1,0 +1,756 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007",
+  "issue": "SpaceDazher/Veritas#7",
+  "role": "verification aggregator: freshness, internal status, the seven hard-gate counters, the tamper matrix and the derived verdict",
+  "gate": "verify:s2-007",
+  "commit": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+  "tree": "efae7534c7b496687ca217f35f4906cbdd41c99c",
+  "runId": "s2-007-verify-149e4966ea0216e1301fb2a2",
+  "freshnessModel": "Every mandatory gate is re-run by THIS process. An evidence artifact is accepted only when (a) the process exited 0, (b) the bytes on disk hash to the digest the gate reported for the file it just wrote, (c) the record content address matches, (d) the record is bound to the current HEAD commit and, where the record carries one, to the current HEAD tree, and (e) the internal status, hardGates.ok, comparison.ok and the seven counters say PASS. The frozen evidence/s2-007-dependency-binding.json format has no HEAD-tree field, so that gate is anchored on the HEAD commit, which subsumes the tree for any committed change; uncommitted changes are caught by the dirty-checkout check, which caps the verdict at PASS_WITH_LIMITS.",
+  "gateContracts": {
+    "dependencies": {
+      "command": "npm run --silent verify:s2-007-dependencies",
+      "contract": "stdout JSON { ok:true, status:\"PASS\", mode:\"FULL_GIT_BYTES\" } + evidence/s2-007-dependency-binding.json whose resolved block was written by this run and is bound to the current HEAD commit",
+      "evidenceFiles": [
+        "evidence/s2-007-dependency-binding.json"
+      ]
+    },
+    "agentboard-tests": {
+      "command": "npm run --silent test:s2-007",
+      "contract": "node --test --test-concurrency=1 over tests/agentboard/*.test.mjs: exit 0, \"# fail 0\", a non-zero test count. This gate has no artifact by design, so its freshness is the fact that THIS aggregator spawned the process in THIS invocation and binds the output digest into this run id.",
+      "evidenceFiles": []
+    },
+    "security-probes": {
+      "command": "npm run --silent test:s2-007-security-probes",
+      "contract": "scripts/s2-007-security-probes.mjs --write prints an envelope { status, ok, counters, hardGatesOk, evidenceFile, evidenceSha256, recordDigest, commit, tree } and writes the record it describes.",
+      "evidenceFiles": [
+        "evidence/s2-007-security-probes.json"
+      ]
+    },
+    "db-replay": {
+      "command": "npm run --silent verify:s2-007-db-replay",
+      "contract": "scripts/s2-007-db-replay.mjs prints its JSON report on stdout and writes the SAME report plus its exit code to the artifact; the aggregator requires the file to be deep-equal to {report, exitCode}, the report to carry { status:\"PASS\", ok:true, comparison.ok:true, hardGates.ok:true, crashPhase.ok:true, the seven zero counters } and the record to be bound to the current HEAD commit and tree.",
+      "evidenceFiles": [
+        "evidence/s2-007-db-comparison.json",
+        "evidence/s2-007-db-replay.json"
+      ]
+    }
+  },
+  "gates": {
+    "dependencies": {
+      "command": "npm run --silent verify:s2-007-dependencies",
+      "status": "BLOCKED_DEPENDENCY",
+      "expectedStatus": "PASS",
+      "exitCode": 1,
+      "reasons": [
+        "gate:exit-code:1"
+      ],
+      "checks": [
+        {
+          "check": "gate:exit-code",
+          "ok": false,
+          "detail": "1"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "the gate reported BLOCKED_DEPENDENCY with its real exit code"
+        }
+      ],
+      "counts": null,
+      "counters": null,
+      "freshness": {
+        "evidenceFile": "evidence/s2-007-dependency-binding.json",
+        "beforeSha256": "c6bc111eddade35e5b54c550a1c7b2cee2d6455fa19ea6b815eb11db048aaeff",
+        "afterSha256": "c6bc111eddade35e5b54c550a1c7b2cee2d6455fa19ea6b815eb11db048aaeff",
+        "rewritten": false,
+        "createdByThisRun": false,
+        "commitAnchor": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+        "treeAnchor": "efae7534c7b496687ca217f35f4906cbdd41c99c"
+      },
+      "stderrTail": null,
+      "stdoutTail": " \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 1,\n        \"signal\": null,\n        \"status\": \"FAILED_NONZERO\",\n        \"diagnostics\": [\n          \"run-a/trialCount=283/oracle=282\",\n          \"run-b/trialCount=283/oracle=282\",\n          \"run-a/fs_network_secret_escapes=1\",\n          \"run-b/fs_network_secret_escapes=1\"\n        ]\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 15\n}\n",
+      "reportedIssues": [
+        "rerun.verify-s2-002:failed_nonzero(exit=1)"
+      ]
+    },
+    "agentboard-tests": {
+      "command": "npm run --silent test:s2-007",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "internal:tap-summary-present",
+          "ok": true,
+          "detail": "{\"tests\":338,\"pass\":338,\"fail\":0,\"skipped\":0}"
+        },
+        {
+          "check": "internal:no-failing-tests",
+          "ok": true,
+          "detail": "fail=0"
+        },
+        {
+          "check": "internal:tests-actually-ran",
+          "ok": true,
+          "detail": "tests=338"
+        }
+      ],
+      "counts": {
+        "tests": 338,
+        "pass": 338,
+        "fail": 0,
+        "skipped": 0
+      },
+      "counters": null,
+      "freshness": {
+        "artifact": null,
+        "note": "node --test --test-concurrency=1 over tests/agentboard/*.test.mjs: exit 0, \"# fail 0\", a non-zero test count. This gate has no artifact by design, so its freshness is the fact that THIS aggregator spawned the process in THIS invocation and binds the output digest into this run id.",
+        "boundToThisInvocation": true,
+        "stdoutSha256": "40ca611e8df1d8fc1da706aa05a1ce7e02601be830b272bfb3e6f7d0b543fba5"
+      },
+      "stderrTail": null,
+      "stdoutTail": "er claim\n    ok 5 - the current state is read from the task row, never from the caller claim\n      ---\n      duration_ms: 0.104944\n      type: 'test'\n      ...\n    # Subtest: no argument is optional\n    ok 6 - no argument is optional\n      ---\n      duration_ms: 0.121711\n      type: 'test'\n      ...\n    1..6\nok 62 - S2-007 every disallowed pair is refused with TRANSITION_NOT_ALLOWED\n  ---\n  duration_ms: 4.778531\n  type: 'suite'\n  ...\n# Subtest: S2-007 a guard authorizes only the edge the table binds it to\n    # Subtest: each guard refuses a pair that is not its own\n    ok 1 - each guard refuses a pair that is not its own\n      ---\n      duration_ms: 0.307289\n      type: 'test'\n      ...\n    # Subtest: a guard given only its own edge and no proof still refuses\n    ok 2 - a guard given only its own edge and no proof still refuses\n      ---\n      duration_ms: 0.360039\n      type: 'test'\n      ...\n    # Subtest: a guard with a context that is not an object refuses\n    ok 3 - a guard with a context that is not an object refuses\n      ---\n      duration_ms: 0.668502\n      type: 'test'\n      ...\n    1..3\nok 63 - S2-007 a guard authorizes only the edge the table binds it to\n  ---\n  duration_ms: 1.422004\n  type: 'suite'\n  ...\n# Subtest: S2-007 actor kinds are closed and machine kinds cannot be the gate\n    # Subtest: the actor kind list is the frozen six\n    ok 1 - the actor kind list is the frozen six\n      ---\n      duration_ms: 0.096078\n      type: 'test'\n      ...\n    # Subtest: the DONE edge requires an approval actor kind, so a producer cannot finish its own task\n    ok 2 - the DONE edge requires an approval actor kind, so a producer cannot finish its own task\n      ---\n      duration_ms: 0.082582\n      type: 'test'\n      ...\n    1..2\nok 64 - S2-007 actor kinds are closed and machine kinds cannot be the gate\n  ---\n  duration_ms: 0.243869\n  type: 'suite'\n  ...\n1..64\n# tests 338\n# suites 64\n# pass 338\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 9791.151322\n",
+      "reportedIssues": null
+    },
+    "security-probes": {
+      "command": "npm run --silent test:s2-007-security-probes",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "freshness:byte-digest-matches-this-run",
+          "ok": true,
+          "detail": "file=ea6ee97060290731 reported=ea6ee97060290731"
+        },
+        {
+          "check": "freshness:record-digest-matches-this-run",
+          "ok": true,
+          "detail": "the record content address must equal the one the gate reported"
+        },
+        {
+          "check": "freshness:commit-bound(commit)",
+          "ok": true,
+          "detail": "via commit"
+        },
+        {
+          "check": "freshness:tree-bound(tree)",
+          "ok": true,
+          "detail": "via tree"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "record.ok=true envelope.ok=true"
+        },
+        {
+          "check": "hardGates:ok",
+          "ok": true,
+          "detail": "record.hardGates.ok=true envelope.hardGatesOk=true"
+        },
+        {
+          "check": "hardGates:counters-all-zero",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "hardGates:counters-agree-with-block",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "honesty:no-unaccounted-omits",
+          "ok": true,
+          "detail": "0 omits"
+        }
+      ],
+      "counts": null,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "freshness": {
+        "evidenceFile": "evidence/s2-007-security-probes.json",
+        "beforeSha256": "1b01c6576ca4029c5a4497b43c5e974f619550c4a3161bc967ed32ac6eab6075",
+        "afterSha256": "ea6ee9706029073185d0f71c88fdb229a76aedf6bcdbf641df056fcb24d472cb",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+        "treeAnchor": "efae7534c7b496687ca217f35f4906cbdd41c99c"
+      },
+      "stderrTail": null,
+      "stdoutTail": null,
+      "reportedIssues": null
+    },
+    "db-replay": {
+      "command": "npm run --silent verify:s2-007-db-replay",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "freshness:file-is-this-runs-report",
+          "ok": true,
+          "detail": "the artifact must be exactly the report this process printed, plus its exit code"
+        },
+        {
+          "check": "freshness:commit-bound(commit|testedImplementationCommit|git.commit_sha)",
+          "ok": true,
+          "detail": "via git.commit_sha"
+        },
+        {
+          "check": "freshness:tree-bound(tree|git.tree_sha)",
+          "ok": true,
+          "detail": "via git.tree_sha"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "record.ok=true report.ok=true"
+        },
+        {
+          "check": "comparison:ok",
+          "ok": true,
+          "detail": "comparison.ok=true"
+        },
+        {
+          "check": "hardGates:ok",
+          "ok": true,
+          "detail": "hardGates.ok=true"
+        },
+        {
+          "check": "comparison:crash-phase-ok",
+          "ok": true,
+          "detail": "crashPhase.ok=true"
+        },
+        {
+          "check": "hardGates:counters-all-zero",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "counts": null,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "freshness": {
+        "evidenceFile": "evidence/s2-007-db-comparison.json",
+        "beforeSha256": "ed896bb60bf3631e75ff989e2518a8b34e7cb2c4c610096c1a763b5fb161d827",
+        "afterSha256": "67b7d35ce2fc821728d16f19a723fbffb6d2e9a860f3abd9fb1988d5648136a2",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+        "treeAnchor": "efae7534c7b496687ca217f35f4906cbdd41c99c",
+        "boundBy": "the written file is deep-equal to {this run's stdout report, its exit code}"
+      },
+      "stderrTail": null,
+      "stdoutTail": " \"b\": \"SIGKILL\"\n    },\n    \"pids\": {\n      \"a\": 359311,\n      \"b\": 359336\n    },\n    \"effects_issued\": {\n      \"a\": 1,\n      \"b\": 1\n    },\n    \"effects_issued_after_blind_retry\": {\n      \"a\": 1,\n      \"b\": 1\n    },\n    \"refusals\": {\n      \"a\": {\n        \"lateResult\": \"TRANSITION_NOT_ALLOWED\",\n        \"reconcileByProducer\": \"AUTH_REQUIRED\"\n      },\n      \"b\": {\n        \"lateResult\": \"TRANSITION_NOT_ALLOWED\",\n        \"reconcileByProducer\": \"AUTH_REQUIRED\"\n      }\n    }\n  },\n  \"hardGates\": {\n    \"counters\": {\n      \"crossWorkspaceLeaks\": 0,\n      \"authorityExpansions\": 0,\n      \"duplicateActiveLeases\": 0,\n      \"duplicateExternalEffects\": 0,\n      \"staleFenceMutations\": 0,\n      \"missingJournalOrOutbox\": 0,\n      \"falseApprovals\": 0\n    },\n    \"violations\": [],\n    \"ok\": true\n  },\n  \"freshness\": {\n    \"started_at\": \"2026-09-26T04:26:00.179Z\",\n    \"finished_at\": \"2026-09-26T04:26:07.952Z\",\n    \"duration_ms\": 7773,\n    \"observed_at\": \"2026-09-26T04:26:07.952Z\",\n    \"run_ids\": [\n      \"s2-007-db-run-a\",\n      \"s2-007-db-run-b\"\n    ],\n    \"run_ids_unique\": true,\n    \"window_ms\": 86400000,\n    \"age_ms\": 0,\n    \"verdict\": {\n      \"ok\": true,\n      \"issues\": [],\n      \"age_ms\": 0\n    }\n  },\n  \"git\": {\n    \"commit_sha\": \"fcc4ced561c455f5c6e3263a4a58b824005ca092\",\n    \"tree_sha\": \"efae7534c7b496687ca217f35f4906cbdd41c99c\",\n    \"dirty\": true,\n    \"note\": \"the record describes this TREE; an aggregator re-reads HEAD^{tree} and refuses a record that no longer matches\"\n  },\n  \"exitCode\": 0\n}\n",
+      "reportedIssues": null
+    }
+  },
+  "realExitCodes": {
+    "npm run --silent verify:s2-007-dependencies": 1,
+    "npm run --silent test:s2-007": 0,
+    "npm run --silent test:s2-007-security-probes": 0,
+    "npm run --silent verify:s2-007-db-replay": 0
+  },
+  "gateCommands": {
+    "ok": true,
+    "issues": [],
+    "expectedCommands": {
+      "dependencies": "npm run --silent verify:s2-007-dependencies",
+      "agentboard-tests": "npm run --silent test:s2-007",
+      "security-probes": "npm run --silent test:s2-007-security-probes",
+      "db-replay": "npm run --silent verify:s2-007-db-replay"
+    },
+    "observedCommands": {
+      "dependencies": "node scripts/verify-s2-007-dependencies.mjs",
+      "agentboard-tests": "node --test --test-concurrency=1 \"tests/agentboard/*.test.mjs\"",
+      "security-probes": "node scripts/s2-007-security-probes.mjs",
+      "db-replay": "node scripts/s2-007-db-replay.mjs"
+    }
+  },
+  "hardGates": {
+    "counters": {
+      "crossWorkspaceLeaks": 0,
+      "authorityExpansions": 0,
+      "duplicateActiveLeases": 0,
+      "duplicateExternalEffects": 0,
+      "staleFenceMutations": 0,
+      "missingJournalOrOutbox": 0,
+      "falseApprovals": 0
+    },
+    "sources": [
+      {
+        "source": "evidence/s2-007-security-probes.json",
+        "bound": true,
+        "allZero": true,
+        "counters": {
+          "crossWorkspaceLeaks": 0,
+          "authorityExpansions": 0,
+          "duplicateActiveLeases": 0,
+          "duplicateExternalEffects": 0,
+          "staleFenceMutations": 0,
+          "missingJournalOrOutbox": 0,
+          "falseApprovals": 0
+        },
+        "issues": []
+      },
+      {
+        "source": "evidence/s2-007-db-comparison.json",
+        "bound": true,
+        "allZero": true,
+        "counters": {
+          "crossWorkspaceLeaks": 0,
+          "authorityExpansions": 0,
+          "duplicateActiveLeases": 0,
+          "duplicateExternalEffects": 0,
+          "staleFenceMutations": 0,
+          "missingJournalOrOutbox": 0,
+          "falseApprovals": 0
+        },
+        "issues": []
+      },
+      {
+        "source": "evidence/s2-007-comparison.json",
+        "bound": false,
+        "allZero": true,
+        "counters": {
+          "crossWorkspaceLeaks": 0,
+          "authorityExpansions": 0,
+          "duplicateActiveLeases": 0,
+          "duplicateExternalEffects": 0,
+          "staleFenceMutations": 0,
+          "missingJournalOrOutbox": 0,
+          "falseApprovals": 0
+        },
+        "issues": []
+      }
+    ],
+    "ok": true
+  },
+  "tamperChecks": {
+    "ok": true,
+    "checked": 12,
+    "strong": 12,
+    "undetected": [],
+    "skipped": [
+      "dependencies: the gate produced no evidence artifact in this verification",
+      "agentboard-tests: the subprocess-tap gate shape writes no artifact, so there is nothing to doctor",
+      "security-probes/comparison-flipped: the gate does not carry this field, so the variant is not applicable",
+      "security-probes/db-stale-commit: the variant targets the db-replay-report gate shape",
+      "security-probes/db-stale-tree: the variant targets the db-replay-report gate shape",
+      "security-probes/db-counter-nonzero: the variant targets the db-replay-report gate shape",
+      "security-probes/db-status-not-run-db: the variant targets the db-replay-report gate shape",
+      "security-probes/db-crash-phase-faked: the variant targets the db-replay-report gate shape",
+      "security-probes/dep-stale-commit: the variant targets the json-stdout+file gate shape",
+      "security-probes/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
+      "security-probes/dep-hand-written-green: the variant targets the json-stdout+file gate shape",
+      "db-replay/stale-commit: the variant targets the evidence-envelope gate shape",
+      "db-replay/stale-tree: the variant targets the evidence-envelope gate shape",
+      "db-replay/counter-nonzero: the variant targets the evidence-envelope gate shape",
+      "db-replay/hardgates-flipped: the variant targets the evidence-envelope gate shape",
+      "db-replay/comparison-flipped: the variant targets the evidence-envelope gate shape",
+      "db-replay/status-not-run-db: the variant targets the evidence-envelope gate shape",
+      "db-replay/hand-written-green: the variant targets the evidence-envelope gate shape",
+      "db-replay/omits-hidden: the variant targets the evidence-envelope gate shape",
+      "db-replay/dep-stale-commit: the variant targets the json-stdout+file gate shape",
+      "db-replay/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
+      "db-replay/dep-hand-written-green: the variant targets the json-stdout+file gate shape"
+    ],
+    "results": [
+      {
+        "gate": "security-probes",
+        "variant": "stale-commit",
+        "expectedCheck": "freshness:commit-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=e01f3767fec007f5 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--stale-commit.json"
+      },
+      {
+        "gate": "security-probes",
+        "variant": "stale-tree",
+        "expectedCheck": "freshness:tree-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=3563547e728eb04e reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--stale-tree.json"
+      },
+      {
+        "gate": "security-probes",
+        "variant": "counter-nonzero",
+        "expectedCheck": "hardGates:counters-all-zero",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=01db7cb5e8e100c7 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--counter-nonzero.json"
+      },
+      {
+        "gate": "security-probes",
+        "variant": "hardgates-flipped",
+        "expectedCheck": "hardGates:ok",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9680954b5be162af reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--hardgates-flipped.json"
+      },
+      {
+        "gate": "security-probes",
+        "variant": "status-not-run-db",
+        "expectedCheck": "internal:status",
+        "classifierStatus": "NOT_RUN",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=787d58f2a5ab7a68 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--status-not-run-db.json"
+      },
+      {
+        "gate": "security-probes",
+        "variant": "hand-written-green",
+        "expectedCheck": "freshness:byte-digest-matches-this-run",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--hand-written-green.json"
+      },
+      {
+        "gate": "security-probes",
+        "variant": "omits-hidden",
+        "expectedCheck": "honesty:no-unaccounted-omits",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=19ed94dae1c272f7 reported=ea6ee97060290731",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/security-probes--omits-hidden.json"
+      },
+      {
+        "gate": "db-replay",
+        "variant": "db-stale-commit",
+        "expectedCheck": "freshness:file-is-this-runs-report",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-stale-commit.json"
+      },
+      {
+        "gate": "db-replay",
+        "variant": "db-stale-tree",
+        "expectedCheck": "freshness:file-is-this-runs-report",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-stale-tree.json"
+      },
+      {
+        "gate": "db-replay",
+        "variant": "db-counter-nonzero",
+        "expectedCheck": "freshness:file-is-this-runs-report",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-counter-nonzero.json"
+      },
+      {
+        "gate": "db-replay",
+        "variant": "db-status-not-run-db",
+        "expectedCheck": "internal:status",
+        "classifierStatus": "NOT_RUN",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-status-not-run-db.json"
+      },
+      {
+        "gate": "db-replay",
+        "variant": "db-crash-phase-faked",
+        "expectedCheck": "freshness:file-is-this-runs-report",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:file-is-this-runs-report:the artifact must be exactly the report this process printed, plus its exit code",
+        "scratchFile": ".bb/chats/thr_8sxageuj7j/tmp/s2-007-verify-fcc4ced561c4/db-replay--db-crash-phase-faked.json"
+      }
+    ]
+  },
+  "selfChecks": {
+    "ok": true,
+    "failures": [],
+    "negativeControls": {
+      "allGreenCleanCheckout": "COMPLETE_WITH_LIMITS",
+      "skippedMandatoryGate": "NOT_RUN",
+      "notRunDbMandatoryGate": "NOT_RUN",
+      "blockedDependency": "BLOCKED_DEPENDENCY",
+      "failedGate": "REVISE",
+      "counterFinding": "REVISE",
+      "undetectedTampering": "REVISE",
+      "renamedGate": "REVISE",
+      "dirtyCheckout": "PASS_WITH_LIMITS"
+    },
+    "gateSetOk": true
+  },
+  "observations": [
+    {
+      "name": "offline two-run comparison (evidence/s2-007-comparison.json)",
+      "present": true,
+      "bound": false,
+      "boundTo": {
+        "commit": null,
+        "tree": null
+      },
+      "status": "COMPARISON_OK",
+      "ok": true,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "counterFindings": [],
+      "blocksCompletion": false,
+      "why": "ok=true status=COMPARISON_OK counterFindings=none commitBound=false — regenerate with scripts/s2-007-run.mjs"
+    }
+  ],
+  "matrix": [
+    {
+      "criterion": "C1 dependency binding",
+      "requirement": "issue §1: an upstream binding is verified before any implementation; a missing binding is BLOCKED_DEPENDENCY",
+      "observation": "dependency gate BLOCKED_DEPENDENCY (exit 1); the binding record is bound to HEAD commit fcc4ced561c455f5c6e3263a4a58b824005ca092",
+      "evidence": "evidence/s2-007-dependency-binding.json",
+      "status": "BLOCKED_DEPENDENCY"
+    },
+    {
+      "criterion": "C2 one authoritative contract",
+      "requirement": "issue §2: wire shapes live only in contracts/*.schema.json and are validated only through contracts.mjs",
+      "observation": "not re-measured by this aggregator: the contract registry, its schema set and the generated types are covered by the test gate and the dependency gate; the aggregator does not restate the schemas",
+      "evidence": "contracts/*.schema.json, src/lib/agentboard/contracts.mjs, tests/agentboard/contracts.test.mjs",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C3 canonical board and rights",
+      "requirement": "issue §3: nine states, only the allowed transitions, one lease, server-side actor re-check, idempotent writes, journal+outbox in one transaction",
+      "observation": "test gate PASS (exit 0) over transitions, ACL, idempotency, lease and recovery tests",
+      "evidence": "tests/agentboard/*.test.mjs",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C4 scheduler, leases, handoff",
+      "requirement": "issue §4: deterministic selection, DB time, compare-and-swap, monotonic fence, idempotent outbox, no blind retry",
+      "observation": "probe families concurrent_claim + idempotency_and_crash PASS; DB replay PASS",
+      "evidence": "evidence/s2-007-security-probes.json, evidence/s2-007-comparison.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C5 mandatory negative probes",
+      "requirement": "issue §5: six families through the production-facing path and seven hard gates at 0",
+      "observation": "security-probe gate PASS (exit 0); counters {\"crossWorkspaceLeaks\":0,\"authorityExpansions\":0,\"duplicateActiveLeases\":0,\"duplicateExternalEffects\":0,\"staleFenceMutations\":0,\"missingJournalOrOutbox\":0,\"falseApprovals\":0}",
+      "evidence": "evidence/s2-007-security-probes.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C6 two-process DB replay",
+      "requirement": "issue §6: two process-separated executors on ephemeral PostgreSQL, canonical digests compared, hard gates and crash/restart phase; two identically wrong runs are not a PASS",
+      "observation": "db-replay gate PASS (exit 0)",
+      "evidence": "evidence/s2-007-db-comparison.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C7 freshness of the result",
+      "requirement": "issue §6: the aggregator checks freshness, hardGates.ok, comparison.ok and the internal status, not only the exit code or an existing evidence file",
+      "observation": "every evidence gate was re-run in this invocation and re-classified against 12 tampered copies; undetected tampering: none; 12 of them were STRONG controls (a genuine artifact this aggregator accepted, whose doctored copy it rejected)",
+      "evidence": "evidence/s2-007-summary.json (gates[].checks, tamperChecks)",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C8 no gate renaming",
+      "requirement": "issue §6: a gate may not be renamed to obtain a green status",
+      "observation": "the frozen command set is compared with package.json and with a second literal gate list: intact",
+      "evidence": "evidence/s2-007-summary.json (gateCommands)",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C9 honest A-MVP status",
+      "requirement": "issue §6: NOT_RUN cases, real exit codes and residual limits are reported; no A-MVP or assurance claim is inferred",
+      "observation": "A-MVP status NOT_RUN: 7 cases, all execution NOT_RUN; assuranceStatus NOT_MEASURED",
+      "evidence": "pilots/scenario-a/acceptance-cases.json, evidence/s2-007-summary.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C10 tracked evidence consistency",
+      "requirement": "issue §6: results are bound to commit/tree SHA and raw run IDs",
+      "observation": "offline comparison artifact: status COMPARISON_OK, bound=false, ok=true",
+      "evidence": "evidence/s2-007-comparison.json",
+      "status": "PASS"
+    }
+  ],
+  "aMvp": {
+    "status": "NOT_RUN",
+    "source": "pilots/scenario-a/acceptance-cases.json (execution: NOT_RUN for every A-MVP case)",
+    "cases": [
+      {
+        "id": "A-MVP-01",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN: the veritas.adapter/1.0.0 interface and the NOT_RUN_REAL_ADAPTER probe are engineering evidence about the boundary, not two distinct installed executors",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      },
+      {
+        "id": "A-MVP-02",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN: no generic-CLI discovery run and no second approved agent exist on this host",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      },
+      {
+        "id": "A-MVP-03",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN as an A-MVP case. The offline two-run comparison exercises the deterministic selection order and the probe suite is green, but it drives a test transport, not an approved runtime",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      },
+      {
+        "id": "A-MVP-04",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN: cancel/timeout/fence handling is proven against the boundary; process-group termination for the selected OS/sandbox is not proven here (S2-002 process-tree limits apply)",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      },
+      {
+        "id": "A-MVP-05",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN: no authenticated human performed a change→claim→execute→review→approve cycle in this verification",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      },
+      {
+        "id": "A-MVP-06",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN as an A-MVP case. The two-process claim race ran for real on a disposable PostgreSQL in this verification (probe two_process_claim_race, security-probes gate PASS), but no real adapter executed the claim and no independent human observed it",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      },
+      {
+        "id": "A-MVP-07",
+        "execution": "NOT_RUN",
+        "expected": "PASS",
+        "engineeringEvidence": "NOT_RUN as an A-MVP case. Idempotent dispatch and crash/restart recovery are covered by the probe families and a green DB replay, against a disposable database and a scripted transport",
+        "whyNotClaimed": "a real installed executor, an authenticated human reviewer and an authorized budget are prerequisites of every A-MVP case; none exists in this repository or on this host"
+      }
+    ],
+    "note": "A-MVP stays NOT_RUN. Engineering fixture/replay evidence never upgrades it (issue #7, spec rule 8).",
+    "headCommit": "fcc4ced561c455f5c6e3263a4a58b824005ca092"
+  },
+  "engineeringStatus": "BLOCKED_DEPENDENCY",
+  "assuranceStatus": "NOT_MEASURED",
+  "assuranceCeiling": "NOT_MEASURED is the honest status and no evidence produced by this ticket can move it: a real installed adapter, an authenticated human review and an empirical semantic accuracy are not derivable from a synthetic or replay run.",
+  "notInferred": [
+    "real_adapter_execution",
+    "human_review",
+    "empirical_semantic_accuracy",
+    "A_MVP_PASS",
+    "production_readiness"
+  ],
+  "verdictReasons": [
+    "[BLOCKED_DEPENDENCY] mandatory gate dependencies is BLOCKED_DEPENDENCY: gate:exit-code:1"
+  ],
+  "verdictPrecedence": [
+    "REVISE (critical defect) > BLOCKED_DEPENDENCY > NOT_RUN > PASS_WITH_LIMITS (green but dirty checkout) > COMPLETE_WITH_LIMITS"
+  ],
+  "checkout": {
+    "available": true,
+    "clean": false,
+    "changedPathCount": 4,
+    "changedPaths": [
+      "vidence/public-artifact-check.json",
+      "vidence/s2-007-db-comparison.json",
+      "vidence/s2-007-db-run-a.json",
+      "vidence/s2-007-db-run-b.json"
+    ]
+  },
+  "finalAcceptance": {
+    "note": "The final acceptance set of issue §6 is run by the owner at acceptance, not by this aggregator: this aggregator must not rebuild Next.js or run the whole suite while other work is in flight, and a result it did not observe may not be reported as observed.",
+    "commands": [
+      "npm test",
+      "npm run typecheck",
+      "npm run lint",
+      "npm run build",
+      "npm run inventory:check",
+      "npm run manifest:check",
+      "npm run verify:clean-checkout",
+      "git diff --check"
+    ],
+    "statuses": {
+      "npm test": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run typecheck": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run lint": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run build": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run inventory:check": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run manifest:check": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run verify:clean-checkout": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "git diff --check": "NOT_RUN_BY_THIS_AGGREGATOR"
+    }
+  },
+  "residualLimitations": [
+    "No real AgentOS/Codex/pi adapter is installed on this host: every execution-boundary observation comes from the veritas.adapter/1.0.0 test transport (NOT_RUN_REAL_ADAPTER).",
+    "assuranceStatus is NOT_MEASURED: nothing here calibrates a semantic verifier, and the S2-006 official status stays NEEDS_INPUT.",
+    "The database gate runs against a disposable PostgreSQL container, not a production instance: it validates transactions, fencing and recovery semantics, not operations.",
+    "The metrics inside the offline run are engineering proxies over an injected clock; none is an empirical quality, cost or latency measurement.",
+    "This aggregator certifies the engineering boundary described in issue #7 §2-§5. It is not an A-MVP PASS, not a SolutionPack sign-off and not production readiness."
+  ],
+  "rollback": {
+    "code": "git revert the S2-007 commits, or reset the worktree to the recorded base commit; the live board is a disjoint agentboard_* namespace, so reverting removes the boundary without touching the public synthetic demo.",
+    "database": "DROP the agentboard_* tables created by migrations/0008_agent_board.sql (agentboard_task, agentboard_acl, agentboard_lease, agentboard_adapter, agentboard_budget_grant, agentboard_budget_spend, agentboard_run, agentboard_execution_event, agentboard_transition, agentboard_audit, agentboard_outbox, agentboard_operation, agentboard_reconciliation) and the 0008 row in veritas_schema_migrations. The veritas_demo_* fixtures and migrations 0001-0007 are untouched by S2-007, so the public board keeps working.",
+    "evidence": "delete evidence/s2-007-*.json; the gates are re-runnable from a clean checkout.",
+    "verification": "npm run verify:s2-007 (the aggregator will report NOT_RUN/BLOCKED rather than green until every gate is green again)."
+  },
+  "recordDigest": "c2aee6435284a6b771e5f1bb2b4635399980f114676fb74d1f5d86f1f3b1a37f"
+}

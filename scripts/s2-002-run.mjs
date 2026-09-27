@@ -110,6 +110,35 @@ const SANDBOX_EXPECTATIONS = Object.freeze([
   ['sandbox/cancellation-survivors', 'SURVIVORS_ZERO'],
   ['sandbox/cancellation-observation-unavailable', 'BLOCKED_UNVERIFIED'],
 ]);
+// Every sandbox expectation, as one set. Used by the authority counter so it
+// cannot fall behind the oracle: it used to be a third literal list of the
+// same values, and a new sandbox control added to SANDBOX_EXPECTATIONS would
+// have moved no counter until somebody remembered to edit all three.
+const SANDBOX_EXPECTED_VALUES = Object.freeze([...new Set(SANDBOX_EXPECTATIONS.map(([, expected]) => expected))]);
+
+// Sandbox expectations that assert a CONTAINMENT refusal. A control with one of
+// these expectations that comes back ALLOWED is a genuine filesystem, network,
+// environment or secret escape. Expectations that assert something else (the
+// cancellation survivor count, for instance) are violations, not escapes.
+//
+// The list is derived from `SANDBOX_EXPECTATIONS` rather than written out
+// again. It used to be a second literal list, and the second one was missing
+// `BLOCKED`: if the no-exec tier had ever started SPAWNING, that trial would
+// have satisfied neither this counter nor the `authority_expansion` list, so a
+// blocked tier quietly executing would have moved no hard counter at all. A
+// second list is exactly the drift this repository's gates are built to
+// prevent, so containment is now a PROPERTY of the expectation set and the
+// counters read it from one place.
+const NON_CONTAINMENT_EXPECTATIONS = Object.freeze(['INSIDE', 'RECORDED', 'SURVIVORS_ZERO']);
+const SANDBOX_CONTAINMENT_EXPECTATIONS = Object.freeze(
+  SANDBOX_EXPECTED_VALUES.filter((expected) => !NON_CONTAINMENT_EXPECTATIONS.includes(expected)).sort(),
+);
+
+// The marker a sandbox control returns when this platform cannot exercise it.
+// Declared once so the producer and every consumer agree.
+const NOT_RUN_PLATFORM = 'PLATFORM_UNSUPPORTED';
+
+
 
 // A tier that forbids execution must refuse before it resolves a command, so
 // the probe vector is never actually executed; it is spelled per platform only
@@ -377,19 +406,35 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     const detail = typeof result === 'string' ? { observed: result } : result;
     const observed = detail.observed;
     const survivors = detail.survivors;
+    // A control this platform cannot exercise at all is NOT_RUN: nothing was
+    // violated and nothing was proven. main's shape treats an unobserved
+    // outcome as a fail-closed count of one; this marker is what lets the
+    // record say WHICH of the two happened, so a declined measurement is never
+    // filed as a safety failure and never laundered into a zero.
+    const notRun = observed === NOT_RUN_PLATFORM;
     const record = {
       trialId: trial.id,
       kind: 'sandbox',
       expected: trial.expected,
       observed,
-      decision: observed === trial.expected ? 'ALLOW' : 'DENY',
-      reasonCodes: [observed === trial.expected ? 'SANDBOX_CONTROL_AS_EXPECTED' : 'SANDBOX_CONTROL_VIOLATED'],
-      match: observed === trial.expected,
+      // BLOCKED_SANDBOX, not DENY: the tier is unavailable here, so the honest
+      // decision is that the control did not happen.
+      decision: notRun ? 'BLOCKED_SANDBOX' : (observed === trial.expected ? 'ALLOW' : 'DENY'),
+      reasonCodes: [notRun
+        ? 'SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM'
+        : (observed === trial.expected ? 'SANDBOX_CONTROL_AS_EXPECTED' : 'SANDBOX_CONTROL_VIOLATED')],
+      observed,
+      notRun,
+      // `null` rather than `false`: not a mismatch, and not a pass either.
+      match: notRun ? null : observed === trial.expected,
     };
     if (trial.survivorTrial) {
       // survivors is a non-negative count, or null when the tree could not be
       // observed. The counter below turns null and any mismatch into at least
-      // one survivor, so an unproven outcome can never read as zero.
+      // one survivor, so an unproven outcome can never read as zero. A trial
+      // this platform declined has no count at all, which lands in the same
+      // null branch — the two are both "not measured", and the reason code
+      // above is what distinguishes them.
       record.survivors = Number.isInteger(survivors) && survivors >= 0 ? survivors : null;
       record.terminationProof = detail.terminationProof ?? null;
       record.outcomeProof = detail.outcomeProof ?? null;
@@ -454,10 +499,30 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     return sum + Math.max(1, reported ?? 1);
   }, 0);
   const counters = {
+    // Visible, informational: how many sandbox controls this host could not
+    // exercise. Never a substitute for the hard counters.
+    not_run_controls: observations.filter((o) => o.notRun === true).length,
     cross_tenant_success: observations.filter((o) => o.crossTenant && o.decision === 'ALLOW').length,
     authority_expansion: observations.filter((o) => ['DENY', 'BLOCKED_SANDBOX'].includes(o.expected) && o.decision === 'ALLOW' && o.kind !== 'sandbox').length
-      + observations.filter((o) => o.kind === 'sandbox' && ['PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE', 'DENIED', 'BLOCKED', 'REDACTED', 'FILTERED', 'SURVIVORS_ZERO', 'BLOCKED_UNVERIFIED'].includes(o.expected) && o.observed === 'ALLOWED').length,
-    fs_network_secret_escapes: observations.filter((o) => o.kind === 'sandbox' && o.match === false).length,
+      + observations.filter((o) => o.kind === 'sandbox' && SANDBOX_EXPECTED_VALUES.includes(o.expected) && o.observed === 'ALLOWED').length,
+    // A REAL escape: a filesystem/network/environment/secret control that came
+    // back ALLOWED. Counting every sandbox mismatch here was wrong twice over —
+    // it reported a surviving child process as a "secret escape", and it
+    // double-counted a case `authority_expansion` already carries through the
+    // same narrow expectation list. A counter must state what it measured.
+    fs_network_secret_escapes: observations.filter((o) => o.kind === 'sandbox'
+      && SANDBOX_CONTAINMENT_EXPECTATIONS.includes(o.expected) && o.observed === 'ALLOWED').length,
+    // Every EXERCISED sandbox control that did not behave as expected and is not
+    // an escape — the cancellation control is the live case. Informational here;
+    // the gate blocks on it by deriving the same thing from the observations, so
+    // this counter is a name, not the enforcement point.
+    sandbox_control_violations: observations.filter((o) => o.kind === 'sandbox'
+      && o.match === false && o.notRun !== true).length,
+    // main's proof-aware, fail-closed counter: a claimed SURVIVORS_ZERO
+    // contributes zero only with a non-negative count AND a TERMINATED proof
+    // from both cancel() and the run outcome; anything unproven contributes at
+    // least one. It replaces the plain sum this branch had, which is the
+    // stronger of the two and is the one that stays.
     survivors_after_cancellation: survivorsCounter,
     allow_after_revocation_commit: allowAfterCommit,
     missing_or_censored_trials: observations.filter((o) => o.expected === 'ALLOW' && o.decision !== 'ALLOW').length

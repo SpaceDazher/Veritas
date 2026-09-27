@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/board-transition.schema.json",
+  "title": "BoardTransition",
+  "description": "S2-007 append-only canonical board transition. A transition record is written in the SAME transaction as the task state change, the audit row and the outbox event, or nothing is written at all. Transition history is never updated or deleted; a correction appends a new record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "transition_id",
+    "task_id",
+    "workspace_id",
+    "from_state",
+    "to_state",
+    "revision",
+    "actor",
+    "idempotency_key",
+    "reason",
+    "lease_id",
+    "fencing_token",
+    "brief_digest",
+    "policy_digest",
+    "manifest_digest",
+    "occurred_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "transition_id": { "type": "string", "pattern": "^trn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "task_id": { "type": "string", "pattern": "^abt-[a-z0-9][a-z0-9-]{0,62}$" },
+    "workspace_id": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "from_state": { "$ref": "#/$defs/state" },
+    "to_state": { "$ref": "#/$defs/state" },
+    "revision": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "The canonical revision produced BY this transition (previous revision + 1)."
+    },
+    "actor": {
+      "type": "string",
+      "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$",
+      "description": "Server-resolved authenticated principal. Never read from a client payload, prompt, log or model output."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 over the canonical-json-v1 form of the command arguments. Reuse with identical arguments replays the prior result; reuse with different arguments is IDEMPOTENCY_CONFLICT."
+    },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "lease_id": { "oneOf": [{ "type": "string", "pattern": "^lse-[a-z0-9][a-z0-9-]{0,62}$" }, { "type": "null" }] },
+    "fencing_token": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+    "brief_digest": { "$ref": "#/$defs/digest" },
+    "policy_digest": { "$ref": "#/$defs/digest" },
+    "manifest_digest": { "$ref": "#/$defs/digest" },
+    "occurred_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$" }
+  },
+  "$defs": {
+    "state": {
+      "enum": ["BACKLOG", "READY", "CLAIMED", "RUNNING", "BLOCKED", "IN_REVIEW", "DONE", "FAILED", "CANCELLED"]
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

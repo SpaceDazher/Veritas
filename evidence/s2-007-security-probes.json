@@ -1,0 +1,3401 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007",
+  "issue": "SpaceDazher/Veritas#7",
+  "role": "mandatory negative-probe gate: the six adversarial families of issue #7 §5, run against the production-facing command/HTTP boundary",
+  "gate": "test:s2-007-security-probes",
+  "probeModule": "src/lib/agentboard/probes.mjs",
+  "version": "s2-007-probes-v1",
+  "commit": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+  "tree": "efae7534c7b496687ca217f35f4906cbdd41c99c",
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0,
+  "reasons": [],
+  "counters": {
+    "crossWorkspaceLeaks": 0,
+    "authorityExpansions": 0,
+    "duplicateActiveLeases": 0,
+    "duplicateExternalEffects": 0,
+    "staleFenceMutations": 0,
+    "missingJournalOrOutbox": 0,
+    "falseApprovals": 0
+  },
+  "hardGates": {
+    "ok": true,
+    "counters": {
+      "crossWorkspaceLeaks": 0,
+      "authorityExpansions": 0,
+      "duplicateActiveLeases": 0,
+      "duplicateExternalEffects": 0,
+      "staleFenceMutations": 0,
+      "missingJournalOrOutbox": 0,
+      "falseApprovals": 0
+    },
+    "notRun": []
+  },
+  "totals": {
+    "probes": 41,
+    "passed": 41,
+    "failed": 0,
+    "notRun": 0,
+    "families": 6,
+    "countersWithFindings": []
+  },
+  "familiesAttempted": [
+    {
+      "family": "principal_forgery",
+      "total": 9,
+      "passed": 9,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "concurrent_claim",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "idempotency_and_crash",
+      "total": 7,
+      "passed": 7,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "substitution_and_approval",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "callback_integrity",
+      "total": 7,
+      "passed": 7,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "injection_and_traversal",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    }
+  ],
+  "probes": [
+    {
+      "probe": "forged_principal_in_body",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "the forged body is refused with AUTH_REQUIRED; the refusal document names the forged field; the refused create left the store byte-identical; no task exists for the forged identity; nothing was attributed to the impersonated principal"
+    },
+    {
+      "probe": "forged_principal_in_header",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "a forged identity header authenticates nobody; the owner-only task is not in the payload; the body carries no task document; the request is answered for the token principal, not the header"
+    },
+    {
+      "probe": "forged_principal_in_options_env",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "the options bag cannot authenticate the approval; the refusal is a typed board error; the task never reached DONE; the forged options changed nothing; no DONE transition was journalled"
+    },
+    {
+      "probe": "forged_principal_in_prompt_text",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "an approval quoted out of the prompt text is refused; the refusal is typed; the task is still IN_REVIEW; the text is stored as data; the task row grew no granted_scope field; the task row grew no approved field; the task row grew no approval field; the task row grew no actor field; the task row grew no actor_kind field; the task row grew no role field; the task row grew no budget field; the task row grew no capabilities field; the task row grew no lease_id field; no budget grant was derived from"
+    },
+    {
+      "probe": "cross_workspace_read_is_empty",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "crossWorkspaceLeaks",
+      "detail": "the cross-workspace read is refused; the refusal is a typed board-error document; the payload has no task document; the payload does not contain FOREIGN-TITLE-DO-NOT-LEAK; the payload does not contain FOREIGN-DESCRIPTION-DO-NOT-LEAK; the payload does not contain FOREIGN-CRITERION-DO-NOT-LEAK; the payload carries no foreign digest or budget; the payload names no state, revision or lease of the victim; commands.execute refuses the cross-workspace read; the refusal is typed and inside the closed co"
+    },
+    {
+      "probe": "cross_workspace_write_refused",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "crossWorkspaceLeaks",
+      "detail": "the cross-workspace transition is refused; the cross-workspace transition refusal is typed; the cross-workspace cancel is refused; the cross-workspace cancel refusal is typed; the cross-workspace claim is refused; the cross-workspace claim refusal is typed; the foreign store is byte-identical; the foreign task never moved; no lease was created in the foreign workspace; the attacker workspace still holds nothing"
+    },
+    {
+      "probe": "cross_workspace_discovery_is_empty",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "crossWorkspaceLeaks",
+      "detail": "the cross-workspace list is answerable but EMPTY; the list leaks no foreign field; the cross-workspace plan selects nothing; the cross-workspace outbox is EMPTY; an adapter of another workspace may not serve this task; that refusal is typed"
+    },
+    {
+      "probe": "forged_grant_in_arguments",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "a forged principal_id is refused; the principal_id refusal is typed; the principal_id refusal changed nothing; a forged actor is refused; the actor refusal is typed; the actor refusal changed nothing; a forged actor_kind is refused; the actor_kind refusal is typed; the actor_kind refusal changed nothing; a forged role is refused; the role refusal is typed; the role refusal changed nothing; a forged granted_scope is refused; the granted_scope refusal is typed; the granted_scope refusal changed no"
+    },
+    {
+      "probe": "forged_lease_and_fence_in_arguments",
+      "family": "principal_forgery",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "a fencing token that is not the current one is refused; a fencing token that is not the current one is refused with a typed fence/lease error; a fencing token that is not the current one changed nothing; a fence from a lease that never existed is refused; a fence from a lease that never existed is refused with a typed fence/lease error; a fence from a lease that never existed changed nothing; the task is still IN_REVIEW"
+    },
+    {
+      "probe": "two_process_claim_race",
+      "family": "concurrent_claim",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateActiveLeases",
+      "detail": "the seeded task holds no active lease; race child alpha reported ready; race child beta reported ready; both processes reported an outcome; exactly one process won the claim; the loser received a typed, non-retryable refusal; the loser was not told to retry blindly; the database holds exactly ONE active lease; the database recorded exactly ONE claim; exactly one transition into CLAIMED; the task records exactly one attempt"
+    },
+    {
+      "probe": "concurrent_claims_in_one_workspace",
+      "family": "concurrent_claim",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateActiveLeases",
+      "detail": "at most one claim was granted; exactly one ACTIVE lease exists; every granted lease is still readable after the race; every loser received a typed refusal; no loser was told to retry blindly; exactly one transition into CLAIMED; the task records one attempt"
+    },
+    {
+      "probe": "stale_fence_after_reassign",
+      "family": "concurrent_claim",
+      "status": "pass",
+      "passed": true,
+      "counter": "staleFenceMutations",
+      "detail": "the reassignment itself is allowed; the fence moved on; the displaced holder's event is refused; the displaced holder's event is STALE_FENCE; the displaced holder's collect_result is refused; the displaced holder's collect_result is STALE_FENCE; the displaced holder's renew is refused; the displaced holder's renew is STALE_FENCE; the displaced holder's release is refused; the displaced holder's release is STALE_FENCE; no stale write changed anything; no journal row was written by a stale callbac"
+    },
+    {
+      "probe": "stale_fence_after_expiry",
+      "family": "concurrent_claim",
+      "status": "pass",
+      "passed": true,
+      "counter": "staleFenceMutations",
+      "detail": "the sweep expired the lease; no lease is active after the sweep; the task holds no fence after expiry; the post-expiry event is refused; the post-expiry event is STALE_FENCE; the post-expiry collect_result is refused; the post-expiry collect_result is STALE_FENCE; the post-expiry renew is refused; the post-expiry renew is STALE_FENCE; no post-expiry write changed anything; no journal row was written after expiry; the task did not become IN_REVIEW or DONE"
+    },
+    {
+      "probe": "stale_fence_after_cancel",
+      "family": "concurrent_claim",
+      "status": "pass",
+      "passed": true,
+      "counter": "staleFenceMutations",
+      "detail": "the operator cancel is accepted; the task is CANCELLED; the lease was withdrawn with the cancel; the task holds no fence after the cancel; the post-cancel event is refused; the post-cancel event is STALE_FENCE; the post-cancel collect_result is refused; the post-cancel collect_result is STALE_FENCE; no post-cancel write changed anything; the task is still CANCELLED"
+    },
+    {
+      "probe": "stale_fence_after_restart",
+      "family": "concurrent_claim",
+      "status": "pass",
+      "passed": true,
+      "counter": "staleFenceMutations",
+      "detail": "the restarted process sees the committed lease; the restarted process may rotate the lease; the pre-restart holder is stale after the restart; the refusal is STALE_FENCE; the restarted store changed nothing"
+    },
+    {
+      "probe": "same_key_different_payload",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "the first keyed write is committed; an identical replay returns the committed result; the identical replay wrote nothing; the same key with a different payload is refused; the conflict is a typed IDEMPOTENCY_CONFLICT; the conflict is not retryable; the conflict left the store byte-identical; the second task was never created"
+    },
+    {
+      "probe": "mutating_command_requires_idempotency_key",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "a mutating command without a key is refused; the refusal names the missing key; an unkeyed write changed nothing; no task exists"
+    },
+    {
+      "probe": "replayed_dispatch_sends_once",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "the dispatch is committed; exactly one external effect crossed the boundary; the outbox row is ACKED; a repeated dispatch is answerable, not fatal; the second dispatch committed nothing new; the third dispatch committed nothing new; the boundary was crossed exactly ONCE in total; the outbox holds exactly one row for the run; the pre-dispatch state was left to the dispatch alone"
+    },
+    {
+      "probe": "crash_after_send_before_ack",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "an unknown outcome is not a success; it is a typed RECONCILIATION_REQUIRED; it is not retryable; the send intent was recorded before the boundary was crossed; the row is escalated, not re-sendable; the blind retry issues no second external effect; recovery is answerable; recovery issues no external effect; recovery cannot re-send even with a transport in hand; the outbox still holds exactly one row; the unknown outcome is still unknown; the producer may not decide its own unknown effect; that re"
+    },
+    {
+      "probe": "crash_before_intent_is_redispatchable",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "missingJournalOrOutbox",
+      "detail": "the run left exactly one PENDING outbox row; recovery accounts for the PENDING row; recovery escalates nothing (nothing is unknown); recovery still holds the row; the re-dispatch is committed; the re-dispatch crossed the boundary exactly once; the row is ACKED and the work is not lost"
+    },
+    {
+      "probe": "committed_side_effects_are_journalled",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "missingJournalOrOutbox",
+      "detail": "every committed state change is journalled; the journal holds no duplicate edge; every journalled revision is distinct and increasing; each journalled transition names the digests it decided on; the board.task.create side effect is audited; the board.task.transition side effect is audited; the board.task.claim side effect is audited; the board.execution.start side effect is audited; the execution handoff has an outbox row; the outbox row carries the server-built request; the task carries a histo"
+    },
+    {
+      "probe": "refused_side_effects_write_nothing",
+      "family": "idempotency_and_crash",
+      "status": "pass",
+      "passed": true,
+      "counter": "missingJournalOrOutbox",
+      "detail": "the illegal edge is refused; the illegal edge refusal is typed; the illegal edge refusal is in the closed code set; the unknown command is refused; the unknown command refusal is typed; the unknown command refusal is in the closed code set; the unknown argument is refused; the unknown argument refusal is typed; the unknown argument refusal is in the closed code set; the malformed result is refused; the malformed result refusal is typed; the malformed result refusal is in the closed code set; the"
+    },
+    {
+      "probe": "substituted_task_brief",
+      "family": "substitution_and_approval",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "an approval of a substituted brief is refused; it is a typed MALFORMED_RESULT; the task is still RUNNING; a checkpoint under a substituted brief is refused; that refusal is typed; neither substitution changed anything; no result was recorded on the run; the task never reached IN_REVIEW or DONE"
+    },
+    {
+      "probe": "swapped_policy_and_manifest_digest",
+      "family": "substitution_and_approval",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "a swapped policy digest is refused; the swapped policy digest refusal is typed; a swapped manifest digest is refused; the swapped manifest digest refusal is typed; a review that cannot name the documents it reviewed is refused; the task is still IN_REVIEW; no digest substitution changed anything"
+    },
+    {
+      "probe": "hidden_budget_change",
+      "family": "substitution_and_approval",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "a grant that re-attributes its approver is refused; a grant that re-attributes its approver is typed; a settle beyond the granted limit is refused; a settle beyond the granted limit is typed; a settle the producer may not make is refused; a settle the producer may not make is typed; the granted limits are unchanged; no second grant exists; no spend was recorded; no budget attack changed anything else"
+    },
+    {
+      "probe": "producer_cannot_approve",
+      "family": "substitution_and_approval",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "a producer may not approve its own work; the refusal is a typed BLOCKED_POLICY; the refusal names the actor-kind rule; the task is still IN_REVIEW; no DONE transition was journalled; the self-approval changed nothing"
+    },
+    {
+      "probe": "uncalibrated_verifier_cannot_approve",
+      "family": "substitution_and_approval",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "an uncalibrated verifier (system) may not approve; the system verifier refusal is typed; an uncalibrated verifier (adapter) may not approve; the adapter verifier refusal is typed; an uncalibrated verifier (scheduler) may not approve; the scheduler verifier refusal is typed; an uncalibrated verifier may not decide a reconciliation; no reconciliation row was recorded; the task is still IN_REVIEW; no verifier attempt changed anything"
+    },
+    {
+      "probe": "self_approval_is_refused",
+      "family": "substitution_and_approval",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "the run records its producer; the producer may not approve its own run; the refusal is a typed BLOCKED_POLICY; the refusal names the independence rule; the task is still IN_REVIEW; the self-approval changed nothing"
+    },
+    {
+      "probe": "malformed_callback_refused",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "a result with no outcome is refused; a result with no outcome is a typed MALFORMED_RESULT/ACL refusal; a result with a foreign contract version is refused; a result with a foreign contract version is a typed MALFORMED_RESULT/ACL refusal; a result for a task the run does not own is refused; a result for a task the run does not own is a typed MALFORMED_RESULT/ACL refusal; a result for a workspace the run does not own is refused; a result for a workspace the run does not own is a typed MALFORMED_RE"
+    },
+    {
+      "probe": "out_of_order_callback_refused",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "missingJournalOrOutbox",
+      "detail": "the first callback is journalled; a gap in the sequence is refused; a gap in the sequence is a typed MALFORMED_RESULT; a callback that rewinds the sequence is refused; a callback that rewinds the sequence is a typed MALFORMED_RESULT; the journal holds exactly the one accepted callback; the accepted sequence is 1; the journal is unchanged after the refusals; the task did not advance"
+    },
+    {
+      "probe": "duplicate_callback_refused",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "missingJournalOrOutbox",
+      "detail": "the first callback is journalled; a duplicate callback is either refused or idempotent; the journal holds NO duplicate row; the duplicate wrote nothing; the first collection is committed; the replay is answered without a second teardown; the replay is flagged as a replay; no transition was appended twice; the duplicate collect changed nothing"
+    },
+    {
+      "probe": "unknown_outcome_is_not_retried",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "an unknown outcome is collectable as a FACT; an unknown outcome does not become IN_REVIEW; an unknown outcome does not become DONE; the run is recorded as needing reconciliation; the result is not collected a second time as a success; the collect retry is a typed, non-retryable refusal; the undelivered handoff is sent at most once; and never a second time after that; the unknown outcome never became IN_REVIEW; no reconciliation was recorded without a decision; the run still records the unknown o"
+    },
+    {
+      "probe": "timeout_is_not_retried",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "a timeout is collectable as a FACT; a timeout is not IN_REVIEW; a timeout is not DONE; a timeout is a failure, not a success; a timeouted handoff is sent at most once; and is never re-sent after that; a timeouted result is not overwritten by a success; the recorded outcome is still the timeout; the task never reached DONE"
+    },
+    {
+      "probe": "cancel_then_callback_refused",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "duplicateExternalEffects",
+      "detail": "the run cancel is accepted; collect a result on a cancelled run is refused; collect a result is a typed refusal; append a callback on a cancelled run is refused; append a callback is a typed refusal; re-dispatch the handoff on a cancelled run is refused; re-dispatch the handoff is a typed refusal; a cancelled run issues no external effect; a cancelled run changed nothing; the task is still CANCELLED"
+    },
+    {
+      "probe": "no_false_state_advance",
+      "family": "callback_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "detail": "hostile callback 0 (execution.collect_result) is refused; hostile callback 1 (execution.collect_result) is refused; hostile callback 2 (execution.collect_result) is refused; hostile callback 3 (execution.event) is refused; hostile callback 4 (execution.event) is refused; hostile callback 5 (tasks.transition) is refused; hostile callback 6 (tasks.transition) is refused; the task never became IN_REVIEW; the task never became DONE; the task never became FAILED without a failure; no hostile callback"
+    },
+    {
+      "probe": "injection_in_prompt_text_grants_nothing",
+      "family": "injection_and_traversal",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "the text is stored verbatim as data; the text moved nothing; the text granted no lease; the text minted no fence; the text assigned no executor; the text raised no budget; the text widened no capability; the text widened no tool; the text widened no ACL; the task row grew no granted_scope; the task row grew no approved; the task row grew no approval; the task row grew no actor; the task row grew no actor_kind; the task row grew no role; the task row grew no budget; the task row grew no capabilit"
+    },
+    {
+      "probe": "injection_in_source_and_log_grants_nothing",
+      "family": "injection_and_traversal",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "a quoted source excerpt is stored or refused, never obeyed; a log line is stored or refused, never obeyed; a hostile result payload grants nothing; the injected text did not move the task; the injected text minted no fence; the grant is unchanged by the injected text; the handoff scope is unchanged by the injected text; the handoff tools are unchanged by the injected text; no reconciliation was manufactured from text; no grant row was created from text; no lease beyond the one in flight; the inj"
+    },
+    {
+      "probe": "secret_never_reaches_a_record",
+      "family": "injection_and_traversal",
+      "status": "pass",
+      "passed": true,
+      "counter": "crossWorkspaceLeaks",
+      "detail": "a callback whose payload must be redacted is still accepted as data; no raw secret reached the store record; no raw secret reached the outbox record; no raw secret reached the audit record; no raw secret reached the journal record; no raw secret reached the run record; no raw secret reached the transitions record; no raw secret reached the leases record; no raw secret reached the command read payload; the API answers the owner; no raw secret reached the API payload; no raw secret is present in t"
+    },
+    {
+      "probe": "workspace_traversal_refused",
+      "family": "injection_and_traversal",
+      "status": "pass",
+      "passed": true,
+      "counter": "crossWorkspaceLeaks",
+      "detail": "a workspace_ref with a parent traversal is refused; the a parent traversal refusal is typed; the a parent traversal refusal is an ACL/boundary refusal; the a parent traversal created no task; the a parent traversal changed nothing; a workspace_ref with an absolute path is refused; the an absolute path refusal is typed; the an absolute path refusal is an ACL/boundary refusal; the an absolute path created no task; the an absolute path changed nothing; a workspace_ref with a backslash path is refus"
+    },
+    {
+      "probe": "symlink_escape_refused",
+      "family": "injection_and_traversal",
+      "status": "pass",
+      "passed": true,
+      "counter": "crossWorkspaceLeaks",
+      "detail": "the fixture link really does leave the root; a symlinked workspace that resolves outside is refused; the refusal is typed; the refusal is an ACL/boundary refusal; no task was created through the link; the escape changed nothing; a real subdirectory of the root is admitted"
+    },
+    {
+      "probe": "forbidden_sandbox_blocked",
+      "family": "injection_and_traversal",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "detail": "the claim under NO_EXEC is refused; the claim under NO_EXEC is BLOCKED_SANDBOX; the run under NO_EXEC is refused; the run under NO_EXEC is BLOCKED_SANDBOX; the RUNNING transition under NO_EXEC is refused; the RUNNING transition under NO_EXEC is a typed refusal; NO_EXEC created no run; NO_EXEC granted no lease; NO_EXEC left the task in READY; NO_EXEC changed nothing while refusing; the claim under a blocked isolation tier is refused; the claim under a blocked isolation tier is BLOCKED_SANDBOX; th"
+    }
+  ],
+  "omits": [],
+  "registry": {
+    "missingProbes": [],
+    "counterMismatches": [],
+    "unknownCounters": [],
+    "emptyFamilies": []
+  },
+  "database": {
+    "tier": "podman_disposable",
+    "external": false,
+    "engine": "PostgreSQL",
+    "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+    "container": "veritas-s2-007-security-probes",
+    "migrationsApplied": 8,
+    "migrationCount": 8,
+    "connection": "postgresql://veritas_s2_007_probes@127.0.0.1:44107/veritas_s2_007_probes (password redacted)",
+    "reason": null,
+    "note": "a disposable hardened container was provisioned for this gate, migrated through scripts/apply-migrations.mjs, and removed afterwards"
+  },
+  "probeEvidence": [
+    {
+      "probe": "forged_principal_in_body",
+      "family": "principal_forgery",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the forged body is refused with AUTH_REQUIRED",
+          "ok": true,
+          "detail": "status=401 code=AUTH_REQUIRED"
+        },
+        {
+          "label": "the refusal document names the forged field",
+          "ok": true,
+          "detail": "HTTP_FORGED_PRINCIPAL_IN_BODY"
+        },
+        {
+          "label": "the refused create left the store byte-identical",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no task exists for the forged identity",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "nothing was attributed to the impersonated principal",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "http_status": 401,
+      "refusal_code": "AUTH_REQUIRED"
+    },
+    {
+      "probe": "forged_principal_in_header",
+      "family": "principal_forgery",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a forged identity header authenticates nobody",
+          "ok": true,
+          "detail": "status=403"
+        },
+        {
+          "label": "the owner-only task is not in the payload",
+          "ok": true,
+          "detail": "status=403"
+        },
+        {
+          "label": "the body carries no task document",
+          "ok": true,
+          "detail": "{\"contractVersion\":\"1.0.0\",\"code\":\"ACL_DENIED\",\"message\":\"acl_denied\",\"retryable\":false,\"detail\":null,\"occurred_at\":\"2026-09-25T12:00:00.000Z\"}"
+        },
+        {
+          "label": "the request is answered for the token principal, not the header",
+          "ok": true,
+          "detail": "status=200 tasks=[]"
+        }
+      ],
+      "http_status": 403,
+      "refusal_code": "ACL_DENIED",
+      "authenticated_list_status": 200
+    },
+    {
+      "probe": "forged_principal_in_options_env",
+      "family": "principal_forgery",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the options bag cannot authenticate the approval",
+          "ok": true,
+          "detail": "the DONE was accepted from an options bag"
+        },
+        {
+          "label": "the refusal is a typed board error",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the task never reached DONE",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the forged options changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no DONE transition was journalled",
+          "ok": true,
+          "detail": "[\"READY\",\"CLAIMED\",\"RUNNING\",\"IN_REVIEW\"]"
+        }
+      ],
+      "refusal_code": "AUTH_REQUIRED"
+    },
+    {
+      "probe": "forged_principal_in_prompt_text",
+      "family": "principal_forgery",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "an approval quoted out of the prompt text is refused",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the task is still IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text is stored as data",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no granted_scope field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no approved field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no approval field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no actor field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no actor_kind field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no role field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no budget field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no capabilities field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no lease_id field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no budget grant was derived from text",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the injection changed no committed authority",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "refusal_code": "AUTH_REQUIRED"
+    },
+    {
+      "probe": "cross_workspace_read_is_empty",
+      "family": "principal_forgery",
+      "counter": "crossWorkspaceLeaks",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the cross-workspace read is refused",
+          "ok": true,
+          "detail": "status=422"
+        },
+        {
+          "label": "the refusal is a typed board-error document",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "the payload has no task document",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the payload does not contain FOREIGN-TITLE-DO-NOT-LEAK",
+          "ok": true,
+          "detail": "{\"contractVersion\":\"1.0.0\",\"code\":\"NEEDS_INPUT\",\"message\":\"unknown task abt-probe-foreign-1\",\"retryable\":true,\"detail\":null,\"occurred_at\":\"2026-09-25T12:00:00.000Z\"}"
+        },
+        {
+          "label": "the payload does not contain FOREIGN-DESCRIPTION-DO-NOT-LEAK",
+          "ok": true,
+          "detail": "{\"contractVersion\":\"1.0.0\",\"code\":\"NEEDS_INPUT\",\"message\":\"unknown task abt-probe-foreign-1\",\"retryable\":true,\"detail\":null,\"occurred_at\":\"2026-09-25T12:00:00.000Z\"}"
+        },
+        {
+          "label": "the payload does not contain FOREIGN-CRITERION-DO-NOT-LEAK",
+          "ok": true,
+          "detail": "{\"contractVersion\":\"1.0.0\",\"code\":\"NEEDS_INPUT\",\"message\":\"unknown task abt-probe-foreign-1\",\"retryable\":true,\"detail\":null,\"occurred_at\":\"2026-09-25T12:00:00.000Z\"}"
+        },
+        {
+          "label": "the payload carries no foreign digest or budget",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the payload names no state, revision or lease of the victim",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "commands.execute refuses the cross-workspace read",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the refusal is typed and inside the closed code set",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "the refusal document names no field of the victim",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "http_status": 422,
+      "refusal_code": "NEEDS_INPUT",
+      "command_refusal_code": "NEEDS_INPUT"
+    },
+    {
+      "probe": "cross_workspace_write_refused",
+      "family": "principal_forgery",
+      "counter": "crossWorkspaceLeaks",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the cross-workspace transition is refused",
+          "ok": true,
+          "detail": "transition was accepted"
+        },
+        {
+          "label": "the cross-workspace transition refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "the cross-workspace cancel is refused",
+          "ok": true,
+          "detail": "cancel was accepted"
+        },
+        {
+          "label": "the cross-workspace cancel refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "the cross-workspace claim is refused",
+          "ok": true,
+          "detail": "claim was accepted"
+        },
+        {
+          "label": "the cross-workspace claim refusal is typed",
+          "ok": true,
+          "detail": "AGENT_UNAVAILABLE"
+        },
+        {
+          "label": "the foreign store is byte-identical",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the foreign task never moved",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no lease was created in the foreign workspace",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the attacker workspace still holds nothing",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "write_transition_code": "ACL_DENIED",
+      "write_cancel_code": "ACL_DENIED",
+      "write_claim_code": "AGENT_UNAVAILABLE"
+    },
+    {
+      "probe": "cross_workspace_discovery_is_empty",
+      "family": "principal_forgery",
+      "counter": "crossWorkspaceLeaks",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the cross-workspace list is answerable but EMPTY",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "label": "the list leaks no foreign field",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the cross-workspace plan selects nothing",
+          "ok": true,
+          "detail": "{\"contractVersion\":\"1.0.0\",\"decision_id\":\"dsc-3c47d73c6d975595\",\"workspace_id\":\"ws-probe-foreign\",\"max_concurrency\":1,\"selected_task_id\":null,\"selected_adapter_id\":null,\"selected_lease_id\":null,\"selec"
+        },
+        {
+          "label": "the cross-workspace outbox is EMPTY",
+          "ok": true,
+          "detail": "[]"
+        },
+        {
+          "label": "an adapter of another workspace may not serve this task",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "that refusal is typed",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        }
+      ]
+    },
+    {
+      "probe": "forged_grant_in_arguments",
+      "family": "principal_forgery",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a forged principal_id is refused",
+          "ok": true,
+          "detail": "principal_id was accepted"
+        },
+        {
+          "label": "the principal_id refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the principal_id refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged actor is refused",
+          "ok": true,
+          "detail": "actor was accepted"
+        },
+        {
+          "label": "the actor refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the actor refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged actor_kind is refused",
+          "ok": true,
+          "detail": "actor_kind was accepted"
+        },
+        {
+          "label": "the actor_kind refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the actor_kind refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged role is refused",
+          "ok": true,
+          "detail": "role was accepted"
+        },
+        {
+          "label": "the role refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the role refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged granted_scope is refused",
+          "ok": true,
+          "detail": "granted_scope was accepted"
+        },
+        {
+          "label": "the granted_scope refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the granted_scope refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged allowed_tools is refused",
+          "ok": true,
+          "detail": "allowed_tools was accepted"
+        },
+        {
+          "label": "the allowed_tools refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the allowed_tools refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged capabilities is refused",
+          "ok": true,
+          "detail": "capabilities was accepted"
+        },
+        {
+          "label": "the capabilities refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the capabilities refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged approved is refused",
+          "ok": true,
+          "detail": "approved was accepted"
+        },
+        {
+          "label": "the approved refusal is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the approved refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged approval is refused",
+          "ok": true,
+          "detail": "approval was accepted"
+        },
+        {
+          "label": "the approval refusal is typed",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the approval refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged budget is refused",
+          "ok": true,
+          "detail": "budget was accepted"
+        },
+        {
+          "label": "the budget refusal is typed",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the budget refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a forged budget_grant is refused",
+          "ok": true,
+          "detail": "budget_grant was accepted"
+        },
+        {
+          "label": "the budget_grant refusal is typed",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the budget_grant refusal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task is still IN_REVIEW after every forged argument",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no grant row was created by a payload",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a FAITHFUL repeat of the resolved grant is not a forgery",
+          "ok": true,
+          "detail": "a faithful repeat was refused"
+        },
+        {
+          "label": "the independent review then stands",
+          "ok": true,
+          "detail": "DONE"
+        }
+      ],
+      "arg_principal_id_code": "AUTH_REQUIRED",
+      "arg_actor_code": "AUTH_REQUIRED",
+      "arg_actor_kind_code": "AUTH_REQUIRED",
+      "arg_role_code": "AUTH_REQUIRED",
+      "arg_granted_scope_code": "AUTH_REQUIRED",
+      "arg_allowed_tools_code": "AUTH_REQUIRED",
+      "arg_capabilities_code": "AUTH_REQUIRED",
+      "arg_approved_code": "AUTH_REQUIRED",
+      "arg_approval_code": "BLOCKED_POLICY",
+      "arg_budget_code": "BLOCKED_POLICY",
+      "arg_budget_grant_code": "BLOCKED_POLICY",
+      "positive_control_code": "ACCEPTED"
+    },
+    {
+      "probe": "forged_lease_and_fence_in_arguments",
+      "family": "principal_forgery",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a fencing token that is not the current one is refused",
+          "ok": true,
+          "detail": "the forged lease/fence was accepted"
+        },
+        {
+          "label": "a fencing token that is not the current one is refused with a typed fence/lease error",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "a fencing token that is not the current one changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a fence from a lease that never existed is refused",
+          "ok": true,
+          "detail": "the forged lease/fence was accepted"
+        },
+        {
+          "label": "a fence from a lease that never existed is refused with a typed fence/lease error",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "a fence from a lease that never existed changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task is still IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "current_fence": 0,
+      "lease_case_a_fencing_token_that_is_not_the_current_one_code": "STALE_FENCE",
+      "lease_case_a_fence_from_a_lease_that_never_existed_code": "STALE_FENCE"
+    },
+    {
+      "probe": "two_process_claim_race",
+      "family": "concurrent_claim",
+      "counter": "duplicateActiveLeases",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the seeded task holds no active lease",
+          "ok": true,
+          "detail": "leases=0"
+        },
+        {
+          "label": "race child alpha reported ready",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "race child beta reported ready",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "both processes reported an outcome",
+          "ok": true,
+          "detail": "[{\"label\":\"alpha\",\"ok\":true,\"typed\":true,\"code\":null,\"retryable\":false,\"lease_id\":\"lse-race-alpha-le1\",\"lease_state\":\"ACTIVE\",\"revision\":3},{\"label\":\"beta\",\"ok\":false,\"typed\":true,\"code\":\"REVISION_CONFLICT\",\"retryable\":false,\"message\":\"REVISION_CONFLICT\"}]"
+        },
+        {
+          "label": "exactly one process won the claim",
+          "ok": true,
+          "detail": "[{\"label\":\"alpha\",\"ok\":true,\"typed\":true,\"code\":null,\"retryable\":false,\"lease_id\":\"lse-race-alpha-le1\",\"lease_state\":\"ACTIVE\",\"revision\":3},{\"label\":\"beta\",\"ok\":false,\"typed\":true,\"code\":\"REVISION_CONFLICT\",\"retryable\":false,\"message\":\"REVISION_CONFLICT\"}]"
+        },
+        {
+          "label": "the loser received a typed, non-retryable refusal",
+          "ok": true,
+          "detail": "[{\"label\":\"beta\",\"ok\":false,\"typed\":true,\"code\":\"REVISION_CONFLICT\",\"retryable\":false,\"message\":\"REVISION_CONFLICT\"}]"
+        },
+        {
+          "label": "the loser was not told to retry blindly",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the database holds exactly ONE active lease",
+          "ok": true,
+          "detail": "active=1"
+        },
+        {
+          "label": "the database recorded exactly ONE claim",
+          "ok": true,
+          "detail": "leases=1"
+        },
+        {
+          "label": "exactly one transition into CLAIMED",
+          "ok": true,
+          "detail": "[\"READY\",\"CLAIMED\"]"
+        },
+        {
+          "label": "the task records exactly one attempt",
+          "ok": true,
+          "detail": "attempts=1"
+        }
+      ],
+      "reports": [
+        {
+          "label": "alpha",
+          "ok": true,
+          "code": null
+        },
+        {
+          "label": "beta",
+          "ok": false,
+          "code": "REVISION_CONFLICT"
+        }
+      ],
+      "active_leases": 1,
+      "claims_recorded": 1
+    },
+    {
+      "probe": "concurrent_claims_in_one_workspace",
+      "family": "concurrent_claim",
+      "counter": "duplicateActiveLeases",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "at most one claim was granted",
+          "ok": true,
+          "detail": "granted=1"
+        },
+        {
+          "label": "exactly one ACTIVE lease exists",
+          "ok": true,
+          "detail": "active=1"
+        },
+        {
+          "label": "every granted lease is still readable after the race",
+          "ok": true,
+          "detail": "survivors=[true]"
+        },
+        {
+          "label": "every loser received a typed refusal",
+          "ok": true,
+          "detail": "[\"REVISION_CONFLICT\"]"
+        },
+        {
+          "label": "no loser was told to retry blindly",
+          "ok": true,
+          "detail": "[{\"code\":\"REVISION_CONFLICT\",\"retryable\":false}]"
+        },
+        {
+          "label": "exactly one transition into CLAIMED",
+          "ok": true,
+          "detail": "[\"READY\",\"CLAIMED\"]"
+        },
+        {
+          "label": "the task records one attempt",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "refusal_codes": [
+        "REVISION_CONFLICT"
+      ],
+      "leases_after": [
+        {
+          "lease_id": "lse-concurrent-concurrent-cla-le1",
+          "fence": 1
+        }
+      ]
+    },
+    {
+      "probe": "stale_fence_after_reassign",
+      "family": "concurrent_claim",
+      "counter": "staleFenceMutations",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the reassignment itself is allowed",
+          "ok": true,
+          "detail": "a legitimate reassignment was refused"
+        },
+        {
+          "label": "the fence moved on",
+          "ok": true,
+          "detail": "old=1 new=2"
+        },
+        {
+          "label": "the displaced holder's event is refused",
+          "ok": true,
+          "detail": "event was accepted under a stale fence"
+        },
+        {
+          "label": "the displaced holder's event is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the displaced holder's collect_result is refused",
+          "ok": true,
+          "detail": "collect_result was accepted under a stale fence"
+        },
+        {
+          "label": "the displaced holder's collect_result is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the displaced holder's renew is refused",
+          "ok": true,
+          "detail": "renew was accepted under a stale fence"
+        },
+        {
+          "label": "the displaced holder's renew is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the displaced holder's release is refused",
+          "ok": true,
+          "detail": "release was accepted under a stale fence"
+        },
+        {
+          "label": "the displaced holder's release is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "no stale write changed anything",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no journal row was written by a stale callback",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task is still RUNNING",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "old_fence": 1,
+      "new_fence": 2,
+      "stale_event_code": "STALE_FENCE",
+      "stale_collect_result_code": "STALE_FENCE",
+      "stale_renew_code": "STALE_FENCE",
+      "stale_release_code": "STALE_FENCE"
+    },
+    {
+      "probe": "stale_fence_after_expiry",
+      "family": "concurrent_claim",
+      "counter": "staleFenceMutations",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the sweep expired the lease",
+          "ok": true,
+          "detail": "{\"expired\":[{\"lease_id\":\"lse-concurrent-stale-fence-af-le1\",\"task_id\":\"abt-probe-expiry\",\"adapter_id\":\"adr-probe-a\",\"fencing_token\":1,\"state\":\"RUNNING\",\"revision\":5,\"run_id\":\"run-concurrent-stale-fenc"
+        },
+        {
+          "label": "no lease is active after the sweep",
+          "ok": true,
+          "detail": "[\"EXPIRED\"]"
+        },
+        {
+          "label": "the task holds no fence after expiry",
+          "ok": true,
+          "detail": "null"
+        },
+        {
+          "label": "the post-expiry event is refused",
+          "ok": true,
+          "detail": "event was accepted after expiry"
+        },
+        {
+          "label": "the post-expiry event is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the post-expiry collect_result is refused",
+          "ok": true,
+          "detail": "collect_result was accepted after expiry"
+        },
+        {
+          "label": "the post-expiry collect_result is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the post-expiry renew is refused",
+          "ok": true,
+          "detail": "renew was accepted after expiry"
+        },
+        {
+          "label": "the post-expiry renew is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "no post-expiry write changed anything",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no journal row was written after expiry",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task did not become IN_REVIEW or DONE",
+          "ok": true,
+          "detail": "RUNNING"
+        }
+      ],
+      "sweep": {
+        "expired": 1,
+        "now": "2026-09-26T12:00:00.000Z"
+      },
+      "expired_event_code": "STALE_FENCE",
+      "expired_collect_result_code": "STALE_FENCE",
+      "expired_renew_code": "STALE_FENCE"
+    },
+    {
+      "probe": "stale_fence_after_cancel",
+      "family": "concurrent_claim",
+      "counter": "staleFenceMutations",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the operator cancel is accepted",
+          "ok": true,
+          "detail": "no result"
+        },
+        {
+          "label": "the task is CANCELLED",
+          "ok": true,
+          "detail": "CANCELLED"
+        },
+        {
+          "label": "the lease was withdrawn with the cancel",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task holds no fence after the cancel",
+          "ok": true,
+          "detail": "null"
+        },
+        {
+          "label": "the post-cancel event is refused",
+          "ok": true,
+          "detail": "event was accepted after the cancel"
+        },
+        {
+          "label": "the post-cancel event is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the post-cancel collect_result is refused",
+          "ok": true,
+          "detail": "collect_result was accepted after the cancel"
+        },
+        {
+          "label": "the post-cancel collect_result is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "no post-cancel write changed anything",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task is still CANCELLED",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "cancel_code": "ACCEPTED",
+      "cancelled_event_code": "STALE_FENCE",
+      "cancelled_collect_result_code": "STALE_FENCE"
+    },
+    {
+      "probe": "stale_fence_after_restart",
+      "family": "concurrent_claim",
+      "counter": "staleFenceMutations",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the restarted process sees the committed lease",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the restarted process may rotate the lease",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the pre-restart holder is stale after the restart",
+          "ok": true,
+          "detail": "the pre-restart fence was accepted"
+        },
+        {
+          "label": "the refusal is STALE_FENCE",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "the restarted store changed nothing",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "pre_restart_fence": 2,
+      "restart_tier": "postgres_restart",
+      "post_restart_code": "STALE_FENCE"
+    },
+    {
+      "probe": "same_key_different_payload",
+      "family": "idempotency_and_crash",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the first keyed write is committed",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "an identical replay returns the committed result",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "label": "the identical replay wrote nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the same key with a different payload is refused",
+          "ok": true,
+          "detail": "the key was reused for another payload"
+        },
+        {
+          "label": "the conflict is a typed IDEMPOTENCY_CONFLICT",
+          "ok": true,
+          "detail": "IDEMPOTENCY_CONFLICT"
+        },
+        {
+          "label": "the conflict is not retryable",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the conflict left the store byte-identical",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the second task was never created",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "replay_replayed_flag": false,
+      "conflict_code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "probe": "mutating_command_requires_idempotency_key",
+      "family": "idempotency_and_crash",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a mutating command without a key is refused",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the refusal names the missing key",
+          "ok": true,
+          "detail": "IDEMPOTENCY_KEY_REQUIRED"
+        },
+        {
+          "label": "an unkeyed write changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no task exists",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "refusal_code": "NEEDS_INPUT"
+    },
+    {
+      "probe": "replayed_dispatch_sends_once",
+      "family": "idempotency_and_crash",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the dispatch is committed",
+          "ok": true,
+          "detail": "the dispatch was refused"
+        },
+        {
+          "label": "exactly one external effect crossed the boundary",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "the outbox row is ACKED",
+          "ok": true,
+          "detail": "[\"ACKED\"]"
+        },
+        {
+          "label": "a repeated dispatch is answerable, not fatal",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the second dispatch committed nothing new",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the third dispatch committed nothing new",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the boundary was crossed exactly ONCE in total",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "the outbox holds exactly one row for the run",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the pre-dispatch state was left to the dispatch alone",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "dispatch_summary": {
+        "inspected": 0,
+        "externalEffectsIssued": 0
+      }
+    },
+    {
+      "probe": "crash_after_send_before_ack",
+      "family": "idempotency_and_crash",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "an unknown outcome is not a success",
+          "ok": true,
+          "detail": "a dropped connection was reported as a dispatch"
+        },
+        {
+          "label": "it is a typed RECONCILIATION_REQUIRED",
+          "ok": true,
+          "detail": "RECONCILIATION_REQUIRED"
+        },
+        {
+          "label": "it is not retryable",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the send intent was recorded before the boundary was crossed",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "the row is escalated, not re-sendable",
+          "ok": true,
+          "detail": "[\"RECONCILIATION_REQUIRED\"]"
+        },
+        {
+          "label": "the blind retry issues no second external effect",
+          "ok": true,
+          "detail": "sends=0"
+        },
+        {
+          "label": "recovery is answerable",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "recovery issues no external effect",
+          "ok": true,
+          "detail": "sends=0"
+        },
+        {
+          "label": "recovery cannot re-send even with a transport in hand",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the outbox still holds exactly one row",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the unknown outcome is still unknown",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the producer may not decide its own unknown effect",
+          "ok": true,
+          "detail": "the producer closed its own unknown outcome"
+        },
+        {
+          "label": "that refusal is a typed BLOCKED_POLICY",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "no reconciliation row was recorded",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "first_dispatch_code": "RECONCILIATION_REQUIRED",
+      "retry_summary": {
+        "now": "2026-09-25T12:00:00.000Z",
+        "actor": "prn-owner-alice",
+        "inspected": 0,
+        "intentRecorded": 0,
+        "acked": 0,
+        "escalated": 0,
+        "failed": 0,
+        "externalEffectsIssued": 0,
+        "rows": []
+      }
+    },
+    {
+      "probe": "crash_before_intent_is_redispatchable",
+      "family": "idempotency_and_crash",
+      "counter": "missingJournalOrOutbox",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the run left exactly one PENDING outbox row",
+          "ok": true,
+          "detail": "[\"PENDING\"]"
+        },
+        {
+          "label": "recovery accounts for the PENDING row",
+          "ok": true,
+          "detail": "{\"now\":\"2026-09-25T12:00:00.000Z\",\"actor\":\"prn-owner-alice\",\"inspected\":1,\"pending\":1,\"escalated\":0,\"acked\":0,\"journalAppended\":0,\"externalEffectsIssued\":0,\"rows\":[{\"outbox_id\":\"obx-idempotenc-crash-b"
+        },
+        {
+          "label": "recovery escalates nothing (nothing is unknown)",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "recovery still holds the row",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the re-dispatch is committed",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the re-dispatch crossed the boundary exactly once",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "the row is ACKED and the work is not lost",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "recovery_summary": {
+        "inspected": 1,
+        "pending": 1,
+        "escalated": 0
+      }
+    },
+    {
+      "probe": "committed_side_effects_are_journalled",
+      "family": "idempotency_and_crash",
+      "counter": "missingJournalOrOutbox",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "every committed state change is journalled",
+          "ok": true,
+          "detail": "[\"BACKLOG->READY\",\"READY->CLAIMED\",\"CLAIMED->RUNNING\"]"
+        },
+        {
+          "label": "the journal holds no duplicate edge",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "every journalled revision is distinct and increasing",
+          "ok": true,
+          "detail": "[2,3,4]"
+        },
+        {
+          "label": "each journalled transition names the digests it decided on",
+          "ok": true,
+          "detail": "[\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"]"
+        },
+        {
+          "label": "the board.task.create side effect is audited",
+          "ok": true,
+          "detail": "[\"board.task.create\",\"board.budget.grant\",\"board.task.transition\",\"board.task.claim\",\"board.task.transition\",\"board.execution.start\"]"
+        },
+        {
+          "label": "the board.task.transition side effect is audited",
+          "ok": true,
+          "detail": "[\"board.task.create\",\"board.budget.grant\",\"board.task.transition\",\"board.task.claim\",\"board.task.transition\",\"board.execution.start\"]"
+        },
+        {
+          "label": "the board.task.claim side effect is audited",
+          "ok": true,
+          "detail": "[\"board.task.create\",\"board.budget.grant\",\"board.task.transition\",\"board.task.claim\",\"board.task.transition\",\"board.execution.start\"]"
+        },
+        {
+          "label": "the board.execution.start side effect is audited",
+          "ok": true,
+          "detail": "[\"board.task.create\",\"board.budget.grant\",\"board.task.transition\",\"board.task.claim\",\"board.task.transition\",\"board.execution.start\"]"
+        },
+        {
+          "label": "the execution handoff has an outbox row",
+          "ok": true,
+          "detail": "[\"board.execution.request\"]"
+        },
+        {
+          "label": "the outbox row carries the server-built request",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task carries a history digest",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the history digest is the one the store computed from the journal",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the collected result is recorded on the run",
+          "ok": true,
+          "detail": "\"COLLECTED\""
+        },
+        {
+          "label": "the task is IN_REVIEW after a SUCCEEDED collection",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "transitions": [
+        "BACKLOG->READY",
+        "READY->CLAIMED",
+        "CLAIMED->RUNNING"
+      ],
+      "audit_operations": [
+        "board.task.create",
+        "board.budget.grant",
+        "board.task.transition",
+        "board.task.claim",
+        "board.task.transition",
+        "board.execution.start"
+      ]
+    },
+    {
+      "probe": "refused_side_effects_write_nothing",
+      "family": "idempotency_and_crash",
+      "counter": "missingJournalOrOutbox",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the illegal edge is refused",
+          "ok": true,
+          "detail": "illegal edge was accepted"
+        },
+        {
+          "label": "the illegal edge refusal is typed",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "the illegal edge refusal is in the closed code set",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "the unknown command is refused",
+          "ok": true,
+          "detail": "unknown command was accepted"
+        },
+        {
+          "label": "the unknown command refusal is typed",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the unknown command refusal is in the closed code set",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the unknown argument is refused",
+          "ok": true,
+          "detail": "unknown argument was accepted"
+        },
+        {
+          "label": "the unknown argument refusal is typed",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the unknown argument refusal is in the closed code set",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the malformed result is refused",
+          "ok": true,
+          "detail": "malformed result was accepted"
+        },
+        {
+          "label": "the malformed result refusal is typed",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the malformed result refusal is in the closed code set",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the foreign task is refused",
+          "ok": true,
+          "detail": "foreign task was accepted"
+        },
+        {
+          "label": "the foreign task refusal is typed",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "the foreign task refusal is in the closed code set",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "the store is byte-identical after five refusals",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no audit row was added by a refusal",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no outbox row was added by a refusal",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no transition was journalled by a refusal",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "refusal_illegal_edge": "TRANSITION_NOT_ALLOWED",
+      "refusal_unknown_command": "BLOCKED_POLICY",
+      "refusal_unknown_argument": "BLOCKED_POLICY",
+      "refusal_malformed_result": "BLOCKED_POLICY",
+      "refusal_foreign_task": "NEEDS_INPUT"
+    },
+    {
+      "probe": "substituted_task_brief",
+      "family": "substitution_and_approval",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "an approval of a substituted brief is refused",
+          "ok": true,
+          "detail": "the substituted brief was approved"
+        },
+        {
+          "label": "it is a typed MALFORMED_RESULT",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the task is still RUNNING",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a checkpoint under a substituted brief is refused",
+          "ok": true,
+          "detail": "the substituted checkpoint was collected"
+        },
+        {
+          "label": "that refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "neither substitution changed anything",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no result was recorded on the run",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task never reached IN_REVIEW or DONE",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "approval_code": "MALFORMED_RESULT",
+      "checkpoint_code": "MALFORMED_RESULT"
+    },
+    {
+      "probe": "swapped_policy_and_manifest_digest",
+      "family": "substitution_and_approval",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a swapped policy digest is refused",
+          "ok": true,
+          "detail": "the swapped policy digest was approved"
+        },
+        {
+          "label": "the swapped policy digest refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "a swapped manifest digest is refused",
+          "ok": true,
+          "detail": "the swapped manifest digest was approved"
+        },
+        {
+          "label": "the swapped manifest digest refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "a review that cannot name the documents it reviewed is refused",
+          "ok": true,
+          "detail": "a review naming no manifest was accepted"
+        },
+        {
+          "label": "the task is still IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no digest substitution changed anything",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "swap_policy_digest": "MALFORMED_RESULT",
+      "swap_manifest_digest": "MALFORMED_RESULT",
+      "partial_review": "MALFORMED_RESULT"
+    },
+    {
+      "probe": "hidden_budget_change",
+      "family": "substitution_and_approval",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a grant that re-attributes its approver is refused",
+          "ok": true,
+          "detail": "a grant that re-attributes its approver was accepted"
+        },
+        {
+          "label": "a grant that re-attributes its approver is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "a settle beyond the granted limit is refused",
+          "ok": true,
+          "detail": "a settle beyond the granted limit was accepted"
+        },
+        {
+          "label": "a settle beyond the granted limit is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "a settle the producer may not make is refused",
+          "ok": true,
+          "detail": "a settle the producer may not make was accepted"
+        },
+        {
+          "label": "a settle the producer may not make is typed",
+          "ok": true,
+          "detail": "AUTH_REQUIRED"
+        },
+        {
+          "label": "the granted limits are unchanged",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no second grant exists",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no spend was recorded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no budget attack changed anything else",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "grant": {
+        "task_limit": 5,
+        "campaign_limit": 20,
+        "day_limit": 10
+      },
+      "budget_a_grant_that_re_attributes_its_approver": "AUTH_REQUIRED",
+      "budget_a_settle_beyond_the_granted_limit": "AUTH_REQUIRED",
+      "budget_a_settle_the_producer_may_not_make": "AUTH_REQUIRED"
+    },
+    {
+      "probe": "producer_cannot_approve",
+      "family": "substitution_and_approval",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a producer may not approve its own work",
+          "ok": true,
+          "detail": "the producer reached DONE"
+        },
+        {
+          "label": "the refusal is a typed BLOCKED_POLICY",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the refusal names the actor-kind rule",
+          "ok": true,
+          "detail": "APPROVAL_ACTOR_KIND_FORBIDDEN"
+        },
+        {
+          "label": "the task is still IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no DONE transition was journalled",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the self-approval changed nothing",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "refusal_code": "BLOCKED_POLICY"
+    },
+    {
+      "probe": "uncalibrated_verifier_cannot_approve",
+      "family": "substitution_and_approval",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "an uncalibrated verifier (system) may not approve",
+          "ok": true,
+          "detail": "system reached DONE"
+        },
+        {
+          "label": "the system verifier refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "an uncalibrated verifier (adapter) may not approve",
+          "ok": true,
+          "detail": "adapter reached DONE"
+        },
+        {
+          "label": "the adapter verifier refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "an uncalibrated verifier (scheduler) may not approve",
+          "ok": true,
+          "detail": "scheduler reached DONE"
+        },
+        {
+          "label": "the scheduler verifier refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "an uncalibrated verifier may not decide a reconciliation",
+          "ok": true,
+          "detail": "the verifier closed an unknown outcome"
+        },
+        {
+          "label": "no reconciliation row was recorded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task is still IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no verifier attempt changed anything",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "verifier_system": "ACL_DENIED",
+      "verifier_adapter": "ACL_DENIED",
+      "verifier_scheduler": "ACL_DENIED"
+    },
+    {
+      "probe": "self_approval_is_refused",
+      "family": "substitution_and_approval",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the run records its producer",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the producer may not approve its own run",
+          "ok": true,
+          "detail": "the producer approved its own work"
+        },
+        {
+          "label": "the refusal is a typed BLOCKED_POLICY",
+          "ok": true,
+          "detail": "BLOCKED_POLICY"
+        },
+        {
+          "label": "the refusal names the independence rule",
+          "ok": true,
+          "detail": "SELF_APPROVAL"
+        },
+        {
+          "label": "the task is still IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the self-approval changed nothing",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "producer_of_the_run": "prn-external-codex",
+      "refusal_code": "BLOCKED_POLICY"
+    },
+    {
+      "probe": "malformed_callback_refused",
+      "family": "callback_integrity",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a result with no outcome is refused",
+          "ok": true,
+          "detail": "a result with no outcome was collected"
+        },
+        {
+          "label": "a result with no outcome is a typed MALFORMED_RESULT/ACL refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "a result with a foreign contract version is refused",
+          "ok": true,
+          "detail": "a result with a foreign contract version was collected"
+        },
+        {
+          "label": "a result with a foreign contract version is a typed MALFORMED_RESULT/ACL refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "a result for a task the run does not own is refused",
+          "ok": true,
+          "detail": "a result for a task the run does not own was collected"
+        },
+        {
+          "label": "a result for a task the run does not own is a typed MALFORMED_RESULT/ACL refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "a result for a workspace the run does not own is refused",
+          "ok": true,
+          "detail": "a result for a workspace the run does not own was collected"
+        },
+        {
+          "label": "a result for a workspace the run does not own is a typed MALFORMED_RESULT/ACL refusal",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "a result with a made-up media type is refused",
+          "ok": true,
+          "detail": "a result with a made-up media type was collected"
+        },
+        {
+          "label": "a result with a made-up media type is a typed MALFORMED_RESULT/ACL refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "no malformed result advanced the task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no malformed result was recorded",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no malformed callback changed anything",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "malformed_a_result_with_no_outcome": "MALFORMED_RESULT",
+      "malformed_a_result_with_a_foreign_contract_version": "MALFORMED_RESULT",
+      "malformed_a_result_for_a_task_the_run_does_not_own": "MALFORMED_RESULT",
+      "malformed_a_result_for_a_workspace_the_run_does_not_own": "ACL_DENIED",
+      "malformed_a_result_with_a_made_up_media_type": "MALFORMED_RESULT"
+    },
+    {
+      "probe": "out_of_order_callback_refused",
+      "family": "callback_integrity",
+      "counter": "missingJournalOrOutbox",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the first callback is journalled",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a gap in the sequence is refused",
+          "ok": true,
+          "detail": "a gap in the sequence was journalled"
+        },
+        {
+          "label": "a gap in the sequence is a typed MALFORMED_RESULT",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "a callback that rewinds the sequence is refused",
+          "ok": true,
+          "detail": "a callback that rewinds the sequence was journalled"
+        },
+        {
+          "label": "a callback that rewinds the sequence is a typed MALFORMED_RESULT",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the journal holds exactly the one accepted callback",
+          "ok": true,
+          "detail": "events=1"
+        },
+        {
+          "label": "the accepted sequence is 1",
+          "ok": true,
+          "detail": "1"
+        },
+        {
+          "label": "the journal is unchanged after the refusals",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task did not advance",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "order_a_gap_in_the_sequence": "MALFORMED_RESULT",
+      "order_a_callback_that_rewinds_the_sequence": "MALFORMED_RESULT"
+    },
+    {
+      "probe": "duplicate_callback_refused",
+      "family": "callback_integrity",
+      "counter": "missingJournalOrOutbox",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the first callback is journalled",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a duplicate callback is either refused or idempotent",
+          "ok": true,
+          "detail": "the duplicate callback produced an untyped failure"
+        },
+        {
+          "label": "the journal holds NO duplicate row",
+          "ok": true,
+          "detail": "events=1"
+        },
+        {
+          "label": "the duplicate wrote nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the first collection is committed",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the replay is answered without a second teardown",
+          "ok": true,
+          "detail": "the replay failed"
+        },
+        {
+          "label": "the replay is flagged as a replay",
+          "ok": true,
+          "detail": "replayed=true"
+        },
+        {
+          "label": "no transition was appended twice",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the duplicate collect changed nothing",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "duplicate_code": "ACCEPTED"
+    },
+    {
+      "probe": "unknown_outcome_is_not_retried",
+      "family": "callback_integrity",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "an unknown outcome is collectable as a FACT",
+          "ok": true,
+          "detail": "the unknown outcome was refused outright"
+        },
+        {
+          "label": "an unknown outcome does not become IN_REVIEW",
+          "ok": true,
+          "detail": "BLOCKED"
+        },
+        {
+          "label": "an unknown outcome does not become DONE",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the run is recorded as needing reconciliation",
+          "ok": true,
+          "detail": "{\"run_state\":\"RECONCILIATION_REQUIRED\"}"
+        },
+        {
+          "label": "the result is not collected a second time as a success",
+          "ok": true,
+          "detail": "the unknown outcome was overwritten by a success"
+        },
+        {
+          "label": "the collect retry is a typed, non-retryable refusal",
+          "ok": true,
+          "detail": "STALE_FENCE retryable=false"
+        },
+        {
+          "label": "the undelivered handoff is sent at most once",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "and never a second time after that",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "the unknown outcome never became IN_REVIEW",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no reconciliation was recorded without a decision",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the run still records the unknown outcome",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "state_after_unknown": "BLOCKED",
+      "collect_retry_code": "STALE_FENCE"
+    },
+    {
+      "probe": "timeout_is_not_retried",
+      "family": "callback_integrity",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a timeout is collectable as a FACT",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a timeout is not IN_REVIEW",
+          "ok": true,
+          "detail": "BLOCKED"
+        },
+        {
+          "label": "a timeout is not DONE",
+          "ok": true,
+          "detail": "BLOCKED"
+        },
+        {
+          "label": "a timeout is a failure, not a success",
+          "ok": true,
+          "detail": "BLOCKED"
+        },
+        {
+          "label": "a timeouted handoff is sent at most once",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "and is never re-sent after that",
+          "ok": true,
+          "detail": "sends=1"
+        },
+        {
+          "label": "a timeouted result is not overwritten by a success",
+          "ok": true,
+          "detail": "outcome=undefined"
+        },
+        {
+          "label": "the recorded outcome is still the timeout",
+          "ok": true,
+          "detail": "{}"
+        },
+        {
+          "label": "the task never reached DONE",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "state_after_timeout": "BLOCKED"
+    },
+    {
+      "probe": "cancel_then_callback_refused",
+      "family": "callback_integrity",
+      "counter": "duplicateExternalEffects",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the run cancel is accepted",
+          "ok": true,
+          "detail": "no result"
+        },
+        {
+          "label": "collect a result on a cancelled run is refused",
+          "ok": true,
+          "detail": "collect a result was accepted after the cancel"
+        },
+        {
+          "label": "collect a result is a typed refusal",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "append a callback on a cancelled run is refused",
+          "ok": true,
+          "detail": "append a callback was accepted after the cancel"
+        },
+        {
+          "label": "append a callback is a typed refusal",
+          "ok": true,
+          "detail": "STALE_FENCE"
+        },
+        {
+          "label": "re-dispatch the handoff on a cancelled run is refused",
+          "ok": true,
+          "detail": "re-dispatch the handoff was accepted after the cancel"
+        },
+        {
+          "label": "re-dispatch the handoff is a typed refusal",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "a cancelled run issues no external effect",
+          "ok": true,
+          "detail": "sends=0"
+        },
+        {
+          "label": "a cancelled run changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task is still CANCELLED",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "cancel_code": "ACCEPTED",
+      "after_cancel_collect_a_result": "STALE_FENCE",
+      "after_cancel_append_a_callback": "STALE_FENCE",
+      "after_cancel_re_dispatch_the_handoff": "TRANSITION_NOT_ALLOWED"
+    },
+    {
+      "probe": "no_false_state_advance",
+      "family": "callback_integrity",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "hostile callback 0 (execution.collect_result) is refused",
+          "ok": true,
+          "detail": "execution.collect_result #0 was accepted"
+        },
+        {
+          "label": "hostile callback 1 (execution.collect_result) is refused",
+          "ok": true,
+          "detail": "execution.collect_result #1 was accepted"
+        },
+        {
+          "label": "hostile callback 2 (execution.collect_result) is refused",
+          "ok": true,
+          "detail": "execution.collect_result #2 was accepted"
+        },
+        {
+          "label": "hostile callback 3 (execution.event) is refused",
+          "ok": true,
+          "detail": "execution.event #3 was accepted"
+        },
+        {
+          "label": "hostile callback 4 (execution.event) is refused",
+          "ok": true,
+          "detail": "execution.event #4 was accepted"
+        },
+        {
+          "label": "hostile callback 5 (tasks.transition) is refused",
+          "ok": true,
+          "detail": "tasks.transition #5 was accepted"
+        },
+        {
+          "label": "hostile callback 6 (tasks.transition) is refused",
+          "ok": true,
+          "detail": "tasks.transition #6 was accepted"
+        },
+        {
+          "label": "the task never became IN_REVIEW",
+          "ok": true,
+          "detail": "RUNNING"
+        },
+        {
+          "label": "the task never became DONE",
+          "ok": true,
+          "detail": "RUNNING"
+        },
+        {
+          "label": "the task never became FAILED without a failure",
+          "ok": true,
+          "detail": "RUNNING"
+        },
+        {
+          "label": "no hostile callback journalled a state",
+          "ok": true,
+          "detail": "[\"READY\",\"CLAIMED\",\"RUNNING\"]"
+        },
+        {
+          "label": "no result was recorded for the refused callbacks",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "hostile_0_execution_collect_result": "MALFORMED_RESULT",
+      "hostile_1_execution_collect_result": "STALE_FENCE",
+      "hostile_2_execution_collect_result": "NEEDS_INPUT",
+      "hostile_3_execution_event": "MALFORMED_RESULT",
+      "hostile_4_execution_event": "MALFORMED_RESULT",
+      "hostile_5_tasks_transition": "AUTH_REQUIRED",
+      "hostile_6_tasks_transition": "TRANSITION_NOT_ALLOWED",
+      "final_state": "RUNNING"
+    },
+    {
+      "probe": "injection_in_prompt_text_grants_nothing",
+      "family": "injection_and_traversal",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the text is stored verbatim as data",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text moved nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text granted no lease",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text minted no fence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text assigned no executor",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text raised no budget",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text widened no capability",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text widened no tool",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the text widened no ACL",
+          "ok": true,
+          "detail": "[\"prn-owner-alice\",\"prn-external-codex\",\"prn-owner-bob\"]"
+        },
+        {
+          "label": "the task row grew no granted_scope",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no approved",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no approval",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no actor",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no actor_kind",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no role",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no budget",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task row grew no capabilities",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no grant row exists",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no lease exists",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no transition was journalled",
+          "ok": true,
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "probe": "injection_in_source_and_log_grants_nothing",
+      "family": "injection_and_traversal",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a quoted source excerpt is stored or refused, never obeyed",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "label": "a log line is stored or refused, never obeyed",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "label": "a hostile result payload grants nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the injected text did not move the task",
+          "ok": true,
+          "detail": "RUNNING"
+        },
+        {
+          "label": "the injected text minted no fence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the grant is unchanged by the injected text",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the handoff scope is unchanged by the injected text",
+          "ok": true,
+          "detail": "[\"task.read\",\"artifact.write\"]"
+        },
+        {
+          "label": "the handoff tools are unchanged by the injected text",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no reconciliation was manufactured from text",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no grant row was created from text",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no lease beyond the one in flight",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the injected callbacks changed no authority",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "carrier_a_quoted_source_excerpt": "MALFORMED_RESULT",
+      "carrier_a_log_line": "ACCEPTED",
+      "carrier_a_hostile_result_payload": "MALFORMED_RESULT"
+    },
+    {
+      "probe": "secret_never_reaches_a_record",
+      "family": "injection_and_traversal",
+      "counter": "crossWorkspaceLeaks",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a callback whose payload must be redacted is still accepted as data",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no raw secret reached the store record",
+          "ok": true,
+          "detail": "store leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the outbox record",
+          "ok": true,
+          "detail": "outbox leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the audit record",
+          "ok": true,
+          "detail": "audit leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the journal record",
+          "ok": true,
+          "detail": "journal leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the run record",
+          "ok": true,
+          "detail": "run leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the transitions record",
+          "ok": true,
+          "detail": "transitions leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the leases record",
+          "ok": true,
+          "detail": "leases leaked 0 value(s)"
+        },
+        {
+          "label": "no raw secret reached the command read payload",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the API answers the owner",
+          "ok": true,
+          "detail": "status=200"
+        },
+        {
+          "label": "no raw secret reached the API payload",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "no raw secret is present in the probe evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the journal still recorded that the callback happened",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "surface_store": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "surface_outbox": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "surface_audit": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "surface_journal": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "surface_run": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "surface_transitions": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "surface_leases": {
+        "scanned": true,
+        "leaked": 0
+      },
+      "api_status": 200
+    },
+    {
+      "probe": "workspace_traversal_refused",
+      "family": "injection_and_traversal",
+      "counter": "crossWorkspaceLeaks",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a workspace_ref with a parent traversal is refused",
+          "ok": true,
+          "detail": "a parent traversal was admitted"
+        },
+        {
+          "label": "the a parent traversal refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a parent traversal refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a parent traversal created no task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the a parent traversal changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a workspace_ref with an absolute path is refused",
+          "ok": true,
+          "detail": "an absolute path was admitted"
+        },
+        {
+          "label": "the an absolute path refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the an absolute path refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the an absolute path created no task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the an absolute path changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a workspace_ref with a backslash path is refused",
+          "ok": true,
+          "detail": "a backslash path was admitted"
+        },
+        {
+          "label": "the a backslash path refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a backslash path refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a backslash path created no task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the a backslash path changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a workspace_ref with a NUL byte is refused",
+          "ok": true,
+          "detail": "a NUL byte was admitted"
+        },
+        {
+          "label": "the a NUL byte refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a NUL byte refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a NUL byte created no task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the a NUL byte changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a workspace_ref with a Windows device name is refused",
+          "ok": true,
+          "detail": "a Windows device name was admitted"
+        },
+        {
+          "label": "the a Windows device name refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "the a Windows device name refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "the a Windows device name created no task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the a Windows device name changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a workspace_ref with a sibling-root prefix is refused",
+          "ok": true,
+          "detail": "a sibling-root prefix was admitted"
+        },
+        {
+          "label": "the a sibling-root prefix refusal is typed",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a sibling-root prefix refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "MALFORMED_RESULT"
+        },
+        {
+          "label": "the a sibling-root prefix created no task",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the a sibling-root prefix changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a read_only_path that escapes is refused",
+          "ok": true,
+          "detail": "the escaping read_only_path was admitted"
+        },
+        {
+          "label": "no task exists at all",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a workspace that really is inside its root is admitted",
+          "ok": true,
+          "detail": "the positive control was refused too"
+        },
+        {
+          "label": "exactly one task exists after the positive control",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "escape_case_1": "a parent traversal",
+      "escape_a_parent_traversal": "MALFORMED_RESULT",
+      "escape_case_2": "an absolute path",
+      "escape_an_absolute_path": "MALFORMED_RESULT",
+      "escape_case_3": "a backslash path",
+      "escape_a_backslash_path": "MALFORMED_RESULT",
+      "escape_case_4": "a NUL byte",
+      "escape_a_NUL_byte": "MALFORMED_RESULT",
+      "escape_case_5": "a Windows device name",
+      "escape_a_Windows_device_name": "ACL_DENIED",
+      "escape_case_6": "a sibling-root prefix",
+      "escape_a_sibling_root_prefix": "MALFORMED_RESULT"
+    },
+    {
+      "probe": "symlink_escape_refused",
+      "family": "injection_and_traversal",
+      "counter": "crossWorkspaceLeaks",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the fixture link really does leave the root",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a symlinked workspace that resolves outside is refused",
+          "ok": true,
+          "detail": "the escape was admitted"
+        },
+        {
+          "label": "the refusal is typed",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "the refusal is an ACL/boundary refusal",
+          "ok": true,
+          "detail": "ACL_DENIED"
+        },
+        {
+          "label": "no task was created through the link",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the escape changed nothing",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a real subdirectory of the root is admitted",
+          "ok": true,
+          "detail": "the positive control was refused too"
+        }
+      ],
+      "refusal_code": "ACL_DENIED"
+    },
+    {
+      "probe": "forbidden_sandbox_blocked",
+      "family": "injection_and_traversal",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the claim under NO_EXEC is refused",
+          "ok": true,
+          "detail": "claim was admitted under NO_EXEC"
+        },
+        {
+          "label": "the claim under NO_EXEC is BLOCKED_SANDBOX",
+          "ok": true,
+          "detail": "BLOCKED_SANDBOX"
+        },
+        {
+          "label": "the run under NO_EXEC is refused",
+          "ok": true,
+          "detail": "run was admitted under NO_EXEC"
+        },
+        {
+          "label": "the run under NO_EXEC is BLOCKED_SANDBOX",
+          "ok": true,
+          "detail": "BLOCKED_SANDBOX"
+        },
+        {
+          "label": "the RUNNING transition under NO_EXEC is refused",
+          "ok": true,
+          "detail": "RUNNING was admitted under NO_EXEC"
+        },
+        {
+          "label": "the RUNNING transition under NO_EXEC is a typed refusal",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "NO_EXEC created no run",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "NO_EXEC granted no lease",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "NO_EXEC left the task in READY",
+          "ok": true,
+          "detail": "READY"
+        },
+        {
+          "label": "NO_EXEC changed nothing while refusing",
+          "ok": true,
+          "detail": "a blocked sandbox refusal mutated the store"
+        },
+        {
+          "label": "the claim under a blocked isolation tier is refused",
+          "ok": true,
+          "detail": "claim was admitted under a blocked isolation tier"
+        },
+        {
+          "label": "the claim under a blocked isolation tier is BLOCKED_SANDBOX",
+          "ok": true,
+          "detail": "BLOCKED_SANDBOX"
+        },
+        {
+          "label": "the run under a blocked isolation tier is refused",
+          "ok": true,
+          "detail": "run was admitted under a blocked isolation tier"
+        },
+        {
+          "label": "the run under a blocked isolation tier is BLOCKED_SANDBOX",
+          "ok": true,
+          "detail": "BLOCKED_SANDBOX"
+        },
+        {
+          "label": "the RUNNING transition under a blocked isolation tier is refused",
+          "ok": true,
+          "detail": "RUNNING was admitted under a blocked isolation tier"
+        },
+        {
+          "label": "the RUNNING transition under a blocked isolation tier is a typed refusal",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "a blocked isolation tier created no run",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a blocked isolation tier granted no lease",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "a blocked isolation tier left the task in READY",
+          "ok": true,
+          "detail": "READY"
+        },
+        {
+          "label": "a blocked isolation tier changed nothing while refusing",
+          "ok": true,
+          "detail": "a blocked sandbox refusal mutated the store"
+        },
+        {
+          "label": "the claim under an unregistered profile is refused",
+          "ok": true,
+          "detail": "claim was admitted under an unregistered profile"
+        },
+        {
+          "label": "the claim under an unregistered profile is BLOCKED_SANDBOX",
+          "ok": true,
+          "detail": "BLOCKED_SANDBOX"
+        },
+        {
+          "label": "the run under an unregistered profile is refused",
+          "ok": true,
+          "detail": "run was admitted under an unregistered profile"
+        },
+        {
+          "label": "the run under an unregistered profile is BLOCKED_SANDBOX",
+          "ok": true,
+          "detail": "BLOCKED_SANDBOX"
+        },
+        {
+          "label": "the RUNNING transition under an unregistered profile is refused",
+          "ok": true,
+          "detail": "RUNNING was admitted under an unregistered profile"
+        },
+        {
+          "label": "the RUNNING transition under an unregistered profile is a typed refusal",
+          "ok": true,
+          "detail": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "label": "an unregistered profile created no run",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "an unregistered profile granted no lease",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "an unregistered profile left the task in READY",
+          "ok": true,
+          "detail": "READY"
+        },
+        {
+          "label": "an unregistered profile changed nothing while refusing",
+          "ok": true,
+          "detail": "a blocked sandbox refusal mutated the store"
+        },
+        {
+          "label": "the proven profile admits a run",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the proven profile really created a run row",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "sandbox_no-exec_claim": "BLOCKED_SANDBOX",
+      "sandbox_no-exec_run": "BLOCKED_SANDBOX",
+      "sandbox_a-blocked-isolation-tier_claim": "BLOCKED_SANDBOX",
+      "sandbox_a-blocked-isolation-tier_run": "BLOCKED_SANDBOX",
+      "sandbox_an-unregistered-profile_claim": "BLOCKED_SANDBOX",
+      "sandbox_an-unregistered-profile_run": "BLOCKED_SANDBOX"
+    }
+  ],
+  "honestStatus": {
+    "realAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+    "assuranceStatus": "NOT_MEASURED",
+    "aMvpStatus": "NOT_CLAIMED",
+    "note": "a probe suite that attacks the boundary proves the boundary refuses. It does not prove an executor, a reviewer or a semantic accuracy exists."
+  },
+  "limits": [
+    "No real AgentOS/Codex/pi adapter ran: the execution boundary is modelled by the veritas.adapter/1.0.0 test transport (NOT_RUN_REAL_ADAPTER).",
+    "A green probe run is evidence about REFUSALS, not about task quality, human review or calibration.",
+    "The database tier is a disposable container with a fixture task set; it is not a production persistence, backup or restore validation."
+  ],
+  "runId": "s2-007-probes-ae83265a163181958b6a41b7",
+  "recordDigest": "debfd68c67966c0f512e8090c4616cf5da28401cf57e662923317e84337f3f1c"
+}

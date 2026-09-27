@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/contracts/adapter-registration.schema.json",
+  "title": "AdapterRegistration",
+  "description": "S2-007 operator registration of an execution adapter. Declared capabilities are a CLAIM to be validated against this registration and the current grant — never a permission. A registration with adapter_kind != 'real' can never satisfy an A-MVP real-adapter case and must carry an explicit not-run provenance status.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "adapter_id",
+    "adapter_interface",
+    "provider",
+    "display_name",
+    "adapter_kind",
+    "health",
+    "workspace_id",
+    "principal_id",
+    "declared_capabilities",
+    "declared_tools",
+    "sandbox_profile_id",
+    "max_concurrency",
+    "real_adapter_provenance",
+    "registered_at"
+  ],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "adapter_id": {
+      "type": "string",
+      "pattern": "^adr-[a-z0-9][a-z0-9-]{0,62}$",
+      "description": "Stable registered identity. Adapter selection ties are broken on this value."
+    },
+    "adapter_interface": { "const": "veritas.adapter/1.0.0" },
+    "provider": { "enum": ["codex", "pi", "claude_code", "opencode", "hermes", "generic_cli", "test"] },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "adapter_kind": {
+      "enum": ["real", "wrapper", "test", "unavailable"],
+      "description": "'real' requires a genuinely distinct installed executor. 'wrapper' and 'test' can never be recorded as a real-adapter PASS."
+    },
+    "health": { "enum": ["healthy", "degraded", "unhealthy", "unknown"] },
+    "workspace_id": { "type": "string", "pattern": "^ws-[a-z0-9][a-z0-9-]{0,62}$" },
+    "principal_id": { "type": "string", "pattern": "^prn-[a-z0-9][a-z0-9-]{0,62}$" },
+    "declared_capabilities": {
+      "type": "array",
+      "maxItems": 32,
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,62}$" }
+    },
+    "declared_tools": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "type": "string", "pattern": "^tool:[a-z0-9][a-z0-9._-]{0,62}$" }
+    },
+    "sandbox_profile_id": { "type": "string", "pattern": "^sbx-[a-z0-9][a-z0-9-]{0,62}$" },
+    "max_concurrency": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1,
+      "description": "The bounded profile runs at most ONE active task. A registration may not raise this."
+    },
+    "real_adapter_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "detail"],
+      "properties": {
+        "status": {
+          "enum": ["NOT_RUN_REAL_ADAPTER", "REAL_ADAPTER_AVAILABLE", "REAL_ADAPTER_NOT_INSTALLED", "REAL_ADAPTER_CREDENTIALS_MISSING"],
+          "description": "NOT_RUN_REAL_ADAPTER is the honest result whenever no genuinely installed executor backed the run. It is never upgraded by fixture or replay evidence."
+        },
+        "detail": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "registered_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$" }
+  }
+}
