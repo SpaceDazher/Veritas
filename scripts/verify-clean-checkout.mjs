@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {execFileSync, spawnSync} from 'node:child_process';
 import {gitText} from './git-client.mjs';
+import {failureEvidence} from './tap-evidence.mjs';
 
 const root = process.cwd();
 const git = (...args) => gitText(root, args);
@@ -30,14 +31,21 @@ const run = (id, command, args, options = {}) => {
       env: {...process.env, ...options.env},
     });
   } catch (error) {
-    const record = {id, command: [command, ...args].join(' '), exitCode: null, status: 'NOT_RUN_SANDBOX', reason: error.message};
+    const record = {id, command: [command, ...args].join(' '), exitCode: null, status: 'NOT_RUN_SANDBOX', reason: error.message, failingTests: []};
     commands.push(record);
     return record;
   }
   const record = {id, command: [command, ...args].join(' '), exitCode: result.status ?? 1, status: (result.status ?? 1) === 0 ? 'PASS' : 'FAIL'};
-  const outputTail = ((result.stderr ?? '') + '\n' + (result.stdout ?? '')).trim();
+  const output = (result.stderr ?? '') + '\n' + (result.stdout ?? '');
+  // Recorded for every step, not only failing ones: a green step whose output
+  // still lists failing tests would be a runner bug worth seeing. A failing
+  // step keeps the tail it always had and gains the names the tail drops.
+  record.failingTests = failureEvidence(output).failingTests;
   if (record.status === 'FAIL') {
-    record.reason = outputTail.slice(-1200) || 'no output captured';
+    const evidence = failureEvidence(output);
+    record.failingTests = evidence.failingTests;
+    if (evidence.failureMessage) record.failureMessage = evidence.failureMessage;
+    record.reason = evidence.reason ?? 'no output captured';
   }
   commands.push(record);
   return record;

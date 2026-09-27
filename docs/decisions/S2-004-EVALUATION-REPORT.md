@@ -279,6 +279,7 @@ commit, never the S2-004 record.
   sandbox/identity suites under clean-checkout load (sandbox 17/18 once;
   identity 158/159 twice)`) so the flakes cannot silently
   recur inside a gated run.
+  **Resolved after the push as SpaceDazher/Veritas#16** — see §9.5.
 - **archive-safe binding test** — extending the runner exposed a second
   inherited flaw: `tests/claims/dependency-binding.test.mjs` ran the *real*
   gate against the archive's absent `.git` and failed (107/108), while the
@@ -292,3 +293,79 @@ commit, never the S2-004 record.
   outside this branch's control would force a false `REVISE`. An
   allowlist/override policy for tooling advisories is a spec-level change
   proposed for the next stage.
+### 9.5 Resolution of the tracked load-sensitive flakes (SpaceDazher/Veritas#16)
+
+The flakes tracked in §9.4 were not caused by load reaching into a correct
+implementation. They were the visible symptom of three properties of the
+S2-002 process adapter that only misfire when the host is slow, plus a
+diagnostic gap that made each occurrence unrecoverable. The stage code they
+touched is S2-002, so this is a remediation of the S2-002 adapter made on
+the S2-004 branch; the tracked item is closed by it.
+
+**Root causes.**
+
+1. *The survivor verdict was one transport failure away from a red suite.*
+   `listExistingPids` shells out to PowerShell/CIM. A spawn error or a
+   non-zero exit resolved as "every candidate is still alive" — the correct
+   fail-closed reading of an unverified answer, applied to the FIRST hiccup
+   with no retry, while the sibling descendant query did retry three times.
+   One contended WMI call was therefore indistinguishable from a process that
+   refused to die.
+2. *The settle loop was bounded by iterations, not by time.* It ran a fixed
+   20 rounds, each costing two full `Get-CimInstance Win32_Process`
+   enumerations. An idle host spends milliseconds per round; a host running
+   the clean-checkout gate spends seconds, and 20 rounds then overran the
+   test's own time budget — turning a slow-but-correct cancellation into a
+   bare harness timeout.
+3. *The probe timer and the harness budget were the same number.* Both the
+   sandbox suite and probe G used `60000`, so the adapter's kill timer fired
+   at the instant the harness stopped waiting, and a slow host produced a
+   timeout with no surviving detail instead of an assertion naming the
+   survivors.
+
+**Changes.**
+
+- `src/lib/identity/process-verdict.mjs` (new) holds the policy that was
+  implicit: `queryUntilAnswered` retries an unanswered query inside a
+  wall-clock budget and only then takes the fail-closed reading;
+  `settleUntilGone` bounds the settle loop by wall clock with a hard step
+  ceiling; `awaitTree` waits for a spawned tree to become observable instead
+  of assuming a fixed delay; `parseProcessTable`/`descendantsIn` parse one
+  snapshot and traverse the subtree. It is platform-independent so the policy
+  is testable on every host, not only where the live probes run.
+- `src/lib/identity/sandbox.mjs` uses those helpers. One process-table
+  snapshot per settle step now answers both liveness and discovery instead
+  of two enumerations, and the terminal verdict query is WQL-filtered by
+  `ProcessId` so only candidate rows cross the PowerShell/COM boundary. The
+  fail-closed reading is unchanged: "no survivors" is only ever reported when
+  the OS answered. Anything the settle loop discovers joins the retained set
+  the terminal check inspects, so a re-parented pid cannot fall out of the
+  set it must be checked against.
+- `cancel()` and every probe outcome now carry `processQueries`
+  (`queries`, `failedQueries`, `settleSteps`, `settleUnanswered`,
+  `settleTimedOut`), which is what makes a survivor verdict distinguishable
+  from an unverified one after the fact.
+- Harness budgets: the process-tree tests use a 240s harness budget against a
+  45s probe timer, so a slow host yields a recorded terminal verdict with the
+  counters attached instead of a harness timeout. Probe G and the
+  `sandbox/cancellation-survivors` corpus trial wait for the tree to form and
+  fail closed if it never does, instead of cancelling a fixed 500ms after
+  spawn.
+- `scripts/tap-evidence.mjs` (new, added to `frozenTargets`) extracts the
+  `not ok` names and the first assertion message from a step's full TAP
+  stream, and `verify-clean-checkout.mjs` records them on every command. The
+  1200-character tail is kept; it simply no longer has to be the only
+  evidence. This is the direct answer to "failing subtest id not recoverable
+  (runner stores last 1200 chars)".
+- `tests/identity/process-verdict.test.mjs` and
+  `tests/identity/clean-checkout-evidence.test.mjs` (new, 29 tests) pin the
+  policy on every platform. The regression is reproduced directly: with one
+  transient WMI failure and a correct answer behind it, the previous verdict
+  path reports three survivors and the new one reports zero.
+
+**Limits, stated honestly.** The live process-tree path and probe G remain
+Windows-only, so their behaviour under real load is still not observed by an
+automated test on this branch; what is now asserted everywhere is the policy
+those paths delegate to. Confirming the fix end to end needs a
+`verify:clean-checkout` run on the Windows host that observed the flakes,
+and the record it writes will name any failing subtest.

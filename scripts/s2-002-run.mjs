@@ -17,11 +17,16 @@ import { pathToFileURL } from 'node:url';
 import { PRINCIPALS, WORKSPACES } from '../src/lib/identity/principals.mjs';
 import { createPolicyEngine, POLICY_VERSION } from '../src/lib/identity/policy-engine.mjs';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
+import { awaitTree } from '../src/lib/identity/process-verdict.mjs';
 import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const REVOCATION_TRIALS = 100;
 const IS_WINDOWS = process.platform === 'win32';
+// The live trial's own kill timer, below the spawnRun timeout so a slow host
+// records a terminal verdict with the transport counters attached instead of
+// being killed from outside (SpaceDazher/Veritas#16).
+const LIVE_TRIAL_TIMER_MS = 45000;
 
 // Frozen expectation for board.read over all principals and workspaces,
 // identical to the matrix asserted in tests/identity/policy-engine.test.mjs.
@@ -194,11 +199,26 @@ function sandboxTrialSet(root) {
     const { pid, done } = live.startForControlProbe({
       command: 'cmd.exe',
       args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-      timeoutMs: 60000,
+      timeoutMs: LIVE_TRIAL_TIMER_MS,
     });
-    await new Promise((resolveTimer) => setTimeout(resolveTimer, 500));
+    // The trial measures a process TREE, so it waits for the tree to exist
+    // instead of assuming a fixed 500ms is enough. Under load it is not, and
+    // cancelling before the grandchildren exist both leaks them and turns
+    // this hard counter red for a reason unrelated to the adapter. Fails
+    // closed when the tree never forms: a trial that never had a tree to reap
+    // is not a pass.
+    const formed = await awaitTree((target) => live.descendantPids(target), pid);
+    if (!formed.formed) {
+      await live.cancel(pid);
+      await done;
+      return `TREE_NOT_FORMED_AFTER_${formed.attempts}_POLLS`;
+    }
     const cancel = await live.cancel(pid);
     await done;
+    const queries = live.lastProcessQueries();
+    if (queries.settleUnanswered > 0 || queries.settleTimedOut) {
+      return `VERDICT_UNVERIFIED_QUERIES_${queries.failedQueries}`;
+    }
     return cancel.survivors === 0 && !live.isAlive(pid) ? 'SURVIVORS_ZERO' : `SURVIVORS_${cancel.survivors}`;
   }, expected: 'SURVIVORS_ZERO' });
   return { trials, cleanup: () => { fs.rmSync(root, { recursive: true, force: true }); fs.rmSync(outside, { recursive: true, force: true }); } };
