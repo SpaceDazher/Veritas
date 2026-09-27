@@ -17,16 +17,20 @@ import { pathToFileURL } from 'node:url';
 import { PRINCIPALS, WORKSPACES } from '../src/lib/identity/principals.mjs';
 import { createPolicyEngine, POLICY_VERSION } from '../src/lib/identity/policy-engine.mjs';
 import { createSandbox } from '../src/lib/identity/sandbox.mjs';
-import { awaitTree } from '../src/lib/identity/process-verdict.mjs';
 import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../src/lib/identity/sandbox-profiles.mjs';
+import { buildEscapingProcessTree, waitForPublishedPids } from '../src/lib/identity/process-tree-fixture.mjs';
+import { awaitTree } from '../src/lib/identity/process-verdict.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const REVOCATION_TRIALS = 100;
 const IS_WINDOWS = process.platform === 'win32';
-// The live trial's own kill timer, below the spawnRun timeout so a slow host
-// records a terminal verdict with the transport counters attached instead of
-// being killed from outside (SpaceDazher/Veritas#16).
-const LIVE_TRIAL_TIMER_MS = 45000;
+
+// Corpus revision 2 (issue #41). The process-cancellation coverage is no
+// longer Windows-only: on every platform the live trial spawns a descendant
+// that leaves the child's process group, and a negative control proves that
+// an observer which cannot see the process table produces a fail-closed
+// blocked/unknown outcome instead of a zero-survivor success.
+const CORPUS_REVISION = 2;
 
 // Frozen expectation for board.read over all principals and workspaces,
 // identical to the matrix asserted in tests/identity/policy-engine.test.mjs.
@@ -97,9 +101,35 @@ const SANDBOX_EXPECTATIONS = Object.freeze([
   ['sandbox/output-digest-provenance', 'RECORDED'],
   ['sandbox/output-name-escape', 'PATH_ESCAPE'],
   ['sandbox/no-exec-refuses-execution', 'BLOCKED'],
-  ...(IS_WINDOWS ? [['sandbox/fs-junction-escape', 'LINK_ESCAPE']] : []),
+  // Platform-independent on purpose: the frozen corpus must have the same
+  // trial set and digest on every host, otherwise a run on one platform can
+  // never satisfy an oracle built for another. Node maps symlinkSync's
+  // 'junction' type onto a directory symlink on POSIX, so the link escape is
+  // observable everywhere.
+  ['sandbox/fs-junction-escape', 'LINK_ESCAPE'],
   ['sandbox/cancellation-survivors', 'SURVIVORS_ZERO'],
+  ['sandbox/cancellation-observation-unavailable', 'BLOCKED_UNVERIFIED'],
 ]);
+
+// A tier that forbids execution must refuse before it resolves a command, so
+// the probe vector is never actually executed; it is spelled per platform only
+// so the trial reads honestly.
+const NO_EXEC_PROBE_COMMAND = IS_WINDOWS ? 'cmd.exe' : '/bin/sh';
+const NO_EXEC_PROBE_ARGS = IS_WINDOWS ? ['/c', 'echo hi'] : ['-c', 'echo hi'];
+
+// The live cancellation trial gets its own probe timer, kept below the
+// harness budget that waits on it, so the adapter's kill timer fires before
+// the harness stops waiting (SpaceDazher/Veritas#16).
+const LIVE_TRIAL_TIMER_MS = 45000;
+
+// A descendant that deliberately leaves the child's process group is the
+// hardest case on both platforms: a group- or parent-only kill cannot reach
+// it. setsid(2) on POSIX, Start-Process on Windows. The tree definition lives
+// in process-tree-fixture.mjs so this runner, the adversarial probes and the
+// cancellation verification stage cannot drift apart.
+function descendantTreeCommand(root) {
+  return buildEscapingProcessTree(root, { depth: 2 });
+}
 
 function canonicalize(value) {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -153,15 +183,27 @@ export function buildExpectedCorpusOracle() {
   });
 }
 
+// Records whether this host could create the link-escape fixture, so the run
+// summary states the capability instead of leaving a reader to infer it from a
+// single mismatching trial.
+let linkCapability = { ready: true, failure: null };
+
 function sandboxTrialSet(root) {
   const outside = fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-corpus-out-'));
   fs.writeFileSync(path.join(outside, 'secret.txt'), 'outside');
-  let junctionReady = false;
+  // The link escape is part of the frozen corpus on every platform. If the OS
+  // refuses to create the link the corpus cannot be frozen as specified, so
+  // the trial reports that as its own observed value instead of throwing out
+  // of the trial set: a censored trial and a crashed run must be
+  // distinguishable, and this one is attributed to the trial that could not
+  // run rather than to an anonymous stack trace.
+  let linkEscapeReady = true;
+  let linkEscapeFailure = null;
   try {
-    fs.symlinkSync(outside, path.join(root, 'escape'), 'junction');
-    junctionReady = true;
-  } catch {
-    junctionReady = false;
+    fs.symlinkSync(outside, path.join(root, 'escape'), IS_WINDOWS ? 'junction' : 'dir');
+  } catch (error) {
+    linkEscapeReady = false;
+    linkEscapeFailure = error?.code ?? 'SYMLINK_FAILED';
   }
   const sandbox = createSandbox({
     profile: SANDBOX_NO_EXEC,
@@ -182,13 +224,14 @@ function sandboxTrialSet(root) {
     { id: 'sandbox/secret-redaction', run: () => { const out = sandbox.redact('connect synthetic-db-secret-0123456789 now'); return out.includes('synthetic-db-secret-0123456789') ? 'LEAK' : 'REDACTED'; }, expected: 'REDACTED' },
     { id: 'sandbox/output-digest-provenance', run: () => { const rec = sandbox.writeOutput('result.txt', Buffer.from('deterministic')); return rec.sha256.length === 64 && rec.provenance.createdAt === NOW ? 'RECORDED' : 'BROKEN'; }, expected: 'RECORDED' },
     { id: 'sandbox/output-name-escape', run: () => { try { sandbox.writeOutput('../escape.txt', Buffer.from('x')); return 'ALLOWED'; } catch (e) { return e.code; } }, expected: 'PATH_ESCAPE' },
-    { id: 'sandbox/no-exec-refuses-execution', run: async () => { const outcome = await sandbox.spawnProcess({ command: 'cmd.exe', args: ['/c', 'echo hi'], timeoutMs: 1000 }); return outcome.status === 'BLOCKED_SANDBOX' ? 'BLOCKED' : 'SPAWNED'; }, expected: 'BLOCKED' },
+    { id: 'sandbox/no-exec-refuses-execution', run: async () => { const outcome = await sandbox.spawnProcess({ command: NO_EXEC_PROBE_COMMAND, args: NO_EXEC_PROBE_ARGS, timeoutMs: 1000 }); return outcome.status === 'BLOCKED_SANDBOX' ? 'BLOCKED' : 'SPAWNED'; }, expected: 'BLOCKED' },
+    { id: 'sandbox/fs-junction-escape', run: () => {
+      if (!linkEscapeReady) return `LINK_ESCAPE_UNOBSERVABLE_${linkEscapeFailure}`;
+      try { sandbox.resolvePath('escape/secret.txt'); return 'ALLOWED'; } catch (e) { return e.code; }
+    }, expected: 'LINK_ESCAPE' },
   ];
-  if (junctionReady) {
-    trials.push({ id: 'sandbox/fs-junction-escape', run: () => { try { sandbox.resolvePath('escape/secret.txt'); return 'ALLOWED'; } catch (e) { return e.code; } }, expected: 'LINK_ESCAPE' });
-  }
-  trials.push({ id: 'sandbox/cancellation-survivors', live: true, run: async () => {
-    if (!IS_WINDOWS) return 'PLATFORM_UNSUPPORTED';
+  linkCapability = { ready: linkEscapeReady, failure: linkEscapeFailure };
+  trials.push({ id: 'sandbox/cancellation-survivors', live: true, survivorTrial: true, run: async () => {
     const live = createSandbox({
       profile: SANDBOX_LOCAL_RESTRICTED_BLOCKED,
       workspaceRoots: [root],
@@ -196,31 +239,97 @@ function sandboxTrialSet(root) {
       secrets: {},
       now: NOW,
     });
-    const { pid, done } = live.startForControlProbe({
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-      timeoutMs: LIVE_TRIAL_TIMER_MS,
-    });
-    // The trial measures a process TREE, so it waits for the tree to exist
-    // instead of assuming a fixed 500ms is enough. Under load it is not, and
-    // cancelling before the grandchildren exist both leaks them and turns
-    // this hard counter red for a reason unrelated to the adapter. Fails
-    // closed when the tree never forms: a trial that never had a tree to reap
-    // is not a pass.
+    const tree = descendantTreeCommand(root);
+    const { pid, done } = live.startForControlProbe({ ...tree, timeoutMs: LIVE_TRIAL_TIMER_MS });
+    // Wait until the descendant has published its own pid, so the trial really
+    // observes a two-level tree instead of racing process creation, and until
+    // the adapter can see descendants at all. A tree that never forms is not a
+    // survivor check, so it fails closed as its own observed value.
+    const descendantPids = await waitForPublishedPids(tree.pidFile);
     const formed = await awaitTree((target) => live.descendantPids(target), pid);
     if (!formed.formed) {
       await live.cancel(pid);
       await done;
-      return `TREE_NOT_FORMED_AFTER_${formed.attempts}_POLLS`;
+      return { observed: `TREE_NOT_FORMED_AFTER_${formed.attempts}_POLLS`, survivors: null, terminationProof: null, outcomeProof: null };
     }
     const cancel = await live.cancel(pid);
-    await done;
+    const outcome = await done;
+    // Independent ground truth: the descendant's own pid must be gone, checked
+    // here rather than trusting the adapter's own verdict.
+    const descendantAlive = descendantPids.filter((value) => live.isAlive(value));
     const queries = live.lastProcessQueries();
-    if (queries.settleUnanswered > 0 || queries.settleTimedOut) {
-      return `VERDICT_UNVERIFIED_QUERIES_${queries.failedQueries}`;
+    if (cancel.proof === 'UNVERIFIED' || outcome.proof === 'UNVERIFIED') {
+      return {
+        observed: 'TERMINATION_UNVERIFIED',
+        survivors: null,
+        terminationProof: cancel.proof,
+        outcomeProof: outcome.proof,
+        processQueries: queries,
+      };
     }
-    return cancel.survivors === 0 && !live.isAlive(pid) ? 'SURVIVORS_ZERO' : `SURVIVORS_${cancel.survivors}`;
+    const observedSurvivors = Math.max(cancel.survivors ?? 0, descendantAlive.length);
+    if (observedSurvivors === 0 && cancel.proof === 'TERMINATED' && outcome.proof === 'TERMINATED') {
+      return { observed: 'SURVIVORS_ZERO', survivors: 0, terminationProof: cancel.proof, outcomeProof: outcome.proof, processQueries: queries };
+    }
+    return {
+      observed: `SURVIVORS_${observedSurvivors}`,
+      survivors: observedSurvivors,
+      terminationProof: cancel.proof,
+      outcomeProof: outcome.proof,
+      processQueries: queries,
+    };
   }, expected: 'SURVIVORS_ZERO' });
+
+  // Negative control: an observer that cannot see the process table. The
+  // required behaviour is a fail-closed blocked/unknown outcome, never a
+  // zero-survivor success. The observer seam is the only injection; the
+  // terminate/prove logic under test is the production one.
+  trials.push({ id: 'sandbox/cancellation-observation-unavailable', live: true, survivorTrial: true, run: async () => {
+    const unobservable = {
+      id: 'negative-control:process-table-unavailable',
+      listDescendants: async () => ({ pids: [], observable: false, reason: 'SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE' }),
+      listExisting: async (pids) => ({ alive: pids, observable: false, reason: 'SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE' }),
+      identityFor: (pid) => String(pid),
+    };
+    const blind = createSandbox({
+      profile: SANDBOX_LOCAL_RESTRICTED_BLOCKED,
+      workspaceRoots: [root],
+      artifactRoot: path.join(root, 'artifacts'),
+      secrets: {},
+      now: NOW,
+      processObserver: unobservable,
+    });
+    const { pid, done } = blind.startForControlProbe({
+      command: process.execPath,
+      args: ['-e', 'setTimeout(() => {}, 30000)'],
+      timeoutMs: 30000,
+    });
+    await new Promise((resolveTimer) => setTimeout(resolveTimer, 200));
+    const cancel = await blind.cancel(pid);
+    // The run outcome is read, not assumed. Reporting a hard-coded
+    // outcomeProof here would satisfy the counter's "both sides agree" rule
+    // with a constant and hide exactly the regression that rule exists to
+    // catch: cancel() and the run outcome disagreeing about the same tree.
+    const outcome = await done;
+    const failClosed = cancel.proof === 'UNVERIFIED'
+      && cancel.terminated === false
+      && cancel.survivors === null
+      && cancel.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE')
+      && blind.observationSource === 'negative-control:process-table-unavailable';
+    // Both the adapter's own verdict and the run's own verdict must be
+    // fail-closed. Requiring only one of them would let a regression that
+    // reported success from one side pass as a blocked/unknown control.
+    const bothFailClosed = failClosed
+      && outcome.proof === 'UNVERIFIED'
+      && outcome.terminated === false
+      && outcome.survivors === null;
+    return {
+      observed: bothFailClosed ? 'BLOCKED_UNVERIFIED' : 'FALSE_ZERO_SURVIVOR_SUCCESS',
+      survivors: bothFailClosed ? null : 0,
+      terminationProof: cancel.proof,
+      outcomeProof: outcome.proof,
+    };
+  }, expected: 'BLOCKED_UNVERIFIED' });
   return { trials, cleanup: () => { fs.rmSync(root, { recursive: true, force: true }); fs.rmSync(outside, { recursive: true, force: true }); } };
 }
 
@@ -260,19 +369,33 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     });
   }
 
-  // Sandbox trials (including the live cancellation probe).
+  // Sandbox trials (including the live cancellation probe and its negative
+  // control). A trial may return a bare observed value, or an object carrying
+  // the observed value plus the survivor accounting used by the hard counter.
   for (const trial of sandboxSet.trials) {
-    const observed = await trial.run();
-    record({
+    const result = await trial.run();
+    const detail = typeof result === 'string' ? { observed: result } : result;
+    const observed = detail.observed;
+    const survivors = detail.survivors;
+    const record = {
       trialId: trial.id,
       kind: 'sandbox',
       expected: trial.expected,
       observed,
       decision: observed === trial.expected ? 'ALLOW' : 'DENY',
       reasonCodes: [observed === trial.expected ? 'SANDBOX_CONTROL_AS_EXPECTED' : 'SANDBOX_CONTROL_VIOLATED'],
-      survivors: trial.id === 'sandbox/cancellation-survivors' ? (observed === 'SURVIVORS_ZERO' ? 0 : Number(observed?.match(/SURVIVORS_(\d+)/)?.[1] ?? -1)) : undefined,
       match: observed === trial.expected,
-    });
+    };
+    if (trial.survivorTrial) {
+      // survivors is a non-negative count, or null when the tree could not be
+      // observed. The counter below turns null and any mismatch into at least
+      // one survivor, so an unproven outcome can never read as zero.
+      record.survivors = Number.isInteger(survivors) && survivors >= 0 ? survivors : null;
+      record.terminationProof = detail.terminationProof ?? null;
+      record.outcomeProof = detail.outcomeProof ?? null;
+      if (detail.processQueries) record.processQueries = detail.processQueries;
+    }
+    observations.push(record);
   }
   sandboxSet.cleanup();
 
@@ -309,14 +432,33 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
   }
 
   // Hard counters, computed strictly from recorded observations.
+  // survivors_after_cancellation is fail-closed and cannot be laundered:
+  //   - a mismatching trial contributes at least one, whatever it reported;
+  //   - a claimed SURVIVORS_ZERO contributes zero only with a non-negative
+  //     zero AND a TERMINATED proof from both cancel() and the run outcome;
+  //   - a claimed BLOCKED_UNVERIFIED contributes zero only with a null
+  //     survivor count and an UNVERIFIED proof — the required fail-closed
+  //     behaviour for an unavailable process observation;
+  //   - every other observed value contributes max(1, survivors).
+  // A negative or non-integer survivor count is therefore always a violation.
+  const survivorObservations = observations.filter((o) => o.trialId.startsWith('sandbox/cancellation-'));
+  const survivorsCounter = survivorObservations.reduce((sum, o) => {
+    const reported = Number.isInteger(o.survivors) && o.survivors >= 0 ? o.survivors : null;
+    if (o.match !== true) return sum + 1;
+    if (o.observed === 'SURVIVORS_ZERO') {
+      return sum + (reported === 0 && o.terminationProof === 'TERMINATED' && o.outcomeProof === 'TERMINATED' ? 0 : 1);
+    }
+    if (o.observed === 'BLOCKED_UNVERIFIED') {
+      return sum + (reported === null && o.terminationProof === 'UNVERIFIED' && o.outcomeProof === 'UNVERIFIED' ? 0 : 1);
+    }
+    return sum + Math.max(1, reported ?? 1);
+  }, 0);
   const counters = {
     cross_tenant_success: observations.filter((o) => o.crossTenant && o.decision === 'ALLOW').length,
     authority_expansion: observations.filter((o) => ['DENY', 'BLOCKED_SANDBOX'].includes(o.expected) && o.decision === 'ALLOW' && o.kind !== 'sandbox').length
-      + observations.filter((o) => o.kind === 'sandbox' && ['PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE', 'DENIED', 'BLOCKED', 'REDACTED', 'FILTERED', 'SURVIVORS_ZERO'].includes(o.expected) && o.observed === 'ALLOWED').length,
+      + observations.filter((o) => o.kind === 'sandbox' && ['PATH_ESCAPE', 'ROOT_VIOLATION', 'UNC_PATH', 'DEVICE_PATH', 'LINK_ESCAPE', 'DENIED', 'BLOCKED', 'REDACTED', 'FILTERED', 'SURVIVORS_ZERO', 'BLOCKED_UNVERIFIED'].includes(o.expected) && o.observed === 'ALLOWED').length,
     fs_network_secret_escapes: observations.filter((o) => o.kind === 'sandbox' && o.match === false).length,
-    survivors_after_cancellation: observations
-      .filter((o) => o.trialId === 'sandbox/cancellation-survivors')
-      .reduce((sum, o) => sum + (typeof o.survivors === 'number' ? o.survivors : 1), 0),
+    survivors_after_cancellation: survivorsCounter,
     allow_after_revocation_commit: allowAfterCommit,
     missing_or_censored_trials: observations.filter((o) => o.expected === 'ALLOW' && o.decision !== 'ALLOW').length
       + Math.max(0, corpus.length + sandboxSet.trials.length + REVOCATION_TRIALS - observations.length),
@@ -336,6 +478,11 @@ export async function runCorpus({ runId, executorId, nonceBase, outputRoot }) {
     nonceBase,
     outputRoot,
     corpusDigest,
+    corpusRevision: CORPUS_REVISION,
+    // Host capabilities the frozen corpus depends on. Stated explicitly so a
+    // reader can tell "this host cannot create the link-escape fixture" from
+    // "this host did create it and the control did not hold".
+    linkCapability,
     fixedClock: NOW,
     policyVersion: POLICY_VERSION,
     platform: `${process.platform}/${process.arch} node ${process.version}`,

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "evidenceRevision": 2,
+  "supersedes": null,
+  "issue": "SpaceDazher/Veritas#41",
+  "scope": "Cross-platform process-tree cancellation proof: termination is either proven by re-observing the OS process table, or reported as a fail-closed blocked/unknown outcome.",
+  "evidenceFile": "evidence/s2-002-cancellation-v2-win32.json",
+  "generatedAt": "2026-09-12T12:00:00.000Z",
+  "policyVersion": "s2-002-policy-v5",
+  "corpusRevision": 2,
+  "platform": "win32/x64 node v22.23.2",
+  "observationSource": "platform:win32",
+  "preservedHardGates": {
+    "cross_tenant_success": 0,
+    "authority_expansion": 0,
+    "fs_network_secret_escapes": 0,
+    "survivors_after_cancellation": 0,
+    "allow_after_revocation_commit": 0,
+    "missing_or_censored_trials": 0
+  },
+  "historicalEvidence": [
+    "evidence/s2-002-run-a.json",
+    "evidence/s2-002-run-b.json",
+    "evidence/s2-002-comparison.json",
+    "evidence/s2-002-comparison-integrity.json",
+    "evidence/s2-002-security-probes.json",
+    "evidence/s2-002-podman-sandbox.json",
+    "evidence/s2-002-gvisor-sandbox.json",
+    "evidence/s2-002-dependency-binding.json"
+  ],
+  "counters": {
+    "survivors_after_cancellation": 0,
+    "false_zero_survivor_success": 0
+  },
+  "cases": [
+    {
+      "caseId": "cancellation/descendant-session-escape",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "detail": "platform=win32; descendantsObserved=1; descendantAlive=0; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[6448,17620,21436,23112,23896,24316,25872],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:win32\"}; outcome.status=cancelled"
+    },
+    {
+      "caseId": "cancellation/timeout-descendant-escape",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "detail": "status=timeout; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[10312,21064,21128,22300,25800],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:win32\"}; descendantAlive=0"
+    },
+    {
+      "caseId": "cancellation/negative-control-no-process-table",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "detail": "cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:process-table-unavailable\"}; outcome.survivors=null"
+    },
+    {
+      "caseId": "cancellation/negative-control-descendant-query-fails",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "detail": "descendantsObserved=1; cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:descendant-query-unavailable\"}"
+    },
+    {
+      "caseId": "cancellation/recycled-pid-not-signalled",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true
+      ],
+      "detail": "observer=platform:win32; identitySupported=false; alive=[21668]; pidReused=[]; no per-pid identity token on this platform: stated residual, not a proven control"
+    },
+    {
+      "caseId": "cancellation/self-completed-run-makes-no-claim",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "detail": "status=completed; proof=UNVERIFIED; survivors=null; reasonCodes=[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_TREE_SHAPE_NOT_OBSERVED\"]"
+    },
+    {
+      "caseId": "cancellation/s2-002-frozen-corpus-hard-counters",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "detail": "inProcessReplay; comparedTrials=284; corpusRevision=2; corpusDigest=6b644081b284d1c0; counters={\"cross_tenant_success\":0,\"authority_expansion\":0,\"fs_network_secret_escapes\":0,\"survivors_after_cancellation\":0,\"allow_after_revocation_commit\":0,\"missing_or_censored_trials\":0}; counterViolations=[]"
+    },
+    {
+      "caseId": "cancellation/historical-evidence-untouched",
+      "verdict": "PASS",
+      "checks": [
+        true
+      ],
+      "detail": "checked=8; source=git:HEAD; rewritten=[]"
+    }
+  ],
+  "verdict": "PASS",
+  "limitations": [
+    "Proves the spawned-tree termination control of the in-process probe adapter on this host only; it is not a kernel containment boundary.",
+    "Descendant discovery on POSIX reads /proc; on a host without /proc it falls back to ps, and if neither answers the outcome is UNVERIFIED rather than zero survivors.",
+    "A Windows-only replay still does not establish the non-Windows property; both platforms must be observed independently.",
+    "The adversarial A-K report evidence/s2-002-security-probes.json is the pre-fix record and is left untouched; npm run test:security-probes regenerates it in the working tree by design, so re-running it is an explicit separate act.",
+    "On this Windows host the process observer has no per-pid identity token, so a recycled pid cannot be told apart from one of ours. The case records that residual instead of asserting a control the platform cannot support."
+  ]
+}

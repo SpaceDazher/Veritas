@@ -22,10 +22,16 @@ import {
   executeAuthorizedGvisorTool,
 } from '../src/lib/identity/gvisor-sandbox.mjs';
 import { assertValidContract, validateContract } from '../src/lib/identity/contract-registry.mjs';
+import { buildEscapingProcessTree, readPublishedPids, waitForPublishedPids } from '../src/lib/identity/process-tree-fixture.mjs';
 import { awaitTree } from '../src/lib/identity/process-verdict.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
+
+// The probe's own kill timer, kept below the harness budget that waits on it,
+// so the adapter fires its timer before the harness stops waiting
+// (SpaceDazher/Veritas#16).
+const PROBE_TIMER_MS = 45000;
 
 const SECRETS = {
   'sec-postgres-url': 'synthetic-db-secret-0123456789',
@@ -41,11 +47,6 @@ const INJECTION = [
 function tempRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-probe-'));
 }
-
-// The probe child's own kill timer. It must stay below the harness budget so a
-// slow host produces a recorded timeout verdict with the transport counters
-// attached, rather than a bare harness timeout (SpaceDazher/Veritas#16).
-const PROBE_TIMER_MS = 45000;
 
 function sandboxFor(root, profile = SANDBOX_NO_EXEC) {
   return createSandbox({
@@ -237,11 +238,14 @@ async function probeF() {
   return { detected, detail: outcomes.map((o) => `${o.decision}(${o.reasonCodes.join('|')})`).join('; ') };
 }
 
-// G: child process surviving cancellation/timeout (live, Windows).
+// G: child process surviving cancellation/timeout (live, every platform).
+// The probe child spawns a descendant that leaves the child's process group —
+// `start /b` on Windows, setsid(2) on POSIX — so a group- or parent-only kill
+// provably cannot reach it. Both the cancellation proof and the independent
+// liveness of the descendant's own pid are checked; a second, negative-control
+// case proves that an observer which cannot see the process table produces a
+// fail-closed blocked/unknown outcome rather than a zero-survivor success.
 async function probeG() {
-  if (!IS_WINDOWS) {
-    return { skipped: true, detected: false, detail: 'platform does not expose the Windows process tree; tier remains blocked' };
-  }
   const root = tempRoot();
   const sandbox = createSandbox({
     profile: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 8 } },
@@ -250,42 +254,85 @@ async function probeG() {
     secrets: SECRETS,
     now: NOW,
   });
-  // The probe child spawns its own descendant via `start`; killing the tree
-  // must reap both. This is the survivor check demanded for cancellation.
-  const { pid, done } = sandbox.startForControlProbe({
-    command: 'cmd.exe',
-    args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-    timeoutMs: PROBE_TIMER_MS,
-  });
+  // The probe child spawns its own descendant that a group- or parent-only kill
+  // cannot reach — setsid(2) on POSIX, Start-Process on Windows — and publishes
+  // the descendant's pid, so the survivor check has independent ground truth.
+  // This is the survivor check demanded for cancellation.
+  const tree = buildEscapingProcessTree(root, { depth: 2 });
+  const { pid, done } = sandbox.startForControlProbe({ ...tree, timeoutMs: PROBE_TIMER_MS });
+  const descendants = await waitForPublishedPids(tree.pidFile);
   // Wait for the tree to actually exist instead of assuming it after a fixed
-  // delay. A fixed delay under load cancels a tree that has not spawned its
+  // delay: under load a fixed delay cancels a tree that has not spawned its
   // own children yet, which both leaks the orphans and lets the probe pass
   // without ever having had a tree to reap. Fail closed if it never forms.
   const formed = await awaitTree((target) => sandbox.descendantPids(target), pid);
   if (!formed.formed) {
     await sandbox.cancel(pid);
     await done;
-    const queries = sandbox.lastProcessQueries();
+    const stuck = sandbox.lastProcessQueries();
     fs.rmSync(root, { recursive: true, force: true });
-    return { detected: false, detail: `tree never formed after ${formed.attempts} polls; queries=${queries.queries} failed=${queries.failedQueries}` };
+    return { detected: false, detail: `tree never formed after ${formed.attempts} polls; queries=${stuck.queries} failed=${stuck.failedQueries}` };
   }
   const cancel = await sandbox.cancel(pid);
   const outcome = await done;
   const queries = sandbox.lastProcessQueries();
-  const detected = cancel.survivors === 0 && outcome.terminated === true
-    && (outcome.status === 'cancelled' || outcome.status === 'timeout')
+  const survivorsAlive = descendants.filter((value) => sandbox.isAlive(value));
+  const detected = cancel.proof === 'TERMINATED'
+    && outcome.proof === 'TERMINATED'
+    && cancel.terminated === true
+    && outcome.terminated === true
+    && cancel.survivors === 0
+    && outcome.survivors === 0
+    && outcome.status === 'cancelled'
     && !sandbox.isAlive(pid)
-    // A survivor count of zero is only evidence when the OS answered. An
-    // unverified verdict must not be recorded as a pass.
+    && descendants.length > 0
+    && survivorsAlive.length === 0
+    // A survivor count of zero is evidence only when the OS answered. An
+    // unverified verdict must never be recorded as a pass.
     && queries.settleUnanswered === 0
     && queries.settleTimedOut === false;
-  fs.rmSync(root, { recursive: true, force: true });
-  return {
-    detected,
-    detail: `survivors=${cancel.survivors}; status=${outcome.status}; alive=${sandbox.isAlive(pid)}; `
-      + `descendants=${formed.seen}; polls=${formed.attempts}; queries=${queries.queries}; failed=${queries.failedQueries}; `
-      + `settleSteps=${queries.settleSteps}; settleUnanswered=${queries.settleUnanswered}; settleTimedOut=${queries.settleTimedOut}`,
+
+  // Negative control: unavailable process observation must fail closed.
+  const unobservable = {
+    id: 'negative-control:process-table-unavailable',
+    listDescendants: async () => ({ pids: [], observable: false, reason: 'SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE' }),
+    listExisting: async (pids) => ({ alive: pids, observable: false, reason: 'SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE' }),
+    identityFor: (value) => String(value),
   };
+  const blind = createSandbox({
+    profile: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 8 } },
+    workspaceRoots: [root],
+    artifactRoot: path.join(root, 'artifacts'),
+    secrets: SECRETS,
+    now: NOW,
+    processObserver: unobservable,
+  });
+  const blindRun = blind.startForControlProbe({
+    command: process.execPath,
+    args: ['-e', 'setTimeout(() => {}, 30000)'],
+    timeoutMs: 30000,
+  });
+  await new Promise((resolveTimer) => setTimeout(resolveTimer, 200));
+  const blindCancel = await blind.cancel(blindRun.pid);
+  const blindOutcome = await blindRun.done;
+  const failClosed = blindCancel.proof === 'UNVERIFIED'
+    && blindCancel.terminated === false
+    && blindCancel.survivors === null
+    && blindOutcome.proof === 'UNVERIFIED'
+    && blindOutcome.survivors === null
+    && blindOutcome.terminated === false
+    && blindCancel.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE')
+    && blindOutcome.reasonCodes.includes('SBX_PROCESS_OBSERVATION_UNAVAILABLE');
+
+  const detail = `platform=${tree.platform}; descendantsObserved=${descendants.length}; cancel.proof=${cancel.proof}; cancel.survivors=${cancel.survivors}; ` +
+    `outcome.proof=${outcome.proof}; outcome.status=${outcome.status}; outcome.survivors=${outcome.survivors}; ` +
+    `descendantAlive=${survivorsAlive.length}; rootAlive=${sandbox.isAlive(pid)}; ` +
+    `tree.formed=${formed.formed}; descendantsSeen=${formed.seen}; polls=${formed.attempts}; ` +
+    `queries=${queries.queries}; failedQueries=${queries.failedQueries}; settleSteps=${queries.settleSteps}; ` +
+    `settleUnanswered=${queries.settleUnanswered}; settleTimedOut=${queries.settleTimedOut}; ` +
+    `negativeControl.proof=${blindCancel.proof}; negativeControl.failClosed=${failClosed}`;
+  fs.rmSync(root, { recursive: true, force: true });
+  return { detected: detected && failClosed, detail };
 }
 
 // H: stale grant/lease/fencing token after revocation.

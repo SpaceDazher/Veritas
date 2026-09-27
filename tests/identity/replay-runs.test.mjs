@@ -88,6 +88,22 @@ describe('S2-002 independent replay: corpus runner', () => {
       assert.ok(trial, 'cancellation trial must run');
       assert.equal(trial.decision, 'ALLOW', 'expected behaviour (zero survivors) must be observed');
       assert.equal(trial.survivors, 0);
+      // Corpus revision 2: a zero count is only acceptable with the proof
+      // that backs it, on every platform (issue #41).
+      assert.equal(trial.terminationProof, 'TERMINATED');
+      assert.equal(trial.outcomeProof, 'TERMINATED');
+    }
+  });
+
+  test('the unavailable-observation negative control fails closed on every platform', () => {
+    for (const run of [runA, runB]) {
+      const trial = run.observations.find((o) => o.trialId === 'sandbox/cancellation-observation-unavailable');
+      assert.ok(trial, 'the negative control must run, never be skipped');
+      assert.equal(trial.observed, 'BLOCKED_UNVERIFIED');
+      assert.equal(trial.match, true);
+      assert.equal(trial.survivors, null, 'an unobserved tree must carry no survivor count');
+      assert.equal(trial.terminationProof, 'UNVERIFIED');
+      assert.equal(trial.outcomeProof, 'UNVERIFIED');
     }
   });
 
@@ -178,5 +194,36 @@ describe('S2-002 comparator is fail-closed', () => {
     const comparison = compareRuns(broken, sumB, obsA, obsB);
     assert.equal(comparison.ok, false);
     assert.ok(comparison.counterViolations.some((v) => v.includes('trialCount')));
+  });
+
+  test('a negative survivor counter is a violation, never a silent pass', () => {
+    // Issue #41: the runner used to record survivors = -1 for an unobserved
+    // cancellation, and a `value > 0` limit test accepted it.
+    const broken = { ...sumA, counters: { ...sumA.counters, survivors_after_cancellation: -1 } };
+    const comparison = compareRuns(broken, sumB, obsA, obsB);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.some((v) => v.includes('survivors_after_cancellation=-1')),
+      comparison.counterViolations.join(','));
+  });
+
+  test('a zero-survivor claim without a TERMINATED proof is a violation', () => {
+    const tampered = obsA.map((o) => (o.trialId === 'sandbox/cancellation-survivors'
+      ? { ...o, observed: 'SURVIVORS_ZERO', terminationProof: 'UNVERIFIED', outcomeProof: 'UNVERIFIED' }
+      : o));
+    const forged = { ...sumA, counters: { ...sumA.counters, survivors_after_cancellation: 0 } };
+    const comparison = compareRuns(forged, sumB, tampered, obsB);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.some((v) => v.includes('unprovenZeroSurvivorSuccess')),
+      comparison.counterViolations.join(','));
+  });
+
+  test('a fail-closed outcome carrying a survivor count is a violation', () => {
+    const tampered = obsA.map((o) => (o.trialId === 'sandbox/cancellation-observation-unavailable'
+      ? { ...o, survivors: 0 }
+      : o));
+    const comparison = compareRuns(sumA, sumB, tampered, obsB);
+    assert.equal(comparison.ok, false);
+    assert.ok(comparison.counterViolations.some((v) => v.includes('unverifiedMustNotCarrySurvivorCount')),
+      comparison.counterViolations.join(','));
   });
 });

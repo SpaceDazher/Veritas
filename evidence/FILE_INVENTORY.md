@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 718.
+Generated from `git ls-files`; count: 728.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -380,6 +380,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/product/PRODUCT_CONTRACT.md`
 - `docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md`
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
+- `docs/security/S2-002-PROCESS-CANCELLATION.md`
 - `docs/security/S2-002-SANDBOX-PROFILE.md`
 - `docs/security/S2-002-THREAT-MODEL.md`
 - `docs/stages/stage-1.md`
@@ -402,12 +403,17 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/external/s2-001/pilot-run-manifest.json`
 - `evidence/FILE_INVENTORY.md`
 - `evidence/frozen-manifest.json`
+- `evidence/historical-s2-002-baseline.json`
 - `evidence/policy-probes.json`
 - `evidence/postgres-smoke.json`
 - `evidence/probe-registry.json`
 - `evidence/public-artifact-check.json`
 - `evidence/root-manifest.json`
 - `evidence/s2-001-pilot-binding.json`
+- `evidence/s2-002-cancellation-v2-integrity.json`
+- `evidence/s2-002-cancellation-v2-win32-integrity.json`
+- `evidence/s2-002-cancellation-v2-win32.json`
+- `evidence/s2-002-cancellation-v2.json`
 - `evidence/s2-002-comparison-integrity.json`
 - `evidence/s2-002-comparison.json`
 - `evidence/s2-002-dependency-binding.json`
@@ -553,6 +559,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-pilot-binding.mjs`
 - `scripts/verify-podman-sandbox.mjs`
 - `scripts/verify-postgres-smoke.mjs`
+- `scripts/verify-s2-002-cancellation-v2.mjs`
 - `scripts/verify-s2-002-dependencies.mjs`
 - `scripts/verify-s2-002.mjs`
 - `scripts/verify-s2-003-dependencies.mjs`
@@ -592,6 +599,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/identity/podman-sandbox.mjs`
 - `src/lib/identity/policy-engine.mjs`
 - `src/lib/identity/principals.mjs`
+- `src/lib/identity/process-observer.mjs`
+- `src/lib/identity/process-tree-fixture.mjs`
 - `src/lib/identity/process-verdict.mjs`
 - `src/lib/identity/sandbox-profiles.mjs`
 - `src/lib/identity/sandbox.mjs`
@@ -649,6 +658,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/claims/helpers.mjs`
 - `tests/claims/store.test.mjs`
 - `tests/database/postgres-smoke.test.mjs`
+- `tests/identity/cancellation-process-tree.test.mjs`
 - `tests/identity/clean-checkout-evidence.test.mjs`
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/dependency-binding.test.mjs`

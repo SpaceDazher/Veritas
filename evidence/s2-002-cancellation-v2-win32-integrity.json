@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "evidenceRevision": 2,
+  "platform": "win32/x64 node v22.23.2",
+  "evidenceFile": "evidence/s2-002-cancellation-v2-win32.json",
+  "algorithm": "SHA-256 raw file bytes",
+  "files": {
+    "evidence/s2-002-cancellation-v2-win32.json": "638b49f36cad55b67966204783ef797e170abb7e15a1690af18f308c9f24e274"
+  },
+  "historicalEvidenceRewritten": false
+}
