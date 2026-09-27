@@ -104,6 +104,24 @@ describe('S2-002 independent replay: corpus runner', () => {
       assert.equal(trial.decision, 'ALLOW', 'expected behaviour (zero survivors) must be observed');
       assert.equal(trial.survivors, 0);
       assert.equal(run.summary.counters.survivors_after_cancellation, 0);
+      // Corpus revision 2 (issue #41): a zero count is only acceptable
+      // together with the proof that backs it, on every platform. The not-run
+      // branch above and this assertion are the same control from two ends —
+      // one host declined it, the other proved the one it did run.
+      assert.equal(trial.terminationProof, 'TERMINATED');
+      assert.equal(trial.outcomeProof, 'TERMINATED');
+    }
+  });
+
+  test('the unavailable-observation negative control fails closed on every platform', () => {
+    for (const run of [runA, runB]) {
+      const trial = run.observations.find((o) => o.trialId === 'sandbox/cancellation-observation-unavailable');
+      assert.ok(trial, 'the negative control must run, never be skipped');
+      assert.equal(trial.observed, 'BLOCKED_UNVERIFIED');
+      assert.equal(trial.match, true);
+      assert.equal(trial.survivors, null, 'an unobserved tree must carry no survivor count');
+      assert.equal(trial.terminationProof, 'UNVERIFIED');
+      assert.equal(trial.outcomeProof, 'UNVERIFIED');
     }
   });
 

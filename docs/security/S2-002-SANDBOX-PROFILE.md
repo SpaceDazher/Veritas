@@ -68,13 +68,92 @@ and by both frozen replay runs.
   controls: `cwd` inside the workspace, filtered environment, non-detached
   spawn, hidden window, per-profile `max_processes` (violations rejected
   with `LIMIT_PROCESSES`), `timeout_ms`.
-- Cancellation and timeouts capture descendants before termination, use
-  direct `SIGKILL` plus `taskkill /T /F` on Windows (process-group kill on
-  POSIX), and retry addressable survivors. Terminal survivor proof queries
-  the Windows process table rather than relying on `process.kill(pid, 0)`.
-  Query/termination failures remain non-zero (fail-closed). A
-  grandchild spawned via `start /b` is reaped; timeout and cancellation
-  produce terminal outcomes (`timeout` / `cancelled`), never `success`.
+- Cancellation and timeouts capture the tree **before** the root is
+  terminated, because once the parent exits the OS re-parents descendants and
+  a post-kill parent walk can no longer prove the original tree is gone.
+- Termination is a **proven** claim, never an assumed one (issue #41). The
+  adapter re-observes the OS process table and returns exactly one of:
+  - `TERMINATED` — observed, nothing of the tracked tree is left alive;
+  - `SURVIVORS_REMAINING` — observed, at least one tracked pid is alive;
+  - `UNVERIFIED` — the process table could not be read, so the tree shape or
+    its liveness is unknown.
+  `terminated: true` is emitted only for `TERMINATED`. `survivors` is a
+  non-negative count, or `null` for `UNVERIFIED` — never `0` for an
+  unobserved tree.
+- A readable process table with the root already gone is not an empty tree:
+  descendants are re-parented to init and stop being reachable from it. A run
+  that ends on its own therefore reports `UNVERIFIED` with
+  `SBX_TREE_SHAPE_NOT_OBSERVED` and no survivor count, instead of claiming an
+  empty tree it never observed. Cancellation and timeout capture the tree while
+  the root is alive, which is what makes their proof valid.
+- `src/lib/identity/process-observer.mjs` is the only source of truth about
+  what is still running. Windows uses `Win32_Process` (CIM), answering the
+  root's existence and the descendant walk from one snapshot; Linux reads
+  `/proc`; other POSIX hosts fall back to `ps -A`. A failed query is
+  `observable: false`, never an empty result, and a readable table with the
+  root already gone is `rootPresent: false` — the tree's shape is unknown, not
+  empty.
+- On POSIX the probe child is spawned as a **process-group leader**
+  (`detached: true` → `setsid`), so a group-directed `SIGKILL` reaches every
+  descendant that stays in the group. Windows keeps `detached: false` because
+  `taskkill /T` walks the parent chain.
+- Group and session membership is tracked as a tree edge of its own, which is
+  what catches a descendant that deliberately left the group with `setsid(2)`
+  — the POSIX counterpart of Windows `start /b` — and its own children, which
+  are re-parented to init when their parent dies. The captured session and
+  process group keep working as a re-discovery edge **after** the root is
+  killed, which is the only edge that still reaches the tree at that point: a
+  parent walk from a vanished pid finds nothing. Session/pgroup expansion is
+  only used when the root is genuinely isolated from the adapter's own session
+  and process group; when it is not, discovery fails closed with
+  `SBX_PROCESS_GROUP_NOT_ISOLATED` and returns no pids, rather than falling
+  back to the root's process group — which on a non-detached child is the
+  adapter's own group.
+- Tracked pids carry a per-pid identity token where the platform exposes one
+  (Linux `/proc` starttime). A recycled pid is reported as `SBX_PID_REUSED` and
+  is never signalled and never counted as a survivor; Windows CIM exposes no
+  such token, and the evidence records that residual instead of asserting it.
+  The check covers **both** signal paths: a direct `SIGKILL` that skipped it
+  would kill an unrelated process even when the group/tree kill was correctly
+  refused.
+- Process-table transport is retried inside a wall-clock budget before the
+  fail-closed reading is taken, and the settle loop is bounded by wall clock
+  rather than by a fixed iteration count, so a loaded host is not read as an
+  unobserved tree and the loop cannot overrun the harness budget. A failure
+  that is a verdict about the tree rather than about the transport is not
+  retried. Every outcome and cancel result carries `processQueries`
+  (`queries`, `failedQueries`, `settleSteps`, `settleUnanswered`,
+  `settleTimedOut`), which is what makes a survivor verdict distinguishable
+  from an unverified one after the fact.
+- The observer memoises its process-table snapshot for a fraction of a settle
+  step, so a cancellation costs one table read per step rather than one per
+  tracked pid. On a 109-process host a single cancellation went from 3272
+  `/proc/<pid>/stat` reads to 214.
+- One tree definition, `src/lib/identity/process-tree-fixture.mjs`, is shared by
+  the corpus runner, the probes, the verification stage and the tests, so they
+  cannot drift into observing different trees. POSIX uses `setsid(2)`; Windows
+  uses `Start-Process`, which does not inherit the parent's stdio handles, so a
+  run can finish while the descendant is still alive. Both publish the
+  descendant's own pid, which is the independent ground truth every live case
+  checks. The POSIX inner script is single-quoted on purpose: double quotes let
+  the outer shell expand `$$`, so the published pid was the root's own and the
+  "independent" check was reading the adapter's root back to itself.
+- A descendant that inherits the child's stdout/stderr pipes keeps Node's
+  `close` event from firing, so such a run cannot be reported as `completed`
+  before the descendant is gone; it terminates as `timeout` with a proven,
+  empty tree.
+- Per-profile `max_processes`, `LIMIT_PROCESSES`, and terminal outcomes
+  (`timeout` / `cancelled`) round out the lifecycle control. A grandchild
+  spawned via `start /b` or `setsid` is reaped; timeout and cancellation never
+  produce `success`.
+
+Coverage for this control is platform-specific by construction: the live cases
+in `tests/identity/cancellation-process-tree.test.mjs` and
+`scripts/verify-s2-002-cancellation-v2.mjs` spawn a real descendant that
+leaves the child's process group, check the independent liveness of the pids
+that descendant published, and include two negative controls for unavailable
+process observation. `npm run verify:s2-002-cancellation` publishes the
+versioned evidence `evidence/s2-002-cancellation-v2.json`.
 
 The Podman backend additionally enforces rootless execution, UID 65534,
 read-only rootfs, all capabilities dropped, `no-new-privileges`, seccomp,
@@ -102,8 +181,11 @@ mounts, no environment injection, loopback-only networking, 32 PIDs,
 ### 2.6 Lifecycle semantics (enforced)
 
 - Every run ends in exactly one terminal state: `completed`, `failed`,
-  `timeout`, `cancelled` or `BLOCKED_SANDBOX`. There is no `success` state
-  and no unknown-outcome path; unknown outcomes would fail closed.
+  `timeout`, `cancelled` or `BLOCKED_SANDBOX`. There is no `success` state.
+- Every terminal state carries a termination proof (`TERMINATED`,
+  `SURVIVORS_REMAINING` or `UNVERIFIED`) and the observation source that
+  produced it. An unknown outcome is a valid state, but it fails closed: it
+  never becomes a success.
 
 ## 3. What this sandbox is NOT (honest boundary statement)
 

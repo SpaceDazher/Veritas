@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "evidenceRevision": 2,
+  "platform": "linux/x64 node v22.23.2",
+  "evidenceFile": "evidence/s2-002-cancellation-v2.json",
+  "algorithm": "SHA-256 raw file bytes",
+  "files": {
+    "evidence/s2-002-cancellation-v2.json": "ab548faba04037d2b391d791661052f8d369745b6ed059ec539d0c9c22ba4844"
+  },
+  "historicalEvidenceRewritten": false
+}

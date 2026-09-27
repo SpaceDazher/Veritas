@@ -6,16 +6,30 @@
 // cancellation, and artifact outputs with digest and provenance.
 //
 // Honesty boundary: a cwd + filtered env + tree kill is NOT a full sandbox.
-// This Windows child-process adapter is not the executable sandbox: its
 // This in-process probe adapter never launches executable tiers. The separate
 // evidence-bound Podman and gVisor bridges own agent-triggered execution.
 // LOCAL_RESTRICTED execution is implemented separately by the evidence-bound
-// rootless Podman bridge in podman-sandbox.mjs. spawnForControlProbe() exists
-// solely as a research instrument for the legacy tree-kill control.
+// rootless Podman bridge in podman-sandbox.mjs. startForControlProbe() and
+// spawnForControlProbe() exist solely as a research instrument for the
+// process-tree termination control.
+//
+// Termination is a PROVEN claim, never an assumed one (issue #41). The
+// adapter terminates the whole spawned tree and then re-observes the OS
+// process table. `terminated: true` is emitted only when observation was
+// available and nothing of the tracked tree is left alive; an unavailable
+// observer or a surviving pid yields a fail-closed UNVERIFIED/SURVIVORS
+// outcome. A Windows-only replay never established this property for POSIX.
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { DEFAULT_PROCESS_OBSERVER } from './process-observer.mjs';
+import {
+  queryUntilAnswered,
+  settleUntilGone,
+  SETTLE_BUDGET_MS,
+  SETTLE_POLL_MS,
+} from './process-verdict.mjs';
 
 const DEVICE_NAMES = new Set([
   'CON', 'PRN', 'AUX', 'NUL',
@@ -77,7 +91,7 @@ function realpathDeepest(target) {
   return { real: fs.realpathSync(current), missing };
 }
 
-export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets = {}, now }) {
+export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets = {}, now, processObserver }) {
   if (!profile || !profile.tier) throw new Error('SANDBOX_PROFILE_REQUIRED');
   if (!Array.isArray(workspaceRoots) || workspaceRoots.length === 0) {
     throw new Error('SANDBOX_ROOTS_REQUIRED');
@@ -199,6 +213,26 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   // process.kill(pid, 0) unreliable for liveness of direct children.
   const exitSeen = new Set();
 
+  // The observer is the only source of truth about what is still running. The
+  // default is the host platform observer; an injected observer exists so the
+  // fail-closed path (issue #41) can be exercised against a platform that
+  // cannot report its process table. `observationSource` records which one
+  // produced a proof, so an injected run can never be mistaken for a host
+  // observation.
+  const observer = processObserver ?? DEFAULT_PROCESS_OBSERVER;
+  const observationSource = observer.id ?? 'injected:unknown';
+  const isPlatformObserver = processObserver === undefined;
+
+  // Counters for the process-table transport, carried into every outcome and
+  // cancel result (SpaceDazher/Veritas#16). They are what makes a survivor
+  // verdict distinguishable from an unverified one after the fact: a run that
+  // reached TERMINATED after zero failed queries answered the OS, and a run
+  // that reached UNVERIFIED after many failed queries never got an answer.
+  const transport = { queries: 0, failedQueries: 0, settleSteps: 0, settleTimedOut: false, settleUnanswered: 0 };
+  function transportSnapshot() {
+    return { ...transport };
+  }
+
   function isAlive(pid) {
     if (exitSeen.has(pid)) return false;
     try {
@@ -209,47 +243,178 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
   }
 
-  function listDescendants(pid) {
-    if (process.platform !== 'win32') return Promise.resolve([]);
-    const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
-      `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
-      `($p | Select-Object -Unique) -join ' '`;
-    const attempt = (triesLeft) => new Promise((resolve) => {
-      const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
-        windowsHide: true,
-      });
-      let out = '';
-      child.stdout.on('data', (chunk) => { out += chunk; });
-      child.on('error', () => resolve(triesLeft > 1 ? attempt(triesLeft - 1) : []));
-      child.on('close', (code) => {
-        if (code !== 0 && triesLeft > 1) {
-          resolve(attempt(triesLeft - 1));
-          return;
-        }
-        resolve(out.split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0 && value !== pid));
-      });
-    });
-    return attempt(3);
+  // Descendants of the spawned tree. An observer that cannot answer is NOT an
+  // empty tree: it reports observable:false and every caller fails closed.
+  // `known` carries the sessions/process groups our own processes created, so
+  // a re-discovery pass still sees a grandchild that was re-parented to init
+  // when its parent died.
+  // A process-table query that failed for transport reasons is retried inside a
+  // wall-clock budget before the fail-closed reading is taken, so a loaded
+  // host is not read as an unobserved tree (Veritas#16). The reading stays
+  // fail-closed: an unanswered query still yields observable:false, never an
+  // empty tree.
+  //
+  // A failure that is a verdict about the tree rather than about the transport
+  // — a root that is not isolated from this adapter's own session, or a test
+  // observer that is blind by construction — is deterministic, so retrying it
+  // would only spend the budget before returning the same answer.
+  const RETRYABLE_OBSERVATION_FAILURES = [
+    'SBX_PROCESS_TABLE_QUERY_FAILED',
+    'SBX_PROCFS_SNAPSHOT_EMPTY',
+    'SBX_PS_QUERY_UNAVAILABLE',
+    'SBX_PROCESS_OBSERVATION_UNAVAILABLE',
+  ];
+  function retryableReason(reason) {
+    return RETRYABLE_OBSERVATION_FAILURES.some((prefix) => String(reason ?? '').startsWith(prefix));
   }
 
-  function treeKill(pid) {
+  async function askQuery(attempt) {
+    const result = await queryUntilAnswered(async () => {
+      let value;
+      try {
+        value = await attempt();
+      } catch (error) {
+        return { answered: false, reason: `query_threw:${error?.code ?? error?.name ?? 'Error'}` };
+      }
+      if (value && value.observable === false) {
+        const reason = value.reason ?? 'unobserved';
+        // Reported as an answer rather than as a transport failure when it is
+        // deterministic, so the retry policy returns it at once instead of
+        // spending its whole wall-clock budget to reach the same conclusion.
+        if (!retryableReason(reason)) return { answered: true, value };
+        return { answered: false, reason };
+      }
+      return { answered: true, value };
+    });
+    transport.queries += result.attempts;
+    transport.failedQueries += result.failures;
+    return result;
+  }
+
+  async function discoverTree(pid, known = {}) {
+    const query = await askQuery(() => observer.listDescendants(pid, known));
+    const result = query.answered ? query.value : { observable: false, reason: query.lastFailure };
+    if (!result || result.observable !== true) {
+      return {
+        pids: [],
+        identities: {},
+        sessions: [],
+        processGroups: [],
+        processGroupIsolated: null,
+        rootPresent: false,
+        observable: false,
+        reason: result?.reason ?? 'SBX_PROCESS_OBSERVATION_UNAVAILABLE',
+      };
+    }
+    // Issue #41: a root that is NOT isolated from this adapter's own session
+    // and process group means the only tree edges available are the ones that
+    // sweep in unrelated host processes. Claiming isolation the platform does
+    // not have would let a cancellation signal the harness's own process
+    // group, so the discovery fails closed instead of widening the tree.
+    if (result.processGroupIsolated === false) {
+      return {
+        pids: [],
+        identities: {},
+        sessions: [...(known.sessions ?? [])],
+        processGroups: [...(known.processGroups ?? [])],
+        processGroupIsolated: false,
+        rootPresent: result.rootPresent !== false,
+        observable: false,
+        reason: 'SBX_PROCESS_GROUP_NOT_ISOLATED',
+      };
+    }
+    const identities = observer.identityForMany ? observer.identityForMany(result.pids) : {};
+    for (const candidate of result.pids) identities[candidate] ??= observer.identityFor(candidate);
+    return {
+      pids: [...new Set(result.pids)],
+      identities,
+      sessions: uniqueIds([...(known.sessions ?? []), ...(result.sessions ?? [])]),
+      processGroups: uniqueIds([...(known.processGroups ?? []), ...(result.processGroups ?? [])]),
+      processGroupIsolated: result.processGroupIsolated ?? null,
+      // readable-but-absent is different from unreadable: an absent root means
+      // the tree's shape is unknown, not that the tree was empty.
+      rootPresent: result.rootPresent !== false,
+      observable: true,
+      reason: result.reason ?? null,
+      processGroup: result.processGroup ?? null,
+    };
+  }
+
+  // Liveness of a tracked pid set. Query failure is fail-closed: every
+  // candidate is reported alive, because "could not look" is not "gone".
+  async function observeExisting(pids, identities) {
+    if (pids.length === 0) return { alive: [], observable: true, reason: null, pidReused: [] };
+    const query = await askQuery(() => observer.listExisting(pids, identities));
+    const result = query.answered ? query.value : { observable: false, reason: query.lastFailure };
+    if (!result || result.observable !== true) {
+      return {
+        alive: [...pids],
+        observable: false,
+        reason: result?.reason ?? 'SBX_PROCESS_OBSERVATION_UNAVAILABLE',
+        pidReused: [],
+      };
+    }
+    return {
+      alive: result.alive,
+      observable: true,
+      reason: result.reason ?? null,
+      pidReused: result.pidReused ?? [],
+    };
+  }
+
+  // Terminate one tracked pid plus, on POSIX, its whole process group. A
+  // reported group/pid kill is a signal request, never proof: only
+  // observeExisting() can conclude that a process is gone.
+  function treeKill(pid, identities = {}) {
     return new Promise((resolve) => {
+      if (!identityStillMatches(pid, identities)) {
+        // The number now belongs to a different process; signalling it would
+        // hit an unrelated pid.
+        resolve({ signalled: false, reason: 'SBX_PID_REUSED' });
+        return;
+      }
       if (process.platform === 'win32') {
         const killer = spawn('taskkill', ['/T', '/F', '/PID', String(pid)], { windowsHide: true });
-        killer.on('error', () => resolve(false));
-        killer.on('close', () => resolve(true));
-      } else {
-        try {
-          process.kill(-pid, 'SIGKILL');
-        } catch {
-          try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
-        }
-        resolve(true);
+        killer.on('error', () => resolve({ signalled: false, reason: 'SBX_TASKKILL_UNAVAILABLE' }));
+        killer.on('close', () => resolve({ signalled: true, reason: null }));
+        return;
       }
+      // POSIX: the probe child is spawned as a process-group leader, so the
+      // negative pid addresses the group and reaches every descendant that did
+      // not leave it with setsid(2).
+      let groupSignalled = false;
+      try {
+        process.kill(-pid, 'SIGKILL');
+        groupSignalled = true;
+      } catch {
+        groupSignalled = false;
+      }
+      let pidSignalled = false;
+      try {
+        process.kill(pid, 'SIGKILL');
+        pidSignalled = true;
+      } catch {
+        pidSignalled = false;
+      }
+      resolve({
+        signalled: groupSignalled || pidSignalled,
+        reason: groupSignalled || pidSignalled ? null : 'SBX_SIGNAL_UNSUPPORTED',
+      });
     });
   }
 
-  function directKill(pid, childHandle = null) {
+  // A tracked pid may only be signalled while the number still belongs to the
+  // process the tree captured. This check lives in ONE place and every signal
+  // path goes through it: a direct SIGKILL that skipped it would kill an
+  // unrelated process even though the group/tree kill was correctly refused.
+  function identityStillMatches(pid, identities = {}) {
+    const identity = identities?.[pid];
+    if (!identity || typeof observer.identityFor !== 'function') return true;
+    return observer.identityFor(pid) === identity;
+  }
+
+  function directKill(pid, childHandle = null, identities = {}) {
+    if (!identityStillMatches(pid, identities)) return false;
     try {
       if (childHandle?.pid === pid) return childHandle.kill('SIGKILL');
       process.kill(pid, 'SIGKILL');
@@ -259,88 +424,257 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
   }
 
-  // Node's process.kill(pid, 0) is not an authoritative liveness probe on
-  // Windows: a recently terminated process can remain open through a handle
-  // long enough to be reported as alive. Query the OS process table for the
-  // terminal cancellation proof instead. Query failures are fail-closed: all
-  // candidates are treated as survivors.
-  function listExistingPids(pids) {
-    const candidates = [...new Set(pids.filter((pid) => Number.isInteger(pid) && pid > 0))];
-    if (candidates.length === 0) return Promise.resolve([]);
-    if (process.platform !== 'win32') {
-      return Promise.resolve(candidates.filter((pid) => isAlive(pid)));
+  function trackPid(tracked, identities, pid) {
+    if (!Number.isInteger(pid) || pid <= 0 || tracked.has(pid)) return;
+    tracked.add(pid);
+    identities[pid] ??= observer.identityFor(pid);
+  }
+
+  function uniqueIds(values) {
+    return [...new Set(values.filter((value) => Number.isInteger(value) && value > 0))].sort((a, b) => a - b);
+  }
+
+  // Terminal proof for a tracked tree.
+  //   TERMINATED            — observed, nothing of the tree is left alive
+  //   SURVIVORS_REMAINING   — observed, at least one tracked pid is alive
+  //   UNVERIFIED            — the process table could not be observed
+  // `terminated` is true only for TERMINATED, so a blocked/unknown
+  // observation can never be reported as successful termination.
+  function terminationProof({ alive, observable, reason, trackedProcessIds, rounds, pidReused = [] }) {
+    const reasonCodes = [];
+    if (!observable) {
+      reasonCodes.push('SBX_PROCESS_OBSERVATION_UNAVAILABLE', reason ?? 'SBX_PROCESS_OBSERVATION_UNAVAILABLE');
+      return {
+        proof: 'UNVERIFIED',
+        terminated: false,
+        treeVerified: false,
+        survivors: null,
+        remainingProcessIds: [],
+        trackedProcessIds,
+        rounds,
+        pidReused,
+        reasonCodes,
+      };
     }
-    const literal = candidates.join(',');
-    const script = `$ids=@(${literal});` +
-      `Get-CimInstance Win32_Process | Where-Object { $ids -contains [int]$_.ProcessId } | ` +
-      `ForEach-Object ProcessId`;
-    return new Promise((resolve) => {
-      const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
-        windowsHide: true,
-      });
-      let out = '';
-      let failed = false;
-      child.stdout.on('data', (chunk) => { out += chunk; });
-      child.on('error', () => {
-        failed = true;
-        resolve(candidates);
-      });
-      child.on('close', (code) => {
-        if (failed) return;
-        if (code !== 0) {
-          resolve(candidates);
-          return;
-        }
-        resolve(out.split(/\s+/).map(Number).filter((value) => candidates.includes(value)));
-      });
-    });
-  }
-
-  async function survivorPids(pid, knownDescendants = []) {
-    const discovered = await listDescendants(pid);
-    const candidates = new Set([pid, ...knownDescendants, ...discovered]);
-    return listExistingPids([...candidates]);
-  }
-
-  async function countSurvivors(pid, knownDescendants = []) {
-    return (await survivorPids(pid, knownDescendants)).length;
-  }
-
-  // Settles a just-killed tree: waits until the direct child's exit is seen
-  // and a full descendant enumeration reports nothing alive. Bounded wait,
-  // terminal verdict either way.
-  async function settleTree(pid, knownDescendants = []) {
-    const tracked = new Set([pid, ...knownDescendants]);
-    for (let attempt = 0; attempt < 20; attempt += 1) {
-      for (const descendant of await listDescendants(pid)) tracked.add(descendant);
-      const existing = await listExistingPids([...tracked]);
-      if (existing.length === 0) return;
-      for (const candidate of existing) {
-        directKill(candidate);
-        await treeKill(candidate);
-      }
-      await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
+    if (alive.length > 0) {
+      reasonCodes.push('SBX_SURVIVOR_PIDS_PRESENT');
+      return {
+        proof: 'SURVIVORS_REMAINING',
+        terminated: false,
+        treeVerified: true,
+        survivors: alive.length,
+        remainingProcessIds: alive,
+        trackedProcessIds,
+        rounds,
+        pidReused,
+        reasonCodes,
+      };
     }
+    if (pidReused.length > 0) reasonCodes.push('SBX_PID_REUSED');
+    reasonCodes.push('SBX_TERMINATION_PROVEN');
+    return {
+      proof: 'TERMINATED',
+      terminated: true,
+      treeVerified: true,
+      survivors: 0,
+      remainingProcessIds: [],
+      trackedProcessIds,
+      rounds,
+      pidReused,
+      reasonCodes,
+    };
   }
 
   // Capture the process tree before terminating the root. Once the parent
-  // exits Windows may re-parent descendants, making post-kill enumeration
-  // unable to prove that the original tree is gone. Kill deepest candidates
-  // explicitly and retain their PIDs for the terminal survivor check.
-  async function terminateTree(pid, childHandle = null) {
-    const descendants = await listDescendants(pid);
-    // Ask Windows to terminate the tree while the root/parent relation still
-    // exists. Killing the root handle first can re-parent a child that raced
-    // the CIM snapshot and make /T unable to discover it.
-    await treeKill(pid);
-    for (const descendant of [...descendants].reverse()) {
-      directKill(descendant);
-      await treeKill(descendant);
+  // exits, descendants are re-parented and post-kill ppid enumeration can no
+  // longer prove the original tree is gone. Kill deepest candidates
+  // explicitly and retain their pids (with starttime identity) for the
+  // terminal survivor proof.
+  async function captureTree(pid) {
+    const first = await discoverTree(pid);
+    const tracked = new Set();
+    const identities = { ...first.identities };
+    trackPid(tracked, identities, pid);
+    for (const descendant of first.pids) trackPid(tracked, identities, descendant);
+    let observable = first.observable;
+    // A readable process table with the root already gone cannot describe the
+    // tree: descendants are re-parented to init and are no longer reachable
+    // from it. Reporting an empty tree here would be the same false zero the
+    // proof exists to prevent, so the shape counts as unobserved.
+    let reason = first.reason;
+    if (observable && !first.rootPresent) {
+      observable = false;
+      reason = 'SBX_TREE_SHAPE_NOT_OBSERVED';
     }
-    directKill(pid, childHandle);
-    await treeKill(pid);
-    await settleTree(pid, descendants);
-    return descendants;
+    let sessions = first.sessions;
+    let processGroups = first.processGroups;
+    if (observable) {
+      // A second pass catches a descendant forked between the two reads.
+      const second = await discoverTree(pid, { sessions, processGroups });
+      if (second.observable) {
+        for (const member of second.pids) trackPid(tracked, identities, member);
+        sessions = second.sessions;
+        processGroups = second.processGroups;
+      } else {
+        observable = false;
+        reason = second.reason;
+      }
+    }
+    return {
+      tracked: [...tracked],
+      identities,
+      observable,
+      reason,
+      sessions,
+      processGroups,
+      processGroup: first.processGroup ?? null,
+      processGroupIsolated: first.processGroupIsolated ?? null,
+    };
+  }
+
+  // Terminates a just-cancelled tree and returns a terminal proof either way.
+  // Every step re-observes the whole tracked set and re-signals whatever is
+  // still alive, bounded by wall clock rather than by a fixed iteration count:
+  // under load one step costs seconds, not milliseconds (Veritas#16).
+  //
+  // Re-discovery is NOT a safety net here and must not be advertised as one.
+  // terminateTree() kills the root before this runs, and once the root is gone
+  // a parent walk cannot reach a re-parented descendant, so `discoverTree`
+  // yields nothing. The pre-kill capture in captureTree() is what makes the
+  // proof valid; this loop only re-observes and re-signals what it captured.
+  async function settleTree(pid, captured) {
+    const tracked = new Set(captured.tracked);
+    const identityMap = { ...captured.identities };
+    const known = { sessions: captured.sessions, processGroups: captured.processGroups };
+    trackPid(tracked, identityMap, pid);
+    const pidReused = new Set();
+    let rounds = 0;
+    let proof = null;
+    const settled = await settleUntilGone({
+      budgetMs: SETTLE_BUDGET_MS,
+      pollMs: SETTLE_POLL_MS,
+      observe: async () => {
+        rounds += 1;
+        if (exitSeen.has(pid)) tracked.delete(pid);
+        const discovered = await discoverTree(pid, known);
+        if (!discovered.observable) {
+          const blind = await observeExisting([...tracked], identityMap);
+          proof = terminationProof({
+            alive: blind.alive,
+            observable: false,
+            reason: discovered.reason,
+            trackedProcessIds: [...tracked],
+            rounds,
+            pidReused: [...pidReused],
+          });
+          return { settled: true, answered: false, alive: blind.alive, reason: discovered.reason };
+        }
+        for (const descendant of discovered.pids) trackPid(tracked, identityMap, descendant);
+        known.sessions = discovered.sessions;
+        known.processGroups = discovered.processGroups;
+        const observed = await observeExisting([...tracked], identityMap);
+        for (const reused of observed.pidReused) pidReused.add(reused);
+        if (!observed.observable) {
+          proof = terminationProof({
+            alive: observed.alive,
+            observable: false,
+            reason: observed.reason,
+            trackedProcessIds: [...tracked],
+            rounds,
+            pidReused: [...pidReused],
+          });
+          return { settled: true, answered: false, alive: observed.alive, reason: observed.reason };
+        }
+        if (observed.alive.length === 0) {
+          proof = terminationProof({
+            alive: [],
+            observable: true,
+            reason: null,
+            trackedProcessIds: [...tracked],
+            rounds,
+            pidReused: [...pidReused],
+          });
+          return { settled: true, answered: true, alive: [] };
+        }
+        return { settled: false, answered: true, alive: observed.alive };
+      },
+      terminate: async (alive) => {
+        for (const candidate of alive) {
+          directKill(candidate, null, identityMap);
+          await treeKill(candidate, identityMap);
+        }
+      },
+    });
+    transport.settleSteps += settled.steps;
+    transport.settleTimedOut = transport.settleTimedOut || settled.timedOut;
+    transport.settleUnanswered += settled.unanswered;
+    if (proof) return proof;
+    const observed = await observeExisting([...tracked], identityMap);
+    return terminationProof({
+      alive: observed.alive,
+      observable: observed.observable,
+      reason: observed.reason,
+      trackedProcessIds: [...tracked],
+      rounds,
+      pidReused: [...pidReused],
+    });
+  }
+
+  // Observation-only proof for a run that ended on its own (completed or
+  // failed). Nothing is signalled here: a normal exit is not a cancellation,
+  // but any surviving member of the tracked tree is still reported instead of
+  // being rounded down to zero.
+  async function verifyTree(pid) {
+    const captured = await captureTree(pid);
+    if (!captured.observable) {
+      return {
+        proof: terminationProof({
+          alive: captured.tracked,
+          observable: false,
+          reason: captured.reason,
+          trackedProcessIds: captured.tracked,
+          rounds: 0,
+        }),
+        descendants: captured.tracked.filter((entry) => entry !== pid),
+        captured,
+      };
+    }
+    const tracked = new Set(captured.tracked);
+    if (exitSeen.has(pid)) tracked.delete(pid);
+    const observed = await observeExisting([...tracked], captured.identities);
+    return {
+      proof: terminationProof({
+        alive: observed.alive,
+        observable: observed.observable,
+        reason: observed.reason,
+        trackedProcessIds: [...tracked],
+        rounds: 1,
+        pidReused: observed.pidReused,
+      }),
+      descendants: captured.tracked.filter((entry) => entry !== pid),
+      captured,
+    };
+  }
+
+  async function terminateTree(pid, childHandle = null) {
+    const captured = await captureTree(pid);
+    // Ask the OS to terminate the tree while the root/parent relation still
+    // exists. Killing the root handle first can hide a descendant that raced
+    // the snapshot from a /T or group kill.
+    //
+    // The root is signalled exactly once here. The pre-kill capture is what
+    // makes the proof valid, and settleTree() re-signals anything the capture
+    // found still alive, so a second and third signal to the root only added
+    // work and made the signal count disagree with the tracked set.
+    directKill(pid, childHandle, captured.identities);
+    await treeKill(pid, captured.identities);
+    for (const descendant of captured.tracked.slice().reverse()) {
+      if (descendant === pid) continue;
+      directKill(descendant, null, captured.identities);
+      await treeKill(descendant, captured.identities);
+    }
+    const proof = await settleTree(pid, captured);
+    return { proof, descendants: captured.tracked.filter((entry) => entry !== pid), captured };
   }
 
   function probeEnv() {
@@ -351,6 +685,12 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
     return { ...osVars, ...base };
   }
+
+  // POSIX children are spawned as process-group leaders (libuv setsid), so a
+  // group-directed SIGKILL reaches every descendant that stays in the group.
+  // Windows keeps detached:false because taskkill /T walks the parent chain
+  // and a detached child would get its own console.
+  const useProcessGroup = process.platform !== 'win32';
 
   function withinProcessLimit() {
     const max = profile.process?.max_processes ?? 1;
@@ -386,7 +726,7 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       child = spawn(command, args, {
         cwd: roots[0],
         env: probeEnv(),
-        detached: false,
+        detached: useProcessGroup,
         windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe'],
       });
@@ -400,8 +740,10 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       timeoutTimer: null,
       cancelled: false,
       timedOut: false,
-      knownDescendants: [],
       terminationPromise: null,
+      trackedPids: [],
+      identities: {},
+      descendants: [],
     };
     activeProbes.set(pid, record);
     let stdout = Buffer.alloc(0);
@@ -412,18 +754,34 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const finish = async (status, exitCode) => {
       if (record.timeoutTimer) clearTimeout(record.timeoutTimer);
       activeProbes.delete(pid);
-      if (record.terminationPromise) {
-        record.knownDescendants = await record.terminationPromise;
-      }
-      const remainingProcessIds = await survivorPids(pid, record.knownDescendants);
+      // A cancellation or timeout already started the terminate-and-prove
+      // sequence; a run that ended on its own is only observed, so a normal
+      // exit never signals a pid it does not own.
+      const termination = record.terminationPromise
+        ? await record.terminationPromise
+        : await verifyTree(pid);
+      record.trackedPids = termination.captured.tracked;
+      record.identities = termination.captured.identities;
+      record.descendants = termination.descendants;
+      const proof = termination.proof;
       settle.resolve({
         status,
-        terminated: status !== 'completed',
+        // `terminated` is a proven statement about the whole tracked tree,
+        // not a restatement of the status string.
+        terminated: proof.terminated && status !== 'completed',
+        // Proof fields: `proof` is the machine-readable verdict, `survivors`
+        // is a non-negative count or null when the tree could not be observed.
+        proof: proof.proof,
+        treeVerified: proof.treeVerified,
+        survivors: proof.survivors,
+        remainingProcessIds: proof.remainingProcessIds,
+        trackedProcessIds: proof.trackedProcessIds,
+        reasonCodes: proof.reasonCodes,
+        observationSource,
+        processQueries: transportSnapshot(),
         exitCode,
         pid,
         durationMs: Date.now() - started,
-        survivors: remainingProcessIds.length,
-        remainingProcessIds,
         stdoutDigest: sha256(redact(stdout.toString('utf8'))),
         stderrDigest: sha256(redact(stderr.toString('utf8'))),
         limits: profile.process ?? {},
@@ -445,7 +803,6 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
         finish('cancelled', null);
         return;
       }
-      activeProbes.delete(pid);
       finish(code === 0 ? 'completed' : 'failed', code);
     });
     record.timeoutTimer = setTimeout(() => {
@@ -456,15 +813,36 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     return { pid, done };
   }
 
+  // Cancellation is fail-closed: the returned proof is TERMINATED only when
+  // the whole tracked tree was re-observed as gone. Otherwise the caller sees
+  // SURVIVORS_REMAINING (observed survivors) or UNVERIFIED (observation
+  // unavailable, survivors: null) and `terminated` is false.
   async function cancel(pid) {
     const record = activeProbes.get(pid);
     if (record) record.cancelled = true;
     const termination = record?.terminationPromise ?? terminateTree(pid, record?.child ?? null);
     if (record) record.terminationPromise = termination;
-    const descendants = await termination;
-    if (record) record.knownDescendants = descendants;
-    const remainingProcessIds = await survivorPids(pid, descendants);
-    return { terminated: true, survivors: remainingProcessIds.length, remainingProcessIds, pid };
+    const { proof, descendants, captured } = await termination;
+    if (record) {
+      record.trackedPids = captured.tracked;
+      record.identities = captured.identities;
+      record.descendants = descendants;
+    }
+    return {
+      pid,
+      terminated: proof.terminated,
+      proof: proof.proof,
+      treeVerified: proof.treeVerified,
+      survivors: proof.survivors,
+      remainingProcessIds: proof.remainingProcessIds,
+      trackedProcessIds: proof.trackedProcessIds,
+      descendants,
+      reasonCodes: proof.reasonCodes,
+      observationSource,
+      // Distinguishes "the OS confirmed N processes are still alive" from
+      // "the OS never answered within the retry budget" (fail-closed).
+      processQueries: transportSnapshot(),
+    };
   }
 
   // Public execution path: blocked tiers never spawn anything.
@@ -473,7 +851,10 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       return {
         status: 'BLOCKED_SANDBOX',
         terminated: true,
+        proof: 'TERMINATED',
+        survivors: 0,
         reasonCodes: ['SBX_EXEC_FORBIDDEN'],
+        observationSource,
         blockedReason: executableTier ? boundary.reason : 'SBX_TIER_FORBIDS_EXEC',
       };
     }
@@ -516,6 +897,17 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     tier,
     profileId: profile.profile_id,
     executionAllowed,
+    observationSource,
+    platformObserver: isPlatformObserver,
+    // Descendant pids of a live root, for awaitTree() in process-verdict.mjs:
+    // a cancellation probe has to act on a tree that exists, and a fixed delay
+    // after spawn assumes the child already created its own children.
+    // Unobservable and empty are both reported as an empty list, so a caller
+    // that waits for a non-empty result simply keeps polling.
+    descendantPids: async (pid) => (await discoverTree(pid)).pids,
+    // Transport counters as of now, so a caller can tell a survivor verdict
+    // from an unverified one without inspecting the whole outcome.
+    lastProcessQueries: transportSnapshot,
     blockedReason: executionAllowed ? null : (executableTier ? boundary.reason : 'SBX_TIER_FORBIDS_EXEC'),
     blockedDetail: executableTier ? boundary.detail : 'NO_EXEC permits contract/evidence operations only.',
     resolvePath,

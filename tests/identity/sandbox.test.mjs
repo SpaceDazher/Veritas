@@ -45,7 +45,7 @@ describe('S2-002 sandbox: tier discipline', () => {
     const sandbox = makeSandbox(SANDBOX_NO_EXEC, [root]);
     assert.equal(sandbox.tier, 'NO_EXEC');
     assert.equal(sandbox.executionAllowed, false);
-    const outcome = await sandbox.spawnProcess({ command: 'cmd.exe', args: ['/c', 'echo hi'], timeoutMs: 1000 });
+    const outcome = await sandbox.spawnProcess({ command: IS_WINDOWS ? 'cmd.exe' : '/bin/sh', args: IS_WINDOWS ? ['/c', 'echo hi'] : ['-c', 'echo hi'], timeoutMs: 1000 });
     assert.equal(outcome.status, 'BLOCKED_SANDBOX');
     assert.ok(outcome.reasonCodes.includes('SBX_EXEC_FORBIDDEN'));
     assert.equal(outcome.pid, undefined, 'no process may be created');
@@ -210,24 +210,33 @@ describe('S2-002 sandbox: environment and secrets', () => {
   });
 });
 
-describe('S2-002 sandbox: process tree and cancellation', { skip: !IS_WINDOWS }, () => {
+// S2-002 sandbox: process tree and cancellation. Cross-platform since the
+// #41 fix: the cancellation guarantee is observed on whichever host runs the
+// suite, and a descendant that leaves the child's process group is used so a
+// group-only or parent-only kill cannot pass by accident. The dedicated
+// regression coverage, including the negative controls for unavailable process
+// observation, lives in tests/identity/cancellation-process-tree.test.mjs.
+describe('S2-002 sandbox: process tree and cancellation', { skip: false }, () => {
+  const treeCommand = (root) => (IS_WINDOWS
+    ? { command: 'cmd.exe', args: ['/d', '/s', '/c', 'ping -n 60 127.0.0.1 >nul'] }
+    : { command: '/bin/sh', args: ['-c', 'sleep 60'] });
+
   test('cancellation kills the whole tree: no survivors', { timeout: 60000 }, async () => {
     const root = makeWorkspace();
     const sandbox = makeSandbox(SANDBOX_LOCAL_RESTRICTED_BLOCKED, [root]);
-    const { pid, done } = sandbox.startForControlProbe({
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'ping -n 60 127.0.0.1 >nul'],
-      timeoutMs: 60000,
-    });
+    const { pid, done } = sandbox.startForControlProbe({ ...treeCommand(root), timeoutMs: 60000 });
     assert.ok(pid > 0);
     assert.equal(sandbox.isAlive(pid), true);
     const cancel = await sandbox.cancel(pid);
     assert.equal(cancel.terminated, true);
+    assert.equal(cancel.proof, 'TERMINATED', JSON.stringify(cancel));
     assert.equal(cancel.survivors, 0, `no process may survive cancellation: ${JSON.stringify(cancel)}`);
     assert.equal(sandbox.isAlive(pid), false);
     const outcome = await done;
     assert.equal(outcome.status, 'cancelled', 'cancel must yield a terminal cancelled outcome');
     assert.equal(outcome.terminated, true);
+    assert.equal(outcome.proof, 'TERMINATED');
+    assert.equal(outcome.survivors, 0);
     fs.rmSync(root, { recursive: true, force: true });
   });
 
@@ -241,6 +250,7 @@ describe('S2-002 sandbox: process tree and cancellation', { skip: !IS_WINDOWS },
     });
     assert.equal(outcome.status, 'timeout');
     assert.equal(outcome.terminated, true);
+    assert.equal(outcome.proof, 'TERMINATED', JSON.stringify(outcome));
     assert.equal(outcome.survivors, 0);
     assert.notEqual(outcome.status, 'success');
     fs.rmSync(root, { recursive: true, force: true });
@@ -250,14 +260,10 @@ describe('S2-002 sandbox: process tree and cancellation', { skip: !IS_WINDOWS },
     const root = makeWorkspace();
     const profile = { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED, process: { ...SANDBOX_LOCAL_RESTRICTED_BLOCKED.process, max_processes: 1 } };
     const sandbox = makeSandbox(profile, [root]);
-    const first = sandbox.startForControlProbe({
-      command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'ping -n 60 127.0.0.1 >nul'],
-      timeoutMs: 20000,
-    });
+    const first = sandbox.startForControlProbe({ ...treeCommand(root), timeoutMs: 20000 });
     assert.ok(first.pid > 0);
     await assert.rejects(
-      () => sandbox.spawnForControlProbe({ command: 'cmd.exe', args: ['/d', '/s', '/c', 'echo second'], timeoutMs: 5000 }),
+      () => sandbox.spawnForControlProbe({ ...treeCommand(root), timeoutMs: 5000 }),
       (error) => error.code === 'LIMIT_PROCESSES',
     );
     await sandbox.cancel(first.pid);

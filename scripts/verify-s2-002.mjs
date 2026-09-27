@@ -137,7 +137,7 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
   }
 
   const counterLimitEntries = Object.entries(COUNTER_LIMITS);
-  for (const [label, summary] of runs) {
+  for (const [label, summary, observations] of runs) {
     const counters = summary?.counters;
     if (!counters || typeof counters !== 'object') {
       counterViolations.push(`${label}/missingCounters`);
@@ -145,18 +145,19 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
     }
     for (const [counter, limit] of counterLimitEntries) {
       const value = counters[counter];
-      // Fail closed: a missing or non-finite counter is a violation, never
-      // an implicit pass (NaN comparisons are always false).
-      //
-      // The `value < 0` guard that used to live here has been REMOVED and
-      // deliberately not re-applied. PR #42 carries the same fix in a strictly
-      // stronger form — `Number.isInteger` as well as `value < 0`, so a
-      // fractional sentinel cannot pass either — and #42 is the branch that owns
-      // issue #41. Re-adding the weaker line here would mean that merging this
-      // ticket after #42 silently replaces the stronger one. Until #42 lands the
-      // pre-existing hole stands here, and it is recorded as such in
-      // S2-007-EVALUATION-REPORT.md §13.4.
-      if (typeof value !== 'number' || !Number.isFinite(value) || value > limit) {
+      // The `value < 0` guard this branch had written for the same defect was
+      // deliberately NOT carried over: the check below came from the #41
+      // review fixes on main and is strictly stronger (`Number.isInteger` as
+      // well as `value < 0`, so a fractional sentinel cannot pass either).
+      // `Number.isInteger(null)` is false, so the explicitly-unmeasured
+      // `survivors_after_cancellation: null` that this branch's accounting
+      // produces still fails closed here, which is what the not-run branch
+      // further down depends on.
+      // Fail closed: a missing, non-numeric, non-integer or negative counter is
+      // a violation, never an implicit pass. A negative value used to slip
+      // through a `value > limit` test and launder an unobserved process
+      // observation into a zero-survivor pass (issue #41).
+      if (!Number.isInteger(value) || value < 0 || value > limit) {
         counterViolations.push(`${label}/${counter}=${String(value)}`);
       }
     }
@@ -172,6 +173,29 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
     }
     if (summary.corpusDigest !== summaryA?.corpusDigest || summary.corpusDigest !== summaryB?.corpusDigest) {
       counterViolations.push(`${label}/corpusDigestDrift`);
+    }
+    // A zero-survivor cancellation result is only acceptable together with the
+    // termination proof that backs it. An unproven or unavailable process
+    // observation must be reported as blocked/unknown, never as success.
+    for (const observation of observations) {
+      if (!String(observation.trialId ?? '').startsWith('sandbox/cancellation-')) continue;
+      const reported = observation.survivors;
+      if (!Number.isInteger(reported) && reported !== null) {
+        counterViolations.push(`${label}/${observation.trialId}/survivorsNotCountable=${String(reported)}`);
+        continue;
+      }
+      if (reported !== null && reported < 0) {
+        counterViolations.push(`${label}/${observation.trialId}/negativeSurvivors=${String(reported)}`);
+        continue;
+      }
+      if (observation.observed === 'SURVIVORS_ZERO'
+        && (reported !== 0 || observation.terminationProof !== 'TERMINATED' || observation.outcomeProof !== 'TERMINATED')) {
+        counterViolations.push(`${label}/${observation.trialId}/unprovenZeroSurvivorSuccess`);
+      }
+      if (observation.observed === 'BLOCKED_UNVERIFIED'
+        && (reported !== null || observation.terminationProof !== 'UNVERIFIED')) {
+        counterViolations.push(`${label}/${observation.trialId}/unverifiedMustNotCarrySurvivorCount`);
+      }
     }
   }
 

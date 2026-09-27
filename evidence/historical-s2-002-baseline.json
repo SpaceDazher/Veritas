@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "scope": "Immutable baseline of the S2-002 evidence records that existed BEFORE the SpaceDazher/Veritas#41 fix. These four run/comparison records are rewritten by design whenever npm run verify:s2-002 runs, so they cannot be pinned in frozen-manifest.json the way the other four are. This file is the fixed point: a rewrite of any of them that is not an explicit, reviewed re-baseline is drift, whether or not evidence/root-manifest.json was re-frozen in the same commit.",
+  "issue": "SpaceDazher/Veritas#41",
+  "algorithm": "SHA-256 raw file bytes",
+  "generatedAt": "2026-09-12T12:00:00.000Z",
+  "rebaselineRequires": "An explicit change to this file, reviewed as a deliberate re-baseline. Re-freezing evidence/root-manifest.json does NOT rebaseline it.",
+  "files": {
+    "evidence/s2-002-run-a.json": {
+      "sha256": "0acc652cced1217f0faa9d36adf722ca39175bde24ee5e0d416682ec6a912982",
+      "bytes": 962
+    },
+    "evidence/s2-002-run-b.json": {
+      "sha256": "d51adf4fe0952852f0c804f3d7de9d6aab83225ece2b53a8842918b42c9f57d3",
+      "bytes": 960
+    },
+    "evidence/s2-002-comparison.json": {
+      "sha256": "a3b4626a0c189811712159e8a09ac12704b0d9f84a808cf3d89a4add14a52a78",
+      "bytes": 576
+    },
+    "evidence/s2-002-comparison-integrity.json": {
+      "sha256": "dd28600f73493f51fff18f5207068b23bf9d31f71a766874f997ad4bd988ff19",
+      "bytes": 394
+    },
+    "evidence/s2-002-security-probes.json": {
+      "sha256": "3bdd25d9d0a45bd82127b74ca1e759781049f626b1f573344d7d5068d8c9724d",
+      "bytes": 2964
+    },
+    "evidence/s2-002-podman-sandbox.json": {
+      "sha256": "5b7a6314edaf2860cc78a2855fd2a82fcd17bee8dc358742404ffc006740bf2c",
+      "bytes": 1390
+    },
+    "evidence/s2-002-gvisor-sandbox.json": {
+      "sha256": "c5cc3ce34b92f9ec8d2bc0400fde04f8bcc2e93c5656037712e350c60d4540af",
+      "bytes": 1425
+    },
+    "evidence/s2-002-dependency-binding.json": {
+      "sha256": "dd3f28faa66dbaebdf0e8f189f9b0484578ecd3504ac7006985c9b571f88fd34",
+      "bytes": 4306
+    }
+  }
+}

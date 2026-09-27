@@ -67,7 +67,7 @@ npm run build
 | --- | --- |
 | Общий suite | `npm test` |
 | Identity / authorization | `npm run test:identity` |
-| Sandbox | `npm run test:sandbox`, `npm run test:security-probes` |
+| Sandbox | `npm run test:sandbox`, `npm run test:security-probes`, `npm run verify:s2-002-cancellation` |
 | PostgreSQL | `npm run verify:postgres-smoke` |
 | Ingestion | `npm run test:ingestion`, `npm run verify:s2-003`, `npm run verify:s2-003-db-replay` |
 | Claims | `npm run test:claims`, `npm run verify:s2-004`, `npm run verify:s2-004-db-replay` |
@@ -88,6 +88,30 @@ S2-002 проверяет process-tree cancellation, local execution и sandbox 
 - failure live-process probe не означает permission ослабить policy или превратить skip в pass.
 
 При platform-specific failure сначала воспроизведи его отдельной командой и проверь [issue #16](https://github.com/SpaceDazher/Veritas/issues/16), затем зафиксируй exact OS, runtime и probe ID.
+
+### Process cancellation на всех платформах
+
+До [issue #41](https://github.com/SpaceDazher/Veritas/issues/41) cancellation
+на не-Windows хосте возвращал `survivors: 0`, хотя потомок процесса продолжал
+работать, а hard gate принимал `survivors: -1` от непроверенного наблюдения.
+Теперь termination — это доказанное утверждение, а не предположение:
+
+- возможны ровно три терминальных значения: `TERMINATED`,
+  `SURVIVORS_REMAINING`, `UNVERIFIED`;
+- `terminated: true` только при `TERMINATED`; `survivors` — неотрицательное
+  число либо `null` при `UNVERIFIED`, никогда `0` для ненаблюдённого дерева;
+- POSIX-потомок спавнится лидером process group, а дерево отслеживается по
+  session и process group, поэтому потомок, ушедший через `setsid` (аналог
+  `start /b` в Windows), тоже находится и reap-ится;
+- недоступная таблица процессов даёт fail-closed `UNVERIFIED`, а не успех.
+
+Verification: `npm run verify:s2-002` and `npm run verify:s2-002-cancellation`
+на **обеих** платформах, каждая пишет свой файл
+(`evidence/s2-002-cancellation-v2.json` и `-win32.json`); наблюдения
+независимы, одно не выводится из другого.
+Полный разбор: [S2-002-PROCESS-CANCELLATION.md](security/S2-002-PROCESS-CANCELLATION.md).
+После изменения этого контроля его снова нужно наблюдать на обеих платформах:
+успешный replay только на Windows не доказывает свойство на не-Windows.
 
 ## S2-006 и calibration
 
