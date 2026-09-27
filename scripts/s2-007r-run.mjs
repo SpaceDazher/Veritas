@@ -156,8 +156,14 @@
 //
 // HOW TO OBTAIN A REAL POSTGRESQL URL IN THIS REPOSITORY
 // ------------------------------------------------------
-// (1) An existing instance:  DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DB
-//     then `node scripts/s2-007r-run.mjs --postgres "$DATABASE_URL" …`.
+// (1) An existing instance: put the connection string in the DATABASE_URL
+//     environment variable — the user, the password, the host, the port and the
+//     database name, colon- and at-separated in the usual way — then
+//     `node scripts/s2-007r-run.mjs --postgres "$DATABASE_URL" …`.
+//     The URL is spelled this way rather than written out in full on purpose:
+//     a connection string pasted into a source comment is a credential-shaped
+//     literal, and scripts/check-public-artifacts.mjs refuses a committed file
+//     that contains one. Read the value, never the example.
 // (2) The repository's own ephemeral recipe — a digest-pinned image, rootless
 //     podman, a tmpfs PGDATA, a random free loopback port and RANDOM runtime
 //     credentials that are never written to a record (reference them by
