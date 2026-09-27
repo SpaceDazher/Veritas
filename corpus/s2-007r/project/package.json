@@ -1,0 +1,11 @@
+{
+  "name": "veritas-s2-007r-project",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The ONE deterministic project of S2-007R (issue SpaceDazher/Veritas#45). No dependencies: the oracle must be recomputable on any host with a Node runtime and nothing else.",
+  "scripts": {
+    "verify": "node verify.mjs",
+    "test": "node --test src/"
+  }
+}

@@ -160,6 +160,7 @@ import {
   assertDigestsMatch,
   assertHumanOnlyApproval,
   assertNotSelfApproved,
+  assertLiveExecutionAuthorized,
   assertSandboxExecutable,
   assertScopeSubset,
   assertTaskVisible,
@@ -750,6 +751,11 @@ async function guardContextFor(ctx, { task, toState, expectedRevision, reason, l
     // consults (assertIdentityConsult) only, where this module built the
     // request and can therefore vouch for it.
     authorizer: undefined,
+    // The server-resolved named human authorisation for a run bound to the
+    // HOST_UNISOLATED floor tier (issue #45). It is forwarded so the guard's own
+    // live-execution gate judges the same document execution.start judged; it
+    // is never taken from the payload.
+    unisolatedExecutionAuthorization: ctx.unisolatedExecutionAuthorization ?? null,
     // The count that AUTHORIZED the edge. A claim is judged against the
     // workspace as it stood before the claim, which is also the count the
     // post-commit verification must use — otherwise the lease the claim itself
@@ -1056,7 +1062,7 @@ const handlers = Object.freeze({
     // registration is what decides whether it may serve this task.
     const adapters = await registeredAdapters({ store: ctx.store, adapters: ctx.adapters, workspaceId: task.workspace_id });
     const adapter = resolveAdapter(adapters, ctx.args.adapter_id, task);
-    crossCheckAdapterAgainstTask(adapter, task);
+    crossCheckAdapterAgainstTask(adapter, task, ctx);
     const grant = await resolveGrant(ctx.store, { workspaceId: task.workspace_id, taskId: task.task_id, now: ctx.instant });
     const spent = grant ? await resolveSpent(ctx.store, grant, ctx.instant) : undefined;
     // The concurrency count is read BEFORE the claim and is the very count the
@@ -1193,7 +1199,7 @@ const handlers = Object.freeze({
     const fence = resolveFence(ctx, task, lease, { required: true });
     const adapters = await registeredAdapters({ store: ctx.store, adapters: ctx.adapters, workspaceId: task.workspace_id });
     const next = resolveAdapter(adapters, ctx.args.new_adapter_id, task);
-    crossCheckAdapterAgainstTask(next, task);
+    crossCheckAdapterAgainstTask(next, task, ctx);
     // The new holder is authorized before the old right is withdrawn, so a
     // reassignment can never leave a task with nobody authorized to run it.
     await recheck(ctx, { capability: COMMAND_TABLE['tasks.lease.reassign'].capability, task });
@@ -1295,6 +1301,7 @@ const handlers = Object.freeze({
       sandbox: ctx.sandbox ?? null,
       idempotencyKey: ctx.idempotencyKey,
       workspaceRoots: resolveWorkspaceRoots(workspaceId, ctx.workspaceRoots),
+      unisolatedExecutionAuthorization: ctx.unisolatedExecutionAuthorization ?? null,
     });
     const selected = tick.decision?.selected_task_id ?? null;
     const moved = typeof selected === 'string' ? await readTask(ctx, selected, { workspaceId }) : null;
@@ -1312,7 +1319,15 @@ const handlers = Object.freeze({
     // adapter must be registered, healthy and actually cover the task, and the
     // budget must be assigned. An unassigned budget is not zero.
     const profileId = task.workspace_ref?.isolation_profile_id ?? null;
-    assertSandboxExecutable(profileId);
+    // A live execution passes ONE gate. An isolated tier with measured OS
+    // controls needs nothing beyond the proven-set check; the HOST_UNISOLATED
+    // floor is admitted only with a valid named human authorisation resolved
+    // server-side, and the resolved decision is returned so the run record can
+    // quote it verbatim. Everything else is refused exactly as before.
+    const sandboxDecision = assertLiveExecutionAuthorized(profileId, {
+      authorization: ctx.unisolatedExecutionAuthorization,
+      now: ctx.instant,
+    });
     const adapters = await registeredAdapters({ store: ctx.store, adapters: ctx.adapters, workspaceId });
     const grant = await resolveGrant(ctx.store, { workspaceId, taskId, now: ctx.instant });
     if (!isPlainObject(grant)) {
@@ -1353,7 +1368,7 @@ const handlers = Object.freeze({
     }
     const fence = resolveFence(ctx, task, lease, { required: true });
     const adapter = resolveAdapter(adapters, ctx.args.adapter_id ?? task.assigned_adapter_id, task);
-    crossCheckAdapterAgainstTask(adapter, task);
+    crossCheckAdapterAgainstTask(adapter, task, ctx);
     if (adapter.sandbox_profile_id !== profileId) {
       throw new BlockedSandbox('ADAPTER_SANDBOX_MISMATCH', 'the adapter is not bound to the task isolation profile');
     }
@@ -1380,7 +1395,22 @@ const handlers = Object.freeze({
       idempotencyKey: ctx.idempotencyKey,
       argsDigest: ctx.argsDigest,
     });
-    return { data: { run: created.run ?? null, request }, revision: task.revision };
+    // The sandbox decision travels with the run so the journal, the run record
+    // and any later verifier read the SAME authorisation that let the run
+    // start. A run that was authorised on the host-unisolated floor therefore
+    // carries the permit by value, and a reviewer can re-judge it.
+    return {
+      data: {
+        run: created.run ?? null,
+        request,
+        sandboxDecision: {
+          tier: sandboxDecision.tier,
+          profile_id: sandboxDecision.profile_id,
+          authorization: sandboxDecision.authorization,
+        },
+      },
+      revision: task.revision,
+    };
   },
 
   async 'execution.event'(ctx) {
@@ -1750,7 +1780,7 @@ function resolveAdapter(adapters, adapterId, task) {
   return adapter;
 }
 
-function crossCheckAdapterAgainstTask(adapter, task) {
+function crossCheckAdapterAgainstTask(adapter, task, ctx = null) {
   // The task's requirements are the floor; an adapter that declares less may
   // not serve it, and a self-declared capability is a claim, never a grant.
   crossCheckCapabilities({
@@ -1760,7 +1790,17 @@ function crossCheckAdapterAgainstTask(adapter, task) {
   });
   assertCapabilitySubset(task.required_capabilities, adapter.declared_capabilities);
   assertToolSubset(task.allowed_tools, adapter.declared_tools);
-  assertSandboxExecutable(adapter.sandbox_profile_id);
+  // The live-execution gate, not the bare proven-set check (issue #45). An
+  // isolated tier needs nothing beyond the proven set; the HOST_UNISOLATED
+  // floor needs the named human authorisation the boundary resolved
+  // server-side, which is why the context is threaded in here rather than
+  // being invented at each call site. Every other profile is refused exactly
+  // as before — this is not a relaxation of the proven set, it is the same
+  // proven set plus one loudly-named floor that needs a permit.
+  assertLiveExecutionAuthorized(adapter.sandbox_profile_id, {
+    authorization: ctx?.unisolatedExecutionAuthorization ?? null,
+    now: ctx?.instant ?? null,
+  });
   return true;
 }
 
@@ -2251,9 +2291,15 @@ export async function execute({
   authorizer = null,
   requireAuthorizer = false,
   ids = null,
+  // The named human authorisation for a run bound to the HOST_UNISOLATED floor
+  // tier (issue #45). It is SERVER-RESOLVED and deliberately not a payload
+  // argument: an adapter, a task, an execution event, a skill or a replayed
+  // record can neither supply nor widen it. Isolated profiles need nothing
+  // here, and supplying a permit for one is refused rather than ignored.
+  unisolatedExecutionAuthorization = null,
 } = {}) {
   try {
-    return await run({ command, args, principal, actorKind, store, adapters, clock, transport, now, workspaceRoots, realpath, sandbox, authorizer, requireAuthorizer, ids });
+    return await run({ command, args, principal, actorKind, store, adapters, clock, transport, now, workspaceRoots, realpath, sandbox, authorizer, requireAuthorizer, ids, unisolatedExecutionAuthorization });
   } catch (error) {
     // Nothing escapes untyped: a crash inside a handler is a typed refusal,
     // never a success and never a partially applied operation reported as one.
@@ -2314,6 +2360,7 @@ async function run(input) {
     ids: input.ids ?? deterministicIdFactory({ command, workspace_id: args.workspace_id ?? null, actor: resolved.principal_id }),
   });
   ctx.sandbox = input.sandbox;
+  ctx.unisolatedExecutionAuthorization = input.unisolatedExecutionAuthorization ?? null;
   ctx.idempotencyKey = idempotencyKey;
   ctx.argsDigest = argsDigest;
   ctx.identityArgs = null;

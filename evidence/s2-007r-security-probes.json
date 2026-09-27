@@ -1,0 +1,1064 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#45",
+  "role": "mandatory negative-probe gate for the real-adapter ticket: five adversarial probes run against the production-facing command boundary",
+  "gate": "test:s2-007r-probes",
+  "probeModule": "scripts/s2-007r-probes.mjs",
+  "version": "s2-007r-real-probes-v1",
+  "commit": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+  "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0,
+  "reasons": [],
+  "counters": {
+    "crossWorkspaceLeaks": 0,
+    "authorityExpansions": 0,
+    "duplicateActiveLeases": 0,
+    "duplicateExternalEffects": 0,
+    "staleFenceMutations": 0,
+    "missingJournalOrOutbox": 0,
+    "falseApprovals": 0
+  },
+  "hardGates": {
+    "ok": true,
+    "counters": {
+      "crossWorkspaceLeaks": 0,
+      "authorityExpansions": 0,
+      "duplicateActiveLeases": 0,
+      "duplicateExternalEffects": 0,
+      "staleFenceMutations": 0,
+      "missingJournalOrOutbox": 0,
+      "falseApprovals": 0
+    },
+    "notRun": 0
+  },
+  "counterMap": {
+    "uninstalled_adapter_cannot_claim_real": "falseApprovals",
+    "comparison_across_projects_or_budgets_refused": "falseApprovals",
+    "skill_authority_expansion_blocked": "authorityExpansions",
+    "provider_error_never_reported_as_success": "missingJournalOrOutbox",
+    "test_transport_case_counts_not_run": "falseApprovals"
+  },
+  "totals": {
+    "probes": 5,
+    "passed": 5,
+    "failed": 0,
+    "notRun": 0,
+    "arms": 19,
+    "armsNotRun": 0,
+    "families": 3,
+    "countersWithFindings": []
+  },
+  "familiesAttempted": [
+    {
+      "family": "real_adapter_provenance",
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "comparison_integrity",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    },
+    {
+      "family": "authority_and_outcome",
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "notRun": 0,
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "status": "PASS"
+    }
+  ],
+  "probes": [
+    {
+      "probe": "uninstalled_adapter_cannot_claim_real",
+      "family": "real_adapter_provenance",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "arms": [
+        {
+          "arm": "uncorroborated_real_claim_refused",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "real_kind_without_available_provenance_refused",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "test_transport_cannot_be_built_or_promoted_as_real",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "corroborated_real_claim_accepted_and_the_corroboration_decides",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "evidence_writer_refuses_an_uncorroborated_real_run",
+          "required": false,
+          "status": "ok"
+        }
+      ],
+      "detail": "the uncorroborated REAL_ADAPTER_AVAILABLE claim is refused; the refusal is a typed NOT_RUN_REAL_ADAPTER from the closed error set; the refusal is a NotRunRealAdapter carrying a code from the closed error set; no adapter row exists for the refused id; the refused registration changed nothing at all; capabilities.executionEnabled is false; capabilities.realAdapterStatus is not REAL_ADAPTER_AVAILABLE; adapter_kind real with NOT_RUN_REAL_ADAPTER provenance is refused; the refusal is NOT_RUN_REAL_ADA"
+    },
+    {
+      "probe": "test_transport_case_counts_not_run",
+      "family": "real_adapter_provenance",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "arms": [
+        {
+          "arm": "a_complete_succeeded_run_on_the_test_transport_upgrades_nothing",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "a_replay_rebuilds_its_own_wrapper_registration",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "a_wrapper_candidate_is_never_installed_even_when_the_binary_exists",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "the_evidence_writer_refuses_a_pass_case_on_the_test_transport",
+          "required": true,
+          "status": "ok"
+        }
+      ],
+      "detail": "the scripted run collects as SUCCEEDED; the task reaches IN_REVIEW, never DONE; no transition reached DONE; capabilities.realAdapterStatus stays NOT_RUN_REAL_ADAPTER after a SUCCEEDED scripted run; capabilities.executionEnabled stays false; the committed registration is adapter_kind test with NOT_RUN_REAL_ADAPTER provenance; the run row carries no real-adapter provenance of its own; a replay over a SUCCEEDED scripted run constructs; the replay registration is adapter_kind wrapper, never real; th"
+    },
+    {
+      "probe": "comparison_across_projects_or_budgets_refused",
+      "family": "comparison_integrity",
+      "status": "pass",
+      "passed": true,
+      "counter": "falseApprovals",
+      "arms": [
+        {
+          "arm": "a_cell_pair_with_a_different_project_budget_or_cost_basis_is_refused",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "a_refused_comparison_writes_no_measurement_block",
+          "required": false,
+          "status": "not_run"
+        }
+      ],
+      "detail": "POSITIVE CONTROL: a pair with the same run set, project, budget and cost basis is compared; the compared pair carries verdict COMPARED and no delta it may not state; a pair whose two ends carry the SAME normalised argv is refused, not compared; the identical-argv refusal is a code from the closed error set; a differing project_digest is refused with a typed NEEDS_INPUT; the refusal names project_digest and COMPARISON_INPUT_MISMATCH; the project_digest refusal is a code from the closed error set;"
+    },
+    {
+      "probe": "skill_authority_expansion_blocked",
+      "family": "authority_and_outcome",
+      "status": "pass",
+      "passed": true,
+      "counter": "authorityExpansions",
+      "arms": [
+        {
+          "arm": "an_authority_argument_in_a_payload_is_refused",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "a_non_canonical_authority_field_is_refused",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "an_adapter_claim_wider_than_its_registration_is_refused",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "the_refusals_committed_nothing",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "the_child_argv_allowlist_is_derived_from_the_request",
+          "required": false,
+          "status": "not_run"
+        }
+      ],
+      "detail": "a payload carrying the planted approved is refused; the approved refusal is a typed AUTH_REQUIRED; a payload carrying the planted granted_scope is refused; the granted_scope refusal is a typed AUTH_REQUIRED; a payload carrying the planted allowed_tools is refused; the allowed_tools refusal is a typed AUTH_REQUIRED; a non-canonical authority field is refused; an adapter claiming a planted tool is refused; the refusal is a typed CAPABILITY_MISMATCH; the refusal names the claim that is not register"
+    },
+    {
+      "probe": "provider_error_never_reported_as_success",
+      "family": "authority_and_outcome",
+      "status": "pass",
+      "passed": true,
+      "counter": "missingJournalOrOutbox",
+      "arms": [
+        {
+          "arm": "a_provider_error_on_a_zero_exit_code_is_collected_as_failed",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "an_unknown_outcome_is_escalated_never_resent_and_never_done",
+          "required": true,
+          "status": "ok"
+        },
+        {
+          "arm": "provider_failure_classification_of_the_recorded_shapes",
+          "required": false,
+          "status": "ok"
+        }
+      ],
+      "detail": "the provider-failure result is collected; the collected run is FAILED, never SUCCEEDED; the collected result outcome is FAILED; the collected error code is PROVIDER_FAILURE; a 402 provider refusal is NOT reported as BUDGET_EXCEEDED; the task ends FAILED, not IN_REVIEW and not DONE; no transition reached IN_REVIEW or DONE; the terminal FAILED transition is journalled against the producer; the refusal left audit rows (a committed side effect is never a silent write); a FAILED task cannot be requeu"
+    }
+  ],
+  "omits": [],
+  "deferredArms": [
+    {
+      "probe": "comparison_across_projects_or_budgets_refused",
+      "arm": "a_refused_comparison_writes_no_measurement_block",
+      "reason": "the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run",
+      "code": "NEEDS_INPUT",
+      "pendingOn": "scripts/s2-007r-comparison-run.mjs"
+    },
+    {
+      "probe": "skill_authority_expansion_blocked",
+      "arm": "the_child_argv_allowlist_is_derived_from_the_request",
+      "reason": "the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow",
+      "code": "NEEDS_INPUT",
+      "pendingOn": "a real run record with measurements[].skills_authority"
+    }
+  ],
+  "registry": {
+    "ok": true,
+    "missingProbes": [],
+    "unknownCounters": [],
+    "emptyFamilies": [],
+    "counterMismatches": []
+  },
+  "probeEvidence": [
+    {
+      "probe": "uninstalled_adapter_cannot_claim_real",
+      "family": "real_adapter_provenance",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the uncorroborated REAL_ADAPTER_AVAILABLE claim is refused",
+          "ok": true,
+          "detail": "refused NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the refusal is a typed NOT_RUN_REAL_ADAPTER from the closed error set",
+          "ok": true,
+          "detail": "NotRunRealAdapter/NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the refusal is a NotRunRealAdapter carrying a code from the closed error set",
+          "ok": true,
+          "detail": "NotRunRealAdapter/NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "no adapter row exists for the refused id",
+          "ok": true,
+          "detail": "rows=adr-s2007r-stub"
+        },
+        {
+          "label": "the refused registration changed nothing at all",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "capabilities.executionEnabled is false",
+          "ok": true,
+          "detail": "executionEnabled=false"
+        },
+        {
+          "label": "capabilities.realAdapterStatus is not REAL_ADAPTER_AVAILABLE",
+          "ok": true,
+          "detail": "realAdapterStatus=NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "adapter_kind real with NOT_RUN_REAL_ADAPTER provenance is refused",
+          "ok": true,
+          "detail": "refused NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the refusal is NOT_RUN_REAL_ADAPTER",
+          "ok": true,
+          "detail": "NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "a test transport cannot be constructed with adapter_kind real",
+          "ok": true,
+          "detail": "NotRunRealAdapter/NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "a test transport cannot raise its own provenance to REAL_ADAPTER_AVAILABLE",
+          "ok": true,
+          "detail": "NotRunRealAdapter/NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "a hand-forged test registration claiming REAL_ADAPTER_AVAILABLE is refused PROVENANCE_UPGRADE_REFUSED",
+          "ok": true,
+          "detail": "BlockedPolicy/PROVENANCE_UPGRADE_REFUSED"
+        },
+        {
+          "label": "a claim corroborated by an installed probe row is accepted",
+          "ok": true,
+          "detail": "accepted"
+        },
+        {
+          "label": "the corroborated registration is committed as adapter_kind real",
+          "ok": true,
+          "detail": "adr-codex-local:real,adr-s2007r-stub:test"
+        },
+        {
+          "label": "capabilities reports REAL_ADAPTER_AVAILABLE only with the corroborating host fact",
+          "ok": true,
+          "detail": "realAdapterStatus=REAL_ADAPTER_AVAILABLE"
+        },
+        {
+          "label": "capabilities.executionEnabled is true for the corroborated adapter",
+          "ok": true,
+          "detail": "executionEnabled=true"
+        },
+        {
+          "label": "the same registration WITHOUT an installed probe row reads NOT_RUN_REAL_ADAPTER",
+          "ok": true,
+          "detail": "realAdapterStatus=NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the same registration without a host fact does not enable execution",
+          "ok": true,
+          "detail": "executionEnabled=false"
+        },
+        {
+          "label": "the evidence writer refuses an uncorroborated REAL_ADAPTER_AVAILABLE run record",
+          "ok": true,
+          "detail": "NotRunRealAdapter/NOT_RUN_REAL_ADAPTER"
+        }
+      ],
+      "arms": [
+        {
+          "arm": "uncorroborated_real_claim_refused",
+          "required": true,
+          "description": "adapters.register refuses a REAL_ADAPTER_AVAILABLE claim no installed executor corroborates",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "real_kind_without_available_provenance_refused",
+          "required": true,
+          "description": "adapter_kind real with a non-AVAILABLE provenance is refused instead of degraded",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "test_transport_cannot_be_built_or_promoted_as_real",
+          "required": true,
+          "description": "createTestTransport refuses a real kind and an AVAILABLE provenance; a hand-forged test registration is refused at the boundary",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "corroborated_real_claim_accepted_and_the_corroboration_decides",
+          "required": true,
+          "description": "an installed probe row is the ONLY thing that turns the same claim green, and removing it turns it red again",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "evidence_writer_refuses_an_uncorroborated_real_run",
+          "required": false,
+          "description": "assertRealRunEvidence refuses a record whose run claims REAL_ADAPTER_AVAILABLE with no installed probe row (owner A/B)",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        }
+      ],
+      "hostProbe": {
+        "installedIds": [
+          "adr-codex-local",
+          "adr-pi-local",
+          "adr-claude-code-local",
+          "adr-opencode-local",
+          "adr-hermes-local"
+        ],
+        "notInstalledIds": [
+          "adr-generic-cli"
+        ]
+      },
+      "uncorroboratedClaim": {
+        "adapter_id": "adr-generic-cli",
+        "refused_code": "NOT_RUN_REAL_ADAPTER"
+      },
+      "corroboratedRegistration": {
+        "adapter_id": "adr-codex-local",
+        "hostFact": "probeRealAdapters installed:true",
+        "withoutHostFact": "NOT_RUN_REAL_ADAPTER"
+      },
+      "evidenceWriterModule": "src/lib/executors/evidence-writer.mjs"
+    },
+    {
+      "probe": "test_transport_case_counts_not_run",
+      "family": "real_adapter_provenance",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the scripted run collects as SUCCEEDED",
+          "ok": true,
+          "detail": "run_state=COLLECTED outcome=SUCCEEDED"
+        },
+        {
+          "label": "the task reaches IN_REVIEW, never DONE",
+          "ok": true,
+          "detail": "state=IN_REVIEW"
+        },
+        {
+          "label": "no transition reached DONE",
+          "ok": true,
+          "detail": "states=READY,CLAIMED,RUNNING,IN_REVIEW"
+        },
+        {
+          "label": "capabilities.realAdapterStatus stays NOT_RUN_REAL_ADAPTER after a SUCCEEDED scripted run",
+          "ok": true,
+          "detail": "realAdapterStatus=NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "capabilities.executionEnabled stays false",
+          "ok": true,
+          "detail": "executionEnabled=false"
+        },
+        {
+          "label": "the committed registration is adapter_kind test with NOT_RUN_REAL_ADAPTER provenance",
+          "ok": true,
+          "detail": "kind=test status=NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the run row carries no real-adapter provenance of its own",
+          "ok": true,
+          "detail": "runs=1"
+        },
+        {
+          "label": "a replay over a SUCCEEDED scripted run constructs",
+          "ok": true,
+          "detail": "constructed"
+        },
+        {
+          "label": "the replay registration is adapter_kind wrapper, never real",
+          "ok": true,
+          "detail": "kind=wrapper"
+        },
+        {
+          "label": "the replay registration is NOT_RUN_REAL_ADAPTER even though the replayed run SUCCEEDED",
+          "ok": true,
+          "detail": "status=NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the replay adapter id is not the real adapter id",
+          "ok": true,
+          "detail": "adapter_id=adr-wrapper-replay"
+        },
+        {
+          "label": "a wrapper-kind candidate naming an installed binary is still NOT installed",
+          "ok": true,
+          "detail": "installed=false detail=codex: candidate kind 'wrapper' can never be reported as installed"
+        },
+        {
+          "label": "a PASSed A-MVP case on the test transport is refused NOT_RUN_REAL_ADAPTER",
+          "ok": true,
+          "detail": "NotRunRealAdapter/NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "the refusal is typed and its code is in the closed set",
+          "ok": true,
+          "detail": "typed=true code=NOT_RUN_REAL_ADAPTER"
+        },
+        {
+          "label": "no S2-007R evidence record was created or modified by the refused write",
+          "ok": true,
+          "detail": "scope=/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json before=090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a after=090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a"
+        },
+        {
+          "label": "this gate's own record (evidence/s2-007r-security-probes.json) was not touched by the refused write either",
+          "ok": true,
+          "detail": "byte-compared inside the arm"
+        }
+      ],
+      "arms": [
+        {
+          "arm": "a_complete_succeeded_run_on_the_test_transport_upgrades_nothing",
+          "required": true,
+          "description": "a full SUCCEEDED run driven by the scripted transport leaves every real-adapter status at NOT_RUN_REAL_ADAPTER",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "a_replay_rebuilds_its_own_wrapper_registration",
+          "required": true,
+          "description": "createReplayTransport re-derives adapter_kind wrapper / NOT_RUN_REAL_ADAPTER whatever the record claims",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "a_wrapper_candidate_is_never_installed_even_when_the_binary_exists",
+          "required": true,
+          "description": "probeRealAdapters structurally cannot report a mock/wrapper/test candidate as installed",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "the_evidence_writer_refuses_a_pass_case_on_the_test_transport",
+          "required": true,
+          "description": "a record shaped like a real run but produced by the scripted transport is refused NOT_RUN_REAL_ADAPTER and writes nothing (owner A/B)",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        }
+      ],
+      "scriptedRun": {
+        "run_id": "run-d6f1501eb100000b",
+        "task_state": "IN_REVIEW",
+        "realAdapterStatus": "NOT_RUN_REAL_ADAPTER"
+      },
+      "refusedEvidenceWrite": {
+        "module": "src/lib/executors/evidence-writer.mjs",
+        "refused_code": "NOT_RUN_REAL_ADAPTER",
+        "refused_detail": "REAL_RUN_EVIDENCE_VERSION",
+        "evidenceDirBefore": "090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a",
+        "evidenceDirAfter": "090c30f63cb9f6607b783a1409b7503d2bba93a9e18b999ce65607c2e0411b5a",
+        "evidenceDirScope": "/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json",
+        "gateOutputUnchangedDuringProbe": true,
+        "gateOutputExcludedFromDigest": true,
+        "gateLevelBinding": "scripts/verify-s2-007r.mjs additionally requires honesty.transport_source in {codex-transport, pi-transport}, a non-null corroboration.executor_session_id that appears in the raw log bytes, a non-empty parent-observed pid tree and a binary that a live probeRealAdapters() row reports installed before it will report REAL_ADAPTER_AVAILABLE, so a file-fact-complete forgery still reads NOT_RUN_REAL_ADAPTER at the gate."
+      }
+    },
+    {
+      "probe": "comparison_across_projects_or_budgets_refused",
+      "family": "comparison_integrity",
+      "counter": "falseApprovals",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "POSITIVE CONTROL: a pair with the same run set, project, budget and cost basis is compared",
+          "ok": true,
+          "detail": "verdict=COMPARED"
+        },
+        {
+          "label": "the compared pair carries verdict COMPARED and no delta it may not state",
+          "ok": true,
+          "detail": "verdict=COMPARED"
+        },
+        {
+          "label": "a pair whose two ends carry the SAME normalised argv is refused, not compared",
+          "ok": true,
+          "detail": "NeedsInput COMPARISON_INPUT_MISMATCH:argv_digest_normalised:sha256:9999999999999999999999999999999999999999999999999999999999999999==sha256:999999999999999999999999999999999999999999999999999999999999"
+        },
+        {
+          "label": "the identical-argv refusal is a code from the closed error set",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "a differing project_digest is refused with a typed NEEDS_INPUT",
+          "ok": true,
+          "detail": "NeedsInput/NEEDS_INPUT"
+        },
+        {
+          "label": "the refusal names project_digest and COMPARISON_INPUT_MISMATCH",
+          "ok": true,
+          "detail": "COMPARISON_INPUT_MISMATCH:project_digest:sha256:1111111111111111111111111111111111111111111111111111111111111111!=sha256:2222222222222222222222222222222222222222222222222222222222222222"
+        },
+        {
+          "label": "the project_digest refusal is a code from the closed error set",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "a differing budget_grant_id is refused with a typed NEEDS_INPUT",
+          "ok": true,
+          "detail": "NeedsInput/NEEDS_INPUT"
+        },
+        {
+          "label": "the refusal names budget_grant_id and COMPARISON_INPUT_MISMATCH",
+          "ok": true,
+          "detail": "COMPARISON_INPUT_MISMATCH:budget_grant_id:grt-s2007r-compare!=grt-s2007r-other"
+        },
+        {
+          "label": "the budget_grant_id refusal is a code from the closed error set",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "a differing cost_basis is refused with a typed NEEDS_INPUT",
+          "ok": true,
+          "detail": "NeedsInput/NEEDS_INPUT"
+        },
+        {
+          "label": "the refusal names cost_basis and COMPARISON_INPUT_MISMATCH",
+          "ok": true,
+          "detail": "COMPARISON_INPUT_MISMATCH:cost_basis:EXECUTOR_REPORTED_USD!=PROXY_TOKENS_NO_USD_REPORTED"
+        },
+        {
+          "label": "the cost_basis refusal is a code from the closed error set",
+          "ok": true,
+          "detail": "NEEDS_INPUT"
+        }
+      ],
+      "arms": [
+        {
+          "arm": "a_cell_pair_with_a_different_project_budget_or_cost_basis_is_refused",
+          "required": true,
+          "description": "compareCells refuses two configurations whose project_digest, budget_grant_id or cost_basis differ, with COMPARISON_INPUT_MISMATCH",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "a_refused_comparison_writes_no_measurement_block",
+          "required": false,
+          "description": "a comparison artifact produced from a refused pair carries verdict REFUSED and no measurements",
+          "status": "not_run",
+          "reason": "the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run",
+          "code": "NEEDS_INPUT",
+          "checks": [],
+          "pendingOn": "scripts/s2-007r-comparison-run.mjs"
+        }
+      ],
+      "compareCellsModule": "src/lib/executors/measure.mjs",
+      "comparisonRefusals": "three mismatched preconditions refused with COMPARISON_INPUT_MISMATCH"
+    },
+    {
+      "probe": "skill_authority_expansion_blocked",
+      "family": "authority_and_outcome",
+      "counter": "authorityExpansions",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "a payload carrying the planted approved is refused",
+          "ok": true,
+          "detail": "refused AUTH_REQUIRED"
+        },
+        {
+          "label": "the approved refusal is a typed AUTH_REQUIRED",
+          "ok": true,
+          "detail": "AuthRequired/AUTH_REQUIRED"
+        },
+        {
+          "label": "a payload carrying the planted granted_scope is refused",
+          "ok": true,
+          "detail": "refused AUTH_REQUIRED"
+        },
+        {
+          "label": "the granted_scope refusal is a typed AUTH_REQUIRED",
+          "ok": true,
+          "detail": "AuthRequired/AUTH_REQUIRED"
+        },
+        {
+          "label": "a payload carrying the planted allowed_tools is refused",
+          "ok": true,
+          "detail": "refused AUTH_REQUIRED"
+        },
+        {
+          "label": "the allowed_tools refusal is a typed AUTH_REQUIRED",
+          "ok": true,
+          "detail": "AuthRequired/AUTH_REQUIRED"
+        },
+        {
+          "label": "a non-canonical authority field is refused",
+          "ok": true,
+          "detail": "BlockedPolicy/ARGUMENT_NOT_CANONICAL"
+        },
+        {
+          "label": "an adapter claiming a planted tool is refused",
+          "ok": true,
+          "detail": "refused CAPABILITY_MISMATCH"
+        },
+        {
+          "label": "the refusal is a typed CAPABILITY_MISMATCH",
+          "ok": true,
+          "detail": "CapabilityMismatch/CAPABILITY_MISMATCH"
+        },
+        {
+          "label": "the refusal names the claim that is not registered",
+          "ok": true,
+          "detail": "ADAPTER_CLAIM_NOT_REGISTERED"
+        },
+        {
+          "label": "the refused call left a validated board-error document on the transport",
+          "ok": true,
+          "detail": "errors=1"
+        },
+        {
+          "label": "POSITIVE CONTROL: the un-expanded claim is still accepted",
+          "ok": true,
+          "detail": "accepted"
+        },
+        {
+          "label": "the effective tool set never contains a planted tool",
+          "ok": true,
+          "detail": "tools=tool:fs.read,tool:fs.write,tool:test.run"
+        },
+        {
+          "label": "every refused attempt left the store byte-identical",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "label": "the task still grants only tool:fs.read",
+          "ok": true,
+          "detail": "allowed_tools=[\"tool:fs.read\"]"
+        },
+        {
+          "label": "the task did not reach IN_REVIEW or DONE",
+          "ok": true,
+          "detail": "state=RUNNING"
+        },
+        {
+          "label": "no journal row mentions the planted authority",
+          "ok": true,
+          "detail": "rows=0"
+        },
+        {
+          "label": "an execution.event whose ARGS carry a forged granted_scope is refused AUTH_REQUIRED",
+          "ok": true,
+          "detail": "AuthRequired/AUTH_REQUIRED"
+        }
+      ],
+      "arms": [
+        {
+          "arm": "an_authority_argument_in_a_payload_is_refused",
+          "required": true,
+          "description": "approved / granted_scope / allowed_tools in a command body are AUTH_REQUIRED: only a server-resolved value may appear there. Every value sent is one the planted SKILL.md asked for.",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "a_non_canonical_authority_field_is_refused",
+          "required": true,
+          "description": "an unknown key such as skill_requested_tools is BLOCKED_POLICY ARGUMENT_NOT_CANONICAL",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "an_adapter_claim_wider_than_its_registration_is_refused",
+          "required": true,
+          "description": "capabilities({claimed}) refuses the planted tool set tool:net.fetch with a validated board-error recorded on the transport",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "the_refusals_committed_nothing",
+          "required": true,
+          "description": "the whole store is byte-identical before and after every refused expansion attempt, and the task grant still excludes the planted tool",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "the_child_argv_allowlist_is_derived_from_the_request",
+          "required": false,
+          "description": "the real transport builds its --tools argv from request.allowed_tools, so the child cannot reach an ungranted tool (owner A)",
+          "status": "not_run",
+          "reason": "the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow",
+          "code": "NEEDS_INPUT",
+          "checks": [],
+          "pendingOn": "a real run record with measurements[].skills_authority"
+        }
+      ],
+      "planted": {
+        "fixture": "SKILL.md (synthetic, planted for this probe, written to a scratch directory, parsed, and deleted before the assertions)",
+        "sha256": "8bea43a50ee9de41d67d8936366451c47b2bbc869bcad397a4fff272236edb35",
+        "requests": [
+          "tool:net.fetch",
+          "board.review.approve",
+          "task.read",
+          "task.write",
+          "artifact.write",
+          "evidence.submit",
+          "checkpoint.write",
+          "budget.spend",
+          "approved=true"
+        ],
+        "parsed": {
+          "granted_scope": [
+            "task.read",
+            "task.write",
+            "artifact.write",
+            "evidence.submit",
+            "checkpoint.write",
+            "budget.spend"
+          ],
+          "approved": true,
+          "requested_tools": [
+            "tool:net.fetch"
+          ],
+          "requested_capabilities": [
+            "board.review.approve"
+          ]
+        },
+        "payloadFieldsSent": [
+          "approved",
+          "granted_scope",
+          "allowed_tools"
+        ],
+        "consumed_by_assertions": true
+      }
+    },
+    {
+      "probe": "provider_error_never_reported_as_success",
+      "family": "authority_and_outcome",
+      "counter": "missingJournalOrOutbox",
+      "status": "pass",
+      "checks": [
+        {
+          "label": "the provider-failure result is collected",
+          "ok": true,
+          "detail": "collected"
+        },
+        {
+          "label": "the collected run is FAILED, never SUCCEEDED",
+          "ok": true,
+          "detail": "run_state=FAILED"
+        },
+        {
+          "label": "the collected result outcome is FAILED",
+          "ok": true,
+          "detail": "outcome=FAILED"
+        },
+        {
+          "label": "the collected error code is PROVIDER_FAILURE",
+          "ok": true,
+          "detail": "code=PROVIDER_FAILURE"
+        },
+        {
+          "label": "a 402 provider refusal is NOT reported as BUDGET_EXCEEDED",
+          "ok": true,
+          "detail": "code=PROVIDER_FAILURE"
+        },
+        {
+          "label": "the task ends FAILED, not IN_REVIEW and not DONE",
+          "ok": true,
+          "detail": "state=FAILED"
+        },
+        {
+          "label": "no transition reached IN_REVIEW or DONE",
+          "ok": true,
+          "detail": "states=READY,CLAIMED,RUNNING,FAILED"
+        },
+        {
+          "label": "the terminal FAILED transition is journalled against the producer",
+          "ok": true,
+          "detail": "rows=4 actors=READY:prn-owner-alice,CLAIMED:prn-external-codex,RUNNING:prn-external-codex,FAILED:prn-external-codex"
+        },
+        {
+          "label": "the refusal left audit rows (a committed side effect is never a silent write)",
+          "ok": true,
+          "detail": "auditRows=8"
+        },
+        {
+          "label": "a FAILED task cannot be requeued blind (no reconciliation, no blind retry)",
+          "ok": true,
+          "detail": "StaleFence/STALE_FENCE"
+        },
+        {
+          "label": "the dispatch intent is recorded as exactly one PENDING outbox row",
+          "ok": true,
+          "detail": "pending=1"
+        },
+        {
+          "label": "a crossing whose outcome is unknown is refused RECONCILIATION_REQUIRED",
+          "ok": true,
+          "detail": "ReconciliationRequired/RECONCILIATION_REQUIRED"
+        },
+        {
+          "label": "the escalation happened exactly once and no effect is claimed",
+          "ok": true,
+          "detail": "escalated=1 effects=0"
+        },
+        {
+          "label": "the outbox row is RECONCILIATION_REQUIRED, never re-queued as PENDING",
+          "ok": true,
+          "detail": "RECONCILIATION_REQUIRED"
+        },
+        {
+          "label": "recovery issues no external effect and re-sends nothing",
+          "ok": true,
+          "detail": "effects=0 escalated=0"
+        },
+        {
+          "label": "the producer may not close its own unknown effect",
+          "ok": true,
+          "detail": "AuthRequired/AUTH_REQUIRED"
+        },
+        {
+          "label": "no reconciliation row exists, so the unknown outcome is correctly still open",
+          "ok": true,
+          "detail": "rows=0"
+        },
+        {
+          "label": "the task never reached DONE",
+          "ok": true,
+          "detail": "state=RUNNING"
+        },
+        {
+          "label": "the unknown-outcome path is typed end to end (no untyped throw escaped)",
+          "ok": true,
+          "detail": "an untyped throw would mean a silent degradation"
+        },
+        {
+          "label": "a pi exit 0 with a 402 error message is read as a FAILURE, not a success",
+          "ok": true,
+          "detail": "failure={\"reason\":\"EXECUTOR_STOP_REASON_ERROR\",\"message\":\"402: insufficient credit for openrouter/amazon/nova-lite-v1\",\"credit_limited\":true} exit=0"
+        },
+        {
+          "label": "the pi credit limit is recognised (credit_limited true)",
+          "ok": true,
+          "detail": "{\"reason\":\"EXECUTOR_STOP_REASON_ERROR\",\"message\":\"402: insufficient credit for openrouter/amazon/nova-lite-v1\",\"credit_limited\":true}"
+        },
+        {
+          "label": "a codex exit 1 with turn.failed is read as a FAILURE",
+          "ok": true,
+          "detail": "failure={\"reason\":\"EXECUTOR_ERROR_RECORD\",\"message\":\"model not found\",\"credit_limited\":false}"
+        },
+        {
+          "label": "neither shape is reported as an assistant answer",
+          "ok": true,
+          "detail": "pi_text=null"
+        },
+        {
+          "label": "POSITIVE CONTROL: a clean pi record is read as no failure",
+          "ok": true,
+          "detail": "failure=null"
+        }
+      ],
+      "arms": [
+        {
+          "arm": "a_provider_error_on_a_zero_exit_code_is_collected_as_failed",
+          "required": true,
+          "description": "a result carrying PROVIDER_FAILURE — the pi \"exit 0 with a 402 message\" shape — never becomes SUCCEEDED, IN_REVIEW or DONE",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "an_unknown_outcome_is_escalated_never_resent_and_never_done",
+          "required": true,
+          "description": "a transport that dies between the SEND intent and the ACK escalates RECONCILIATION_REQUIRED; recovery reissues nothing; the task never reaches DONE",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        },
+        {
+          "arm": "provider_failure_classification_of_the_recorded_shapes",
+          "required": false,
+          "description": "the executor outcome reader classifies a pi exit 0 with a 402 message and a codex exit 1 with turn.failed as a FAILURE, so no exit-code mapping can promote them to success (owner A)",
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
+        }
+      ],
+      "providerError": {
+        "run_id": "run-d6f1501eb100000b",
+        "run_state": "FAILED",
+        "error_code": "PROVIDER_FAILURE",
+        "task_state": "FAILED"
+      },
+      "unknownOutcome": {
+        "run_id": "run-d6f1501eb1000009",
+        "escalated": 1,
+        "externalEffectsIssued": 0,
+        "recoveryEffects": 0,
+        "task_state": "RUNNING"
+      },
+      "failureMapModule": "src/lib/executors/failure-map.mjs"
+    }
+  ],
+  "modelInvocations": {
+    "budget": 2,
+    "used": 0,
+    "reason": "every assertion in this gate is a committed refusal, a row that was not written, or a status that did not move. A real model call would be setup, never the assertion, so this gate spends none of the two-invocation budget."
+  },
+  "honestStatus": {
+    "realAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+    "assuranceStatus": "NOT_MEASURED",
+    "aMvpStatus": "NOT_CLAIMED",
+    "note": "a probe suite that attacks the boundary proves the boundary refuses. It does not prove an executor, a reviewer or a semantic accuracy exists, and this gate runs no executor at all."
+  },
+  "limits": [
+    "No real executor crossed the boundary in this gate: the scripted veritas.adapter/1.0.0 test transport is the only transport under test, so honestStatus.realAdapterStatus is NOT_RUN_REAL_ADAPTER and nothing here may be read as a real-adapter run.",
+    "Arms that need the real-executor tree could not run and are listed in deferredArms with the exact owning file; 2 of them. They move no counter and change no probe verdict, and they cap the ticket at PARTIAL.",
+    "A green probe run is evidence about REFUSALS, not about task quality, human review or calibration.",
+    "The probes run against the in-memory store. A claim proven here is proven about the command boundary, not about a PostgreSQL transaction; the two-process behaviour is the DB replay gate of the S2-007 ticket."
+  ],
+  "runId": "s2-007r-probes-eb0cf8b64071668a3a74f226",
+  "recordDigest": "98d6f1b3a592feb29a0b1e1c5f6bf46d887851982caa277fa176c4ea4fa5d15d"
+}

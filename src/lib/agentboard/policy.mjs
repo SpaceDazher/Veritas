@@ -94,10 +94,12 @@ import {
   SANDBOX_PROFILES,
   TRANSITIONS,
   isExecutableSandboxProfile,
+  isHostUnisolatedSandboxProfile,
   isKnownState,
   toStoredDigest,
   toWireDigest,
 } from './constants.mjs';
+import { toInjectedInstant } from './clock.mjs';
 import {
   AclDenied,
   AgentUnavailable,
@@ -785,6 +787,148 @@ export function assertSandboxExecutable(profileId) {
   return true;
 }
 
+// --- the host-unisolated floor (issue #45) -----------------------------------
+
+// The shape a named human authorisation must have. It is a document, not a
+// flag: an approval with no author, no scope, no window and no digest over its
+// own body is indistinguishable from a value somebody typed into a payload, so
+// it is refused. Field names are fixed and closed; `additionalProperties` is
+// false in spirit because every property below is checked for type and shape
+// and anything extra is ignored rather than trusted.
+const HOST_UNISOLATED_AUTHORISATION_FIELDS = Object.freeze([
+  'authorization_id', 'authorised_by_principal_id', 'authorised_by_label',
+  'authority', 'scope', 'profile_id', 'issued_at', 'expires_at', 'body_digest',
+]);
+
+const HOST_UNISOLATED_AUTHORISATION_PATTERNS = Object.freeze({
+  authorization_id: /^aut-hu-[a-z0-9][a-z0-9-]{0,56}$/,
+  authorised_by_principal_id: /^prn-[a-z0-9][a-z0-9-]{0,62}$/,
+  // A human label is prose, not a parsed token: the charset is bounded so the
+  // field cannot smuggle a value, and wide enough to say who actually signed.
+  authorised_by_label: /^[A-Za-z0-9][A-Za-z0-9 ._@:,()'\-]{0,119}$/,
+  profile_id: /^sbx-[a-z0-9][a-z0-9-]{0,62}$/,
+  issued_at: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+  expires_at: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+  body_digest: /^sha256:[0-9a-f]{64}$/,
+});
+
+export const HOST_UNISOLATED_AUTHORISATION_KINDS = Object.freeze(['HUMAN_OWNER']);
+export const HOST_UNISOLATED_AUTHORISATION_SCOPES = Object.freeze(['SINGLE_PILOT_RUN']);
+
+/**
+ * The digest an authorisation must carry over its own body. It is an
+ * integrity control, not a signature: it proves the document the caller holds
+ * is the document the server recorded, and it proves nothing about who wrote
+ * it. The identity comes from the recorded principal, never from the document.
+ */
+export function hostUnisolatedAuthorizationDigest(authorization) {
+  const { body_digest: ignored, ...body } = isPlainObject(authorization) ? authorization : {};
+  // canonicalDigest returns the bare hex; the wire form of every digest on this
+  // boundary is `sha256:<hex>` (constants.DIGEST_PATTERN), so the prefix is
+  // added here rather than left to each caller to remember.
+  return `sha256:${canonicalDigest(body)}`;
+}
+
+/**
+ * Validate a named human authorisation for unisolated host execution.
+ *
+ * The authorisation is resolved SERVER-SIDE and handed to execute() as an
+ * option; it is never a payload argument, so the confused-deputy rule holds —
+ * an adapter, a task, an execution event, a skill or a replayed record cannot
+ * supply, widen or renew it. Every check here is fail-closed and typed.
+ */
+export function assertUnisolatedExecutionAuthorized(authorization, { profileId, now } = {}) {
+  if (!isPlainObject(authorization)) {
+    throw new BlockedSandbox(
+      'BLOCKED_SANDBOX',
+      'a run bound to the host-unisolated tier requires a named human authorisation document resolved server-side; none was supplied',
+    );
+  }
+  for (const field of HOST_UNISOLATED_AUTHORISATION_FIELDS) {
+    if (!Object.prototype.hasOwnProperty.call(authorization, field)) {
+      throw new BlockedSandbox('BLOCKED_SANDBOX', `the unisolated-execution authorisation is missing ${field}`);
+    }
+  }
+  for (const [field, pattern] of Object.entries(HOST_UNISOLATED_AUTHORISATION_PATTERNS)) {
+    if (typeof authorization[field] !== 'string' || !pattern.test(authorization[field])) {
+      throw new BlockedSandbox('BLOCKED_SANDBOX', `the unisolated-execution authorisation field ${field} is malformed`);
+    }
+  }
+  if (!HOST_UNISOLATED_AUTHORISATION_KINDS.includes(authorization.authority)) {
+    throw new BlockedSandbox(
+      'BLOCKED_SANDBOX',
+      `only ${HOST_UNISOLATED_AUTHORISATION_KINDS.join('|')} may authorise unisolated host execution; got ${authorization.authority}`,
+    );
+  }
+  if (!HOST_UNISOLATED_AUTHORISATION_SCOPES.includes(authorization.scope)) {
+    throw new BlockedSandbox(
+      'BLOCKED_SANDBOX',
+      `the unisolated-execution authorisation scope must be one of ${HOST_UNISOLATED_AUTHORISATION_SCOPES.join('|')}; got ${authorization.scope}`,
+    );
+  }
+  if (authorization.profile_id !== profileId) {
+    throw new BlockedSandbox(
+      'BLOCKED_SANDBOX',
+      `the authorisation names profile ${authorization.profile_id} but the run is bound to ${String(profileId)}`,
+    );
+  }
+  if (hostUnisolatedAuthorizationDigest(authorization) !== authorization.body_digest) {
+    throw new BlockedSandbox('BLOCKED_SANDBOX', 'the unisolated-execution authorisation digest does not match its own body');
+  }
+  const issued = Date.parse(authorization.issued_at);
+  const expires = Date.parse(authorization.expires_at);
+  if (!Number.isFinite(issued) || !Number.isFinite(expires) || expires <= issued) {
+    throw new BlockedSandbox('BLOCKED_SANDBOX', 'the unisolated-execution authorisation window is not a real interval');
+  }
+  // `now` is the injected board clock, never the wall clock: a run must not
+  // depend on when the guard happened to be evaluated.
+  const instant = toInjectedInstant(now, 'now');
+  const at = Date.parse(instant);
+  if (at < issued || at > expires) {
+    throw new BlockedSandbox(
+      'BLOCKED_SANDBOX',
+      `the unisolated-execution authorisation is outside its window (${authorization.issued_at}..${authorization.expires_at}, now ${instant})`,
+    );
+  }
+  return Object.freeze({ ...authorization });
+}
+
+/**
+ * The single gate a LIVE execution passes through.
+ *
+ * An isolated tier with measured OS controls needs nothing beyond
+ * assertSandboxExecutable — this function is not a relaxation for it. The
+ * host-unisolated floor is admitted only with a valid named authorisation, and
+ * the authorisation is returned to the caller so the run record can quote it
+ * verbatim. Every other profile, including the *_blocked and NO_EXEC ones, is
+ * refused exactly as before.
+ */
+export function assertLiveExecutionAuthorized(profileId, { authorization, now } = {}) {
+  if (typeof profileId !== 'string' || profileId.length === 0) {
+    throw new BlockedSandbox('BLOCKED_SANDBOX', 'no sandbox profile is bound to this run');
+  }
+  if (!SANDBOX_PROFILES.some((profile) => profile.profile_id === profileId)) {
+    throw new BlockedSandbox('BLOCKED_SANDBOX', `sandbox profile ${profileId} is not a registered S2-002 profile`);
+  }
+  if (isExecutableSandboxProfile(profileId)) {
+    if (authorization !== undefined && authorization !== null) {
+      // An authorisation for a profile that does not need one is a smell, not
+      // a harmless extra: it means somebody believed a permit was required, or
+      // that it buys something. Refuse rather than ignore it.
+      throw new BlockedSandbox(
+        'BLOCKED_SANDBOX',
+        `profile ${profileId} has measured OS controls and needs no unisolated-execution authorisation; one was supplied`,
+      );
+    }
+    return Object.freeze({ tier: 'ISOLATED', profile_id: profileId, authorization: null });
+  }
+  if (isHostUnisolatedSandboxProfile(profileId)) {
+    const checked = assertUnisolatedExecutionAuthorized(authorization, { profileId, now });
+    return Object.freeze({ tier: 'HOST_UNISOLATED', profile_id: profileId, authorization: checked });
+  }
+  throw new BlockedSandbox('BLOCKED_SANDBOX', `sandbox profile ${profileId} has no proven OS controls on this host`);
+}
+
 /**
  * Digest binding. A digest is an integrity control, never a signature: this
  * proves the caller's document is the one the task still names, and proves
@@ -1116,7 +1260,14 @@ function assertAdapterCoversTask(task, ctx) {
   const adapter = requireRegisteredAdapter(ctx.adapters, adapterId);
   assertCapabilitySubset(task.required_capabilities, adapter.declared_capabilities);
   assertToolSubset(task.allowed_tools, adapter.declared_tools);
-  assertSandboxExecutable(ctx.sandboxProfileId ?? adapter.sandbox_profile_id);
+  // The live-execution gate, not the bare proven-set check: an isolated tier
+  // needs nothing beyond the proven set, and the HOST_UNISOLATED floor needs
+  // the named human authorisation the boundary resolved server-side. Every
+  // other profile is refused exactly as before (issue #45).
+  assertLiveExecutionAuthorized(ctx.sandboxProfileId ?? adapter.sandbox_profile_id, {
+    authorization: ctx.unisolatedExecutionAuthorization ?? null,
+    now: ctx.now ?? null,
+  });
   assertWorkspaceWithin(task.workspace_ref, resolveWorkspaceRoots(task, ctx), { realpath: ctx.realpath });
   if (ctx.requestScopes !== undefined || ctx.grantedScopes !== undefined) {
     assertScopeSubset(ctx.requestScopes ?? [], ctx.grantedScopes ?? []);

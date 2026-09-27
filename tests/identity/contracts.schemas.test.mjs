@@ -382,14 +382,69 @@ describe('S2-002 lease semantics (fencing)', () => {
 });
 
 describe('S2-002 sandbox profile semantics', () => {
-  test('tiers are exactly NO_EXEC | LOCAL_RESTRICTED | UNTRUSTED_CODE', () => {
+  test('tiers are exactly NO_EXEC | LOCAL_RESTRICTED | UNTRUSTED_CODE | HOST_UNISOLATED', () => {
     for (const tier of ['NO_EXEC', 'LOCAL_RESTRICTED', 'UNTRUSTED_CODE']) {
       const doc = sandboxNoExec();
       doc.tier = tier;
       if (tier !== 'NO_EXEC') doc.os_controls_evidence = SHA(HEX64B);
       assert.equal(validateContract('sandbox-profile', doc).valid, true, tier);
     }
+    const hostUnisolated = sandboxNoExec();
+    hostUnisolated.tier = 'HOST_UNISOLATED';
+    hostUnisolated.profile_id = 'sbx-host-unisolated-v1';
+    hostUnisolated.os_controls_evidence = SHA(HEX64B);
+    hostUnisolated.network = { policy: 'unrestricted', allowlist: [] };
+    hostUnisolated.environment = { allowlist: ['*'], secret_handles: [] };
+    assert.equal(validateContract('sandbox-profile', hostUnisolated).valid, true);
     assert.equal(validateContract('sandbox-profile', { ...sandboxNoExec(), tier: 'FULL' }).valid, false);
+  });
+
+  // The HOST_UNISOLATED floor exists so a host that cannot run a model-calling
+  // agent inside an isolation profile can still RECORD the truth. These four
+  // tests are the structural half of that decision: the tier may not be
+  // dressed up as an isolated one, and no isolated tier may be dressed down
+  // into it.
+  test('HOST_UNISOLATED must declare that it does not control the network', () => {
+    const base = sandboxNoExec();
+    base.tier = 'HOST_UNISOLATED';
+    base.profile_id = 'sbx-host-unisolated-v1';
+    base.os_controls_evidence = SHA(HEX64B);
+    base.environment = { allowlist: ['*'], secret_handles: [] };
+    for (const policy of ['deny_all', 'allowlist']) {
+      const doc = { ...base, network: policy === 'deny_all' ? { policy, allowlist: [] } : { policy, allowlist: [{ host: 'api.openrouter.ai', ports: [443] }] } };
+      assert.equal(validateContract('sandbox-profile', doc).valid, false, `HOST_UNISOLATED with network ${policy} must not validate`);
+    }
+    assert.equal(validateContract('sandbox-profile', { ...base, network: { policy: 'unrestricted', allowlist: [] } }).valid, true);
+  });
+
+  test('HOST_UNISOLATED may not present a secret handle it has no mechanism for', () => {
+    const base = sandboxNoExec();
+    base.tier = 'HOST_UNISOLATED';
+    base.profile_id = 'sbx-host-unisolated-v1';
+    base.os_controls_evidence = SHA(HEX64B);
+    base.network = { policy: 'unrestricted', allowlist: [] };
+    base.environment = { allowlist: ['*'], secret_handles: ['sec-openrouter'] };
+    assert.equal(validateContract('sandbox-profile', base).valid, false);
+  });
+
+  test('HOST_UNISOLATED requires the digest of the measured absence of controls', () => {
+    const base = sandboxNoExec();
+    base.tier = 'HOST_UNISOLATED';
+    base.profile_id = 'sbx-host-unisolated-v1';
+    base.network = { policy: 'unrestricted', allowlist: [] };
+    base.environment = { allowlist: ['*'], secret_handles: [] };
+    assert.equal(validateContract('sandbox-profile', base).valid, false, 'no evidence digest must not validate');
+  });
+
+  test('no isolated tier may declare unrestricted network or a wildcard environment', () => {
+    for (const tier of ['LOCAL_RESTRICTED', 'UNTRUSTED_CODE']) {
+      const doc = sandboxNoExec();
+      doc.tier = tier;
+      doc.profile_id = `sbx-${tier.toLowerCase()}-default`;
+      doc.os_controls_evidence = SHA(HEX64B);
+      assert.equal(validateContract('sandbox-profile', { ...doc, network: { policy: 'unrestricted', allowlist: [] } }).valid, false, `${tier} unrestricted network must not validate`);
+      assert.equal(validateContract('sandbox-profile', { ...doc, environment: { allowlist: ['*'], secret_handles: [] } }).valid, false, `${tier} wildcard environment must not validate`);
+    }
   });
 
   test('restricted tiers require OS control evidence', () => {

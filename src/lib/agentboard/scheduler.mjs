@@ -105,8 +105,10 @@ import {
   toBoardError,
 } from './errors.mjs';
 import { SANDBOX_LOCAL_RESTRICTED_PODMAN, SANDBOX_UNTRUSTED_CODE_GVISOR } from '../identity/sandbox-profiles.mjs';
+import { isHostUnisolatedSandboxProfile } from './constants.mjs';
 import { canonicalDigest } from '../verifier/canonical-json.mjs';
 import * as policy from './policy.mjs';
+import { toInjectedInstant, dayKeyOf, ISO_INSTANT } from './clock.mjs';
 
 // Re-exported from constants.mjs, never re-declared here (issue §"one
 // authoritative contract").
@@ -141,7 +143,6 @@ const MAX_OUTBOX_BATCH = 64;        // bounded work per driver call
 const MAX_CANDIDATE_TASKS = 256;    // bounded read per plan
 const MAX_STORE_TASK_READ = 200;    // the store refuses a listTasks limit above 200
 
-const ISO_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const PRINCIPAL_ID = /^prn-[a-z0-9][a-z0-9-]{0,62}$/;
 const HEX64 = /^[0-9a-f]{64}$/;
 
@@ -224,27 +225,12 @@ function dedupeReasons(reasons) {
  * `YYYY-MM-DDTHH:MM:SS.sssZ` string. A missing or unparseable clock is a
  * refusal, never a fallback to the host clock.
  */
-export function toInjectedInstant(value, label = 'now') {
-  let candidate = value;
-  if (isPlainObject(candidate) && typeof candidate.now === 'function') candidate = candidate.now();
-  if (typeof candidate === 'function') candidate = candidate();
-  if (candidate instanceof Date) {
-    if (Number.isNaN(candidate.getTime())) throw new BlockedPolicy(`INJECTED_CLOCK_INVALID:${label}`);
-    return candidate.toISOString();
-  }
-  if (typeof candidate === 'string') {
-    if (ISO_INSTANT.test(candidate)) return candidate;
-    const parsed = new Date(candidate);
-    if (Number.isNaN(parsed.getTime())) throw new BlockedPolicy(`INJECTED_CLOCK_INVALID:${label}`);
-    return parsed.toISOString();
-  }
-  throw new BlockedPolicy(`INJECTED_CLOCK_MISSING:${label}`, 'the scheduler never reads the process clock');
-}
+// The injected-clock reader now lives in clock.mjs and is re-exported here, so
+// every existing importer of scheduler.toInjectedInstant keeps working while
+// policy.mjs can use it without importing this module back.
+export { toInjectedInstant, dayKeyOf, ISO_INSTANT, CLOCK_VERSION } from './clock.mjs';
 
-/** UTC calendar day of an injected instant — the budget `day_key`. */
-function dayKeyOf(instant) {
-  return String(instant).slice(0, 10);
-}
+
 
 /**
  * Resolve the injected id factory for a contract prefix. The factory may be a
@@ -474,7 +460,7 @@ export function evaluateTaskCandidates(tasks, options = {}) {
     if (isVisible && isVisible(task, principalId) !== true) reasons.push(EXCLUSION_REASONS.ACL_DENIED);
     if (leaseHeld.has(task.task_id)) reasons.push(EXCLUSION_REASONS.ACTIVE_LEASE_EXISTS);
 
-    if (sandbox && !sandboxProvenFor(sandbox, task)) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
+    if (sandbox && !sandboxProvenFor(sandbox, task, { authorization: context.unisolatedExecutionAuthorization ?? null, now: context.now ?? null })) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
 
     if (grantFor) {
       const grant = grantFor(task);
@@ -512,7 +498,7 @@ export function eligibleTasks(tasks, { dependenciesSatisfiedFor } = {}) {
  * exist exactly because that tier could not be proven on this host. A missing
  * sandbox context is NOT proven.
  */
-function sandboxProvenFor(sandbox, task) {
+function sandboxProvenFor(sandbox, task, options = {}) {
   const declared = typeof sandbox === 'string' ? { profile_id: sandbox, proven: true } : sandbox;
   if (!isPlainObject(declared)) return false;
   if (declared.proven === false) return false;
@@ -520,8 +506,15 @@ function sandboxProvenFor(sandbox, task) {
   const contextProfile = declared.profile_id ?? null;
   if (contextProfile && taskProfile && contextProfile !== taskProfile) return false;
   const effective = taskProfile ?? contextProfile;
-  if (typeof effective !== 'string' || !PROVEN_SANDBOX_PROFILE_IDS.includes(effective)) return false;
-  return sandboxProfileExecutable(effective);
+  if (typeof effective !== 'string' || effective.length === 0) return false;
+  // A profile with measured OS controls needs nothing beyond the proven set.
+  if (PROVEN_SANDBOX_PROFILE_IDS.includes(effective)) return sandboxProfileExecutable(effective);
+  // The HOST_UNISOLATED floor (issue #45) is dispatchable only with a valid
+  // named human authorisation resolved server-side. It is NOT proven and it is
+  // never reported as proven: the decision that admits it is the same
+  // assertLiveExecutionAuthorized gate the command boundary uses, so a tick and
+  // a manual execution.start can never disagree about whether a run is allowed.
+  return sandboxProfileExecutable(effective, options);
 }
 
 /**
@@ -530,10 +523,17 @@ function sandboxProvenFor(sandbox, task) {
  * stays a cheap pre-filter. A refusal is data here — it becomes the
  * SANDBOX_NOT_PROVEN exclusion reason — while any other failure propagates.
  */
-function sandboxProfileExecutable(profileId) {
+function sandboxProfileExecutable(profileId, options = {}) {
   if (typeof profileId !== 'string' || profileId.length === 0) return false;
-  if (!isExecutableSandboxProfile(profileId)) return false;
+  if (!isExecutableSandboxProfile(profileId) && !isHostUnisolatedSandboxProfile(profileId)) return false;
   try {
+    if (isHostUnisolatedSandboxProfile(profileId)) {
+      policyFunction('assertLiveExecutionAuthorized')(profileId, {
+        authorization: options.authorization ?? null,
+        now: options.now ?? null,
+      });
+      return true;
+    }
     policyFunction('assertSandboxExecutable')(profileId);
     return true;
   } catch (error) {
@@ -710,7 +710,7 @@ function adapterExclusionReasons(adapter, task, context) {
 
   const taskProfile = task?.workspace_ref?.isolation_profile_id ?? null;
   const adapterProfile = adapter.sandbox_profile_id ?? null;
-  if (context.sandbox && !sandboxProvenFor(context.sandbox, task)) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
+  if (context.sandbox && !sandboxProvenFor(context.sandbox, task, { authorization: context.unisolatedExecutionAuthorization ?? null, now: context.now ?? null })) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
   if (taskProfile && adapterProfile && taskProfile !== adapterProfile) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
   if (!sandboxProfileExecutable(taskProfile) || !sandboxProfileExecutable(adapterProfile)) {
     reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
@@ -814,6 +814,10 @@ export function planDispatch({
   principalId = null,
   dependenciesSatisfiedFor = null,
   briefValidatedFor = null,
+  // Server-resolved named human authorisation (issue #45). Only the
+  // HOST_UNISOLATED floor tier consults it; an isolated profile ignores it and
+  // the caller is refused if it supplies one (policy.assertLiveExecutionAuthorized).
+  unisolatedExecutionAuthorization = null,
 } = {}) {
   if (typeof workspaceId !== 'string' || workspaceId.length === 0) throw new NeedsInput('WORKSPACE_ID_MISSING');
   const instant = toInjectedInstant(now, 'now');
@@ -830,6 +834,7 @@ export function planDispatch({
 
   const grantForTask = (task) => pickGrant(grants, task, instant);
   const evaluated = evaluateTaskCandidates(workspaceTasks, {
+    unisolatedExecutionAuthorization,
     dependenciesSatisfiedFor: dependenciesSatisfiedFor ?? undefined,
     briefValidatedFor,
     principalId,
@@ -945,7 +950,7 @@ export function planDispatch({
  * tasks, adapters, grants and active leases, so the plan is always built from
  * server-side state and never from a request payload.
  */
-async function planFromStore({ store, workspaceId, principalId, now, ids, sandbox }) {
+async function planFromStore({ store, workspaceId, principalId, now, ids, sandbox, unisolatedExecutionAuthorization = null }) {
   const [tasks, adapters, grants, leases] = await Promise.all([
     // A bounded read: the store caps `limit` at 200, and the decision is
     // evaluated over at most MAX_CANDIDATE_TASKS rows anyway.
@@ -1117,6 +1122,10 @@ export async function runSchedulerTick({
   sandbox = null,
   idempotencyKey = null,
   workspaceRoots = null,
+  // Server-resolved named human authorisation for a run bound to the
+  // HOST_UNISOLATED floor tier (issue #45). Never a payload argument.
+  unisolatedExecutionAuthorization = null,
+  options = {},
 } = {}) {
   if (!isPlainObject(store)) throw new NeedsInput('STORE_MISSING');
   if (typeof workspaceId !== 'string' || workspaceId.length === 0) throw new NeedsInput('WORKSPACE_ID_MISSING');
@@ -1129,7 +1138,7 @@ export async function runSchedulerTick({
   } else if (dispatch !== null && dispatch !== undefined) {
     decision = dispatch;
   } else {
-    decision = await planFromStore({ store, workspaceId, principalId: actorId, now: instant, ids, sandbox });
+    decision = await planFromStore({ store, workspaceId, principalId: actorId, now: instant, ids, sandbox, unisolatedExecutionAuthorization });
   }
   assertBoardContract('dispatch-decision', decision);
   if (decision.workspace_id !== workspaceId) {
@@ -1172,10 +1181,16 @@ export async function runSchedulerTick({
   // 1. Sandbox: the isolation profile must be provable AND the executor must be
   //    bound to the same profile the task was authorized for.
   const profileId = task.workspace_ref?.isolation_profile_id ?? null;
-  if (sandboxProvenFor(sandbox ?? profileId, task) !== true) {
+  const liveAuthorization = options.unisolatedExecutionAuthorization
+    ?? options.unisolated_execution_authorization
+    ?? null;
+  if (sandboxProvenFor(sandbox ?? profileId, task, { authorization: liveAuthorization, now: instant }) !== true) {
     throw new BlockedSandbox('SANDBOX_NOT_PROVEN', `isolation profile ${String(profileId)} is not provable on this host`);
   }
-  policyFunction('assertSandboxExecutable')(profileId);
+  const sandboxDecision = policyFunction('assertLiveExecutionAuthorized')(profileId, {
+    authorization: liveAuthorization,
+    now: instant,
+  });
   // 2. Health is current, server-side: the registration is the authority and
   //    the live transport may only veto it.
   if (registration.health !== 'healthy') {
@@ -1185,7 +1200,10 @@ export async function runSchedulerTick({
     throw new AgentUnavailable('ADAPTER_UNAVAILABLE', 'the adapter is registered as unavailable');
   }
   const adapterProfileId = registrationSandboxProfileId(registration);
-  policyFunction('assertSandboxExecutable')(adapterProfileId);
+  policyFunction('assertLiveExecutionAuthorized')(adapterProfileId, {
+    authorization: liveAuthorization,
+    now: instant,
+  });
   if (adapterProfileId !== profileId) {
     throw new BlockedSandbox('ADAPTER_SANDBOX_MISMATCH', 'the adapter is not bound to the task isolation profile');
   }

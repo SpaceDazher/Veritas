@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://veritas.local/contracts/sandbox-profile.schema.json",
   "title": "Veritas Sandbox Profile (S2-002)",
-  "description": "Explicit sandbox tier with mandatory filesystem, network, environment, process and cancellation controls. LOCAL_RESTRICTED and UNTRUSTED_CODE require an OS-control evidence digest; missing evidence means the tier stays blocked.",
+  "description": "Explicit sandbox tier with mandatory filesystem, network, environment, process and cancellation controls. LOCAL_RESTRICTED and UNTRUSTED_CODE require an OS-control evidence digest; missing evidence means the tier stays blocked. HOST_UNISOLATED (issue #45) is a strictly LOWER tier that exists so a host which cannot execute a model-calling agent inside an isolation profile can still be RECORDED truthfully: it must declare network policy 'unrestricted' and environment allowlist '*' because those are the controls it does not have, it requires an evidence digest of the measured ABSENCE of OS controls, and a run bound to it is authorised only by a separate, named human authorisation document resolved server-side. It is never an isolation tier and may never be counted as one.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,7 +18,7 @@
   "properties": {
     "contractVersion": { "const": "1.0.0" },
     "profile_id": { "type": "string", "pattern": "^sbx-[a-z0-9][a-z0-9-]{0,62}$" },
-    "tier": { "enum": ["NO_EXEC", "LOCAL_RESTRICTED", "UNTRUSTED_CODE"] },
+    "tier": { "enum": ["NO_EXEC", "LOCAL_RESTRICTED", "UNTRUSTED_CODE", "HOST_UNISOLATED"] },
     "os_controls_evidence": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "filesystem": {
       "type": "object",
@@ -39,7 +39,7 @@
       "additionalProperties": false,
       "required": ["policy", "allowlist"],
       "properties": {
-        "policy": { "enum": ["deny_all", "allowlist"] },
+        "policy": { "enum": ["deny_all", "allowlist", "unrestricted"] },
         "allowlist": {
           "type": "array",
           "items": {
@@ -66,6 +66,10 @@
         {
           "if": { "properties": { "policy": { "const": "allowlist" } }, "required": ["policy"] },
           "then": { "properties": { "allowlist": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "policy": { "const": "unrestricted" } }, "required": ["policy"] },
+          "then": { "properties": { "allowlist": { "maxItems": 0 } } }
         }
       ]
     },
@@ -76,7 +80,13 @@
       "properties": {
         "allowlist": {
           "type": "array",
-          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$" }
+          "items": {
+            "description": "The literal '*' is legal ONLY for the HOST_UNISOLATED tier and means 'the whole operator environment is inherited, and that is the control this tier does not have'.",
+            "anyOf": [
+              { "const": "*" },
+              { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$" }
+            ]
+          }
         },
         "secret_handles": {
           "type": "array",
@@ -114,10 +124,43 @@
   "allOf": [
     {
       "if": {
-        "properties": { "tier": { "enum": ["LOCAL_RESTRICTED", "UNTRUSTED_CODE"] } },
+        "properties": { "tier": { "enum": ["LOCAL_RESTRICTED", "UNTRUSTED_CODE", "HOST_UNISOLATED"] } },
         "required": ["tier"]
       },
       "then": { "required": ["os_controls_evidence"] }
+    },
+    {
+      "if": { "properties": { "tier": { "const": "HOST_UNISOLATED" } }, "required": ["tier"] },
+      "then": {
+        "description": "A tier that does not control the network or the environment must say so. deny_all/allowlist and a narrow allowlist are both forbidden here, so no record can present this tier as isolated.",
+        "properties": {
+          "network": {
+            "properties": { "policy": { "const": "unrestricted" }, "allowlist": { "maxItems": 0 } },
+            "required": ["policy", "allowlist"]
+          },
+          "environment": {
+            "properties": {
+              "allowlist": {
+                "maxItems": 1,
+                "items": { "const": "*" }
+              },
+              "secret_handles": { "maxItems": 0 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "tier": { "enum": ["NO_EXEC", "LOCAL_RESTRICTED", "UNTRUSTED_CODE"] } },
+        "required": ["tier"]
+      },
+      "then": {
+        "properties": {
+          "network": { "properties": { "policy": { "enum": ["deny_all", "allowlist"] } } },
+          "environment": { "properties": { "allowlist": { "not": { "const": ["*"] } } } }
+        }
+      }
     }
   ]
 }

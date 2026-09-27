@@ -1,0 +1,1218 @@
+{
+  "schemaVersion": 1,
+  "record_kind": "s2-007r-amvp-cases",
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#45",
+  "written_by": "scripts/s2-007r-measurement-set.mjs (s2-007r-measurement-set-v1)",
+  "commit": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+  "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+  "run_set_id": "rs-s2007r-pilot-c55c3ecbfca6439e",
+  "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+  "budget_grant_id": "grt-s2007r-pilot",
+  "vocabulary": [
+    "PASS",
+    "PARTIAL",
+    "NOT_RUN",
+    "NOT_RUN_DB",
+    "BLOCKED"
+  ],
+  "vocabulary_note": "PASS means this case was observed on a REAL run of this run set. The run set completed zero governed runs, so no case is PASS. A-MVP-04 is PARTIAL because three of its clauses were really observed and two termination arms plus the isolation clause were not.",
+  "pilot_file": {
+    "path": "pilots/scenario-a/acceptance-cases.json",
+    "sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+    "frozen_manifest_entry": {
+      "shape": "object-keyed-by-path",
+      "sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9"
+    },
+    "matches_frozen_manifest": true,
+    "unchanged_by_this_ticket": true,
+    "verbatim": {
+      "version": "1.0.0",
+      "scenario": "A",
+      "cases": [
+        {
+          "id": "A-OUT-01",
+          "kind": "artifact",
+          "input": "codex-pi-roles",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Verify Codex and pi responsibilities, executor/reviewer separation and actual version discovery.",
+          "expected": "PASS",
+          "evidence_required": "codex-pi-roles: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-02",
+          "kind": "artifact",
+          "input": "configurations",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Load pinned configurations from clean checkout; compare secrets-free config digests.",
+          "expected": "PASS",
+          "evidence_required": "configurations: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-03",
+          "kind": "artifact",
+          "input": "skills-instructions",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Resolve every skill/instruction version and prohibit instruction authority escalation.",
+          "expected": "PASS",
+          "evidence_required": "skills-instructions: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-04",
+          "kind": "artifact",
+          "input": "development-process",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Replay documented development stages with test and review gates.",
+          "expected": "PASS",
+          "evidence_required": "development-process: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-05",
+          "kind": "artifact",
+          "input": "shared-kanban",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Assert Web/API/CLI share canonical task revision and all nine states.",
+          "expected": "PASS",
+          "evidence_required": "shared-kanban: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-06",
+          "kind": "artifact",
+          "input": "project-memory",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Resolve project memory references within ACL; agent chat is not canonical.",
+          "expected": "PASS",
+          "evidence_required": "project-memory: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-07",
+          "kind": "artifact",
+          "input": "handoff-rules",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Revoke previous lease before handoff; old fencing token cannot write.",
+          "expected": "PASS",
+          "evidence_required": "handoff-rules: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-08",
+          "kind": "artifact",
+          "input": "eval-sets",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Freeze held-out corpus and identical tasks, models, seeds and budgets before comparison.",
+          "expected": "PASS",
+          "evidence_required": "eval-sets: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-09",
+          "kind": "artifact",
+          "input": "measured-metrics",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Recompute all METRIC_POLICY numerators, denominators, coverage and confidence intervals.",
+          "expected": "PASS",
+          "evidence_required": "measured-metrics: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-10",
+          "kind": "artifact",
+          "input": "clean-checkout-install",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Install pinned dependencies in isolated clean checkout and run documented fixture demo.",
+          "expected": "PASS",
+          "evidence_required": "clean-checkout-install: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-11",
+          "kind": "artifact",
+          "input": "rollback",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Revert candidate without deleting journal; verify pre-change baseline tests.",
+          "expected": "PASS",
+          "evidence_required": "rollback: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-12",
+          "kind": "artifact",
+          "input": "evidence-pack",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Resolve hashed artifacts to brief, manifest, executions and independent review.",
+          "expected": "PASS",
+          "evidence_required": "evidence-pack: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-13",
+          "kind": "artifact",
+          "input": "limitations-selection-reasons",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Bound winner to frozen corpus; document ties, unknowns and rejected candidates.",
+          "expected": "PASS",
+          "evidence_required": "limitations-selection-reasons: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-OUT-14",
+          "kind": "artifact",
+          "input": "human-approval-request",
+          "operation": "Verify supplied artifact against frozen brief",
+          "oracle": "Require authenticated non-producer human decision bound to artifact hash; pending is not approved.",
+          "expected": "PASS",
+          "evidence_required": "human-approval-request: digest + test report + reviewer identity",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "NEG-01",
+          "kind": "negative",
+          "input": "goal-change",
+          "operation": "Hidden goal change after freeze",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-02",
+          "kind": "negative",
+          "input": "threshold-change",
+          "operation": "Threshold changed after results",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-03",
+          "kind": "negative",
+          "input": "missing-budget",
+          "operation": "Absent numeric spending authorization",
+          "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "NEEDS_INPUT",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-04",
+          "kind": "negative",
+          "input": "unknown-model",
+          "operation": "Unknown model or access method",
+          "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "NEEDS_INPUT",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-05",
+          "kind": "negative",
+          "input": "absolute-best",
+          "operation": "Claim absolutely best solution",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-06",
+          "kind": "negative",
+          "input": "self-approval",
+          "operation": "Single model approves its output",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-07",
+          "kind": "negative",
+          "input": "private-export",
+          "operation": "Private note included in public artifact",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-08",
+          "kind": "negative",
+          "input": "source-injection",
+          "operation": "Source instruction changes agent permissions",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-09",
+          "kind": "negative",
+          "input": "opinion-as-fact",
+          "operation": "Expert opinion promoted to fact",
+          "oracle": "Policy returns HUMAN_REVIEW; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "HUMAN_REVIEW",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-10",
+          "kind": "negative",
+          "input": "causal-overclaim",
+          "operation": "Unsupported causal relation asserted as knowledge",
+          "oracle": "Policy returns HUMAN_REVIEW; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "HUMAN_REVIEW",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-11",
+          "kind": "negative",
+          "input": "missing-source",
+          "operation": "Missing source counted as successful empty import",
+          "oracle": "Policy returns NEEDS_INPUT; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "NEEDS_INPUT",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-12",
+          "kind": "negative",
+          "input": "research-rollout",
+          "operation": "AgentOS research verdict used for production authorization",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-13",
+          "kind": "negative",
+          "input": "double-claim",
+          "operation": "Two agents claim the same task",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-14",
+          "kind": "negative",
+          "input": "forged-capability",
+          "operation": "Agent self-attests unregistered capability",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-15",
+          "kind": "negative",
+          "input": "expired-lease",
+          "operation": "Lease expires while old worker writes",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-16",
+          "kind": "negative",
+          "input": "agent-crash",
+          "operation": "Agent process crashes with unknown side effects",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-17",
+          "kind": "negative",
+          "input": "empty-response",
+          "operation": "Provider returns empty response",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-18",
+          "kind": "negative",
+          "input": "done-no-artifacts",
+          "operation": "Agent reports DONE without artifacts",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-19",
+          "kind": "negative",
+          "input": "failed-tests",
+          "operation": "Result fails required tests",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-20",
+          "kind": "negative",
+          "input": "adapter-criteria",
+          "operation": "Adapter mutates acceptance criteria",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-21",
+          "kind": "negative",
+          "input": "self-grant",
+          "operation": "Agent grants itself tools or permissions",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-22",
+          "kind": "negative",
+          "input": "replay",
+          "operation": "Duplicate operation replays a side effect",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-23",
+          "kind": "negative",
+          "input": "open-dependency",
+          "operation": "Task starts with incomplete dependency",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-24",
+          "kind": "negative",
+          "input": "cancel-zombie",
+          "operation": "Cancelled worker keeps writing",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-25",
+          "kind": "negative",
+          "input": "unknown-retry",
+          "operation": "Unknown outcome retried without reconciliation",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-26",
+          "kind": "negative",
+          "input": "private-leak",
+          "operation": "Private task disclosed to another user",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "NEG-27",
+          "kind": "negative",
+          "input": "state-divergence",
+          "operation": "UI and API return different canonical revisions",
+          "oracle": "Policy returns BLOCKED; dependent operation has no side effect. Unit fixture only, not runtime certification.",
+          "expected": "BLOCKED",
+          "evidence_required": "evidence/contract-tests.json",
+          "execution": "CONTRACT_TEST"
+        },
+        {
+          "id": "A-MVP-01",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Two distinct real agent adapters execute through the same versioned contract; record binaries, versions, access and runs.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-MVP-02",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Generic CLI discovery and an additional approved agent work without changing core.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-MVP-03",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Scheduler chooses READY tasks by priority then ID, validates registered capabilities, dependencies and budget; emits explanation.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-MVP-04",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Crash, timeout, cancellation terminate process group, fence late writes and reconcile unknown effects.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-MVP-05",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Human creates small repository change; claim, workspace, execute, tests, IN_REVIEW, authenticated human decision, journal replay.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-MVP-06",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Atomic lease race integration test with two concurrent workers yields exactly one lease.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        },
+        {
+          "id": "A-MVP-07",
+          "kind": "mvp",
+          "input": "Approved local runner and isolated repository fixture",
+          "operation": "Replay produces zero duplicate external effects using persistent idempotency keys.",
+          "oracle": "Check canonical journal and real runtime evidence; mocks alone do not pass.",
+          "expected": "PASS",
+          "evidence_required": "Runtime test log, agent versions, journal and artifact hashes",
+          "execution": "NOT_RUN"
+        }
+      ]
+    }
+  },
+  "pilot_file_note": "the frozen pilot file keeps every A-MVP case at execution NOT_RUN because the contract schema has no value for a real run (SPEC D9). It is QUOTED here with its sha256 so the two documents cannot disagree silently, and it was not edited: pilots/ is a frozen target.",
+  "cases": {
+    "A-MVP-01": {
+      "id": "A-MVP-01",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "NOT_RUN",
+      "assertion": "PASS requires two registrations with adapter_kind \"real\" and DIFFERENT provider values, each REAL_ADAPTER_AVAILABLE with an installed probe row, AND each with at least one collected run in agentboard_execution_event attributable to its own run_id. Measured: providers codex and pi are registered and each was really spawned; agentboard_execution_event = 0 rows per schema, agentboard_run = 0 rows per schema.",
+      "artefact": [
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pia",
+          "provider": "pi",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pia",
+          "provider": "codex",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pb1",
+          "provider": "pi",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pb1",
+          "provider": "codex",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pb2",
+          "provider": "pi",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pb2",
+          "provider": "codex",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-pi-pa2",
+          "provider": "pi",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "provenance bootstrap crossing run-bootstrap-codex-pa2",
+          "provider": "codex",
+          "exit_status": 1,
+          "governed": false,
+          "is_a_run": false
+        },
+        {
+          "what": "SQL read after all four cells",
+          "source": "evidence/s2-007r-pilot.json#store.sql_read",
+          "detail": "read after all four cells and before container removal: 4 schemas, 55 tables each, tasks 2, runs 0, agentboard_execution_event 0 per schema",
+          "verified_by": "the run step, against a real PostgreSQL 17.11 with 9 migrations applied"
+        }
+      ],
+      "clauses_observed": [
+        "two distinct real adapters (codex, pi) were registered against the frozen contract schema and both were ACCEPTed",
+        "each adapter really spawned its own binary on this host; the parent observed the pid and the exit code, and the raw process log is on disk with its sha256"
+      ],
+      "clauses_not_run": [
+        "a governed run per adapter",
+        "collected ExecutionResult per adapter",
+        "agentboard_execution_event rows attributable to each adapter's own run_id"
+      ],
+      "reason": "the registration half really happened and the RUN half did not: policy.assertSandboxExecutable(sbx-host-unisolated-v1) answers BLOCKED_SANDBOX on the per-edge gate, so tasks.claim never opened a lease and no run ever existed. The only real crossings are the provenance bootstraps, which this run set records as governed:false, is_a_run:false, board_commands_called:0; they corroborate a REGISTRATION and cannot satisfy a clause that asks for a run."
+    },
+    "A-MVP-02": {
+      "id": "A-MVP-02",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "NOT_RUN",
+      "assertion": "PASS requires (a) a caller-supplied probeRealAdapters({candidates}) list resolving at least one candidate outside REAL_ADAPTER_PROBE_CANDIDATES, (b) the additional approved agent registered AND ran, and (c) the tracked diff of this ticket touching none of contracts/, src/lib/agentboard/, migrations/, pilots/, src/lib/identity/. Measured: (a) discovery is data-driven, (b) pi is registered and never ran a task, (c) FALSE at this HEAD.",
+      "artefact": [
+        {
+          "what": "the tracked diff at HEAD",
+          "paths_touched_in_frozen_targets": [
+            "contracts/sandbox-profile.schema.json",
+            "src/lib/agentboard/commands.mjs",
+            "src/lib/agentboard/constants.mjs",
+            "src/lib/agentboard/policy.mjs",
+            "src/lib/agentboard/scheduler.mjs",
+            "src/lib/identity/sandbox-profiles.mjs",
+            "tests/identity/contracts.schemas.test.mjs"
+          ],
+          "source": "git diff --stat, read-only"
+        },
+        {
+          "what": "the decision that made those edits",
+          "path": "docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md",
+          "note": "the repository owner added the HOST_UNISOLATED floor tier inside contracts/, src/lib/agentboard/ and src/lib/identity/. It is a frozen-target edit made by that decision, not by the measurement step, and it is reported here rather than edited around."
+        },
+        {
+          "what": "registrations",
+          "cell": "all",
+          "adapters": []
+        }
+      ],
+      "clauses_observed": [
+        "adapter discovery is data-driven: the board resolved adr-codex-local and adr-pi-local from the installed executables on this host"
+      ],
+      "clauses_not_run": [
+        "the additional approved agent running a task",
+        "the \"without changing core\" condition, which is false at this HEAD"
+      ],
+      "reason": "two of the three conditions hold and the third is FALSE at this HEAD, so the case could not be PASS on this ticket's own terms even if a run had existed: the owner's D3 decision edited contracts/sandbox-profile.schema.json, four files under src/lib/agentboard/ and src/lib/identity/sandbox-profiles.mjs. The run half is separately blocked by the same BLOCKED_SANDBOX refusal. This is reported, not worked around."
+    },
+    "A-MVP-03": {
+      "id": "A-MVP-03",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "NOT_RUN",
+      "assertion": "PASS requires the decision to select argmin(priority rank, task_id), every other candidate to appear in DispatchDecision.excluded with a reason from the closed enum, AND the selected adapter's start() to have really spawned. Measured: the first two hold (the decision explains itself and its candidate is excluded with the closed reason SANDBOX_NOT_PROVEN); the third does not, because no adapter was selected (selected_adapter_id: null).",
+      "artefact": [
+        {
+          "what": "the DispatchDecision document",
+          "decision_id": "dsc-pia-000001",
+          "decided_at": "2026-09-26T09:00:10.000Z",
+          "selected_task_id": null,
+          "selected_adapter_id": null,
+          "excluded": [
+            {
+              "subject_kind": "task",
+              "subject_id": "abt-s2007r-pia-01",
+              "reasons": [
+                "SANDBOX_NOT_PROVEN"
+              ]
+            }
+          ],
+          "budget_snapshot": {
+            "currency": "USD",
+            "assigned": true,
+            "task_remaining": 0.5,
+            "campaign_remaining": 2,
+            "day_remaining": 2
+          },
+          "decision_digest": "sha256:f8fdfc91c52b61c83aa4cad9c740278f3175e3b236b4eefdbbfa3902a91f2892",
+          "cell": "cell-pia"
+        },
+        {
+          "what": "the same decision in every cell",
+          "cells": [
+            "cell-pia",
+            "cell-pb1",
+            "cell-pb2",
+            "cell-pa2"
+          ],
+          "reason": "every cell produced selected_task_id null with SANDBOX_NOT_PROVEN"
+        }
+      ],
+      "clauses_observed": [
+        "the deterministic order ran and the decision explained itself: no selection, every candidate excluded with the closed reason SANDBOX_NOT_PROVEN",
+        "the budget snapshot was resolved server-side: currency USD, assigned true, task_remaining 0.5, campaign_remaining 2, day_remaining 2",
+        "the decision document carries its own content digest"
+      ],
+      "clauses_not_run": [
+        "a selected adapter",
+        "a real crossing by the selected adapter"
+      ],
+      "reason": "the DECISION half of this case is really observed and the CROSSING half is not: the only candidate was excluded with SANDBOX_NOT_PROVEN, so selected_adapter_id is null and no start() ever ran. The case asks for both, so it is NOT_RUN rather than a partial pass."
+    },
+    "A-MVP-04": {
+      "id": "A-MVP-04",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "PARTIAL",
+      "assertion": "PASS requires, for each of SIGKILL, timeout and cancel: every recorded descendant pid gone, the proof TERMINATED (never survivors:0 without it), the terminal event carrying the fence, and a late callback refused STALE_FENCE with byte-identical audit/outbox row counts. Measured on this run: cancel: NOT_RUN (UNKNOWN_OUTCOME) — SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL; timeout: NOT_RUN (RECONCILIATION_REQUIRED) — SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL; sigkill: OBSERVED (RECONCILIATION_REQUIRED). 2 of 3 termination arms are therefore NOT_RUN, and the isolation clause is NOT_RUN on this host whatever any run shows.",
+      "artefact": [
+        {
+          "what": "lifecycle record",
+          "path": "results/s2-007r/lifecycle-record.json",
+          "arms": [
+            {
+              "arm": "cancel",
+              "run_id": "run-lifecycle-cancel-pi",
+              "result": "UNKNOWN_OUTCOME",
+              "clause": "NOT_RUN",
+              "reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL"
+            },
+            {
+              "arm": "timeout",
+              "run_id": "run-lifecycle-timeout-pi",
+              "result": "RECONCILIATION_REQUIRED",
+              "clause": "NOT_RUN",
+              "reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL"
+            },
+            {
+              "arm": "sigkill",
+              "run_id": "run-lifecycle-sigkill-pi",
+              "result": "RECONCILIATION_REQUIRED",
+              "clause": "OBSERVED",
+              "reason": null
+            }
+          ]
+        },
+        {
+          "what": "cancel arm",
+          "run_id": "run-lifecycle-cancel-pi",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68331
+          ],
+          "caveat": "NO_PROCESS_WAS_OBSERVED_BEFORE_THE_KILL: the survivor count covers only the processes already seen",
+          "independent_later_reading": {
+            "when": "2000 ms after the arm settled",
+            "pid": 68331,
+            "alive": false,
+            "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+            "note": "the pid was no longer resolvable at the moment of this read",
+            "why": "a killed child that has not been reaped is still in the process table, so a survivor count taken at the instant of the kill can name a process that is already gone; this later reading is the independent one"
+          },
+          "readings": {
+            "observer_verdict": "SURVIVORS_REMAINING",
+            "observer_survivors": 1,
+            "observer_remaining_process_ids": [
+              68331
+            ],
+            "parent_pid": 68331,
+            "parent_alive": false,
+            "parent_method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+            "agree": false,
+            "independent_reading_contradicts_the_observer": true,
+            "root_cause_of_the_staleness": "the shipped observer memoises its /proc snapshot for SNAPSHOT_TTL_MS (src/lib/identity/process-observer.mjs:191), so a survivor count taken inside that window of a reap can name a pid that is already gone. Measured on this host with no model involved: after the child's exit event had fired in the parent, listExisting still reported the pid alive and 1.5 s later reported it gone, while process.kill(pid, 0) answered ESRCH throughout."
+          }
+        },
+        {
+          "what": "timeout arm",
+          "run_id": "run-lifecycle-timeout-pi",
+          "terminal": "RECONCILIATION_REQUIRED",
+          "cancel_proof": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+          "termination_published": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+          "readings": {
+            "observer_verdict": "SURVIVORS_REMAINING",
+            "observer_survivors": 1,
+            "observer_remaining_process_ids": [
+              68478
+            ],
+            "parent_pid": 68478,
+            "parent_alive": false,
+            "parent_method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+            "agree": false,
+            "independent_reading_contradicts_the_observer": true,
+            "root_cause_of_the_staleness": "the shipped observer memoises its /proc snapshot for SNAPSHOT_TTL_MS (src/lib/identity/process-observer.mjs:191), so a survivor count taken inside that window of a reap can name a pid that is already gone. Measured on this host with no model involved: after the child's exit event had fired in the parent, listExisting still reported the pid alive and 1.5 s later reported it gone, while process.kill(pid, 0) answered ESRCH throughout."
+          }
+        },
+        {
+          "what": "sigkill arm",
+          "run_id": "run-lifecycle-sigkill-pi",
+          "terminal": "RECONCILIATION_REQUIRED",
+          "note": null,
+          "readings": {
+            "observer_verdict": null,
+            "observer_survivors": null,
+            "observer_remaining_process_ids": null,
+            "parent_pid": 68799,
+            "parent_alive": false,
+            "parent_method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+            "agree": null,
+            "independent_reading_contradicts_the_observer": null,
+            "root_cause_of_the_staleness": "the shipped observer memoises its /proc snapshot for SNAPSHOT_TTL_MS (src/lib/identity/process-observer.mjs:191), so a survivor count taken inside that window of a reap can name a pid that is already gone. Measured on this host with no model involved: after the child's exit event had fired in the parent, listExisting still reported the pid alive and 1.5 s later reported it gone, while process.kill(pid, 0) answered ESRCH throughout."
+          }
+        },
+        {
+          "what": "the two readings of every killed pid, side by side",
+          "note": "the transport waits for the child exit before it accounts, so the observer answer is not a reaping race in the parent. What it can still be is the observer's own memoised /proc snapshot. Where the two disagree the observer answer is KEPT as the proof and the parent-side reading is published beside it; the clause is NOT_RUN with the observer's exact reason and is never rounded up.",
+          "arms_with_contradicting_independent_reading": [
+            "cancel",
+            "timeout"
+          ],
+          "contradiction_is_a_root_cause_in_a_frozen_module": "src/lib/identity/process-observer.mjs:191 (SNAPSHOT_TTL_MS = 20, #procTable). Fixing it is the S2-002 identity owner's change, not this ticket's: a survivor count taken inside that window of a reap names a pid that is already gone."
+        },
+        {
+          "what": "sandbox profile in force",
+          "profile_id": "sbx-host-unisolated-v1",
+          "tier": "HOST_UNISOLATED",
+          "isolation_observed": false,
+          "os_controls_absence_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+          "evidence_file": "evidence/s2-007r-host-unisolated.json"
+        }
+      ],
+      "clauses_observed": [
+        "group signalling really happened on every arm, and the transport refused to claim a clean stop it could not prove",
+        "an independent parent-side reading 2000 ms after the arm settled found the killed pids no longer resolvable, so nothing leaked out of the group; both readings are published and the observer's answer was not overwritten",
+        "the external SIGKILL arm reached RECONCILIATION_REQUIRED without any call into the boundary",
+        "every late-write probe after every arm was refused: a checkpoint with a stale expected_sequence, and a second cancel. Zero accepted late writes."
+      ],
+      "clauses_not_run": [
+        "the cancel arm's TERMINATED proof: SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "the timeout arm's TERMINATED proof: SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "the audit/outbox row-count comparison for the cancellation path",
+        "OS ISOLATION, permanently, on this host: createSandbox().executionAllowed is false for every executable tier, and the run's profile is the HOST_UNISOLATED floor with isolation_observed false. This clause is NOT_RUN whatever any run shows."
+      ],
+      "reason": "the process-group, fencing and reconciliation clauses were exercised against real children and behaved correctly. 2 of 3 termination arms are NOT_RUN with the exact reasons quoted above — a proof of SURVIVORS_REMAINING is never reported as a pass, and where an independent parent-side reading contradicts it both are published and neither is overwritten — and the isolation clause is NOT_RUN by construction on this host. The case is therefore PARTIAL and not PASS."
+    },
+    "A-MVP-05": {
+      "id": "A-MVP-05",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "NOT_RUN",
+      "assertion": "PASS requires an authenticated non-producer human to move a task IN_REVIEW -> DONE, with the decision bound to the artifact hash. Measured: no such principal exists in this run, and no DONE edge was attempted.",
+      "artefact": [
+        {
+          "what": "the principals this run defined",
+          "note": "no principal holds board.review.approve; the run set records the DONE edge as unreachable by construction"
+        },
+        {
+          "what": "the task states reached",
+          "final_states": []
+        }
+      ],
+      "clauses_observed": [],
+      "clauses_not_run": [
+        "IN_REVIEW",
+        "an authenticated human decision",
+        "the DONE edge",
+        "a journal replay of a DONE transition"
+      ],
+      "reason": "this run has no authenticated human reviewer. A script that played the approver would be exactly the false PASS this ticket forbids, so the case is NOT_RUN rather than executed with a fixture approver. The approval is issue #12's work.",
+      "fixed": true
+    },
+    "A-MVP-06": {
+      "id": "A-MVP-06",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "NOT_RUN",
+      "assertion": "PASS requires two distinct OS pids racing for one lease on the real store, exactly one winner and one typed non-retryable refusal, and from SQL active_lease_rows=1, claimed_transition_rows=1, attempts=1, duplicateActiveLeases=0. Measured: no lease was ever created, so there was nothing to race for.",
+      "artefact": [
+        {
+          "what": "SQL read after all four cells",
+          "source": "evidence/s2-007r-pilot.json#store.sql_read",
+          "detail": "read after all four cells and before container removal: 4 schemas, 55 tables each, tasks 2, runs 0, agentboard_execution_event 0 per schema",
+          "verified_by": "the run step, against a real PostgreSQL 17.11 with 9 migrations applied"
+        },
+        {
+          "what": "the refusals that preceded the race",
+          "codes": [
+            "BLOCKED_SANDBOX"
+          ]
+        }
+      ],
+      "clauses_observed": [
+        "the real store was real: PostgreSQL 17.11 in a digest-pinned rootless-podman container, 9 migrations applied, read after the run and then removed"
+      ],
+      "clauses_not_run": [
+        "two racing child processes",
+        "a lease",
+        "the atomicity observation"
+      ],
+      "reason": "the race needs tasks.claim, and the per-edge sandbox gate refuses tasks.claim with BLOCKED_SANDBOX before a fence can exist. No race was fabricated: a race invented between two refusals would prove nothing about the board's fencing."
+    },
+    "A-MVP-07": {
+      "id": "A-MVP-07",
+      "pilot_expected": "PASS",
+      "pilot_execution_in_the_frozen_file": "NOT_RUN",
+      "pilot_file": "pilots/scenario-a/acceptance-cases.json",
+      "pilot_file_sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "pass_requires": "a REAL run. A case observed on the test transport, on a replay transport, on a probe or on a registration is NOT_RUN, whatever the record would like to call it.",
+      "observed": "NOT_RUN",
+      "assertion": "PASS requires the transport's own file-based crossing counter to show exactly one crossing per (task, stage) before and after a SIGKILL + restart, one committed ledger row per key, duplicateExternalEffects=0 and a recovery that issued 0 effects. Measured: there is no governed crossing to interrupt, so nothing was counted before or after.",
+      "artefact": [
+        {
+          "what": "the only real crossings in this run set",
+          "crossings": [
+            {
+              "run_id": "run-bootstrap-pi-pia",
+              "provider": "pi",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-codex-pia",
+              "provider": "codex",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-pi-pb1",
+              "provider": "pi",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-codex-pb1",
+              "provider": "codex",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-pi-pb2",
+              "provider": "pi",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-codex-pb2",
+              "provider": "codex",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-pi-pa2",
+              "provider": "pi",
+              "governed": false,
+              "is_a_run": false
+            },
+            {
+              "run_id": "run-bootstrap-codex-pa2",
+              "provider": "codex",
+              "governed": false,
+              "is_a_run": false
+            }
+          ]
+        },
+        {
+          "what": "the lifecycle SIGKILL arm, which is a different case",
+          "run_id": "run-lifecycle-sigkill-pi",
+          "note": "it exercised the reconciliation path of a transport-level crossing, not a board-governed outbox row, and it is reported under A-MVP-04"
+        }
+      ],
+      "clauses_observed": [],
+      "clauses_not_run": [
+        "a SIGKILL between an outbox SEND intent and its ACK",
+        "outbox.recover from a new process",
+        "the crossing counter before and after",
+        "the blind retry"
+      ],
+      "reason": "the interruption this case measures needs a governed crossing in flight. There is none: every attempt was refused at the claim edge, so there was no SEND to interrupt and no recovery to reconcile. Nothing was simulated to fill the gap."
+    }
+  },
+  "summary": {
+    "pass": [],
+    "partial": [
+      "A-MVP-04"
+    ],
+    "not_run": [
+      "A-MVP-01",
+      "A-MVP-02",
+      "A-MVP-03",
+      "A-MVP-05",
+      "A-MVP-06",
+      "A-MVP-07"
+    ],
+    "pass_count": 0,
+    "note": "zero PASS written. A-MVP-05 is NOT_RUN by construction (no authenticated human reviewer). A-MVP-02 carries a condition that is false at this HEAD because of the owner's D3 decision."
+  },
+  "status_table": {
+    "engineeringStatus": "PARTIAL",
+    "engineeringStatus_semantics": "the engineering contour exists, is gated and reports honestly; the run half of the pilot could not start, and the reason is one function in a frozen file. This value is the ticket's own statement; scripts/verify-s2-007r.mjs derives its own verdict independently and its exit code is reported beside this table.",
+    "realAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+    "realAdapterStatus_semantics": "no run in this run set carries a corroborated executor crossing. The two registrations are REAL_ADAPTER_AVAILABLE, and the two adapters really spawned, but both crossings are recorded as governed:false, is_a_run:false, board_commands_called:0: they corroborate a REGISTRATION and are not a run. A probe, a registration, a fixture, a stub or a replay never lifts this status.",
+    "assuranceStatus": "NOT_MEASURED",
+    "assuranceStatus_semantics": "there is no independent human review and no empirical semantic-accuracy measurement in this run.",
+    "aMvpStatus": "NOT_CLAIMED",
+    "aMvpStatus_semantics": "no named operator accepted a bounded pilot after review. The permit that admitted the HOST_UNISOLATED floor is neither a review nor an acceptance, and the budget grant approves no acceptance criterion.",
+    "per_case": {
+      "A-MVP-01": {
+        "expected": "PASS",
+        "observed": "NOT_RUN"
+      },
+      "A-MVP-02": {
+        "expected": "PASS",
+        "observed": "NOT_RUN"
+      },
+      "A-MVP-03": {
+        "expected": "PASS",
+        "observed": "NOT_RUN"
+      },
+      "A-MVP-04": {
+        "expected": "PASS",
+        "observed": "PARTIAL"
+      },
+      "A-MVP-05": {
+        "expected": "PASS",
+        "observed": "NOT_RUN"
+      },
+      "A-MVP-06": {
+        "expected": "PASS",
+        "observed": "NOT_RUN"
+      },
+      "A-MVP-07": {
+        "expected": "PASS",
+        "observed": "NOT_RUN"
+      }
+    },
+    "run_set": {
+      "run_set_id": "rs-s2007r-pilot-c55c3ecbfca6439e",
+      "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+      "budget_grant_id": "grt-s2007r-pilot"
+    },
+    "campaign_spend_usd": 0,
+    "not_inferred": [
+      "real_adapter_execution",
+      "human_review",
+      "empirical_semantic_accuracy",
+      "A_MVP_PASS",
+      "production_readiness",
+      "os_isolation",
+      "cross_executor_comparability"
+    ]
+  },
+  "budget": {
+    "grant_id": "grt-s2007r-pilot",
+    "currency": "USD",
+    "task_limit": 0.5,
+    "campaign_limit": 2,
+    "day_limit": 2,
+    "timeout_ms": 600000,
+    "authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+    "approval_owner": "issue #12 (S2-012)",
+    "campaign_spend_usd": 0,
+    "cap_usd": 2,
+    "stop_at_usd": 1.6,
+    "campaign_cap_never_exceeded": true,
+    "spend_outside_the_board_usd": 0.00009786,
+    "spend_outside_the_board_note": "one direct pi preflight call, before any grant was drawn on. codex reported no monetary cost and none was estimated."
+  },
+  "sandbox": {
+    "profile_id": "sbx-host-unisolated-v1",
+    "tier": "HOST_UNISOLATED",
+    "isolation_observed": false,
+    "os_controls_absence_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+    "evidence_file": "evidence/s2-007r-host-unisolated.json",
+    "note": "every run in this run set is bound to the HOST_UNISOLATED floor (sbx-host-unisolated-v1) and the record says isolation_observed:false. No record written by this ticket BINDS a run to a proven profile, and no record written by this ticket NAMES a proven profile id at all: the registry's proven list is quoted only inside `capabilities.sandboxProfileIds`, which is a statement about which profiles have measured OS controls on this host, never a profile a run was authorised under. The floor tier is deliberately outside that list, so assertSandboxExecutable(sbx-host-unisolated-v1) still answers BLOCKED_SANDBOX on its own."
+  },
+  "authority_probe": {
+    "measurement_7": {
+      "planted": 2,
+      "refused": 2,
+      "granted": 0,
+      "is_a_run": false,
+      "workspace_root": "/tmp/veritas-s2-007r-ws/measurement-plant"
+    },
+    "note": "the plant behind measurement 7 was executed by the measurement step; it is a boundary observation, not a run."
+  },
+  "hard_gate_counters": {
+    "crossWorkspaceLeaks": 0,
+    "authorityExpansions": 0,
+    "duplicateActiveLeases": 0,
+    "duplicateExternalEffects": 0,
+    "staleFenceMutations": 0,
+    "missingJournalOrOutbox": 0,
+    "falseApprovals": 0
+  },
+  "hard_gate_counters_note": "READ from evidence/s2-007r-security-probes.json, the probe gate's own accounting, not asserted here. This record is not a second authority on the counters: they are repeated only so this record cannot be read as a silent second accounting. As of this write they are NOT all zero: every one of the seven is 0. Issue #45's own stop rule says a non-zero HARD_GATE_COUNTERS value is a stop and is reported, never fixed by editing the probe, so this record reports it and neither mints nor repairs a counter. The counter is the probe gate's to explain; this record's own statuses are unaffected by it, because no status here is derived from a counter.",
+  "evidence_sources": [
+    {
+      "path": "results/s2-007r/cell-pia/run-record.json",
+      "what": "the cell-pia driver invocation record (A)",
+      "sha256": "26cd444e8766e5d29985eb9a436f5c45dc32e059c55b6c25a3e06393c4ad0735",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pb1/run-record.json",
+      "what": "the cell-pb1 driver invocation record (B)",
+      "sha256": "627dfef951dddf303d38f4e49e8fdcaf058939df91f106deca00b26d91a51925",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pb2/run-record.json",
+      "what": "the cell-pb2 driver invocation record (B)",
+      "sha256": "9b58c403412adf952feb94dd565373f9fbd92becf3d0c7d1382858ad365e1d59",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pa2/run-record.json",
+      "what": "the cell-pa2 driver invocation record (A)",
+      "sha256": "163ccb380a0674ae0baf167fda54dc2369c3534810ed590bcaaa86d81d94424f",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pia/run-01.json",
+      "what": "one attempted governed run of cell-pia",
+      "sha256": "83420f22d4577f555102dcc28dfed586c0efb74b0ca19a9e359117ebd637ba88",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pia/run-02.json",
+      "what": "one attempted governed run of cell-pia",
+      "sha256": "74c943f14366d6c07bbd99465b2f41f2873dbb98e76cc174577ebb5920347538",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pb1/run-01.json",
+      "what": "one attempted governed run of cell-pb1",
+      "sha256": "d53dede1614106f8fa1405d61f25d3cd1f9e8b10fff6885bccde269198cced59",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pb1/run-02.json",
+      "what": "one attempted governed run of cell-pb1",
+      "sha256": "a6e5ba91d6f1b9de83578fe3dc7f55ae9baf8a94a85fc48482845ef4f1ca8eec",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pb2/run-01.json",
+      "what": "one attempted governed run of cell-pb2",
+      "sha256": "24f5195fc32d089bd49820a12001107b4a8969bb2dd9d430cc9c836f9fd265b1",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pb2/run-02.json",
+      "what": "one attempted governed run of cell-pb2",
+      "sha256": "f4b1ff9756bb6201e9d965b1bca0aafe59e3be32109b00173175202d21d7a780",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pa2/run-01.json",
+      "what": "one attempted governed run of cell-pa2",
+      "sha256": "3e8c353d5425e2c0a5d6c0adceb7ca1120c3ccd719b52b350f41d92ba2d6dd0e",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/cell-pa2/run-02.json",
+      "what": "one attempted governed run of cell-pa2",
+      "sha256": "e21f75a5eccd61e854fe86a1a499ef67da4e05fb6dfcf93bf908330958a3c8fb",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/lifecycle-record.json",
+      "what": "the lifecycle record the A-MVP-04 clauses are read from",
+      "sha256": "d7f1dddef60da86bd45620feb019375d3533b863599aab7bd522d4f476da2bf3",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/campaign-ledger.json",
+      "what": "the campaign ledger the budget row is read from",
+      "sha256": "e59968e334f560a2decef13ffed4b9dde227a31c05c4a054eca1e6dfce14bca4",
+      "present_on_disk": true
+    },
+    {
+      "path": "pilots/scenario-a/acceptance-cases.json",
+      "what": "the frozen pilot file quoted verbatim above",
+      "sha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+      "present_on_disk": true
+    },
+    {
+      "path": "evidence/s2-007r-host-unisolated.json",
+      "what": "the measured ABSENCE of OS controls the sandbox profile is digest-bound to",
+      "sha256": "5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+      "present_on_disk": true
+    },
+    {
+      "path": "evidence/s2-007r-security-probes.json",
+      "what": "the probe gate's own accounting of the same authority refusals",
+      "sha256": "78c4a6bdb955503080005b5762273bcf60d0ea2be386fc1415f190e93434f3dd",
+      "present_on_disk": true
+    },
+    {
+      "path": "results/s2-007r/measurement-plant/SKILL.md",
+      "what": "the published plant behind measurement 7",
+      "sha256": "3167e923e25dea8d57f94bfeed3ef0d5c7fb67ea9077dbc6909e0e6dd2cf0543",
+      "present_on_disk": true
+    },
+    {
+      "path": "docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md",
+      "what": "the owner's D3 decision that made the A-MVP-02 core condition false at this HEAD",
+      "sha256": "f596f9f939e3aba001d62c11eadade43f8d01dccf92469ad2cbb6fd7a2f763ec",
+      "present_on_disk": true
+    }
+  ],
+  "limitations": [
+    "This record writes no PASS. Zero governed runs completed, so no A-MVP case has the real-run evidence its own oracle requires.",
+    "A-MVP-04 is PARTIAL, not PASS: the cancel proof is SURVIVORS_REMAINING, the timeout arm published no termination proof, and the isolation clause is NOT_RUN on this host by construction.",
+    "A-MVP-02 carries a condition that is false at this HEAD (the owner's D3 decision edited contracts/, src/lib/agentboard/ and src/lib/identity/), so the case could not be PASS on this ticket's own terms.",
+    "The per-case file is read by the gate only when it is bound to the current commit AND to a corroborated real-adapter run. With no corroborated run, the gate forces every case to NOT_RUN whatever this file claims: that is the fail-closed direction, and it is why the values here agree with what the gate will print."
+  ],
+  "record_digest_method": "sha256: + canonical-json-v1 over this record with record_digest removed",
+  "record_digest": "sha256:93af6508c7a9703db93b76aed4077f0ce8064891fd9ad02581700114c0e7196b"
+}
