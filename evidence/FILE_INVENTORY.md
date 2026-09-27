@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 773.
+Generated from `git ls-files`; count: 774.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -491,6 +491,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `migrations/0006_verifier_acl.sql`
 - `migrations/0007_verifier_store_hardening.sql`
 - `migrations/0008_agent_board.sql`
+- `migrations/0009_agent_board_hardening.sql`
 - `next.config.ts`
 - `package-lock.json`
 - `package.json`
