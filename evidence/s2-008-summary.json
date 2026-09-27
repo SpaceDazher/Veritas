@@ -6,8 +6,8 @@
   "ok": true,
   "exitCode": 0,
   "base": {
-    "commit_sha": "23df9053915ac42e21b70cd5988a88288b81241c",
-    "tree_sha": "2a0beb50b7849ec4600736e063143d3cbc26301c",
+    "commit_sha": "27c92d9870e488395068aac6e7c73764a7ea500b",
+    "tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 57,
@@ -15,7 +15,7 @@
     "track_tracked": true
   },
   "invocation": {
-    "id": "f19e074ca99cddac44e8ef8ff37b9bd0",
+    "id": "05d210304ac7010bfb0984eda1cb9628",
     "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
     "passed_to": [
       "scripts/s2-008-replay.mjs",
@@ -33,22 +33,7 @@
   "boundaries": [
     "BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it; the WORKING-TREE surface is what the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) covers, and this aggregator judges the child records from the bytes on disk at judging time"
   ],
-  "provability_exempt": [
-    {
-      "paths": [
-        "evidence/s2-008-comparison.json",
-        "evidence/s2-008-controls.json",
-        "evidence/s2-008-dependency-binding.json",
-        "evidence/s2-008-harness.json",
-        "evidence/s2-008-probes.json",
-        "evidence/s2-008-replay.json",
-        "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json",
-        "evidence/s2-008-summary.json"
-      ],
-      "reason": "these are the records this chain's own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)"
-    }
-  ],
+  "provability_exempt": [],
   "gates": {
     "dependency": {
       "status": "PASS",
@@ -125,17 +110,7 @@
       "track_files_expected_count": 57,
       "track_files_unaccounted": [],
       "track_files_untracked": [],
-      "track_files_modified": [
-        "evidence/s2-008-comparison.json",
-        "evidence/s2-008-controls.json",
-        "evidence/s2-008-dependency-binding.json",
-        "evidence/s2-008-harness.json",
-        "evidence/s2-008-probes.json",
-        "evidence/s2-008-replay.json",
-        "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json",
-        "evidence/s2-008-summary.json"
-      ]
+      "track_files_modified": []
     },
     "corpus": {
       "status": "PASS",
@@ -344,8 +319,8 @@
       "reason": null,
       "source": "scripts/s2-008-replay.mjs",
       "overall": "PASS",
-      "invocation_id": "f19e074ca99cddac44e8ef8ff37b9bd0",
-      "head_tree_sha": "2a0beb50b7849ec4600736e063143d3cbc26301c",
+      "invocation_id": "05d210304ac7010bfb0984eda1cb9628",
+      "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
       "campaign_verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
       "observed_campaign_decision": "UNRESOLVED",
@@ -354,25 +329,25 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-27T23:25:10.334Z",
-        "finished_at": "2026-09-27T23:25:13.245Z",
+        "observed_at": "2026-09-27T23:28:17.934Z",
+        "finished_at": "2026-09-27T23:28:26.155Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
-        "age_ms": 10
+        "age_ms": 17
       }
     },
     "harness": {
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-27T23:25:13.959Z",
-      "evidence_sha256": "7d4c11533e4b2837b437485c74833ad6a51caac4a224e1a7c2d9cdf4a2332f67",
+      "observed_at": "2026-09-27T23:28:27.328Z",
+      "evidence_sha256": "ced4f185de7bd5badfa270d846abd6f16f946c4f7867518a94888ec52c80f26c",
       "evidence_bytes": 71951,
       "record_is_this_run": true,
       "invocation_id_required": true,
-      "invocation_id": "f19e074ca99cddac44e8ef8ff37b9bd0",
-      "head_tree_sha": "2a0beb50b7849ec4600736e063143d3cbc26301c",
+      "invocation_id": "05d210304ac7010bfb0984eda1cb9628",
+      "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
       "head_tree_sha_matches": true,
       "exit_code_recorded": null,
       "overall": "PASS",
@@ -399,13 +374,13 @@
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-27T23:25:13.962Z",
-    "started_at": "2026-09-27T23:25:01.895Z",
-    "replay_judged_at": "2026-09-27T23:25:13.255Z",
-    "harness_judged_at": "2026-09-27T23:25:13.959Z",
+    "observed_at": "2026-09-27T23:28:27.331Z",
+    "started_at": "2026-09-27T23:28:03.641Z",
+    "replay_judged_at": "2026-09-27T23:28:26.172Z",
+    "harness_judged_at": "2026-09-27T23:28:27.328Z",
     "window_ms": 21600000,
-    "head_tree_sha": "2a0beb50b7849ec4600736e063143d3cbc26301c",
-    "replay_finished_at": "2026-09-27T23:25:13.245Z"
+    "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
+    "replay_finished_at": "2026-09-27T23:28:26.155Z"
   },
   "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
@@ -432,6 +407,6 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-27T23:25:13.962Z",
-  "startedAtIso": "2026-09-27T23:25:01.895Z"
+  "observedAtIso": "2026-09-27T23:28:27.331Z",
+  "startedAtIso": "2026-09-27T23:28:03.641Z"
 }
