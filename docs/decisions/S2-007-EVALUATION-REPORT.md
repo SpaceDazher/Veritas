@@ -798,9 +798,16 @@ reader does not "fix" a decision.
   scored as a control violation — an accounting defect, and a documented
   `NOT_RUN` property, not an observed escape (see the Verdict and
   [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md)). That
-  host-side `NOT_RUN` is the reason the dependency gate is red on Linux; the owner
-  decided not to weaken it, and the Windows acceptance cleared the ticket on the
-  platform where the control can actually run.
+  host-side `NOT_RUN` used to be the reason the dependency gate was red on
+  Linux. **That is no longer true.** PR #42 made the cancellation control
+  exercisable on every platform, so after merging `main` this branch runs
+  `verify:s2-002` to exit 0 on Linux with the control PROVED there and not
+  skipped: `sandbox/cancellation-survivors` reports `SURVIVORS_ZERO` with
+  `terminationProof` and `outcomeProof` both `TERMINATED`, and
+  `not_run_controls` is 0. The honest-reporting accounting this branch added
+  is what makes the two outcomes distinguishable in the record at all — it is
+  why "declined" can be read apart from "proved" instead of inferred from a
+  zero. See [S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md).
 * No production deployment, no spending authorization, no credential
   acquisition and no external action is implied or performed.
 * Empirical semantic accuracy is not measured and is not inferred from any

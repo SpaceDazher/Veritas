@@ -186,9 +186,13 @@ gate green. S2-007 remains `engineeringStatus = BLOCKED_DEPENDENCY`, which is th
 fail-closed outcome, not a defect to be worked around.
 
 Defects 1, 2 and 4 — the harness accounting defects — are now **fixed**; see §8. The
-sandbox defect (Defect 3) is fixed in `src/lib/identity/sandbox.mjs` and tracked as
-[#41](https://github.com/SpaceDazher/Veritas/issues/41). **The gate is still red on Linux,
-by design.**
+sandbox defect (Defect 3) was fixed in `src/lib/identity/sandbox.mjs` under
+[#41](https://github.com/SpaceDazher/Veritas/issues/41), and
+[PR #42](https://github.com/SpaceDazher/Veritas/pull/42) has since landed on `main`.
+**The gate was red on Linux by design, and is now green there because the control
+is exercisable on every platform** — see the closing note at the end of this
+document. The parts of this analysis that remain current are the accounting
+rules in §8 and the parent-based enumeration limit below.
 
 ## 7. How to reproduce
 
@@ -269,9 +273,34 @@ Windows walks the CIM parent/child graph and POSIX walks `/proc` ppid, and neith
 a process that re-parented out of the tree. Closing it needs a mechanism that is not
 parent-based — a cgroup, a pid namespace, or Windows job objects — not a better walk.
 
+## Closing note, after PR #42 merged
+
 The conclusion this document reached is the one
-[PR #42](https://github.com/SpaceDazher/Veritas/pull/42) is built on, and it is #42 that
-implements it. [#41](https://github.com/SpaceDazher/Veritas/issues/41) therefore remains
+[PR #42](https://github.com/SpaceDazher/Veritas/pull/42) was built on, and #42
+has since landed on `main`. Two of the statements above are therefore now
+history rather than current state, and both are corrected here rather than left
+to be contradicted by the next reader:
+
+* **The Linux gate is no longer red.** With a process observer that works on
+  every platform, the cancellation control is no longer Windows-only, so on
+  Linux it is *proved* rather than skipped: `SURVIVORS_ZERO` with
+  `terminationProof`/`outcomeProof` = `TERMINATED`, `not_run_controls` 0, and
+  `verify:s2-002` exits 0. What this document argued for — that a declined
+  measurement must be reported as declined and not as a zero — is still true
+  and still implemented; it simply no longer has to carry the Linux verdict on
+  its own, because there is nothing left to decline.
+* **`survivors_after_cancellation` is no longer `null` when unmeasured.** The
+  proof-aware counter #42 introduced counts an unproven outcome as at least one
+  survivor rather than as an unmeasured `null`. It fails closed just as
+  hard, and it keeps the counter a number, which is what the gate's
+  `Number.isInteger` check expects.
+
+The accounting this ticket contributed survives the merge: a control a platform
+genuinely cannot exercise is still recorded as `notRun: true` with `match: null`
+and reason `SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM`, and an unexercised hard
+control still **blocks** `verify:s2-002` rather than passing it. That is the
+part of the work #42 does not replace, and it is the reason the difference
+between "declined" and "proved" is legible in a record instead of a guess. [#41](https://github.com/SpaceDazher/Veritas/issues/41) therefore remains
 open on `main` after this ticket merges, correctly: nothing here claims otherwise, and
 nothing in this ticket's diff touches the cancellation mechanism. What stays here is the
 accounting half — a control this platform cannot exercise is *reported* as not run, and an
