@@ -1,4 +1,17 @@
-## Verdict: COMPLETE_WITH_LIMITS (engineering boundary only) — issue #7 NOT closed
+## Verdict: COMPLETE_WITH_LIMITS (engineering boundary only)
+
+> **Status update, after this report was written.** Issue #7 has since been closed by the
+> owner's decision, after the unperformed part of its original scope was carried into
+> [#45](https://github.com/SpaceDazher/Veritas/issues/45) (two real adapters, the configuration
+> comparison, the seven measurements, A-MVP-01..07). The SolutionPack closure and human
+> approval remain with [#12](https://github.com/SpaceDazher/Veritas/issues/12).
+>
+> The verdict below is unchanged and so is every fact under it: the engineering boundary is
+> `COMPLETE_WITH_LIMITS`, `realAdapterStatus` is `NOT_RUN_REAL_ADAPTER`, `assuranceStatus` is
+> `NOT_MEASURED` and A-MVP-01..07 are `NOT_RUN`. **Closing the ticket changed none of those.**
+> What it records is that the remaining work is tracked, not discarded — which is what the
+> ticket's own wording required before `COMPLETE_WITH_LIMITS` could be called anything but
+> the engineering half.
 
 `engineeringStatus = COMPLETE_WITH_LIMITS`, `assuranceStatus = NOT_MEASURED`,
 `realAdapterStatus = NOT_RUN_REAL_ADAPTER`, `A-MVP-01..07 = NOT_RUN`.
@@ -192,7 +205,7 @@ realAdapterStatus = NOT_RUN_REAL_ADAPTER
 aMvpStatus        = NOT_RUN (7/7 cases)
 verdictReasons    = ["verify:s2-007 -> COMPLETE_WITH_LIMITS, 4/4 mandatory gates",
                      "verify:clean-checkout -> exit 0, 44/44 commands PASS",
-                     "issue #7 itself NOT closed: real adapters and A-MVP-01..07 NOT_RUN",
+                     "issue #7 has been closed by the owner with the remainder tracked in #45; the facts below are unchanged: real adapters and A-MVP-01..07 are still NOT_RUN",
                      "accepting commit c922c09 is not yet in origin"]
 verdictPrecedence = REVISE (critical defect) > BLOCKED_DEPENDENCY > NOT_RUN
                     > PASS_WITH_LIMITS > COMPLETE_WITH_LIMITS
