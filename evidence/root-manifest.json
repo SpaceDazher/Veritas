@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "0c314e11ba6edd0a846086a50c74e485fa796d2f",
-  "sourceTree": "72d3770d7d8bd080d0611455f11543d0400ecc8e",
-  "trackedFileCount": 912,
-  "manifestFileCount": 907,
-  "payloadManifestSha256": "2b68310faed3d3468b600b4a6bdee83dc226ea3813279a0264b8690cc6660912",
-  "fileManifestSha256": "ca52783966052fe5ed46c016d9e03607b3cd2992f56e3b1444ddc1103a8787a9",
+  "sourceCommit": "593d59731bb9d24560c7ab1116c774c18c7ab136",
+  "sourceTree": "cba8860cfbd6d6c0b0db2d0633861c9e6df5401a",
+  "trackedFileCount": 913,
+  "manifestFileCount": 908,
+  "payloadManifestSha256": "2a80ffbc2ab94d94abcb3683e36e5dba4d16f10b0382cae7768b49a2e0b388e8",
+  "fileManifestSha256": "61953946c8110e687a640f9d53148e3f0d1667f1cce8b841cb828044ce0a7cd5",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1852,6 +1852,11 @@
       "bytes": 6900
     },
     {
+      "path": "docs/decisions/2026-09-27-s2-007r-partial-disposition.md",
+      "sha256": "25eef3bfa7870031a02e56c940d260ad4b9ec2c065dfedb993cb5eeb7d526117",
+      "bytes": 6650
+    },
+    {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
       "sha256": "fd48bbfc30673e51c880f8f105ad9300a39be9e94d9244237af771f506452b34",
       "bytes": 3980
@@ -2023,8 +2028,8 @@
     },
     {
       "path": "docs/stages/S2-007R.md",
-      "sha256": "ecefd1c69dfe9def527793e47697d7498ef6210b00a6b97ecdbc318474920c0c",
-      "bytes": 54440
+      "sha256": "cbb0490c4df4814de124567b5a71fb8fa8cab50368299901ae8ae36dc88e9b61",
+      "bytes": 56684
     },
     {
       "path": "docs/stages/stage-1.md",
@@ -2103,8 +2108,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "53387b9caed266b20488c3aaa2bf76fedbeeffc4a2cfac94631c45eb794bf785",
-      "bytes": 40790
+      "sha256": "f4eb31cc7bc57f92d9c9a9bcbc6033bc6b961ca6682f96a48a1ad856ca984f46",
+      "bytes": 40851
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -2438,12 +2443,12 @@
     },
     {
       "path": "evidence/s2-007r-amvp-cases.json",
-      "sha256": "c527cd59e66f0c6e942b9719f7e330d157402158e3d92f1ee4c4ed40a9fbc3f4",
-      "bytes": 71517
+      "sha256": "d84fbf1fb52a9aa53ad6ad4ba0adbcf63dc464e2b805f099cea80ed77d87ed22",
+      "bytes": 71709
     },
     {
       "path": "evidence/s2-007r-comparison.json",
-      "sha256": "e70f241370c70964cdd142478b54c9f6bc11af012362d2f9861c0ec801417ff2",
+      "sha256": "e88d6ac66cb232bb126a3515a610a0dae20fe35ea8ff1a55efb41526eca243e2",
       "bytes": 168561
     },
     {
@@ -3393,8 +3398,8 @@
     },
     {
       "path": "scripts/s2-007r-measurement-set.mjs",
-      "sha256": "fa9d3e8686893e5222d6060db30062f3e6e349c241160bfacf3e7b28f0a7caa6",
-      "bytes": 110009
+      "sha256": "a542adbfda0631d179176af68c51fded9e0110dc4afa5060590c3a32045de7f3",
+      "bytes": 110701
     },
     {
       "path": "scripts/s2-007r-probes.mjs",
