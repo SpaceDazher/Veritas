@@ -158,8 +158,20 @@ test('the campaign verdict is reported as it came out, and `overall` counts it (
   assert.ok(['PASS', 'PASS_WITH_LIMITS', 'FAIL'].includes(verdict), verdict);
   assert.equal(properties.length, 5);
   const held = properties.filter((property) => property.ok).map((property) => property.id);
-  assert.deepEqual(held, ['A1', 'A2', 'A3', 'A4'], 'the A-property set changed; re-read the report before trusting this test');
-  assert.equal(overall, 'FAIL', 'A5 cannot hold while the track is untracked, and the report must say so');
+  // The tripwire, re-pinned to the DELIVERED state. It read
+  // ['A1','A2','A3','A4'] while the track was untracked, and it went red the
+  // moment the track was committed (`a18a2e5`), because A5 then holds. The
+  // assertion was not weakened: the pin is still exact, and the two members
+  // below say WHY each half is what it is, so a regression in either direction
+  // is red again.
+  assert.deepEqual(held, ['A1', 'A2', 'A3', 'A4', 'A5'], 'the A-property set changed; re-read the report before trusting this test');
+  const a5 = properties.find((property) => property.id === 'A5');
+  assert.match(a5.evidence, /track_tracked=true/, `A5 is held for another reason than the committed track: ${a5.evidence}`);
+  // `overall` is FAIL while all five properties hold, because the campaign
+  // verdict is delegated to `resolveCampaignVerdict` over the two runs against
+  // the frozen table, and A3's table findings make that verdict FAIL. The
+  // report must keep saying so rather than passing on held-count alone.
+  assert.equal(overall, 'FAIL', 'every property held but the campaign verdict did not decide it; the report must say so');
   // EV2 / S6: the campaign verdict is a TERM of `overall`. It used to be
   // computed, printed in the same RESULT line, and left out of the decision, so
   // the unmutated harness reported `properties_held=5/5 … verdict=FAIL
