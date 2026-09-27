@@ -6,21 +6,19 @@
   "ok": false,
   "exitCode": 1,
   "base": {
-    "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-    "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 0,
-    "track_tracked": false
+    "tracked_files_of_this_track": 51,
+    "track_tracked": true
   },
   "gates": {
     "dependency": {
-      "status": "BLOCKED_DEPENDENCY",
-      "exitCode": 1,
+      "status": "PASS",
+      "exitCode": 0,
       "source": "scripts/verify-s2-008-dependencies.mjs",
-      "issues": [
-        "index.mjs-absent-at-commit"
-      ],
+      "issues": [],
       "bindings": [
         "S2-002:BOUND",
         "S2-006:BOUND",
@@ -28,7 +26,7 @@
         "S1-004:BOUND",
         "S1-011:BOUND"
       ],
-      "track_files_tracked": 0
+      "track_files_tracked": 51
     },
     "probes": {
       "status": "PASS",
@@ -223,11 +221,11 @@
       "overall": "FAIL",
       "properties": [
         "A3:FAILED",
-        "A5:FAILED"
+        "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-27T11:07:56.187Z",
-        "finished_at": "2026-09-27T11:07:58.259Z",
+        "observed_at": "2026-09-27T11:10:20.731Z",
+        "finished_at": "2026-09-27T11:10:22.643Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true
@@ -244,32 +242,29 @@
         "A2:HELD",
         "A3:HELD",
         "A4:HELD",
-        "A5:FAILED"
+        "A5:HELD"
       ],
       "reason": null
     }
   },
   "defects": [
-    "dependency gate: BLOCKED_DEPENDENCY (index.mjs-absent-at-commit)",
     "replay gate: FAIL (the replay process exited 1 (FAIL))",
     "harness gate: FAIL (FAIL)"
   ],
   "notRun": [
     "NOT_RUN: the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
-    "NOT_RUN: the track's own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git",
     "NOT_RUN: the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
   ],
   "blockingGates": [
-    "dependency",
     "replay",
     "harness"
   ],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-27T11:07:51.356Z",
+    "observed_at": "2026-09-27T11:10:16.108Z",
     "window_ms": 21600000,
-    "head_tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-    "replay_finished_at": "2026-09-27T11:07:58.259Z"
+    "head_tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "replay_finished_at": "2026-09-27T11:10:22.643Z"
   },
   "track_status": "FAIL",
   "authoritative": {
@@ -291,7 +286,6 @@
     }
   },
   "ticket_preconditions_not_met": [
-    "the track's own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git",
     "the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
   ],
   "engineering_status": "BLOCKED_DEPENDENCY",
@@ -299,5 +293,5 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-27T11:07:51.356Z"
+  "observedAtIso": "2026-09-27T11:10:16.108Z"
 }

@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 788.
+Generated from `git ls-files`; count: 842.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -380,6 +380,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
 - `docs/decisions/S2-007-EVALUATION-REPORT.md`
+- `docs/decisions/S2-008-EVALUATION-REPORT.md`
 - `docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md`
 - `docs/DEVELOPMENT.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
@@ -395,6 +396,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/security/S2-002-SANDBOX-PROFILE.md`
 - `docs/security/S2-002-THREAT-MODEL.md`
 - `docs/stages/S2-007.md`
+- `docs/stages/S2-008.md`
 - `docs/stages/stage-1.md`
 - `eslint.config.mjs`
 - `evidence/clean-checkout.json`
@@ -482,6 +484,20 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007-run-b.json`
 - `evidence/s2-007-security-probes.json`
 - `evidence/s2-007-summary.json`
+- `evidence/s2-008-comparison.json`
+- `evidence/s2-008-controls.json`
+- `evidence/s2-008-dependency-binding.json`
+- `evidence/s2-008-harness.json`
+- `evidence/s2-008-probes.json`
+- `evidence/s2-008-replay.json`
+- `evidence/s2-008-run-a.json`
+- `evidence/s2-008-run-b.json`
+- `evidence/s2-008-security-probes.json`
+- `evidence/s2-008-summary.json`
+- `evidence/s2-008/corpus/cases/dev.json`
+- `evidence/s2-008/corpus/cases/holdout.json`
+- `evidence/s2-008/corpus/manifest.json`
+- `evidence/s2-008/corpus/preregistration.json`
 - `evidence/sloqual-001-comparison.json`
 - `evidence/sloqual-001-integrity.json`
 - `evidence/sloqual-001-run-a.json`
@@ -576,6 +592,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007-db-replay.mjs`
 - `scripts/s2-007-run.mjs`
 - `scripts/s2-007-security-probes.mjs`
+- `scripts/s2-008-build-corpus.mjs`
+- `scripts/s2-008-harness.mjs`
+- `scripts/s2-008-replay.mjs`
+- `scripts/s2-008-run.mjs`
+- `scripts/s2-008-security-probes.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/sloqual-freeze.mjs`
 - `scripts/sloqual-run.mjs`
@@ -601,6 +622,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-s2-006.mjs`
 - `scripts/verify-s2-007-dependencies.mjs`
 - `scripts/verify-s2-007.mjs`
+- `scripts/verify-s2-008-dependencies.mjs`
+- `scripts/verify-s2-008.mjs`
 - `scripts/verify-sloqual-001.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-board-cli.mjs`
@@ -665,6 +688,20 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
+- `src/lib/research/causality.mjs`
+- `src/lib/research/comparator.mjs`
+- `src/lib/research/constants.mjs`
+- `src/lib/research/contracts.mjs`
+- `src/lib/research/dataset.mjs`
+- `src/lib/research/executor.mjs`
+- `src/lib/research/expected-values.mjs`
+- `src/lib/research/index.mjs`
+- `src/lib/research/negative-controls.mjs`
+- `src/lib/research/policy.mjs`
+- `src/lib/research/preregistration.mjs`
+- `src/lib/research/probes.mjs`
+- `src/lib/research/registry.mjs`
+- `src/lib/research/runner.mjs`
 - `src/lib/sloqual/comparator.mjs`
 - `src/lib/sloqual/contract.mjs`
 - `src/lib/sloqual/index.mjs`
@@ -696,6 +733,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md`
 - `tasks/S2-006E_ENGINEERING_CLOSURE.md`
 - `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
+- `tasks/S2-008_RD_EXPERIMENT_CYCLE.md`
 - `tasks/SLOQUAL-001_SLO_QUALIFICATION.md`
 - `tests/agentboard/concurrency.test.mjs`
 - `tests/agentboard/contracts-drift.test.mjs`
@@ -741,6 +779,22 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/security-hardening.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
 - `tests/ingestion/transactional-audit.test.mjs`
+- `tests/research/comparator-probes.test.mjs`
+- `tests/research/comparator.test.mjs`
+- `tests/research/dataset.test.mjs`
+- `tests/research/fixtures/fixture-corrupted-variants.mjs`
+- `tests/research/fixtures/fixture-digest.mjs`
+- `tests/research/fixtures/fixture-expected-values.mjs`
+- `tests/research/fixtures/fixture-fixed-clock.mjs`
+- `tests/research/fixtures/fixture-measurement-set.mjs`
+- `tests/research/fixtures/fixture-preregistration.mjs`
+- `tests/research/fixtures/fixture-run-identity.mjs`
+- `tests/research/fixtures/fixture-temp-base.mjs`
+- `tests/research/fixtures/index.mjs`
+- `tests/research/fixtures/README.md`
+- `tests/research/harness.test.mjs`
+- `tests/research/registry-prereg.test.mjs`
+- `tests/research/replay-two-run.test.mjs`
 - `tests/sloqual/comparator.test.mjs`
 - `tests/sloqual/contract.test.mjs`
 - `tests/sloqual/harness.test.mjs`

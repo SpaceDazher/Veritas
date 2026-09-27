@@ -1,5 +1,15 @@
 ## Verdict: TRACK_REJECTED_AS_ACCEPTED — the machinery is real, three of five criteria hold, two do not, and the ticket stays `BLOCKED_DEPENDENCY` behind #45
 
+> **Delivery update (2026-09-27, §20).** The headline above and the status table
+> under it are the **pre-commit snapshot** at base `bd0e2f5`, and they are left as
+> they were measured. Delivery then committed the track, which moved exactly two
+> facts: **A5 is now HELD** (`track_tracked=true tracked_files=39`) and the
+> **dependency gate is now PASS** — so it is four of five criteria, and
+> `blockingGates` is `replay`, `harness`. **A3 still FAILS** (`findingsA=3
+> findingsB=3`), `trackStatus` is still `FAIL`, and the ticket is still
+> `BLOCKED_DEPENDENCY` behind #45. Read §20 for the current numbers; do not read
+> the table below as the state of the branch.
+
 > **Supersession.** An earlier version of this file (written against the pre-repair
 > tree, 2026-09-27 01:52 local) concluded that the track had "no harness, no tests,
 > no evidence and five modules still throwing `NOT_IMPLEMENTED`", and recorded a
@@ -1164,3 +1174,93 @@ determinism the track claims.
   The harness is `4/5` (A5 untracked), the replay is `0/2`, the aggregator is
   `FAIL`, and the campaign verdict is `FAIL`. The repair changed what the red
   numbers mean, not the numbers.
+
+---
+
+## 20. Delivery pass (2026-09-27) — the commit lands, and what it changed
+
+The delivery worker owns git; this section is their record, appended rather than
+merged into the sections above, which stay the snapshot they measured at base
+`bd0e2f5`. Two facts moved when the track was committed, and one defect was
+fixed on the way. The verdicts that did not move are restated so a reader does
+not have to diff two snapshots.
+
+### 20.1 What delivery did
+
+1. **Staged and committed the whole track** (59 files, 37 243 insertions) at
+   `a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa`, tree
+   `64f7c99ba376cb400225cce1868b3cffd430c587`, and pushed the branch
+   `bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke`.
+2. **Fixed a host-dependence defect in the evidence.** The three gate scripts
+   serialised the purge record's `dir` / `base` as an absolute path, so five
+   committed records carried this machine's account name, worktree layout and
+   thread id, and their bytes could not be reproduced on another checkout. The
+   scripts now serialise a repository-relative path (a fixed
+   `<external-scratch-root>` token for a root outside the tree), and the ten
+   records were regenerated after the fix. The library return value is still
+   absolute; only the committed copy is shortened.
+3. **Re-ran the whole chain at the delivery commit** and re-pinned the ten
+   digests (§20.3).
+4. **Re-indexed the file inventory and refroze the root manifest** at the
+   delivery commit, which the track's 54 new paths had made stale.
+
+### 20.2 The two facts that moved
+
+| | At the `bd0e2f5` snapshot | At the delivery commit |
+| --- | --- | --- |
+| **A5** | **FAILED** — `track_tracked=false`, `git ls-files` saw `0` files of the track | **HELD** — `track_tracked=true tracked_files=39`, `base_binding=SATISFIED`, `chain_verified=true`, `crash_classified=PASS`, `reconciliation_rows=1` |
+| **dependency gate** | `BLOCKED_DEPENDENCY` (`index.mjs-absent-at-commit`) | **PASS (exit 0)**, all five upstream bindings `BOUND`, `track_files_tracked: 51` |
+| `blockingGates` | `dependency`, `replay`, `harness` | `replay`, `harness` |
+| `verify:s2-008` | exit `1` | exit `1` (unchanged) |
+
+**Nothing else moved.** `A1`, `A2` and `A4` hold; **`A3` still FAILS** with
+`findingsA=3 findingsB=3` — the frozen design cannot derive its preregistered
+per-trial outcomes at 8 cases × 5 seeds, which is a real answer and not a defect
+of the harness. `trackStatus` is still `FAIL`, `engineeringStatus` is still
+`BLOCKED_DEPENDENCY`, `assuranceStatus` is still `NOT_MEASURED`,
+`realAdapterStatus` is still `NOT_RUN_REAL_ADAPTER`, and `A-MVP-01..07` are still
+`NOT_RUN`: **the ticket is not accepted by this track.** Its own acceptance is
+the real-executor campaign in #45, and this pass did not touch it.
+
+Two of the harness's five properties are reported `HELD` and its own `verdict`
+is still `FAIL`, because the verdict is delegated to `resolveCampaignVerdict`
+over the table comparison — the A3 findings. That disagreement is the harness
+being honest, not a defect: the harness cannot pass while the authoritative A3
+fails.
+
+### 20.3 The ten records at the delivery commit
+
+| File | sha256 |
+| --- | --- |
+| `evidence/s2-008-comparison.json` | `70e41b54095ee166e5b13f393edc580b1cacf59a7652912a54b197382ba7a43d` |
+| `evidence/s2-008-controls.json` | `7e5820a9252ad409a03c81c1e1976361e5294b1558b93cba2a382d10ff846163` |
+| `evidence/s2-008-dependency-binding.json` | `20d263bd46c7cd43cb9d7de7c53c23712c75e47f22c439d5221803887f61b55c` |
+| `evidence/s2-008-harness.json` | `49e8a354abffb2103137f1d0556b5563290c105ebe2b24c88c03edc81ff1d5c4` |
+| `evidence/s2-008-probes.json` | `4ca4f9712c5c19ba852fd8243a476c6522b009fbbdd5253cdab05563b9ea855e` |
+| `evidence/s2-008-replay.json` | `36f321d0d37f9266ed43b94a8a63c883e34d9fe59a5c543ac492ef77dacb2a7b` |
+| `evidence/s2-008-run-a.json` | `44a351cc0838125b64e1439d93bf6d1d679332e7a6b68fc466ede3cf78ea0620` |
+| `evidence/s2-008-run-b.json` | `65828269e7018ef4f7adf172b476efff21d23d764ef63565df352fa18a5ad880` |
+| `evidence/s2-008-security-probes.json` | `02e5c76cdde2644ca007d3fcdc4058bdab2f87d0e3e0ba611cdf6eee39ecb232` |
+| `evidence/s2-008-summary.json` | `2aee7e00364e36e2f61645898712b4f77ec3da7fe67e7b3491fa83379482523c` |
+
+`run-a`, `run-b`, `replay` and `summary` carry run ids, nonces and a wall-clock
+member, so their digests move on every run; the other six are byte-stable on the
+same base. The digests above are the bytes committed here; the manifest and
+inventory reindex that follows them changes no S2-008 record.
+
+### 20.4 What the commit does NOT fix, and the one command that re-reads it
+
+* **A3 is still red.** The fix is a decision about the frozen design (more
+  cases, more seeds, or a published band the design can actually resolve), and
+  that is a new preregistration, not a patch.
+* **The evidence is bound to the commit it was produced at.** After the
+  reindex and the manifest seal, `HEAD` moves on by two commits, so
+  `base.commit_sha` in the committed records names `a18a2e5`, not the tip. This
+  is the repo's existing seal semantics — the S2-007 artefacts are bound to
+  their merge commit for the same reason — and it is why a re-run is one command:
+  `npm run verify:s2-008` on the pushed branch re-derives the same verdicts with
+  the base advanced, and the aggregator's freshness gate treats the record it
+  did not write as a failure, not as authority.
+* **`tsconfig.json` still excludes `.mjs`**, so `npm run typecheck` remains
+  vacuous for this tree. Not in this pass's ownership.
+* **No real executor, no real spend, no human review.** Unchanged by a commit.

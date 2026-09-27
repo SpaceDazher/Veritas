@@ -10,12 +10,12 @@
     "confidence": 0.95
   },
   "base": {
-    "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-    "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 0,
-    "track_tracked": false
+    "tracked_files_of_this_track": 39,
+    "track_tracked": true
   },
   "controls": [
     {

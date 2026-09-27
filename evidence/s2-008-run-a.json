@@ -6,22 +6,22 @@
   "evidence_eligible": true,
   "corpus": "evidence/s2-008/corpus",
   "base": {
-    "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-    "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
+    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 0,
-    "track_tracked": false
+    "tracked_files_of_this_track": 51,
+    "track_tracked": true
   },
   "provenance": {
     "version": "s2-008-runner-v1",
-    "commit": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-    "tree": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-    "run_id": "s2-008-run-a-0-p217020",
+    "commit": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+    "tree": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "run_id": "s2-008-run-a-0-p220580",
     "label": "a",
-    "executor_id": "exec-s2-008-a-0-p217020",
-    "pid": 217020,
-    "nonce": "n-a-1a3cc5c34ad49129",
+    "executor_id": "exec-s2-008-a-0-p220580",
+    "pid": 220580,
+    "nonce": "n-a-76ffec4b7340e763",
     "clock": "2026-01-01T01:00:00.000Z",
     "started_at": "2026-01-01T01:00:00.000Z"
   },
@@ -65,19 +65,13 @@
     "read_at": "2026-01-01T01:00:00.000Z",
     "decision_at": "2026-01-01T01:00:00.000Z"
   },
-  "harness_findings": [
-    {
-      "code": "TRACK_UNTRACKED",
-      "detail": "git ls-files reports 0 tracked file(s) of this track, so no artefact of this run is bound to a base in any sense a reader can check",
-      "where": "git ls-files (read-only)"
-    }
-  ],
+  "harness_findings": [],
   "version": "s2-008-runner-v1",
-  "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-  "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-  "raw_run_id": "s2-008-run-a-0-p217020",
-  "nonce": "n-a-1a3cc5c34ad49129",
-  "executor_id": "exec-s2-008-a-0-p217020",
+  "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+  "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+  "raw_run_id": "s2-008-run-a-0-p220580",
+  "nonce": "n-a-76ffec4b7340e763",
+  "executor_id": "exec-s2-008-a-0-p220580",
   "output_root": ".bb/s2-008/run/out-a-0",
   "expected_table_digest": "9aad76e1b0f8c6f55ac59548347278f1b4f7c3e5ea4d11a75d2fd1896c08af62",
   "preregistration_digest": "8fab7e83d472b7914b6e660dd956f6dc394589bcd4ab323162b6545dde7fe479",
@@ -198,7 +192,7 @@
           "granted_units": 8,
           "spent_units": 1,
           "units": 1,
-          "settle_key": "12370d80284d0128b5fe6f2dc267a2f92de52760d176139fe7052ce9bcf8e900",
+          "settle_key": "e3b937c5c7c3ca518aefac55cb086eb085b3831d3be9f592311c809a362d515a",
           "replayed": false
         },
         "evaluator": {
@@ -351,15 +345,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p217020",
-        "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-        "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-        "nonce": "n-a-1a3cc5c34ad49129",
-        "executor_id": "exec-s2-008-a-0-p217020"
+        "raw_run_id": "s2-008-run-a-0-p220580",
+        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+        "nonce": "n-a-76ffec4b7340e763",
+        "executor_id": "exec-s2-008-a-0-p220580"
       },
       "budget": {
         "units": 1,
-        "settle_key": "12370d80284d0128b5fe6f2dc267a2f92de52760d176139fe7052ce9bcf8e900",
+        "settle_key": "e3b937c5c7c3ca518aefac55cb086eb085b3831d3be9f592311c809a362d515a",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -430,7 +424,7 @@
           "granted_units": 8,
           "spent_units": 2,
           "units": 1,
-          "settle_key": "0a5c26fe4fa7b470d068c913ccd2d37e17be4266c6732424096f91c7a252fdd8",
+          "settle_key": "cce605301b7ed584f67ab3f3ad03d2ada1c39a53c54446b46a2338ee1fcf4248",
           "replayed": false
         },
         "evaluator": {
@@ -583,15 +577,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p217020",
-        "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-        "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-        "nonce": "n-a-1a3cc5c34ad49129",
-        "executor_id": "exec-s2-008-a-0-p217020"
+        "raw_run_id": "s2-008-run-a-0-p220580",
+        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+        "nonce": "n-a-76ffec4b7340e763",
+        "executor_id": "exec-s2-008-a-0-p220580"
       },
       "budget": {
         "units": 1,
-        "settle_key": "0a5c26fe4fa7b470d068c913ccd2d37e17be4266c6732424096f91c7a252fdd8",
+        "settle_key": "cce605301b7ed584f67ab3f3ad03d2ada1c39a53c54446b46a2338ee1fcf4248",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -662,7 +656,7 @@
           "granted_units": 8,
           "spent_units": 3,
           "units": 1,
-          "settle_key": "8ee1eca9fda0d545f1444560d7c41150d4c8e4c6f90097861078a2bf88a8ba0b",
+          "settle_key": "f28e88c5ca74c99ad9ebb9593078ed1de8e4753306dd6506feb34ff9a3e4e3fa",
           "replayed": false
         },
         "evaluator": {
@@ -815,15 +809,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p217020",
-        "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-        "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-        "nonce": "n-a-1a3cc5c34ad49129",
-        "executor_id": "exec-s2-008-a-0-p217020"
+        "raw_run_id": "s2-008-run-a-0-p220580",
+        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+        "nonce": "n-a-76ffec4b7340e763",
+        "executor_id": "exec-s2-008-a-0-p220580"
       },
       "budget": {
         "units": 1,
-        "settle_key": "8ee1eca9fda0d545f1444560d7c41150d4c8e4c6f90097861078a2bf88a8ba0b",
+        "settle_key": "f28e88c5ca74c99ad9ebb9593078ed1de8e4753306dd6506feb34ff9a3e4e3fa",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -885,7 +879,7 @@
           "granted_units": 8,
           "spent_units": 4,
           "units": 1,
-          "settle_key": "73c50111f6aa113e03f46ad35858aed4514f5381c9bea8ff9aaecb32aac4b85a",
+          "settle_key": "60f773bf1b96f1339841f22c1dd1f9725533dc02c5f7e031f8662c547b3f50c9",
           "replayed": false
         },
         "evaluator": {
@@ -1038,15 +1032,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-a-0-p217020",
-        "commit_sha": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
-        "tree_sha": "747a57934cfaf2e04c3322cc3d5f649340f80da0",
-        "nonce": "n-a-1a3cc5c34ad49129",
-        "executor_id": "exec-s2-008-a-0-p217020"
+        "raw_run_id": "s2-008-run-a-0-p220580",
+        "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+        "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+        "nonce": "n-a-76ffec4b7340e763",
+        "executor_id": "exec-s2-008-a-0-p220580"
       },
       "budget": {
         "units": 1,
-        "settle_key": "73c50111f6aa113e03f46ad35858aed4514f5381c9bea8ff9aaecb32aac4b85a",
+        "settle_key": "60f773bf1b96f1339841f22c1dd1f9725533dc02c5f7e031f8662c547b3f50c9",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -1133,7 +1127,7 @@
   },
   "ledger": {
     "chain_verified": true,
-    "snapshot_digest": "sha256:d510d82703fed1547ed870a6d292c3f651fcd873e1dc8355b5cccb4795f4e463",
+    "snapshot_digest": "sha256:305650de03ad0353e8dc1b2a617e750ffbfa186f0168ea2e55ae9e72c77cd364",
     "record_kinds": [
       "ACCESS",
       "PREREGISTRATION_RECORDED",
@@ -1238,6 +1232,6 @@
       "verdict": "VIOLATION"
     }
   ],
-  "decision_digest": "316c76cd52ba1f99f9ca80e4db47fd8072197ffc546804114be043fb0c51c555",
-  "artefact_digest": "64371343007a7c408e55f2f71f36bc75100e2ed1bb999fa6c2014310aedab119"
+  "decision_digest": "9630862127ee0ff9eb68dff257fd58142c92a65ce98d95bdd5c40cbd897f5e05",
+  "artefact_digest": "449fae0d0fb27a9d0468958eef8a742d28fc17e8932255ea3d64799813e7d6ad"
 }
