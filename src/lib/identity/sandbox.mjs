@@ -16,6 +16,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import {
+  SNAPSHOT_SCRIPT,
+  descendantsIn,
+  parseProcessTable,
+  queryUntilAnswered,
+  settleUntilGone,
+  SETTLE_BUDGET_MS,
+} from './process-verdict.mjs';
 
 const DEVICE_NAMES = new Set([
   'CON', 'PRN', 'AUX', 'NUL',
@@ -198,6 +206,14 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   // keeps OpenProcess succeeding for a terminated child, which makes
   // process.kill(pid, 0) unreliable for liveness of direct children.
   const exitSeen = new Set();
+  // Counters for the process-table transport. Surfaced in every probe outcome
+  // so that a survivor verdict can be told apart from an unverified one when
+  // a clean-checkout run goes red (SpaceDazher/Veritas#16 recorded a flake
+  // whose failing subtest was unrecoverable).
+  const transport = { queries: 0, failedQueries: 0, settleSteps: 0, settleTimedOut: false, settleUnanswered: 0 };
+  function transportSnapshot() {
+    return { ...transport };
+  }
 
   function isAlive(pid) {
     if (exitSeen.has(pid)) return false;
@@ -209,42 +225,74 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
   }
 
-  function listDescendants(pid) {
-    if (process.platform !== 'win32') return Promise.resolve([]);
-    const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
-      `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
-      `($p | Select-Object -Unique) -join ' '`;
-    const attempt = (triesLeft) => new Promise((resolve) => {
-      const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
-        windowsHide: true,
-      });
+  // One PowerShell/CIM round trip. Never throws: a transport failure is
+  // reported as { answered: false } so the retry-and-fail-closed policy in
+  // process-verdict.mjs decides what it means, instead of this adapter
+  // silently equating "the query did not run" with "the process survived".
+  function queryProcessTable(script) {
+    return new Promise((resolve) => {
+      if (process.platform !== 'win32') {
+        resolve({ answered: false, reason: 'no_process_table_query_on_this_platform' });
+        return;
+      }
+      transport.queries += 1;
+      let child;
+      try {
+        child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { windowsHide: true });
+      } catch (error) {
+        transport.failedQueries += 1;
+        resolve({ answered: false, reason: `spawn_threw:${error?.code ?? error?.name ?? 'Error'}` });
+        return;
+      }
       let out = '';
-      child.stdout.on('data', (chunk) => { out += chunk; });
-      child.on('error', () => resolve(triesLeft > 1 ? attempt(triesLeft - 1) : []));
+      // A child that never produced a usable stdout stream must still settle
+      // the promise: an unsettled verdict query would hang cancellation and
+      // surface as a bare harness timeout with no detail.
+      child.stdout?.on('data', (chunk) => { out += chunk; });
+      child.on('error', (error) => {
+        transport.failedQueries += 1;
+        resolve({ answered: false, reason: `spawn_error:${error?.code ?? error?.name ?? 'Error'}` });
+      });
       child.on('close', (code) => {
-        if (code !== 0 && triesLeft > 1) {
-          resolve(attempt(triesLeft - 1));
+        if (code !== 0) {
+          transport.failedQueries += 1;
+          resolve({ answered: false, reason: `nonzero_exit:${code}` });
           return;
         }
-        resolve(out.split(/\s+/).map(Number).filter((value) => Number.isInteger(value) && value > 0 && value !== pid));
+        resolve({ answered: true, value: out });
       });
     });
-    return attempt(3);
+  }
+
+  // Descendant discovery fails soft: an unanswered query yields no
+  // descendants, exactly as the previous three-try enumeration did, because
+  // discovery only widens the set that is subsequently killed and re-checked
+  // by pid. Liveness is the verdict and it never fails soft.
+  async function listDescendants(pid) {
+    if (process.platform !== 'win32') return [];
+    const result = await queryUntilAnswered(() => queryProcessTable(SNAPSHOT_SCRIPT));
+    if (!result.answered) return [];
+    return descendantsIn(parseProcessTable(result.value), pid);
   }
 
   function treeKill(pid) {
     return new Promise((resolve) => {
-      if (process.platform === 'win32') {
-        const killer = spawn('taskkill', ['/T', '/F', '/PID', String(pid)], { windowsHide: true });
-        killer.on('error', () => resolve(false));
-        killer.on('close', () => resolve(true));
-      } else {
-        try {
-          process.kill(-pid, 'SIGKILL');
-        } catch {
-          try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
+      try {
+        if (process.platform === 'win32') {
+          const killer = spawn('taskkill', ['/T', '/F', '/PID', String(pid)], { windowsHide: true });
+          killer.on('error', () => resolve(false));
+          killer.on('close', () => resolve(true));
+        } else {
+          try {
+            process.kill(-pid, 'SIGKILL');
+          } catch {
+            try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
+          }
+          resolve(true);
         }
-        resolve(true);
+      } catch {
+        // Never leave the caller awaiting a kill that will not report back.
+        resolve(false);
       }
     });
   }
@@ -262,38 +310,32 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   // Node's process.kill(pid, 0) is not an authoritative liveness probe on
   // Windows: a recently terminated process can remain open through a handle
   // long enough to be reported as alive. Query the OS process table for the
-  // terminal cancellation proof instead. Query failures are fail-closed: all
-  // candidates are treated as survivors.
-  function listExistingPids(pids) {
+  // terminal cancellation proof instead.
+  //
+  // The query is WQL-filtered by ProcessId so only the candidate rows cross
+  // the PowerShell/COM boundary, instead of marshalling every process on the
+  // host into the shell and filtering it there. Candidates are validated as
+  // positive integers before interpolation, so the filter carries no
+  // caller-controlled text.
+  //
+  // A query that stays unanswered for the whole retry budget is fail-closed:
+  // every candidate is reported as alive. "No survivors" is therefore only
+  // ever reported when the OS actually said so.
+  async function listExistingPids(pids) {
     const candidates = [...new Set(pids.filter((pid) => Number.isInteger(pid) && pid > 0))];
-    if (candidates.length === 0) return Promise.resolve([]);
+    if (candidates.length === 0) return [];
     if (process.platform !== 'win32') {
-      return Promise.resolve(candidates.filter((pid) => isAlive(pid)));
+      return candidates.filter((pid) => isAlive(pid));
     }
-    const literal = candidates.join(',');
-    const script = `$ids=@(${literal});` +
-      `Get-CimInstance Win32_Process | Where-Object { $ids -contains [int]$_.ProcessId } | ` +
-      `ForEach-Object ProcessId`;
-    return new Promise((resolve) => {
-      const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
-        windowsHide: true,
-      });
-      let out = '';
-      let failed = false;
-      child.stdout.on('data', (chunk) => { out += chunk; });
-      child.on('error', () => {
-        failed = true;
-        resolve(candidates);
-      });
-      child.on('close', (code) => {
-        if (failed) return;
-        if (code !== 0) {
-          resolve(candidates);
-          return;
-        }
-        resolve(out.split(/\s+/).map(Number).filter((value) => candidates.includes(value)));
-      });
-    });
+    const filter = candidates.map((pid) => `ProcessId=${pid}`).join(' OR ');
+    const script = `Get-CimInstance Win32_Process -Filter "${filter}" | ForEach-Object ProcessId`;
+    const result = await queryUntilAnswered(() => queryProcessTable(script));
+    if (!result.answered) return candidates;
+    const alive = result.value
+      .split(/\s+/)
+      .map(Number)
+      .filter((value) => Number.isInteger(value) && candidates.includes(value));
+    return [...new Set(alive)];
   }
 
   async function survivorPids(pid, knownDescendants = []) {
@@ -306,21 +348,46 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     return (await survivorPids(pid, knownDescendants)).length;
   }
 
-  // Settles a just-killed tree: waits until the direct child's exit is seen
-  // and a full descendant enumeration reports nothing alive. Bounded wait,
-  // terminal verdict either way.
+  // Settles a just-killed tree: re-observes until one process-table snapshot
+  // reports nothing tracked alive, killing whatever the previous snapshot
+  // still listed. Bounded by wall clock rather than by a fixed iteration
+  // count, because a loaded host spends seconds per snapshot where an idle
+  // one spends milliseconds, and a fixed count is what overran the test
+  // budget. An unanswerable snapshot is fail-closed: every tracked pid counts
+  // as alive and the loop keeps working instead of declaring success.
   async function settleTree(pid, knownDescendants = []) {
     const tracked = new Set([pid, ...knownDescendants]);
-    for (let attempt = 0; attempt < 20; attempt += 1) {
-      for (const descendant of await listDescendants(pid)) tracked.add(descendant);
-      const existing = await listExistingPids([...tracked]);
-      if (existing.length === 0) return;
-      for (const candidate of existing) {
-        directKill(candidate);
-        await treeKill(candidate);
-      }
-      await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
-    }
+    const settled = await settleUntilGone({
+      budgetMs: SETTLE_BUDGET_MS,
+      observe: async () => {
+        if (process.platform !== 'win32') {
+          // No process-table query exists here, so liveness is whatever the
+          // platform probe can see and descendant discovery stays empty. The
+          // loop is still bounded, so this cannot hang a caller.
+          const alive = [...tracked].filter((candidate) => isAlive(candidate));
+          return { settled: alive.length === 0, answered: true, alive };
+        }
+        const result = await queryUntilAnswered(() => queryProcessTable(SNAPSHOT_SCRIPT));
+        if (!result.answered) {
+          return { settled: false, answered: false, alive: [...tracked], reason: result.lastFailure };
+        }
+        const entries = parseProcessTable(result.value);
+        for (const descendant of descendantsIn(entries, pid)) tracked.add(descendant);
+        const present = new Set(entries.map((entry) => entry.pid));
+        const alive = [...tracked].filter((candidate) => present.has(candidate));
+        return { settled: alive.length === 0, answered: true, alive };
+      },
+      terminate: async (alive) => {
+        for (const candidate of alive) {
+          directKill(candidate);
+          await treeKill(candidate);
+        }
+      },
+    });
+    transport.settleSteps += settled.steps;
+    transport.settleTimedOut = transport.settleTimedOut || settled.timedOut;
+    transport.settleUnanswered += settled.unanswered;
+    return { ...settled, tracked: [...tracked] };
   }
 
   // Capture the process tree before terminating the root. Once the parent
@@ -329,9 +396,9 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   // explicitly and retain their PIDs for the terminal survivor check.
   async function terminateTree(pid, childHandle = null) {
     const descendants = await listDescendants(pid);
-    // Ask Windows to terminate the tree while the root/parent relation still
-    // exists. Killing the root handle first can re-parent a child that raced
-    // the CIM snapshot and make /T unable to discover it.
+    // Ask Windows to terminate the root while the parent/child relation
+    // still exists. Killing the root handle first can re-parent a child that
+    // raced the process-table snapshot and make /T unable to discover it.
     await treeKill(pid);
     for (const descendant of [...descendants].reverse()) {
       directKill(descendant);
@@ -339,8 +406,12 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
     directKill(pid, childHandle);
     await treeKill(pid);
-    await settleTree(pid, descendants);
-    return descendants;
+    const settled = await settleTree(pid, descendants);
+    // Anything the settle loop discovered and killed also belongs to the
+    // original tree, so it joins the retained set the terminal check looks
+    // at. Dropping it would let a re-parented pid that escaped this round be
+    // reported as "no survivors".
+    return [...new Set([...descendants, ...settled.tracked])];
   }
 
   function probeEnv() {
@@ -424,6 +495,7 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
         durationMs: Date.now() - started,
         survivors: remainingProcessIds.length,
         remainingProcessIds,
+        processQueries: transportSnapshot(),
         stdoutDigest: sha256(redact(stdout.toString('utf8'))),
         stderrDigest: sha256(redact(stderr.toString('utf8'))),
         limits: profile.process ?? {},
@@ -464,7 +536,15 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     const descendants = await termination;
     if (record) record.knownDescendants = descendants;
     const remainingProcessIds = await survivorPids(pid, descendants);
-    return { terminated: true, survivors: remainingProcessIds.length, remainingProcessIds, pid };
+    return {
+      terminated: true,
+      survivors: remainingProcessIds.length,
+      remainingProcessIds,
+      pid,
+      // Distinguishes "the OS confirmed N processes are still alive" from
+      // "the OS never answered within the retry budget" (fail-closed).
+      processQueries: transportSnapshot(),
+    };
   }
 
   // Public execution path: blocked tiers never spawn anything.
@@ -524,6 +604,8 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     redact,
     writeOutput,
     isAlive,
+    descendantPids: (pid) => listDescendants(pid),
+    lastProcessQueries: transportSnapshot,
     spawnProcess,
     startForControlProbe,
     spawnForControlProbe: (request) => runProbe(request),

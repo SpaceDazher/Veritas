@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 714.
+Generated from `git ls-files`; count: 718.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -546,6 +546,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/sloqual-run.mjs`
 - `scripts/smoke.mjs`
 - `scripts/synthetic-smoke.mjs`
+- `scripts/tap-evidence.mjs`
 - `scripts/validate-contracts.mjs`
 - `scripts/verify-clean-checkout.mjs`
 - `scripts/verify-gvisor-sandbox.mjs`
@@ -591,6 +592,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/identity/podman-sandbox.mjs`
 - `src/lib/identity/policy-engine.mjs`
 - `src/lib/identity/principals.mjs`
+- `src/lib/identity/process-verdict.mjs`
 - `src/lib/identity/sandbox-profiles.mjs`
 - `src/lib/identity/sandbox.mjs`
 - `src/lib/ingestion/canonical.mjs`
@@ -647,11 +649,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/claims/helpers.mjs`
 - `tests/claims/store.test.mjs`
 - `tests/database/postgres-smoke.test.mjs`
+- `tests/identity/clean-checkout-evidence.test.mjs`
 - `tests/identity/contracts.schemas.test.mjs`
 - `tests/identity/dependency-binding.test.mjs`
 - `tests/identity/gvisor-sandbox.test.mjs`
 - `tests/identity/podman-sandbox.test.mjs`
 - `tests/identity/policy-engine.test.mjs`
+- `tests/identity/process-verdict.test.mjs`
 - `tests/identity/replay-runs.test.mjs`
 - `tests/identity/sandbox.test.mjs`
 - `tests/identity/security-probes.test.mjs`

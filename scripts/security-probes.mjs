@@ -22,6 +22,7 @@ import {
   executeAuthorizedGvisorTool,
 } from '../src/lib/identity/gvisor-sandbox.mjs';
 import { assertValidContract, validateContract } from '../src/lib/identity/contract-registry.mjs';
+import { awaitTree } from '../src/lib/identity/process-verdict.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
 const IS_WINDOWS = process.platform === 'win32';
@@ -40,6 +41,11 @@ const INJECTION = [
 function tempRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 's2-002-probe-'));
 }
+
+// The probe child's own kill timer. It must stay below the harness budget so a
+// slow host produces a recorded timeout verdict with the transport counters
+// attached, rather than a bare harness timeout (SpaceDazher/Veritas#16).
+const PROBE_TIMER_MS = 45000;
 
 function sandboxFor(root, profile = SANDBOX_NO_EXEC) {
   return createSandbox({
@@ -249,16 +255,37 @@ async function probeG() {
   const { pid, done } = sandbox.startForControlProbe({
     command: 'cmd.exe',
     args: ['/d', '/s', '/c', 'start /b cmd /c ping -n 60 127.0.0.1 >nul & ping -n 60 127.0.0.1 >nul'],
-    timeoutMs: 60000,
+    timeoutMs: PROBE_TIMER_MS,
   });
-  await new Promise((resolveTimer) => setTimeout(resolveTimer, 500));
+  // Wait for the tree to actually exist instead of assuming it after a fixed
+  // delay. A fixed delay under load cancels a tree that has not spawned its
+  // own children yet, which both leaks the orphans and lets the probe pass
+  // without ever having had a tree to reap. Fail closed if it never forms.
+  const formed = await awaitTree((target) => sandbox.descendantPids(target), pid);
+  if (!formed.formed) {
+    await sandbox.cancel(pid);
+    await done;
+    const queries = sandbox.lastProcessQueries();
+    fs.rmSync(root, { recursive: true, force: true });
+    return { detected: false, detail: `tree never formed after ${formed.attempts} polls; queries=${queries.queries} failed=${queries.failedQueries}` };
+  }
   const cancel = await sandbox.cancel(pid);
   const outcome = await done;
+  const queries = sandbox.lastProcessQueries();
   const detected = cancel.survivors === 0 && outcome.terminated === true
     && (outcome.status === 'cancelled' || outcome.status === 'timeout')
-    && !sandbox.isAlive(pid);
+    && !sandbox.isAlive(pid)
+    // A survivor count of zero is only evidence when the OS answered. An
+    // unverified verdict must not be recorded as a pass.
+    && queries.settleUnanswered === 0
+    && queries.settleTimedOut === false;
   fs.rmSync(root, { recursive: true, force: true });
-  return { detected, detail: `survivors=${cancel.survivors}; status=${outcome.status}; alive=${sandbox.isAlive(pid)}` };
+  return {
+    detected,
+    detail: `survivors=${cancel.survivors}; status=${outcome.status}; alive=${sandbox.isAlive(pid)}; `
+      + `descendants=${formed.seen}; polls=${formed.attempts}; queries=${queries.queries}; failed=${queries.failedQueries}; `
+      + `settleSteps=${queries.settleSteps}; settleUnanswered=${queries.settleUnanswered}; settleTimedOut=${queries.settleTimedOut}`,
+  };
 }
 
 // H: stale grant/lease/fencing token after revocation.
