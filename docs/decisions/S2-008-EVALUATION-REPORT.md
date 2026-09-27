@@ -382,7 +382,8 @@ the aggregator’s trust model, and a child’s account of itself is untrusted i
    and `HARD_GATE_COUNTERS` from `src/lib/research/probes.mjs`, plus
    `EXPECTED_CONTROLS` and `EXTRA_CONTROL_IDS`, give **6 probes and 7 controls**; a
    record reporting fewer, or a counter map reporting none of the declared counters,
-   is a defect (`gates.probes.floors`, `read_from` names the source).
+   is a defect (`gates.probes.floor`, `read_from` names the source; the per-run
+   verdicts land in `gates.probes.floor_issues`, empty on this tree).
 4. **Provability over the whole track (`G4`).** The aggregator copies
    `track_files_expected`, `track_files_untracked` and `track_files_modified` into
    `gates.dependency`, and **any** untracked or modified track file is a blocking
@@ -450,9 +451,19 @@ What the green summary now carries that the third step's did not
 was passed to, the two records that must carry it, `excluded_from_repeatability: true`,
 `decides: false`); `gates.replay.invocation_id` and `gates.harness.invocation_id` beside
 their `head_tree_sha`; `gates.harness.evidence_sha256`, `evidence_bytes` and
-`record_is_this_run`; `gates.probes.floors` naming 6 probes, 7 controls and 6
-hard-gate counters with `read_from`; and `gates.dependency.track_files_expected_count`
-beside `track_files_untracked []` and `track_files_modified []`.
+`record_is_this_run`; `gates.probes.floor` naming 6 probes, 7 controls and 6
+hard-gate counters with `read_from`, and `gates.probes.floor_issues []`; and
+`gates.dependency.track_files_expected_count` beside `track_files_untracked []` and
+`track_files_modified`.
+
+One reader's question is answered in the record rather than left to be discovered:
+`gates.dependency.track_files_modified` is **not** empty on a write run — it names the
+**9 records the chain itself rewrote in that same run**
+(`comparison`, `controls`, `dependency-binding`, `harness`, `probes`, `replay`,
+`run-a`, `run-b`, `summary`). Those are exempt by name, because a chain that refused to
+tolerate its own output would be red on every run; everything else in the track is not
+exempt, which is why the five **uncommitted source** files were a defect before the
+commit above and are not a defect after it.
 
 `npm run manifest:write` / `manifest:check` were deliberately **not** run: they seal at
 HEAD and pin the commit in `evidence/closure-record.json`, and the Seal worker owns

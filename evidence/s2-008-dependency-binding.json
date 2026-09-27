@@ -10,8 +10,8 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
-  "head_tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
+  "head": "23df9053915ac42e21b70cd5988a88288b81241c",
+  "head_tree_sha": "2a0beb50b7849ec4600736e063143d3cbc26301c",
   "invocation_id": null,
   "contracts": [
     {
@@ -123,12 +123,7 @@
       "evidence/s2-008-replay.json",
       "evidence/s2-008-run-a.json",
       "evidence/s2-008-run-b.json",
-      "evidence/s2-008-summary.json",
-      "scripts/s2-008-harness.mjs",
-      "scripts/s2-008-replay.mjs",
-      "scripts/verify-s2-008-dependencies.mjs",
-      "scripts/verify-s2-008.mjs",
-      "tests/research/gate-semantics.test.mjs"
+      "evidence/s2-008-summary.json"
     ],
     "track_files_modified_by_the_chain": [
       "evidence/s2-008-comparison.json",
@@ -141,12 +136,7 @@
       "evidence/s2-008-run-b.json"
     ],
     "track_files_modified_other": [
-      "evidence/s2-008-summary.json",
-      "scripts/s2-008-harness.mjs",
-      "scripts/s2-008-replay.mjs",
-      "scripts/verify-s2-008-dependencies.mjs",
-      "scripts/verify-s2-008.mjs",
-      "tests/research/gate-semantics.test.mjs"
+      "evidence/s2-008-summary.json"
     ],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
@@ -540,7 +530,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 17814,
+      "bytes": 17052,
       "issues": []
     },
     {
