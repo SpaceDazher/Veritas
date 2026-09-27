@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "27c92d9870e488395068aac6e7c73764a7ea500b",
-  "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
-  "invocation_id": "05d210304ac7010bfb0984eda1cb9628",
+  "head": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
+  "head_tree_sha": "869655bb82367b69ca6ab28951da65f48c0f65ac",
+  "invocation_id": "3965f4d42301f9b1a066aacd4a5625b8",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -527,7 +527,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 17052,
+      "bytes": 16043,
       "issues": []
     },
     {

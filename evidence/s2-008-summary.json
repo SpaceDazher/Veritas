@@ -6,8 +6,8 @@
   "ok": true,
   "exitCode": 0,
   "base": {
-    "commit_sha": "27c92d9870e488395068aac6e7c73764a7ea500b",
-    "tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
+    "commit_sha": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
+    "tree_sha": "869655bb82367b69ca6ab28951da65f48c0f65ac",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 57,
@@ -15,7 +15,7 @@
     "track_tracked": true
   },
   "invocation": {
-    "id": "05d210304ac7010bfb0984eda1cb9628",
+    "id": "3965f4d42301f9b1a066aacd4a5625b8",
     "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
     "passed_to": [
       "scripts/s2-008-replay.mjs",
@@ -319,8 +319,8 @@
       "reason": null,
       "source": "scripts/s2-008-replay.mjs",
       "overall": "PASS",
-      "invocation_id": "05d210304ac7010bfb0984eda1cb9628",
-      "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
+      "invocation_id": "3965f4d42301f9b1a066aacd4a5625b8",
+      "head_tree_sha": "869655bb82367b69ca6ab28951da65f48c0f65ac",
       "campaign_verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
       "observed_campaign_decision": "UNRESOLVED",
@@ -329,25 +329,25 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-27T23:28:17.934Z",
-        "finished_at": "2026-09-27T23:28:26.155Z",
+        "observed_at": "2026-09-27T23:31:30.858Z",
+        "finished_at": "2026-09-27T23:31:33.122Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
-        "age_ms": 17
+        "age_ms": 8
       }
     },
     "harness": {
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-27T23:28:27.328Z",
-      "evidence_sha256": "ced4f185de7bd5badfa270d846abd6f16f946c4f7867518a94888ec52c80f26c",
+      "observed_at": "2026-09-27T23:31:33.650Z",
+      "evidence_sha256": "0b00c90c873537cd8f364b897f6cf712b76536187cb1b3781ca439d55eebd694",
       "evidence_bytes": 71951,
       "record_is_this_run": true,
       "invocation_id_required": true,
-      "invocation_id": "05d210304ac7010bfb0984eda1cb9628",
-      "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
+      "invocation_id": "3965f4d42301f9b1a066aacd4a5625b8",
+      "head_tree_sha": "869655bb82367b69ca6ab28951da65f48c0f65ac",
       "head_tree_sha_matches": true,
       "exit_code_recorded": null,
       "overall": "PASS",
@@ -374,13 +374,13 @@
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-27T23:28:27.331Z",
-    "started_at": "2026-09-27T23:28:03.641Z",
-    "replay_judged_at": "2026-09-27T23:28:26.172Z",
-    "harness_judged_at": "2026-09-27T23:28:27.328Z",
+    "observed_at": "2026-09-27T23:31:33.652Z",
+    "started_at": "2026-09-27T23:31:22.403Z",
+    "replay_judged_at": "2026-09-27T23:31:33.130Z",
+    "harness_judged_at": "2026-09-27T23:31:33.650Z",
     "window_ms": 21600000,
-    "head_tree_sha": "bbb27cf3679999c64df24d9d91aea442ec0530fa",
-    "replay_finished_at": "2026-09-27T23:28:26.155Z"
+    "head_tree_sha": "869655bb82367b69ca6ab28951da65f48c0f65ac",
+    "replay_finished_at": "2026-09-27T23:31:33.122Z"
   },
   "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
@@ -407,6 +407,6 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-27T23:28:27.331Z",
-  "startedAtIso": "2026-09-27T23:28:03.641Z"
+  "observedAtIso": "2026-09-27T23:31:33.652Z",
+  "startedAtIso": "2026-09-27T23:31:22.403Z"
 }
