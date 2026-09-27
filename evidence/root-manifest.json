@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "ca39d44fe749f25b52c25f6473edf2d1f48b8127",
-  "sourceTree": "c4468e8d85c249d1f0bec86441b9fb8cee78d264",
+  "sourceCommit": "a676b8d79e4639fc72319e85288f10a9203072b8",
+  "sourceTree": "59b85fe1119e16834070781f6f8b54227daf3e4d",
   "trackedFileCount": 788,
   "manifestFileCount": 783,
-  "payloadManifestSha256": "d753e1d04db0e3cc0ded7f2c9aebc0f29a0266828bfdca66620338538a8a562d",
-  "fileManifestSha256": "934a313d560e2a8541afdab2061cd2eb42a248cd198463e1b99ff696a473d2a5",
+  "payloadManifestSha256": "510e41e3442147385ed40c04db97e855d7b999141b427c7388bbefc0a66526b2",
+  "fileManifestSha256": "56a0a693905e4707b3b48fbecce4a4d465c6dfbe2270a784bef72717e7cded38",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1898,8 +1898,8 @@
     },
     {
       "path": "docs/decisions/S2-007-EVALUATION-REPORT.md",
-      "sha256": "b5102ee2ef712eb19750d446ed2092d7e152f364e6a6dca209163b8f556988c6",
-      "bytes": 75527
+      "sha256": "1add072d5a24f2f40b08e62acf2810aaa2966c5fa5a35e729e6881822f0ca94d",
+      "bytes": 76521
     },
     {
       "path": "docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md",
@@ -2543,8 +2543,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "3fd2333cf8138625b6e5fe1e0032fa7543155a25695232bc5dc8e7b5675bce73",
-      "bytes": 11403
+      "sha256": "10fff9f1715caf07c4b5b27e013f12805089fa15c6e91653e56727f5655ecfdc",
+      "bytes": 12014
     },
     {
       "path": "results/s2-002/run-a/observations.json",
