@@ -12,11 +12,11 @@
     "multiplicity_family_size": 3
   },
   "base": {
-    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
-    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+    "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
+    "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 39,
+    "tracked_files_of_this_track": 45,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|evidence/s2-008/) — the TRACK sources and the corpus, without the s2-008 evidence records and without the verify-s2-008* aggregator scripts",
     "track_tracked": true
   },

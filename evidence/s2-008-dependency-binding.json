@@ -10,7 +10,7 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+  "head": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -48,15 +48,8 @@
     "verified": 610,
     "issues": [],
     "untracked_in_frozen_trees": [],
-    "track_files_tracked": 51,
-    "track_files_untracked": [
-      "evidence/s2-008/corpus/preregistration-superseded.json",
-      "evidence/s2-008/corpus/preregistration-supersession.json",
-      "evidence/s2-008/corpus/supersession-ledger.json",
-      "src/lib/research/campaign-expectation.mjs",
-      "tests/research/gate-semantics.test.mjs",
-      "tests/research/triage-hardening.test.mjs"
-    ],
+    "track_files_tracked": 57,
+    "track_files_untracked": [],
     "track_files_modified": [
       "evidence/s2-008-comparison.json",
       "evidence/s2-008-controls.json",
@@ -67,27 +60,8 @@
       "evidence/s2-008-run-a.json",
       "evidence/s2-008-run-b.json",
       "evidence/s2-008-summary.json",
-      "evidence/s2-008/corpus/manifest.json",
-      "evidence/s2-008/corpus/preregistration.json",
-      "scripts/s2-008-build-corpus.mjs",
-      "scripts/s2-008-harness.mjs",
-      "scripts/s2-008-replay.mjs",
-      "scripts/s2-008-run.mjs",
-      "scripts/s2-008-security-probes.mjs",
       "scripts/verify-s2-008.mjs",
-      "src/lib/research/dataset.mjs",
-      "src/lib/research/expected-values.mjs",
-      "src/lib/research/index.mjs",
-      "src/lib/research/preregistration.mjs",
-      "tests/research/comparator-probes.test.mjs",
-      "tests/research/comparator.test.mjs",
-      "tests/research/fixtures/README.md",
-      "tests/research/fixtures/fixture-corrupted-variants.mjs",
-      "tests/research/fixtures/fixture-expected-values.mjs",
-      "tests/research/fixtures/fixture-measurement-set.mjs",
-      "tests/research/fixtures/fixture-preregistration.mjs",
-      "tests/research/harness.test.mjs",
-      "tests/research/replay-two-run.test.mjs"
+      "tests/research/gate-semantics.test.mjs"
     ],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
@@ -443,21 +417,21 @@
       "path": "evidence/s2-008-run-a.json",
       "required": true,
       "present": true,
-      "bytes": 37907,
+      "bytes": 37920,
       "issues": []
     },
     {
       "path": "evidence/s2-008-run-b.json",
       "required": true,
       "present": true,
-      "bytes": 37907,
+      "bytes": 37920,
       "issues": []
     },
     {
       "path": "evidence/s2-008-replay.json",
       "required": true,
       "present": true,
-      "bytes": 35963,
+      "bytes": 35988,
       "issues": []
     },
     {
@@ -478,7 +452,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 11001,
+      "bytes": 10901,
       "issues": []
     },
     {

@@ -11,10 +11,11 @@
 
 Section map, in the order the history has to be read: §0.1 what was asked · §0.2 what
 was built · §0.3 the first delivery was red, and the three root causes · §0.4 the
-repair · §0.5 the new gate condition · §0.6 acceptance table A1..A5 · §0.7 the six
-negative probes · §0.8 the `A === B` rule and the frozen table · §0.9 the two
-process-separated runs · §0.10 the honest campaign outcome · §0.11 the limits ·
-§0.12 what remains blocked behind #45 · §0.13 VERDICT.
+repair · §0.5 the new gate condition · §0.5a the triage round · **§0.5b the third
+red-to-green step: an aggregator that could not return `PASS`** · §0.6 acceptance
+table A1..A5 · §0.7 the six negative probes · §0.8 the `A === B` rule and the frozen
+table · §0.9 the two process-separated runs · §0.10 the honest campaign outcome ·
+§0.11 the limits · §0.12 what remains blocked behind #45 · §0.13 VERDICT.
 
 ### 0.1 What was asked
 
@@ -233,6 +234,96 @@ sources is a supersession, which is what R-A asked for. The eight synthetic case
 did not change in either round (`git diff --name-only HEAD -- evidence/s2-008/corpus/cases/`
 → 0 files), and `FROZEN_CASES_DIGEST` is byte-identical across all three ledger
 entries, which is the point of the anchor covering both digests.
+
+### 0.5b The third red-to-green step — an aggregator that could not return `PASS`
+
+The second round closed every way to reach a *false* green, and left one way to reach
+a `false` red. The owner's own ordered re-run of the tree found
+the last defect in the aggregator itself, not in the track:
+
+```text
+npm run s2-008:harness                -> exit 0  RESULT properties_held=5/5 verdict=FAIL overall=PASS
+npm run verify:s2-008-replay          -> exit 0  RESULT properties_held=2/2 verdict=FAIL overall=PASS
+npm run verify:s2-008                 -> exit 3  status=NOT_RUN ok=false blockingGates=[] defects=[]
+```
+
+**What it meant.** Every check the track owns had run and every one had passed —
+five gates `PASS(exit=0)`, an empty defect list, an empty blocking-gate list — and
+the aggregator still answered `NOT_RUN`, exit **3**, forever. A `NOT_RUN` is defined
+in this repository's own header (`scripts/verify-s2-008.mjs`, the first rule) as
+*"I could not check"*, never *"I checked and it was inconclusive"*. The terminal
+state was therefore saying **the opposite of what had happened**: it claimed a check
+was missing while the record next to it listed five that had run.
+
+**The cause was a data model, not a threshold.** One array, `notRun`, carried two
+incompatible kinds of entry. Five were real gate-level `NOT_RUN`s — the dependency
+gate that could not run, the corpus check that could not run, a mandatory probe or
+control that did not run, the cross-process replay, the harness that could not run
+every property. **Two were statements about the track, not about a check**: that the
+harness's `A3` is table-derived rather than a measurement (so the replay's `A3` is
+the authoritative one), and that the campaign behind
+[#45](https://github.com/SpaceDazher/Veritas/issues/45) is `NOT_RUN`, so this
+deterministic track does not decide the ticket's own scope. The status line then read
+`notRun.length > 0`, and the two informational notes are present on **every** run —
+so `PASS` was unreachable by construction, and a gate whose verdict is a constant is
+not a gate.
+
+**The fix separates what may vote from what may only be recorded.** The status is
+now derived from the gate-level terms alone; the two notes moved to a `scopeNotes`
+array that is published in `evidence/s2-008-summary.json` and printed, member for
+member, and that cannot decide anything. The reason a scope note must not vote is
+one sentence: *a scope note is not an answer to the question the verdict asks — it
+never says whether a check this stage owns was performed or what it found — so a note
+that votes is a veto, and a veto held by a statement that is true on every run is a
+gate whose verdict is a constant.* Nothing was softened to get here: the `NOT_RUN`
+paths still exit **3**, and a child gate that exits 0 while printing no counter map
+is still a `NOT_RUN` rather than a pass.
+
+**The third precondition went the other way — stricter, not looser.** *The track's
+own files are untracked (`git ls-files` reports 0 of them), so no artefact of this
+track is bound to a base a reader can check* was a soft note, and then a `NOT_RUN`
+entry. Provability is a hard requirement of this repository, so it is now a **defect
+in `defects` and blocking**: `FAIL`, exit **1**. This is the one place the repair is
+strictly stronger than the file it replaced, and the file says so in its own header.
+
+**Verified now — every number below is traceable to a named evidence file.** The
+command list with its observed exit codes, run in this order on this tree:
+
+| command | observed exit | what the run printed |
+| --- | --- | --- |
+| `node --test --test-concurrency=1 "tests/research/*.test.mjs"` | **0** | `# tests 250 / # suites 11 / # pass 250 / # fail 0 / # skipped 0` |
+| `npm run s2-008:check-corpus` | **0** | `unseal_digest sha256:9ff4511e…`, `expected_table_digest 8062bc85…`, `expected_campaign_decision "UNRESOLVED"`, `source_ledger_entries 3` |
+| `npm run test:s2-008-security-probes` | **0** | 6 families, 6 probes ran, `allPassed true`, `notRun []`, `broken []`, all six hard-gate counters `0` — `evidence/s2-008-probes.json` |
+| `npm run verify:s2-008-replay` | **0** | `RESULT properties_held=2/2 not_run=0 verdict=FAIL overall=PASS`; `expected_decision=UNRESOLVED observed_decision=UNRESOLVED agrees=true` — `evidence/s2-008-replay.json`, `properties = [A3 HELD, A5 HELD]` |
+| `npm run verify:s2-008` | **0** | `"status": "PASS"`, `"ok": true`, `"exitCode": 0`, `blockingGates []`, `notRunGates []`, `defects []`, `notRun []`, and both `scopeNotes` — `evidence/s2-008-summary.json`, `observedAtIso 2026-09-27T14:12:12.280Z` |
+| `npm run verify:s2-008-dependencies` | **0** | `checked 23`, `ok true`, `frozen_targets.verified 610/610 pinned_paths`, `track_files_tracked 57`, `track_files_untracked []`, `syntax.modules 34 / parsed 34` — `evidence/s2-008-dependency-binding.json` |
+| `npm run lint` | **0** | `eslint .` clean |
+| `npm run typecheck` | **0** | `tsc --noEmit` clean (and it still reads none of the `.mjs` — §0.11 item 7) |
+| `npm run inventory:write` | **0** | `{"exitCode":0,"mode":"write","trackedFiles":848,"path":"evidence/FILE_INVENTORY.md"}` |
+
+`npm run manifest:write` / `manifest:check` were deliberately **not** run: they seal
+at HEAD and pin the commit in `evidence/closure-record.json`, the tree is dirty, and
+the Seal worker owns that order.
+
+**The record is not laundered, and the number that matters is still `FAIL`.** The
+campaign decision and the frozen expectation are both still reported, in both child
+records: `gates.replay` and `gates.harness` each publish
+`expected_campaign_decision "UNRESOLVED"` beside `observed_campaign_decision
+"UNRESOLVED"` beside `campaign_verdict` / `verdict` `"FAIL"`. The aggregator's `PASS`
+is a statement about the *gates*, and `gates.harness.properties` is still
+`[A1 HELD, A2 HELD, A3 HELD, A4 HELD, A5 HELD]` with `overall "PASS"` and `verdict
+"FAIL"`. The ticket's own scope is untouched: `engineering_status
+"BLOCKED_DEPENDENCY"`, `assurance_status "NOT_MEASURED"`, `real_adapter_status
+"NOT_RUN_REAL_ADAPTER"`, `a_mvp_status "NOT_RUN (A-MVP-01..07, behind #45)"`.
+
+**Three pins hold the split in place**, in
+`tests/research/gate-semantics.test.mjs`, against the real exported helpers of the
+real script — all three `ok` in the 250 above: every gate green **with both scope
+notes present** is `PASS` / exit 0 **and the notes are still in the summary's
+`scopeNotes`**; a child gate reporting `NOT_RUN` is still `NOT_RUN` / exit 3 with the
+gate id in `notRunGates`; and an untracked track file is a defect / exit 1, with the
+controls that 1, 2 and 57 tracked files make the same run `PASS` and that an
+*unreported* count (`null`) is not invented into a failure.
 
 ### 0.6 Acceptance table A1..A5 → observation → evidence path
 
@@ -457,15 +548,18 @@ was not written to produce this answer, and a hand-edited declaration is refused
 | --- | --- | --- |
 | `npm run s2-008:harness` | 0 | `RESULT properties_held=5/5 not_run=0 broken=0 verdict=FAIL overall=PASS` |
 | `npm run verify:s2-008-replay` | 0 | `RESULT properties_held=2/2 not_run=0 verdict=FAIL overall=PASS` |
-| `npm run verify:s2-008` | **3** | `status NOT_RUN`, `ok false`, `exitCode 3`; all five gates `PASS(exit=0)` (`dependency`, `corpus`, `probes`, `replay`, `harness`); `blockingGates []`, `notRunGates []`, `defects []` |
+| `npm run verify:s2-008` | **3** | `status NOT_RUN`, `ok false`, `exitCode 3`; all five gates `PASS(exit=0)` (`dependency`, `corpus`, `probes`, `replay`, `harness`); `blockingGates []`, `notRunGates []`, `defects []` — **superseded by §0.5b**: that exit 3 was the last defect, and the current observed value is exit **0**, `status PASS`, with the two disclosures in the non-binding `scopeNotes` |
 | `npm test` | 0 | `# tests 1469  # pass 1462  # fail 0  # skipped 7` |
 | `npm run inventory:write` / `inventory:check` | 0 / 0 | `trackedFiles 842`; `listedFiles 842`, `missingFromInventory []`, `missingFromGit []` |
 | `S2_008_FRESHNESS_WINDOW_MS=0 node scripts/verify-s2-008.mjs --no-write` | 1 | `status FAIL`, `blockingGates ["replay"]`, `stale evidence: stale-run-timestamp` |
 
-The committed aggregator record is the artifact of those runs:
-`evidence/s2-008-summary.json` → `status NOT_RUN`, `exitCode 3`, `blockingGates []`,
-`defects []`, with both `NOT_RUN` disclosures — the table-derived harness A3, and the
-campaign behind [#45](https://github.com/SpaceDazher/Veritas/issues/45).
+The committed aggregator record was the artifact of those runs, and it is the record
+**§0.5b** replaced: `evidence/s2-008-summary.json` then read `status NOT_RUN`,
+`exitCode 3`, `blockingGates []`, `defects []`, with both `NOT_RUN` disclosures — the
+table-derived harness A3, and the campaign behind
+[#45](https://github.com/SpaceDazher/Veritas/issues/45). It now reads `status PASS`,
+`exitCode 0`, `blockingGates []`, `defects []`, and the same two disclosures in
+`scopeNotes`, which are recorded and printed and cannot decide a verdict.
 
 **Verified now — by this documentation pass, each with its observed exit code:**
 

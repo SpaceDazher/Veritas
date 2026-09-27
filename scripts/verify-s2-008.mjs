@@ -32,6 +32,14 @@
 // keeps its own exit code (0 / 1 / 3) and the aggregator keeps them separate
 // instead of averaging them into one number.
 //
+// A FIFTH KIND OF STATEMENT IS NOT A STATUS AT ALL. A `scopeNotes` entry says
+// what this track does NOT decide — which gate owns a property, and which part
+// of the ticket's scope is somebody else's campaign. It is recorded in the
+// summary and in the printed output, and it is deliberately kept out of the
+// status: a note is not an answer to "did a check this stage owns hold?", so a
+// note that could decide a verdict would be a verdict fixed by a constant that
+// is true on every run. See the three-way split at `deriveVerdict`.
+//
 //   node scripts/verify-s2-008.mjs
 //   node scripts/verify-s2-008.mjs --print-summary
 //   S2_008_FRESHNESS_WINDOW_MS=0 node scripts/verify-s2-008.mjs   # prove the refusal
@@ -383,12 +391,120 @@ function recordCarriesRunIds(record) {
 }
 
 /** The gate status, mapped from the child's exit code. Exit 3 is NOT_RUN and is
- *  never softened into a pass. */
-function gateStatusFromExit(exitCode) {
+ *  never softened into a pass. Exported so the gate-semantics tests can drive
+ *  the verdict cases with the SAME mapping a real run applies, rather than with
+ *  a hand-typed status. */
+export function gateStatusFromExit(exitCode) {
   if (exitCode === 0) return 'PASS';
   if (exitCode === 3) return 'NOT_RUN';
   if (exitCode === 1) return 'FAIL';
   return `NOT_RUN_UNMAPPED_EXIT_${String(exitCode)}`;
+}
+
+/**
+ * THE SCOPE NOTES (F2) — the statements that are neither a defect nor a
+ * gate-level NOT_RUN, because they answer a DIFFERENT question: not "did a
+ * check this stage owns hold?" and not "could such a check be made?", but
+ * "what does this track NOT decide, and whose answer is authoritative?".
+ *
+ *   * the A3-ownership note: the harness's A3 declares itself
+ *     `TABLE_DERIVED_RUN_RECORDS`, so its agreement count is definitional and
+ *     the replay's A3 is the measurement. This says WHICH GATE OWNS a
+ *     property; both gates ran, and `crossRecordAgreement` already refused a
+ *     harness A3 that claims a measurement it did not make; and
+ *   * the #45 scope statement: the campaign behind issue #45 is NOT_RUN, so this
+ *     deterministic track does not decide the ticket's own scope.
+ *
+ * They are RETURNED, not thrown away, and `verify` puts them in the summary's
+ * `scopeNotes` and the printed output. What they no longer do is vote: they used
+ * to be pushed into `notRun`, whose `length > 0` forces NOT_RUN, so a pair of
+ * notes that are present on every single run made this aggregator report
+ * `NOT_RUN` with an empty defect list and exit 3 forever, with all five gates
+ * PASS. A note that is always true cannot be evidence about the run.
+ * @param {{verdict: string, note: string}} crossRecord The result of
+ *   `crossRecordAgreement` for this run.
+ * @returns {string[]} The non-binding notes, in the order they are printed.
+ */
+export function ticketScopeNotes(crossRecord) {
+  const notes = [];
+  if (crossRecord?.verdict === 'NOT_COMPARABLE_DISCLOSED') {
+    notes.push(`the harness's A3 is table-derived, not a measurement (${crossRecord.note}); the authoritative A3 is the replay's`);
+  }
+  notes.push('the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket\'s own scope');
+  return notes;
+}
+
+/**
+ * THE DERIVED VERDICT — F1, F2, F3, in ONE place, and exported so
+ * `tests/research/gate-semantics.test.mjs` pins the decision with the same code
+ * a real run executes rather than with a re-implementation of it.
+ *
+ * THREE KINDS OF STATEMENT, AND ONLY ONE OF THEM DECIDES (EV5, repaired):
+ *
+ *   1. BLOCKING DEFECTS — a check this stage DID perform and that failed, plus
+ *      the ticket-level precondition that provability is a hard requirement of
+ *      this repository. A blocking gate, or a provability defect, is `FAIL`
+ *      (exit 1).
+ *   2. GATE-LEVEL NOT_RUNs — "I could not check": a gate that could not run, a
+ *      mandatory probe or control that did not run, a cross-process replay that
+ *      did not complete, a hard-gate counter map the probes gate did not report.
+ *      Every one of them is `NOT_RUN` (exit 3) and none is ever a pass. Both
+ *      `notRunGates` (the gates whose own status is NOT_RUN) and `notRun` (the
+ *      named reasons) are read, because one gate-level NOT_RUN is reportable
+ *      without that gate's own status flipping — the probes gate that exits 0
+ *      and printed no counter map is the case that needs the second term, and
+ *      dropping it would turn a check this stage could not make into a PASS.
+ *   3. SCOPE NOTES — see `ticketScopeNotes`. They are recorded in the summary
+ *      and in the printed output, and they CANNOT decide anything: a scope note
+ *      is not an answer to the question the verdict asks. It never says whether
+ *      a check this stage owns was performed or what it found — it says what
+ *      the track does not decide — so a note that can veto is a gate whose
+ *      verdict a constant decides, and a constant present on every run makes
+ *      the gate permanently NOT_RUN while every gate it aggregates is PASS.
+ *
+ * F3, THE ONE PLACE THIS REPAIR IS STRICTER THAN THE FILE IT REPLACED: the
+ * track's own files being untracked used to be a soft note. Provability is a
+ * hard requirement here — an untracked track is bound to no base a reader can
+ * check — so it is a blocking DEFECT now, and the aggregator goes RED (exit 1)
+ * instead of yellow. Nothing else became stricter or more permissive: a gate
+ * that could not run still yields `NOT_RUN` and exit 3, a failed gate is still
+ * `FAIL` and exit 1, and a scope note still cannot fail a run.
+ * @param {{gates?: object, defects?: string[], notRun?: string[], scopeNotes?: string[]}} input
+ * @returns {{status: string, ok: boolean, exitCode: number, defects: string[],
+ *   notRun: string[], scopeNotes: string[], blockingGates: string[],
+ *   notRunGates: string[], provabilityDefects: string[]}}
+ */
+export function deriveVerdict({ gates = {}, defects = [], notRun = [], scopeNotes = [] } = {}) {
+  // The gate statuses are read, never averaged: one NOT_RUN is a NOT_RUN.
+  const blocking = Object.entries(gates).filter(([, gate]) => gate.status === 'FAIL' || gate.status === 'BLOCKED_DEPENDENCY' || String(gate.status).startsWith('NOT_RUN_UNMAPPED'));
+  const notRunGates = Object.entries(gates).filter(([, gate]) => gate.status === 'NOT_RUN' || String(gate.status).startsWith('NOT_RUN_UNMAPPED'));
+  // F3: the provability precondition, as a blocking defect. `git ls-files`
+  // counts this track's own files; zero of them means no artefact here is bound
+  // to a base, and the two integrity gates that would have noticed are green for
+  // the wrong reason. Previously a note (and then a NOT_RUN entry); now RED.
+  // The test is the strict `=== 0` and NOT `Number(x) === 0`: a dependency gate
+  // that reported `null` (it said nothing) is not a gate that reported ZERO, and
+  // a coercion would turn a missing report into a fabricated failure.
+  const provabilityDefects = gates.dependency?.track_files_tracked === 0
+    ? ['provability: the track\'s own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git']
+    : [];
+  // F1: the status reads the GATE-LEVEL terms and the blocking defects, and
+  // `notRun` now holds gate-level entries only — a scope note cannot reach it,
+  // so the two notes that are present on every run can no longer decide this.
+  const status = blocking.length > 0 || provabilityDefects.length > 0
+    ? 'FAIL'
+    : (notRunGates.length > 0 || notRun.length > 0 ? 'NOT_RUN' : 'PASS');
+  return {
+    status,
+    ok: status === 'PASS',
+    exitCode: status === 'PASS' ? 0 : (status === 'NOT_RUN' ? 3 : 1),
+    defects: [...defects, ...provabilityDefects],
+    notRun: [...notRun],
+    scopeNotes: [...scopeNotes],
+    blockingGates: blocking.map(([id]) => id),
+    notRunGates: notRunGates.map(([id]) => id),
+    provabilityDefects,
+  };
 }
 
 export function verify(args = {}) {
@@ -557,32 +673,66 @@ export function verify(args = {}) {
   const crossRecord = crossRecordAgreement(harnessRecord, classified.evidence);
   if (crossRecord.issues.length > 0) {
     defects.push(`harness/replay A3 disagreement: ${crossRecord.issues.join('; ')}`);
-  } else if (crossRecord.verdict === 'NOT_COMPARABLE_DISCLOSED') {
-    notRun.push(`NOT_RUN: the harness's A3 is table-derived, not a measurement (${crossRecord.note}); the authoritative A3 is the replay's`);
   }
-
-  // 4. the derived verdict. The gate statuses are read, never averaged: one
-  //    NOT_RUN is a NOT_RUN.
-  const blocking = Object.entries(gates).filter(([, gate]) => gate.status === 'FAIL' || gate.status === 'BLOCKED_DEPENDENCY' || String(gate.status).startsWith('NOT_RUN_UNMAPPED'));
-  const notRunGates = Object.entries(gates).filter(([, gate]) => gate.status === 'NOT_RUN' || String(gate.status).startsWith('NOT_RUN_UNMAPPED'));
-  // EV5: THE STATUS IS NEVER PASS, AND THE SUMMARY SAYS WHY IN ONE PLACE.
+  // F2: the two informational statements leave `notRun` and become
+  // `scopeNotes` — recorded, printed, and unable to decide the verdict. They are
+  // BUILT by `ticketScopeNotes` and DERIVED by `deriveVerdict`, which is what
+  // tests/research/gate-semantics.test.mjs pins; nothing here re-types a note.
+  const scopeNotes = ticketScopeNotes(crossRecord);
+  // 4. THE DERIVED VERDICT: ONE STATUS, THREE KINDS OF STATEMENT, AND ONLY THE
+  //    FIRST TWO DECIDE IT. The rule itself is `deriveVerdict` (exported, and
+  //    pinned by tests/research/gate-semantics.test.mjs); this paragraph is the
+  //    honest description of what it does.
   //
-  // This used to compute a PASS and then push a disclaimer into `defects` while
-  // also setting `ok: true` and `exitCode: 0` — a green summary that
-  // contradicted its own defects. The two ticket-level preconditions are
-  // therefore STATUS TERMS now, and each is a named NOT_RUN entry:
-  //   * the campaign behind #45 is NOT_RUN, so this track's engineering result
-  //     is not the ticket's verdict; and
-  //   * the track's own files are untracked until delivery adds them, so nothing
-  //     here is bound to a base a reader can check.
-  // A reader of ONE file now sees a single consistent answer.
-  const ticketPreconditions = [];
-  if (gates.dependency.track_files_tracked === 0) {
-    ticketPreconditions.push('the track\'s own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git');
-  }
-  ticketPreconditions.push('the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket\'s own scope');
-  for (const reason of ticketPreconditions) notRun.push(`NOT_RUN: ${reason}`);
-  const status = blocking.length > 0 ? 'FAIL' : (notRunGates.length > 0 || notRun.length > 0 ? 'NOT_RUN' : 'PASS');
+  //    EV5: THIS USED TO BE A GREEN SUMMARY THAT CONTRADICTED ITS OWN DEFECTS —
+  //    it computed a PASS and then pushed a disclaimer into `defects` while
+  //    also setting `ok: true` and `exitCode: 0`. The repair is a three-way
+  //    split, because "a check failed", "a check could not be made" and "this
+  //    track does not decide that" are three different claims, and only the
+  //    first two are about this run's own work:
+  //
+  //      1. BLOCKING DEFECTS (`defects`, `blockingGates`) — a check this stage
+  //         DID perform and that failed (a gate that exited 1, a drifted corpus,
+  //         a moved hard-gate counter, a harness/replay A3 disagreement), plus
+  //         the ticket-level precondition that PROVABILITY is a hard requirement
+  //         of this repository. `FAIL`, exit 1.
+  //      2. GATE-LEVEL NOT_RUNs (`notRun`, `notRunGates`) — "I could not
+  //         check": the dependency gate that could not run, the corpus check
+  //         that could not run, a mandatory probe or control that did not run,
+  //         the cross-process replay that did not complete, the hard-gate
+  //         counter map the probes gate did not report, the harness that could
+  //         not run every property. `NOT_RUN`, exit 3, never a pass and never a
+  //         soft pass: a gate that could not run still yields exit 3, and that
+  //         path is unchanged by this repair.
+  //      3. NON-BINDING SCOPE NOTES (`scopeNotes`) — statements about WHAT THIS
+  //         TRACK DOES NOT DECIDE, never about a check it owns: which gate OWNS
+  //         a property (the harness's A3 is table-derived, so the replay's A3 is
+  //         the authoritative one) and the SCOPE of the ticket (the campaign
+  //         behind #45 is NOT_RUN, so this deterministic track does not decide
+  //         the ticket's own verdict). Recorded in the summary and in the
+  //         printed output, and they decide NOTHING.
+  //
+  //    WHY A SCOPE NOTE MUST NOT BE ABLE TO DECIDE A VERDICT: it is not an
+  //    answer to the question the verdict asks — it never says whether a check
+  //    this stage owns was performed or what it found — so a note that votes is
+  //    a veto, and a veto held by a statement that is true on EVERY run is a
+  //    gate whose verdict is a constant. That is the bug this repair removes:
+  //    the two notes named in (3) are present on every run of this track, so
+  //    while they sat in `notRun` (whose `length > 0` forces NOT_RUN) the
+  //    aggregator reported `status NOT_RUN`, `exit 3`, `blockingGates []`,
+  //    `defects []` FOREVER, with all five gates PASS. Honest about scope is
+  //    required; letting the scope decide is what made this gate meaningless.
+  //
+  //    F3, THE ONE PLACE THIS REPAIR IS STRICTER THAN THE FILE IT REPLACED:
+  //    the third ticket-level precondition — "the track's own files are
+  //    untracked (git ls-files reports 0 of them), so no artefact of this track
+  //    is bound to a base a reader can check" — was a soft note here and is a
+  //    blocking DEFECT now. Provability is a hard requirement of this
+  //    repository, so an untracked track turns the gate RED (exit 1) rather than
+  //    yellow. Nothing else changed direction: nothing became more permissive,
+  //    and every other non-zero exit of this file is untouched.
+  const verdict = deriveVerdict({ gates, defects, notRun, scopeNotes });
+  const status = verdict.status;
   // The instant this SUMMARY was produced, which is the gate's own observation
   // instant: the one both child records were judged against plus the run's own
   // end. Sampled here rather than at the top of the function, for the reason
@@ -593,14 +743,17 @@ export function verify(args = {}) {
     gate: 'scripts/verify-s2-008.mjs',
     role: 'verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the freshness refusal, and the derived status',
     status,
-    ok: status === 'PASS',
-    exitCode: status === 'PASS' ? 0 : (status === 'NOT_RUN' ? 3 : 1),
+    ok: verdict.ok,
+    exitCode: verdict.exitCode,
     base,
     gates,
-    defects,
-    notRun,
-    blockingGates: blocking.map(([id]) => id),
-    notRunGates: notRunGates.map(([id]) => id),
+    defects: verdict.defects,
+    notRun: verdict.notRun,
+    // F2: the non-binding statements, kept in the summary and in the printed
+    // output. The honesty of the record is the point; their silence is not.
+    scopeNotes: verdict.scopeNotes,
+    blockingGates: verdict.blockingGates,
+    notRunGates: verdict.notRunGates,
     freshness: {
       observed_at: observedAtIso,
       started_at: startedAtIso,
@@ -621,7 +774,12 @@ export function verify(args = {}) {
       harness_a3_is: crossRecord.verdict === 'COMPARABLE' ? 'MEASUREMENT_AND_AGREES' : 'TABLE_DERIVED_NOT_A_MEASUREMENT',
       cross_record_agreement: crossRecord,
     },
-    ticket_preconditions_not_met: ticketPreconditions,
+    // F2/F3: each ticket-level statement has ONE home. The provability
+    // precondition is unmet and is a defect (so it is in `defects` above and
+    // here); the #45 campaign statement is a scope note and is in
+    // `scopeNotes`. This list therefore names only unmet preconditions this
+    // file treats as defects, and is empty on a run whose track is tracked.
+    ticket_preconditions_not_met: verdict.provabilityDefects,
     engineering_status: 'BLOCKED_DEPENDENCY',
     assurance_status: 'NOT_MEASURED',
     real_adapter_status: 'NOT_RUN_REAL_ADAPTER',
@@ -666,6 +824,9 @@ function main() {
       notRunGates: summary.notRunGates,
       defects: summary.defects,
       notRun: summary.notRun,
+      // F2: printed, so the notes are readable in the run's own output and not
+      // only by opening the summary file.
+      scopeNotes: summary.scopeNotes,
       ...(written ? { written } : {}),
     }, null, 2)}\n`);
   }

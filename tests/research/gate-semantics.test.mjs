@@ -82,7 +82,15 @@ import test from 'node:test';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { wilsonInterval } from '../../src/lib/sloqual/statistics.mjs';
 import { decisionFromInterval, latencyRecorded, resolveCampaignVerdict, resolveTrialVerdict, ruleFeasibility } from '../../src/lib/research/comparator.mjs';
-import { classifyCurrentReplay, freshnessVerdict } from '../../scripts/verify-s2-008.mjs';
+import { classifyCurrentReplay, crossRecordAgreement, freshnessVerdict } from '../../scripts/verify-s2-008.mjs';
+// The members THIS repair adds to the aggregator are read through a NAMESPACE,
+// for the reason this file's header gives for `expected-values.mjs`: a named
+// import of a member that does not exist is a LINK-TIME SyntaxError that takes
+// the whole file down, so one missing export would hide every other case behind
+// a single stack trace. A namespace cannot do that — the missing member reads as
+// `undefined` and the case that needs it fails with a message naming the arrival
+// it is waiting for.
+import * as aggregator from '../../scripts/verify-s2-008.mjs';
 import { campaignDecisionAgreement } from '../../scripts/s2-008-replay.mjs';
 import * as expectedValues from '../../src/lib/research/expected-values.mjs';
 import {
@@ -718,5 +726,216 @@ test('the decision path reads no clock and no random source', () => {
     for (const [pattern, what] of [[/\bDate\.now\s*\(/, 'Date.now()'], [/\bMath\.random\s*\(/, 'Math.random()'], [/new Date\s*\(\s*\)/, 'new Date() with no argument']]) {
       assert.equal(pattern.test(code), false, `src/lib/research/${name} reads ${what} on a decision path`);
     }
+  }
+});
+
+// --- the aggregator's THREE-WAY SPLIT (F1..F3, the aggregator fix) ---------
+//
+// WHAT WAS BROKEN, IN THE OWN WORDS OF THE DEFECT: `notRun` received TWO KINDS
+// OF ENTRY. Gate-level NOT_RUNs — the dependency gate that could not run, the
+// corpus check that could not run, a mandatory probe or control that did not
+// run, the cross-process replay, the harness that could not run every property
+// — which are real. And two INFORMATIONAL statements about scope: which gate
+// OWNS a property (the harness's A3 is table-derived, so the replay's A3 is the
+// authoritative one) and which part of the ticket belongs to the campaign behind
+// #45. The status line read `notRun.length > 0`, so two notes that are present
+// on EVERY run of this track made the aggregator report `NOT_RUN` and exit 3
+// forever, with an empty defect list and all five gates PASS.
+//
+// THE THREE KINDS, AND WHAT EACH ONE MAY DO
+//   1. blocking defects      -> FAIL, exit 1. A check this stage performed and
+//      that failed, plus the provability precondition (F3: an untracked track
+//      turns the gate RED, where it used to be a soft note).
+//   2. gate-level NOT_RUNs   -> NOT_RUN, exit 3. "I could not check", never a
+//      pass, never a soft pass. UNCHANGED by the repair.
+//   3. non-binding scope notes -> recorded in `scopeNotes`, in the summary and
+//      in the printed output, and unable to decide anything.
+//
+// WHY THE SPLIT IS PINNED HERE AND NOT IN A MOCK: every case below calls the
+// aggregator's OWN exported functions — `crossRecordAgreement` to produce the
+// cross-record verdict the A3 note is written from, `aggregator.ticketScopeNotes`
+// to build the notes, `aggregator.gateStatusFromExit` for the child-exit ->
+// status mapping a real run applies, and `aggregator.deriveVerdict`, the single
+// place the status is computed. A mock of `deriveVerdict` would assert that a
+// mock returns what the mock returns; these cases assert the rule the aggregator
+// a reader runs enforces. The full aggregator (`verify`) spawns four child gates
+// and rewrites the evidence records, so the run that exercises this wiring end to
+// end is `npm run verify:s2-008`, not a test — the last case here is a source
+// tripwire that the wiring has not been abandoned.
+
+/**
+ * The five child gates in the shape `verify` builds them, every one PASS — the
+ * shape a real green run has. `overrides` replaces or merges a member, and
+ * `trackFilesTracked` is the dependency gate's own `git ls-files` count.
+ */
+function gatesAllGreen(overrides = {}, { trackFilesTracked = 57 } = {}) {
+  const gates = {
+    dependency: { status: 'PASS', exitCode: 0, track_files_tracked: trackFilesTracked },
+    corpus: { status: 'PASS', exitCode: 0 },
+    probes: { status: 'PASS', exitCode: 0 },
+    replay: { status: 'PASS', exitCode: 0 },
+    harness: { status: 'PASS', exitCode: 0 },
+  };
+  for (const [id, gate] of Object.entries(overrides)) {
+    gates[id] = { ...(gates[id] ?? {}), ...gate };
+  }
+  return gates;
+}
+
+/** The cross-record result of a run whose harness A3 DISCLOSES that it is
+ *  table-derived — the shape the delivered harness record has, and the one the
+ *  A3-ownership scope note is written from. */
+function disclosedCrossRecord() {
+  return crossRecordAgreement({
+    ticket: 'S2-008',
+    kind: 'HARNESS',
+    properties: [{ id: 'A3', ok: true, agreement_source: 'TABLE_DERIVED_RUN_RECORDS', evidence: 'findingsA=0 findingsB=0' }],
+  }, replayRecord());
+}
+
+test('F1 every gate green plus BOTH scope notes is PASS and exit 0, and both notes are still in the summary', () => {
+  // The case the defect is about, in the shape it actually occurs: all five
+  // gates PASS, no defect, no gate-level NOT_RUN — and the two informational
+  // notes present, which is every run of this track.
+  const scopeNotes = aggregator.ticketScopeNotes(disclosedCrossRecord());
+  assert.equal(scopeNotes.length, 2, `the two scope notes this track always carries were not both built: ${JSON.stringify(scopeNotes)}`);
+  assert.match(scopeNotes[0], /table-derived/, `the A3-ownership note says something else: ${scopeNotes[0]}`);
+  assert.match(scopeNotes[0], /authoritative A3 is the replay's/, scopeNotes[0]);
+  assert.match(scopeNotes[1], /#45/, `the #45 scope statement says something else: ${scopeNotes[1]}`);
+  const verdict = aggregator.deriveVerdict({ gates: gatesAllGreen(), defects: [], notRun: [], scopeNotes });
+  // The verdict the defect says was unreachable.
+  assert.equal(verdict.status, 'PASS', `two scope notes decided the verdict again: ${JSON.stringify(verdict)}`);
+  assert.equal(verdict.ok, true);
+  assert.equal(verdict.exitCode, 0, 'a PASS must exit 0 — the exit code is the answer a pipeline reads');
+  assert.deepEqual([...verdict.blockingGates], []);
+  assert.deepEqual([...verdict.notRunGates], []);
+  assert.deepEqual([...verdict.notRun], [], 'a green run has no gate-level NOT_RUN');
+  assert.deepEqual([...verdict.defects], []);
+  // …and the record is not laundered: the notes are STILL THERE, member for
+  // member, because the honesty of the record is the point.
+  assert.deepEqual([...verdict.scopeNotes], [...scopeNotes], 'the scope notes were dropped from the summary instead of being made non-binding');
+  // The note set is DERIVED from the run, not a constant: a harness A3 that
+  // claims to be a measurement carries no A3-ownership note, and the verdict is
+  // unchanged. A veto that switches off with a disclosure would be a gate whose
+  // answer depends on its own honesty about provenance.
+  const comparable = crossRecordAgreement({
+    properties: [{ id: 'A3', ok: true, agreement_source: 'MEASURED', evidence: 'findingsA=0 findingsB=0' }],
+  }, replayRecord());
+  assert.equal(comparable.verdict, 'COMPARABLE', 'a measurement-declaring A3 was not treated as a measurement');
+  const measuredNotes = aggregator.ticketScopeNotes(comparable);
+  assert.equal(measuredNotes.length, 1, `a measured A3 still produced an ownership note: ${JSON.stringify(measuredNotes)}`);
+  assert.equal(aggregator.deriveVerdict({ gates: gatesAllGreen(), defects: [], notRun: [], scopeNotes: measuredNotes }).status, 'PASS');
+});
+
+test('F1 a child gate that reported NOT_RUN is still NOT_RUN, exit 3, and named in notRunGates', () => {
+  // The path the repair must NOT touch: a gate that could not run. Exit 3 stays
+  // NOT_RUN, the status is NOT_RUN, the process exits 3, and the gate is named
+  // in `notRunGates` so a reader of ONE file knows WHICH check could not be
+  // made. The scope notes are present here too — they must not soften it, and
+  // they must not sharpen it.
+  const scopeNotes = aggregator.ticketScopeNotes(disclosedCrossRecord());
+  const verdict = aggregator.deriveVerdict({
+    gates: gatesAllGreen({ harness: { status: aggregator.gateStatusFromExit(3), exitCode: 3 } }),
+    defects: [],
+    notRun: ['NOT_RUN: the harness could not run every property'],
+    scopeNotes,
+  });
+  assert.equal(verdict.status, 'NOT_RUN', `a gate that could not run reported ${verdict.status}: ${JSON.stringify(verdict)}`);
+  assert.equal(verdict.exitCode, 3, 'NOT_RUN must exit 3 and never 0');
+  assert.equal(verdict.ok, false);
+  assert.deepEqual([...verdict.notRunGates], ['harness'], 'the NOT_RUN gate was not named');
+  assert.deepEqual([...verdict.blockingGates], [], 'a NOT_RUN is not a blocking gate');
+  assert.deepEqual([...verdict.scopeNotes], [...scopeNotes], 'the notes must survive a NOT_RUN run unchanged too');
+  // The SECOND gate-level NOT_RUN form: a gate that exits 0 but reported no
+  // counter map is a check this stage could not make, and its own status never
+  // flips. It stays NOT_RUN — dropping this term would have turned a check that
+  // could not be performed into a PASS, which is the weakening the repair is
+  // forbidden to make.
+  const countersAbsent = aggregator.deriveVerdict({
+    gates: gatesAllGreen(),
+    defects: [],
+    notRun: ['NOT_RUN: the probes gate reported no counter map'],
+    scopeNotes,
+  });
+  assert.equal(countersAbsent.status, 'NOT_RUN', 'a probes gate that printed no counter map was read as a pass');
+  assert.equal(countersAbsent.exitCode, 3);
+  // The exit-code vocabulary itself, since every case above maps an exit to a
+  // status through it: 0 is PASS, 1 is FAIL, 3 is NOT_RUN, and an exit nobody
+  // mapped is NOT softened — it is named, it is both a blocking gate and a
+  // NOT_RUN gate, and blocking wins, which is the pre-repair behaviour of that
+  // path and is left exactly as it was.
+  assert.equal(aggregator.gateStatusFromExit(0), 'PASS');
+  assert.equal(aggregator.gateStatusFromExit(1), 'FAIL');
+  assert.equal(aggregator.gateStatusFromExit(3), 'NOT_RUN');
+  assert.match(aggregator.gateStatusFromExit(9), /^NOT_RUN_UNMAPPED_EXIT_/);
+  const unmapped = aggregator.deriveVerdict({ gates: gatesAllGreen({ probes: { status: aggregator.gateStatusFromExit(9), exitCode: 9 } }), defects: [], notRun: [], scopeNotes });
+  assert.equal(unmapped.status, 'FAIL', 'an unmapped child exit was softened into a pass');
+  assert.equal(unmapped.exitCode, 1);
+  assert.deepEqual([...unmapped.blockingGates], ['probes']);
+  assert.deepEqual([...unmapped.notRunGates], ['probes']);
+});
+
+test('F3 an UNTRACKED track file is a DEFECT and exit 1 — strictly stricter than the note it replaced', () => {
+  // Provability is a hard requirement of this repository, so a track whose own
+  // files `git ls-files` cannot see must turn this gate RED. It was a soft note
+  // (and then a NOT_RUN entry) before this repair; nothing here is weaker than
+  // that, and this case is the one place the aggregator became stricter.
+  const scopeNotes = aggregator.ticketScopeNotes(disclosedCrossRecord());
+  const verdict = aggregator.deriveVerdict({ gates: gatesAllGreen({}, { trackFilesTracked: 0 }), defects: [], notRun: [], scopeNotes });
+  assert.equal(verdict.status, 'FAIL', `an untracked track was not a failure: ${JSON.stringify(verdict)}`);
+  assert.equal(verdict.exitCode, 1, 'a blocking defect must exit 1, not 3 — 3 is NOT_RUN and this is a FAIL');
+  assert.equal(verdict.ok, false);
+  assert.equal(verdict.defects.length, 1, `the untracked track produced no defect: ${JSON.stringify(verdict.defects)}`);
+  assert.match(verdict.defects[0], /untracked/, verdict.defects[0]);
+  assert.match(verdict.defects[0], /bound to a base a reader can check/, verdict.defects[0]);
+  assert.deepEqual([...verdict.provabilityDefects], [...verdict.defects], 'the provability defect must also be the unmet ticket precondition');
+  assert.deepEqual([...verdict.notRunGates], [], 'this is a FAIL, not a NOT_RUN');
+  assert.deepEqual([...verdict.scopeNotes], [...scopeNotes], 'a failure must not drop the scope notes from the record');
+  // THE CONTROL, or the case proves nothing: the count is the whole rule. One
+  // tracked file of this track is enough, and the same gates with it are PASS —
+  // so the red above is about provability and not about the gates.
+  for (const tracked of [1, 2, 57]) {
+    const green = aggregator.deriveVerdict({ gates: gatesAllGreen({}, { trackFilesTracked: tracked }), defects: [], notRun: [], scopeNotes });
+    assert.equal(green.status, 'PASS', `${String(tracked)} tracked files did not make the same green run a pass`);
+    assert.deepEqual([...green.defects], []);
+  }
+  // A dependency gate that never reported the count is not the same as zero, and
+  // is not invented into a failure: `null` means the gate did not say, and the
+  // aggregate verdict reads the gates' own statuses for that.
+  const unreported = aggregator.deriveVerdict({ gates: gatesAllGreen({ dependency: { track_files_tracked: null } }), defects: [], notRun: [], scopeNotes });
+  assert.equal(unreported.status, 'PASS', 'an unreported tracked-file count was invented into a failure');
+  // And a real defect still fails, and still names the gate: the provability
+  // term is ADDITIVE to the existing ones, never a replacement for them.
+  const alsoFailed = aggregator.deriveVerdict({ gates: gatesAllGreen({ corpus: { status: 'FAIL', exitCode: 1 } }, { trackFilesTracked: 0 }), defects: ['corpus gate: FAIL (drift in evidence/s2-008/corpus/manifest.json)'], notRun: [], scopeNotes });
+  assert.equal(alsoFailed.status, 'FAIL');
+  assert.equal(alsoFailed.exitCode, 1);
+  assert.deepEqual([...alsoFailed.blockingGates], ['corpus']);
+  assert.equal(alsoFailed.defects.length, 2, 'the corpus defect was lost when the provability defect fired');
+});
+
+test('the aggregator DERIVES its status through deriveVerdict, and its source no longer votes with the notes', () => {
+  // The wiring tripwire. `deriveVerdict` and the cases above are only the gate if
+  // `verify` actually calls them: a later repair that recomputes the status
+  // inline would leave every case above green and the aggregator wrong again.
+  const source = readFileSync(path.join(REPO, 'scripts', 'verify-s2-008.mjs'), 'utf8');
+  assert.match(source, /deriveVerdict\(\{ gates, defects, notRun, scopeNotes \}\)/, 'verify no longer derives its status through deriveVerdict');
+  assert.match(source, /scopeNotes: verdict\.scopeNotes/, 'the summary no longer publishes the notes the derivation returned');
+  assert.match(source, /const scopeNotes = ticketScopeNotes\(crossRecord\);/, 'the notes are no longer built by the one function that owns them');
+  // The defect itself, as a property of the source: neither note may be pushed
+  // into `notRun`, and the two of them are built inside `ticketScopeNotes`
+  // rather than typed at a call site.
+  assert.equal(/notRun\.push\([^)]*A3 is table-derived/.test(source), false, 'the A3-ownership note is back in notRun');
+  assert.equal(/notRun\.push\([^)]*#45/.test(source), false, 'the #45 scope statement is back in notRun');
+  assert.equal(/for \(const reason of ticketPreconditions\)/.test(source), false, 'the ticket preconditions are pushed into notRun again');
+  // And the freshness and staleness refusals are still in this file, verbatim in
+  // shape — the repair was to the status line and to nothing else.
+  for (const [pattern, what] of [
+    [/'stale-tree-sha'/, 'the stale-tree refusal'],
+    [/'stale-run-timestamp'/, 'the stale-run refusal'],
+    [/'record-from-the-future'/, 'the record-from-the-future refusal'],
+    [/'green-with-nonzero-exit'/, 'the green-written-by-a-failing-run refusal'],
+    [/not the one this invocation wrote/, 'the stale-green byte refusal'],
+  ]) {
+    assert.match(source, pattern, `${what} is gone from the aggregator`);
   }
 });

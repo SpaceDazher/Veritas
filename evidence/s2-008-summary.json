@@ -2,15 +2,15 @@
   "ticket": "S2-008",
   "gate": "scripts/verify-s2-008.mjs",
   "role": "verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the freshness refusal, and the derived status",
-  "status": "NOT_RUN",
-  "ok": false,
-  "exitCode": 3,
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0,
   "base": {
-    "commit_sha": "813f5be66d8ddd936e925cca491063c6409ff7c3",
-    "tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
+    "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
+    "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 51,
+    "tracked_files_of_this_track": 57,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
@@ -27,7 +27,7 @@
         "S1-004:BOUND",
         "S1-011:BOUND"
       ],
-      "track_files_tracked": 51
+      "track_files_tracked": 57
     },
     "corpus": {
       "status": "PASS",
@@ -236,19 +236,19 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-27T13:39:41.765Z",
-        "finished_at": "2026-09-27T13:39:44.083Z",
+        "observed_at": "2026-09-27T14:40:17.165Z",
+        "finished_at": "2026-09-27T14:40:19.153Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
-        "age_ms": 8
+        "age_ms": 6
       }
     },
     "harness": {
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-27T13:39:44.600Z",
+      "observed_at": "2026-09-27T14:40:19.617Z",
       "overall": "PASS",
       "verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
@@ -265,22 +265,23 @@
     }
   },
   "defects": [],
-  "notRun": [
-    "NOT_RUN: the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
-    "NOT_RUN: the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
+  "notRun": [],
+  "scopeNotes": [
+    "the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
+    "the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
   ],
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-27T13:39:44.600Z",
-    "started_at": "2026-09-27T13:39:35.115Z",
-    "replay_judged_at": "2026-09-27T13:39:44.091Z",
-    "harness_judged_at": "2026-09-27T13:39:44.600Z",
+    "observed_at": "2026-09-27T14:40:19.617Z",
+    "started_at": "2026-09-27T14:40:12.248Z",
+    "replay_judged_at": "2026-09-27T14:40:19.159Z",
+    "harness_judged_at": "2026-09-27T14:40:19.617Z",
     "window_ms": 21600000,
-    "head_tree_sha": "504f0a1947fd6c19f5a53695c18f322bdd9880fa",
-    "replay_finished_at": "2026-09-27T13:39:44.083Z"
+    "head_tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
+    "replay_finished_at": "2026-09-27T14:40:19.153Z"
   },
-  "track_status": "NOT_RUN",
+  "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
     "a3": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
     "a5": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
@@ -299,14 +300,12 @@
       }
     }
   },
-  "ticket_preconditions_not_met": [
-    "the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
-  ],
+  "ticket_preconditions_not_met": [],
   "engineering_status": "BLOCKED_DEPENDENCY",
   "assurance_status": "NOT_MEASURED",
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-27T13:39:44.600Z",
-  "startedAtIso": "2026-09-27T13:39:35.115Z"
+  "observedAtIso": "2026-09-27T14:40:19.617Z",
+  "startedAtIso": "2026-09-27T14:40:12.248Z"
 }
