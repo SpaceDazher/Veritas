@@ -47,7 +47,24 @@
 // this twice on the same base produces byte-identical evidence, because every
 // instant in it is the injected one and the base SHAs are the only thing that
 // can move.
+// A NOTE ON THE WALL CLOCK AND ON THE INVOCATION ID
+// Exactly two numbers in this record come from outside the frozen literals, and
+// both are marked `decides: false`:
+//   * `freshness.observed_at` exists so `verify-s2-008.mjs` can tell a fresh
+//     record from a stale one;
+//   * `invocation_id` is the id `scripts/verify-s2-008.mjs` generates once per
+//     chain run and passes with `--invocation-id`, so a record copied from an
+//     earlier run cannot be read as this run's.
+// Both are excluded from the repeatability comparison BY NAME. Neither decides
+// what a property is worth; the invocation id decides only WHETHER the record on
+// disk is the one this run produced, never WHAT the campaign is.
+//
+//   node scripts/s2-008-harness.mjs
+//   node scripts/s2-008-harness.mjs --no-write
+//   node scripts/s2-008-harness.mjs --invocation-id <hex>            (spawned by the chain)
+//   node scripts/s2-008-harness.mjs --out .bb/s2-008/harness.json    (record written there instead)
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -85,6 +102,9 @@ import { assertFrozenCampaignDerivable } from '../src/lib/research/campaign-expe
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CORPUS_DIR = path.join(REPO_ROOT, 'evidence', 's2-008', 'corpus');
 const EVIDENCE_DIR = path.join(REPO_ROOT, 'evidence');
+/** THIS record's own file name, named once because the invocation binding, the
+ *  `--out` destination and the printed digest all key on it. */
+const HARNESS_RECORD_NAME = 's2-008-harness.json';
 const SCRATCH = path.join(REPO_ROOT, '.bb', 's2-008', 'harness');
 
 /** The injected clock. A frozen literal, never `Date.now()`. @type {string} */
@@ -790,6 +810,64 @@ function wantsWrite(argv) {
   return true;
 }
 
+/** `--invocation-id <id>`: the chain's per-run id, recorded in the record so a
+ *  reader can tell this run's record from a previous run's copy. A bare
+ *  `--invocation-id` (no value) and a malformed id are a REFUSAL, not a
+ *  default: a caller that asked to bind this record to an invocation and named
+ *  nothing must not get a record that claims to be unbound.
+ *
+ *  It decides nothing. The properties, the table, the comparator and the exit
+ *  code are computed exactly as before, whether the id is present or not.
+ *
+ *  @param {string[]} argv
+ *  @returns {string|null} the id, or null when the caller passed none
+ */
+function readInvocationId(argv) {
+  for (let index = 2; index < argv.length; index += 1) {
+    const token = String(argv[index] ?? '');
+    const match = /^--invocation[-_]id(?:=(.*))?$/.exec(token);
+    if (match === null) continue;
+    const inline = match[1];
+    const value = inline !== undefined ? inline : (String(argv[index + 1] ?? '').startsWith('--') ? '' : String(argv[index + 1] ?? ''));
+    if (inline === undefined) index += 1;
+    if (!/^[!-~]{1,200}$/.test(value)) {
+      const error = new Error(`--invocation-id must be 1-200 printable non-space characters, got ${JSON.stringify(String(value).slice(0, 40))}`);
+      error.code = 'HARNESS_INVOCATION_ID_INVALID';
+      throw error;
+    }
+    return value;
+  }
+  return null;
+}
+
+/** `--out <path>`: where THIS record (`s2-008-harness.json`) is written. The
+ *  three companion records keep their own destinations, and `--no-write` still
+ *  writes nothing anywhere — the flag is a destination, not a decision.
+ *
+ *  It exists for one reason: the chain spawns this harness with `--no-write`, so
+ *  the record it judges is the one on disk from an EARLIER run, and a per-run
+ *  invocation id can never match it. A chain that wants the id binding to be
+ *  decidable asks for the record at a path of its own choosing, where this run's
+ *  bytes land and the committed record is never touched.
+ */
+function readOut(argv) {
+  for (let index = 2; index < argv.length; index += 1) {
+    const token = String(argv[index] ?? '');
+    const match = /^--out(?:=(.*))?$/.exec(token);
+    if (match === null) continue;
+    const inline = match[1];
+    const value = inline !== undefined ? inline : (String(argv[index + 1] ?? '').startsWith('--') ? '' : String(argv[index + 1] ?? ''));
+    if (inline === undefined) index += 1;
+    if (value.length === 0) {
+      const error = new Error('--out was passed with no path');
+      error.code = 'HARNESS_OUT_INVALID';
+      throw error;
+    }
+    return value;
+  }
+  return null;
+}
+
 async function main(argv = process.argv) {
   // 0. Purge this harness's OWN fixtures. Everything it writes lives under
   //    SCRATCH, so a repeat run on a permanent base fails on the property and
@@ -797,11 +875,19 @@ async function main(argv = process.argv) {
   rmSync(SCRATCH, { recursive: true, force: true });
   mkdirSync(SCRATCH, { recursive: true });
 
+  // 0b. THE INVOCATION BINDING, read before anything is measured, so a
+  //     malformed `--invocation-id` cannot leave a half-run behind that reads
+  //     like a result. With no flag both values are null and every property, the
+  //     table, the comparator and the exit code are exactly what they were.
+  const invocationId = readInvocationId(argv);
+  const outOverride = readOut(argv);
+
   // 1. The base.
   const base = resolveBase();
   const write = wantsWrite(argv);
   log('# s2-008 parallel-track harness');
   log(`mode write_evidence=${String(write)}${write ? '' : ' (--no-write: properties are reported, no evidence file is written or touched)'}`);
+  log(`invocation id=${String(invocationId)} bound=${String(invocationId !== null)} head_tree_sha=${base.tree_sha} decides=false excluded_from_repeatability=true`);
   log(`config ${JSON.stringify(CONFIG)}`);
   log(`base commit=${base.commit_sha} tree=${base.tree_sha} branch=${base.branch} worktree_dirty=${String(base.worktree_dirty)}`);
   log(`base track_tracked=${String(base.track_tracked)} tracked_files_of_this_track=${base.tracked_files_of_this_track}`);
@@ -1042,6 +1128,21 @@ async function main(argv = process.argv) {
   const record = {
     ticket: 'S2-008',
     harness: 'scripts/s2-008-harness.mjs',
+    // THE INVOCATION BINDING, at the top level so a reader — and the
+    // aggregator — can read both members without walking the record. The object
+    // below says what the id is FOR and what it is not allowed to decide.
+    invocation_id: invocationId,
+    head_tree_sha: base.tree_sha,
+    invocation: {
+      invocation_id: invocationId,
+      head_tree_sha: base.tree_sha,
+      source: 'scripts/verify-s2-008.mjs generates one id per chain run and passes it with --invocation-id; a harness started by hand records null and says so',
+      purpose: 'to tell this run\'s record from a copy of an earlier run\'s record — nothing else',
+      decides: false,
+      excluded_from_repeatability: true,
+      excluded_fields: ['invocation_id', 'invocation.invocation_id'],
+      note: 'the id is unique per aggregator run and carries no information about the campaign; every property, the verdict and the exit code are computed exactly as they are without it',
+    },
     config: CONFIG,
     base,
     contracts: allResearchContractDigests(),
@@ -1108,10 +1209,31 @@ async function main(argv = process.argv) {
     's2-008-harness.json': record,
   };
   if (write) mkdirSync(EVIDENCE_DIR, { recursive: true });
+  let harnessBytesSha256 = null;
   for (const [name, document] of Object.entries(files)) {
     const body = `${JSON.stringify(document, null, 2)}\n`;
-    if (write) writeFileSync(path.join(EVIDENCE_DIR, name), body);
-    log(`${write ? 'wrote' : 'not written (--no-write)'} evidence/${name} digest=${canonicalDigest(document)} bytes=${Buffer.byteLength(body)}`);
+    if (name === HARNESS_RECORD_NAME) harnessBytesSha256 = createHash('sha256').update(body).digest('hex');
+    const overridden = name === HARNESS_RECORD_NAME && outOverride !== null;
+    const destination = overridden ? path.resolve(REPO_ROOT, outOverride) : path.join(EVIDENCE_DIR, name);
+    if (write) {
+      mkdirSync(path.dirname(destination), { recursive: true });
+      writeFileSync(destination, body);
+    }
+    log(`${write ? 'wrote' : 'not written (--no-write)'} ${overridden ? rel(destination) : `evidence/${name}`} digest=${canonicalDigest(document)} bytes=${Buffer.byteLength(body)}`);
+  }
+  // The digest of the EXACT BYTES of THIS record, printed in BOTH modes and in
+  // the shape `verify-s2-008.mjs` already reads for the replay
+  // (`REPLAY_EVIDENCE_SHA256 <hex>`): a caller that hashes the record on disk and
+  // compares the two digests can then tell "the bytes on disk are the ones this
+  // run produced" from "a previous record is lying there". Under `--no-write`
+  // nothing is on disk, and the line says `NOT_ON_DISK` so it cannot be read as
+  // a claim that it is.
+  if (harnessBytesSha256 !== null) {
+    const writtenTo = write
+      ? (outOverride === null ? `evidence/${HARNESS_RECORD_NAME}` : rel(path.resolve(REPO_ROOT, outOverride)))
+      : 'not-written';
+    log(`HARNESS_EVIDENCE_SHA256 ${harnessBytesSha256}${write ? '' : ' NOT_ON_DISK'}`);
+    log(`HARNESS_EVIDENCE_PATH ${writtenTo}`);
   }
 
   const exit = overall === 'PASS' ? 0 : (overall === 'NOT_RUN' ? 3 : 1);

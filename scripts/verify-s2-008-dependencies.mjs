@@ -26,8 +26,41 @@
 //   5. EVIDENCE PRESENCE. Every artefact this track names exists and is
 //      readable. Absence is recorded as absence, never as agreement.
 //
+//   6. THE WHOLE TRACK, NAMED. `frozen_targets` publishes the three views a
+//      reader needs to judge provability: `track_files_expected` (the track's
+//      file set, walked from the WORKING TREE), `track_files_tracked` (what
+//      `git ls-files` reports) and `track_files_untracked` /
+//      `track_files_modified` (the two `git status` views). Before this round
+//      only the first two existed, and the aggregator read `track_files_tracked
+//      === 0` — so a track with 24 of its 57 files still tracked looked proved
+//      while the dependency gate itself was naming 33 untracked files that
+//      nothing downstream could see. Provability is a property of the WHOLE
+//      track, and this gate now publishes the whole track.
+//
+// BOOTSTRAP ORDERING: `--chain-produced <paths>`
+//   `scripts/verify-s2-008.mjs` spawns THIS GATE (its step 1) BEFORE it spawns
+//   the replay (its step 3) that writes `evidence/s2-008-replay.json`, while
+//   this gate listed that record as REQUIRED. The first chain run on a clean
+//   base was therefore red for the existence of a file the chain had not
+//   written yet — reproduced with `rm -f evidence/s2-008-replay.json && node
+//   scripts/verify-s2-008.mjs --no-write` -> exit 1, defect
+//   `evidence-absent:evidence/s2-008-replay.json`, and exit 0 from the second
+//   run on. That is not a false green (the chain owns the presence of the
+//   records it wrote, and the chain is what checks that), but a gate that is
+//   red on a clean base is a gate whose first answer is about ORDERING.
+//
+//   The chain therefore passes `--chain-produced <comma-separated paths>`
+//   (repeatable), and with it those paths are excluded from REQUIRED: they are
+//   still READ, still reported with their presence, their byte count and the
+//   reason they were excluded, and the aggregator owns whether they exist.
+//   WITHOUT the flag the behaviour is byte-for-byte what it was, so
+//   `npm run verify:s2-008-dependencies` keeps its contract. A path this gate
+//   does not know is a NAMED ISSUE, not a silent exclusion: the flag can only
+//   cover this track's own evidence, never an arbitrary path.
+//
 //   node scripts/verify-s2-008-dependencies.mjs
 //   node scripts/verify-s2-008-dependencies.mjs --print-record
+//   node scripts/verify-s2-008-dependencies.mjs --chain-produced evidence/s2-008-replay.json
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
@@ -61,8 +94,75 @@ const DEPENDENCY_BINDINGS = Object.freeze([
   Object.freeze({ id: 'S1-011', artefact: 'evidence/external/s1-011/evaluation-record.json', kind: 'record' }),
 ]);
 
+/** The track's scope, as ONE pattern. `git ls-files`, the working-tree walk
+ *  and every filter below read the same regex, so "this track's files" is one
+ *  definition rather than three that can drift apart. */
+const TRACK_PATH = /^(src\/lib\/research\/|tests\/research\/|scripts\/s2-008-|scripts\/verify-s2-008|evidence\/s2-008)/;
+
+/** The roots the working-tree walk reads. `evidence` is walked ONE level deep
+ *  on purpose: the track's own records (`evidence/s2-008-*.json`) sit BESIDE
+ *  the corpus directory, while `evidence/` also holds every other stage's
+ *  evidence and `evidence/external/` a tree of downloaded records. */
+const TRACK_WALK_ROOTS = Object.freeze([
+  Object.freeze({ rel: 'src/lib/research', deep: true }),
+  Object.freeze({ rel: 'tests/research', deep: true }),
+  Object.freeze({ rel: 'scripts', deep: true }),
+  Object.freeze({ rel: 'evidence/s2-008', deep: true }),
+  Object.freeze({ rel: 'evidence', deep: false }),
+]);
+
+/** The evidence this gate requires, and the evidence it only reports. Frozen
+ *  so the chain's `--chain-produced` flag can be checked against ONE list. */
+const REQUIRED_EVIDENCE = Object.freeze([
+  'evidence/s2-008-probes.json',
+  'evidence/s2-008-controls.json',
+  'evidence/s2-008-comparison.json',
+  'evidence/s2-008-security-probes.json',
+  'evidence/s2-008-run-a.json',
+  'evidence/s2-008-run-b.json',
+  'evidence/s2-008-replay.json',
+  'evidence/s2-008/corpus/manifest.json',
+  'evidence/s2-008/corpus/preregistration.json',
+]);
+const OPTIONAL_EVIDENCE = Object.freeze([
+  'evidence/s2-008-summary.json',
+  'evidence/s2-008-harness.json',
+  'evidence/s2-008-negative-controls.json',
+]);
+/** Why an excluded path is excluded, in the record, in the same words a
+ *  reader needs: the chain that spawned this gate writes the record in the
+ *  SAME run and AFTER this gate, and the chain is what checks it exists. */
+const CHAIN_PRODUCED_REASON = 'excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes.';
+
+/** The records the SPAWNING CHAIN writes in the same run, after this gate.
+ *
+ *  The list is FROZEN here rather than taken from the caller, because a caller
+ *  that may exclude ANY path may as well exclude the corpus manifest or the
+ *  security-probes record and call it a bootstrap: the flag is an ORDERING
+ *  statement ("this run writes these itself"), not a way to shorten the required
+ *  list. Every row is produced by a child `scripts/verify-s2-008.mjs` spawns
+ *  after this gate. `evidence/s2-008-security-probes.json` is deliberately NOT
+ *  in the set: the chain spawns that gate WITHOUT `--write`, so it writes
+ *  nothing and the file has to exist before the chain runs.
+ */
+const CHAIN_PRODUCED_ALLOWED = Object.freeze([
+  OUT_RELATIVE,
+  'evidence/s2-008-probes.json',
+  'evidence/s2-008-controls.json',
+  'evidence/s2-008-comparison.json',
+  'evidence/s2-008-harness.json',
+  'evidence/s2-008-run-a.json',
+  'evidence/s2-008-run-b.json',
+  'evidence/s2-008-replay.json',
+]);
+
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Is this path one of the records this gate reads? */
+function isKnownEvidence(relPath) {
+  return REQUIRED_EVIDENCE.includes(relPath) || OPTIONAL_EVIDENCE.includes(relPath) || relPath === OUT_RELATIVE;
 }
 
 function sha256Of(bytes) {
@@ -168,6 +268,40 @@ function listFilesRecursive(absDir) {
 }
 
 /**
+ * THE TRACK'S FILE SET, FROM THE WORKING TREE.
+ *
+ * The other two views are Git's (`git ls-files` for tracked, `git status` for
+ * untracked and modified), and between them they can only report what Git
+ * knows. This walk is the one view Git cannot bias: it enumerates the files
+ * that are THERE, so a file that is untracked AND ignored — invisible to both
+ * `git ls-files` and `git status --porcelain` — is still in the expected set,
+ * and `track_files_unaccounted` names it.
+ *
+ * @returns {string[]} sorted repository-relative paths inside the track scope
+ */
+function trackFilesExpected() {
+  const found = new Set();
+  for (const root of TRACK_WALK_ROOTS) {
+    const abs = path.join(REPO_ROOT, root.rel);
+    if (root.deep) {
+      for (const absFile of listFilesRecursive(abs)) {
+        const relPath = path.relative(REPO_ROOT, absFile).split(path.sep).join('/');
+        if (TRACK_PATH.test(relPath)) found.add(relPath);
+      }
+      continue;
+    }
+    if (!existsSync(abs)) continue;
+    for (const entry of readdirSync(abs).sort((a, b) => (a < b ? -1 : 1))) {
+      const absFile = path.join(abs, entry);
+      if (statSync(absFile).isDirectory()) continue;
+      const relPath = path.relative(REPO_ROOT, absFile).split(path.sep).join('/');
+      if (TRACK_PATH.test(relPath)) found.add(relPath);
+    }
+  }
+  return [...found].sort();
+}
+
+/**
  * THE FROZEN CONTRACTS. Three independent reads of each file: the digest the
  * issue pins, the digest the frozen manifest records, and the digest of the
  * bytes at the pinned commit and in the working tree. A contract that is only
@@ -257,7 +391,7 @@ function checkFrozenTargets(commit, manifestFiles) {
     if (line.startsWith('??')) untracked.push(line.slice(3).trim());
     else issues.push(`frozen-target-modified:${line.slice(3).trim()}`);
   }
-  const TRACK_PATH = /^(src\/lib\/research\/|tests\/research\/|scripts\/s2-008-|scripts\/verify-s2-008|evidence\/s2-008)/;
+  const TRACK_SCOPE_NOTE = 'the same regex the tracked/untracked/modified views use: ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008)';
   const trackFiles = git('ls-files', '-z').split('\0').filter(Boolean).filter((relPath) => TRACK_PATH.test(relPath));
   // EV6: THE TRACK'S OWN UNTRACKED FILES, NAMED. The frozen-tree scan above
   // can only see untracked files UNDER a frozen root, and this track's files are
@@ -279,22 +413,48 @@ function checkFrozenTargets(commit, manifestFiles) {
   } catch {
     trackUntracked = [];
   }
+  const trackModified = (() => {
+    try {
+      return git('status', '--porcelain', '--', 'src/lib/research', 'tests/research', 'scripts', 'evidence')
+        .split('\n').filter(Boolean).filter((line) => !line.startsWith('??') && TRACK_PATH.test(line.slice(3).trim()))
+        .map((line) => line.slice(3).trim()).sort();
+    } catch {
+      return [];
+    }
+  })();
+  // The three Git views are read independently of the walk, and the walk is the
+  // one that can name a file Git cannot see at all. `track_files_unaccounted` is
+  // REPORTED, not an issue: it is empty on a healthy tree, and a reader can see
+  // whether the track's whole file set is covered by the three views.
+  const trackExpected = trackFilesExpected();
+  const seenByGit = new Set([...trackFiles, ...trackUntracked, ...trackModified]);
+  // WHICH MODIFICATIONS ARE THE CHAIN'S OWN OUTPUT. The chain's children write
+  // these records, so a provability term that blocks on ANY modified track file
+  // would be blocking on the evidence the previous chain run produced. Both
+  // lists are published: `track_files_modified_other` is the one that names a
+  // developer's uncommitted edit, and it is the one a reader should be shown.
+  const modifiedByChain = trackModified.filter((relPath) => CHAIN_PRODUCED_ALLOWED.includes(relPath));
+  const modifiedOther = trackModified.filter((relPath) => !CHAIN_PRODUCED_ALLOWED.includes(relPath));
   return {
     pinned_paths: Object.keys(manifestFiles).length,
     verified,
     issues,
     untracked_in_frozen_trees: untracked,
+    // THE WHOLE TRACK, THREE VIEWS, ONE SCOPE. `track_files_expected` is the
+    // working-tree walk (a LIST of repository-relative paths, sorted, unique);
+    // `track_files_tracked` is what `git ls-files` reports of them;
+    // `track_files_untracked` and `track_files_modified` are the two `git status`
+    // views. Provability is a property of the whole set, and the aggregator
+    // reads all four.
+    track_files_expected: trackExpected,
+    track_files_expected_count: trackExpected.length,
+    track_files_expected_source: `the WORKING TREE, walked over ${TRACK_WALK_ROOTS.map((root) => root.rel).join(', ')} and filtered with ${TRACK_SCOPE_NOTE}`,
+    track_files_unaccounted: trackExpected.filter((relPath) => !seenByGit.has(relPath)),
     track_files_tracked: trackFiles.length,
     track_files_untracked: trackUntracked,
-    track_files_modified: (() => {
-      try {
-        return git('status', '--porcelain', '--', 'src/lib/research', 'tests/research', 'scripts', 'evidence')
-          .split('\n').filter(Boolean).filter((line) => !line.startsWith('??') && TRACK_PATH.test(line.slice(3).trim()))
-          .map((line) => line.slice(3).trim());
-      } catch {
-        return [];
-      }
-    })(),
+    track_files_modified: trackModified,
+    track_files_modified_by_the_chain: modifiedByChain,
+    track_files_modified_other: modifiedOther,
     untracked_visibility_note: 'scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate\'s files to change',
     note: 'A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason.',
   };
@@ -605,41 +765,108 @@ function checkSyntax() {
   return { modules: files.length, parsed, issues, note: 'node --check proves the file PARSES; it is not type checking, and tsconfig.json excludes .mjs from `tsc` entirely' };
 }
 
-/** EVIDENCE PRESENCE. Absence is recorded as absence, never as agreement. */
-function checkEvidence() {
-  const required = [
-    'evidence/s2-008-probes.json',
-    'evidence/s2-008-controls.json',
-    'evidence/s2-008-comparison.json',
-    'evidence/s2-008-security-probes.json',
-    'evidence/s2-008-run-a.json',
-    'evidence/s2-008-run-b.json',
-    'evidence/s2-008-replay.json',
-    'evidence/s2-008/corpus/manifest.json',
-    'evidence/s2-008/corpus/preregistration.json',
-  ];
-  const optional = [
-    'evidence/s2-008-summary.json',
-    'evidence/s2-008-harness.json',
-    'evidence/s2-008-negative-controls.json',
-  ];
-  const rows = [];
-  for (const relPath of required) {
-    const abs = path.join(REPO_ROOT, relPath);
-    const present = existsSync(abs);
-    rows.push({ path: relPath, required: true, present, bytes: present ? statSync(abs).size : null, issues: present ? [] : ['absent'] });
+/**
+ * THE CHAIN'S OWN RECORDS: `--chain-produced <comma-separated paths>`, passed
+ * by `scripts/verify-s2-008.mjs` and readable here more than once.
+ *
+ * The raw argv is scanned rather than only the parsed args, because
+ * `parseArgs` keeps the LAST value of a repeated flag and a chain that lists
+ * four records across two flags would silently lose the first two. A value
+ * that is a bare `true` (`--chain-produced --no-write`) is a usage error and is
+ * a named issue, not an empty exclusion set: a caller who asked to exclude
+ * something and named nothing must not get a green gate for having asked.
+ *
+ * @param {string[]} argv `process.argv`
+ * @returns {{paths: string[], flag_seen: boolean, issues: string[]}}
+ */
+export function resolveChainProduced(argv = []) {
+  const raw = [];
+  for (let index = 2; index < argv.length; index += 1) {
+    const token = String(argv[index] ?? '');
+    const match = /^--(?:chain[-_]produced|chain[-_]produced[-_]paths)(?:=(.*))?$/.exec(token);
+    if (match === null) continue;
+    const inline = match[1];
+    if (inline !== undefined) {
+      raw.push(inline);
+      continue;
+    }
+    const next = argv[index + 1];
+    if (next === undefined || String(next).startsWith('--')) {
+      raw.push('');
+      continue;
+    }
+    raw.push(String(next));
+    index += 1;
   }
-  for (const relPath of optional) {
-    const abs = path.join(REPO_ROOT, relPath);
-    const present = existsSync(abs);
-    rows.push({ path: relPath, required: false, present, bytes: present ? statSync(abs).size : null, issues: [] });
+  const paths = [...new Set(raw
+    .flatMap((value) => String(value).split(','))
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0))].sort();
+  const issues = [];
+  if (raw.length > 0 && paths.length === 0) {
+    issues.push('chain-produced-without-a-path: `--chain-produced` was passed with no value, so nothing was excluded; the flag is reported instead of ignored');
   }
-  return rows;
+  return { paths, flag_seen: raw.length > 0, issues };
 }
 
-export function verifyDependencies(args = {}) {
+/** EVIDENCE PRESENCE. Absence is recorded as absence, never as agreement.
+ *
+ *  `chainProduced` are the paths the spawning chain writes in this same run,
+ *  AFTER this gate. They are excluded from REQUIRED — and only from REQUIRED:
+ *  they are still read, still counted when present, and still carry their
+ *  presence and their byte count in the record, so an exclusion can never look
+ *  like a file that was checked and found.
+ *
+ *  @param {string[]} [chainProduced] paths the spawning chain produces
+ * @returns {{rows: object[], excluded: string[], unknown: string[], no_effect: string[]}}
+ */
+function checkEvidence(chainProduced = []) {
+  const excluded = [];
+  const unknown = [];
+  const noEffect = [];
+  const rows = [];
+  const push = (relPath, required) => {
+    const abs = path.join(REPO_ROOT, relPath);
+    const present = existsSync(abs);
+    // An exclusion is applied ONLY for a path the chain provably writes after
+    // this gate. Anything else is `unknown`, and the caller turns that into an
+    // issue: a flag that cannot narrow anything must not read as one that did.
+    const chainProducedHere = chainProduced.includes(relPath) && CHAIN_PRODUCED_ALLOWED.includes(relPath);
+    const row = {
+      path: relPath,
+      required: chainProducedHere ? false : required,
+      present,
+      bytes: present ? statSync(abs).size : null,
+      issues: [],
+    };
+    if (chainProducedHere) {
+      row.required = false;
+      row.excluded_from_required = true;
+      row.chain_produced = true;
+      row.exclusion_reason = CHAIN_PRODUCED_REASON;
+      excluded.push(relPath);
+      if (required !== true) noEffect.push(relPath);
+    }
+    if (!present && row.required) row.issues.push('absent');
+    rows.push(row);
+  };
+  for (const relPath of chainProduced) {
+    if (!CHAIN_PRODUCED_ALLOWED.includes(relPath)) unknown.push(relPath);
+  }
+  for (const relPath of REQUIRED_EVIDENCE) push(relPath, true);
+  for (const relPath of OPTIONAL_EVIDENCE) push(relPath, false);
+  return { rows, excluded, unknown, no_effect: noEffect };
+}
+
+export function verifyDependencies(args = {}, argv = process.argv) {
   const issues = [];
   const checked = [];
+  const chain = resolveChainProduced(argv);
+  // A flag the gate cannot honour is reported, never applied. `--chain-produced
+  // <a path this gate does not know>` is the shape of a flag aimed at something
+  // other than this track's evidence, and an exclusion nobody can read is not a
+  // narrowing, it is a hole.
+  issues.push(...chain.issues);
   const head = (() => {
     try {
       return git('rev-parse', 'HEAD').trim();
@@ -694,13 +921,36 @@ export function verifyDependencies(args = {}) {
   const syntax = checkSyntax();
   issues.push(...syntax.issues);
   checked.push(`syntax:${syntax.parsed}/${syntax.modules}`);
-  const evidence = checkEvidence();
-  for (const row of evidence) {
+  const evidence = checkEvidence(chain.paths);
+  issues.push(...evidence.unknown.map((relPath) => `chain-produced-unknown-path:${relPath}: --chain-produced can only cover the records the spawning chain writes AFTER this gate (${CHAIN_PRODUCED_ALLOWED.join(', ')}), so this path is not excluded${isKnownEvidence(relPath) ? '; it IS one of this gate\'s own evidence paths and stays REQUIRED' : ''}`));
+  for (const row of evidence.rows) {
     if (row.present) checked.push(`evidence:${row.path}`);
     else if (row.required) issues.push(`evidence-absent:${row.path}`);
   }
   const rootManifest = readJsonFile(ROOT_MANIFEST);
   if (rootManifest === null) issues.push(`${ROOT_MANIFEST}:unreadable`);
+
+  // The head TREE, for the same invocation binding the two run gates carry:
+  // a record is only this run's record if it names the tree the aggregator
+  // observed. Read-only git, and read only after `head` is known to be a
+  // commit, so this cannot become a second source of truth for it.
+  const headTree = GIT_OBJECT.test(String(head))
+    ? (() => {
+      try {
+        return git('rev-parse', 'HEAD^{tree}').trim();
+      } catch {
+        return null;
+      }
+    })()
+    : null;
+  const invocationId = typeof args.invocationId === 'string' || typeof args.invocation_id === 'string'
+    ? String(args.invocationId ?? args.invocation_id)
+    : (args.invocationId === true || args.invocation_id === true ? true : null);
+  if (invocationId === true) {
+    issues.push('invocation-id-without-a-value: `--invocation-id` was passed with no value, so this record cannot be bound to the invocation that asked for it');
+  } else if (invocationId !== null && !/^[!-~]{1,200}$/.test(invocationId)) {
+    issues.push(`invocation-id-malformed: an invocation id must be 1-200 printable non-space characters; got ${String(invocationId).slice(0, 40).replace(/[^\x21-\x7e]/g, '?')}`);
+  }
 
   const record = {
     ticket: 'S2-008',
@@ -720,12 +970,32 @@ export function verifyDependencies(args = {}) {
     },
     scope: 'the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict',
     head,
+    head_tree_sha: headTree,
+    invocation_id: invocationId,
     contracts,
     frozen_targets: targets,
     bindings,
     modules,
     syntax,
-    evidence,
+    evidence: evidence.rows,
+    // THE CHAIN'S OWN RECORDS, in full: which paths were excluded from
+    // REQUIRED, why, whether the exclusion had any effect, and which named
+    // paths the gate refused to exclude because it does not know them. Without
+    // the flag every list here is empty and the required set is the one above,
+    // byte for byte, which is what keeps `npm run verify:s2-008-dependencies`
+    // on its own contract.
+    chain_run: {
+      flag: '--chain-produced <comma-separated paths>',
+      flag_seen: chain.flag_seen,
+      allowed: [...CHAIN_PRODUCED_ALLOWED],
+      excluded: evidence.excluded,
+      excluded_had_no_effect: evidence.no_effect,
+      refused: evidence.unknown,
+      required: [...REQUIRED_EVIDENCE],
+      required_effective: evidence.rows.filter((row) => row.required).map((row) => row.path),
+      reason: CHAIN_PRODUCED_REASON,
+      owner_of_the_excluded_records: 'scripts/verify-s2-008.mjs — the chain spawns this gate before the children that write those records, so the chain is what checks they exist and what their bytes are',
+    },
     root_manifest_readable: rootManifest !== null,
     issues,
     checked: checked.length,
@@ -760,10 +1030,24 @@ function main() {
       ok: result.ok,
       mode: result.mode,
       head: result.head,
+      head_tree_sha: result.head_tree_sha ?? null,
+      invocation_id: result.invocation_id ?? null,
       checked: result.checked,
       issues: result.issues,
+      // THE WHOLE TRACK, on stdout as well as in the record: the aggregator
+      // reads this summary, so a field that lived only in the written record
+      // would be a field the chain cannot see.
+      track_files_expected: result.frozen_targets?.track_files_expected ?? null,
+      track_files_expected_count: result.frozen_targets?.track_files_expected_count ?? null,
+      track_files_unaccounted: result.frozen_targets?.track_files_unaccounted ?? null,
       track_files_tracked: result.frozen_targets?.track_files_tracked ?? null,
       track_files_untracked: result.frozen_targets?.track_files_untracked ?? null,
+      track_files_modified: result.frozen_targets?.track_files_modified ?? null,
+      track_files_modified_by_the_chain: result.frozen_targets?.track_files_modified_by_the_chain ?? null,
+      track_files_modified_other: result.frozen_targets?.track_files_modified_other ?? null,
+      chain_produced_excluded: result.chain_run?.excluded ?? [],
+      chain_produced_refused: result.chain_run?.refused ?? [],
+      chain_produced_reason: result.chain_run?.flag_seen === true ? result.chain_run.reason : null,
       syntax: result.syntax ? { modules: result.syntax.modules, parsed: result.syntax.parsed, note: result.syntax.note } : null,
       byte_sources: result.byte_sources ?? null,
       binding_sources: (result.bindings ?? []).map((row) => `${row.id}:${row.source}${row.drift === true ? '(DRIFT)' : ''}`),

@@ -40,14 +40,108 @@
 // note that could decide a verdict would be a verdict fixed by a constant that
 // is true on every run. See the three-way split at `deriveVerdict`.
 //
+// THE TRUST MODEL OF THIS FILE, IN ONE SENTENCE:
+//   A RECORD THAT IS NOT BOUND TO THIS INVOCATION IS NOT THIS RUN'S EVIDENCE.
+//
+// Before this repair the aggregator read what its children SAID about
+// themselves. `classifyCurrentReplay` re-hashed the replay record — but against
+// the digest the REPLAY ITSELF printed, and the five pass terms were then read
+// back out of that same record's own claims, so a stubbed replay that ran no
+// trial, copied the previous honest file, refreshed two timestamps and printed
+// the digest of what it wrote produced status PASS with `defects []`
+// (reproduced, observed exit 0). The probes gate's `totals` were stored and
+// never compared with anything, so a probes gate that ran nothing was
+// indistinguishable from one that ran everything (reproduced, observed exit 0,
+// published `probes_ran 0, controls_ran 0`). The harness record was read raw —
+// no digest, no freshness, no exit-code agreement, no overall agreement — and a
+// check run REWROTE it (reproduced twice, both observed exit 0). Partial
+// untracking of the track was invisible (reproduced, observed exit 0, with 33
+// untracked files named by the dependency gate itself).
+//
+// THE FIX, and it is five checks, all of them strengthening:
+//   1. INVOCATION BINDING (G1). This aggregator mints ONE invocation id per run
+//      (`randomBytes`, node:crypto), passes it to all three child gates as
+//      `--invocation-id <id>`, and REFUSES a child record that does not carry
+//      it, or whose tree is not the tree this checkout is on. A record copied
+//      from an earlier run cannot match, so the A3 stub dies here. WHERE the
+//      binding can be required is stated rather than assumed: the REPLAY record
+//      is written by a child this aggregator spawns in this run, so the id is
+//      required of it in every mode, and the HARNESS record is required of it
+//      only when this run asked the harness to write that record (a WRITE run);
+//      on a CHECK run the harness is spawned with `--no-write`, the record on
+//      disk is an EARLIER run's committed artefact by construction, and it is
+//      judged for AGREEMENT with the process this run observed instead. Both
+//      are published (`gates.*.invocation_id`, `head_tree_sha`,
+//      `head_tree_sha_matches`), so a reader can see which run a record belongs
+//      to without re-running anything.
+//   2. THE HARNESS RECORD IS JUDGED LIKE THE REPLAY'S (G2): a digest THIS file
+//      computes over the bytes it read, the invocation binding, and an
+//      agreement check between the record's own claims and what this run
+//      observed. A record whose `overall` is not PASS, whose property flags are
+//      not all true, or whose recorded exit code disagrees with the exit code
+//      the aggregator saw is a DEFECT — and a CHECK run is spawned with
+//      `--no-write` by this file's own mode, so it can no longer overwrite the
+//      record it is judging.
+//   3. PROBE FLOORS (G3). The probes gate's counts are compared with the counts
+//      the FROZEN probe list declares in `src/lib/research/probes.mjs` — read
+//      from the CODE, never from the record. Fewer probes or fewer controls than
+//      the code declares is a defect, and a counter map that reports none of the
+//      declared counters is a defect, not a pass.
+//   4. PROVABILITY OVER THE WHOLE TRACK (G4). The untracked and modified lists
+//      the dependency gate already computes are copied into `gates.dependency`
+//      and ANY entry in either is a blocking defect with the paths named. A
+//      dependency gate that reports nothing is a defect too: "the gate said
+//      nothing" is not "the gate found nothing". The one exemption is the
+//      explicit set of records this chain's own children write in this run
+//      (`CHAIN_WRITTEN_RECORDS`, published as `provability_exempt`), which is
+//      the same ORDERING statement the dependency gate's `--chain-produced`
+//      makes; a modified CORPUS file is not exempt.
+//   5. G5, BOOTSTRAP ORDERING. This chain spawns the dependency gate BEFORE it
+//      spawns the replay that writes `evidence/s2-008-replay.json`, so that gate
+//      is told, with its own `--chain-produced` flag, which records this run
+//      produces itself. Without the flag the gate's standalone contract is
+//      byte-for-byte unchanged.
+//
+// THE INVOCATION ID IS EXCLUDED FROM REPEATABILITY, ON PURPOSE, AND IT IS THE
+// ONLY RANDOM VALUE ON THIS PATH. It decides nothing about the VERDICT of a
+// measurement: it decides only WHETHER a record is the current run's, which is
+// the same role the freshness observation plays, and for the same reason — a
+// per-run identity cannot be a constant if it is to bind anything. Two runs of
+// this aggregator on one tree therefore produce child records whose bytes
+// differ in `invocation_id` and in nothing else that any verdict reads; the
+// verdict itself stays a pure function of the record and the tree. That is why
+// the id is published next to the other instants (`summary.invocation`) instead
+// of being hidden in a record nobody diffs.
+//
+// THE STATED BOUNDARY, NOT A DEFECT (B-low, G6). The integrity gates read
+// COMMITTED bytes — `scripts/generate-manifests.mjs` reads `git show HEAD:<file>`
+// and `scripts/check-inventory.mjs` reads `git ls-files` — so a hand-edited
+// `evidence/s2-008-summary.json` in the WORKING TREE is invisible to them until
+// the next chain run rewrites it. That is not closed here and is not claimed to
+// be: the working-tree surface is what `scripts/s2-008-build-corpus.mjs --check`
+// (the corpus drift gate) covers, and this aggregator's own reading of the
+// child records is over the bytes on disk at judging time. The boundary is
+// printed by every run (`boundaries`), so a reader never has to open the report
+// to learn what this gate does not see.
+//
 //   node scripts/verify-s2-008.mjs
 //   node scripts/verify-s2-008.mjs --print-summary
 //   S2_008_FRESHNESS_WINDOW_MS=0 node scripts/verify-s2-008.mjs   # prove the refusal
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+// The FLOORS are read from the frozen code and never from a record: the number
+// of probes the probe list declares, and the number of controls the frozen
+// control descriptors plus the named extra declare. This file may not edit
+// `src/lib/research/**` and does not need to — importing the tables IS the
+// reading of them, and it is what makes a record's own count checkable against
+// something the record cannot choose.
+import { EXPECTED_CONTROLS } from '../src/lib/research/expected-values.mjs';
+import { EXTRA_CONTROL_IDS } from '../src/lib/research/negative-controls.mjs';
+import { HARD_GATE_COUNTERS, PROBE_FAMILIES, PROBE_NAMES } from '../src/lib/research/probes.mjs';
 
 import { parseArgs, resolveBase } from './s2-008-run.mjs';
 // R-C: the campaign-decision rule is DEFINED ONCE, in the replay, and this
@@ -64,6 +158,58 @@ const FRESHNESS_WINDOW_MS = Number(process.env.S2_008_FRESHNESS_WINDOW_MS ?? 6 *
 const SUMMARY_RELATIVE = 'evidence/s2-008-summary.json';
 const REPLAY_RELATIVE = 'evidence/s2-008-replay.json';
 const HARNESS_RELATIVE = 'evidence/s2-008-harness.json';
+/** THE RECORDS THIS CHAIN'S CHILDREN WRITE, AFTER the dependency gate has run.
+ *  Passed as that gate's `--chain-produced` (G5): it makes the FIRST run on a
+ *  clean base green instead of red for a file the chain had not written yet, and
+ *  it excludes them from REQUIRED only — they are still read and still reported.
+ *  A frozen list, because a list read off the filesystem is a list that shrinks
+ *  when the filesystem does. `evidence/s2-008-security-probes.json` is NOT in it:
+ *  the probes gate is spawned without `--write`, so that record has to exist
+ *  before the chain runs. */
+const CHAIN_PRODUCED_RECORDS = Object.freeze([
+  REPLAY_RELATIVE,
+  'evidence/s2-008-run-a.json',
+  'evidence/s2-008-run-b.json',
+  'evidence/s2-008-probes.json',
+  'evidence/s2-008-controls.json',
+  'evidence/s2-008-comparison.json',
+  HARNESS_RELATIVE,
+  // The dependency gate's OWN record: it writes that file itself, at step 1 of
+  // this run, so it is the chain's business exactly like the others.
+  'evidence/s2-008-dependency-binding.json',
+]);
+/** The same set, plus the summary THIS file writes. The summary is not in
+ *  `--chain-produced` (the dependency gate's own frozen list does not accept it
+ *  and would name a `chain-produced-unknown-path` issue), but it is written by
+ *  this run, so the provability rule below does not report it as an uncommitted
+ *  change either. A hand-edited summary in the working tree is the B-low
+ *  boundary, and the next write run overwrites it — which is why the boundary
+ *  says so rather than pretending the file cannot be edited. */
+const CHAIN_WRITTEN_RECORDS = Object.freeze([...CHAIN_PRODUCED_RECORDS, SUMMARY_RELATIVE]);
+
+/** The probes the FROZEN probe list declares, counted from the code: every
+ *  family in `PROBE_FAMILIES` with every name `PROBE_NAMES` gives it. Six
+ *  today; a record that reports fewer did not run the list. */
+export const DECLARED_PROBE_COUNT = PROBE_FAMILIES
+  .reduce((total, family) => total + (Array.isArray(PROBE_NAMES[family]) ? PROBE_NAMES[family].length : 0), 0);
+/** The controls the frozen descriptors declare plus the ONE named extra the
+ *  probes record itemises (`controls_extra_ids`). Seven today. */
+export const DECLARED_CONTROL_COUNT = EXPECTED_CONTROLS.length + EXTRA_CONTROL_IDS.length;
+
+/** The working-tree boundary (B-low), stated where every run prints it. It is a
+ *  boundary and not a defect: nothing here can be false, and a statement that
+ *  cannot be false must not decide anything. */
+const WORKING_TREE_BOUNDARY = 'BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it; the WORKING-TREE surface is what the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) covers, and this aggregator judges the child records from the bytes on disk at judging time';
+
+/** The invocation id: the one random value on this path, and the only one.
+ *  16 bytes from `node:crypto`, minted once per `verify()` call, handed to both
+ *  children as `--invocation-id <id>` and required back in their records. It is
+ *  EXCLUDED FROM REPEATABILITY, exactly like the freshness observation, and for
+ *  the same reason: a per-run identity is what binds a record to a run, and a
+ *  constant could bind nothing. It decides no measurement. */
+export function newInvocationId() {
+  return randomBytes(16).toString('hex');
+}
 
 /**
  * The aggregator's own reading of the wall clock — and WHERE it reads it.
@@ -260,11 +406,358 @@ export function freshnessVerdict({ record, headTreeSha, observedAtIso, windowMs 
 }
 
 /**
- * THE AGGREGATOR CONTRACT: the report of THIS invocation and the record on disk
- * must be the same bytes, and the record must be fresh. A previous green file
- * can therefore never turn a current NOT_RUN or FAIL into a PASS.
+ * THE INVOCATION BINDING (G1) — the check that makes "this run's evidence" mean
+ * something.
+ *
+ * A record is bound to a run by TWO facts the run itself observed:
+ *   * the TREE it was produced on, and
+ *   * the INVOCATION ID this aggregator minted and handed the child as
+ *     `--invocation-id <id>`.
+ *
+ * The tree is read from the member the ticket names, `head_tree_sha`, and falls
+ * back to `base.tree_sha` — every S2-008 record already carries the tree in its
+ * own `base` block, so the fallback is a real binding and not a hole: a record
+ * whose tree is another tree is refused either way, and a record that carries
+ * NEITHER member is refused. The invocation id has no fallback on purpose: it is
+ * the one thing a record copied from an earlier run cannot reproduce, and the
+ * A3 stub (a replay that ran nothing, copied the previous honest record,
+ * refreshed two timestamps and printed the digest of what it wrote) is refused
+ * here rather than explained in a report.
+ *
+ * `requireInvocationId` defaults to "an invocation id was supplied", so the unit
+ * cases that classify a synthetic record with no invocation of their own keep
+ * working; `verify()` ALWAYS supplies the id it minted, and the gate below is
+ * only ever skipped by a caller that has no invocation to compare against. The
+ * TREE binding follows the same switch, because it means the same thing: a
+ * record the aggregator did not ask to be written (the harness record on a check
+ * run) is not required to be this run's, and a record that IS this run's is.
+ * @param {object|null} record
+ * @param {{invocationId?: string|null, headTreeSha?: string|null,
+ *   requireInvocationId?: boolean, requireTreeBinding?: boolean, label?: string}} options
+ * @returns {string[]} The issues, empty when the record is bound to this run.
  */
-export function classifyCurrentReplay(executed, writtenEvidence, { headTreeSha = null, observedAtIso = null, windowMs = FRESHNESS_WINDOW_MS } = {}) {
+export function invocationBindingIssues(record, {
+  invocationId = null, headTreeSha = null, requireInvocationId = invocationId !== null, requireTreeBinding = requireInvocationId, label = 'child record',
+} = {}) {
+  const issues = [];
+  if (!isPlainObject(record)) {
+    issues.push(`${label}: the record is unreadable, so nothing in it can be bound to this invocation`);
+    return issues;
+  }
+  const tree = typeof record.head_tree_sha === 'string' && record.head_tree_sha.length > 0
+    ? record.head_tree_sha
+    : (typeof record.base?.tree_sha === 'string' && record.base.tree_sha.length > 0 ? record.base.tree_sha : null);
+  if (requireTreeBinding) {
+    if (tree === null) {
+      issues.push(`${label}: it names no tree at all (no head_tree_sha and no base.tree_sha), so it is bound to no base`);
+    } else if (typeof headTreeSha === 'string' && headTreeSha.length > 0 && tree !== headTreeSha) {
+      issues.push(`${label}: it is bound to tree ${tree.slice(0, 12)} while this checkout is on ${headTreeSha.slice(0, 12)}`);
+    }
+  }
+  if (requireInvocationId) {
+    const own = typeof record.invocation_id === 'string' ? record.invocation_id : null;
+    if (own === null || own.length === 0) {
+      issues.push(`${label}: it carries no invocation_id, so nothing binds it to the run that produced it — a record that is not bound to this invocation is not this run's evidence`);
+    } else if (own !== invocationId) {
+      issues.push(`${label}: it was written by invocation ${own.slice(0, 12)}, not by this one (${String(invocationId).slice(0, 12)})`);
+    }
+  }
+  return issues;
+}
+
+/**
+ * THE HARNESS RECORD'S AGREEMENT WITH WHAT THIS RUN OBSERVED (G2).
+ *
+ * The harness record was read raw before this repair: a record whose `overall`
+ * was FAIL, whose A1..A5 flags were all false and whose A3 claimed to be a
+ * MEASUREMENT was reported as a PASS gate with exit 0 (reproduced, observed exit
+ * 0, published `overall FAIL` beside `A1:FAILED..A5:FAILED`). Three claims are
+ * therefore compared with the observation, and each disagreement is a defect:
+ *   * `overall` must be PASS — a record that reports its own run as failed is
+ *     not evidence of a green one, whatever the process it came from did;
+ *   * every property flag must be `true`, and the failing ids are named;
+ *   * a recorded exit code must equal the exit code THIS run saw. The member is
+ *     optional (the delivered harness record carries none) and its absence is
+ *     PUBLISHED as `exit_code_recorded: null` rather than treated as agreement:
+ *     a record that says nothing cannot contradict anything, and the live exit
+ *     code is judged on its own either way.
+ * @param {object|null} record
+ * @param {number|null} observedExitCode
+ * @returns {string[]} The disagreements, empty when the record agrees.
+ */
+export function harnessAgreementIssues(record, observedExitCode) {
+  const issues = [];
+  if (!isPlainObject(record)) {
+    issues.push('the harness record is unreadable, so none of its claims can be compared with what this run observed');
+    return issues;
+  }
+  if (record.overall !== 'PASS') {
+    issues.push(`the harness record reports overall=${String(record.overall)} while the harness process exited ${String(observedExitCode)}`);
+  }
+  if (!Array.isArray(record.properties) || record.properties.length === 0) {
+    issues.push('the harness record carries no acceptance property, so none of A1..A5 was observed');
+  } else {
+    const notHeld = record.properties
+      .filter((property) => !isPlainObject(property) || property.ok !== true)
+      .map((property) => String(property?.id ?? 'unidentified'));
+    if (notHeld.length > 0) {
+      issues.push(`the harness record reports ${notHeld.join(', ')} as NOT held, so the record on disk contradicts the harness process this run observed`);
+    }
+  }
+  if (Number.isInteger(record.exitCode) && record.exitCode !== observedExitCode) {
+    issues.push(`the harness record reports exitCode=${record.exitCode} while this run observed ${String(observedExitCode)}`);
+  }
+  if (record.overall === 'PASS' && observedExitCode !== 0) {
+    issues.push(`the harness record is green while the harness process exited ${String(observedExitCode)}; a green record written by a failing run is the exact shape of a fake green`);
+  }
+  return issues;
+}
+
+/**
+ * THE HARNESS RECORD, judged the way the replay's is (G2): a digest THIS file
+ * computes over the bytes it read, the invocation binding, and the agreement
+ * check above. The digest is deliberately NOT compared with a digest the child
+ * printed: the replay's printed digest is kept because the replay's bytes are
+ * written by the run itself and the comparison catches a record that is not the
+ * one this run produced, but a record that carries its own digest proves
+ * nothing about itself — it is published instead, as the aggregator's own
+ * reading of the bytes it judged.
+ * @param {{exitCode: number|null, stdout?: string}} executed The child result this run observed.
+ * @param {{invocationId?: string|null, headTreeSha?: string|null, requireInvocationId?: boolean,
+ *   requireReportedDigest?: boolean}} options
+ * @returns {{gate: object, evidence: object|null, evidence_sha256: string|null, evidence_bytes: number}}
+ */
+export function classifyCurrentHarness(executed, {
+  invocationId = null, headTreeSha = null, requireInvocationId = invocationId !== null, requireReportedDigest = requireInvocationId,
+} = {}) {
+  const bytes = readHarnessBytes();
+  if (bytes === null) {
+    return {
+      gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 harness', reason: 'the harness record is absent; this run read no bytes to judge' },
+      evidence: null,
+      evidence_sha256: null,
+      evidence_bytes: 0,
+    };
+  }
+  // THE AGGREGATOR'S OWN DIGEST over the bytes it read.
+  const evidenceSha256 = createHash('sha256').update(bytes).digest('hex');
+  let record = null;
+  try {
+    record = JSON.parse(bytes.toString('utf8'));
+  } catch {
+    return {
+      gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 harness', reason: `the harness record is not readable JSON (sha256 ${evidenceSha256.slice(0, 12)}, ${bytes.length} bytes)` },
+      evidence: null,
+      evidence_sha256: evidenceSha256,
+      evidence_bytes: bytes.length,
+    };
+  }
+  // THE BYTES THIS RUN WROTE, when the chain asked for them. The harness prints
+  // `HARNESS_EVIDENCE_SHA256 <hex>` over the exact bytes it wrote, and the
+  // aggregator re-hashes what is on disk: a child that wrote one record and
+  // reported the digest of another is refused. This is the one comparison that
+  // is NOT a tautology — and it is only possible when the chain told the child
+  // to write, which is why it is not demanded of a `--no-write` run (the line
+  // then says `NOT_ON_DISK`, truthfully).
+  if (requireReportedDigest) {
+    const reported = /HARNESS_EVIDENCE_SHA256 ([0-9a-f]{64})/.exec(String(executed.stdout ?? ''));
+    if (reported === null) {
+      return {
+        gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 harness', reason: 'the harness reported no evidence digest, so the record on disk cannot be matched against the run that produced it' },
+        evidence: record,
+        evidence_sha256: evidenceSha256,
+        evidence_bytes: bytes.length,
+      };
+    }
+    if (reported[1] !== evidenceSha256) {
+      return {
+        gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 harness', reason: `the record on disk is not the one this invocation wrote (reported ${reported[1].slice(0, 12)}, on disk ${evidenceSha256.slice(0, 12)})` },
+        evidence: record,
+        evidence_sha256: evidenceSha256,
+        evidence_bytes: bytes.length,
+      };
+    }
+  }
+  const issues = [
+    ...invocationBindingIssues(record, { invocationId, headTreeSha, requireInvocationId, label: 'the harness record' }),
+    ...harnessAgreementIssues(record, executed.exitCode),
+  ];
+  if (issues.length > 0) {
+    return {
+      gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 harness', reason: issues.join('; ') },
+      evidence: record,
+      evidence_sha256: evidenceSha256,
+      evidence_bytes: bytes.length,
+    };
+  }
+  return {
+    gate: { status: gateStatusFromExit(executed.exitCode), exitCode: executed.exitCode, source: 'current S2-008 harness', reason: null },
+    evidence: record,
+    evidence_sha256: evidenceSha256,
+    evidence_bytes: bytes.length,
+  };
+}
+
+/**
+ * THE PROBE AND CONTROL FLOORS (G3) — the numbers come from the FROZEN CODE and
+ * never from the record, which is the whole point: a record that reports its own
+ * count can report any count.
+ *
+ * Three shapes are separated, because they are three different answers:
+ *   * a DEFECT is a check this stage performed and that failed — fewer probes or
+ *     fewer controls than the frozen lists declare, a counter map that carries
+ *     none of the declared hard-gate counters (the A1a stub printed `{}` and
+ *     exited 0), or a counter that moved;
+ *   * a NOT_RUN is a check this stage could not make — no counter map, no totals
+ *     block, no integer count. `notRun` is never softened into a pass and never
+ *     sharpened into a failure;
+ *   * the declared counts themselves are published by the caller (`gates.probes
+ *     .floor`) so a reader sees where the floor came from.
+ * @param {object|null} record The probes gate's own JSON envelope.
+ * @returns {{defects: string[], notRun: string[], declared: {probes: number, controls: number}}}
+ */
+export function probeFloorIssues(record, {
+  declaredProbes = DECLARED_PROBE_COUNT, declaredControls = DECLARED_CONTROL_COUNT, hardGateCounters = HARD_GATE_COUNTERS,
+} = {}) {
+  const defects = [];
+  const notRun = [];
+  const counters = isPlainObject(record?.counters) ? record.counters : null;
+  if (counters === null) {
+    notRun.push('NOT_RUN: the probes gate reported no counter map');
+  } else {
+    // An EMPTY counter map made `Object.values(counters).every((v) => v === 0)`
+    // vacuously true, so a gate that measured nothing looked exactly like a gate
+    // that measured six defences and found them all intact. The declared
+    // counter names come from `src/lib/research/probes.mjs`, so the map must
+    // carry them or it reports nothing.
+    const missing = hardGateCounters.filter((name) => !(name in counters));
+    if (missing.length > 0) {
+      defects.push(`probes gate: the hard-gate counter map reports none of the ${hardGateCounters.length} counters the frozen probe list declares (missing ${missing.join(', ')}); a counter map that reports nothing is a check that did not happen, not a check that passed`);
+    }
+    const moved = Object.entries(counters).filter(([, value]) => value !== 0).map(([name, value]) => `${name}=${value}`);
+    if (moved.length > 0) defects.push(`hard-gate counters moved: ${moved.join(', ')}`);
+  }
+  const totals = isPlainObject(record?.totals) ? record.totals : null;
+  if (totals === null) {
+    notRun.push('NOT_RUN: the probes gate reported no totals, so the number of probes and controls it actually ran is unknown');
+  } else {
+    if (!Number.isInteger(totals.probes_ran)) {
+      notRun.push('NOT_RUN: the probes gate reported no integer count of the probes it ran');
+    } else if (totals.probes_ran < declaredProbes) {
+      defects.push(`probes gate: ${totals.probes_ran} of the ${declaredProbes} probes the frozen probe list declares (src/lib/research/probes.mjs) were run`);
+    }
+    if (!Number.isInteger(totals.controls_ran)) {
+      notRun.push('NOT_RUN: the probes gate reported no integer count of the controls it ran');
+    } else if (totals.controls_ran < declaredControls) {
+      defects.push(`probes gate: ${totals.controls_ran} of the ${declaredControls} controls the frozen control list declares (EXPECTED_CONTROLS + EXTRA_CONTROL_IDS) were run`);
+    }
+  }
+  return { defects, notRun, declared: { probes: declaredProbes, controls: declaredControls, hard_gate_counters: hardGateCounters.length } };
+}
+
+/**
+ * PROVABILITY OVER THE WHOLE TRACK (G4) — not its first file.
+ *
+ * `scripts/verify-s2-008-dependencies.mjs` already computes the whole picture
+ * (`track_files_tracked`, `track_files_untracked`, `track_files_modified`) and
+ * the aggregator copied NONE of the last two, so `git rm --cached -r
+ * src/lib/research tests/research` — 24 of 57 files still tracked — left this
+ * chain at exit 0 with `defects []` while the dependency gate's own record named
+ * 33 untracked files (reproduced, observed exit 0). The rule:
+ *   * ANY untracked or MODIFIED track file is a defect, with the paths named. A
+ *     modified gate script is the same hole from the other side: the integrity
+ *     gates read committed bytes, so an uncommitted edit to this file is
+ *     invisible to them until it is committed;
+ *   * a `null` is a defect TOO. "The dependency gate said nothing" is not "the
+ *     dependency gate found nothing", and reading it as the latter is how a
+ *     partially untracked track came through green;
+ *   * a file the gate expected and could not ACCOUNT for at all (tracked,
+ *     untracked and modified, none of it) is a defect, because the report does
+ *     not then cover the whole set it declared;
+ *   * the all-untracked case keeps its own, older defect in `deriveVerdict`
+ *     (`track_files_tracked === 0`) and still fails exactly as it did.
+ *
+ * The shapes are the dependency gate's own (`scripts/verify-s2-008-dependencies.mjs`):
+ * `track_files_expected` is the frozen SET of paths this track is made of,
+ * `track_files_tracked` the `git ls-files` count, and `track_files_untracked` /
+ * `track_files_modified` / `track_files_unaccounted` lists of paths.
+ *
+ * `chainProduced` is the narrow exemption, and it is the same ORDERING statement
+ * the dependency gate's `--chain-produced` makes: the seven records this chain's
+ * own children write in this same run are the chain's business, and a gate that
+ * demanded they be tracked and clean BEFORE the chain has run would be the
+ * bootstrap trap in a new dress (it is the same reason a clean base is green on
+ * the FIRST run). Every other track file — every source, every test, every
+ * script, the whole corpus — is still blocking, and a MODIFIED corpus file is
+ * still a defect: the drift gate and this rule then say the same thing about the
+ * same bytes, which is the point of having two of them.
+ * @param {object|null} dependencyGate The aggregator's `gates.dependency`.
+ * @param {{chainProduced?: ReadonlyArray<string>}} [options]
+ * @returns {string[]} The defects, empty when the whole track is provable.
+ */
+export function trackProvabilityDefects(dependencyGate, { chainProduced = CHAIN_WRITTEN_RECORDS } = {}) {
+  const gate = isPlainObject(dependencyGate) ? dependencyGate : {};
+  const defects = [];
+  // The paths are NAMED, up to a bound, with the remainder counted: a defect
+  // that says "33 files" and shows none of them is a defect nobody can act on.
+  const name = (list) => {
+    const shown = list.slice(0, 24).map(String);
+    return `${shown.join(', ')}${list.length > shown.length ? `, …and ${list.length - shown.length} more` : ''}`;
+  };
+  const tracked = gate.track_files_tracked;
+  if (!Number.isInteger(tracked)) {
+    defects.push(`provability: the dependency gate reported no count of this track's tracked files (track_files_tracked=${JSON.stringify(tracked ?? null)}), so no artefact of this track is bound to a base a reader can check; delivery owns git`);
+  } else if (tracked === 0) {
+    defects.push('provability: the track\'s own files are untracked (git ls-files reports 0 of them), so no artefact of this track is bound to a base a reader can check; delivery owns git');
+  }
+  if (!Array.isArray(gate.track_files_expected) || gate.track_files_expected.length === 0) {
+    defects.push(`provability: the dependency gate named no expected set of files for this track (track_files_expected=${JSON.stringify(gate.track_files_expected ?? null)}), so its untracked and modified lists cannot be read as a statement about the WHOLE track`);
+  }
+  const exempt = new Set(chainProduced);
+  for (const [key, what] of [['track_files_untracked', 'untracked'], ['track_files_modified', 'modified'], ['track_files_unaccounted', 'unaccounted-for']]) {
+    const list = gate[key];
+    if (list === undefined) continue;
+    if (!Array.isArray(list)) {
+      defects.push(`provability: the dependency gate reported no ${what} track files (${key}=${JSON.stringify(list ?? null)}); "the gate said nothing" is not "the gate found nothing"`);
+      continue;
+    }
+    const reported = list.filter((entry) => !exempt.has(String(entry)));
+    if (reported.length > 0) {
+      defects.push(`provability: ${reported.length} ${what} file(s) of this track are not bound to a base a reader can check (${key}): ${name(reported)}`);
+    }
+  }
+  return defects;
+}
+
+/**
+ * The paths the provability rule above EXEMPTED, with the reason, published so
+ * the exemption is visible instead of silent. Exempt means "this chain writes it
+ * in this run", never "it does not matter".
+ * @param {object|null} dependencyGate The aggregator's `gates.dependency`.
+ * @param {{chainProduced?: ReadonlyArray<string>}} [options]
+ * @returns {string[]}
+ */
+export function chainProducedExemptions(dependencyGate, { chainProduced = CHAIN_WRITTEN_RECORDS } = {}) {
+  const gate = isPlainObject(dependencyGate) ? dependencyGate : {};
+  const exempt = new Set(chainProduced);
+  const seen = [];
+  for (const key of ['track_files_untracked', 'track_files_modified', 'track_files_unaccounted']) {
+    for (const entry of (Array.isArray(gate[key]) ? gate[key] : [])) {
+      if (exempt.has(String(entry)) && !seen.includes(String(entry))) seen.push(String(entry));
+    }
+  }
+  return seen;
+}
+
+/**
+ * THE AGGREGATOR CONTRACT: the report of THIS invocation and the record on disk
+ * must be the same bytes, the record must be bound to THIS invocation, and it
+ * must be fresh. A previous green file can therefore never turn a current
+ * NOT_RUN or FAIL into a PASS.
+ */
+export function classifyCurrentReplay(executed, writtenEvidence, {
+  headTreeSha = null, observedAtIso = null, windowMs = FRESHNESS_WINDOW_MS, invocationId = null,
+} = {}) {
   // THE STALE-GREEN REFUSAL. The child prints `REPLAY_EVIDENCE_SHA256 <hex>`, the
   // digest of the exact bytes it wrote. The bytes on disk are re-hashed HERE and
   // must match. A record that was not written by this invocation — a previous
@@ -293,6 +786,22 @@ export function classifyCurrentReplay(executed, writtenEvidence, { headTreeSha =
     return {
       gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 replay', reason: 'the replay record carries no run identities' },
       evidence: null,
+    };
+  }
+  // G1, THE INVOCATION BINDING. The digest above proves the record on disk is
+  // the file the child wrote THIS PROCESS — and a stub that writes the previous
+  // honest record and prints the digest of what it wrote satisfies it exactly.
+  // What a copied record cannot reproduce is the id this aggregator minted and
+  // handed the child as `--invocation-id`, so that is what is required here. A
+  // child that does not yet understand the flag writes no id, and a record with
+  // no id is REFUSED: the safe direction is a red gate, never a green one.
+  const bindingIssues = invocationBindingIssues(writtenEvidence, {
+    invocationId, headTreeSha, label: 'the replay record',
+  });
+  if (bindingIssues.length > 0) {
+    return {
+      gate: { status: 'FAIL', exitCode: executed.exitCode, source: 'current S2-008 replay', reason: bindingIssues.join('; ') },
+      evidence: writtenEvidence,
     };
   }
   if (executed.exitCode !== 0) {
@@ -384,6 +893,17 @@ function readReplayBytes() {
   }
 }
 
+/** The harness record's bytes, exactly as they are on disk. The aggregator
+ *  hashes these itself (see `classifyCurrentHarness`); it never accepts a digest
+ *  the record states about itself. */
+function readHarnessBytes() {
+  try {
+    return readFileSync(path.join(REPO_ROOT, HARNESS_RELATIVE));
+  } catch {
+    return null;
+  }
+}
+
 function recordCarriesRunIds(record) {
   return isPlainObject(record?.separation)
     && typeof record?.separation?.raw_run_id?.a === 'string'
@@ -443,8 +963,17 @@ export function ticketScopeNotes(crossRecord) {
  *
  *   1. BLOCKING DEFECTS — a check this stage DID perform and that failed, plus
  *      the ticket-level precondition that provability is a hard requirement of
- *      this repository. A blocking gate, or a provability defect, is `FAIL`
- *      (exit 1).
+ *      this repository. A blocking gate, a provability defect, or ANY entry in
+ *      `defects` is `FAIL` (exit 1). The `defects` term is what this repair
+ *      closed: `defects` was BUILT as the list of failed checks and then not
+ *      read by the status, so a defect this file raised on its own — a
+ *      harness/replay A3 disagreement, a refused child record, a track file that
+ *      is untracked or modified — was printed beside `ok: true` and `exitCode: 0`
+ *      whenever no gate's own status had flipped with it. A summary that lists a
+ *      defect and reports a pass is the green-with-a-disclaimer shape this file
+ *      exists to remove, and it was still reachable through the `defects` term
+ *      alone. Nothing became more permissive: every run that reported a defect
+ *      and no blocking gate was already wrong, and is now red.
  *   2. GATE-LEVEL NOT_RUNs — "I could not check": a gate that could not run, a
  *      mandatory probe or control that did not run, a cross-process replay that
  *      did not complete, a hard-gate counter map the probes gate did not report.
@@ -491,7 +1020,10 @@ export function deriveVerdict({ gates = {}, defects = [], notRun = [], scopeNote
   // F1: the status reads the GATE-LEVEL terms and the blocking defects, and
   // `notRun` now holds gate-level entries only — a scope note cannot reach it,
   // so the two notes that are present on every run can no longer decide this.
-  const status = blocking.length > 0 || provabilityDefects.length > 0
+  // `defects.length > 0` decides as well, and that is the term this repair
+  // closed: a defect this file raised with no gate status to back it used to be
+  // printed beside `ok: true`.
+  const status = blocking.length > 0 || provabilityDefects.length > 0 || defects.length > 0
     ? 'FAIL'
     : (notRunGates.length > 0 || notRun.length > 0 ? 'NOT_RUN' : 'PASS');
   return {
@@ -513,12 +1045,46 @@ export function verify(args = {}) {
   // `nowIso` below.
   const startedAtIso = nowIso();
   const base = resolveBase();
+  // THE INVOCATION ID (G1). One per run, minted here, handed to both child gates
+  // as `--invocation-id <id>`, and required back in the records they write. It is
+  // the only random value on this path and it is EXCLUDED FROM REPEATABILITY,
+  // exactly like the freshness observation: it decides only whether a record is
+  // the current run's, never what a measurement is. `verify({ invocationId })`
+  // accepts one so a test can drive the refusal with a known id.
+  const invocationId = typeof args.invocationId === 'string' && args.invocationId.length > 0
+    ? args.invocationId
+    : newInvocationId();
+  // Whether this run is a CHECK. It is read HERE, before the first child is
+  // spawned, because it decides how the harness is spawned (see 3b): a check run
+  // must not rewrite the record it is about to judge, and a write run must
+  // produce a record bound to THIS invocation or the binding is vacuous.
+  const noWrite = args.noWrite === true || args.no_write === true || args.nowrite === true;
   const gates = {};
   const notRun = [];
   const defects = [];
 
   // 1. the dependency gate
-  const dependency = runNode('scripts/verify-s2-008-dependencies.mjs');
+  //
+  // G5, BOOTSTRAP ORDERING. This gate runs BEFORE the aggregator spawns the
+  // replay that writes `evidence/s2-008-replay.json`, while it listed that
+  // record as REQUIRED — so the FIRST chain run on a clean base was red for the
+  // existence of a file the chain had not written yet (reproduced: `rm -f
+  // evidence/s2-008-replay.json` and the chain three times -> exit 1, defect
+  // `evidence-absent:evidence/s2-008-replay.json`, then exit 0, exit 0). Not a
+  // false green — the chain owns the records it writes and is what checks them —
+  // but a gate whose FIRST answer is about ORDERING answers the wrong question.
+  // `--chain-produced <paths>` is that gate's explicit flag for it: the listed
+  // records are excluded from REQUIRED, still read, still reported with their
+  // presence, and the chain owns them. WITHOUT the flag the gate's behaviour is
+  // byte-for-byte what it was, so `npm run verify:s2-008-dependencies` keeps its
+  // own contract. The list below is the set of records this chain's children
+  // write AFTER this gate, and it is a CONSTANT rather than a set of whatever
+  // happens to exist: a list assembled from the filesystem is a list that
+  // shrinks when the filesystem does.
+  const dependency = runNode('scripts/verify-s2-008-dependencies.mjs', [
+    '--chain-produced', CHAIN_PRODUCED_RECORDS.join(','),
+    '--invocation-id', invocationId,
+  ]);
   const dependencyRecord = parseLastJson(dependency.stdout);
   gates.dependency = {
     // The dependency gate has its OWN status vocabulary
@@ -531,6 +1097,18 @@ export function verify(args = {}) {
     issues: dependencyRecord?.issues ?? [],
     bindings: dependencyRecord?.bindings ?? null,
     track_files_tracked: dependencyRecord?.track_files_tracked ?? null,
+    // G4: the WHOLE track, not its first file. The dependency gate already
+    // computes the untracked and modified lists; the aggregator copied neither,
+    // so a PARTIALLY untracked track (24 of 57 files still tracked) came through
+    // this chain at exit 0 with `defects []` while the dependency gate's own
+    // record named 33 untracked files. All three counts are copied here and read
+    // by `trackProvabilityDefects` below.
+    track_files_expected: dependencyRecord?.track_files_expected ?? null,
+    track_files_expected_count: dependencyRecord?.track_files_expected_count ?? null,
+    track_files_unaccounted: dependencyRecord?.track_files_unaccounted ?? null,
+    track_files_tracked: dependencyRecord?.track_files_tracked ?? null,
+    track_files_untracked: dependencyRecord?.track_files_untracked ?? null,
+    track_files_modified: dependencyRecord?.track_files_modified ?? null,
   };
   if (dependency.exitCode === 3) notRun.push('NOT_RUN: the dependency gate could not run');
   else if (dependency.exitCode !== 0) defects.push(`dependency gate: ${gates.dependency.status} (${(dependencyRecord?.issues ?? []).join(', ')})`);
@@ -586,28 +1164,50 @@ export function verify(args = {}) {
   // 2. the probes gate
   const probes = runNode('scripts/s2-008-security-probes.mjs', args.corpus === undefined ? [] : ['--corpus', String(args.corpus)]);
   const probesRecord = parseLastJson(probes.stdout);
+  // G3, THE FLOORS. The numbers the record reports are compared with the numbers
+  // the FROZEN probe list and control list declare in the CODE. Before this, the
+  // counters were checked for "every value is 0" (which an empty map satisfies
+  // vacuously) and `totals` was stored and compared with nothing, so a probes
+  // gate stub that ran no probe and no control, printed `{"counters":{},
+  // "totals":{"probes_ran":0,"controls_ran":0}}` and exited 0 was a PASS gate
+  // (reproduced, observed exit 0, and the summary published those zeroes).
+  const floors = probeFloorIssues(probesRecord);
+  // The GATE's own status is the aggregator's judgement of that gate, not a copy
+  // of the child's exit code: a probes gate that ran nothing exits 0, and
+  // publishing `PASS(exit=0)` beside a chain that is red over it would be the
+  // green-with-a-disclaimer shape all over again. A failed floor is FAIL, an
+  // unmade check is NOT_RUN, and neither is ever softened.
+  const floorStatus = floors.defects.length > 0 ? 'FAIL' : (floors.notRun.length > 0 ? 'NOT_RUN' : null);
   gates.probes = {
-    status: gateStatusFromExit(probes.exitCode),
+    status: floorStatus ?? gateStatusFromExit(probes.exitCode),
     exitCode: probes.exitCode,
     source: 'scripts/s2-008-security-probes.mjs',
     counters: probesRecord?.counters ?? null,
     totals: probesRecord?.totals ?? null,
     reasons: probesRecord?.reasons ?? null,
+    // WHY the status above is not the child's exit code, when it is not.
+    floor_issues: [...floors.defects, ...floors.notRun],
+    // Published so a reader sees WHERE the floor came from: a number out of the
+    // record is not a floor, it is a claim.
+    floor: {
+      ...floors.declared,
+      read_from: 'src/lib/research/probes.mjs (PROBE_FAMILIES, PROBE_NAMES, HARD_GATE_COUNTERS) and the frozen control list (EXPECTED_CONTROLS + EXTRA_CONTROL_IDS)',
+      rule: 'fewer probes or fewer controls than the code declares is a defect; a counter map that reports none of the declared counters is a defect, not a pass',
+    },
   };
   if (probes.exitCode === 3) notRun.push('NOT_RUN: a mandatory probe or control did not run');
   else if (probes.exitCode !== 0) defects.push(`probes gate: ${gates.probes.status} (${(probesRecord?.reasons ?? []).join(', ')})`);
-  // The hard-gate counters, read from the gate's own report and never from a
-  // file: a counter that moved is a failure whatever the rest says.
-  const counters = isPlainObject(probesRecord?.counters) ? probesRecord.counters : null;
-  if (counters !== null) {
-    const moved = Object.entries(counters).filter(([, value]) => value !== 0).map(([name, value]) => `${name}=${value}`);
-    if (moved.length > 0) defects.push(`hard-gate counters moved: ${moved.join(', ')}`);
-  } else {
-    notRun.push('NOT_RUN: the probes gate reported no counter map');
-  }
+  // The hard-gate counters and the probe/control FLOORS, read from the gate's
+  // own report and compared against the code — never against the record.
+  defects.push(...floors.defects);
+  notRun.push(...floors.notRun);
 
-  // 3. the cross-process replay, spawned BY THE AGGREGATOR
-  const replayArgs = args.corpus === undefined ? [] : ['--corpus', String(args.corpus)];
+  // 3. the cross-process replay, spawned BY THE AGGREGATOR, with THIS
+  //    invocation's id (G1).
+  const replayArgs = [
+    ...(args.corpus === undefined ? [] : ['--corpus', String(args.corpus)]),
+    '--invocation-id', invocationId,
+  ];
   const replay = runNode('scripts/s2-008-replay.mjs', replayArgs);
   const replayRecord = readJson(REPLAY_RELATIVE);
   // The instant this record is JUDGED at, sampled AFTER the child returned (see
@@ -617,6 +1217,7 @@ export function verify(args = {}) {
     headTreeSha: base.tree_sha,
     observedAtIso: replayObservedAtIso,
     windowMs: Number.isFinite(args.freshnessWindowMs) ? args.freshnessWindowMs : FRESHNESS_WINDOW_MS,
+    invocationId,
   });
   gates.replay = {
     status: classified.gate.status,
@@ -625,6 +1226,10 @@ export function verify(args = {}) {
     reason: classified.gate.reason ?? null,
     source: 'scripts/s2-008-replay.mjs',
     overall: classified.evidence?.overall ?? null,
+    // G1, published: the id the record had to carry, and the tree it had to be
+    // bound to. A reader can check both without re-running the chain.
+    invocation_id: classified.evidence?.invocation_id ?? null,
+    head_tree_sha: classified.evidence?.head_tree_sha ?? classified.evidence?.base?.tree_sha ?? null,
     // R-C: the campaign's ANSWER is reported next to the gate status, so a
     // reader of one file sees both. It decides nothing.
     campaign_verdict: classified.evidence?.verdict ?? null,
@@ -649,15 +1254,66 @@ export function verify(args = {}) {
   //     A3, or it declares itself table-derived and is reported as
   //     NON-AUTHORITATIVE — and a record that claims a measurement it did not
   //     make is a defect, not a nuance.
-  const harness = runNode('scripts/s2-008-harness.mjs', args.corpus === undefined ? [] : ['--corpus', String(args.corpus), '--no-write']);
-  const harnessRecord = readJson(HARNESS_RELATIVE);
+  //
+  // G2, HOW THE HARNESS IS SPAWNED. The defect (F, reproduced twice) was that the
+  // record was read raw AND that a CHECK run rewrote it: `--no-write` was passed
+  // only when `--corpus` was, so `verify-s2-008.mjs --no-write` erased a marker a
+  // reader had put into `evidence/s2-008-harness.json` (observed exit 0), while
+  // the file's own comment said a check must not touch the evidence it inspects.
+  // So the mode follows THIS run's mode:
+  //   * a CHECK run (`--no-write`) spawns the harness with `--no-write`, and the
+  //     record on disk is the COMMITTED artefact it is — an EARLIER run's record,
+  //     by construction. It is judged for what an earlier record can still be
+  //     judged for: it must AGREE with the process this run just observed (its
+  //     `overall` PASS, every property flag true, a recorded exit code that
+  //     agrees), and the invocation id and tree it names are PUBLISHED so a
+  //     reader can see which run it belongs to. The id is NOT demanded of it: a
+  //     record the chain did not ask to be written cannot name the chain's id,
+  //     and demanding it anyway would make every check run red over a file the
+  //     check is forbidden to refresh;
+  //   * a WRITE run spawns the harness with `--write`, so the record on disk IS
+  //     this run's, and then the invocation id, the tree AND the printed digest
+  //     are all REQUIRED (G1). Without them the binding would be vacuous.
+  // Either way the record is judged by `classifyCurrentHarness`: a digest THIS
+  // file computes over the bytes it read, and the agreement check against the
+  // exit code this run observed.
+  const harness = runNode('scripts/s2-008-harness.mjs', [
+    ...(args.corpus === undefined ? [] : ['--corpus', String(args.corpus)]),
+    noWrite ? '--no-write' : '--write',
+    '--invocation-id', invocationId,
+  ]);
   // Sampled after the harness returned, for the same reason as the replay's.
   const harnessObservedAtIso = nowIso();
+  const harnessClassified = classifyCurrentHarness(harness, {
+    invocationId,
+    headTreeSha: base.tree_sha,
+    requireInvocationId: !noWrite,
+    requireReportedDigest: !noWrite,
+  });
+  const harnessRecord = harnessClassified.evidence;
   gates.harness = {
-    status: gateStatusFromExit(harness.exitCode),
+    status: harnessClassified.gate.status,
     exitCode: harness.exitCode,
     source: 'scripts/s2-008-harness.mjs',
     observed_at: harnessObservedAtIso,
+    // G2: the aggregator's OWN digest of the bytes it judged, and how the
+    // record was bound. Neither is a claim the record makes about itself.
+    evidence_sha256: harnessClassified.evidence_sha256,
+    evidence_bytes: harnessClassified.evidence_bytes,
+    // `false` on a check run: the chain spawned the harness with `--no-write`,
+    // so the record it judged is an EARLIER run's committed record and is judged
+    // for AGREEMENT with the process this run observed, not for provenance.
+    record_is_this_run: !noWrite,
+    invocation_id_required: !noWrite,
+    invocation_id: harnessRecord?.invocation_id ?? null,
+    head_tree_sha: harnessRecord?.head_tree_sha ?? harnessRecord?.base?.tree_sha ?? null,
+    // REPORTED, not required, on a check run: the committed record names the
+    // tree it was produced on, and a reader can see at a glance whether that is
+    // this checkout's. Demanding it of a record the chain may not refresh would
+    // make the gate red after every commit, which is the ordering trap G5 exists
+    // to remove.
+    head_tree_sha_matches: (harnessRecord?.head_tree_sha ?? harnessRecord?.base?.tree_sha ?? null) === base.tree_sha,
+    exit_code_recorded: Number.isInteger(harnessRecord?.exitCode) ? harnessRecord.exitCode : null,
     overall: harnessRecord?.overall ?? null,
     // R-C, both gates: the campaign VERDICT is the honest answer and is
     // reported. It is not, and never was, the thing a green here means.
@@ -666,10 +1322,10 @@ export function verify(args = {}) {
     observed_campaign_decision: harnessRecord?.observed_campaign_decision ?? null,
     decision_agrees_with_table: harnessRecord?.decision_agrees_with_table ?? null,
     properties: (harnessRecord?.properties ?? []).map((property) => `${property.id}:${property.ok ? 'HELD' : 'FAILED'}`),
-    reason: null,
+    reason: harnessClassified.gate.reason ?? null,
   };
-  if (harness.exitCode === 3) notRun.push('NOT_RUN: the harness could not run every property');
-  else if (harness.exitCode !== 0) defects.push(`harness gate: ${gates.harness.status} (${harnessRecord?.overall ?? 'unknown'})`);
+  if (gates.harness.status === 'NOT_RUN') notRun.push(`NOT_RUN: the harness could not run every property${gates.harness.reason === null ? '' : ` (${gates.harness.reason})`}`);
+  else if (gates.harness.status !== 'PASS') defects.push(`harness gate: ${gates.harness.status} (${gates.harness.reason ?? harnessRecord?.overall ?? 'unknown'})`);
   const crossRecord = crossRecordAgreement(harnessRecord, classified.evidence);
   if (crossRecord.issues.length > 0) {
     defects.push(`harness/replay A3 disagreement: ${crossRecord.issues.join('; ')}`);
@@ -731,6 +1387,15 @@ export function verify(args = {}) {
   //    repository, so an untracked track turns the gate RED (exit 1) rather than
   //    yellow. Nothing else changed direction: nothing became more permissive,
   //    and every other non-zero exit of this file is untouched.
+  //
+  //    G4, THE SAME RULE OVER THE WHOLE TRACK. `trackProvabilityDefects` is read
+  //    here, from the dependency gate's own untracked and modified lists, and its
+  //    defects go into `defects` — which now DECIDE (see `deriveVerdict`): a
+  //    partially untracked track used to pass this chain at exit 0 with an empty
+  //    defect list while the dependency gate named 33 untracked files.
+  const trackDefects = trackProvabilityDefects(gates.dependency);
+  const trackExempt = chainProducedExemptions(gates.dependency);
+  defects.push(...trackDefects);
   const verdict = deriveVerdict({ gates, defects, notRun, scopeNotes });
   const status = verdict.status;
   // The instant this SUMMARY was produced, which is the gate's own observation
@@ -741,11 +1406,35 @@ export function verify(args = {}) {
   const summary = {
     ticket: 'S2-008',
     gate: 'scripts/verify-s2-008.mjs',
-    role: 'verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the freshness refusal, and the derived status',
+    role: 'verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the invocation binding, the freshness refusal, and the derived status',
     status,
     ok: verdict.ok,
     exitCode: verdict.exitCode,
     base,
+    // G1: the invocation this run minted. Published, and declared EXCLUDED FROM
+    // REPEATABILITY, so nobody reads the difference between two runs of one tree
+    // as a change in the verdict: the id decides only whether a record is the
+    // current run's.
+    invocation: {
+      id: invocationId,
+      minted_by: 'scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)',
+      passed_to: ['scripts/s2-008-replay.mjs', 'scripts/s2-008-harness.mjs'],
+      required_in: [REPLAY_RELATIVE, HARNESS_RELATIVE],
+      required_when: noWrite ? 'a WRITE run: the record on disk is this run\'s, so it must carry the id; a CHECK run does not write it and judges the committed record by its TREE binding and its agreement with the observed process instead' : 'this WRITE run',
+      excluded_from_repeatability: true,
+      decides: false,
+      note: 'the only random value on this path. It is not part of any decision about a measurement, and nothing else in the summary changes between two runs of one tree because of it',
+    },
+    // G6: the boundary this gate does NOT close, printed by every run. It is a
+    // boundary and not a defect: a statement that cannot be false must not decide
+    // anything, and the corpus drift gate is what covers the working tree.
+    boundaries: [WORKING_TREE_BOUNDARY],
+    // What the provability rule exempted, and why. An exemption that cannot be
+    // seen in the record is a hole with a comment on it.
+    provability_exempt: trackExempt.length === 0 ? [] : [{
+      paths: trackExempt,
+      reason: 'these are the records this chain\'s own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)',
+    }],
     gates,
     defects: verdict.defects,
     notRun: verdict.notRun,
@@ -774,12 +1463,13 @@ export function verify(args = {}) {
       harness_a3_is: crossRecord.verdict === 'COMPARABLE' ? 'MEASUREMENT_AND_AGREES' : 'TABLE_DERIVED_NOT_A_MEASUREMENT',
       cross_record_agreement: crossRecord,
     },
-    // F2/F3: each ticket-level statement has ONE home. The provability
-    // precondition is unmet and is a defect (so it is in `defects` above and
-    // here); the #45 campaign statement is a scope note and is in
-    // `scopeNotes`. This list therefore names only unmet preconditions this
-    // file treats as defects, and is empty on a run whose track is tracked.
-    ticket_preconditions_not_met: verdict.provabilityDefects,
+    // F2/F3/G4: each ticket-level statement has ONE home. The provability
+    // preconditions are unmet and are defects (so they are in `defects` above and
+    // here); the #45 campaign statement is a scope note and is in `scopeNotes`.
+    // This list therefore names only unmet preconditions this file treats as
+    // defects, and is empty on a run whose whole track is tracked, committed and
+    // unmodified.
+    ticket_preconditions_not_met: [...verdict.provabilityDefects, ...trackDefects],
     engineering_status: 'BLOCKED_DEPENDENCY',
     assurance_status: 'NOT_MEASURED',
     real_adapter_status: 'NOT_RUN_REAL_ADAPTER',
@@ -793,8 +1483,8 @@ export function verify(args = {}) {
   // `--no-write` is honoured: a CHECK run of this aggregator must not mutate the
   // summary it is checking. Its three child gates are still spawned, because
   // their whole point is to produce a current report; the harness is spawned
-  // with `--no-write` so the check leaves the evidence it inspects untouched.
-  const noWrite = args.noWrite === true || args.no_write === true || args.nowrite === true;
+  // with `--no-write` on a check run too (see 3b), so a check leaves BOTH the
+  // summary and the harness record it is judging untouched.
   if (args.write !== false && !noWrite) {
     const body = `${JSON.stringify(summary, null, 2)}\n`;
     writeFileSync(outFile, body, 'utf8');
@@ -824,9 +1514,18 @@ function main() {
       notRunGates: summary.notRunGates,
       defects: summary.defects,
       notRun: summary.notRun,
+      // G1: printed, so a reader can see WHICH invocation produced the child
+      // records this run judged.
+      invocation_id: summary.invocation.id,
       // F2: printed, so the notes are readable in the run's own output and not
       // only by opening the summary file.
       scopeNotes: summary.scopeNotes,
+      // G6: the boundary is printed too. A gate that does not say what it cannot
+      // see leaves a reader to guess, and this is the one thing here that is NOT
+      // closed: the integrity gates read committed bytes, so a hand-edited
+      // summary in the WORKING TREE is invisible to them until the next chain run
+      // rewrites it, and the corpus drift gate is what covers that surface.
+      boundaries: summary.boundaries,
       ...(written ? { written } : {}),
     }, null, 2)}\n`);
   }

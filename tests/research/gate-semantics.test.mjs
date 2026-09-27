@@ -44,6 +44,10 @@
 //   * the gate accepting a FAIL verdict on agreement, and the committed record
 //     carrying the new terms — R-C (W3, `scripts/verify-s2-008.mjs`,
 //     `scripts/s2-008-replay.mjs`, then the regenerated evidence).
+//   * the G7 TRUST-MODEL cases at the end of this file — G1..G5: the
+//     invocation binding, the harness-record treatment, the probe-count
+//     floors, whole-track provability and the clean-base bootstrap
+//     (`scripts/verify-s2-008.mjs`, `scripts/verify-s2-008-dependencies.mjs`).
 // A red case here is the ticket's own red state, not a defect in the test.
 //
 // HOW THE PLANNED EXPORTS ARE READ, AND WHY IT MATTERS
@@ -74,8 +78,12 @@
 // that could not produce matching bytes could not reach a single path past that
 // check, and every case below would be vacuous.
 import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import {
+  appendFileSync, copyFileSync, cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
@@ -765,12 +773,25 @@ test('the decision path reads no clock and no random source', () => {
 
 /**
  * The five child gates in the shape `verify` builds them, every one PASS — the
- * shape a real green run has. `overrides` replaces or merges a member, and
- * `trackFilesTracked` is the dependency gate's own `git ls-files` count.
+ * shape a real green run has. `overrides` replaces or merges a member.
+ *
+ * THE DEPENDENCY GATE PUBLISHES THE WHOLE TRACK'S PROVABILITY (G4), so the
+ * green shape states all of it and not only the count: every file of the track
+ * tracked, none of them untracked, none of them modified. A count alone is no
+ * longer the whole rule — 1 of 57 tracked is 56 untracked — so a helper that
+ * published only the count would describe a state the aggregator is required to
+ * refuse.
  */
-function gatesAllGreen(overrides = {}, { trackFilesTracked = 57 } = {}) {
+function gatesAllGreen(overrides = {}, { trackFilesTracked = 57, trackFilesExpected = 57, trackFilesUntracked = [], trackFilesModified = [] } = {}) {
   const gates = {
-    dependency: { status: 'PASS', exitCode: 0, track_files_tracked: trackFilesTracked },
+    dependency: {
+      status: 'PASS',
+      exitCode: 0,
+      track_files_tracked: trackFilesTracked,
+      track_files_expected: trackFilesExpected,
+      track_files_untracked: trackFilesUntracked,
+      track_files_modified: trackFilesModified,
+    },
     corpus: { status: 'PASS', exitCode: 0 },
     probes: { status: 'PASS', exitCode: 0 },
     replay: { status: 'PASS', exitCode: 0 },
@@ -891,19 +912,40 @@ test('F3 an UNTRACKED track file is a DEFECT and exit 1 — strictly stricter th
   assert.deepEqual([...verdict.provabilityDefects], [...verdict.defects], 'the provability defect must also be the unmet ticket precondition');
   assert.deepEqual([...verdict.notRunGates], [], 'this is a FAIL, not a NOT_RUN');
   assert.deepEqual([...verdict.scopeNotes], [...scopeNotes], 'a failure must not drop the scope notes from the record');
-  // THE CONTROL, or the case proves nothing: the count is the whole rule. One
-  // tracked file of this track is enough, and the same gates with it are PASS —
-  // so the red above is about provability and not about the gates.
-  for (const tracked of [1, 2, 57]) {
-    const green = aggregator.deriveVerdict({ gates: gatesAllGreen({}, { trackFilesTracked: tracked }), defects: [], notRun: [], scopeNotes });
-    assert.equal(green.status, 'PASS', `${String(tracked)} tracked files did not make the same green run a pass`);
-    assert.deepEqual([...green.defects], []);
-  }
-  // A dependency gate that never reported the count is not the same as zero, and
-  // is not invented into a failure: `null` means the gate did not say, and the
-  // aggregate verdict reads the gates' own statuses for that.
-  const unreported = aggregator.deriveVerdict({ gates: gatesAllGreen({ dependency: { track_files_tracked: null } }), defects: [], notRun: [], scopeNotes });
-  assert.equal(unreported.status, 'PASS', 'an unreported tracked-file count was invented into a failure');
+  // THE CONTROL, or the case proves nothing: the same five green gates ARE a
+  // pass when the track is provable. Under G4 the green shape is narrower than
+  // it used to be — a count is no longer the whole rule, because ONE tracked
+  // file of a 57-file track is 56 untracked ones, and naming them is the
+  // defect E1 is about. So the control is the WHOLE track, tracked, unmodified.
+  const green = aggregator.deriveVerdict({ gates: gatesAllGreen(), defects: [], notRun: [], scopeNotes });
+  assert.equal(green.status, 'PASS', `the same five green gates with the whole track tracked are not a pass: ${JSON.stringify(green)}`);
+  assert.deepEqual([...green.defects], []);
+  // …and the MIDDLE of the scale, which is the E1 shape: part of the track
+  // tracked, the rest named. Before the repair this was a green run. The rule
+  // that NAMES the paths is the aggregator's own and lives in ONE exported
+  // function, so `verify` and this case cannot read two different rules; what
+  // `deriveVerdict` owes that rule is that a defect it is HANDED decides,
+  // because the EV5 term without it prints a defect beside `ok: true`.
+  assert.equal(typeof aggregator.trackProvabilityDefects, 'function', 'scripts/verify-s2-008.mjs must export ONE whole-track provability rule (G4: `trackProvabilityDefects`), so `verify` and this case read the same rule and not two');
+  const partialGate = gatesAllGreen({}, { trackFilesTracked: 24, trackFilesUntracked: ['src/lib/research/comparator.mjs', 'tests/research/gate-semantics.test.mjs'] }).dependency;
+  const partial = aggregator.trackProvabilityDefects(partialGate);
+  assert.ok(partial.length > 0, 'a track with 33 of its files untracked is provable');
+  assert.ok(
+    partial.some((defect) => defect.includes('src/lib/research/comparator.mjs')),
+    `the defect did not name the untracked paths: ${JSON.stringify(partial)}`,
+  );
+  const partialVerdict = aggregator.deriveVerdict({ gates: gatesAllGreen({}, { trackFilesTracked: 24 }), defects: partial, notRun: [], scopeNotes });
+  assert.equal(partialVerdict.status, 'FAIL', 'a defect the aggregator raised about an untracked file did not fail the verdict');
+  assert.equal(partialVerdict.exitCode, 1, 'a provability defect must exit 1');
+  // THE SILENT END OF THE SCALE: a dependency gate that reported no count at
+  // all said NOTHING, and "the gate said nothing" is not "the gate found
+  // nothing". Before the repair `null` was invented into a green run.
+  const silentGate = gatesAllGreen({ dependency: { track_files_tracked: null } }).dependency;
+  const silent = aggregator.trackProvabilityDefects(silentGate);
+  assert.ok(silent.length > 0, 'a dependency gate that reported no provability at all is a provability pass');
+  const silentVerdict = aggregator.deriveVerdict({ gates: gatesAllGreen({ dependency: { track_files_tracked: null } }), defects: silent, notRun: [], scopeNotes });
+  assert.notEqual(silentVerdict.status, 'PASS', 'a dependency gate that reported no provability at all is a silent pass');
+  assert.notEqual(silentVerdict.exitCode, 0, 'a silent provability pass still exited 0');
   // And a real defect still fails, and still names the gate: the provability
   // term is ADDITIVE to the existing ones, never a replacement for them.
   const alsoFailed = aggregator.deriveVerdict({ gates: gatesAllGreen({ corpus: { status: 'FAIL', exitCode: 1 } }, { trackFilesTracked: 0 }), defects: ['corpus gate: FAIL (drift in evidence/s2-008/corpus/manifest.json)'], notRun: [], scopeNotes });
@@ -938,4 +980,416 @@ test('the aggregator DERIVES its status through deriveVerdict, and its source no
   ]) {
     assert.match(source, pattern, `${what} is gone from the aggregator`);
   }
+});
+
+// ===========================================================================
+// G7 — THE AGGREGATOR'S TRUST MODEL: FIVE FORGERIES AND THREE CONTROLS
+// ===========================================================================
+//
+// WHAT THIS SECTION IS. Everything above pins the DECISION from inside one
+// process: a record, a function call, an assertion. Everything below pins the
+// same decision from OUTSIDE, where the only authority is a process exit code.
+// The adversarial recheck that produced this round found that the aggregator
+// trusted what the child gate scripts said ABOUT THEMSELVES, and each of the
+// five forgeries below was OBSERVED — by hand, on commit 6f9ac46 — to produce
+// `node scripts/verify-s2-008.mjs --no-write` with exit 0, `status PASS` and
+// `defects []`:
+//
+//   A3  a `scripts/s2-008-replay.mjs` that runs no trial and no comparator,
+//       copies the previous honest record, refreshes its two timestamps and its
+//       base, and prints the digest of the bytes it wrote. Nothing in that
+//       record is bound to the invocation that read it, so the aggregator
+//       compared the record with ITSELF and called it current. G1: one
+//       invocation id per run, generated by the aggregator, refused unless the
+//       record carries it and the tree the aggregator observed.
+//   A1a a `scripts/s2-008-security-probes.mjs` that prints `{"counters":{},
+//       "totals":{"probes_ran":0,"controls_ran":0}}` and exits 0. The only check
+//       was "every counter is 0", which an empty map satisfies, so a gate that
+//       ran NOTHING was indistinguishable from a gate that ran everything. G3:
+//       the totals are floored by the number the FROZEN probe list declares.
+//   F   a doctored `evidence/s2-008-harness.json` — `overall FAIL`, verdict and
+//       observed decision POSITIVE, A1..A5 `ok:false`, A3 promoted to
+//       `agreement_source: MEASUREMENT` — invoked with `--corpus`, so the
+//       harness was spawned with `--no-write` and the record survived. The
+//       aggregator read it RAW: the harness gate was published
+//       `PASS(exit=0)` beside `overall FAIL` and `A1:FAILED..A5:FAILED`, and the
+//       chain was exit 0 / PASS / `defects []`. G2: the harness record gets the
+//       replay record's treatment — an aggregator-computed digest, the
+//       invocation binding, and an agreement check between the record's claims
+//       and what the aggregator observed.
+//   E1  `git rm --cached -r src/lib/research tests/research` — 24 of this
+//       track's 57 files still tracked, 33 untracked. The dependency gate
+//       computes and publishes both lists; the aggregator copied NEITHER and
+//       guarded only on `track_files_tracked === 0`, so the chain was exit 0 /
+//       PASS / `defects []` while the dependency gate's own record named 33
+//       untracked files. G4: provability over the WHOLE track, and any untracked
+//       or modified file is a blocking defect with the paths named.
+//   G   a base on which `evidence/s2-008-replay.json` does not exist. Gate 1
+//       runs before the aggregator spawns the replay that writes it, so the
+//       FIRST run on a clean base was exit 1 with `evidence-absent`, and runs 2
+//       and 3 were exit 0. It cannot produce a false green, but a gate is red
+//       for a file's existence on the first run. G5: on a chain run the
+//       dependency gate stops requiring the records the chain itself produces.
+//
+// THE THREE CONTROLS AT THE END are the things that were already verified and
+// must not be broken by the repair: a fabricated POSITIVE decision stays
+// refused, a track NONE of whose files is tracked stays refused, and a CHECK run
+// does not rewrite the record it is judging.
+//
+// WHY EVERY CASE RUNS ON A COPY, AND WHY IT RUNS THE CHAIN. Each case answers a
+// question about what the aggregator does when a child gate LIES to it, so it
+// has to put the liar in front of the real aggregator and read the process exit
+// code. A mock of `verify()` would assert that a mock returns what a mock
+// returns. The copy is a `git clone` of the repository's own object store with
+// `--no-hardlinks` and `gc.auto=0` — the source is READ, never collected and
+// never hard-linked — with the WORKING TREE laid over it, so a fix that has not
+// been committed yet is in the copy and this file can never modify the
+// repository it is asserting about. Every mutation is COMMITTED in the copy
+// before the chain runs, so `git status` is clean at the dependency gate and the
+// condition under test is the only thing that gate can see; the one case that
+// must NOT be committed is the untracked-track case, where the untracking IS
+// the condition.
+//
+// WHAT IS RED ON PURPOSE HERE, AND WHY. G7 requires every case to fail against
+// the pre-fix aggregator and pass after it, so five of these are red until the
+// parallel workers land — and the two that changed an EXISTING expectation (F3's
+// middle-of-the-scale control, and `null` provability no longer being a silent
+// pass) are red for the same reason. The section header above names the
+// arrival each one waits for.
+
+/** The two reproductions that need a stub child gate, written out in full
+ *  rather than patched, because a stub is the ATTACK and an attack that is
+ *  assembled by string surgery is an attack nobody has read. */
+const REPLAY_STUB_SOURCE = [
+  '// G7/A3 STUB — a replay that runs no trial, invokes no comparator and',
+  '// publishes the PREVIOUS run\'s record with two refreshed timestamps and a',
+  '// refreshed base. It re-exports the real module kept beside it, so the',
+  '// aggregator still judges through the genuine frozen expectation, and the',
+  '// forgery runs only when this file IS the spawned child (the aggregator',
+  '// imports the module for its helpers, exactly as it imports the real one).',
+  "import { execFileSync } from 'node:child_process';",
+  "import { createHash } from 'node:crypto';",
+  "import { readFileSync, writeFileSync } from 'node:fs';",
+  "import path from 'node:path';",
+  "import { fileURLToPath, pathToFileURL } from 'node:url';",
+  '',
+  "export * from './s2-008-replay-real.mjs';",
+  '',
+  'const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;',
+  'if (isMain) {',
+  "  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');",
+  "  const file = path.join(root, 'evidence', 's2-008-replay.json');",
+  "  const record = JSON.parse(readFileSync(file, 'utf8'));",
+  "  const git = (...parts) => execFileSync('git', parts, { cwd: root, encoding: 'utf8' }).trim();",
+  '  const finished = new Date();',
+  "  record.freshness.observed_at = new Date(finished.getTime() - 1000).toISOString();",
+  '  record.freshness.finished_at = finished.toISOString();',
+  "  record.base.commit_sha = git('rev-parse', 'HEAD');",
+  "  record.base.tree_sha = git('rev-parse', 'HEAD^{tree}');",
+  '  const body = `${JSON.stringify(record, null, 2)}\\n`;',
+  "  writeFileSync(file, body, 'utf8');",
+  "  const digest = createHash('sha256').update(body).digest('hex');",
+  '  process.stdout.write(`wrote evidence/s2-008-replay.json bytes=${Buffer.byteLength(body)}\\n`);',
+  '  process.stdout.write(`REPLAY_EVIDENCE_SHA256 ${digest}\\n`);',
+  '  process.exitCode = 0;',
+  '}',
+  '',
+].join('\n');
+
+const PROBES_STUB_SOURCE = [
+  '// G7/A1a STUB — a probes gate that ran nothing: no probe, no control, an',
+  '// empty counter map, zero totals, exit 0. Every counter it reports IS zero,',
+  '// so the pre-fix "no counter moved" check has nothing at all to say.',
+  'process.stdout.write(`${JSON.stringify({ counters: {}, totals: { probes_ran: 0, controls_ran: 0 } })}\\n`);',
+  'process.exitCode = 0;',
+  '',
+].join('\n');
+
+/** Top-level entries that are not part of the tree a chain run needs: the git
+ *  metadata (the copy has its own), the installed packages (a symlink), the BB
+ *  runtime, and a build cache. */
+const NOT_COPIED = new Set(['.git', 'node_modules', '.bb', 'tsconfig.tsbuildinfo']);
+
+/**
+ * A throwaway copy of the whole tree that a chain run can be pointed at.
+ *
+ * The clone carries the repository's real HISTORY, because
+ * `verify-s2-008-dependencies.mjs` reads a binding commit's parents and refuses
+ * an archive checkout (`archive-mode:no-object-database`); a fresh `git init`
+ * copy answers that with a refusal that has nothing to do with the case under
+ * test. The working tree is laid over the checkout, so uncommitted work is
+ * included: a copy of `HEAD` instead would be green against a tree nobody has
+ * run yet, which is exactly the failure this file exists to prevent.
+ */
+function makeChainCopy() {
+  const root = mkdtempSync(path.join(tmpdir(), 's2-008-chain-'));
+  const commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: REPO, encoding: 'utf8' }).trim();
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO, encoding: 'utf8' }).trim();
+  // `gc.auto=0` and `--no-hardlinks`: this file must not modify the repository
+  // it copies, and a local clone is otherwise free to collect or hard-link the
+  // source object store.
+  execFileSync('git', ['-c', 'gc.auto=0', 'clone', '-q', '--no-hardlinks', '--no-checkout', '--local', commonDir, root], { encoding: 'utf8' });
+  execFileSync('git', ['checkout', '-q', '--detach', head], { cwd: root, encoding: 'utf8' });
+  for (const entry of readdirSync(REPO, { withFileTypes: true })) {
+    if (NOT_COPIED.has(entry.name)) continue;
+    // `recursive` MERGES into what the checkout already laid down, so a file
+    // that is uncommitted in the working tree overwrites its committed twin and
+    // an untracked new file appears. That is the point: a copy of `HEAD` would
+    // be green against a tree nobody has run yet.
+    cpSync(path.join(REPO, entry.name), path.join(root, entry.name), { recursive: true });
+  }
+  // `pg` and `ajv` are reached from the copy, so the installed tree is a
+  // symlink and is excluded from the index: it is not a file of this track and
+  // it must not reach `git status`.
+  symlinkSync(path.join(REPO, 'node_modules'), path.join(root, 'node_modules'));
+  appendFileSync(path.join(root, '.git', 'info', 'exclude'), '\nnode_modules\n');
+  return root;
+}
+
+/** Commit everything in the copy, so the dependency gate sees a clean tree and
+ *  the condition under test is the only thing it can report. */
+function commitAll(root, message) {
+  execFileSync('git', ['add', '-A'], { cwd: root, encoding: 'utf8' });
+  execFileSync('git', ['-c', 'user.email=gate-semantics@example.invalid', '-c', 'user.name=s2-008 gate semantics', 'commit', '-q', '--allow-empty', '-m', message], { cwd: root, encoding: 'utf8' });
+}
+
+/**
+ * The chain, in the copy, with the verdict on stdout.
+ *
+ * `--print-summary` makes stdout the summary itself and `--no-write` keeps the
+ * aggregator from writing it, so the ONLY files the run touches are the ones
+ * the child gates write — and any mutation of the harness record is therefore
+ * the bug and not this file's own doing.
+ */
+function chainRun(root, extraArgs = []) {
+  const result = spawnSync(
+    process.execPath,
+    [path.join(root, 'scripts', 'verify-s2-008.mjs'), '--print-summary', '--no-write', ...extraArgs],
+    { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 900_000 },
+  );
+  const stdout = String(result.stdout ?? '');
+  let summary = null;
+  try {
+    summary = JSON.parse(stdout.trim());
+  } catch {
+    summary = null;
+  }
+  assert.ok(summary !== null, `the aggregator printed no summary JSON (exit ${String(result.status)}); stdout: ${stdout.slice(0, 400)}; stderr: ${String(result.stderr ?? '').slice(0, 400)}`);
+  return { exitCode: typeof result.status === 'number' ? result.status : null, summary, stderr: String(result.stderr ?? '') };
+}
+
+/** A copy of the tree, `mutate`d, used, and removed — whatever `fn` does. */
+function withChainCopy(mutate, fn) {
+  const root = makeChainCopy();
+  try {
+    mutate(root);
+    return fn(root);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+/** The verdict a reader sees: the status, the defects and the process exit. */
+function verdictOf(run) {
+  return JSON.stringify({ status: run.summary.status, exit: run.exitCode, defects: run.summary.defects, notRun: run.summary.notRun });
+}
+
+test('G7/A3 a replay record copied out of an earlier run is refused: nothing in it is bound to THIS invocation', () => {
+  // THE FORGERY, member for member, and it is the one that was observed to
+  // produce a green chain: no trial, no comparator, the previous honest record
+  // re-published with two fresh timestamps and the base this checkout is on, and
+  // the digest of the bytes it wrote printed on stdout — so the aggregator's own
+  // "the record on disk is the one this invocation wrote" check is SATISFIED.
+  // What the record cannot do is name the invocation it belongs to.
+  withChainCopy((root) => {
+    const scripts = path.join(root, 'scripts');
+    // The real module is kept beside the stub under a name the aggregator never
+    // spawns, so `export *` hands the aggregator the genuine
+    // `frozenCampaignDecision` and `campaignDecisionAgreement`.
+    copyFileSync(path.join(scripts, 's2-008-replay.mjs'), path.join(scripts, 's2-008-replay-real.mjs'));
+    writeFileSync(path.join(scripts, 's2-008-replay.mjs'), REPLAY_STUB_SOURCE, 'utf8');
+    // The forgery is run once on its own first, so the case can say the stub is
+    // a gate that ran nothing — a stub that stopped being one would make every
+    // assertion below vacuous.
+    const alone = spawnSync(process.execPath, [path.join(scripts, 's2-008-replay.mjs')], { cwd: root, encoding: 'utf8' });
+    assert.equal(alone.status, 0, `the A3 stub did not exit 0 on its own: ${String(alone.stderr).slice(0, 400)}`);
+    assert.match(String(alone.stdout), /REPLAY_EVIDENCE_SHA256 [0-9a-f]{64}/, 'the A3 stub printed no evidence digest, so it is not the forgery this case describes');
+    commitAll(root, 'G7/A3: a replay that ran nothing and re-published an earlier run\'s record');
+  }, (root) => {
+    const run = chainRun(root);
+    assert.notEqual(run.summary.gates.replay.status, 'PASS', `a replay that ran nothing produced a green replay gate: ${verdictOf(run)}`);
+    assert.notEqual(run.summary.status, 'PASS', `the chain reported PASS on a replay that ran nothing: ${verdictOf(run)}`);
+    assert.notEqual(run.exitCode, 0, `the process exited 0 while the replay gate was refused: ${verdictOf(run)}`);
+    assert.ok(run.summary.defects.length > 0, `the refused replay gate produced no defect at all: ${verdictOf(run)}`);
+    assert.ok(run.summary.defects.some((defect) => /replay/i.test(defect)), `no defect named the replay gate: ${JSON.stringify(run.summary.defects)}`);
+  });
+});
+
+test('G7/A1a a probes gate that ran NOTHING is refused: its totals are floored by the frozen probe list', () => {
+  // The floor is the whole point. A counter map that reports zero probes is not
+  // a pass with nothing to say, it is a gate that did not run, and the number
+  // that would catch it comes from the FROZEN probe list in code — never from
+  // the record that is under suspicion.
+  withChainCopy((root) => {
+    const stub = path.join(root, 'scripts', 's2-008-security-probes.mjs');
+    writeFileSync(stub, PROBES_STUB_SOURCE, 'utf8');
+    const alone = spawnSync(process.execPath, [stub], { cwd: root, encoding: 'utf8' });
+    assert.equal(alone.status, 0, `the A1a stub did not exit 0 on its own: ${String(alone.stderr).slice(0, 400)}`);
+    assert.deepEqual(
+      JSON.parse(String(alone.stdout).trim()),
+      { counters: {}, totals: { probes_ran: 0, controls_ran: 0 } },
+      'the A1a stub is not a gate that ran nothing, so the case below would be vacuous',
+    );
+    commitAll(root, 'G7/A1a: a probes gate that ran nothing and reported zero of everything');
+  }, (root) => {
+    const run = chainRun(root);
+    // NOT `gates.probes.status`: the gate's own status is mapped from the exit
+    // code it returned, and a gate that LIES exits 0 — the ticket's words are
+    // that the totals "are a defect", so the defect list and the chain's own
+    // status are what this case reads.
+    assert.notEqual(run.summary.status, 'PASS', `the chain reported PASS with zero probes run: ${verdictOf(run)}`);
+    assert.notEqual(run.exitCode, 0, `the process exited 0 with zero probes run: ${verdictOf(run)}`);
+    assert.ok(run.summary.defects.some((defect) => /probes/i.test(defect)), `no defect named the probes gate: ${JSON.stringify(run.summary.defects)}`);
+    // …and the refusal is about the COUNT, not about a counter having moved: an
+    // empty counter map has no counter to move, which is the whole hole.
+    assert.ok(
+      run.summary.defects.some((defect) => /counter map reports none of the 6 counters/i.test(defect)),
+      `no defect named the empty counter map: ${JSON.stringify(run.summary.defects)}`,
+    );
+  });
+});
+
+test('G7/F a DOCTORED harness record is a defect, not a PASS gate, and a check run does not launder it', () => {
+  // The record says, in its own words, that every property it owns FAILED and
+  // that the campaign came back POSITIVE against a frozen non-positive
+  // expectation, and it promotes its A3 from table-derived to a measurement. It
+  // is invoked with `--corpus`, so the harness is spawned with `--no-write` and
+  // the doctored bytes are still there when the aggregator reads them. Before
+  // the repair the aggregator read them raw and published
+  // `harness: PASS(exit=0)` beside `overall: FAIL` and `A1:FAILED..A5:FAILED`.
+  withChainCopy((root) => {
+    const file = path.join(root, 'evidence', 's2-008-harness.json');
+    const record = JSON.parse(readFileSync(file, 'utf8'));
+    record.overall = 'FAIL';
+    record.verdict = 'POSITIVE';
+    record.observed_campaign_decision = 'POSITIVE';
+    record.decision_agrees_with_table = false;
+    for (const property of record.properties) {
+      property.ok = false;
+      if (property.id === 'A3') property.agreement_source = 'MEASUREMENT';
+    }
+    writeFileSync(file, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+    commitAll(root, 'G7/F: a harness record that reports FAIL for every property it owns');
+  }, (root) => {
+    const run = chainRun(root, ['--corpus', 'evidence/s2-008/corpus']);
+    assert.notEqual(run.summary.gates.harness.status, 'PASS', `a record that reports overall=FAIL was published as a green harness gate: ${verdictOf(run)}`);
+    assert.notEqual(run.summary.status, 'PASS', `the chain reported PASS beside a harness record that reports FAILED: ${verdictOf(run)}`);
+    assert.notEqual(run.exitCode, 0, `the process exited 0 beside a harness record that reports FAILED: ${verdictOf(run)}`);
+    assert.ok(run.summary.defects.length > 0, `the refused harness record produced no defect at all: ${verdictOf(run)}`);
+    assert.ok(run.summary.defects.some((defect) => /harness/i.test(defect)), `no defect named the disagreement: ${JSON.stringify(run.summary.defects)}`);
+    // …and the check run did not rewrite the record it was judging: the
+    // doctored bytes are still the bytes on disk afterwards. A gate that
+    // overwrites the evidence it inspects cannot report on it.
+    const after = JSON.parse(readFileSync(path.join(root, 'evidence', 's2-008-harness.json'), 'utf8'));
+    assert.equal(after.overall, 'FAIL', 'the check run rewrote the harness record it was judging');
+  });
+});
+
+test('G7/E1 a PARTIALLY untracked track is refused, and the defect names the untracked paths', () => {
+  // The scale in the middle is the one nothing guarded. `track_files_tracked`
+  // is 24 here, not 0, so the strict `=== 0` never fired — while a third of
+  // this track's own files had left the base a reader can check, and the
+  // dependency gate had PUBLISHED their names in a list the aggregator did not
+  // copy. Provability is a property of the WHOLE track.
+  withChainCopy((root) => {
+    // Nothing is committed after this: the untracking IS the condition, and
+    // committing it would be committing the defect away.
+    execFileSync('git', ['rm', '-q', '--cached', '-r', 'src/lib/research', 'tests/research'], { cwd: root, encoding: 'utf8' });
+    const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' })
+      .split('\n')
+      .filter((relPath) => /^(src\/lib\/research\/|tests\/research\/|scripts\/s2-008-|scripts\/verify-s2-008|evidence\/s2-008\/|evidence\/s2-008-)/.test(relPath));
+    assert.ok(tracked.length > 0, 'the reproduction untracked EVERY file of the track, so it is the all-untracked case and not this one');
+    assert.equal(tracked.includes('src/lib/research/comparator.mjs'), false, 'the reproduction did not untrack a track source');
+    assert.equal(tracked.includes('scripts/verify-s2-008.mjs'), true, 'the reproduction untracked the whole track instead of part of it');
+  }, (root) => {
+    const run = chainRun(root);
+    assert.notEqual(run.summary.status, 'PASS', `the chain reported PASS with a third of the track untracked: ${verdictOf(run)}`);
+    assert.notEqual(run.exitCode, 0, `the process exited 0 with a third of the track untracked: ${verdictOf(run)}`);
+    const joined = run.summary.defects.join(' | ');
+    assert.ok(run.summary.defects.length > 0, `a partially untracked track produced no defect at all: ${verdictOf(run)}`);
+    assert.match(joined, /untracked|not tracked|provability/i, `the defect did not name the condition: ${joined}`);
+    assert.ok(joined.includes('src/lib/research/comparator.mjs'), `the defect did not name the untracked paths: ${joined}`);
+  });
+});
+
+test('G7/G a base whose own evidence does not exist yet goes green on the FIRST chain run', () => {
+  // `evidence/s2-008-replay.json` is REQUIRED by the dependency gate, and gate
+  // 1 runs before the aggregator spawns the replay that writes it — so the
+  // first run on a clean base was red for a file's existence and the second
+  // and third were green. The file is removed HERE, in a commit, rather than
+  // with `rm` in the working tree: this is a base on which the record was never
+  // produced, and a working-tree deletion of a file the repository tracks would
+  // be a second, unrelated thing for the new provability rule to report.
+  withChainCopy((root) => {
+    // `-f`: the copy carries the working tree's own evidence bytes over its
+    // checkout, so the file is locally modified and a plain `git rm` would
+    // refuse to remove it. The record is still the one this base never produced.
+    execFileSync('git', ['rm', '-q', '-f', 'evidence/s2-008-replay.json'], { cwd: root, encoding: 'utf8' });
+    commitAll(root, 'G7/G: a base on which the replay record was never produced');
+  }, (root) => {
+    const run = chainRun(root);
+    assert.equal(run.exitCode, 0, `the FIRST chain run on a clean base was red: ${verdictOf(run)}`);
+    assert.equal(run.summary.status, 'PASS', `the first chain run on a clean base reported ${String(run.summary.status)}: ${verdictOf(run)}`);
+    assert.deepEqual(run.summary.defects, [], `the first chain run on a clean base reported defects: ${JSON.stringify(run.summary.defects)}`);
+    // The record the run produced is the one the aggregator judged, and it is
+    // there afterwards: a green first run that left no evidence is not a green
+    // first run.
+    assert.ok(existsSync(path.join(root, 'evidence', 's2-008-replay.json')), 'the first chain run produced no replay record');
+  });
+});
+
+test('G7 the controls the repair must not break: a fabricated POSITIVE, an untracked track, and a check run that does not rewrite what it judges', () => {
+  // (1) THE FABRICATED POSITIVE, still refused. A record whose decision is
+  // POSITIVE against a frozen non-positive expectation is a table finding, and
+  // the gate term reads the IN-CODE expectation rather than the record's own
+  // `decision_agrees_with_table`.
+  const fabricated = replayRecord({ top: { observed_campaign_decision: 'POSITIVE', comparison: { runs: { a: { decision: 'POSITIVE' } } } } });
+  assert.equal(fabricated.overall_terms.decision_agrees_with_table, true, 'the twin does not actually lie, so the refusal below tests nothing');
+  const { gate } = gateOf(fabricated);
+  assert.equal(gate.status, 'FAIL', 'a fabricated POSITIVE is no longer refused');
+  assert.match(String(gate.reason), /CAMPAIGN_DECISION_DIVERGES_FROM_FROZEN_TABLE/, `the refusal named something else: ${String(gate.reason)}`);
+
+  // (2) A TRACK NONE OF WHOSE FILES IS TRACKED, still refused, and still a
+  // FAIL (exit 1) rather than a NOT_RUN: provability is a check this stage
+  // performs, not a check it could not perform.
+  const scopeNotes = aggregator.ticketScopeNotes(disclosedCrossRecord());
+  const allUntracked = aggregator.deriveVerdict({
+    gates: gatesAllGreen({}, { trackFilesTracked: 0, trackFilesUntracked: ['src/lib/research/comparator.mjs'] }),
+    defects: [], notRun: [], scopeNotes,
+  });
+  assert.equal(allUntracked.status, 'FAIL', `a track with no tracked file at all is ${String(allUntracked.status)}`);
+  assert.equal(allUntracked.exitCode, 1, 'an untracked track must exit 1, not NOT_RUN');
+  assert.ok(allUntracked.defects.length > 0, 'an untracked track produced no defect');
+
+  // (3) A CHECK RUN MUST NOT REWRITE THE RECORD IT IS JUDGING — asserted on the
+  // COPY, never on the repository. A marker is written into the committed
+  // harness record, the chain is run with `--no-write` and the marker has to
+  // still be there: before the repair the harness was spawned WITHOUT
+  // `--no-write` unless `--corpus` was passed, so a plain check run overwrote
+  // the evidence it was checking.
+  withChainCopy((root) => {
+    const file = path.join(root, 'evidence', 's2-008-harness.json');
+    const record = JSON.parse(readFileSync(file, 'utf8'));
+    record.s2_008_gate_semantics_marker = 'MUST-SURVIVE-A-CHECK-RUN';
+    writeFileSync(file, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+    commitAll(root, 'G7: a harness record carrying a marker a check run must not lose');
+  }, (root) => {
+    const file = path.join(root, 'evidence', 's2-008-harness.json');
+    const run = chainRun(root);
+    // The run is green, so the marker cannot have been lost for a second
+    // reason: the tree is clean and every gate has to pass.
+    assert.equal(run.exitCode, 0, `the control run on a clean tree was red: ${verdictOf(run)}`);
+    const after = JSON.parse(readFileSync(file, 'utf8'));
+    assert.equal(after.s2_008_gate_semantics_marker, 'MUST-SURVIVE-A-CHECK-RUN', 'a CHECK run rewrote the harness record it was judging');
+  });
 });

@@ -45,16 +45,20 @@
 //      not run. "I could not check" and "I checked and it failed" are different
 //      answers and are never collapsed.
 //
-// A NOTE ON THE WALL CLOCK
-// Exactly one number in this record comes from the wall clock: `freshness.
-// observed_at`, which exists so `verify-s2-008.mjs` can tell a fresh record
-// from a stale one. It is marked `decides: false` and is excluded from the
-// repeatability comparison by name. Every instant the DECISION reads is a
-// frozen literal inside the children.
+// A NOTE ON THE WALL CLOCK AND ON THE INVOCATION ID
+// Exactly two numbers in this record come from outside the frozen literals, and
+// both are marked `decides: false`: `freshness.observed_at`, which exists so
+// `verify-s2-008.mjs` can tell a fresh record from a stale one, and
+// `invocation_id`, the per-chain-run id `scripts/verify-s2-008.mjs` generates
+// and passes with `--invocation-id`. Both are excluded from the repeatability
+// comparison BY NAME. Every instant the DECISION reads is a frozen literal
+// inside the children, and the id decides only WHETHER the record on disk is
+// this run's, never WHAT the campaign is.
 //
 //   node scripts/s2-008-replay.mjs
 //   node scripts/s2-008-replay.mjs --corpus .bb/s2-008/selftest-corpus
 //   node scripts/s2-008-replay.mjs --no-write
+//   node scripts/s2-008-replay.mjs --invocation-id <hex>    (spawned by the chain)
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -96,6 +100,37 @@ const OUT_RELATIVE = 'evidence/s2-008-replay.json';
 /** The number of properties the replay owns. The aggregator adds its own; the
  *  two sets are never merged into one number. */
 const OWNED_PROPERTIES = Object.freeze(['A3', 'A5']);
+
+/** `--invocation-id <id>`: the chain's per-run id, recorded in the record so a
+ *  reader can tell this run's record from a previous run's copy — the record a
+ *  stub that copies the last honest record and refreshes two timestamps can
+ *  never produce. A bare flag and a malformed value are a REFUSAL (the caller
+ *  gets exit 2 and no record), not a default: a caller that asked to bind this
+ *  record to an invocation and named nothing must not get a record that claims
+ *  to be unbound.
+ *
+ *  It decides nothing. The table, the comparator, the properties, the NOT_RUN
+ *  set and the exit code are computed exactly as they are without it.
+ *
+ *  @param {string[]} argv
+ *  @returns {string|null} the id, or null when the caller passed none
+ */
+export function readInvocationId(argv = []) {
+  for (let index = 2; index < argv.length; index += 1) {
+    const token = String(argv[index] ?? '');
+    const match = /^--invocation[-_]id(?:=(.*))?$/.exec(token);
+    if (match === null) continue;
+    const inline = match[1];
+    const value = inline !== undefined ? inline : (String(argv[index + 1] ?? '').startsWith('--') ? '' : String(argv[index + 1] ?? ''));
+    if (!/^[!-~]{1,200}$/.test(value)) {
+      const error = new Error(`--invocation-id must be 1-200 printable non-space characters, got ${JSON.stringify(String(value).slice(0, 40))}`);
+      error.code = 'REPLAY_INVOCATION_ID_INVALID';
+      throw error;
+    }
+    return value;
+  }
+  return null;
+}
 
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -350,8 +385,11 @@ function controlTrial(prereg) {
   };
 }
 
-async function replay(args = {}) {
+async function replay(args = {}, argv = process.argv) {
   const corpusDir = typeof args.corpus === 'string' ? path.resolve(args.corpus) : COMMITTED_CORPUS_DIR;
+  // THE INVOCATION BINDING, read first: a bad `--invocation-id` is refused
+  // before a single child is spawned, so a refusal leaves no partial record.
+  const invocationId = readInvocationId(argv);
   const evidenceEligible = corpusDir === COMMITTED_CORPUS_DIR;
   // The children ALWAYS write their record, because the replay has to read what
   // they produced: to the committed evidence path for the committed corpus, and
@@ -380,6 +418,7 @@ async function replay(args = {}) {
   log('# s2-008 cross-process replay');
   log(`config corpus=${rel(corpusDir)} evidence_eligible=${String(evidenceEligible)} write_evidence=${String(writeChildren && evidenceEligible)} table_digest=${tableDigest} metric=${EXPECTED_METRIC.name} noise_band=${String(EXPECTED_METRIC.noiseBand)}`);
   log(`base commit=${base.commit_sha} tree=${base.tree_sha} branch=${base.branch} track_tracked=${String(base.track_tracked)} tracked_files_of_this_track=${base.tracked_files_of_this_track}`);
+  log(`invocation id=${String(invocationId)} bound=${String(invocationId !== null)} head_tree_sha=${base.tree_sha} decides=false excluded_from_repeatability=true`);
   log(`frozen campaign decision=${frozenCampaign.decision} reason=${String(frozenCampaign.decisionReason)} interval=${frozenCampaign.interval.lower}..${frozenCampaign.interval.upper} confidence=${String(frozenCampaign.confidence)} never_rejects=${String(frozenCampaign.rule_feasibility.never_rejects)}`);
 
   // 2. The two process-separated runs.
@@ -776,6 +815,23 @@ async function replay(args = {}) {
     owned_properties: [...OWNED_PROPERTIES],
     evidence_eligible: evidenceEligible,
     write_evidence: writeChildren && evidenceEligible,
+    // THE INVOCATION BINDING, at the top level so the aggregator can read both
+    // members without walking: `invocation_id` is the chain's per-run id (null
+    // when a human started this replay), `head_tree_sha` the tree the record is
+    // about. A record copied from an earlier run carries that run's id and
+    // cannot match the id this run generated.
+    invocation_id: invocationId,
+    head_tree_sha: base.tree_sha,
+    invocation: {
+      invocation_id: invocationId,
+      head_tree_sha: base.tree_sha,
+      source: 'scripts/verify-s2-008.mjs generates one id per chain run and passes it with --invocation-id; a replay started by hand records null and says so',
+      purpose: 'to tell this run\'s record from a copy of an earlier run\'s record — nothing else',
+      decides: false,
+      excluded_from_repeatability: true,
+      excluded_fields: ['invocation_id', 'invocation.invocation_id'],
+      note: 'the id is unique per aggregator run and carries no information about the campaign; the properties, the verdict and the exit code are computed exactly as they are without it',
+    },
     base,
     corpus: { dir: rel(corpusDir), preregistration_digest: prereg.preregistration_digest ?? null, expected_table_digest: tableDigest },
     children: { a: { ...childA, stdout: undefined, stderr: childA.stderr.slice(-800) }, b: { ...childB, stdout: undefined, stderr: childB.stderr.slice(-800) } },
@@ -851,20 +907,27 @@ async function replay(args = {}) {
   };
   const outFile = path.join(REPO_ROOT, typeof args.out === 'string' ? args.out : OUT_RELATIVE);
   const write = writeChildren && evidenceEligible;
+  // The body is built in BOTH modes, so a check run can publish the digest of
+  // the bytes it did NOT write. The aggregator reads `REPLAY_EVIDENCE_SHA256`
+  // to tell "the record on disk is the one this invocation wrote" from "a
+  // previous green file is lying there", and that question has to be answerable
+  // when nothing was written — under `--no-write` the same digest is reported on
+  // its own line as NOT_ON_DISK, never as a claim that it is on disk.
+  const body = `${JSON.stringify(record, null, 2)}\n`;
+  const bytesSha256 = createHash('sha256').update(body).digest('hex');
   if (writeChildren && evidenceEligible) {
     mkdirSync(path.dirname(outFile), { recursive: true });
-    const body = `${JSON.stringify(record, null, 2)}\n`;
     writeFileSync(outFile, body, 'utf8');
     // The digest of the EXACT BYTES written, printed so the aggregator can tell
     // "the record on disk is what this invocation wrote" from "a previous green
     // file is lying there". A digest of the in-memory object would not survive
     // the `written` member this very line adds.
-    const bytesSha256 = createHash('sha256').update(body).digest('hex');
     record.written = { path: rel(outFile), bytes: Buffer.byteLength(body), bytes_sha256: bytesSha256 };
     log(`wrote ${rel(outFile)} bytes=${Buffer.byteLength(body)} bytes_sha256=${bytesSha256}`);
     log(`REPLAY_EVIDENCE_SHA256 ${bytesSha256}`);
   } else {
     log(`not written to evidence/: evidence_eligible=${String(evidenceEligible)} (a non-committed corpus is never evidence)`);
+    log(`REPLAY_EVIDENCE_SHA256_NOT_ON_DISK ${bytesSha256}`);
   }
   log(`RESULT exit_code=${exitCode}`);
   return { record, exitCode, comparison, controls, crashRestart, repeatability, properties, overall, notRun, separation, evidenceA, evidenceB, verdict };
@@ -915,7 +978,7 @@ function parseRepeatWitness(text) {
 
 async function main() {
   const args = parseArgs(process.argv);
-  const result = await replay(args);
+  const result = await replay(args, process.argv);
   process.exitCode = result.exitCode;
 }
 

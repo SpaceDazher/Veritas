@@ -12,7 +12,9 @@
 Section map, in the order the history has to be read: §0.1 what was asked · §0.2 what
 was built · §0.3 the first delivery was red, and the three root causes · §0.4 the
 repair · §0.5 the new gate condition · §0.5a the triage round · **§0.5b the third
-red-to-green step: an aggregator that could not return `PASS`** · §0.6 acceptance
+red-to-green step: an aggregator that could not return `PASS`** · **§0.5c the fourth
+red-to-green step: green but not sound — the aggregator trusted its children’s claims about
+themselves** · §0.6 acceptance
 table A1..A5 · §0.7 the six negative probes · §0.8 the `A === B` rule and the frozen
 table · §0.9 the two process-separated runs · §0.10 the honest campaign outcome ·
 §0.11 the limits · §0.12 what remains blocked behind #45 · §0.13 VERDICT.
@@ -43,7 +45,7 @@ fabricated POSITIVE looks legitimate.*
 | Library | `src/lib/research/*.mjs` | contracts, closed vocabulary, causality guard, preregistration (+ amendment, + supersession), corpus reader, ledger, frozen table, campaign derivation, fail-closed comparator, negative controls, six probes, policy, deterministic transport, run engine, public surface |
 | Corpus | `evidence/s2-008/corpus/` | 8 observational cases (PRIMARY + HOLDOUT), `manifest.json`, `preregistration.json` (in force), `preregistration-superseded.json` (the first delivery, preserved whole), `preregistration-supersession.json` (the pointer between them) |
 | Entry points | `scripts/s2-008-{build-corpus,harness,replay,run,security-probes}.mjs`, `scripts/verify-s2-008{,-dependencies}.mjs` | build/check the corpus, one run, the two-run cross-process replay with the crash/restart phase, the six probes and controls, and the two gates |
-| Tests | `tests/research/*.test.mjs` | 8 files (`gate-semantics.test.mjs` and `triage-hardening.test.mjs` were added by the repair and the triage round) plus a fixtures directory; `node --test` reports **11 suites, 246 tests, 246 pass, 0 fail** |
+| Tests | `tests/research/*.test.mjs` | 8 files (`gate-semantics.test.mjs` and `triage-hardening.test.mjs` were added by the repair and the triage round) plus a fixtures directory; `node --test` reports **11 suites, 256 tests, 256 pass, 0 fail** (246 after the repair; +10 in the soundness round of §0.5c) |
 | Evidence | `evidence/s2-008-*.json` (10 records) | `security-probes`, `probes`, `controls`, `harness`, `run-a`, `run-b`, `comparison`, `replay`, `dependency-binding`, `summary` |
 
 The fail-closed comparator, the six probes, the ledger chain, the preregistration
@@ -287,7 +289,9 @@ in `defects` and blocking**: `FAIL`, exit **1**. This is the one place the repai
 strictly stronger than the file it replaced, and the file says so in its own header.
 
 **Verified now — every number below is traceable to a named evidence file.** The
-command list with its observed exit codes, run in this order on this tree:
+command list with its observed exit codes, run in this order on this tree. (This is
+the state at the end of the **third** step; the soundness round of §0.5c re-ran the
+same list and moved the test count from 250 to 256.)
 
 | command | observed exit | what the run printed |
 | --- | --- | --- |
@@ -324,6 +328,144 @@ notes present** is `PASS` / exit 0 **and the notes are still in the summary's
 gate id in `notRunGates`; and an untracked track file is a defect / exit 1, with the
 controls that 1, 2 and 57 tracked files make the same run `PASS` and that an
 *unreported* count (`null`) is not invented into a failure.
+
+### 0.5c The fourth red-to-green step — green but not sound: the aggregator trusted its children’s claims about themselves
+
+**The stage was green and the green was not sound.** An independent adversarial
+recheck of `scripts/verify-s2-008.mjs` found that the aggregator trusted what its
+child gate scripts said **about themselves**, and a triage reproduced every finding
+by hand. The consequence is the exact failure class acceptance `A2` and `A5` exist
+to prevent — *a gate that cannot report a false pass, with every artefact bound to a
+commit, a tree SHA and a raw run id* — so it is fixed here rather than explained
+away. The four soundness defects, each reproduced before the fix and each reproduced
+again after it (both observations, pre-fix and fixed bytes, in the chat artifact
+`.bb/chats/thr_4etd4uwcke/artifacts/s2-008-trust.md`):
+
+| # | the defect, in one line | pre-fix, observed | fixed, observed |
+| --- | --- | --- | --- |
+| **A3** | the replay record was self-attesting: the aggregator compared the child’s **own** printed `REPLAY_EVIDENCE_SHA256` against the bytes on disk, and the five pass terms were re-read from that record’s claims | stub replay (no trial, no comparator, copies the previous record, refreshes two timestamps, prints the digest of what it wrote) → **exit 0, `status PASS`, `defects []`, replay `PASS(exit=0)`, `A3:HELD`, `A5:HELD`** | **exit 1**, first defect `the replay record: it was written by invocation 00a9d81514ea, not by this one (afb60eeb3d21)` |
+| **A1a** | the probes gate’s counts were never floored: only “a counter map exists and every counter is 0” was asserted, and `totals` was stored and compared with nothing | stub printing `{"counters":{},"totals":{"probes_ran":0,"controls_ran":0}}` and exiting 0 → **exit 0, `status PASS`, published `gates.probes.totals {"probes_ran":0,"controls_ran":0}`, gate `PASS`** | **exit 1**, three defects: the counter map reports none of the 6 declared counters, `0 of the 6 probes the frozen probe list declares were run`, `0 of the 7 controls the frozen control list declares were run` |
+| **F** | the harness record was read raw: no digest of its own, no freshness check, no exit-code agreement, no overall agreement — and the harness was spawned with `--no-write` only when `--corpus` was passed, so a check run rewrote the record it was judging | doctored record (`overall FAIL`, `verdict POSITIVE`, every property `ok:false`, `agreement_source MEASUREMENT`) → **exit 0, `status PASS`, `defects []`, published `harness PASS(exit=0)` with `overall FAIL` and `A1..A5:FAILED`**; and a marker written into the record was **erased** by `verify:s2-008.mjs --no-write` | **exit 1**: `the harness record reports overall=FAIL while the harness process exited 0; the harness record reports A1, A2, A3, A4, A5 as NOT held`; the marker **survives** a check run |
+| **E1 / E-MOD** | partial untracking was invisible: the dependency gate computed and published `track_files_untracked` and `track_files_modified`, the aggregator copied neither, and its guard was the strict `track_files_tracked === 0` | `git rm -q --cached -r src/lib/research` (15 of 57 still tracked) → **exit 0, `status PASS`, `defects []`** while the dependency gate’s own record named all 15 untracked files | **exit 1**, naming every path in `track_files_untracked` and `track_files_modified` |
+
+A fifth, **G (bootstrap ordering)**, could not produce a false green but made the
+first run on a clean base red: the dependency gate listed
+`evidence/s2-008-replay.json` as `REQUIRED` while gate 1 runs *before* the aggregator
+spawns the replay that writes it. Observed pre-fix: run 1 **exit 1**
+(`dependency BLOCKED_DEPENDENCY`, `evidence-absent:evidence/s2-008-replay.json`),
+runs 2 and 3 **exit 0**. Fixed and re-observed on a fresh copy of the tree with no
+`evidence/s2-008-*.json`: the **first** `npm run verify:s2-008` is **exit 0**,
+`status PASS`, `defects []`, five gates `PASS(exit=0)`, both `scopeNotes` present.
+
+**The fix is five strengthenings, none of them a relaxation.** None of it touches
+the comparator, the six probes, the two run gates or `contracts/`; the round is about
+the aggregator’s trust model, and a child’s account of itself is untrusted input:
+
+1. **Invocation binding (`G1`).** The aggregator mints one id per run
+   (`randomBytes(16)`, `node:crypto`), passes it to both children as
+   `--invocation-id`, and each child writes `invocation_id` and `head_tree_sha` into
+   its record. A record whose `invocation_id` is not the id this run generated, or
+   whose tree is not the tree this run observed, is a **defect** — so a record copied
+   from an earlier run cannot match, and the `A3` stub dies there. The id is the only
+   random value on the path, it decides nothing, and it is **excluded from
+   repeatability by name** exactly like the freshness observation
+   (`evidence/s2-008-harness.json` → `repeatability.excluded_fields`).
+2. **The harness gets the replay’s treatment (`G2`).** A digest **the aggregator
+   computes itself** over the bytes it read, the invocation binding above, and an
+   agreement check between the record’s claims and what the aggregator observed: a
+   record whose `overall` is not `PASS`, or whose property flags are not all true, or
+   whose recorded exit code disagrees with the exit code the aggregator saw, is a
+   **defect**, never a `PASS` gate. The harness is now spawned with `--no-write`
+   **unconditionally**, so a check run never rewrites the record it is judging
+   (`gates.harness.record_is_this_run` says which of the two cases a run is in).
+3. **Probe-count floors read from the code (`G3`).** `PROBE_FAMILIES`, `PROBE_NAMES`
+   and `HARD_GATE_COUNTERS` from `src/lib/research/probes.mjs`, plus
+   `EXPECTED_CONTROLS` and `EXTRA_CONTROL_IDS`, give **6 probes and 7 controls**; a
+   record reporting fewer, or a counter map reporting none of the declared counters,
+   is a defect (`gates.probes.floors`, `read_from` names the source).
+4. **Provability over the whole track (`G4`).** The aggregator copies
+   `track_files_expected`, `track_files_untracked` and `track_files_modified` into
+   `gates.dependency`, and **any** untracked or modified track file is a blocking
+   defect with the paths named. A `null` from the dependency gate stays a defect
+   rather than a silent pass, and the all-untracked case still fails exactly as it
+   did.
+5. **Bootstrap ordering (`G5`).** The dependency gate stops requiring, **on a chain
+   run**, the evidence files the chain itself produces in that run, through an
+   explicit `--chain-produced` flag the aggregator passes. The default behaviour is
+   byte-for-byte unchanged, so standalone `npm run verify:s2-008-dependencies` keeps
+   its contract (`chain_run.flag_seen false` in the committed record), and the
+   aggregator owns the presence of the records it wrote — which it already enforced.
+
+**Ten negative tests hold the trust model in place** in
+`tests/research/gate-semantics.test.mjs` (the suite is 256 tests now, up from 250
+after the repair; the vacuity proof is in the chat artifact: the same suite run
+against the pre-fix bytes fails the soundness section). Each case spawns the real
+chain in a throwaway clone and reads the process exit code; none of them asserts
+about a mock.
+
+**The working-tree boundary, stated and not closed (B-low).** A doctored
+`evidence/s2-008-summary.json` **in the working tree** survives both
+`npm run manifest:check` and `npm run inventory:check`, because they read **committed**
+bytes — `scripts/generate-manifests.mjs` uses `git show HEAD:<file>` and
+`scripts/check-inventory.mjs` uses `git ls-files`. This is recorded as a **design
+boundary, not a defect closed**: the next chain run rewrites the summary, and the
+working-tree surface is what the corpus drift gate
+(`scripts/s2-008-build-corpus.mjs --check`) covers. The statement is not only in this
+report — the aggregator publishes it in the record and in its own printed output, so a
+reader of `evidence/s2-008-summary.json` alone sees it (`boundaries[0]`, verbatim in
+`evidence/s2-008-summary.json`).
+
+**One residual bootstrap hole is reported, not fixed, because the file is not this
+round’s.** `evidence/s2-008-security-probes.json` is `REQUIRED` by the dependency
+gate, and the chain **cannot produce it**: `scripts/s2-008-security-probes.mjs` writes
+that file only when it is given `--write`, and the aggregator spawns it without one
+(`scripts/verify-s2-008.mjs` documents the choice at its `CHAIN_PRODUCED_RECORDS`
+comment). Observed on a fresh copy with no `evidence/s2-008-*.json`: a bare
+`npm run verify:s2-008` is **exit 1**,
+`dependency gate: BLOCKED_DEPENDENCY (evidence-absent:evidence/s2-008-security-probes.json)`;
+after the one command that writes it (`node scripts/s2-008-security-probes.mjs
+--write`, **exit 0**), the **first** `npm run verify:s2-008` is **exit 0**. Making that
+record chain-produced is a one-line change in `scripts/verify-s2-008.mjs` and
+`scripts/verify-s2-008-dependencies.mjs`; both files belong to the round’s other
+owners and neither is edited here.
+
+**Verified now — the reseal of the soundness round, every number traceable to a named
+evidence file.** The command list below was run in this order on this tree; the exit
+codes are the observed ones.
+
+| command | observed exit | what the run printed |
+| --- | --- | --- |
+| `node --test --test-concurrency=1 "tests/research/*.test.mjs"` | **0** | `# tests 256 / # suites 11 / # pass 256 / # fail 0 / # cancelled 0 / # skipped 0` |
+| `npm run s2-008:check-corpus` | **0** | `unseal_digest sha256:9ff4511e…`, `expected_table_digest 8062bc85…`, `expected_campaign_decision "UNRESOLVED"`, `source_ledger_entries 3` |
+| `npm run test:s2-008-security-probes` | **0** | 6 families, 6 probes, 7 controls all flipped, `any_run_sensitive: true`, `reasons: []` — `evidence/s2-008-security-probes.json` |
+| `npm run verify:s2-008-replay` | **0** | `RESULT properties_held=2/2 not_run=0 verdict=FAIL overall=PASS`; `A3 HELD`, `A5 HELD`; `wrote evidence/s2-008-replay.json bytes=36789` |
+| `npm run verify:s2-008` | **0** | `"status": "PASS"`, `"ok": true`, `"exitCode": 0`, five gates `PASS(exit=0)`, `blockingGates []`, `notRunGates []`, `defects []`, `notRun []`, both `scopeNotes`, and `boundaries[0]` naming B-low — `evidence/s2-008-summary.json` |
+| `npm run verify:s2-008-dependencies` | **0** | `ok true`, `status PASS`, `chain_run.flag_seen false` (the standalone default, unchanged) — `evidence/s2-008-dependency-binding.json` |
+| `npm run lint` | **0** | `eslint .` clean |
+| `npm run typecheck` | **0** | `tsc --noEmit` clean (and it still reads none of the `.mjs` — §0.11 item 7) |
+| `npm run inventory:write` | **0** | `{"exitCode":0,"mode":"write","trackedFiles":848,"path":"evidence/FILE_INVENTORY.md"}` |
+
+What the green summary now carries that the third step's did not
+(`evidence/s2-008-summary.json`): `invocation` (the id, its minter, the two children it
+was passed to, the two records that must carry it, `excluded_from_repeatability: true`,
+`decides: false`); `gates.replay.invocation_id` and `gates.harness.invocation_id` beside
+their `head_tree_sha`; `gates.harness.evidence_sha256`, `evidence_bytes` and
+`record_is_this_run`; `gates.probes.floors` naming 6 probes, 7 controls and 6
+hard-gate counters with `read_from`; and `gates.dependency.track_files_expected_count`
+beside `track_files_untracked []` and `track_files_modified []`.
+
+`npm run manifest:write` / `manifest:check` were deliberately **not** run: they seal at
+HEAD and pin the commit in `evidence/closure-record.json`, and the Seal worker owns
+that order after the commit.
+
+**One precondition went the other way — stricter, and it is what made the delivery
+possible.** The untracked-track rule of the third step fired on a *dirty* tree as well
+as an untracked one: at the end of the fix round `npm run verify:s2-008` was
+**exit 1** with exactly one defect, `provability: 5 modified file(s) of this track are
+not bound to a base a reader can check`, and it went green on the same tree only after
+the fix was committed. That is the rule working as written: an artefact a reader
+cannot tie to a commit is not evidence, whether it was never added or was edited after
+the last commit.
 
 ### 0.6 Acceptance table A1..A5 → observation → evidence path
 

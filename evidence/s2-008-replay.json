@@ -9,9 +9,24 @@
   ],
   "evidence_eligible": true,
   "write_evidence": true,
+  "invocation_id": "be2da8de9c38155a1c79d7a70c2df8cc",
+  "head_tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
+  "invocation": {
+    "invocation_id": "be2da8de9c38155a1c79d7a70c2df8cc",
+    "head_tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
+    "source": "scripts/verify-s2-008.mjs generates one id per chain run and passes it with --invocation-id; a replay started by hand records null and says so",
+    "purpose": "to tell this run's record from a copy of an earlier run's record — nothing else",
+    "decides": false,
+    "excluded_from_repeatability": true,
+    "excluded_fields": [
+      "invocation_id",
+      "invocation.invocation_id"
+    ],
+    "note": "the id is unique per aggregator run and carries no information about the campaign; the properties, the verdict and the exit code are computed exactly as they are without it"
+  },
   "base": {
-    "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-    "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
+    "commit_sha": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+    "tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 57,
@@ -34,7 +49,7 @@
         "evidence/s2-008/corpus",
         "--write"
       ],
-      "pid": 163175,
+      "pid": 190650,
       "exitCode": 0,
       "signal": null,
       "timedOut": false,
@@ -51,7 +66,7 @@
         "evidence/s2-008/corpus",
         "--write"
       ],
-      "pid": 163196,
+      "pid": 190662,
       "exitCode": 0,
       "signal": null,
       "timedOut": false,
@@ -63,20 +78,20 @@
     "a": {
       "path": "evidence/s2-008-run-a.json",
       "artefact_bound": true,
-      "digest": "71f8741e9e9f4e6665a8cff04697f06dab028c475d7893043f9183d17d1ba65c",
+      "digest": "9418838008988cc2dc6d80aa68333dd3563fee0321fbcb01831e54d9c925aeb6",
       "readable": true,
-      "child_pid": 163175,
-      "record_pid": 163175,
+      "child_pid": 190650,
+      "record_pid": 190650,
       "pid_bound": true,
       "pid_binding_reason": null
     },
     "b": {
       "path": "evidence/s2-008-run-b.json",
       "artefact_bound": true,
-      "digest": "dc2d51ac3279643a461dcdcc380f14e2665d5876c0e56d2b8a8715b8c2052f38",
+      "digest": "2ff707a067bac3279a2832273fa152efa2a02dbe54fba73edf36eeadfe52c897",
       "readable": true,
-      "child_pid": 163196,
-      "record_pid": 163196,
+      "child_pid": 190662,
+      "record_pid": 190662,
       "pid_bound": true,
       "pid_binding_reason": null
     }
@@ -90,20 +105,20 @@
       "output_root"
     ],
     "raw_run_id": {
-      "a": "s2-008-run-a-0-p163175",
-      "b": "s2-008-run-b-0-p163196"
+      "a": "s2-008-run-a-0-p190650",
+      "b": "s2-008-run-b-0-p190662"
     },
     "nonce": {
-      "a": "n-a-3257b9b7c3723e5d",
-      "b": "n-b-8b4db75fb6cf7312"
+      "a": "n-a-554bd711398e8a04",
+      "b": "n-b-cdf12e44993af797"
     },
     "executor_id": {
-      "a": "exec-s2-008-a-0-p163175",
-      "b": "exec-s2-008-b-0-p163196"
+      "a": "exec-s2-008-a-0-p190650",
+      "b": "exec-s2-008-b-0-p190662"
     },
     "pid": {
-      "a": 163175,
-      "b": 163196
+      "a": 190650,
+      "b": 190662
     },
     "output_root": {
       "a": ".bb/s2-008/run/out-a-0",
@@ -223,7 +238,7 @@
                   "variant": "provenance_field",
                   "corrupted": {
                     "field": "trials[0].provenance.raw_run_id",
-                    "from": "s2-008-run-a-0-p163175",
+                    "from": "s2-008-run-a-0-p190650",
                     "to": "run-forged",
                     "variant": "provenance_field"
                   },
@@ -268,7 +283,7 @@
                   "variant": "provenance_field",
                   "corrupted": {
                     "field": "trials[0].provenance.raw_run_id",
-                    "from": "s2-008-run-b-0-p163196",
+                    "from": "s2-008-run-b-0-p190662",
                     "to": "run-forged",
                     "variant": "provenance_field"
                   },
@@ -447,7 +462,7 @@
         }
       },
       "notRun": [],
-      "digest": "1b34ff620e0c14ba342a396213c97485112309338d85be8c3dbc0c280a4a60f5"
+      "digest": "948b5519499eb5e49ef6f38e4209bee8926b289e8ea16d5a96527ed5b069dd30"
     },
     "notRun": [],
     "error": null,
@@ -497,10 +512,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-          "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
-          "resolved_commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-          "resolved_tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a"
+          "commit_sha": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+          "tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
+          "resolved_commit_sha": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+          "resolved_tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63"
         },
         "missing": []
       },
@@ -711,10 +726,10 @@
     "runs": {
       "a": {
         "label": "runA",
-        "raw_run_id": "s2-008-run-a-0-p163175",
-        "nonce": "n-a-3257b9b7c3723e5d",
-        "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-        "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
+        "raw_run_id": "s2-008-run-a-0-p190650",
+        "nonce": "n-a-554bd711398e8a04",
+        "commit_sha": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+        "tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -774,10 +789,10 @@
       },
       "b": {
         "label": "runB",
-        "raw_run_id": "s2-008-run-b-0-p163196",
-        "nonce": "n-b-8b4db75fb6cf7312",
-        "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-        "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
+        "raw_run_id": "s2-008-run-b-0-p190662",
+        "nonce": "n-b-cdf12e44993af797",
+        "commit_sha": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+        "tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -950,13 +965,13 @@
   },
   "crash_restart": {
     "phase1": {
-      "pid": 163234,
+      "pid": 190703,
       "exitCode": null,
       "signal": "SIGKILL",
       "killed": true
     },
     "phase2": {
-      "pid": 163281,
+      "pid": 190737,
       "exitCode": 0,
       "document": {
         "ticket": "S2-008",
@@ -964,8 +979,8 @@
         "phase": 2,
         "label": "crash",
         "base": {
-          "commit_sha": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-          "tree_sha": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
+          "commit_sha": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+          "tree_sha": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
           "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
           "worktree_dirty": true,
           "tracked_files_of_this_track": 57,
@@ -974,13 +989,13 @@
         },
         "provenance": {
           "version": "s2-008-runner-v1",
-          "commit": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
-          "tree": "fe0b76ab1c2c617a1da90610a3c649beeb304a7a",
-          "run_id": "s2-008-run-crash-restart-p163281",
+          "commit": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+          "tree": "fa64a569135bb074f21fc0e7bc42db165f6a6b63",
+          "run_id": "s2-008-run-crash-restart-p190737",
           "label": "crash",
-          "executor_id": "exec-s2-008-crash-restart-p163281",
-          "pid": 163281,
-          "nonce": "n-crash-27f2e72b77b97d77",
+          "executor_id": "exec-s2-008-crash-restart-p190737",
+          "pid": 190737,
+          "nonce": "n-crash-44a599e06050ca99",
           "clock": "2026-01-01T01:00:00.000Z",
           "started_at": "2026-01-01T01:00:00.000Z"
         },
@@ -998,9 +1013,9 @@
         "trials_executed_by_the_restart": 0,
         "reconciliation": {
           "record_kind": "RECONCILIATION",
-          "reconciliation_id": "rec-19b197e3494bb234",
-          "run_id": "s2-008-run-crash-restart-p163281",
-          "nonce": "n-crash-27f2e72b77b97d77",
+          "reconciliation_id": "rec-741ec404a9c6cc7f",
+          "run_id": "s2-008-run-crash-restart-p190737",
+          "nonce": "n-crash-44a599e06050ca99",
           "trial_index": 0,
           "trial": "trl-s2-008-01",
           "resolution": "EFFECT_UNDETERMINED",
@@ -1018,7 +1033,7 @@
           "created_at": "2026-01-01T01:00:00.000Z",
           "detail": "the process was killed between taking the preregistered reservation and executing the first trial; the effect of the interrupted trial is undetermined"
         },
-        "crashed_run_id": "s2-008-run-crash-crash-p163234",
+        "crashed_run_id": "s2-008-run-crash-crash-p190703",
         "blind_retry": false,
         "retry_attempted": false,
         "implicit_zero": false,
@@ -1119,7 +1134,7 @@
     {
       "letter": "a",
       "path": "evidence/s2-008-run-a.json",
-      "pid": 163175,
+      "pid": 190650,
       "exitCode": 0,
       "readable": true,
       "pid_bound": true,
@@ -1131,7 +1146,7 @@
     {
       "letter": "b",
       "path": "evidence/s2-008-run-b.json",
-      "pid": 163196,
+      "pid": 190662,
       "exitCode": 0,
       "readable": true,
       "pid_bound": true,
@@ -1147,8 +1162,8 @@
     "b": []
   },
   "freshness": {
-    "observed_at": "2026-09-27T14:40:17.165Z",
-    "finished_at": "2026-09-27T14:40:19.153Z",
+    "observed_at": "2026-09-27T23:07:02.812Z",
+    "finished_at": "2026-09-27T23:07:06.683Z",
     "source": "wall_clock",
     "decides": false,
     "excluded_from_repeatability": true
