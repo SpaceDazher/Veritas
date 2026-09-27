@@ -129,6 +129,79 @@ const RESTART_ROOT = 'D:/workspaces/probe-restart';
 const NEUTRAL_WORKSPACE = 'ws-probe-neutral';
 const NEUTRAL_ROOT = 'D:/workspaces/probe-neutral';
 
+// The CLOSED set of identifiers this module owns. Exported because the probe
+// harness needs it to purge its own fixtures from an operator-supplied
+// database before it re-runs — see `purgeProbeFixtures`.
+//
+// WHY THE PROBES ARE NOT IDEMPOTENT ON A SHARED DATABASE
+// Every id here is deterministic, and several of them are PRIMARY KEYs:
+// `abt-probe-race`, `adr-probe-race`, the five workspaces. That is what makes
+// the record reproducible — the same tree yields the same ids, the same keys
+// and the same digests — and it is also what makes a SECOND run against the
+// same database measure a leftover row instead of the property under test. The
+// two database-backed concurrency probes are where it shows: the first run
+// leaves a CLAIMED task and an ACTIVE lease, and the second run's claim is
+// then refused for the wrong reason, which the harness reads as a duplicate
+// lease and as a stale fence that mutated something.
+//
+// Two honest ways out, and this module keeps the one that does not cost
+// determinism. Making the ids unique per run would fix the collision and break
+// reproducibility, and the whole point of the record is that it is a content
+// address. Purging the module's OWN namespaces before a re-run keeps the ids
+// deterministic and makes the tier honest: the fixtures are removed, and the
+// removal is reported in the record rather than assumed.
+export const PROBE_WORKSPACES = Object.freeze([
+  WORKSPACE, FOREIGN_WORKSPACE, RACE_WORKSPACE, RESTART_WORKSPACE, NEUTRAL_WORKSPACE,
+]);
+export const PROBE_ADAPTER_PREFIX = 'adr-probe-';
+
+/**
+ * Remove every row this module created from `pool`, and nothing else.
+ *
+ * Two independent guards keep an operator's own data safe:
+ *
+ *   1. The delete is bounded to `PROBE_WORKSPACES` and to adapters whose id
+ *      starts with `PROBE_ADAPTER_PREFIX`. A row outside both is never
+ *      touched, whatever it is.
+ *   2. The tables are visited in foreign-key order (children before parents),
+ *      so a probe row that is still referenced by its own journal is removed
+ *      with it rather than being skipped and left to collide again.
+ *
+ * @returns {Promise<{purged: boolean, rows: Record<string, number>, workspaces: string[]}>}
+ */
+export async function purgeProbeFixtures(pool, { dryRun = false } = {}) {
+  const workspaces = [...PROBE_WORKSPACES];
+  // agentboard_audit and agentboard_outbox have no FK, and audit rows are keyed
+  // by workspace; the rest are reached through workspace_id or their parent.
+  const plan = [
+    ['agentboard_outbox', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_audit', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_operation', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_reconciliation', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_execution_event', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_run', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_budget_spend', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_budget_grant', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_transition', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_lease', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_acl', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_task', `WHERE workspace_id = ANY($1::text[])`],
+    ['agentboard_adapter', `WHERE adapter_id LIKE $1`],
+  ];
+  const rows = {};
+  for (const [table, where] of plan) {
+    const params = table === 'agentboard_adapter'
+      ? [`${PROBE_ADAPTER_PREFIX}%`]
+      : [workspaces];
+    const count = await pool.query(`SELECT count(*)::int AS total FROM ${table} ${where}`, params);
+    rows[table] = count.rows[0].total;
+    if (!dryRun && rows[table] > 0) {
+      await pool.query(`DELETE FROM ${table} ${where}`, params);
+    }
+  }
+  return { purged: !dryRun, rows, workspaces };
+}
+
 // Principals. Every one of them is a server-resolved id of the S2-002
 // registry; a probe forges none of them, it only ever presents one that the
 // caller is not.

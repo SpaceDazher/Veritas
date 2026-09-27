@@ -707,6 +707,45 @@ different workspace is skipped rather than acted on.
 sweep moves nothing in B and that an unscoped sweep is a typed refusal; the
 test was confirmed to fail when the filter is removed.
 
+### The security probes only passed on a pristine database
+
+The same defect, in the module that produces the hard-gate evidence, and found
+while resolving the merge with `main` rather than in the first review pass.
+
+Every probe id is deterministic on purpose — the record is a content address,
+and the same tree has to yield the same ids, keys and digests — and several of
+them are `agentboard_task.task_id` or `agentboard_adapter.adapter_id`, which are
+PRIMARY KEYs. Against a **supplied** database the suite therefore measured its
+own leftovers from the previous run. The two database-backed concurrency probes
+are where it showed: the second run found its task already `CLAIMED` with an
+`ACTIVE` lease, read its own correctly-refused claim as a duplicate lease, and
+reported `duplicateActiveLeases=1` and `staleFenceMutations=1` — a
+`BLOCKED_SAFETY` verdict for a run in which nothing was violated. Reproduced:
+41/41 on a virgin database, 39/41 on the second run, 39/41 on the third.
+
+The `external` tier's own `note` had admitted the collision while describing it
+as a problem with *another live run*. It is a problem with the previous run of
+the same gate, which is the case that matters: `verify:s2-007` runs this gate
+as a mandatory step, so a developer who points `DATABASE_URL` at a persistent
+database gets a gate that is green once and red forever after.
+
+The two candidate fixes both had a real cost, so the third one won:
+
+* make the ids unique per run — fixes the collision and breaks the record's
+  reproducibility, which is the record's whole purpose;
+* keep the ids and tell the operator to use a fresh database — that is the
+  status quo, just louder;
+* **purge the module's own namespaces before the run** — deterministic ids
+  preserved, the tier becomes re-runnable, and the removal is reported in the
+  record so a reader can tell a fresh measurement from an inherited one.
+
+`purgeProbeFixtures` deletes only rows inside the five probe workspaces and
+only adapters under `adr-probe-`, visits the tables in foreign-key order, and
+returns the per-table counts. A row outside both sets is never touched whatever
+it is, and `summary-aggregator.test.mjs` pins that against a row planted in an
+operator-owned workspace. Verified on this host: five consecutive 41/41 runs
+against one database, and `npm test` green twice over the same database.
+
 ### The database-backed tests only passed on a pristine database
 
 `tests/agentboard/concurrency.test.mjs` used fixed `task_id` and `adapter_id`

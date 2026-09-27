@@ -26,6 +26,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { Pool } from 'pg';
 
 import {
   EXPECTED_AGGREGATOR_SCRIPT,
@@ -49,7 +50,8 @@ import {
   workspaceState,
 } from '../../scripts/verify-s2-007.mjs';
 import { decideGateOutcome, redactConnectionString, resolveDatabase, HEAD_GATE_COUNTERS } from '../../scripts/s2-007-security-probes.mjs';
-import { HARD_GATE_COUNTERS } from '../../src/lib/agentboard/probes.mjs';
+import { HARD_GATE_COUNTERS, PROBE_WORKSPACES, purgeProbeFixtures } from '../../src/lib/agentboard/probes.mjs';
+import { applyMigrations } from '../../scripts/apply-migrations.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HEAD = headIdentity(ROOT);
@@ -753,6 +755,65 @@ describe('the probe runner never writes a credential and never claims a database
   it('keeps the counter list identical to the probe module (one list, never two)', () => {
     assert.deepEqual(HEAD_GATE_COUNTERS, HARD_GATE_COUNTERS);
     assert.equal(HEAD_GATE_COUNTERS.length, 7);
+  });
+
+  it('purges only its own fixtures, and only inside the probe namespaces', async () => {
+    // The probe ids are deterministic on purpose — the record is a content
+    // address — and several are PRIMARY KEYs, so a second run against the same
+    // database used to measure the first run's leftovers: the race probe found
+    // its task already CLAIMED, read its own refused claim as a duplicate
+    // lease, and reported duplicateActiveLeases=1 and staleFenceMutations=1
+    // for a run in which nothing was violated. The purge is the fix, and it is
+    // only safe if it cannot reach an operator's rows.
+    const url = process.env.VERITAS_S2_007_TEST_DATABASE_URL ?? process.env.DATABASE_URL;
+    if (!url) return; // the dedicated-database tests fail rather than skip
+    const pool = new Pool({ connectionString: url, max: 2 });
+    try {
+      await applyMigrations({ connectionString: url, root: ROOT });
+      const foreign = 'ws-operator-owned';
+      const foreignTask = 'abt-operator-owned';
+      await pool.query(
+        `INSERT INTO agentboard_task (task_id, workspace_id, revision, state, priority, title, goal, description,
+          dependencies, required_capabilities, allowed_tools, workspace_ref, time_limits, cost_limits,
+          brief_digest, policy_digest, manifest_digest, history_digest)
+         VALUES ($1, $2, 1, 'BACKLOG', 'LOW', 'operator', 'operator', 'operator',
+          '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb,
+          repeat('a', 64), repeat('b', 64), repeat('c', 64), repeat('d', 64))`,
+        [foreignTask, foreign],
+      );
+      try {
+        // A probe fixture, named the way the probe module names one.
+        await pool.query(
+          `INSERT INTO agentboard_task (task_id, workspace_id, revision, state, priority, title, goal, description,
+            dependencies, required_capabilities, allowed_tools, workspace_ref, time_limits, cost_limits,
+            brief_digest, policy_digest, manifest_digest, history_digest)
+           VALUES ('abt-probe-purge-check', $1, 1, 'BACKLOG', 'LOW', 'p', 'p', 'p',
+            '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb,
+            repeat('a', 64), repeat('b', 64), repeat('c', 64), repeat('d', 64))`,
+          [PROBE_WORKSPACES[0]],
+        );
+
+        const purged = await purgeProbeFixtures(pool);
+        assert.equal(purged.purged, true);
+        assert.ok(purged.rows.agentboard_task >= 1, 'the probe fixture is counted');
+        assert.deepEqual(purged.workspaces, [...PROBE_WORKSPACES]);
+
+        const gone = await pool.query('SELECT count(*)::int AS n FROM agentboard_task WHERE task_id = $1', ['abt-probe-purge-check']);
+        assert.equal(gone.rows[0].n, 0, "the probe suite's own fixture is removed");
+        const kept = await pool.query('SELECT count(*)::int AS n FROM agentboard_task WHERE task_id = $1', [foreignTask]);
+        assert.equal(kept.rows[0].n, 1, "a row outside every probe namespace survives the purge");
+
+        // A second purge is a no-op, which is what makes a re-run deterministic
+        // rather than merely survivable.
+        const again = await purgeProbeFixtures(pool);
+        assert.equal(Object.values(again.rows).reduce((a, b) => a + b, 0), 0, 'nothing of ours is left to remove');
+      } finally {
+        await pool.query('DELETE FROM agentboard_acl WHERE task_id = $1', [foreignTask]);
+        await pool.query('DELETE FROM agentboard_task WHERE task_id = $1', [foreignTask]);
+      }
+    } finally {
+      await pool.end().catch(() => {});
+    }
   });
 });
 

@@ -62,8 +62,9 @@ import { applyMigrations } from './apply-migrations.mjs';
 import { freePort, waitForPostgres, POSTGRES_IMAGE } from './verify-postgres-smoke.mjs';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import {
-  HARD_GATE_COUNTERS, PROBE_FAMILIES, PROBES_VERSION, runAllProbes,
+  HARD_GATE_COUNTERS, PROBE_FAMILIES, PROBES_VERSION, purgeProbeFixtures, runAllProbes,
 } from '../src/lib/agentboard/probes.mjs';
+import { Pool } from 'pg';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_RELATIVE = 'evidence/s2-007-security-probes.json';
@@ -169,6 +170,25 @@ export async function resolveDatabase({ explicit = null, podmanAllowed = true, e
   const external = explicit ?? env.S2_007_DATABASE_URL ?? env.DATABASE_URL ?? null;
   if (typeof external === 'string' && external !== '') {
     const migrations = await applyMigrations({ connectionString: external, root: ROOT });
+    // The fixtures are purged before the run, and the purge is REPORTED.
+    //
+    // The probe ids are deterministic on purpose — the record is a content
+    // address, and the same tree must yield the same ids and digests — and
+    // several of them are PRIMARY KEYs. That makes the suite re-runnable only
+    // if the previous run's fixtures are gone, and a second run against the
+    // same database used to measure the leftovers: the race probe found a task
+    // already CLAIMED with an ACTIVE lease, read its own refused claim as a
+    // duplicate lease, and reported `duplicateActiveLeases=1` and
+    // `staleFenceMutations=1` for a run in which nothing was violated. The
+    // purge is bounded to this module's own workspaces and adapter prefix, so
+    // an operator's rows are never touched.
+    const pool = new Pool({ connectionString: external, max: 2 });
+    let purge;
+    try {
+      purge = await purgeProbeFixtures(pool);
+    } finally {
+      await pool.end().catch(() => {});
+    }
     return {
       connectionString: external,
       tier: 'external',
@@ -178,7 +198,8 @@ export async function resolveDatabase({ explicit = null, podmanAllowed = true, e
       container: null,
       migrationsApplied: migrations.applied.length,
       migrationCount: migrations.migrations.length,
-      note: 'the operator-supplied database was migrated with the ordered migration set before the probes ran; probes that share a database with another live run would collide on the fixed fixture workspace ids',
+      fixturesPurged: purge,
+      note: `the operator-supplied database was migrated with the ordered migration set, then the probe suite's OWN fixtures were purged before the run (${Object.entries(purge.rows).filter(([, n]) => n > 0).map(([table, n]) => `${table}=${n}`).join(', ') || 'nothing to remove'}). Ids stay deterministic so the record remains a content address; only rows inside the probe's own workspaces and adapter prefix are ever deleted.`,
       cleanup: () => {},
     };
   }
@@ -376,6 +397,10 @@ export async function runSecurityProbes(args = {}) {
       connection: redactConnectionString(database.connectionString),
       reason: database.reason ?? null,
       note: database.note ?? null,
+      // What the pre-run purge removed, by table. A re-runnable tier has to be
+      // able to SAY it cleaned up: an operator reading a green record has to
+      // be able to tell a fresh measurement from one that inherited rows.
+      fixturesPurged: database.fixturesPurged ?? null,
     },
     probeEvidence: report.evidence,
     honestStatus: {
