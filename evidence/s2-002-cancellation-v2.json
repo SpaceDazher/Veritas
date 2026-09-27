@@ -48,7 +48,20 @@
         true,
         true
       ],
-      "detail": "platform=posix; descendantsObserved=1; descendantAlive=0; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[59915,59916,59917,59918,59919,59920],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; outcome.status=cancelled"
+      "namedChecks": {
+        "descendantObserved": true,
+        "cancelProofTerminated": true,
+        "cancelTerminated": true,
+        "cancelSurvivorsZero": true,
+        "outcomeProofTerminated": true,
+        "outcomeStatusCancelled": true,
+        "outcomeSurvivorsZero": true,
+        "rootDead": true,
+        "publishedDescendantsDead": true,
+        "trackedExceedsPublished": true
+      },
+      "failed": [],
+      "detail": "platform=posix; descendantsObserved=1; descendantAlive=0; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[538667,538668,538669,538670,538671],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; outcome.status=cancelled"
     },
     {
       "caseId": "cancellation/timeout-descendant-escape",
@@ -61,7 +74,16 @@
         true,
         true
       ],
-      "detail": "status=timeout; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[59922,59923,59924,59925,59944],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; descendantAlive=0"
+      "namedChecks": {
+        "statusTimeout": true,
+        "proofTerminated": true,
+        "terminated": true,
+        "survivorsZero": true,
+        "statusNotSuccess": true,
+        "publishedDescendantsDead": true
+      },
+      "failed": [],
+      "detail": "status=timeout; {\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[538674,538675,538677,538680],\"reasonCodes\":[\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"platform:linux\"}; descendantAlive=0"
     },
     {
       "caseId": "cancellation/negative-control-no-process-table",
@@ -78,7 +100,20 @@
         true,
         true
       ],
-      "detail": "cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[59945],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:process-table-unavailable\"}; outcome.survivors=null"
+      "namedChecks": {
+        "cancelProofUnverified": true,
+        "cancelNotTerminated": true,
+        "cancelSurvivorsNull": true,
+        "cancelReasonCodes": true,
+        "outcomeProofUnverified": true,
+        "outcomeNotTerminated": true,
+        "outcomeSurvivorsNull": true,
+        "outcomeReasonCodes": true,
+        "observationSourceRecorded": true,
+        "injectedObserverFlagged": true
+      },
+      "failed": [],
+      "detail": "cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[538684],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:process-table-unavailable\"}; outcome.survivors=null"
     },
     {
       "caseId": "cancellation/negative-control-descendant-query-fails",
@@ -89,9 +124,20 @@
         true,
         true,
         true,
+        true,
         true
       ],
-      "detail": "descendantsObserved=1; cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[59952],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:descendant-query-unavailable\"}"
+      "namedChecks": {
+        "descendantObserved": true,
+        "cancelProofUnverified": true,
+        "cancelNotTerminated": true,
+        "cancelSurvivorsNull": true,
+        "outcomeProofUnverified": true,
+        "outcomeSurvivorsNull": true,
+        "unobservableDescendantStillAlive": true
+      },
+      "failed": [],
+      "detail": "descendantsObserved=1; unobservableDescendantAlive=1; cancel={\"proof\":\"UNVERIFIED\",\"terminated\":false,\"survivors\":null,\"remainingProcessIds\":[],\"trackedProcessIds\":[538691],\"reasonCodes\":[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_NEGATIVE_CONTROL_NO_PROCESS_TABLE\"],\"observationSource\":\"negative-control:descendant-query-unavailable\"}"
     },
     {
       "caseId": "cancellation/recycled-pid-not-signalled",
@@ -100,10 +146,34 @@
         true,
         true,
         true,
+        true
+      ],
+      "namedChecks": {
+        "shapeContract": true,
+        "harnessNotCountedAlive": true,
+        "harnessReportedReused": true,
+        "harnessStillAlive": true
+      },
+      "failed": [],
+      "detail": "observer=platform:linux; identitySupported=true; alive=[]; pidReused=[538658]; stale identity token detected as reuse"
+    },
+    {
+      "caseId": "cancellation/stale-token-never-signalled",
+      "verdict": "PASS",
+      "checks": [
+        true,
+        true,
         true,
         true
       ],
-      "detail": "observer=platform:linux; identitySupported=true; alive=[]; pidReused=[59907]; stale identity token detected as reuse"
+      "namedChecks": {
+        "trackedPidNotSignalled": true,
+        "harnessNotSignalled": true,
+        "reuseReported": true,
+        "reusedNotCountedAlive": true
+      },
+      "failed": [],
+      "detail": "cancel={\"proof\":\"TERMINATED\",\"terminated\":true,\"survivors\":0,\"remainingProcessIds\":[],\"trackedProcessIds\":[538908],\"reasonCodes\":[\"SBX_PID_REUSED\",\"SBX_TERMINATION_PROVEN\"],\"observationSource\":\"negative-control:stale-identity-token\"}; outcome.proof=TERMINATED; cancel.reasonCodes=[\"SBX_PID_REUSED\",\"SBX_TERMINATION_PROVEN\"]; trackedPidAlive=true"
     },
     {
       "caseId": "cancellation/self-completed-run-makes-no-claim",
@@ -116,6 +186,15 @@
         true,
         true
       ],
+      "namedChecks": {
+        "statusCompleted": true,
+        "noTerminationClaim": true,
+        "proofUnverified": true,
+        "survivorsNull": true,
+        "treeUnverified": true,
+        "treeShapeReason": true
+      },
+      "failed": [],
       "detail": "status=completed; proof=UNVERIFIED; survivors=null; reasonCodes=[\"SBX_PROCESS_OBSERVATION_UNAVAILABLE\",\"SBX_TREE_SHAPE_NOT_OBSERVED\"]"
     },
     {
@@ -135,15 +214,40 @@
         true,
         true
       ],
+      "namedChecks": {
+        "comparisonOk": true,
+        "noMismatchedDecisions": true,
+        "noCounterViolations": true,
+        "noOracleViolations": true,
+        "digestStableAcrossRuns": true,
+        "hardGate:cross_tenant_success": true,
+        "hardGate:authority_expansion": true,
+        "hardGate:fs_network_secret_escapes": true,
+        "hardGate:survivors_after_cancellation": true,
+        "hardGate:allow_after_revocation_commit": true,
+        "hardGate:missing_or_censored_trials": true,
+        "runBSurvivorCounterZero": true
+      },
+      "failed": [],
       "detail": "inProcessReplay; comparedTrials=284; corpusRevision=2; corpusDigest=6b644081b284d1c0; counters={\"cross_tenant_success\":0,\"authority_expansion\":0,\"fs_network_secret_escapes\":0,\"survivors_after_cancellation\":0,\"allow_after_revocation_commit\":0,\"missing_or_censored_trials\":0}; counterViolations=[]"
     },
     {
       "caseId": "cancellation/historical-evidence-untouched",
       "verdict": "PASS",
       "checks": [
+        true,
+        true,
+        true,
         true
       ],
-      "detail": "checked=8; source=git:HEAD; rewritten=[]"
+      "namedChecks": {
+        "noneRewritten": true,
+        "allRecordsPresent": true,
+        "allHaveCommittedDigest": true,
+        "notRootManifestOnly": true
+      },
+      "failed": [],
+      "detail": "checked=8; sources=[\"git:HEAD\"]; rewritten=[]"
     }
   ],
   "verdict": "PASS",
@@ -151,6 +255,7 @@
     "Proves the spawned-tree termination control of the in-process probe adapter on this host only; it is not a kernel containment boundary.",
     "Descendant discovery on POSIX reads /proc; on a host without /proc it falls back to ps, and if neither answers the outcome is UNVERIFIED rather than zero survivors.",
     "A Windows-only replay still does not establish the non-Windows property; both platforms must be observed independently.",
-    "The adversarial A-K report evidence/s2-002-security-probes.json is the pre-fix record and is left untouched; npm run test:security-probes regenerates it in the working tree by design, so re-running it is an explicit separate act."
+    "The adversarial A-K report evidence/s2-002-security-probes.json is the pre-fix record and is left untouched; npm run test:security-probes regenerates it in the working tree by design, so re-running it is an explicit separate act.",
+    "The Windows record evidence/s2-002-cancellation-v2-win32.json was observed before the review fixes landed and does NOT describe the current code; it must be re-observed on the Windows host."
   ]
 }

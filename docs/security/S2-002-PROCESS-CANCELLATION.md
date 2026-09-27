@@ -102,17 +102,47 @@ reachable from a pid that is gone.
 - The tree is captured **before** the root dies, and the tracked pid set
   carries its session/process group. That is what finds a descendant which
   left the group with `setsid(2)` — the POSIX counterpart of Windows
-  `start /b` — and, on re-discovery, the grandchild that is re-parented to init
-  once its parent is gone.
+  `start /b` — and the grandchild that is re-parented to init once its parent
+  is gone.
+- **The captured session/process group is also a re-discovery edge after the
+  root dies.** `terminateTree()` kills the root before the settle loop starts,
+  so a parent walk from that pid can never find anything again: every settle
+  round after the kill saw an empty tree. The observer therefore sweeps the
+  sessions and process groups that were captured while the root was alive, and
+  those edges were checked for isolation at capture time, so the sweep cannot
+  reach an unrelated host process. The pre-kill capture is what makes the
+  proof valid; the settle loop re-observes and re-signals what it captured.
 - Session/pgroup expansion is only used when the root is genuinely isolated
-  from the adapter's own session and process group
-  (`SBX_PROCESS_GROUP_NOT_ISOLATED` when it is not), so it can never sweep in
-  unrelated host processes.
+  from the adapter's own session and process group. When it is not, the
+  query **fails closed** with `SBX_PROCESS_GROUP_NOT_ISOLATED` and returns no
+  pids at all. It is not merely reported: an earlier revision fell back to
+  every member of the root's process group, which on a non-detached child is
+  the adapter's own group, so the caller was handed its own pid as a
+  "descendant" and the kill path would have signalled the harness.
+- Both signal paths enforce the identity token. A direct `SIGKILL` that
+  skipped the check would kill an unrelated process even when the
+  group/tree kill was correctly refused, so `directKill()` and `treeKill()`
+  share one identity check.
 - A recycled pid is reported as `SBX_PID_REUSED`, is never signalled, and is
   never counted as a survivor. The identity token exists where the platform
   exposes one (Linux `/proc` starttime); Windows CIM has none, so the case
   records that residual rather than asserting a control the platform cannot
-  support.
+  support. A stale token means the number belongs to a different process, so
+  the refusal is a statement about *that* process, not a survivor of ours.
+- The observer memoises its `/proc` table for a fraction of a settle step.
+  Asking for N identities used to cost N full synchronous scans of the whole
+  host process table — 3272 `stat` reads for one cancellation of a five-pid
+  tree on a 109-process host, and growing linearly with the host. One
+  cancellation now costs 214.
+- Process-table transport is retried inside a wall-clock budget before the
+  fail-closed reading is taken (`process-verdict.mjs`), so a loaded host is not
+  read as an unobserved tree, and the settle loop is bounded by wall clock
+  rather than by a fixed iteration count. A failure that is a *verdict* about
+  the tree — a non-isolated root, or a test observer that is blind by
+  construction — is not retried; retrying it would spend the budget to reach
+  the same answer. Every outcome and cancel result carries `processQueries`,
+  which is what tells a survivor verdict apart from an unverified one after
+  the fact.
 - One tree definition, in `src/lib/identity/process-tree-fixture.mjs`, is shared
   by the corpus runner, the adversarial probes, the verification stage and the
   regression suite, so the four cannot drift into observing different trees.
@@ -120,7 +150,10 @@ reachable from a pid that is gone.
   independent process that does **not** inherit the parent's stdio handles, so a
   run can finish while the descendant is still alive. Both publish the
   descendant's own pid, which is what gives every live case independent ground
-  truth instead of the adapter's own verdict.
+  truth instead of the adapter's own verdict. The POSIX inner script is
+  single-quoted on purpose: with double quotes the outer `/bin/sh` expanded
+  `$$` to its own pid, so every "independent ground truth" check was reading
+  the root back to itself instead of the descendant it claimed to observe.
 
 ### 2.4 Counters that cannot be laundered
 
@@ -139,6 +172,20 @@ integer (`-1` used to pass a `value > limit` test), and flags a zero-survivor
 claim with no `TERMINATED` proof, or an `UNVERIFIED` claim that carries a
 survivor count.
 
+Both sides of the "from both" rules are **read, not assumed**. The corpus
+negative control used to `await done` and then report a hard-coded
+`outcomeProof: 'UNVERIFIED'`, which satisfied the rule with a constant and hid
+the exact regression the rule exists to catch: `cancel()` and the run outcome
+disagreeing about the same tree. The trial now reads the real outcome and
+requires *both* to be fail-closed.
+
+The evidence's own counters are derived from **named** checks rather than from a
+positional index into a boolean array. `survivors_after_cancellation` used to
+read `checks[3]`, which happened to be the right check for one case and a
+different one for another; reordering either array would have silently changed
+what the counter measured. It now names the checks it requires, and a failing
+case reports the names that failed.
+
 ### 2.5 Platform-independent corpus
 
 The frozen corpus now has the same trial set and the same digest on every host:
@@ -147,6 +194,20 @@ POSIX; a host that refuses to create the link fails the corpus closed instead
 of censoring the trial), and the cancellation trial spawns a real descendant on
 every platform instead of returning `PLATFORM_UNSUPPORTED`. Adversarial probe G
 is cross-platform and no longer reports `SKIPPED` off Windows.
+
+A host that cannot create the link-escape fixture now reports it as the trial's
+own observed value (`LINK_ESCAPE_UNOBSERVABLE_<code>`) and records the
+capability in the run summary, instead of throwing out of the trial set. A
+censored trial and a crashed run are distinguishable that way, and the failure
+is attributed to the trial that could not run. The trial still fails the
+`missing_or_censored_trials` comparison, so this is fail-closed, not a pass.
+
+The live cancellation trial waits for the tree to actually exist
+(`awaitTree`) before cancelling it. Cancelling a tree that has not spawned its
+own children yet both leaks the orphans and turns a hard counter red for a
+reason unrelated to the adapter; a tree that never forms is reported as
+`TREE_NOT_FORMED_AFTER_<n>_POLLS` and fails closed rather than passing as a
+survivor check.
 
 ## 3. Coverage
 
@@ -161,9 +222,12 @@ verify:s2-002-cancellation`):
 | `cancellation/negative-control-no-process-table` | negative control | an observer that cannot read the process table yields `UNVERIFIED`, `terminated: false`, `survivors: null` |
 | `cancellation/negative-control-descendant-query-fails` | negative control | descendant enumeration failing alone also fails the proof closed, even when liveness still works |
 | `cancellation/recycled-pid-not-signalled` | negative control | a stale identity token reports `pidReused`; the unrelated live pid is neither signalled nor counted |
+| `cancellation/stale-token-never-signalled` | negative control | the *signalling* half: a real cancellation whose tracked root carries a stale token, asserting the tracked pid was never signalled and the reuse was reported |
+| `cancellation/root-not-isolated` | negative control | a root that is not isolated from the adapter fails discovery closed instead of sweeping in the harness's own process group |
+| `cancellation/re-parented-descendant-rediscovered` | live | after the root is killed, the captured session/process group edges still re-discover the re-parented escapee the fixture published |
 | `cancellation/self-completed-run-makes-no-claim` | negative control | a run that exits on its own reports `UNVERIFIED` with no survivor count, because its tree was never observed while the root lived |
 | `cancellation/s2-002-frozen-corpus-hard-counters` | replay | the frozen corpus replays clean on this host: all six hard counters at zero, no counter violations, no oracle violations |
-| `cancellation/historical-evidence-untouched` | integrity | the eight pre-fix evidence records still match their committed digests |
+| `cancellation/historical-evidence-untouched` | integrity | the eight pre-fix evidence records still match a fixed-point baseline, and the guard was not satisfied by the regenerable root manifest alone |
 
 In the frozen corpus: `sandbox/cancellation-survivors` (real descendant, plus
 independent ground truth on the pids the descendant published) and
@@ -179,8 +243,9 @@ property.
 
 | file | content |
 |---|---|
-| `evidence/s2-002-cancellation-v2.json` | `evidenceRevision: 2`, `linux/x64`, observer `platform:linux`, preserved hard gates, counters, 8 cases with raw detail, verdict `PASS` |
-| `evidence/s2-002-cancellation-v2-win32.json` | the same 8 cases observed on `win32/x64`, observer `platform:win32`, verdict `PASS` |
+| `evidence/s2-002-cancellation-v2.json` | `evidenceRevision: 2`, `linux/x64`, observer `platform:linux`, preserved hard gates, counters, the cases with raw detail, verdict `PASS` |
+| `evidence/s2-002-cancellation-v2-win32.json` | the same cases observed on `win32/x64`, observer `platform:win32` |
+| `evidence/historical-s2-002-baseline.json` | the fixed point for the eight pre-fix records, including the four that `verify:s2-002` rewrites by design |
 | `*-integrity.json` | SHA-256 of the record, `historicalEvidenceRewritten: false` |
 
 Untouched, and verified byte-identical to their committed digests by the
@@ -189,9 +254,14 @@ Untouched, and verified byte-identical to their committed digests by the
 `comparison-integrity.json`, `security-probes.json`, `podman-sandbox.json`,
 `gvisor-sandbox.json`, `dependency-binding.json`.
 
-That is enforced, not just intended. Note that `npm run test:security-probes`
-and `npm run verify:s2-002` regenerate their own reports by design, so
-re-running them is an explicit separate act, not part of publishing this fix.
+That is enforced, not just intended, and by which source matters. Four of the
+eight are pinned directly in `evidence/frozen-manifest.json`. The other four
+are rewritten every time `npm run verify:s2-002` runs, so they cannot be: the
+baseline above is their fixed point, and the guard refuses to be satisfied by
+`evidence/root-manifest.json` alone — that file is regenerable, so a commit
+that rewrote a record and re-froze the root manifest in the same change would
+otherwise have passed. The baseline is itself pinned in the frozen manifest,
+so moving it needs an explicit, reviewed freeze.
 
 The new evidence file is deliberately **not** in the frozen integrity manifest
 (`scripts/validate-contracts.mjs`): it records raw pids from a live process

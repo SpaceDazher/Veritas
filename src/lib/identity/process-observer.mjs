@@ -30,10 +30,6 @@ function uniquePids(values) {
   return [...new Set(values.filter((value) => Number.isInteger(value) && value > 0))].sort((a, b) => a - b);
 }
 
-function uniqueIds(values) {
-  return [...new Set(values.filter((value) => Number.isInteger(value) && value > 0))].sort((a, b) => a - b);
-}
-
 // `ps`/CIM helpers ----------------------------------------------------------
 
 function runCommand(command, args) {
@@ -142,10 +138,18 @@ function walkDescendants(table, rootPid) {
   return found;
 }
 
-function groupMembers(table, rootPid) {
-  const root = table.get(rootPid);
-  if (!root) return [];
-  return [...table.values()].filter((record) => record.pgrp === root.pgrp).map((record) => record.pid);
+// Every process in one of `sessions` / `processGroups`, excluding the adapter's
+// own. This is the only edge that still reaches a descendant after its parent
+// is gone: once the root exits, descendants are re-parented to init and a
+// parent walk can no longer find them.
+function sweepByGroup(table, sessions, processGroups, own, exclude) {
+  const pids = [];
+  for (const record of table.values()) {
+    if (record.pid === exclude) continue;
+    if (record.session === own.session || record.pgrp === own.pgrp) continue;
+    if (sessions.has(record.session) || processGroups.has(record.pgrp)) pids.push(record.pid);
+  }
+  return pids;
 }
 
 function ownIdentity(table) {
@@ -178,9 +182,41 @@ function identityFor(table, pid) {
   return record.starttime ? `${pid}:${record.starttime}` : String(pid);
 }
 
+// A /proc table is a full scan (one synchronous readFileSync per host process),
+// so it is memoised for SNAPSHOT_TTL_MS. Every query in one settle step then
+// shares a single scan instead of re-reading the whole table per tracked pid —
+// that turned a single cancellation into thousands of synchronous reads on a
+// large host. The TTL is shorter than a settle poll, so a still-observing
+// caller never reads a stale table for a whole step.
+const SNAPSHOT_TTL_MS = 20;
+let cachedProcTable = null;
+let cachedProcAt = -Infinity;
+
+function procTable() {
+  const now = Date.now();
+  if (cachedProcTable && now - cachedProcAt < SNAPSHOT_TTL_MS) return cachedProcTable;
+  cachedProcTable = procSnapshot();
+  cachedProcAt = now;
+  return cachedProcTable;
+}
+
 function pidIdentity(pid) {
   if (IS_WINDOWS) return String(pid);
-  return identityFor(procSnapshot(), pid);
+  return identityFor(procTable(), pid);
+}
+
+// One table read for a whole pid set, so asking for N identities costs one
+// scan rather than N.
+function pidIdentities(pids) {
+  if (IS_WINDOWS) {
+    const out = {};
+    for (const pid of pids) out[pid] = String(pid);
+    return out;
+  }
+  const table = procTable();
+  const out = {};
+  for (const pid of pids) out[pid] = identityFor(table, pid);
+  return out;
 }
 
 // Public observer -----------------------------------------------------------
@@ -199,46 +235,74 @@ export function createProcessObserver({ platform = process.platform } = {}) {
   //      group;
   //   3. the root's own process-group members.
   // (2) and (3) are only used when the root is genuinely isolated from the
-  // observer's own session and process group; otherwise they would sweep in
-  // unrelated host processes, so they are refused and reported instead.
+  // observer's own session and process group. When it is not, the only tree
+  // edges left are ones that sweep in unrelated host processes — including,
+  // on the default spawn path, this adapter's own process group — so the
+  // query fails closed instead of widening the tree. See issue #41.
   async function posixTree(rootPid, table, known) {
+    const own = ownIdentity(table);
+    const knownSessions = new Set((known.sessions ?? []).filter((id) => id !== own.session));
+    const knownGroups = new Set((known.processGroups ?? []).filter((id) => id !== own.pgrp));
     const root = table.get(rootPid);
     if (!root) {
       // The table is readable; the subject is not in it. That is not an empty
       // tree — the tree's shape is simply unknown, because a descendant
       // re-parented to init is no longer reachable from a pid that is gone.
-      return { pids: [], observable: true, rootPresent: false, reason: 'SBX_ROOT_NOT_IN_PROCESS_TABLE', sessions: [], processGroups: [], processGroupIsolated: null };
+      //
+      // The sessions/process groups captured while the root WAS alive are the
+      // one edge that still reaches the tree afterwards: they were checked for
+      // isolation at capture time, so sweeping them here cannot reach an
+      // unrelated host process. Without this, every settle round after the
+      // kill discovered nothing at all.
+      const pids = uniquePids(sweepByGroup(table, knownSessions, knownGroups, own, null));
+      return {
+        pids,
+        observable: true,
+        rootPresent: false,
+        reason: 'SBX_ROOT_NOT_IN_PROCESS_TABLE',
+        sessions: uniquePids([...knownSessions]),
+        processGroups: uniquePids([...knownGroups]),
+        processGroupIsolated: null,
+        sweptCapturedGroups: pids.length > 0,
+      };
     }
-    const own = ownIdentity(table);
     const isolated = root.session !== own.session && root.pgrp !== own.pgrp;
-    const byParent = childrenOf(table);
+    if (!isolated) {
+      // Refused, and reported. A non-isolated root shares this adapter's
+      // session and/or process group, so expanding by group would sweep in
+      // every process on the host that shares it.
+      return {
+        pids: [],
+        observable: false,
+        rootPresent: true,
+        reason: 'SBX_PROCESS_GROUP_NOT_ISOLATED',
+        sessions: uniquePids([...knownSessions]),
+        processGroups: uniquePids([...knownGroups]),
+        processGroupIsolated: false,
+        processGroup: root.pgrp,
+      };
+    }
     const discovered = walkDescendants(table, rootPid);
     const pids = new Set(discovered);
-    const sessions = new Set(known.sessions ?? []);
-    const processGroups = new Set(known.processGroups ?? []);
+    const sessions = new Set(knownSessions);
+    const processGroups = new Set(knownGroups);
     for (const pid of [rootPid, ...discovered]) {
       const record = table.get(pid);
       if (!record) continue;
       if (record.session !== own.session) sessions.add(record.session);
       if (record.pgrp !== own.pgrp) processGroups.add(record.pgrp);
     }
-    if (isolated) {
-      for (const record of table.values()) {
-        if (record.pid === rootPid) continue;
-        if (sessions.has(record.session) || processGroups.has(record.pgrp)) pids.add(record.pid);
-      }
-    } else {
-      for (const pid of groupMembers(table, rootPid)) pids.add(pid);
-    }
+    for (const member of sweepByGroup(table, sessions, processGroups, own, rootPid)) pids.add(member);
     pids.delete(rootPid);
     return {
       pids: uniquePids([...pids]),
       observable: true,
       rootPresent: true,
-      reason: isolated ? null : 'SBX_PROCESS_GROUP_NOT_ISOLATED',
-      sessions: uniqueIds([...sessions]),
-      processGroups: uniqueIds([...processGroups]),
-      processGroupIsolated: isolated,
+      reason: null,
+      sessions: uniquePids([...sessions]),
+      processGroups: uniquePids([...processGroups]),
+      processGroupIsolated: true,
+      sweptCapturedGroups: true,
       processGroup: root.pgrp,
     };
   }
@@ -277,7 +341,7 @@ export function createProcessObserver({ platform = process.platform } = {}) {
       };
     }
     if (platform === 'linux' && procAvailable()) {
-      const table = procSnapshot();
+      const table = procTable();
       if (!table) return { pids: [], observable: false, rootPresent: false, reason: 'SBX_PROCFS_SNAPSHOT_EMPTY', platform };
       return { ...(await posixTree(rootPid, table, known)), platform };
     }
@@ -314,7 +378,7 @@ export function createProcessObserver({ platform = process.platform } = {}) {
       };
     }
     if (platform === 'linux' && procAvailable()) {
-      const table = procSnapshot();
+      const table = procTable();
       if (!table) return { alive: candidates, observable: false, reason: 'SBX_PROCFS_SNAPSHOT_EMPTY', platform, pidReused: [], identitySupported: true };
       const alive = [];
       const pidReused = [];
@@ -352,6 +416,7 @@ export function createProcessObserver({ platform = process.platform } = {}) {
     listDescendants,
     listExisting,
     identityFor: (pid) => pidIdentity(pid),
+    identityForMany: (pids) => pidIdentities(pids),
   });
 }
 

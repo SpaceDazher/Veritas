@@ -128,10 +128,17 @@ const frozenTargets = [
   // verification code is frozen; the observation it produces is evidence.
   'scripts/verify-s2-002-cancellation-v2.mjs',
   'scripts/verify-s2-002-dependencies.mjs', 'scripts/verify-clean-checkout.mjs',
+  'scripts/tap-evidence.mjs',
   'scripts/verify-podman-sandbox.mjs', 'scripts/verify-gvisor-sandbox.mjs',
   'scripts/verify-postgres-smoke.mjs', 'scripts/apply-migrations.mjs',
   'migrations', 'tests/database',
   'evidence/s2-002-dependency-binding.json', 'evidence/s2-002-security-probes.json',
+  // The fixed point for the four S2-002 run/comparison records that
+  // `npm run verify:s2-002` rewrites by design and that therefore cannot be
+  // pinned above. Frozen so that re-baselining them requires an explicit,
+  // reviewed freeze: re-freezing evidence/root-manifest.json must not be enough
+  // to move this baseline.
+  'evidence/historical-s2-002-baseline.json',
   'evidence/s2-002-podman-sandbox.json', 'evidence/s2-002-gvisor-sandbox.json',
   'evidence/postgres-smoke.json',
   // S2-003: ingestion contracts, connectors, pipeline, corpus and evidence

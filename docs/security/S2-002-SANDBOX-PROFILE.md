@@ -100,20 +100,44 @@ and by both frozen replay runs.
 - Group and session membership is tracked as a tree edge of its own, which is
   what catches a descendant that deliberately left the group with `setsid(2)`
   — the POSIX counterpart of Windows `start /b` — and its own children, which
-  are re-parented to init when their parent dies. Session/pgroup expansion is
+  are re-parented to init when their parent dies. The captured session and
+  process group keep working as a re-discovery edge **after** the root is
+  killed, which is the only edge that still reaches the tree at that point: a
+  parent walk from a vanished pid finds nothing. Session/pgroup expansion is
   only used when the root is genuinely isolated from the adapter's own session
-  and process group, so it can never sweep in unrelated host processes.
+  and process group; when it is not, discovery fails closed with
+  `SBX_PROCESS_GROUP_NOT_ISOLATED` and returns no pids, rather than falling
+  back to the root's process group — which on a non-detached child is the
+  adapter's own group.
 - Tracked pids carry a per-pid identity token where the platform exposes one
   (Linux `/proc` starttime). A recycled pid is reported as `SBX_PID_REUSED` and
   is never signalled and never counted as a survivor; Windows CIM exposes no
   such token, and the evidence records that residual instead of asserting it.
+  The check covers **both** signal paths: a direct `SIGKILL` that skipped it
+  would kill an unrelated process even when the group/tree kill was correctly
+  refused.
+- Process-table transport is retried inside a wall-clock budget before the
+  fail-closed reading is taken, and the settle loop is bounded by wall clock
+  rather than by a fixed iteration count, so a loaded host is not read as an
+  unobserved tree and the loop cannot overrun the harness budget. A failure
+  that is a verdict about the tree rather than about the transport is not
+  retried. Every outcome and cancel result carries `processQueries`
+  (`queries`, `failedQueries`, `settleSteps`, `settleUnanswered`,
+  `settleTimedOut`), which is what makes a survivor verdict distinguishable
+  from an unverified one after the fact.
+- The observer memoises its process-table snapshot for a fraction of a settle
+  step, so a cancellation costs one table read per step rather than one per
+  tracked pid. On a 109-process host a single cancellation went from 3272
+  `/proc/<pid>/stat` reads to 214.
 - One tree definition, `src/lib/identity/process-tree-fixture.mjs`, is shared by
   the corpus runner, the probes, the verification stage and the tests, so they
   cannot drift into observing different trees. POSIX uses `setsid(2)`; Windows
   uses `Start-Process`, which does not inherit the parent's stdio handles, so a
   run can finish while the descendant is still alive. Both publish the
   descendant's own pid, which is the independent ground truth every live case
-  checks.
+  checks. The POSIX inner script is single-quoted on purpose: double quotes let
+  the outer shell expand `$$`, so the published pid was the root's own and the
+  "independent" check was reading the adapter's root back to itself.
 - A descendant that inherits the child's stdout/stderr pipes keeps Node's
   `close` event from firing, so such a run cannot be reported as `completed`
   before the descendant is gone; it terminates as `timeout` with a proven,

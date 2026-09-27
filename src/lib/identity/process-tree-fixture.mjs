@@ -18,6 +18,13 @@ import path from 'node:path';
 
 const PS_QUOTE = (value) => `'${String(value).replace(/'/g, "''")}'`;
 const PS_ENCODE = (script) => Buffer.from(script, 'utf16le').toString('base64');
+// Single quotes, so the OUTER shell does not expand the inner script. With
+// double quotes the outer /bin/sh expanded `$$` to its own pid, so the
+// published pid was the root's — the very process the adapter already tracks.
+// Every "independent ground truth" check downstream was then reading the
+// adapter's own root back to itself instead of the descendant it claims to
+// observe independently.
+const SH_QUOTE = (value) => `'${String(value).replace(/'/g, "'\\''")}'`;
 
 export const TREE_PID_FILE = 'tree.pid';
 
@@ -40,11 +47,11 @@ export function buildEscapingProcessTree(root, { platform = process.platform, de
   }
   const posixPidFile = pidFile.split('\\').join('/');
   let inner = `echo $$ > ${posixPidFile}; for i in 1 2 3 4 5 6 7 8 9 10 11 12; do sleep 5; done`;
-  for (let level = 1; level < depth; level += 1) inner = `/bin/sh -c ${JSON.stringify(inner)}`;
+  for (let level = 1; level < depth; level += 1) inner = `/bin/sh -c ${SH_QUOTE(inner)}`;
   return {
     platform: 'posix',
     command: '/bin/sh',
-    args: ['-c', `setsid /bin/sh -c ${JSON.stringify(inner)} & sleep 60`],
+    args: ['-c', `setsid /bin/sh -c ${SH_QUOTE(inner)} & sleep 60`],
     pidFile,
   };
 }
