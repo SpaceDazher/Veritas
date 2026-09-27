@@ -727,6 +727,46 @@ Every identifier the file creates is now scoped per process, in the ids the
 store mints as well as in the task and adapter names. `npm test` is green four
 consecutive times against one database.
 
+### The recycled-pid guard introduced on this branch checked the wrong thing —
+### and the mechanism was handed to PR #42
+
+This branch had added a POSIX re-validation so that a pid recycled between the
+process-tree snapshot and the kill would not be SIGKILLed. It compared the
+descendant's **current parent** against the captured set. `terminateTree` kills
+the root first, so every surviving descendant is re-parented to init within
+milliseconds; the guard therefore skipped exactly the processes it existed to
+kill, and `settleTree` re-killed the captured set with no check at all four
+lines later, so a recycled pid was signalled anyway. Measured on the host: a
+child that forks a grandchild, the child is SIGKILLed, and the grandchild's ppid
+becomes 1 — not a captured pid. The `skipped` counter that recorded this was
+written and never read.
+
+An identity-based replacement was written and tested, and then **removed from
+this branch before merge**. [PR #42](https://github.com/SpaceDazher/Veritas/pull/42)
+owns issue #41 and already implements the same conclusion — a process is
+identified by `/proc/<pid>/stat` field 22 (`starttime`), not by its parent —
+more completely, with a dedicated `process-observer.mjs`, two discovery passes,
+session and process-group tracking, an observability check on the shape of the
+tree, and a `terminationProof` whose `SBX_PID_REUSED` reason code names the
+recycling case directly. Both branches started from the same commit and rewrote
+the same ~500 lines, so keeping a second implementation here would have made
+the merge a silent overwrite in whichever direction it resolved.
+
+What #42 takes from this review is the **finding**, not the code: the parent
+comparison is not a valid guard for this problem, and the loop that follows it
+will undo any guard that is not applied in both places. That is recorded in
+[S2-002-NON-WINDOWS-HOST-ANALYSIS.md](S2-002-NON-WINDOWS-HOST-ANALYSIS.md),
+whose table row for `sandbox.mjs` now reads *withdrawn from this ticket*.
+
+The consequence is stated rather than hidden: **`main` keeps the original #41
+defect after this ticket merges** — `listDescendants` returns `[]` off Windows,
+so `cancel()` can report `survivors: 0` while a re-parented process is still
+running. That is not a regression against the state of `main` today, and closing
+it is #42's job. This ticket's `verify:s2-002` nevertheless still refuses to
+pass on such a host, because an unexercised hard control blocks the gate rather
+than passing it; that refusal is the honest-reporting half of the problem and
+it stays here.
+
 ### Smaller findings, all fixed
 
 | Finding | Fix |
@@ -734,7 +774,7 @@ consecutive times against one database.
 | `listTasks` re-read the ACL row it had just loaded, and read it a third time for the wire document: three round trips per task, 600 at `limit: 200`. | One pass per task; the ACL row is loaded once and reused for the visibility decision and the document. |
 | `expireLeases` and `collectResult` ignored the result of `updateRows`, so a silently skipped write was possible. The sweep is unattended, and the accumulator is the only record that a result was produced. | Both now treat an empty result as a typed hard failure, as every other write in the file already did. |
 | A lease expiry was journalled with `payload.kind = 'lease_rebind'`, the same kind a reassignment uses. A consumer of the journal could not tell "somebody else took over" from "the right ran out". | Now `lease_expire`. The DB-replay projection identifies that transition by the presence of `expired_at` in its payload rather than by the kind string, so a rename cannot silently turn a normalized digest into a compared one. |
-| The two sandbox escape counters were separate literal lists that had drifted. The containment list was missing `BLOCKED`, so if the no-exec tier had begun spawning, that trial would have moved neither counter. | Both are derived from the oracle's expectation set. Adding a sandbox control now necessarily moves the counters that watch it. |
+| The two sandbox escape counters were separate literal lists that had drifted. The containment list was missing `BLOCKED`, so if the no-exec tier had begun spawning, that trial would have moved neither counter. | Both are derived from the oracle's expectation set. Adding a sandbox control now necessarily moves the counters that watch it. PR #42 edits the same counter expressions for its own new trial, so the two sides have to be reconciled by hand when they meet; this branch's derivation is the one that survives it. |
 | `settleBudget` accepted a required `operation_id` whose dedup behaviour was unstated. It is the operation that CREATED the `(grant_id, day_key)` bucket; the ledger is what dedups, and only for a key the caller reuses. | Stated in the method, with the three cases written out, so a caller cannot read the column as a uniqueness guarantee it never was. |
 | The route documentation said seventeen and eighteen routes; `HTTP_ROUTES` has nineteen. | Corrected in all three headers. |
 | `README.md` had the `S2-008…S2-012` row merged into the `S2-007` cell by a stray `||`, two `S2-007` rows from two commits on the branch, and a claim that the clean-checkout was green when the committed evidence records 36 PASS / 8 FAIL. | Table split, duplicate removed, and the clean-checkout line now matches `evidence/clean-checkout.json`. |

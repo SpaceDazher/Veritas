@@ -10,8 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
-import { classifyPosixPid, createSandbox, posixProcessIdentityOf } from '../../src/lib/identity/sandbox.mjs';
+import { createSandbox } from '../../src/lib/identity/sandbox.mjs';
 import { SANDBOX_NO_EXEC, SANDBOX_LOCAL_RESTRICTED_BLOCKED } from '../../src/lib/identity/sandbox-profiles.mjs';
 
 const NOW = '2026-09-12T12:00:00.000Z';
@@ -288,83 +287,6 @@ describe('S2-002 sandbox: artifact outputs', () => {
     for (const bad of ['../escape.txt', 'a/b/../../../escape.txt', 'data\\evil.txt', 'CON']) {
       assert.throws(() => sandbox.writeOutput(bad, Buffer.from('x')), (error) => ['PATH_ESCAPE', 'ROOT_VIOLATION', 'DEVICE_PATH'].includes(error.code), bad);
     }
-    fs.rmSync(root, { recursive: true, force: true });
-  });
-});
-
-// ===========================================================================
-// The recycled-pid guard, on the platform that has a /proc.
-//
-// The cancellation suite above is Windows-only, which left the POSIX
-// enumeration and the kill-path guard completely untested on the platform
-// that runs them. Two properties are pinned here:
-//
-//   1. THE GUARD DECIDES ON PROCESS IDENTITY, NOT PARENTAGE. A parent check
-//      is the trap this replaced: `terminateTree` kills the root first, so
-//      every survivor is re-parented to init and a parent check refuses to
-//      kill exactly the processes it was written to kill. `classifyPosixPid`
-//      is therefore asked the question directly, with a starttime that is
-//      wrong on purpose.
-//   2. THE RETURNED HONESTY MARKERS ARE NOT DECORATIVE. `authoritative:false`
-//      and `survivorsAreProof:false` are the declared reason #41 is still
-//      open, so a regression that drops them must fail here.
-// ===========================================================================
-
-describe('S2-002 sandbox: the recycled-pid guard is an identity check', { skip: IS_WINDOWS || !fs.existsSync('/proc/self/stat') }, () => {
-  test('a pid is the same process only while its starttime matches', () => {
-    const mine = posixProcessIdentityOf(process.pid);
-    assert.ok(mine, 'this process must have a readable /proc identity');
-    assert.equal(mine.pid, process.pid);
-    assert.ok(Number.isInteger(mine.starttime) && mine.starttime > 0, 'starttime is a positive integer');
-
-    // The real process, the real captured starttime: the guard must say
-    // "signal it".
-    assert.equal(classifyPosixPid(process.pid, mine.starttime), 'same');
-
-    // The pid is alive and identical, but the captured starttime belongs to
-    // something else — which is exactly what a recycled pid looks like. This
-    // is the assertion the previous ppid-based version could not make: it
-    // would have answered from the parent, which is the test runner either
-    // way, and so said "fine" in both cases.
-    assert.equal(classifyPosixPid(process.pid, mine.starttime + 1), 'recycled');
-
-    // No captured starttime is not evidence of a recycled pid. "Unknown"
-    // must be its own answer, so the kill path keeps its old behaviour
-    // instead of silently leaving the work running.
-    assert.equal(classifyPosixPid(process.pid, undefined), 'unknown');
-    assert.equal(classifyPosixPid(process.pid, null), 'unknown');
-
-    // A pid that is gone is unknown, never 'recycled' and never 'same'.
-    const gone = spawnSync(process.execPath, ['-e', '0'], { encoding: 'utf8' });
-    assert.equal(gone.status, 0, 'the throwaway process must have run');
-    assert.equal(classifyPosixPid(2 ** 30, 1), 'unknown', 'an unreadable pid is unknown');
-  });
-
-  test('cancel() reports the enumeration it used and refuses to call itself a proof', { timeout: 60000 }, async () => {
-    const root = makeWorkspace();
-    const sandbox = makeSandbox(SANDBOX_LOCAL_RESTRICTED_BLOCKED, [root]);
-    // The child forks ONE generation of descendants and then idles, so the
-    // tree the POSIX walk has to find is a real one.
-    const childSource = `
-      const { spawn } = require('node:child_process');
-      spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { stdio: 'ignore' });
-      setTimeout(() => {}, 60000);
-    `;
-    const { pid, done } = sandbox.startForControlProbe({
-      command: process.execPath,
-      args: ['-e', childSource],
-      timeoutMs: 60000,
-    });
-    await new Promise((resolve) => setTimeout(resolve, 700));
-    const cancel = await sandbox.cancel(pid);
-    await done.catch(() => {});
-
-    assert.equal(cancel.enumeration, 'posix-proc-parent-walk');
-    assert.equal(cancel.recycledPidGuard, 'posix-starttime-identity');
-    assert.equal(cancel.authoritative, false, 'a parent-based walk is never authoritative');
-    assert.equal(cancel.survivorsAreProof, false, 'and its survivor count is never a proof');
-    assert.equal(cancel.survivors, 0, `the tree must actually be gone: ${JSON.stringify(cancel)}`);
-    assert.deepEqual(cancel.skippedRecycledPids, [], 'no captured pid was refused in an ordinary tree');
     fs.rmSync(root, { recursive: true, force: true });
   });
 });

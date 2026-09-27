@@ -147,13 +147,16 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
       const value = counters[counter];
       // Fail closed: a missing or non-finite counter is a violation, never
       // an implicit pass (NaN comparisons are always false).
-      // A counter is a COUNT of observed events, so it must be a finite,
-      // non-negative number. Comparing with `value > limit` alone let any
-      // negative sentinel pass: -1, -9999 and -1e9 were all accepted as a
-      // clean zero, which is how an unmeasured control could be reported as a
-      // passing one. A null counter (an explicitly unmeasured control) and a
-      // negative or non-finite one both fail closed here.
-      if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > limit) {
+      //
+      // The `value < 0` guard that used to live here has been REMOVED and
+      // deliberately not re-applied. PR #42 carries the same fix in a strictly
+      // stronger form — `Number.isInteger` as well as `value < 0`, so a
+      // fractional sentinel cannot pass either — and #42 is the branch that owns
+      // issue #41. Re-adding the weaker line here would mean that merging this
+      // ticket after #42 silently replaces the stronger one. Until #42 lands the
+      // pre-existing hole stands here, and it is recorded as such in
+      // S2-007-EVALUATION-REPORT.md §13.4.
+      if (typeof value !== 'number' || !Number.isFinite(value) || value > limit) {
         counterViolations.push(`${label}/${counter}=${String(value)}`);
       }
     }

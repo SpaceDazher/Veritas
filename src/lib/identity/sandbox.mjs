@@ -77,85 +77,6 @@ function realpathDeepest(target) {
   return { real: fs.realpathSync(current), missing };
 }
 
-
-// A process IDENTITY, not just an id.
-//
-// A pid on its own is a slot, not a process: once a process exits the kernel
-// is free to hand the same number to something else, and SIGKILL does not
-// care which one it lands on. `/proc/<pid>/stat` field 22 is `starttime`,
-// the process's start instant in clock ticks since boot, and it is unique
-// for the lifetime of the boot. A captured pid plus its captured starttime
-// therefore names ONE process, and re-reading starttime immediately before
-// the signal is the race-free way to answer "is this still the process I
-// found?".
-//
-// WHY NOT THE PARENT (ppid)
-// The first version of this re-validation compared the descendant's CURRENT
-// parent against the captured set. That is wrong in the exact case the loop
-// exists for: `terminateTree` kills the root FIRST, so every surviving
-// descendant is re-parented to init, its parent is no longer in the captured
-// set, and the guard skipped exactly the processes it was written to kill.
-// (Measured on this host: a child that forks a grandchild, the child is
-// SIGKILLed, and the grandchild's ppid becomes 1 — not a captured pid.) The
-// guard was then undone four lines later anyway, because `settleTree`
-// re-kills the captured set with no check at all.
-//
-// The asymmetry is deliberate and one-directional: a MISMATCH is positive
-// evidence that the pid was recycled, and the process is left alone. An
-// UNREADABLE starttime (the process is gone, or this platform has no
-// /proc) is not evidence of anything, so the captured pid is signalled as
-// before. "I cannot tell" must never mean "the work I was told to stop
-// keeps running".
-export function posixProcessIdentityOf(pid) {
-  try {
-    const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
-    const close = stat.lastIndexOf(')');
-    if (close < 0) return null;
-    // After the comm field: index 0 is state, so ppid is 1 and starttime
-    // (field 22) is 19.
-    const fields = stat.slice(close + 1).trim().split(/\s+/);
-    const starttime = Number(fields[19]);
-    if (!Number.isInteger(starttime) || starttime <= 0) return null;
-    return { pid, starttime };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Capture `pid -> starttime` for a set of pids, right now.
- *
- * @param {number[]} pids
- * @returns {Map<number, number>} pid -> captured starttime. A pid whose
- *   starttime cannot be read is absent, and `classifyPosixPid` then reports
- *   "unknown" rather than "same" — which is deliberately NOT the same as
- *   "recycled", because only the latter is evidence of anything.
- */
-function captureIdentities(pids) {
-  const captured = new Map();
-  for (const pid of pids) {
-    const identity = posixProcessIdentityOf(pid);
-    if (identity !== null) captured.set(pid, identity.starttime);
-  }
-  return captured;
-}
-
-/**
- * The kill-path decision, as one pure function so it can be tested without
- * manufacturing a recycled pid.
- *
- * @param {number} pid
- * @param {number|undefined} expectedStarttime the value captured before the
- *   root was killed
- * @returns {'same'|'recycled'|'unknown'}
- */
-export function classifyPosixPid(pid, expectedStarttime) {
-  if (expectedStarttime === undefined || expectedStarttime === null) return 'unknown';
-  const identity = posixProcessIdentityOf(pid);
-  if (identity === null) return 'unknown';
-  return identity.starttime === expectedStarttime ? 'same' : 'recycled';
-}
-
 export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets = {}, now }) {
   if (!profile || !profile.tier) throw new Error('SANDBOX_PROFILE_REQUIRED');
   if (!Array.isArray(workspaceRoots) || workspaceRoots.length === 0) {
@@ -288,65 +209,8 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     }
   }
 
-  // POSIX descendant enumeration.
-  //
-  // Returning [] here used to be harmless-looking and was not: `cancel()`
-  // derives its survivor count from the descendants it enumerated, so an empty
-  // list on a non-Windows host produced `survivors: 0` while the grandchildren
-  // the child had forked were still running. That is a FALSE PASS, and it is
-  // the defect tracked as SpaceDazher/Veritas#41.
-  //
-  // On Linux the parent of every process is field 4 of /proc/<pid>/stat. That
-  // field sits after the (possibly space- or paren-containing) comm field, so
-  // it is read from the LAST ')' rather than by splitting the whole line.
-  // One full pass builds a parent -> children index, then breadth-first
-  // closure from the root yields the descendants.
-  function posixDescendants(rootPid) {
-    let entries;
-    try {
-      entries = fs.readdirSync('/proc');
-    } catch {
-      return [];
-    }
-    const childrenOf = new Map();
-    for (const entry of entries) {
-      if (!/^\d+$/.test(entry)) continue;
-      const stat = (() => {
-        try {
-          return fs.readFileSync(`/proc/${entry}/stat`, 'utf8');
-        } catch {
-          return null;
-        }
-      })();
-      if (stat === null) continue;
-      const close = stat.lastIndexOf(')');
-      if (close < 0) continue;
-      const ppid = Number(stat.slice(close + 1).trim().split(/\s+/)[1]);
-      if (!Number.isInteger(ppid) || ppid <= 0) continue;
-      if (!childrenOf.has(ppid)) childrenOf.set(ppid, []);
-      childrenOf.get(ppid).push(Number(entry));
-    }
-    const found = [];
-    const seen = new Set([rootPid]);
-    let frontier = [rootPid];
-    // Bounded depth so a cycle in a racy /proc snapshot cannot spin.
-    for (let depth = 0; depth < 64 && frontier.length > 0; depth += 1) {
-      const next = [];
-      for (const parent of frontier) {
-        for (const child of childrenOf.get(parent) ?? []) {
-          if (seen.has(child)) continue;
-          seen.add(child);
-          found.push(child);
-          next.push(child);
-        }
-      }
-      frontier = next;
-    }
-    return found;
-  }
-
   function listDescendants(pid) {
-    if (process.platform !== 'win32') return Promise.resolve(posixDescendants(pid));
+    if (process.platform !== 'win32') return Promise.resolve([]);
     const script = `$p=@(${pid});$all=Get-CimInstance Win32_Process;` +
       `foreach($i in (1..5)){$p=@($p + @($all | Where-Object { $p -contains $_.ParentProcessId } | ForEach-Object ProcessId | Select-Object -Unique))};` +
       `($p | Select-Object -Unique) -join ' '`;
@@ -445,33 +309,16 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   // Settles a just-killed tree: waits until the direct child's exit is seen
   // and a full descendant enumeration reports nothing alive. Bounded wait,
   // terminal verdict either way.
-  //
-  // The identity map is threaded through BOTH the direct kill in
-  // `terminateTree` and this loop, on purpose. The previous version checked
-  // recycled pids in the direct loop and then re-killed the whole captured set
-  // here with no check, so the protection was undone by the very next step;
-  // whatever this loop does not signal has to be for a reason that is
-  // recorded, not a gap between two loops.
-  async function settleTree(pid, knownDescendants = [], identities = null, skippedRecycled = []) {
+  async function settleTree(pid, knownDescendants = []) {
     const tracked = new Set([pid, ...knownDescendants]);
     for (let attempt = 0; attempt < 20; attempt += 1) {
       for (const descendant of await listDescendants(pid)) tracked.add(descendant);
       const existing = await listExistingPids([...tracked]);
       if (existing.length === 0) return;
-      let signalled = 0;
       for (const candidate of existing) {
-        // Windows has no starttime to compare, so the captured set is the
-        // whole authority there and this check is POSIX-only. On POSIX a
-        // positive mismatch means the pid now belongs to something else.
-        if (identities !== null && classifyPosixPid(candidate, identities.get(candidate)) === 'recycled') {
-          if (!skippedRecycled.includes(candidate)) skippedRecycled.push(candidate);
-          continue;
-        }
         directKill(candidate);
         await treeKill(candidate);
-        signalled += 1;
       }
-      if (signalled === 0) return; // nothing this loop is allowed to touch is left
       await new Promise((resolveTimer) => setTimeout(resolveTimer, 100));
     }
   }
@@ -482,35 +329,18 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
   // explicitly and retain their PIDs for the terminal survivor check.
   async function terminateTree(pid, childHandle = null) {
     const descendants = await listDescendants(pid);
-    // Every captured pid is bound to its starttime WHILE the tree is still
-    // intact, i.e. before the root is killed and before anything is
-    // re-parented. That snapshot is what makes "is this still the process I
-    // found?" answerable milliseconds later.
-    const identities = process.platform === 'win32'
-      ? null
-      : captureIdentities([pid, ...descendants]);
     // Ask Windows to terminate the tree while the root/parent relation still
     // exists. Killing the root handle first can re-parent a child that raced
     // the CIM snapshot and make /T unable to discover it.
     await treeKill(pid);
-    // Re-validate each captured pid immediately before signalling it. A pid
-    // can exit between the snapshot and the kill and be RECYCLED to an
-    // unrelated process, and SIGKILL does not care. Identity, not parentage:
-    // by now the survivors are re-parented to init, so a parent check would
-    // refuse to kill them at all (see `posixIdentityOf`).
-    const skippedRecycled = [];
     for (const descendant of [...descendants].reverse()) {
-      if (classifyPosixPid(descendant, identities?.get(descendant)) === 'recycled') {
-        if (!skippedRecycled.includes(descendant)) skippedRecycled.push(descendant);
-        continue;
-      }
       directKill(descendant);
       await treeKill(descendant);
     }
     directKill(pid, childHandle);
     await treeKill(pid);
-    await settleTree(pid, descendants, identities, skippedRecycled);
-    return { descendants, skippedRecycled };
+    await settleTree(pid, descendants);
+    return descendants;
   }
 
   function probeEnv() {
@@ -583,7 +413,7 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
       if (record.timeoutTimer) clearTimeout(record.timeoutTimer);
       activeProbes.delete(pid);
       if (record.terminationPromise) {
-        record.knownDescendants = (await record.terminationPromise).descendants;
+        record.knownDescendants = await record.terminationPromise;
       }
       const remainingProcessIds = await survivorPids(pid, record.knownDescendants);
       settle.resolve({
@@ -631,42 +461,10 @@ export function createSandbox({ profile, workspaceRoots, artifactRoot, secrets =
     if (record) record.cancelled = true;
     const termination = record?.terminationPromise ?? terminateTree(pid, record?.child ?? null);
     if (record) record.terminationPromise = termination;
-    const { descendants, skippedRecycled } = await termination;
+    const descendants = await termination;
     if (record) record.knownDescendants = descendants;
     const remainingProcessIds = await survivorPids(pid, descendants);
-    // `survivors` counts what this platform could actually SEE, and on neither
-    // supported platform is that a proof.
-    //
-    // Both enumerations are parent-based: Windows walks the CIM parent/child
-    // graph, POSIX walks /proc ppid. A process that re-parents itself away from
-    // the tree before the snapshot — a double fork is enough — is invisible to
-    // both, survives the kill, and is still not in `remainingProcessIds`. That
-    // was reproduced here: a double-forked grandchild outlived `cancel()` while
-    // the returned count was 0. Closing it fully needs a mechanism that is not
-    // parent-based (a cgroup, a pid namespace, or job objects), not a better
-    // walk.
-    //
-    // So the count is returned together with an explicit non-authoritative
-    // marker. A consumer MUST NOT read `survivors: 0` as "nothing survived";
-    // S2-002 keeps the tier blocked on any host where this control is
-    // unexercised, and that is the correct posture until the mechanism is
-    // replaced rather than refined.
-    return {
-      terminated: true,
-      survivors: remainingProcessIds.length,
-      remainingProcessIds,
-      pid,
-      enumeration: process.platform === 'win32' ? 'windows-cim-parent-walk' : 'posix-proc-parent-walk',
-      authoritative: false,
-      survivorsAreProof: false,
-      enumerationNote: 'parent-based enumeration cannot see a process that re-parented out of the tree; survivors is the count of VISIBLE survivors, not a guarantee',
-      // Captured pids that were NOT signalled because the kernel had already
-      // handed that number to a different process. Reported rather than
-      // dropped: a non-empty list means the walk and the kill disagreed, and
-      // the process that actually holds the number was left alone on purpose.
-      skippedRecycledPids: skippedRecycled,
-      recycledPidGuard: process.platform === 'win32' ? 'unavailable-on-this-platform' : 'posix-starttime-identity',
-    };
+    return { terminated: true, survivors: remainingProcessIds.length, remainingProcessIds, pid };
   }
 
   // Public execution path: blocked tiers never spawn anything.

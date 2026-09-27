@@ -224,7 +224,7 @@ and it does — for the honest reason, not a fabricated one.
 | 1 | `scripts/s2-002-run.mjs` | A sandbox control this platform cannot exercise is recorded as `notRun: true`, `decision: 'BLOCKED_SANDBOX'`, `reasonCodes: ['SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM']`, `match: null`, `survivors: null`. It is excluded from the violation counters, and a new **informational** `not_run_controls` counter makes the skip visible. `survivors_after_cancellation` is `null` when unmeasured. |
 | 2 | `scripts/s2-002-run.mjs` | `SANDBOX_EXPECTATIONS` no longer drops `sandbox/fs-junction-escape` off Windows, so the oracle matches the trial set the runner builds. A host that genuinely cannot create the link still fails closed with `missingTrial`. |
 | 3 | `scripts/verify-s2-002.mjs` | The counter check now rejects `value < 0` and non-finite values, so no negative sentinel can pass. And an observation with `notRun: true` on a hard-counter trial (`HARD_COUNTER_TRIALS`) pushes `hardControlNotRun=<trialId>` — an unexercised hard control **blocks** the gate instead of passing it. |
-| 4 | `src/lib/identity/sandbox.mjs` | `listDescendants` enumerates POSIX descendants from `/proc/<pid>/stat` (parent read from the field after the last `)`, depth-bounded) instead of returning `[]`; each captured pid is re-validated against the captured parentage immediately before it is signalled, so a recycled pid is not killed; and `cancel()` now returns `enumeration`, `authoritative: false` and `survivorsAreProof: false` alongside the count. **This improves [#41](https://github.com/SpaceDazher/Veritas/issues/41) but does not close it — see below.** |
+| 4 | `src/lib/identity/sandbox.mjs` | **Withdrawn from this ticket.** An attempt at the POSIX half of [#41](https://github.com/SpaceDazher/Veritas/issues/41) was made here and then removed before merge: it competed with [PR #42](https://github.com/SpaceDazher/Veritas/pull/42), which owns the mechanism and implements it more completely (a dedicated `process-observer.mjs`, two discovery passes, session and process-group tracking, and a `terminationProof`). #42 also carries a **stricter** version of the row-3 counter check (`Number.isInteger` as well as `value < 0`). The pre-merge review here independently confirmed the same conclusion #42 reaches — identity, not parentage — and recorded it, so #42's author has the finding. Rows 1–3 are honest *reporting* of a control this platform cannot run and are **not** part of #41; they stay here. See the review record in [S2-007-EVALUATION-REPORT.md](S2-007-EVALUATION-REPORT.md) §13.4. |
 
 Verified on this host:
 
@@ -269,11 +269,13 @@ Windows walks the CIM parent/child graph and POSIX walks `/proc` ppid, and neith
 a process that re-parented out of the tree. Closing it needs a mechanism that is not
 parent-based — a cgroup, a pid namespace, or Windows job objects — not a better walk.
 
-So the fix delivers what is deliverable: the tree that *is* visible is now actually
-terminated (previously it was not), recycled pids are not killed, and `cancel()` returns
-`authoritative: false` / `survivorsAreProof: false` with a note, so **no consumer can read
-`survivors: 0` as "nothing survived"**. [#41](https://github.com/SpaceDazher/Veritas/issues/41)
-therefore remains open, correctly: its "false success" symptom is narrowed and labelled,
-not eliminated. A process group (`detached: true`) narrows the window but does not close it
-either, because `setsid` escapes a group too — that is why the field, not the walk, is what
-makes the behaviour honest.
+The conclusion this document reached is the one
+[PR #42](https://github.com/SpaceDazher/Veritas/pull/42) is built on, and it is #42 that
+implements it. [#41](https://github.com/SpaceDazher/Veritas/issues/41) therefore remains
+open on `main` after this ticket merges, correctly: nothing here claims otherwise, and
+nothing in this ticket's diff touches the cancellation mechanism. What stays here is the
+accounting half — a control this platform cannot exercise is *reported* as not run, and an
+unexercised hard control *blocks* the gate instead of passing it — which is what makes the
+Linux red gate legible rather than mysterious. A process group (`detached: true`) narrows
+the window but does not close it either, because `setsid` escapes a group too; that is why
+#42 treats the observation itself as the thing to report, not the walk.
