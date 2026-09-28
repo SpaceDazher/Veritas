@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "b91ca5af5238c09f3b94f3ab2872b4459ba20515",
-  "sourceTree": "f505383a510122e105b512fadb89d6d1f3b512e0",
-  "trackedFileCount": 1658,
-  "manifestFileCount": 1653,
-  "payloadManifestSha256": "a558c231a1ab012aaea261a4cfd9883bfa38c74554ef6b70d2f058d9883e66c9",
-  "fileManifestSha256": "570a8f9ed3c703c8bc5fccd7c47d6b55e88c6ed5779bf1da995349dc68a15e3c",
+  "sourceCommit": "785a28346c4b9ac7750e3d7bf957737875b55a26",
+  "sourceTree": "91568ea1eaba5c75c1087b5a7864ad23d9c93709",
+  "trackedFileCount": 1661,
+  "manifestFileCount": 1656,
+  "payloadManifestSha256": "933e95a8928172deef4307ed2d1447219707453def76651cd75025cf5b97a3e0",
+  "fileManifestSha256": "c5f704961b918763c954d23d8ad5f4b8e1a9e4b43cf8cbc761334b14e23b34f1",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -5042,6 +5042,11 @@
       "bytes": 12727
     },
     {
+      "path": "corpus/s2-008-campaign/preregistration.v2.draft.json",
+      "sha256": "7caa0893789c0e0574906fd3cb8328bd7d95a22f8ed544396cb8354740b3ef1a",
+      "bytes": 16429
+    },
+    {
       "path": "corpus/s2-008-campaign/source-ledger.json",
       "sha256": "cf0783c0ea038caf940ad050efd1005d8e49b1e0e028a91fdeddb657e9e8511c",
       "bytes": 1210
@@ -5178,8 +5183,8 @@
     },
     {
       "path": "docs/decisions/S2-008-ACCEPTANCE-REPORT.md",
-      "sha256": "1efc9e37ac5472f984ab2956c5f21d113f09b59dc3106d71678013b7fa62fc1d",
-      "bytes": 23526
+      "sha256": "6f07212f101d2957b1979b96a716e832b400389d74d4df458b6eb63e0736a515",
+      "bytes": 25872
     },
     {
       "path": "docs/decisions/S2-008-EVALUATION-REPORT.md",
@@ -5348,8 +5353,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "644dec04bb9115aed5171e69dfe71ce01e892788c63a01bd72fe2abd33ed2ee2",
-      "bytes": 86098
+      "sha256": "42c5af399b930115d73f1ddd06a4ffb72d5ebb9808daf3dc83822bf40098a420",
+      "bytes": 86244
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -6837,6 +6842,11 @@
       "bytes": 21625
     },
     {
+      "path": "scripts/s2-008-campaign-arm-model.mjs",
+      "sha256": "e65e50b6328b825a5a584e4611736d2687e2492f97bf1726c59e2c1b02577806",
+      "bytes": 14162
+    },
+    {
       "path": "scripts/s2-008-campaign-arm.mjs",
       "sha256": "393e619c5f2f6184b3603d15ff3f7e16a950f2a979f287458e30a8a38a7efdd5",
       "bytes": 5801
@@ -7940,6 +7950,11 @@
       "path": "tests/isolation/profile-axes.test.mjs",
       "sha256": "7421d474de4baa59f34f12df10ac5d06610002bbd760b578a5142175e70a64b6",
       "bytes": 28672
+    },
+    {
+      "path": "tests/research/campaign-arm-model.test.mjs",
+      "sha256": "9fe727e4c8d7677b443c7d054feaf8dd4c535eaf2328e11657394859cf5ccb36",
+      "bytes": 18639
     },
     {
       "path": "tests/research/comparator-probes.test.mjs",
