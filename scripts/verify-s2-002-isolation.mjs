@@ -42,6 +42,7 @@ const SUBJECT = 'A-MVP-04';
 const CANARY = 'VERITAS_S2_002_NOT_A_REAL_SECRET_CANARY_9f3c1d7b4e2a6058';
 
 const read = (file) => JSON.parse(readFileSync(file, 'utf8'));
+const isPlainObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value);
 const findings = [];
 const check = (name, fn) => {
   try {
@@ -143,6 +144,57 @@ function gateLive(imageStatus, image) {
     equal(probe.VERITAS_TMP_FS_WRITABLE, 'true', 'the declared tmpfs was not writable');
     equal(probe.VERITAS_UID, '65534:65534');
     return `routes=${probe.VERITAS_ROUTE_ROWS} /etc=${probe.VERITAS_HOST_FS_WRITABLE} /tmp=${probe.VERITAS_TMP_FS_WRITABLE} uid=${probe.VERITAS_UID}`;
+  });
+
+  // ---------------------------------------------------------------------
+  // THE AXIS PROSE IS CROSS-CHECKED AGAINST THE RAW LOG, NOT THE RECORD.
+  //
+  // The three checks above read `live.realRun.axisProbe` — a field INSIDE the
+  // record being judged. A check that reads the same file it is judging proves
+  // nothing about the world: the record could carry any number at all, and the
+  // prose around those numbers (`axes.*.declared`, `.on`, `.off`, `.enforced_by`)
+  // was not read by any check. That was found by falsification, not by reading:
+  // a record claiming "a route to the model API host exists inside the container
+  // (VERITAS_ROUTE_ROWS=2)" while the raw log it points at says
+  // `VERITAS_ROUTE_ROWS=0` passed all seventeen checks with exit 0.
+  //
+  // So the ground truth is the RAW LOG, which is already read for the secret
+  // scan: it carries every command with its argv and the untruncated probe
+  // output. Same pattern as the S2-008 aggregator, which was found reading its
+  // children's claims about themselves.
+  // ---------------------------------------------------------------------
+  check('live: the axis NUMBERS are re-derived from the raw log, not read from the record', () => {
+    const raw = readFileSync(path.join(ROOT, live.rawLog.file), 'utf8');
+    const rows = /VERITAS_ROUTE_ROWS=([0-9]+)/.exec(raw);
+    must(rows, 'the raw log does not record VERITAS_ROUTE_ROWS at all, so nothing measured the network axis');
+    equal(rows[1], '0', 'the raw log says the container HAD a route, so deny_all is not in force');
+    equal(String(live.realRun.axisProbe.VERITAS_ROUTE_ROWS), rows[1], 'the record contradicts its own raw log about the route table');
+    const uid = /VERITAS_UID=([0-9]+:[0-9]+)/.exec(raw);
+    must(uid, 'the raw log does not record VERITAS_UID');
+    equal(String(live.realRun.axisProbe.VERITAS_UID), uid[1], 'the record contradicts its own raw log about the uid');
+    const hostFs = /VERITAS_HOST_FS_WRITABLE=([A-Z_]+)/.exec(raw);
+    must(hostFs, 'the raw log does not record VERITAS_HOST_FS_WRITABLE');
+    equal(String(live.realRun.axisProbe.VERITAS_HOST_FS_WRITABLE), hostFs[1], 'the record contradicts its own raw log about the root filesystem');
+    return `re-derived from the raw log: rows=${rows[1]} uid=${uid[1]} host_fs=${hostFs[1]}`;
+  });
+
+  check('live: the declared network policy matches the argv the container was launched with', () => {
+    const raw = readFileSync(path.join(ROOT, live.rawLog.file), 'utf8');
+    must(/--network=none/.test(raw), 'the raw log shows no --network=none on the executor launch, so the network claim is unsupported');
+    const declared = String(live.axes?.network?.declared ?? '');
+    equal(declared, 'deny_all', `the record declares network=${declared || '(absent)'} while the launch ran with --network=none`);
+    return 'declared=deny_all and the launch carried --network=none';
+  });
+
+  check('live: every axis names both what it measured and what it denies', () => {
+    const axes = isPlainObject(live.axes) ? live.axes : {};
+    must(Object.keys(axes).length >= 4, `the record publishes ${Object.keys(axes).length} axes, fewer than the four it claims`);
+    for (const [name, axis] of Object.entries(axes)) {
+      must(isPlainObject(axis), `${name} is not an axis object`);
+      must(Array.isArray(axis.on) && axis.on.length > 0, `${name} publishes no measurement it claims to have made`);
+      must(Array.isArray(axis.off) && axis.off.length > 0, `${name} claims a control but names nothing it denies — prose without a measurement`);
+    }
+    return `${Object.keys(axes).length} axes, each naming what is on and what is off`;
   });
 
   check('live: the operator environment did not reach the container', () => {
