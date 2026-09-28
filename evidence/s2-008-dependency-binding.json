@@ -10,8 +10,8 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "d9f37b33a1e5179f2a68f7377b31392214d035a1",
-  "head_tree_sha": "20badab47f913c4187815e6c7494f8aefbd029bf",
+  "head": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
+  "head_tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
   "invocation_id": null,
   "contracts": [
     {
@@ -228,10 +228,10 @@
         "note": "the authoritative S1-004 evaluation record is not tracked in this repository; this row is a claim about it, not a check of it"
       },
       "source": "GIT_BLOB_AT_HEAD",
-      "commit_sha256": "adee0d41a62935ab79ce40000765ef42403a97ca6c15da9f0c1695bb0a2c5830",
-      "commit_bytes": 11719,
-      "working_tree_sha256": "adee0d41a62935ab79ce40000765ef42403a97ca6c15da9f0c1695bb0a2c5830",
-      "working_tree_bytes": 11719,
+      "commit_sha256": "5765462488c396c0cc5613e31d018534bdae510b34ae956a2bc60517dacc2109",
+      "commit_bytes": 11914,
+      "working_tree_sha256": "5765462488c396c0cc5613e31d018534bdae510b34ae956a2bc60517dacc2109",
+      "working_tree_bytes": 11914,
       "drift": false,
       "ok": true
     },
@@ -505,21 +505,21 @@
       "path": "evidence/s2-008-run-a.json",
       "required": true,
       "present": true,
-      "bytes": 37920,
+      "bytes": 37907,
       "issues": []
     },
     {
       "path": "evidence/s2-008-run-b.json",
       "required": true,
       "present": true,
-      "bytes": 37920,
+      "bytes": 37907,
       "issues": []
     },
     {
       "path": "evidence/s2-008-replay.json",
       "required": true,
       "present": true,
-      "bytes": 36849,
+      "bytes": 36824,
       "issues": []
     },
     {
