@@ -1,0 +1,632 @@
+[
+ {
+  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+  "subject": "evidence: close S2-002 #41 two-host wording manifest and closure binding",
+  "committed_at": 1790421856
+ },
+ {
+  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+  "subject": "diag(s2-002): isolate the two non-zero hard counters without touching evidence",
+  "committed_at": 1790424777
+ },
+ {
+  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+  "subject": "fix(s2-002): a surviving process is a violated control, not a secret escape",
+  "committed_at": 1790425960
+ },
+ {
+  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790425965
+ },
+ {
+  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+  "subject": "evidence: close the closure record",
+  "committed_at": 1790425972
+ },
+ {
+  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+  "subject": "diag(s2-002): settle sweep to separate a cancellation defect from a trial-timing race",
+  "committed_at": 1790458559
+ },
+ {
+  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790458564
+ },
+ {
+  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+  "subject": "evidence: close the closure record",
+  "committed_at": 1790458568
+ },
+ {
+  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+  "subject": "docs: record the Windows engineering acceptance at c922c09",
+  "committed_at": 1790466020
+ },
+ {
+  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790466026
+ },
+ {
+  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+  "subject": "evidence: close the closure record",
+  "committed_at": 1790466032
+ },
+ {
+  "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+  "subject": "merge: S2-002 counter correctness and the S2-007 acceptance record",
+  "committed_at": 1790466374
+ },
+ {
+  "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790466384
+ },
+ {
+  "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+  "subject": "evidence: close the closure record",
+  "committed_at": 1790466398
+ },
+ {
+  "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+  "subject": "fix(S2-002): make the process-tree survivor verdict load-tolerant and recoverable",
+  "committed_at": 1790467223
+ },
+ {
+  "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+  "subject": "chore: refreeze the integrity manifest for the #16 process-verdict fix",
+  "committed_at": 1790467285
+ },
+ {
+  "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+  "subject": "chore: reseal the tracked-file inventory after the #16 fix",
+  "committed_at": 1790467333
+ },
+ {
+  "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+  "subject": "chore: reseal the root manifest after the #16 inventory and refreeze",
+  "committed_at": 1790467339
+ },
+ {
+  "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+  "subject": "chore: rebind the closure record to the #16 implementation commit",
+  "committed_at": 1790467394
+ },
+ {
+  "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+  "subject": "Merge pull request #44 from SpaceDazher/bb/spacedazher-veritas-16-s2-004-flaky-sandbox-iden-thr_k2piks9trg",
+  "committed_at": 1790467883
+ },
+ {
+  "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+  "subject": "fix: make the S2-007 gates re-runnable and the lease sweep tenant-scoped",
+  "committed_at": 1790470157
+ },
+ {
+  "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+  "subject": "evidence: index the S2-007 review-fix files and the 0009 migration",
+  "committed_at": 1790470207
+ },
+ {
+  "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+  "subject": "evidence: reseal the root manifest and the closure record for the S2-007 review fixes",
+  "committed_at": 1790470249
+ },
+ {
+  "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+  "subject": "S2-002 #41: close the review findings on the cancellation proof",
+  "committed_at": 1790471053
+ },
+ {
+  "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+  "subject": "chore: reseal the tracked-file inventory after the #41 review fixes",
+  "committed_at": 1790471056
+ },
+ {
+  "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+  "subject": "chore: reseal the root manifest after the #41 review fixes",
+  "committed_at": 1790471064
+ },
+ {
+  "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+  "subject": "chore: refreeze the integrity manifest for the #41 review fixes",
+  "committed_at": 1790471124
+ },
+ {
+  "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+  "subject": "docs: record the pre-merge review findings and the 0009 hardening migration",
+  "committed_at": 1790471128
+ },
+ {
+  "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+  "subject": "chore: reseal the root manifest after the #41 integrity refreeze",
+  "committed_at": 1790471132
+ },
+ {
+  "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+  "subject": "chore: close the #41 review-fix manifest and closure binding",
+  "committed_at": 1790471141
+ },
+ {
+  "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+  "subject": "evidence: reseal the root manifest and the closure record for the review record",
+  "committed_at": 1790471162
+ },
+ {
+  "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+  "subject": "evidence: refresh the public-artifact scan over the 774 tracked files",
+  "committed_at": 1790471194
+ },
+ {
+  "case_id": "12990652103986ef5b2eeafa70064c8a9e8473ea",
+  "subject": "evidence: reseal the root manifest and the closure record after the artifact scan",
+  "committed_at": 1790471205
+ },
+ {
+  "case_id": "ac3fbec30c1c0090800cc7744df47eaf9f7cfbe2",
+  "subject": "refactor: hand the #41 cancellation mechanism to PR #42, keep the accounting",
+  "committed_at": 1790471988
+ },
+ {
+  "case_id": "2dd5d8d9d0a20f8f211c4ed6adfcd2531064a4bb",
+  "subject": "evidence: reseal the root manifest and the closure record for the #41 withdrawal",
+  "committed_at": 1790472006
+ },
+ {
+  "case_id": "f1665aa6fcc89dfecbb6037b04cf6f1150ec0d45",
+  "subject": "evidence: refreeze the contract manifest after the #41 withdrawal",
+  "committed_at": 1790472063
+ },
+ {
+  "case_id": "c20a7c8fd3dabf954b74ff1a3b5ea4231945f54a",
+  "subject": "evidence: reseal the root manifest and the closure record for the refreeze",
+  "committed_at": 1790472075
+ },
+ {
+  "case_id": "3852f2bce87c5f0f64705afb1543ff2d6387c41e",
+  "subject": "Merge pull request #42 from SpaceDazher/bb/spacedazher-veritas-41-s2-002-process-cancellati-thr_fu97ejh397",
+  "committed_at": 1790474760
+ },
+ {
+  "case_id": "982019e2ce253fa06467dfa82aa91d9729c208c7",
+  "subject": "merge: bring main in, so #41 lands before the S2-007 boundary",
+  "committed_at": 1790479716
+ },
+ {
+  "case_id": "a593f7ff4d284980d9842fa4c5ebe2d2658307dc",
+  "subject": "docs: correct the Linux-gate status now that #41 has landed",
+  "committed_at": 1790479772
+ },
+ {
+  "case_id": "e7dd3ac16366cbc2e571e3c82bfb1c5dc08af5e7",
+  "subject": "evidence: reindex, rescan and refreeze after the main merge",
+  "committed_at": 1790479783
+ },
+ {
+  "case_id": "03e47c880a8054cadd72bf972a052dc5e055518b",
+  "subject": "evidence: reseal the root manifest and the closure record after the main merge",
+  "committed_at": 1790479792
+ },
+ {
+  "case_id": "69bdf1d6863a1dc9f9aaab28067721c761ea9029",
+  "subject": "fix(s2-007): purge the probe suite's own fixtures so the gate is re-runnable",
+  "committed_at": 1790480185
+ },
+ {
+  "case_id": "ca39d44fe749f25b52c25f6473edf2d1f48b8127",
+  "subject": "evidence: reindex, rescan and refreeze after the probe-fixture purge",
+  "committed_at": 1790480201
+ },
+ {
+  "case_id": "b576e7c455f712b44b90cdb209d32a7cbe0423f5",
+  "subject": "evidence: reseal the root manifest and the closure record for the probe-fixture purge",
+  "committed_at": 1790480210
+ },
+ {
+  "case_id": "a676b8d79e4639fc72319e85288f10a9203072b8",
+  "subject": "docs: record that #7 is closed by owner decision, with the remainder in #45",
+  "committed_at": 1790480792
+ },
+ {
+  "case_id": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+  "subject": "evidence: reseal the root manifest and the closure record after the #7 closure record",
+  "committed_at": 1790480842
+ },
+ {
+  "case_id": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+  "subject": "merge: S2-007 engineering boundary (PR #43) into the S2-008 parallel-track branch",
+  "committed_at": 1790481714
+ },
+ {
+  "case_id": "038fc5aa70ba9c8210c39df07b19c5b1ceb67470",
+  "subject": "docs: record SLOQUAL-001 issue closure and #20-#40 label state",
+  "committed_at": 1790481739
+ },
+ {
+  "case_id": "e754d0a938023eb7a223a49cb37cc579f2fcd214",
+  "subject": "evidence: reseal inventory and root manifest after the #40 closure docs",
+  "committed_at": 1790481749
+ },
+ {
+  "case_id": "97ed8f6be8016c70b3bf204f0e0087678f5925fa",
+  "subject": "evidence: rebind closure record after the #40 closure",
+  "committed_at": 1790481755
+ },
+ {
+  "case_id": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+  "subject": "S2-008 #8: deterministic parallel track - preregistration, fail-closed comparator, six negative probes, two-process replay",
+  "committed_at": 1790507407
+ },
+ {
+  "case_id": "ccd7affa65a8d81b54c71c92c2d43d3abe24d880",
+  "subject": "evidence: reindex the file inventory and reseal the S2-008 records at the delivery commit",
+  "committed_at": 1790507517
+ },
+ {
+  "case_id": "4891b3c7bbd14786cd9704333f1ce67da953f464",
+  "subject": "evidence: refreeze the root manifest and the closure record for the S2-008 commit",
+  "committed_at": 1790507530
+ },
+ {
+  "case_id": "0f1d78d92792004ee18fcfb2ba258d55a3f996a0",
+  "subject": "fix(s2-008): re-pin the A-property tripwire to the delivered state",
+  "committed_at": 1790507651
+ },
+ {
+  "case_id": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+  "subject": "evidence: refreeze the root manifest and the closure record for the tripwire fix",
+  "committed_at": 1790507659
+ },
+ {
+  "case_id": "908d8332837241eeef08c30ef9508845383a4252",
+  "subject": "S2-007R #45: two real executors, the host-unisolated floor tier, the A/B axis and A-MVP-01..07 on a real run",
+  "committed_at": 1790507823
+ },
+ {
+  "case_id": "8c98e82313b584e581f7fda6507354717751ad9d",
+  "subject": "chore: refreeze the integrity manifest for the S2-007R working tree",
+  "committed_at": 1790507837
+ },
+ {
+  "case_id": "7bb950eed7fd5ef7deab900dd54c692a81eb6950",
+  "subject": "chore: bind the S2-007R closure record to the implementation commit",
+  "committed_at": 1790507914
+ },
+ {
+  "case_id": "5c54d43738798461499a15091f08cd59fa716413",
+  "subject": "S2-007R: keep the connection-string example out of a committed source comment",
+  "committed_at": 1790508274
+ },
+ {
+  "case_id": "41dd515cfd8a4810bfcc19b1a735845cbe8c182b",
+  "subject": "chore: refreeze the integrity manifest after the public-artifact fix",
+  "committed_at": 1790508278
+ },
+ {
+  "case_id": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+  "subject": "chore: rebind the S2-007R closure record",
+  "committed_at": 1790508283
+ },
+ {
+  "case_id": "0c231b894b61103bf26209ed89c9179983b0a9b7",
+  "subject": "S2-008 #8: repair the red first delivery - self-consistent frozen rule, well-posed campaign, property-based gate",
+  "committed_at": 1790516784
+ },
+ {
+  "case_id": "c63001c342bb16592793ee942799712e7c284456",
+  "subject": "evidence: reindex the file inventory over the six new S2-008 repair files",
+  "committed_at": 1790516839
+ },
+ {
+  "case_id": "d0075b4fb174f5b0336b7617251baf4c516cf007",
+  "subject": "evidence: seal the root manifest at the S2-008 repair commit c63001c",
+  "committed_at": 1790516852
+ },
+ {
+  "case_id": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
+  "subject": "evidence: rebind the closure record to the S2-008 repair commit c63001c",
+  "committed_at": 1790516859
+ },
+ {
+  "case_id": "75ea661e49a1232bd592b8abd166f4d17c2ade84",
+  "subject": "S2-008 #8: aggregator verdict reads gate-level NOT_RUN only; scope notes stop voting; untracked track is now blocking",
+  "committed_at": 1790520058
+ },
+ {
+  "case_id": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+  "subject": "S2-008 #8: rebind the root manifest, closure and commit records to 75ea661",
+  "committed_at": 1790520108
+ },
+ {
+  "case_id": "0c314e11ba6edd0a846086a50c74e485fa796d2f",
+  "subject": "S2-007R: a governed run per adapter, a real oracle, and computed observations",
+  "committed_at": 1790521074
+ },
+ {
+  "case_id": "90bf97cb95c3ed37c6cd179e12b3123d66e5478e",
+  "subject": "chore: refreeze the integrity manifest for the governed S2-007R run set",
+  "committed_at": 1790521115
+ },
+ {
+  "case_id": "445970eb7d66198305abddaf45599cfd724ed164",
+  "subject": "chore: rebind the S2-007R closure record to the governed run set",
+  "committed_at": 1790549835
+ },
+ {
+  "case_id": "593d59731bb9d24560c7ab1116c774c18c7ab136",
+  "subject": "S2-007R: the ticket ends PARTIAL by owner decision, and the A-MVP pass count now reads its cases",
+  "committed_at": 1790551033
+ },
+ {
+  "case_id": "ab6a315a813240da5d129971a0ffdc808b05d9ad",
+  "subject": "chore: refreeze the integrity manifest for the PARTIAL disposition",
+  "committed_at": 1790551047
+ },
+ {
+  "case_id": "a2f7717203b4f0fcd00ea179c2258e4107eb2bbd",
+  "subject": "chore: rebind the S2-007R closure record",
+  "committed_at": 1790551052
+ },
+ {
+  "case_id": "23df9053915ac42e21b70cd5988a88288b81241c",
+  "subject": "S2-008 #8: the aggregator trusted its children; bind every child record to this invocation",
+  "committed_at": 1790551370
+ },
+ {
+  "case_id": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+  "subject": "S2-007R: register the six frozen-file edits as reviewed deviations",
+  "committed_at": 1790551584
+ },
+ {
+  "case_id": "27c92d9870e488395068aac6e7c73764a7ea500b",
+  "subject": "S2-008 #8: reseal the evidence of the green run, and the fourth red-to-green step in the docs",
+  "committed_at": 1790551670
+ },
+ {
+  "case_id": "41d0544905f62e03c001ae2ea9431481eff81f76",
+  "subject": "S2-008 #8: the evidence the green run at 27c92d9 wrote (invocation 05d21030, five gates PASS, defects [])",
+  "committed_at": 1790551711
+ },
+ {
+  "case_id": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
+  "subject": "S2-008 #8: docs: the soundness round added six negative tests, not ten (256 = 250 + 6)",
+  "committed_at": 1790551878
+ },
+ {
+  "case_id": "370eaa0920b07add7ba9764c1889dc7a7e907370",
+  "subject": "S2-008 #8: the evidence the green run at cf60577 wrote (invocation per run, five gates PASS, defects [])",
+  "committed_at": 1790551896
+ },
+ {
+  "case_id": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
+  "subject": "S2-008 #8: the aggregator read its children's claims about themselves; bind every child record to the invocation that wrote it",
+  "committed_at": 1790556050
+ },
+ {
+  "case_id": "35ae3d5ef3c2c460f31b364f99de37de5fd08dd8",
+  "subject": "S2-008 #8: the evidence the green run at 19fe44f wrote (invocation 20271860904a8bc83a2243cd7a42ec61, tree cc36496e, five gates PASS, defects [])",
+  "committed_at": 1790556077
+ },
+ {
+  "case_id": "f490517e98f59056543568805ea267f1583aa34e",
+  "subject": "S2-008 #8: rebind the root manifest, closure and commit records to 35ae3d5",
+  "committed_at": 1790556107
+ },
+ {
+  "case_id": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+  "subject": "S2-008 #8: the verifier no longer shares an address space with the run it judges",
+  "committed_at": 1790557469
+ },
+ {
+  "case_id": "8e0fec54b3c74ac3255bcb34734bd0e3ae020e1e",
+  "subject": "S2-008 #8: reseal the S2-008 evidence on the no-shared-address-space tree",
+  "committed_at": 1790557513
+ },
+ {
+  "case_id": "8d18eafd8f6d61e3e6c194f38755d97eab54500e",
+  "subject": "chore: reseal the root manifest at the S2-008 boundary-fix implementation commit",
+  "committed_at": 1790557565
+ },
+ {
+  "case_id": "d9f37b33a1e5179f2a68f7377b31392214d035a1",
+  "subject": "chore: rebind the closure and commit records to the S2-008 boundary-fix commit",
+  "committed_at": 1790557597
+ },
+ {
+  "case_id": "3a66a0a1463e6add8860b8af85d7c9b1ab0adeb2",
+  "subject": "S2-008 #8: reseal the S2-008 records on the boundary-fix tree",
+  "committed_at": 1790561559
+ },
+ {
+  "case_id": "7e3407920aa1ab35569a278138f0b38418d2b933",
+  "subject": "chore: reseal the root manifest at the S2-008 boundary-fix tree",
+  "committed_at": 1790561610
+ },
+ {
+  "case_id": "2d6b73cac49e85ee4c96aeaa35029c90e5a1a907",
+  "subject": "chore: rebind the closure and commit records to the S2-008 boundary-fix tree",
+  "committed_at": 1790561658
+ },
+ {
+  "case_id": "42b7a0e630179d8beb8baf2c6338b28b06f374da",
+  "subject": "Merge remote-tracking branch 'origin/main' into merge-43",
+  "committed_at": 1790566091
+ },
+ {
+  "case_id": "5819560af2f6d568053aed3bb7336c4648fc9645",
+  "subject": "evidence: reseal the root manifest and the closure record on the merge with main",
+  "committed_at": 1790566100
+ },
+ {
+  "case_id": "e113382da032ce1dfea97746d9997c92c58aaea4",
+  "subject": "Merge pull request #43 from SpaceDazher/s2-007-engineering-boundary",
+  "committed_at": 1790566384
+ },
+ {
+  "case_id": "868f3655706011dbbc35d22174c98f751cc2dbf6",
+  "subject": "S2-007R: the four mandatory gates, the reviewed deviations, and a plant refused on a real run",
+  "committed_at": 1790566506
+ },
+ {
+  "case_id": "3df812cf36f3ef1b3c4739a783013d6c464372bc",
+  "subject": "chore: track the files this pass added",
+  "committed_at": 1790566506
+ },
+ {
+  "case_id": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
+  "subject": "Merge remote-tracking branch 'origin/main' into bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+  "committed_at": 1790566508
+ },
+ {
+  "case_id": "25d3921adbebf70a7d5cb1341bf892e70c5ce205",
+  "subject": "chore: refreeze the integrity manifest",
+  "committed_at": 1790566512
+ },
+ {
+  "case_id": "3b880342ba4c5bec28e0513108f8cc62142ce22e",
+  "subject": "chore: rebind the closure record",
+  "committed_at": 1790566518
+ },
+ {
+  "case_id": "1923dc99d3e5e6e714f3ccb6580269c96a6822d4",
+  "subject": "S2-007R: the final disposition — engineering finished, ticket closed PARTIAL",
+  "committed_at": 1790566576
+ },
+ {
+  "case_id": "cf000e058085aacbadfee3ccdd618a9238308b85",
+  "subject": "chore: refreeze",
+  "committed_at": 1790566581
+ },
+ {
+  "case_id": "a3ef83260bf1118bc61ecf2aa5a1b944e34e4fc3",
+  "subject": "chore: closure record",
+  "committed_at": 1790566588
+ },
+ {
+  "case_id": "3c328bd117999c27db34cb0705661d739862c6ae",
+  "subject": "S2-008 #8: reseal the S2-008 records on the merge with main (e113382)",
+  "committed_at": 1790566714
+ },
+ {
+  "case_id": "bd4d8c409f7dc25a91d35c3e3a9fe8d5ef9a9c6e",
+  "subject": "chore: reseal the root manifest at the S2-008 merge with main",
+  "committed_at": 1790566720
+ },
+ {
+  "case_id": "0d36a3255e7a7b009b2f67e49d11e9734e8366de",
+  "subject": "chore: rebind the closure and commit records to the S2-008 merge with main",
+  "committed_at": 1790566725
+ },
+ {
+  "case_id": "1b347d5317c65fcecabcd9ecc95660b6cd56f142",
+  "subject": "Merge origin/main into the S2-007R branch",
+  "committed_at": 1790566799
+ },
+ {
+  "case_id": "0146d8964018848401ca434691117fa171ec2e39",
+  "subject": "chore: re-seal the inventory and the integrity manifest after the merge with main",
+  "committed_at": 1790566803
+ },
+ {
+  "case_id": "b6121227af9a54f4878a4e7d08feccf418c60e84",
+  "subject": "chore: rebind the closure record after the merge with main",
+  "committed_at": 1790566808
+ },
+ {
+  "case_id": "82c0a40d1316742b157ea7de5f1ca57f0787a2e2",
+  "subject": "Merge pull request #46 from SpaceDazher/bb/spacedazher-veritas-45-s2-007r-a-mvp-01-07-7-thr_mgkk7cb5t6",
+  "committed_at": 1790567231
+ },
+ {
+  "case_id": "5c60e35daf98c446c64bcb91def042e920ddd101",
+  "subject": "S2-008 #8: point the S2-008 records at #12, which now holds what #45 carried",
+  "committed_at": 1790568708
+ },
+ {
+  "case_id": "9170f563519e054dad0a07144dbcd8eea22b7f4b",
+  "subject": "S2-008 #8: reseal the S2-008 records with the #12 scope note",
+  "committed_at": 1790569130
+ },
+ {
+  "case_id": "388a37956fe63baeee8c57be426aa4a47b913103",
+  "subject": "chore: reseal the root manifest for the #12 scope note",
+  "committed_at": 1790569135
+ },
+ {
+  "case_id": "59cca292e695fc7f84dd1ae8c147035c4373fa31",
+  "subject": "chore: rebind the closure and commit records for the #12 scope note",
+  "committed_at": 1790569140
+ },
+ {
+  "case_id": "3109a6183790d95c0fa9fe7d14a5dc19e48528fb",
+  "subject": "Merge remote-tracking branch 'origin/main' into bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+  "committed_at": 1790569500
+ },
+ {
+  "case_id": "16933f35f45a2bee4cecb9bc512b7b6a9f06ec53",
+  "subject": "S2-008 #8: re-seal the dependency binding after main moved the frozen inputs",
+  "committed_at": 1790569905
+ },
+ {
+  "case_id": "b50f052c6147e3e01cd0cd7ee14d861a6375366e",
+  "subject": "chore: reviewed refreeze of the integrity manifest for the #45/#46 contract change",
+  "committed_at": 1790572733
+ },
+ {
+  "case_id": "9876c11c1cbcb7d6df905f0059bd1d54d5730855",
+  "subject": "chore: reseal the root manifest after the #45/#46 integrity refreeze",
+  "committed_at": 1790572744
+ },
+ {
+  "case_id": "da41fc9489780cabbb129f88e59d346894e8bc4b",
+  "subject": "chore: rebind the closure record to the #45/#46 refreeze commit",
+  "committed_at": 1790572754
+ },
+ {
+  "case_id": "e90dd12d28d127d520d543a1b740abb63ae59360",
+  "subject": "Merge pull request #49 from SpaceDazher/refreeze/integrity-manifest-45-46",
+  "committed_at": 1790574222
+ },
+ {
+  "case_id": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+  "subject": "Merge remote-tracking branch 'origin/main' into bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+  "committed_at": 1790574648
+ },
+ {
+  "case_id": "043795c9e3392e537185c83551b10ed6decdd0ee",
+  "subject": "S2-008 #8: reseal the S2-008 records on the tree that carries main's refreeze",
+  "committed_at": 1790574948
+ },
+ {
+  "case_id": "69065630a0e5352939b74ce363af7584e2053896",
+  "subject": "chore: reseal the root manifest and rebind the closure records on the post-refreeze tree",
+  "committed_at": 1790574970
+ },
+ {
+  "case_id": "516dbdc427496a8c32282b3438a4d26f012dbb0d",
+  "subject": "S2-002 A-MVP-04: a real executor inside a digest-pinned isolation profile",
+  "committed_at": 1790579575
+ },
+ {
+  "case_id": "2086fd2c8771125a79edd2a11f5cdc3c7fa95b12",
+  "subject": "chore: reseal the root manifest after the A-MVP-04 isolation tree",
+  "committed_at": 1790579604
+ },
+ {
+  "case_id": "42df5c8211b8ab03e6cee5c57a454a702956851c",
+  "subject": "chore: rebind the closure record to the A-MVP-04 isolation commit",
+  "committed_at": 1790579619
+ },
+ {
+  "case_id": "740c764f241c43f77bca24c2fc41aea417d6df98",
+  "subject": "merge: main (S2-002 A-MVP-04 real executor) into the S2-008 acceptance base",
+  "committed_at": 1790583259
+ },
+ {
+  "case_id": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+  "subject": "chore: reseal the root manifest, inventory and closure records on the acceptance base",
+  "committed_at": 1790583300
+ }
+]

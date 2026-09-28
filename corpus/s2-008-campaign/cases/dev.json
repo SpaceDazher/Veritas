@@ -1,0 +1,3762 @@
+[
+ {
+  "case_id": "57ce8a4a6a607c4a421ee12dc49c6dd854d404b5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "Initial commit",
+  "committed_at": 1788961776,
+  "agreement_by_trial": {},
+  "index": 0
+ },
+ {
+  "case_id": "03ffb31add0afb59f51b6cc85a42edcfd4d7ebf6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "spec(S2-001): publish bounded Veritas product contract and pilot definitions",
+  "committed_at": 1789057623,
+  "agreement_by_trial": {},
+  "index": 1
+ },
+ {
+  "case_id": "84990eee1fb79a1591080b5b4229be13a8b2e60d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-001): add final verification and integrity records",
+  "committed_at": 1789057735,
+  "agreement_by_trial": {},
+  "index": 2
+ },
+ {
+  "case_id": "0a55ee37cedd637231ff827b88be3726cedf5c09",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-001): reconcile final tracked-file inventory",
+  "committed_at": 1789057910,
+  "agreement_by_trial": {},
+  "index": 3
+ },
+ {
+  "case_id": "c7062c7b37bcf0afd0371da0ce03f01d8b54f1a0",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "merge(S2-001): publish bounded Veritas product contract",
+  "committed_at": 1789210990,
+  "agreement_by_trial": {},
+  "index": 4
+ },
+ {
+  "case_id": "c1639c8be14ddf0037f366916ad948cd415d1df9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-001): bind completed external pilot",
+  "committed_at": 1789223283,
+  "agreement_by_trial": {},
+  "index": 5
+ },
+ {
+  "case_id": "a98cce6779cd80a126e598b8004714e3f8242c54",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(evidence): record active reconciliation branch",
+  "committed_at": 1789223376,
+  "agreement_by_trial": {},
+  "index": 6
+ },
+ {
+  "case_id": "ffca400a6e7112bd36a78c498598e04d28f1ce43",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-001): publish reconciliation integrity records",
+  "committed_at": 1789223429,
+  "agreement_by_trial": {},
+  "index": 7
+ },
+ {
+  "case_id": "be2ddd03220322c6bdbedbf574a23f8e1d725c14",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-002): define identity and sandbox security gate",
+  "committed_at": 1789223770,
+  "agreement_by_trial": {},
+  "index": 8
+ },
+ {
+  "case_id": "3c486d04a2cc12c952890d84522a4f82a3910405",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): bind task specification integrity",
+  "committed_at": 1789223817,
+  "agreement_by_trial": {},
+  "index": 9
+ },
+ {
+  "case_id": "90a6b194d0f3d1d651541748512f8f2627ed9c89",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(evidence): make integrity scope ticket-neutral",
+  "committed_at": 1789223831,
+  "agreement_by_trial": {},
+  "index": 10
+ },
+ {
+  "case_id": "7a96919ef1551f7c707429d34f1c697c27526b19",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): refresh repository integrity records",
+  "committed_at": 1789223844,
+  "agreement_by_trial": {},
+  "index": 11
+ },
+ {
+  "case_id": "b079f832ade901ce6eab8b8b68707e9e5cdbb822",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(evidence): pin metadata files to LF",
+  "committed_at": 1789224043,
+  "agreement_by_trial": {},
+  "index": 12
+ },
+ {
+  "case_id": "2fdbf0a997650be37efddacd3c4a72a19c880bdd",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): refresh LF-stable integrity records",
+  "committed_at": 1789224057,
+  "agreement_by_trial": {},
+  "index": 13
+ },
+ {
+  "case_id": "ffd2cf9a9aca8a0ae2e9ac48e50a97f0da900a92",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(evidence): pin Python generators to LF",
+  "committed_at": 1789224279,
+  "agreement_by_trial": {},
+  "index": 14
+ },
+ {
+  "case_id": "9268140675c48a7db75f4bb8ba2427b32a7c7e1b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): refresh cross-platform integrity records",
+  "committed_at": 1789224288,
+  "agreement_by_trial": {},
+  "index": 15
+ },
+ {
+  "case_id": "c79bce14d133849310af606be7e9e119ab5df051",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "spec(S2-002): add fail-closed identity and sandbox contracts",
+  "committed_at": 1789234973,
+  "agreement_by_trial": {},
+  "index": 16
+ },
+ {
+  "case_id": "b02c81b151b7245ff648cf49efd43ab11c2a4ccc",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(ui): navigate home via next/link to satisfy lint",
+  "committed_at": 1789234993,
+  "agreement_by_trial": {},
+  "index": 17
+ },
+ {
+  "case_id": "7b0d68e8342134d9d0ab3d4ccb874691f88d4132",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-002): add authority registry and fail-closed policy engine",
+  "committed_at": 1789235663,
+  "agreement_by_trial": {},
+  "index": 18
+ },
+ {
+  "case_id": "fd33033f0bf16f504a4e3eda37a9d95b599d12e8",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-002): add sandbox boundary adapters with observed OS controls",
+  "committed_at": 1789236462,
+  "agreement_by_trial": {},
+  "index": 19
+ },
+ {
+  "case_id": "9e8f1cfe4315cd1e71c0da2197044313fdfc8503",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-002): run adversarial corpus A-J through production policy path",
+  "committed_at": 1789237398,
+  "agreement_by_trial": {},
+  "index": 20
+ },
+ {
+  "case_id": "f2ec013323d97c70eb363b62fa045507f45a9a5b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-002): add frozen corpus runner with independent run A/B replay",
+  "committed_at": 1789237813,
+  "agreement_by_trial": {},
+  "index": 21
+ },
+ {
+  "case_id": "7fac2a9fb51f7f02fa85f3083b129a6eb52ac32a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-002): record threat model, sandbox profile and evaluation report",
+  "committed_at": 1789238016,
+  "agreement_by_trial": {},
+  "index": 22
+ },
+ {
+  "case_id": "9e19c299ed238fd85b3228d437cb22e24de60f8a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): bind final acceptance run records",
+  "committed_at": 1789238094,
+  "agreement_by_trial": {},
+  "index": 23
+ },
+ {
+  "case_id": "690d97197db11db9ac82fb276a210beeab1cf426",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-002): record clean-archive acceptance verification method",
+  "committed_at": 1789238282,
+  "agreement_by_trial": {},
+  "index": 24
+ },
+ {
+  "case_id": "479f28edcd4b95bad7603b75414edc717b281736",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-002): close P0 review findings in engine, comparator and sandbox",
+  "committed_at": 1789243007,
+  "agreement_by_trial": {},
+  "index": 25
+ },
+ {
+  "case_id": "adf78c5a2e906e3dd014cc2de9be8cda44b412e5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-002): de-credential build placeholder for public artifact scan",
+  "committed_at": 1789243100,
+  "agreement_by_trial": {},
+  "index": 26
+ },
+ {
+  "case_id": "d2ba0b7018e5fc1564666a6e0c674c50dbeb883b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-002): scope build placeholder, archive-safe public artifact check",
+  "committed_at": 1789243217,
+  "agreement_by_trial": {},
+  "index": 27
+ },
+ {
+  "case_id": "3e00de3c99e3e3d1721ac66c5724cc0500f00118",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-002): make public artifact scan commit-free for archive verification",
+  "committed_at": 1789243330,
+  "agreement_by_trial": {},
+  "index": 28
+ },
+ {
+  "case_id": "7759a4f89fd28ca482e4300c837436aa91acebe7",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): bind corrective-round acceptance records",
+  "committed_at": 1789243416,
+  "agreement_by_trial": {},
+  "index": 29
+ },
+ {
+  "case_id": "15b60ae84834f8ae4060b258c2d7732706689864",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-002): final corrective-round acceptance report",
+  "committed_at": 1789243497,
+  "agreement_by_trial": {},
+  "index": 30
+ },
+ {
+  "case_id": "2769453e36723346bae94b3cb0f4edcfd2d48ad6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "deps(S2-002): bind stage-1 dependency gates from AgentOS evidence",
+  "committed_at": 1789244483,
+  "agreement_by_trial": {},
+  "index": 31
+ },
+ {
+  "case_id": "95af5cfcf12ba611158a1856f15d72be5b6ded9d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): refresh measurement records after dependency binding",
+  "committed_at": 1789244517,
+  "agreement_by_trial": {},
+  "index": 32
+ },
+ {
+  "case_id": "eb8ec6feb1ad477bc31da254d9bf4014ad78672d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-002): close fail-open identity and sandbox findings",
+  "committed_at": 1789247734,
+  "agreement_by_trial": {},
+  "index": 33
+ },
+ {
+  "case_id": "b7793c05c0e75a38be816d0417a384dddf75e67e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): bind corrective implementation manifest",
+  "committed_at": 1789247743,
+  "agreement_by_trial": {},
+  "index": 34
+ },
+ {
+  "case_id": "fb444fad711dadd699b7ab33832a3fc577e6b54f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-002): make clean checkout verification evidence-safe",
+  "committed_at": 1789247919,
+  "agreement_by_trial": {},
+  "index": 35
+ },
+ {
+  "case_id": "7e7933bfa9d00b2b57ee115b52f80e410d1c7222",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): rebind clean-checkout verifier manifest",
+  "committed_at": 1789247920,
+  "agreement_by_trial": {},
+  "index": 36
+ },
+ {
+  "case_id": "0ab81740b02e69059d332812927b015715d31d4b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): record passing clean checkout",
+  "committed_at": 1789248030,
+  "agreement_by_trial": {},
+  "index": 37
+ },
+ {
+  "case_id": "a2aefba459668042f1a45c4041de47e1f8a238b8",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): finalize corrective closure chain",
+  "committed_at": 1789248031,
+  "agreement_by_trial": {},
+  "index": 38
+ },
+ {
+  "case_id": "39295fb30d43340af5aea9073b46f19de115572b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-002): record second corrective review round",
+  "committed_at": 1789248104,
+  "agreement_by_trial": {},
+  "index": 39
+ },
+ {
+  "case_id": "384f6d6dd7050c92f07bb90821d77fff9fdf138c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): bind final review report",
+  "committed_at": 1789248105,
+  "agreement_by_trial": {},
+  "index": 40
+ },
+ {
+  "case_id": "f1c545fd58c8bc6b986af7df24159b1132c9e077",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-002): enable evidence-bound rootless Podman sandbox",
+  "committed_at": 1789301196,
+  "agreement_by_trial": {},
+  "index": 41
+ },
+ {
+  "case_id": "dda4ac7d1d65c270efe53466d54431f007614db4",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-002): bind Podman sandbox closure evidence",
+  "committed_at": 1789301202,
+  "agreement_by_trial": {},
+  "index": 42
+ },
+ {
+  "case_id": "a09310a4b1afd630e991469a0e7bec4751ee7edf",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-002): record Podman clean-checkout pass",
+  "committed_at": 1789306162,
+  "agreement_by_trial": {},
+  "index": 43
+ },
+ {
+  "case_id": "88147769d2fd6468e066c1f028ed605c933f9d1e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-002): finalize sandbox evidence chain",
+  "committed_at": 1789306163,
+  "agreement_by_trial": {},
+  "index": 44
+ },
+ {
+  "case_id": "62c9afc62c89d939e4e0e164a9441e7677ea700f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-002): bind Podman execution to authorized canonical argv",
+  "committed_at": 1789306467,
+  "agreement_by_trial": {},
+  "index": 45
+ },
+ {
+  "case_id": "9621b4959bfc76f9c25114f2bc07c90ee83f4595",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-002): bind exact-argv evidence chain",
+  "committed_at": 1789306475,
+  "agreement_by_trial": {},
+  "index": 46
+ },
+ {
+  "case_id": "e21ebc9ca84dfb9674669576d679018edda370f9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-002): record exact-argv clean-checkout pass",
+  "committed_at": 1789306596,
+  "agreement_by_trial": {},
+  "index": 47
+ },
+ {
+  "case_id": "981c548db000bf4144d2ad76fe9141319fde8d8f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-002): finalize exact-argv sandbox chain",
+  "committed_at": 1789306601,
+  "agreement_by_trial": {},
+  "index": 48
+ },
+ {
+  "case_id": "3a2c72d8d61f17e1c8997c66b8b377450c189f8d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "security(S2-002): close sandbox database and tooling limits",
+  "committed_at": 1789311434,
+  "agreement_by_trial": {},
+  "index": 49
+ },
+ {
+  "case_id": "99553e5f51899d4777c839d81be977551d6aeb52",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): bind closure implementation manifest",
+  "committed_at": 1789311459,
+  "agreement_by_trial": {},
+  "index": 50
+ },
+ {
+  "case_id": "f98849326c40f38c848a0e2da7bd914d81671114",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(evidence): preserve implementation manifest binding",
+  "committed_at": 1789311526,
+  "agreement_by_trial": {},
+  "index": 51
+ },
+ {
+  "case_id": "a44c35a1153259de20aa1c0d0aecfea929ceacf6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): refresh corrected root manifest",
+  "committed_at": 1789311538,
+  "agreement_by_trial": {},
+  "index": 52
+ },
+ {
+  "case_id": "a2fa661e2a71080394c3acfdabc785dc17653047",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-002): record limitation closure provenance",
+  "committed_at": 1789311551,
+  "agreement_by_trial": {},
+  "index": 53
+ },
+ {
+  "case_id": "cac1400e33d46e51b7ad3b9297b3b4e2e5952f8b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(evidence): verify canonical git blob bytes",
+  "committed_at": 1789311919,
+  "agreement_by_trial": {},
+  "index": 54
+ },
+ {
+  "case_id": "7d82e91172d8b6b43d05820149196364c2280ac5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): freeze canonical sandbox sources",
+  "committed_at": 1789311944,
+  "agreement_by_trial": {},
+  "index": 55
+ },
+ {
+  "case_id": "933b144ce9cec4778d7730451cf3a8cb49e8cca9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): bind canonical implementation payload",
+  "committed_at": 1789311956,
+  "agreement_by_trial": {},
+  "index": 56
+ },
+ {
+  "case_id": "0115fc2a8fa5edee6e3062f964ac5c7f3d5d71fa",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): record sandbox closure provenance",
+  "committed_at": 1789311961,
+  "agreement_by_trial": {},
+  "index": 57
+ },
+ {
+  "case_id": "ab4efc470823d5040bc771d9feaababaf09722cb",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(portability): normalize SQL archive bytes",
+  "committed_at": 1789312237,
+  "agreement_by_trial": {},
+  "index": 58
+ },
+ {
+  "case_id": "c85243bf46d3ee087d6c47e485a9466becd59a28",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): refreeze portable sandbox contract",
+  "committed_at": 1789312253,
+  "agreement_by_trial": {},
+  "index": 59
+ },
+ {
+  "case_id": "1ef0e9f02182106f07b04756ca4ef7630b3485f4",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): rebind portable implementation payload",
+  "committed_at": 1789312258,
+  "agreement_by_trial": {},
+  "index": 60
+ },
+ {
+  "case_id": "3fb628b69eba27dc4eed79c36eeaaf2bacb9be66",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): record portable closure provenance",
+  "committed_at": 1789312263,
+  "agreement_by_trial": {},
+  "index": 61
+ },
+ {
+  "case_id": "37684bdaaeee1074177df3808785c9e016aa5447",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-002): record green independent clean checkout",
+  "committed_at": 1789312413,
+  "agreement_by_trial": {},
+  "index": 62
+ },
+ {
+  "case_id": "e3ceebcdbd0d095b40afca9ab724bf69fa52266c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): bind final clean-checkout payload",
+  "committed_at": 1789312418,
+  "agreement_by_trial": {},
+  "index": 63
+ },
+ {
+  "case_id": "f28e45b1ef044f9ab6b6c616c0380ac4f368ff5b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): finalize S2-002 closure provenance",
+  "committed_at": 1789312423,
+  "agreement_by_trial": {},
+  "index": 64
+ },
+ {
+  "case_id": "4b4456a3acbe78371e2afcc75d81da59d2765b53",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "Merge pull request #14 from SpaceDazher/codex/s2-002-identity-sandbox",
+  "committed_at": 1789329361,
+  "agreement_by_trial": {},
+  "index": 65
+ },
+ {
+  "case_id": "0c835f84bc6ea8cd5aeab2f818438d9efd761a33",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-003): define source ingestion contract",
+  "committed_at": 1789329642,
+  "agreement_by_trial": {},
+  "index": 66
+ },
+ {
+  "case_id": "09e63b3c63a5836834c37c6d73c471377c6c7c60",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): bind S2-003 task definition",
+  "committed_at": 1789329647,
+  "agreement_by_trial": {},
+  "index": 67
+ },
+ {
+  "case_id": "e57ef133c748de6b734727e2b37d5843fcbdc674",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(evidence): record S2-003 task provenance",
+  "committed_at": 1789329652,
+  "agreement_by_trial": {},
+  "index": 68
+ },
+ {
+  "case_id": "15a23fe55027e67d3faf7601238db5717bf27619",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-003): fail-closed dependency gate bound to S2-002 git bytes and pinned S1-001 evidence",
+  "committed_at": 1789330538,
+  "agreement_by_trial": {},
+  "index": 69
+ },
+ {
+  "case_id": "9b0c39feb35fb278d1edcfc2b1bd9554d8beb1cd",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-003): nine canonical ingestion contracts, read-only connectors, append-only pipeline with idempotency and lineage, migration 0002",
+  "committed_at": 1789331903,
+  "agreement_by_trial": {},
+  "index": 70
+ },
+ {
+  "case_id": "2a31d4652ab38cd47222ce1b2844610399808e14",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-003): frozen 74-case corpus, process-separated A/B replay verifier, adversarial probes A-L all DETECTED",
+  "committed_at": 1789335068,
+  "agreement_by_trial": {},
+  "index": 71
+ },
+ {
+  "case_id": "f1a33eacfdc9bd6079b36ca712ea57914a5b853b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-003): TypeScript contract types generated from schemas with drift-detection test",
+  "committed_at": 1789335234,
+  "agreement_by_trial": {},
+  "index": 72
+ },
+ {
+  "case_id": "622f76a09bea168cc2155456608080044f54418e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-003): postgres smoke proves ingestion migration, append-only triggers and operation idempotency on a live DB",
+  "committed_at": 1789335370,
+  "agreement_by_trial": {},
+  "index": 73
+ },
+ {
+  "case_id": "4b7963e18e11e09d53f252cab1832372c4509ce2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-003): connector contract, provenance/retention and evaluation report; wire s2-003 gates into clean checkout",
+  "committed_at": 1789335707,
+  "agreement_by_trial": {},
+  "index": 74
+ },
+ {
+  "case_id": "cf0c7e9b7a5f3a037f256628113ee7ca6fd0e5ff",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): bind implementation root manifest (263 tracked files)",
+  "committed_at": 1789335747,
+  "agreement_by_trial": {},
+  "index": 75
+ },
+ {
+  "case_id": "36e6960170a15d6102b0b2d1812f4a88993e76b0",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): bind closure provenance",
+  "committed_at": 1789335764,
+  "agreement_by_trial": {},
+  "index": 76
+ },
+ {
+  "case_id": "2b75ce6dde5bc74cf7b21322c3d447772df3f8ef",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): archive-safe dependency gate, frozen manifest and inventory cover ingestion artifacts",
+  "committed_at": 1789336043,
+  "agreement_by_trial": {},
+  "index": 77
+ },
+ {
+  "case_id": "0e2bed9d4c8b001a8356ca4e76f7b19d37e7aa96",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): implementation root manifest",
+  "committed_at": 1789336099,
+  "agreement_by_trial": {},
+  "index": 78
+ },
+ {
+  "case_id": "ba3b7acffac379b2c746064f62ae489d76fbdc41",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure provenance",
+  "committed_at": 1789336106,
+  "agreement_by_trial": {},
+  "index": 79
+ },
+ {
+  "case_id": "c4512091101a1238da92483728a97f6de7d8113c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-003): deterministic fixture arrayBuffer (pooled Buffer.from byteOffset race) plus regression test; archive-degraded dependency gate",
+  "committed_at": 1789336506,
+  "agreement_by_trial": {},
+  "index": 80
+ },
+ {
+  "case_id": "5bfd4a3bb9f07086561f81bd474e80166f88ea4e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refresh implementation root manifest",
+  "committed_at": 1789336521,
+  "agreement_by_trial": {},
+  "index": 81
+ },
+ {
+  "case_id": "d8253895bcf9e9dc4a2866e96c6d3eb18908c74a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refresh closure provenance",
+  "committed_at": 1789336528,
+  "agreement_by_trial": {},
+  "index": 82
+ },
+ {
+  "case_id": "8497129cf49d8a1d50a31665fe2d1c5579f9c365",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-003): archiveMode dependency gate (structural checks without .git, full Git-bytes mode in repo)",
+  "committed_at": 1789336853,
+  "agreement_by_trial": {},
+  "index": 83
+ },
+ {
+  "case_id": "005b50c7c6138552e987edc3d44b76e932caa2e6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze contracts and inventory after gate fix",
+  "committed_at": 1789336867,
+  "agreement_by_trial": {},
+  "index": 84
+ },
+ {
+  "case_id": "8ea786b1dd3388f87510a0c810725fdb5b244d19",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): implementation root manifest",
+  "committed_at": 1789336874,
+  "agreement_by_trial": {},
+  "index": 85
+ },
+ {
+  "case_id": "d5c073c9e32322741d19f02a78b21eeb046fc93f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure provenance",
+  "committed_at": 1789336881,
+  "agreement_by_trial": {},
+  "index": 86
+ },
+ {
+  "case_id": "ef0bc66ad42e5781d10efc2608fbd728a0265acc",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-003): gate cross-binding skip in archive mode",
+  "committed_at": 1789337065,
+  "agreement_by_trial": {},
+  "index": 87
+ },
+ {
+  "case_id": "c4a40b830876e160da6531f73e41b95aed755dea",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze",
+  "committed_at": 1789337079,
+  "agreement_by_trial": {},
+  "index": 88
+ },
+ {
+  "case_id": "040a82d033c49ec494cc7ebae3013bc3bec17f85",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): root manifest",
+  "committed_at": 1789337086,
+  "agreement_by_trial": {},
+  "index": 89
+ },
+ {
+  "case_id": "e1c01deb236cbe8ce3ea5320f0a7214cb43f7858",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure",
+  "committed_at": 1789337093,
+  "agreement_by_trial": {},
+  "index": 90
+ },
+ {
+  "case_id": "5f623a6972afb6fa6173929c96d5a194ec3ae60c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): record green clean-checkout evidence (24/24 commands, exit 0) and final test counts",
+  "committed_at": 1789337254,
+  "agreement_by_trial": {},
+  "index": 91
+ },
+ {
+  "case_id": "da2ef86e9972fee2857c22936f583a25a35e3f50",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): final implementation root manifest",
+  "committed_at": 1789337261,
+  "agreement_by_trial": {},
+  "index": 92
+ },
+ {
+  "case_id": "eb04bd1ff74063a70e27c4a1ac4c166624ece782",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): final closure provenance",
+  "committed_at": 1789337268,
+  "agreement_by_trial": {},
+  "index": 93
+ },
+ {
+  "case_id": "e238ddfb3e569f3da4ce96b2da59a7b4a5f64663",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refresh run telemetry pid fields",
+  "committed_at": 1789337350,
+  "agreement_by_trial": {},
+  "index": 94
+ },
+ {
+  "case_id": "3efcefa9f038a2b33e3cdab9c6ec94e604f9e971",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): root manifest refresh",
+  "committed_at": 1789337357,
+  "agreement_by_trial": {},
+  "index": 95
+ },
+ {
+  "case_id": "c3d667cdc497ada713840343a45786653d17cf33",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure refresh",
+  "committed_at": 1789337364,
+  "agreement_by_trial": {},
+  "index": 96
+ },
+ {
+  "case_id": "dd5676026cc930e3b0d94507041155b17bffb431",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-003): REVISE round - async probes, authorization binding, full idempotency digest, scoped dedup, SSRF/symlink guards, ledger transition, types trailing newline",
+  "committed_at": 1789400551,
+  "agreement_by_trial": {},
+  "index": 97
+ },
+ {
+  "case_id": "9606b6c890b3abd75c85692719a7bb686f67e7ad",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze contracts, corpus and inventory after REVISE fixes",
+  "committed_at": 1789400586,
+  "agreement_by_trial": {},
+  "index": 98
+ },
+ {
+  "case_id": "2e97798bbd0e82a5a4da7a424cd77382af29c068",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): implementation root manifest",
+  "committed_at": 1789400594,
+  "agreement_by_trial": {},
+  "index": 99
+ },
+ {
+  "case_id": "804ee0cbc7719d49b99e6d0c0d4d6456ff84f8da",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure provenance",
+  "committed_at": 1789400601,
+  "agreement_by_trial": {},
+  "index": 100
+ },
+ {
+  "case_id": "69d437ef207799f5dd7c864bf734fa295abda1a5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): green clean checkout (25/25 commands) and best-effort temp cleanup on Windows",
+  "committed_at": 1789401147,
+  "agreement_by_trial": {},
+  "index": 101
+ },
+ {
+  "case_id": "3d5234748163a502df2233f33cee1e718f35ebfb",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze after clean checkout",
+  "committed_at": 1789401162,
+  "agreement_by_trial": {},
+  "index": 102
+ },
+ {
+  "case_id": "eaf1ad4284593315e89236fc77767b56ea4f88dd",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): final root manifest",
+  "committed_at": 1789401170,
+  "agreement_by_trial": {},
+  "index": 103
+ },
+ {
+  "case_id": "db5e68d133da6d70f0ede03671b5c9992206b85d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): final closure",
+  "committed_at": 1789401179,
+  "agreement_by_trial": {},
+  "index": 104
+ },
+ {
+  "case_id": "77224a467947e771ebb3814aba9037039b12c508",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-003): REVISE round findings, fixes and evidence matrix",
+  "committed_at": 1789401276,
+  "agreement_by_trial": {},
+  "index": 105
+ },
+ {
+  "case_id": "3a0f927df0185d1c40af8f83c567208eeaff0f18",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): root manifest (report)",
+  "committed_at": 1789401303,
+  "agreement_by_trial": {},
+  "index": 106
+ },
+ {
+  "case_id": "116ec9f6f3e5a7e0fce0a5038bfdacccda66c06c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure (report)",
+  "committed_at": 1789401311,
+  "agreement_by_trial": {},
+  "index": 107
+ },
+ {
+  "case_id": "34fe03feb21ce353e07ea14beca180f0db98f48e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-003): REVISE-2 - atomic SQL commits with canonical audit events, mandatory DNS resolver with lookup pinning, real streaming budget, child-process DB replay with distinct PIDs, max_segments enforcement",
+  "committed_at": 1789403787,
+  "agreement_by_trial": {},
+  "index": 108
+ },
+ {
+  "case_id": "67400a541d76f5118bd24601722c885db540c832",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): bind final HEAD evidence (run A/B, db comparison) and exclude working results from git",
+  "committed_at": 1789403862,
+  "agreement_by_trial": {},
+  "index": 109
+ },
+ {
+  "case_id": "748d0a7f23f742155f9b571d6a935965645f0934",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): treat clean-checkout evidence as self-referential metadata (excluded from payload manifest)",
+  "committed_at": 1789404214,
+  "agreement_by_trial": {},
+  "index": 110
+ },
+ {
+  "case_id": "46911995de072ba18c877b1146d18d0d368ba196",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze",
+  "committed_at": 1789404231,
+  "agreement_by_trial": {},
+  "index": 111
+ },
+ {
+  "case_id": "b24b474fe664c301d29dc417fe01b89802b07e2d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): root manifest",
+  "committed_at": 1789404239,
+  "agreement_by_trial": {},
+  "index": 112
+ },
+ {
+  "case_id": "a7961d40a6da9a24f0f75a1b4227c5a893bb7a98",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure",
+  "committed_at": 1789404247,
+  "agreement_by_trial": {},
+  "index": 113
+ },
+ {
+  "case_id": "1a3aa3f8947c5d8856a12fd76ee316617f6a73dc",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): bind clean-checkout evidence to final HEAD",
+  "committed_at": 1789404418,
+  "agreement_by_trial": {},
+  "index": 114
+ },
+ {
+  "case_id": "4075e27a3496dca6375c4452b86ad26f16ccec1a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-003): REVISE-2 findings, fixes and evidence matrix",
+  "committed_at": 1789404516,
+  "agreement_by_trial": {},
+  "index": 115
+ },
+ {
+  "case_id": "08b77930e1f96dc375cb9d4bede48bde1db32fb9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): final root manifest",
+  "committed_at": 1789404540,
+  "agreement_by_trial": {},
+  "index": 116
+ },
+ {
+  "case_id": "d71f83227281a270ccf32824001d9c0aa996c798",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): final closure",
+  "committed_at": 1789404548,
+  "agreement_by_trial": {},
+  "index": 117
+ },
+ {
+  "case_id": "f7802cacfdf0ccb5d38877d53f35dfc5ebb8b202",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): bind clean-checkout evidence to final closure HEAD",
+  "committed_at": 1789404753,
+  "agreement_by_trial": {},
+  "index": 118
+ },
+ {
+  "case_id": "6dda664359316446b71988c18811779470e8bb7b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-003): REVISE-3 - atomic commitIngest on the normal ingest path, fixed async SSRF IPv4 regex, mandatory DNS guard for injected transport, tested/evidence commit separation",
+  "committed_at": 1789407883,
+  "agreement_by_trial": {},
+  "index": 119
+ },
+ {
+  "case_id": "1d5c84f30aa830340165c62c8b8143e5db6ab65e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): acceptance evidence for testedImplementationCommit 6dda664359316446b71988c18811779470e8bb7b",
+  "committed_at": 1789407894,
+  "agreement_by_trial": {},
+  "index": 120
+ },
+ {
+  "case_id": "218d5515f60af685b4d93b496a47714bfd740380",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-003): REVISE-3 - single ledger write via commitIngest payload, canonical jsonb outcome comparison, OPERATION_INTENT audit event",
+  "committed_at": 1789408160,
+  "agreement_by_trial": {},
+  "index": 121
+ },
+ {
+  "case_id": "9a4d56c0cb7cbbe72f5c27ebaf29f8c8011dfca2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "chore(S2-003): acceptance evidence for testedImplementationCommit 218d551 (round-3 fixes)",
+  "committed_at": 1789408324,
+  "agreement_by_trial": {},
+  "index": 122
+ },
+ {
+  "case_id": "9c3fc723fb80dea8c042d72d7b89d8bfb155a95f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze contracts and inventory",
+  "committed_at": 1789408352,
+  "agreement_by_trial": {},
+  "index": 123
+ },
+ {
+  "case_id": "6146cd132fa370031e70be83f6800bf26b10e38b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): root manifest",
+  "committed_at": 1789408360,
+  "agreement_by_trial": {},
+  "index": 124
+ },
+ {
+  "case_id": "46a2c9708b91a1996115a2cf6a3d8008bfb3f002",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure",
+  "committed_at": 1789408367,
+  "agreement_by_trial": {},
+  "index": 125
+ },
+ {
+  "case_id": "48b27bc999801b087a9f101d5d35dcd855910dcd",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): bind clean-checkout evidence (testedImplementationCommit + evidenceContainerCommit)",
+  "committed_at": 1789408530,
+  "agreement_by_trial": {},
+  "index": 126
+ },
+ {
+  "case_id": "303bf260d48071deb6e12d881504c42a1cfe959a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-003): commit semantics + REVISE-3 findings/fixes/evidence matrix",
+  "committed_at": 1789408587,
+  "agreement_by_trial": {},
+  "index": 127
+ },
+ {
+  "case_id": "48ff8bed2e6bb10039364759fa2609ba357887a2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): root manifest (report)",
+  "committed_at": 1789408595,
+  "agreement_by_trial": {},
+  "index": 128
+ },
+ {
+  "case_id": "a695e86adeda0bc1d6202eb95eeed79cea791291",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): closure (report)",
+  "committed_at": 1789408604,
+  "agreement_by_trial": {},
+  "index": 129
+ },
+ {
+  "case_id": "90781c723192528258c471e1a0423625170f4d16",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-003): make audit transitions atomic and evidence honest",
+  "committed_at": 1789410114,
+  "agreement_by_trial": {},
+  "index": 130
+ },
+ {
+  "case_id": "abafc5a11c29717bf489f5ff170370cebc112ce3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-003): refresh transactional ingestion evidence",
+  "committed_at": 1789410417,
+  "agreement_by_trial": {},
+  "index": 131
+ },
+ {
+  "case_id": "86b2d883b34b8055154478d274795156f5ec7907",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): seal revised evidence manifest",
+  "committed_at": 1789410446,
+  "agreement_by_trial": {},
+  "index": 132
+ },
+ {
+  "case_id": "5c683717e31842aa2a4e2fc8ed88548e8b9e6ab2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): refreeze reviewed ingestion controls",
+  "committed_at": 1789410722,
+  "agreement_by_trial": {},
+  "index": 133
+ },
+ {
+  "case_id": "42248bc44ba6f3b33fa29a4efb7c9397737d8d3a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-003): reseal reviewed freeze manifest",
+  "committed_at": 1789410749,
+  "agreement_by_trial": {},
+  "index": 134
+ },
+ {
+  "case_id": "b3fe0ee1b0320ad349265fc5e33327833418e197",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-003): record green independent clean checkout",
+  "committed_at": 1789410931,
+  "agreement_by_trial": {},
+  "index": 135
+ },
+ {
+  "case_id": "94b2b6ae3fcbd4a1437facebc3a1268eb684b038",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "gate(S2-004): bind claim graph to canonical S2-003 and Stage-1 evidence",
+  "committed_at": 1789472272,
+  "agreement_by_trial": {},
+  "index": 136
+ },
+ {
+  "case_id": "24c479231fad67c0282377dd49fbf9c2f29ce9dd",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-004): canonical claim graph contracts, store, extraction and probes",
+  "committed_at": 1789474505,
+  "agreement_by_trial": {},
+  "index": 137
+ },
+ {
+  "case_id": "7f8894e2eeb0e5ed2000e511e1094a489e091634",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-004): frozen 96-case corpus, Run A/B verification, PostgreSQL replay, docs",
+  "committed_at": 1789484918,
+  "agreement_by_trial": {},
+  "index": 138
+ },
+ {
+  "case_id": "1e693481f9b565ed6f1e3dd04a82754c1df1c0f3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reseal manifests and inventory after corpus/evidence closure",
+  "committed_at": 1789484961,
+  "agreement_by_trial": {},
+  "index": 139
+ },
+ {
+  "case_id": "e7bf4b81c6278b0fdde10d64e17ea5bb85f2ab9c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): bind closure record and root manifest to implementation commit 1e69348",
+  "committed_at": 1789485222,
+  "agreement_by_trial": {},
+  "index": 140
+ },
+ {
+  "case_id": "3b6f8afb2f9d78b8506b790294aa82c9269c2e3c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-004): record green independent clean checkout",
+  "committed_at": 1789485432,
+  "agreement_by_trial": {},
+  "index": 141
+ },
+ {
+  "case_id": "fb3a120bfaf59a9f8ec6a8faaa136a1d1d0b11ff",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reviewed refreeze covering claim graph artifacts",
+  "committed_at": 1789488968,
+  "agreement_by_trial": {},
+  "index": 142
+ },
+ {
+  "case_id": "e6b9a72b31ede87bb4959b06b058ee4d8f33b4fc",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-004): record frozen-artifact gate incident, reseal and command log",
+  "committed_at": 1789489123,
+  "agreement_by_trial": {},
+  "index": 143
+ },
+ {
+  "case_id": "b31ee5cec189fcc7bc8837871a74a913407f45c9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reseal root manifest, closure record and inventory after the refreeze",
+  "committed_at": 1789489554,
+  "agreement_by_trial": {},
+  "index": 144
+ },
+ {
+  "case_id": "2f4ed0c1a5b169e6df7ec9be50b329815362f631",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-004): record green independent clean checkout after the reviewed refreeze",
+  "committed_at": 1789494310,
+  "agreement_by_trial": {},
+  "index": 145
+ },
+ {
+  "case_id": "56bfe83122955ba1cde245d9689a85c59166560d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-004): close the todo 13 diff-check whitespace findings",
+  "committed_at": 1789494766,
+  "agreement_by_trial": {},
+  "index": 146
+ },
+ {
+  "case_id": "e1d0962bf474cb1c74cf7807f3a0467b0efad304",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reseal root manifest, closure record and inventory after the whitespace fix",
+  "committed_at": 1789494888,
+  "agreement_by_trial": {},
+  "index": 147
+ },
+ {
+  "case_id": "2f82af5e26731e86b6ab60487b32cd0dc976e31b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-004): record green independent clean checkout on the final remediation state",
+  "committed_at": 1789495180,
+  "agreement_by_trial": {},
+  "index": 148
+ },
+ {
+  "case_id": "54c011fd5a81bebf7b3f6c3f4f64af05fe52a207",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-004): cover the S2-004 stage steps in the independent clean checkout",
+  "committed_at": 1789502975,
+  "agreement_by_trial": {},
+  "index": 149
+ },
+ {
+  "case_id": "0eaea4c077c8797d98059b31fd1c191a4756e9d5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-004): refresh PostgreSQL replay evidence on the post-fix tree",
+  "committed_at": 1789503141,
+  "agreement_by_trial": {},
+  "index": 150
+ },
+ {
+  "case_id": "6e899a506cfdb77275348c2ad46457a2ebbd27df",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reseal root manifest, closure record and inventory after stage coverage and db replay refresh",
+  "committed_at": 1789504164,
+  "agreement_by_trial": {},
+  "index": 151
+ },
+ {
+  "case_id": "81f753be77ca6b6d36ea64220741c31673b52167",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-004): archive-safe binding test and the refreeze it requires",
+  "committed_at": 1789504774,
+  "agreement_by_trial": {},
+  "index": 152
+ },
+ {
+  "case_id": "ac5641d8399a11e8f92a7c3d14d2105551c55378",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reseal root manifest, closure record and inventory after the binding test fix",
+  "committed_at": 1789504895,
+  "agreement_by_trial": {},
+  "index": 153
+ },
+ {
+  "case_id": "20ea63c589263c928379f48ecb9727f0791e1d9f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-004): track flakes in report and reseal after the binding test fix",
+  "committed_at": 1789505295,
+  "agreement_by_trial": {},
+  "index": 154
+ },
+ {
+  "case_id": "c572aad60df293b098898b4bd95e0dc0e02bb7e5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-004): record the broken re-seal at 20ea63c and the second identity flake",
+  "committed_at": 1789508426,
+  "agreement_by_trial": {},
+  "index": 155
+ },
+ {
+  "case_id": "e53c105c4ac383ae1c2aa31098d53316626ec9a5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-004): reseal root manifest, closure record and inventory after the seal-incident docs",
+  "committed_at": 1789508523,
+  "agreement_by_trial": {},
+  "index": 156
+ },
+ {
+  "case_id": "f4122726c2926819066fa96255a9ab8aebea25fa",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-004): record green independent clean checkout after the seal-incident remediation",
+  "committed_at": 1789508728,
+  "agreement_by_trial": {},
+  "index": 157
+ },
+ {
+  "case_id": "7662face2091c1f591af2b586502beb4ea698e5e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "Merge pull request #17 from SpaceDazher/codex/s2-004-claim-provenance-graph",
+  "committed_at": 1789598616,
+  "agreement_by_trial": {},
+  "index": 158
+ },
+ {
+  "case_id": "cf2592cbc49dad1fff647e0c373a1a2a9ca03a33",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-005): define cross-domain synthesis task",
+  "committed_at": 1789598703,
+  "agreement_by_trial": {},
+  "index": 159
+ },
+ {
+  "case_id": "4ef14b1ea3334b11779949f2c30196c97019334a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-005): mark S2-004 dependency ready",
+  "committed_at": 1789598719,
+  "agreement_by_trial": {},
+  "index": 160
+ },
+ {
+  "case_id": "21aad724b55ed78e353c9d6df83fb41ed6bbc5a0",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-005): cross-domain retrieval and synthesis over the claim graph",
+  "committed_at": 1789703764,
+  "agreement_by_trial": {},
+  "index": 161
+ },
+ {
+  "case_id": "7a57066a8822bf22d61430abc051545c3bf59e01",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-005): bind Run A/B, DB replay, probes and comparison evidence at 21aad72",
+  "committed_at": 1789703793,
+  "agreement_by_trial": {},
+  "index": 162
+ },
+ {
+  "case_id": "6d4a5b30131fb96764b022409c20518c7c463fcc",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): reseal root manifest, closure record and inventory after cross-domain synthesis",
+  "committed_at": 1789703864,
+  "agreement_by_trial": {},
+  "index": 163
+ },
+ {
+  "case_id": "e19a40ed5e5a08643733ececcdfcfa7598d2ec5a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "style(S2-005): strip trailing whitespace in run executor and probes",
+  "committed_at": 1789703972,
+  "agreement_by_trial": {},
+  "index": 164
+ },
+ {
+  "case_id": "a49a10f7d978a89dfe8ed121a3985bdac177f1d3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): reseal manifests after whitespace fix",
+  "committed_at": 1789703999,
+  "agreement_by_trial": {},
+  "index": 165
+ },
+ {
+  "case_id": "19905a1a3aa7d5853038ce6bf0193edc231633c3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): extend clean-checkout gate with the S2-005 command set",
+  "committed_at": 1789704095,
+  "agreement_by_trial": {},
+  "index": 166
+ },
+ {
+  "case_id": "8b6d8883738051e801b48dd8133971385b494dcb",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): reseal manifests after clean-checkout gate extension",
+  "committed_at": 1789704115,
+  "agreement_by_trial": {},
+  "index": 167
+ },
+ {
+  "case_id": "18880c9db62e7714225af1325e5096e59fd03413",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): inventory the commit manifest and reseal",
+  "committed_at": 1789704612,
+  "agreement_by_trial": {},
+  "index": 168
+ },
+ {
+  "case_id": "7c3aca7b1343474ab64d1c39acf4d6f758c2a148",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "Merge remote-tracking branch 'refs/remotes/local-soft/s2-005' into codex/s2-005-cross-domain-synthesis",
+  "committed_at": 1789706564,
+  "agreement_by_trial": {},
+  "index": 169
+ },
+ {
+  "case_id": "e8b43894dbb3e1fc1ba17b4c3aa6426bc31f6e14",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-005): preserve raw Stage-1 evidence bytes",
+  "committed_at": 1789706683,
+  "agreement_by_trial": {},
+  "index": 170
+ },
+ {
+  "case_id": "e1832e73e9812a2df5d91a4d7f785349038be43a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test(S2-005): reproduce probe evidence mutation on read-only verify",
+  "committed_at": 1789706722,
+  "agreement_by_trial": {},
+  "index": 171
+ },
+ {
+  "case_id": "e9895f533c237f33b99d73f407de32319d24b600",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-005): keep default verifier read-only",
+  "committed_at": 1789706744,
+  "agreement_by_trial": {},
+  "index": 172
+ },
+ {
+  "case_id": "f3dfbeb6473336a9153c4374d4e9c0664aa35f92",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-005): freeze synthesis implementation and verifier scope",
+  "committed_at": 1789706968,
+  "agreement_by_trial": {},
+  "index": 173
+ },
+ {
+  "case_id": "50af3a9a7ba2edf30f699aa3708db1d50af7f00f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): refresh tracked inventory",
+  "committed_at": 1789706980,
+  "agreement_by_trial": {},
+  "index": 174
+ },
+ {
+  "case_id": "f6067c699a2f45f9f53838da7fd711f7034092a2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): seal implementation payload",
+  "committed_at": 1789707012,
+  "agreement_by_trial": {},
+  "index": 175
+ },
+ {
+  "case_id": "ee0d90a633ec3d3d6a8ca2da06f12fd9bbf5e860",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): bind closure to implementation seal",
+  "committed_at": 1789707036,
+  "agreement_by_trial": {},
+  "index": 176
+ },
+ {
+  "case_id": "1ec9882ee7c337899b99e1807499991c573d7f99",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(S2-005): fail closed on broken DB replays",
+  "committed_at": 1789831818,
+  "agreement_by_trial": {},
+  "index": 177
+ },
+ {
+  "case_id": "36e001c68b17e00422fda831bed5bcc9a642afae",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-005): implement PostgreSQL claim linking parity",
+  "committed_at": 1789832063,
+  "agreement_by_trial": {},
+  "index": 178
+ },
+ {
+  "case_id": "8d14ebee710a91071c351e85d7aecb60452f3b5f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): bind green PostgreSQL replay",
+  "committed_at": 1789832092,
+  "agreement_by_trial": {},
+  "index": 179
+ },
+ {
+  "case_id": "7caf04ec22558e220c0da8af93e59262d95dfb2c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): reseal corrected DB implementation",
+  "committed_at": 1789832121,
+  "agreement_by_trial": {},
+  "index": 180
+ },
+ {
+  "case_id": "84f00c45e9c7fd0aacbc7ebe4ea6949d72643775",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): record corrected closure chain",
+  "committed_at": 1789832141,
+  "agreement_by_trial": {},
+  "index": 181
+ },
+ {
+  "case_id": "07e4ce43820844fdaccd9319355ca4fb6c5a8a4b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-005): inventory DB replay regression",
+  "committed_at": 1789832167,
+  "agreement_by_trial": {},
+  "index": 182
+ },
+ {
+  "case_id": "d479d55ab2e8fc8d51990a886b3f5191ff4e52d6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): seal complete ticket payload",
+  "committed_at": 1789832186,
+  "agreement_by_trial": {},
+  "index": 183
+ },
+ {
+  "case_id": "baa8a19e85b732d007ce9cd3101351879842722f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): bind final payload closure",
+  "committed_at": 1789832206,
+  "agreement_by_trial": {},
+  "index": 184
+ },
+ {
+  "case_id": "dd683ceb614e95777cf08c09089454efd48749ef",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): record green independent checkout",
+  "committed_at": 1789832425,
+  "agreement_by_trial": {},
+  "index": 185
+ },
+ {
+  "case_id": "7c1685ac95fcb83d997a307676cb36bec4b2c03a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): publish corrected canonical runs",
+  "committed_at": 1789833037,
+  "agreement_by_trial": {},
+  "index": 186
+ },
+ {
+  "case_id": "8c5bfb26f18dbe3c516ce4f311fab5069d12d814",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): seal canonical ticket evidence",
+  "committed_at": 1789833071,
+  "agreement_by_trial": {},
+  "index": 187
+ },
+ {
+  "case_id": "36fd8f854459f3ee419a997293c966e6840a2373",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-005): finalize closure binding",
+  "committed_at": 1789833088,
+  "agreement_by_trial": {},
+  "index": 188
+ },
+ {
+  "case_id": "d7ce192cec82e7cd66e1dce29faebcfbcfe9bd6f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "Merge pull request #18 from SpaceDazher/codex/s2-005-cross-domain-synthesis",
+  "committed_at": 1789834439,
+  "agreement_by_trial": {},
+  "index": 189
+ },
+ {
+  "case_id": "2863ed4257b7b01670f4c84dbe343e6823f02c6e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs(S2-006): add independent semantic verifier ticket",
+  "committed_at": 1789839157,
+  "agreement_by_trial": {},
+  "index": 190
+ },
+ {
+  "case_id": "496ffcd80fedf0a8b3e53bfdb707998c3f8dae21",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-006): verifier contracts, canonical-json-v1 and type generation",
+  "committed_at": 1789841431,
+  "agreement_by_trial": {},
+  "index": 191
+ },
+ {
+  "case_id": "2deb9a62b1e457a2853aca85cb0ec072cd4f6626",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-006): verifier command API, typed errors, immutable store with idempotency and fencing",
+  "committed_at": 1789844347,
+  "agreement_by_trial": {},
+  "index": 192
+ },
+ {
+  "case_id": "60a3cfe16a6c2df5eeaee4c8123d128f8b9a0b1e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-006): rubric, fixture corpus, calibration harness, baselines and fail-closed comparator",
+  "committed_at": 1789845345,
+  "agreement_by_trial": {},
+  "index": 193
+ },
+ {
+  "case_id": "465e04bd4f19a35df71fb0ab5d9fb68cfb0c3bfe",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(S2-006): capability matrix, offline signatures and adversarial probes A-S",
+  "committed_at": 1789847164,
+  "agreement_by_trial": {},
+  "index": 194
+ },
+ {
+  "case_id": "99b856aafba21f3ddd79167b496636c22e324cb3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-006): verifier gates, offline evidence run, two-process DB replay and freeze scope",
+  "committed_at": 1789849483,
+  "agreement_by_trial": {},
+  "index": 195
+ },
+ {
+  "case_id": "6cd6a8f654d20a47db7bf69591591f2a4179c478",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): bind sealed runs A/B, comparator, fixture calibration, DB replay, probes summary and evaluation report",
+  "committed_at": 1789849494,
+  "agreement_by_trial": {},
+  "index": 196
+ },
+ {
+  "case_id": "720810f6fdd07cd4633d689d0d3afa0818a22e03",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): refresh root manifest for the final ticket tree",
+  "committed_at": 1789849530,
+  "agreement_by_trial": {},
+  "index": 197
+ },
+ {
+  "case_id": "74a55e73a5e2a7caaf7f308ed46f8bf6112333be",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): bind closure and root manifest to the final ticket tree",
+  "committed_at": 1789849725,
+  "agreement_by_trial": {},
+  "index": 198
+ },
+ {
+  "case_id": "73c124e4776a0eb89925112980d15f5c8535e8aa",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): record green independent clean checkout (42/42 gates incl. S2-006 set)",
+  "committed_at": 1789849945,
+  "agreement_by_trial": {},
+  "index": 199
+ },
+ {
+  "case_id": "bffcf1c8867f6bb81dcf2c54252f122f9aef1040",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): reseal manifests after independent acceptance run",
+  "committed_at": 1789850732,
+  "agreement_by_trial": {},
+  "index": 200
+ },
+ {
+  "case_id": "0c94e398f3c0f17d49c8fff322a7772e45a24702",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-006): schema-conformant signature envelope and principal-agnostic comparator",
+  "committed_at": 1789853624,
+  "agreement_by_trial": {},
+  "index": 201
+ },
+ {
+  "case_id": "fa19708bd893dbe11738b5a703c1c11e4155e155",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-006): canonical artifact extraction, provider grant authorization, workspace ACL on read API",
+  "committed_at": 1789855103,
+  "agreement_by_trial": {},
+  "index": 202
+ },
+ {
+  "case_id": "0668dc3e9f131083b926e473ef23f510b24c43d4",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-006): threshold decision authority, crash-restart replay, derived verdict",
+  "committed_at": 1789858632,
+  "agreement_by_trial": {},
+  "index": 203
+ },
+ {
+  "case_id": "873d3c72ae4be7628e1857ab972599e87e8e9687",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): rebind sealed runs, probes status and manifests after review fixes",
+  "committed_at": 1789858889,
+  "agreement_by_trial": {},
+  "index": 204
+ },
+ {
+  "case_id": "376e4adc810bd0284df08ad4dda27a315ab3481d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "style(S2-006): strip trailing blank line at EOF in commands test",
+  "committed_at": 1789859542,
+  "agreement_by_trial": {},
+  "index": 205
+ },
+ {
+  "case_id": "1b9325653e239da3f2d66c7071f16b2f77490e8c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): reseal manifests, inventory and sealed runs after review fixes",
+  "committed_at": 1789860089,
+  "agreement_by_trial": {},
+  "index": 206
+ },
+ {
+  "case_id": "13f3aec2423a7c66d22e5681c1ebf7789abae930",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): reseal with manifest bound to committed evidence bytes",
+  "committed_at": 1789860954,
+  "agreement_by_trial": {},
+  "index": 207
+ },
+ {
+  "case_id": "66d595f3673dee803c755e416d6fbec4b4fd95c3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): bind root manifest to the committed evidence bytes",
+  "committed_at": 1789861298,
+  "agreement_by_trial": {},
+  "index": 208
+ },
+ {
+  "case_id": "5ad8bf908a0863efa1efe776a7c73f2eeb9ab1be",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-006): refresh contract freeze scope and file inventory for review-fix files",
+  "committed_at": 1789861588,
+  "agreement_by_trial": {},
+  "index": 209
+ },
+ {
+  "case_id": "d4875b8549fee37338d742ff30869e1b9ab40a27",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): rebind root manifest after freeze and inventory refresh",
+  "committed_at": 1789861620,
+  "agreement_by_trial": {},
+  "index": 210
+ },
+ {
+  "case_id": "ece3db5d2311e7907c6a3d492017cf1a7d593b29",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): record green independent clean checkout after review fixes",
+  "committed_at": 1789861905,
+  "agreement_by_trial": {},
+  "index": 211
+ },
+ {
+  "case_id": "719e99d27ef552be5a69cd9264be36c76f2e098a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): record final acceptance acceptance-run telemetry",
+  "committed_at": 1789861988,
+  "agreement_by_trial": {},
+  "index": 212
+ },
+ {
+  "case_id": "b7d7a1615154407624548eb1d8e5169ed3664762",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): final manifest rebind",
+  "committed_at": 1789862005,
+  "agreement_by_trial": {},
+  "index": 213
+ },
+ {
+  "case_id": "0914f03fb46ebd0ba823295b155934632cf6bd7b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): align manifest and closure binding",
+  "committed_at": 1789862109,
+  "agreement_by_trial": {},
+  "index": 214
+ },
+ {
+  "case_id": "a612fde8050196bc42c44f8657d9c45f9c3c6bc1",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-006): custody-aware signature verification in comparator",
+  "committed_at": 1789865972,
+  "agreement_by_trial": {},
+  "index": 215
+ },
+ {
+  "case_id": "e1fe38950725e842adc46a71f074efaff1d75190",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-006): async ACL-enforced read API, schema-validated artifacts, day budget serialization, atomic reconciliation",
+  "committed_at": 1789867297,
+  "agreement_by_trial": {},
+  "index": 216
+ },
+ {
+  "case_id": "ea8784bd0ccb16eda342c17b1b6ab0f0f2ac32be",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat(S2-006): validated owner-inputs path for external corpus, independent annotations and threshold decision",
+  "committed_at": 1789867483,
+  "agreement_by_trial": {},
+  "index": 217
+ },
+ {
+  "case_id": "77c3607449a679383860930694947133640624df",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(S2-006): canonical replay payload, awaited store reads in probes, scoped owner evidence output",
+  "committed_at": 1789873408,
+  "agreement_by_trial": {},
+  "index": 218
+ },
+ {
+  "case_id": "3024e4da496912898258bfd05acbd486049072e5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore(S2-006): refresh freeze scope and inventory for fix2 files",
+  "committed_at": 1789873511,
+  "agreement_by_trial": {},
+  "index": 219
+ },
+ {
+  "case_id": "5b3cc0354316757f5ee14d5f6b89c1f27795d303",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): rebind manifest and closure after fix2",
+  "committed_at": 1789873546,
+  "agreement_by_trial": {},
+  "index": 220
+ },
+ {
+  "case_id": "0f9b9a5405b09048a41281717c03b4d85a2f33db",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): record green clean checkout after fix2",
+  "committed_at": 1789873847,
+  "agreement_by_trial": {},
+  "index": 221
+ },
+ {
+  "case_id": "b07c3953d065013d6c7c9a400a32aa3f5de175b1",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): final manifest rebind for fix2",
+  "committed_at": 1789873864,
+  "agreement_by_trial": {},
+  "index": 222
+ },
+ {
+  "case_id": "551f002cb51e343be63951d62c0c78cd87165260",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): align manifest and closure at final HEAD",
+  "committed_at": 1789873941,
+  "agreement_by_trial": {},
+  "index": 223
+ },
+ {
+  "case_id": "397da659493da92cbb782978e74b017f3259c7d3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): bind crash/restart reconciliation evidence (probe S DB half)",
+  "committed_at": 1789874447,
+  "agreement_by_trial": {},
+  "index": 224
+ },
+ {
+  "case_id": "a5466c34b9d6f7acab0e64f8f73e047eeec82a91",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence(S2-006): final manifest and closure binding",
+  "committed_at": 1789874480,
+  "agreement_by_trial": {},
+  "index": 225
+ },
+ {
+  "case_id": "9ad5a621cc311aa07b5739fdc2a403ee2686347d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: add S2-006 round-three security reproducers",
+  "committed_at": 1789877637,
+  "agreement_by_trial": {},
+  "index": 226
+ },
+ {
+  "case_id": "1381f3815c79c4d076647deace13bef35159c046",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix: harden S2-006 trust ACL and database state",
+  "committed_at": 1789878713,
+  "agreement_by_trial": {},
+  "index": 227
+ },
+ {
+  "case_id": "53f5addacf08edcb8f311e116a7d25df0846b981",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record S2-006 round-three verification",
+  "committed_at": 1789879571,
+  "agreement_by_trial": {},
+  "index": 228
+ },
+ {
+  "case_id": "5f2814aa605eed8edd787df2b2412624944ae2da",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: refresh S2-006 freeze scope and inventory",
+  "committed_at": 1789879744,
+  "agreement_by_trial": {},
+  "index": 229
+ },
+ {
+  "case_id": "5b57bdd2c8ec603c492c7c700f5febab054fba51",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind S2-006 round-three closure",
+  "committed_at": 1789879801,
+  "agreement_by_trial": {},
+  "index": 230
+ },
+ {
+  "case_id": "11ba89bce17c0091fa61628f526c89650b4f3c0a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record S2-006 round-three clean checkout",
+  "committed_at": 1789880166,
+  "agreement_by_trial": {},
+  "index": 231
+ },
+ {
+  "case_id": "10e5ccc59a8892e117b674c2ebe213ac1f025b6f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: reproduce owner corpus loader crashes",
+  "committed_at": 1790090371,
+  "agreement_by_trial": {},
+  "index": 232
+ },
+ {
+  "case_id": "23013d2427c0147e44a0eb3128dd1088db342319",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: cover missing owner cases directory",
+  "committed_at": 1790090421,
+  "agreement_by_trial": {},
+  "index": 233
+ },
+ {
+  "case_id": "f136c4b13971ebd62246e1c3faf8654c570c68a7",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: quarantine malformed owner corpus inputs",
+  "committed_at": 1790090482,
+  "agreement_by_trial": {},
+  "index": 234
+ },
+ {
+  "case_id": "847966023bee7042b577df9d19f7b8d82d22a9a2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record owner corpus loader hardening",
+  "committed_at": 1790091477,
+  "agreement_by_trial": {},
+  "index": 235
+ },
+ {
+  "case_id": "769c3ed4115f1b506464ad00fcb722ec6ef7f880",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: inventory owner loader closure",
+  "committed_at": 1790091492,
+  "agreement_by_trial": {},
+  "index": 236
+ },
+ {
+  "case_id": "c8b298363af930c7782836739edf11473c06461c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: freeze owner loader closure",
+  "committed_at": 1790091579,
+  "agreement_by_trial": {},
+  "index": 237
+ },
+ {
+  "case_id": "43838c3fbc371f7934b20819a7cadcbe42ccaa97",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind owner loader closure",
+  "committed_at": 1790091621,
+  "agreement_by_trial": {},
+  "index": 238
+ },
+ {
+  "case_id": "32e3b9e79b8eeb94628851a03f4213f5848e1f18",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: freeze owner loader changes",
+  "committed_at": 1790118851,
+  "agreement_by_trial": {},
+  "index": 239
+ },
+ {
+  "case_id": "e8532ef6e46570c16d6e62a1fdc46e30853bffa7",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind frozen owner loader changes",
+  "committed_at": 1790118892,
+  "agreement_by_trial": {},
+  "index": 240
+ },
+ {
+  "case_id": "2a8142d4324c765ea5f130412ad0483a2eddfc8e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close frozen owner loader manifest",
+  "committed_at": 1790118925,
+  "agreement_by_trial": {},
+  "index": 241
+ },
+ {
+  "case_id": "0ea3e84bea8a2d4d0fb45b2409239e16dd747426",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record owner loader clean checkout",
+  "committed_at": 1790119218,
+  "agreement_by_trial": {},
+  "index": 242
+ },
+ {
+  "case_id": "1bf391baf3250197e2b594e8aa7ce84b12660f4a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: add autonomous S2-006 model-assisted intake plan",
+  "committed_at": 1790123498,
+  "agreement_by_trial": {},
+  "index": 243
+ },
+ {
+  "case_id": "9a77b5e86023bb3bd4739f64f86e0d39c15d4025",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: inventory S2-006M intake",
+  "committed_at": 1790123504,
+  "agreement_by_trial": {},
+  "index": 244
+ },
+ {
+  "case_id": "6d6538472c784c5009ecfa270564f763f2efd072",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: freeze S2-006M intake manifest",
+  "committed_at": 1790123545,
+  "agreement_by_trial": {},
+  "index": 245
+ },
+ {
+  "case_id": "91751f067377de3d9dd852963f4628b36de93006",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-006M intake manifest",
+  "committed_at": 1790123582,
+  "agreement_by_trial": {},
+  "index": 246
+ },
+ {
+  "case_id": "8235bcf5be8f633ad4a95f7e07d0b4617e0b0a6f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record S2-006M clean checkout",
+  "committed_at": 1790123942,
+  "agreement_by_trial": {},
+  "index": 247
+ },
+ {
+  "case_id": "b720b87d976145c21e27164ed23bf4aa5f31d854",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: specify model-assisted OpenRouter pilot (RED missing runner)",
+  "committed_at": 1790124810,
+  "agreement_by_trial": {},
+  "index": 248
+ },
+ {
+  "case_id": "4042d0ae0466a45445c741f1dd81dec4ac80f918",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "feat: add bounded S2-006M OpenRouter diagnostic runner (GREEN)",
+  "committed_at": 1790124977,
+  "agreement_by_trial": {},
+  "index": 249
+ },
+ {
+  "case_id": "f5b4293f51378bfd13d278369b99f7f4fe35f42a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: require explicit partial rate-limit verdict (RED)",
+  "committed_at": 1790125092,
+  "agreement_by_trial": {},
+  "index": 250
+ },
+ {
+  "case_id": "e226058a7b50d0ca306486ded6af6dfb3fee8210",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: fail closed on partial S2-006M provider runs (GREEN)",
+  "committed_at": 1790125119,
+  "agreement_by_trial": {},
+  "index": 251
+ },
+ {
+  "case_id": "ebec07df09f0f50441bb384effc18afd6a50bfe9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record bounded model pilot and rate-limit outcome",
+  "committed_at": 1790125250,
+  "agreement_by_trial": {},
+  "index": 252
+ },
+ {
+  "case_id": "0e50292b3af495078c19171ab19606973c88aae7",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: index S2-006M pilot files",
+  "committed_at": 1790125259,
+  "agreement_by_trial": {},
+  "index": 253
+ },
+ {
+  "case_id": "6c921d88ef08f621646065d6dd196d5ad729b7d6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal S2-006M pilot payload manifest",
+  "committed_at": 1790125305,
+  "agreement_by_trial": {},
+  "index": 254
+ },
+ {
+  "case_id": "f0dc98ae8e211a1d9d47f53204ad7c5e8992764e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-006M pilot manifest",
+  "committed_at": 1790125343,
+  "agreement_by_trial": {},
+  "index": 255
+ },
+ {
+  "case_id": "20d9d83aae42426003bcf5b82a203692e381fe8d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: freeze S2-006M verifier regression test",
+  "committed_at": 1790126568,
+  "agreement_by_trial": {},
+  "index": 256
+ },
+ {
+  "case_id": "d0b9736fcee22a18a43ffed3e139592ab947a92f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind S2-006M frozen manifest",
+  "committed_at": 1790126605,
+  "agreement_by_trial": {},
+  "index": 257
+ },
+ {
+  "case_id": "a63a28db58c888f9d0741db303dd8009128ea1dc",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-006M frozen manifest",
+  "committed_at": 1790126632,
+  "agreement_by_trial": {},
+  "index": 258
+ },
+ {
+  "case_id": "aa822badfff4a9c679746d46594773c28fa78b50",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record S2-006M clean checkout 42 gates",
+  "committed_at": 1790126909,
+  "agreement_by_trial": {},
+  "index": 259
+ },
+ {
+  "case_id": "abd434091489332c9786665203b29db0107f7a77",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: define autonomous Stage 2 engineering closure plan",
+  "committed_at": 1790127289,
+  "agreement_by_trial": {},
+  "index": 260
+ },
+ {
+  "case_id": "1fed8c840d0dca3bb92a79f887d1a2e5057a10e4",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: index autonomous delivery plan",
+  "committed_at": 1790127294,
+  "agreement_by_trial": {},
+  "index": 261
+ },
+ {
+  "case_id": "fdac6b314a6e1039b1c9b9dce14b5219e0f90f72",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind autonomous plan in root manifest",
+  "committed_at": 1790127329,
+  "agreement_by_trial": {},
+  "index": 262
+ },
+ {
+  "case_id": "c444381088cd72f35fc05aba1deddf4ff93e38c2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close autonomous plan manifest",
+  "committed_at": 1790127357,
+  "agreement_by_trial": {},
+  "index": 263
+ },
+ {
+  "case_id": "f2bc6672ef72e6625759bbcc66dcf7de860fbe13",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: reproduce stale S2-006 DB replay acceptance",
+  "committed_at": 1790128350,
+  "agreement_by_trial": {},
+  "index": 264
+ },
+ {
+  "case_id": "1805084473f0c1cf2e0d132eef9e3953ca2bff93",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: bind S2-006 verdict to fresh DB replay",
+  "committed_at": 1790128637,
+  "agreement_by_trial": {},
+  "index": 265
+ },
+ {
+  "case_id": "9f1c4d117f94e5ddea3635c1cf79ad02ac2ae749",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: record S2-006 engineering closure evidence",
+  "committed_at": 1790129027,
+  "agreement_by_trial": {},
+  "index": 266
+ },
+ {
+  "case_id": "71703729f7654f80f4252aa359c2c4d6bb6ee2af",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: index S2-006E closure files",
+  "committed_at": 1790129033,
+  "agreement_by_trial": {},
+  "index": 267
+ },
+ {
+  "case_id": "084be9f4aa4404aaef2fe2fa1d29f97585f3c682",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind S2-006E closure payload",
+  "committed_at": 1790129067,
+  "agreement_by_trial": {},
+  "index": 268
+ },
+ {
+  "case_id": "edebcc928952f28f0a35ded1712b22d2f246690a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-006E manifest",
+  "committed_at": 1790129097,
+  "agreement_by_trial": {},
+  "index": 269
+ },
+ {
+  "case_id": "de1dfc354c12997b08d2f728f6f805480c3b20d3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: require fresh DB gate in frozen manifest",
+  "committed_at": 1790129517,
+  "agreement_by_trial": {},
+  "index": 270
+ },
+ {
+  "case_id": "b3bd86f19aed8e31a1a13a5df0c607b2e160f28b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: freeze S2-006 DB gate and document checkout blockers",
+  "committed_at": 1790129650,
+  "agreement_by_trial": {},
+  "index": 271
+ },
+ {
+  "case_id": "ce67f64b934a67c3f54f2c653d3948233a263d71",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: rebind reviewed S2-006 freeze",
+  "committed_at": 1790129788,
+  "agreement_by_trial": {},
+  "index": 272
+ },
+ {
+  "case_id": "842926b1bab87152f4a3f5ccca78fae36d0205f9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close reviewed S2-006 freeze manifest",
+  "committed_at": 1790129821,
+  "agreement_by_trial": {},
+  "index": 273
+ },
+ {
+  "case_id": "11940686e3897952878dbb21ef7c4432dac78fd4",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record S2-006E clean checkout 42 gates",
+  "committed_at": 1790130248,
+  "agreement_by_trial": {},
+  "index": 274
+ },
+ {
+  "case_id": "f590d37ea8e861431abf3f89f59e01a889ab903d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "Merge pull request #19 from SpaceDazher/codex/s2-006-independent-semantic-verifier",
+  "committed_at": 1790131251,
+  "agreement_by_trial": {},
+  "index": 275
+ },
+ {
+  "case_id": "b385f8fced69d83a88f600d292dfa714c596fdbe",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: document Veritas architecture and Stage 1",
+  "committed_at": 1790315100,
+  "agreement_by_trial": {},
+  "index": 276
+ },
+ {
+  "case_id": "519f6bbbb84ac62dc74775ac2499005bbb573e7b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest",
+  "committed_at": 1790315114,
+  "agreement_by_trial": {},
+  "index": 277
+ },
+ {
+  "case_id": "1e2d56c2208e16df4a4cd150d21ed5af18edf1d0",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "SLOQUAL-001: freeze SLO contract v1.0.0 and scenario manifest v1.0.0",
+  "committed_at": 1790373680,
+  "agreement_by_trial": {},
+  "index": 278
+ },
+ {
+  "case_id": "06a1fcc7cb64b9942ec896bd7bca8590c7d15902",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "SLOQUAL-001: open-loop SLO qualification harness and fail-closed comparator",
+  "committed_at": 1790374442,
+  "agreement_by_trial": {},
+  "index": 279
+ },
+ {
+  "case_id": "d237850953f407e41db5516c4a9986390ae0fd74",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: record SLOQUAL-001 PASS_WITH_LIMITS qualification and report",
+  "committed_at": 1790374824,
+  "agreement_by_trial": {},
+  "index": 280
+ },
+ {
+  "case_id": "4022279b385e5b6498b85fe0759d56f0bab3fa98",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for SLOQUAL-001",
+  "committed_at": 1790374836,
+  "agreement_by_trial": {},
+  "index": 281
+ },
+ {
+  "case_id": "2cd160126fafd79747b9000a8d51a4386de13d97",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close SLOQUAL-001 manifest and closure binding",
+  "committed_at": 1790374862,
+  "agreement_by_trial": {},
+  "index": 282
+ },
+ {
+  "case_id": "115303884cd35f75e9b140a61b119a7cc5f6fb27",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the SLOQUAL-001 contracts and gate",
+  "committed_at": 1790375039,
+  "agreement_by_trial": {},
+  "index": 283
+ },
+ {
+  "case_id": "eea60a1f7fe5cf85262ab48fae518893d79f20d9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal root manifest",
+  "committed_at": 1790375049,
+  "agreement_by_trial": {},
+  "index": 284
+ },
+ {
+  "case_id": "f51a3e41ba800ccf14ab1866618b046b679b39ea",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: rebind SLOQUAL-001 closure record",
+  "committed_at": 1790375063,
+  "agreement_by_trial": {},
+  "index": 285
+ },
+ {
+  "case_id": "d7ea79fbac357ea17057511044d5235655ee33e1",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(s2-007): canonical Agent Board contracts, typed errors, registry and store migration",
+  "committed_at": 1790376945,
+  "agreement_by_trial": {},
+  "index": 286
+ },
+ {
+  "case_id": "c21afd636bb404a008a6396b4d0b9cda4981e9f5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "feat(s2-007): canonical Agent Board boundary, hard-gate probes and PostgreSQL replay",
+  "committed_at": 1790395492,
+  "agreement_by_trial": {},
+  "index": 287
+ },
+ {
+  "case_id": "c24377d757ccedb7f01a9f0b7184532f82b5b4ab",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: index S2-007 payload and reseal the root manifest",
+  "committed_at": 1790395503,
+  "agreement_by_trial": {},
+  "index": 288
+ },
+ {
+  "case_id": "03a32a4b67734fb5b6a8a3145d2c1e1b9e955f4e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 manifest and closure record",
+  "committed_at": 1790395543,
+  "agreement_by_trial": {},
+  "index": 289
+ },
+ {
+  "case_id": "a87dd2b205d3b86631a293edc2349671fd26b0aa",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(s2-007): keep tracked files free of credential shapes and refreeze contracts",
+  "committed_at": 1790395957,
+  "agreement_by_trial": {},
+  "index": 290
+ },
+ {
+  "case_id": "b8f6607b40fe94dbade50d4efb3d99b6a473d6a5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790395968,
+  "agreement_by_trial": {},
+  "index": 291
+ },
+ {
+  "case_id": "a73ca295289a608f3283eb59d03e4c08855e3852",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790395975,
+  "agreement_by_trial": {},
+  "index": 292
+ },
+ {
+  "case_id": "143fa8de9f64122758622738e9309ee42e144ccb",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: record Stage 1 issue closure state for #20-#39",
+  "committed_at": 1790396074,
+  "agreement_by_trial": {},
+  "index": 293
+ },
+ {
+  "case_id": "d23b289644ec5dede164c8707d975ac4792e51d5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal root manifest for Stage 1 issue closure",
+  "committed_at": 1790396089,
+  "agreement_by_trial": {},
+  "index": 294
+ },
+ {
+  "case_id": "801828c770037ac83a25b24ac3664699d0c93da9",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: record the clean-checkout result, the two gate-found defects and the not-verified set",
+  "committed_at": 1790396156,
+  "agreement_by_trial": {},
+  "index": 295
+ },
+ {
+  "case_id": "9bfa51aa6148195e991fea1bf935ea05bcbec513",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: describe the scanner finding without reproducing a credential shape",
+  "committed_at": 1790396232,
+  "agreement_by_trial": {},
+  "index": 296
+ },
+ {
+  "case_id": "21ab906f6c825433828382ccf43f6f9348d03426",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790396237,
+  "agreement_by_trial": {},
+  "index": 297
+ },
+ {
+  "case_id": "9e6e518fe73bacb6ff98796293d9f86d2b89d273",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790396242,
+  "agreement_by_trial": {},
+  "index": 298
+ },
+ {
+  "case_id": "4f61af5bd7307ebf192b745841e2da6bb747f25d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "merge origin/main (SLOQUAL-001 + Stage 1 closure) into S2-007",
+  "committed_at": 1790396402,
+  "agreement_by_trial": {},
+  "index": 299
+ },
+ {
+  "case_id": "0f3c5333e7e6d2c1e187c45f9b95a45ae1ab6642",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest after the merge",
+  "committed_at": 1790396407,
+  "agreement_by_trial": {},
+  "index": 300
+ },
+ {
+  "case_id": "6951b0cbd4cccf678cdd3e9017fe8edc3cf70c72",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record after the merge",
+  "committed_at": 1790396413,
+  "agreement_by_trial": {},
+  "index": 301
+ },
+ {
+  "case_id": "4e0fe2abdfa88b53e47665cd296a77e897ba7808",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(s2-007): bind the advanced base with a reviewed rebase, not an ancestor check",
+  "committed_at": 1790396668,
+  "agreement_by_trial": {},
+  "index": 302
+ },
+ {
+  "case_id": "9c8cbf169136e95e29ab9c63d65928e7d0855927",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790396673,
+  "agreement_by_trial": {},
+  "index": 303
+ },
+ {
+  "case_id": "fcc4ced561c455f5c6e3263a4a58b824005ca092",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790396678,
+  "agreement_by_trial": {},
+  "index": 304
+ },
+ {
+  "case_id": "de988dc80374bf3c64c713addc67e65f6d4d8dbf",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze the contract manifest and reindex after the final gate runs",
+  "committed_at": 1790396842,
+  "agreement_by_trial": {},
+  "index": 305
+ },
+ {
+  "case_id": "7af487a7794e8062fcf74886271700d4984bb775",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790396847,
+  "agreement_by_trial": {},
+  "index": 306
+ },
+ {
+  "case_id": "00cc5b967502a9d4befd8878fa33aa3853e36c9c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790396851,
+  "agreement_by_trial": {},
+  "index": 307
+ },
+ {
+  "case_id": "b1eb6e1e7fdc7c5d9adf2a1bc36881b4ab02a402",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind the final DB replay result",
+  "committed_at": 1790396938,
+  "agreement_by_trial": {},
+  "index": 308
+ },
+ {
+  "case_id": "2e2d94846fdd916c8ec61c92c319b510f8469bf3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790396942,
+  "agreement_by_trial": {},
+  "index": 309
+ },
+ {
+  "case_id": "46b993d677dbbd6ec207d8220cb66bc05fa1ee2a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790396948,
+  "agreement_by_trial": {},
+  "index": 310
+ },
+ {
+  "case_id": "e2d4a2cfaa645c4cbec796ec049808bba12dca1e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: record the S2-002 non-Windows finding, including its own refutation",
+  "committed_at": 1790399018,
+  "agreement_by_trial": {},
+  "index": 311
+ },
+ {
+  "case_id": "953440028298ee7a1d1d674dd815bc0ad935f881",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790399023,
+  "agreement_by_trial": {},
+  "index": 312
+ },
+ {
+  "case_id": "8c4ebf392581836c0cd4c68e7c17670492f02f59",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790399027,
+  "agreement_by_trial": {},
+  "index": 313
+ },
+ {
+  "case_id": "06e84ff3c03fdefb1eb2835a58b27223bc99b581",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: index the S2-002 non-Windows analysis in the file inventory",
+  "committed_at": 1790399109,
+  "agreement_by_trial": {},
+  "index": 314
+ },
+ {
+  "case_id": "f05c6bbf25b3ba44e9e52c897c09aef385b37433",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790399114,
+  "agreement_by_trial": {},
+  "index": 315
+ },
+ {
+  "case_id": "e008b0e708e1e271814f0029a2e0597ed42a0620",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790399120,
+  "agreement_by_trial": {},
+  "index": 316
+ },
+ {
+  "case_id": "81f92c077e0f34200bd3e221cb2605f3147a1e68",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: record the owner's S2-002 decision and the Windows re-measurement",
+  "committed_at": 1790401000,
+  "agreement_by_trial": {},
+  "index": 317
+ },
+ {
+  "case_id": "b54d02d148ca69c93e8b562cd19530ea5d76549e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790401005,
+  "agreement_by_trial": {},
+  "index": 318
+ },
+ {
+  "case_id": "307c1fb69ea0a4314add98d6358499357f215e6f",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790401010,
+  "agreement_by_trial": {},
+  "index": 319
+ },
+ {
+  "case_id": "8796045992f4f48ab448cc36d9a3edb5ccb6ec49",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: correct the S2-007 status block to match the fixed implementation",
+  "committed_at": 1790401045,
+  "agreement_by_trial": {},
+  "index": 320
+ },
+ {
+  "case_id": "92d961e2dfd9d645a82ef31f0b969684b40a3792",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790401049,
+  "agreement_by_trial": {},
+  "index": 321
+ },
+ {
+  "case_id": "d0c6a0228982a9d5758b94b73d4b0743fa974117",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the S2-007 closure record",
+  "committed_at": 1790401054,
+  "agreement_by_trial": {},
+  "index": 322
+ },
+ {
+  "case_id": "afbcc01beede1d7fd3e0a9cee006a8808970c71a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(s2-002): honest not-run accounting, consistent oracle, and a real POSIX survivor check",
+  "committed_at": 1790402762,
+  "agreement_by_trial": {},
+  "index": 323
+ },
+ {
+  "case_id": "4f2a6837b27ab7583dc1ded7bc82f15fd2864b12",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix(s2-002): restore the frozen Windows evidence that my verification runs overwrote",
+  "committed_at": 1790402801,
+  "agreement_by_trial": {},
+  "index": 324
+ },
+ {
+  "case_id": "258a9de8cf3ade3237a457b9a3320351d0bc20c1",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790402824,
+  "agreement_by_trial": {},
+  "index": 325
+ },
+ {
+  "case_id": "8cac56d6868164a2679aa66f8c7e4c016682d771",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the closure record",
+  "committed_at": 1790402829,
+  "agreement_by_trial": {},
+  "index": 326
+ },
+ {
+  "case_id": "1035c8df5597ac3b16859ad1c16b76db61c5278a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix(s2-002): stop claiming a survivor count is a proof, and guard the kill path",
+  "committed_at": 1790404199,
+  "agreement_by_trial": {},
+  "index": 327
+ },
+ {
+  "case_id": "f16f8b3b94d6ea99db923dd87c2e24f379a24a62",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal the root manifest",
+  "committed_at": 1790404204,
+  "agreement_by_trial": {},
+  "index": 328
+ },
+ {
+  "case_id": "8f6254db1be3eb9a3c886ef41465314bf8e797c8",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close the closure record",
+  "committed_at": 1790404209,
+  "agreement_by_trial": {},
+  "index": 329
+ },
+ {
+  "case_id": "c4ca5fa63ce267a07ef9ad4398e897ef570433b7",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "S2-002 #41: prove process-tree termination or fail closed on every platform",
+  "committed_at": 1790406143,
+  "agreement_by_trial": {},
+  "index": 330
+ },
+ {
+  "case_id": "8c975345e579bd7982ae917d2a871e23d57e310b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for the S2-002 #41 cancellation fix",
+  "committed_at": 1790406155,
+  "agreement_by_trial": {},
+  "index": 331
+ },
+ {
+  "case_id": "44f674d205d3bcded7cc1be77d04f98184526145",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the S2-002 #41 cancellation fix",
+  "committed_at": 1790406173,
+  "agreement_by_trial": {},
+  "index": 332
+ },
+ {
+  "case_id": "54cb4b46fbb081328b1964c5b782833a98463495",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-002 #41 manifest and closure binding",
+  "committed_at": 1790406188,
+  "agreement_by_trial": {},
+  "index": 333
+ },
+ {
+  "case_id": "43e69dafe5b35f8e99220d4e7c466d8510e622d6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "S2-002 #41: resolve committed evidence digests without a git directory",
+  "committed_at": 1790406500,
+  "agreement_by_trial": {},
+  "index": 334
+ },
+ {
+  "case_id": "857bbb5d6dd23e9ff057aa784682100f72e5080b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for the S2-002 #41 evidence guard fix",
+  "committed_at": 1790406524,
+  "agreement_by_trial": {},
+  "index": 335
+ },
+ {
+  "case_id": "61f38210bb9d94cd561594986943f671fc569ce1",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the S2-002 #41 evidence guard fix",
+  "committed_at": 1790406616,
+  "agreement_by_trial": {},
+  "index": 336
+ },
+ {
+  "case_id": "14eeffe90b92d9e3dc9fa096a405d1dbfed47484",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-002 #41 evidence guard manifest and closure binding",
+  "committed_at": 1790406663,
+  "agreement_by_trial": {},
+  "index": 337
+ },
+ {
+  "case_id": "4fe553e4e5827d25e6f84c8356edc2b121d511f8",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "S2-002 #41: publish the post-fix corpus replay as new versioned evidence",
+  "committed_at": 1790407546,
+  "agreement_by_trial": {},
+  "index": 338
+ },
+ {
+  "case_id": "5d72900ebf04d0fb3a52ac03be7988a586ce1dba",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for the S2-002 #41 corpus replay record",
+  "committed_at": 1790407571,
+  "agreement_by_trial": {},
+  "index": 339
+ },
+ {
+  "case_id": "ae82ffaaf6d58d34beee881e16353fe602c9a0b8",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the S2-002 #41 corpus replay record",
+  "committed_at": 1790407590,
+  "agreement_by_trial": {},
+  "index": 340
+ },
+ {
+  "case_id": "c13ad930e9ee2b1765ca643dcd063b09d924f55c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-002 #41 corpus replay manifest and closure binding",
+  "committed_at": 1790407639,
+  "agreement_by_trial": {},
+  "index": 341
+ },
+ {
+  "case_id": "a7138a375fd5043f3358b87921eba83486b8fc92",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: note the gate ordering for the frozen S2-002 A-K report",
+  "committed_at": 1790408122,
+  "agreement_by_trial": {},
+  "index": 342
+ },
+ {
+  "case_id": "5d029c79a9fb2379fe2e99671666183e0f49cd87",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the S2-002 #41 doc note",
+  "committed_at": 1790408167,
+  "agreement_by_trial": {},
+  "index": 343
+ },
+ {
+  "case_id": "b1410b496cd0062755b2102a6f6a0c3f1814292c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-002 #41 doc note manifest and closure binding",
+  "committed_at": 1790408214,
+  "agreement_by_trial": {},
+  "index": 344
+ },
+ {
+  "case_id": "921e55fa51967c6b1395f31c2c9a4cd044e17405",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: reproduce Windows dependency subprocess launch failure",
+  "committed_at": 1790408475,
+  "agreement_by_trial": {},
+  "index": 345
+ },
+ {
+  "case_id": "02d973bfb19669ac99420667702a53872c0bde37",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: launch S2-007 dependency reruns through npm CLI on Windows",
+  "committed_at": 1790408527,
+  "agreement_by_trial": {},
+  "index": 346
+ },
+ {
+  "case_id": "7e3ee0909cbe745c838f4396a71c6590035cc3f5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: resolve test module paths with fileURLToPath on Windows",
+  "committed_at": 1790408603,
+  "agreement_by_trial": {},
+  "index": 347
+ },
+ {
+  "case_id": "11d9d7163b0294c8928c084040c0cf1da86f5a76",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: track the S2-007 cross-process claim fixture",
+  "committed_at": 1790408758,
+  "agreement_by_trial": {},
+  "index": 348
+ },
+ {
+  "case_id": "477d910402e7586d8d6b0b938cf7642d28082d89",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: reproduce Windows realpath containment false denial",
+  "committed_at": 1790409333,
+  "agreement_by_trial": {},
+  "index": 349
+ },
+ {
+  "case_id": "a8bb20a1cf714e20c482794b414230a89dab7fe6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "fix: compare Windows realpath segments in workspace guard",
+  "committed_at": 1790409359,
+  "agreement_by_trial": {},
+  "index": 350
+ },
+ {
+  "case_id": "f3b985579b20baa03d16c43e706325088051455b",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "test: isolate offline probe case from integration DATABASE_URL",
+  "committed_at": 1790409388,
+  "agreement_by_trial": {},
+  "index": 351
+ },
+ {
+  "case_id": "a6517fb86ad506683f8e09cdb8d75c3cc5d9dcb5",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "S2-002 #41: a self-completed run must not claim an empty tree it never saw",
+  "committed_at": 1790409425,
+  "agreement_by_trial": {},
+  "index": 352
+ },
+ {
+  "case_id": "bfd21c95df49fef4e01652b8c5d9699906f5604e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for the S2-002 #41 self-completed guard",
+  "committed_at": 1790409434,
+  "agreement_by_trial": {},
+  "index": 353
+ },
+ {
+  "case_id": "f6c4fb26b5e72092556d46f275dae6908a1a6372",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the S2-002 #41 self-completed guard",
+  "committed_at": 1790409453,
+  "agreement_by_trial": {},
+  "index": 354
+ },
+ {
+  "case_id": "793fac547137cd2d37b9aa3cd947e9659cc0cb6c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-002 #41 self-completed guard manifest and closure binding",
+  "committed_at": 1790409499,
+  "agreement_by_trial": {},
+  "index": 355
+ },
+ {
+  "case_id": "cd396e248bbcb67efde947f65a7951b31ce70a23",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: record Windows S2-007 acceptance and remaining limits",
+  "committed_at": 1790410243,
+  "agreement_by_trial": {},
+  "index": 356
+ },
+ {
+  "case_id": "1bedeee4f8c698b1fbd7f041bcc23b642264557c",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: bind S2-007 Windows dependency replay to tested commit",
+  "committed_at": 1790410318,
+  "agreement_by_trial": {},
+  "index": 357
+ },
+ {
+  "case_id": "fc37f3bebef3ed7158b3618a0e39905000262a18",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: inventory Windows acceptance files",
+  "committed_at": 1790410318,
+  "agreement_by_trial": {},
+  "index": 358
+ },
+ {
+  "case_id": "a380680a9c6ec56fcb555d76e6144116978b40c3",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal Windows acceptance payload manifest",
+  "committed_at": 1790410367,
+  "agreement_by_trial": {},
+  "index": 359
+ },
+ {
+  "case_id": "c16260594ecefffaa61eb1721dd94cb83fef230d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close Windows acceptance manifest record",
+  "committed_at": 1790410415,
+  "agreement_by_trial": {},
+  "index": 360
+ },
+ {
+  "case_id": "0d1709a3822d752c0734d97194c22e1ca8557027",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: reseal S2-007 Windows contract and public evidence",
+  "committed_at": 1790410690,
+  "agreement_by_trial": {},
+  "index": 361
+ },
+ {
+  "case_id": "971a9b61dec42776e38114296622eb45140a45d2",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: bind root manifest to Windows acceptance freeze",
+  "committed_at": 1790410849,
+  "agreement_by_trial": {},
+  "index": 362
+ },
+ {
+  "case_id": "f12ef45c848189ae6fd39840af28176ca16a829d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: close Windows acceptance evidence chain",
+  "committed_at": 1790410906,
+  "agreement_by_trial": {},
+  "index": 363
+ },
+ {
+  "case_id": "a8023f2ccebe33dd5725dd6463628cd9d3717ab1",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: preserve MTS bytes in Windows archives",
+  "committed_at": 1790411571,
+  "agreement_by_trial": {},
+  "index": 364
+ },
+ {
+  "case_id": "5b61ad2642c8f944c1115b6ef9815be7914af4e6",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: bind manifest to portable MTS archive",
+  "committed_at": 1790411668,
+  "agreement_by_trial": {},
+  "index": 365
+ },
+ {
+  "case_id": "710dfa1cd04005645b751f39c522658343ee2832",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: close portable archive evidence chain",
+  "committed_at": 1790411755,
+  "agreement_by_trial": {},
+  "index": 366
+ },
+ {
+  "case_id": "1bf50b31f625a560369dd5b9bd4caa919cdbf3d0",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "fix: keep archive provenance honest and record Windows limits",
+  "committed_at": 1790413366,
+  "agreement_by_trial": {},
+  "index": 367
+ },
+ {
+  "case_id": "7495ca67b63e514bc8b0e2af9ba90dd80f61b0f0",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: bind manifest to SLO archive correction",
+  "committed_at": 1790413437,
+  "agreement_by_trial": {},
+  "index": 368
+ },
+ {
+  "case_id": "6a53358978a879bc4f2184eb39198bd7bed73e81",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "chore: close Windows acceptance evidence after SLO correction",
+  "committed_at": 1790413507,
+  "agreement_by_trial": {},
+  "index": 369
+ },
+ {
+  "case_id": "158f7a37254a089021a79fe63cf7b591938b567d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MAJOR",
+  "subject": "S2-002 #41: independent Windows replay, and the defects it exposed",
+  "committed_at": 1790421616,
+  "agreement_by_trial": {},
+  "index": 370
+ },
+ {
+  "case_id": "f92157d610d0af36939ef02126f6ed1684a3d11e",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for the S2-002 #41 Windows replay",
+  "committed_at": 1790421623,
+  "agreement_by_trial": {},
+  "index": 371
+ },
+ {
+  "case_id": "23bfe5287f9d06519c6b4f1cece4070924e57608",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: refreeze contract manifest for the S2-002 #41 Windows replay",
+  "committed_at": 1790421634,
+  "agreement_by_trial": {},
+  "index": 372
+ },
+ {
+  "case_id": "af9f95ad3eb206c9cdf9a9c5f16ca4b4f80ee48a",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: close S2-002 #41 Windows replay manifest and closure binding",
+  "committed_at": 1790421643,
+  "agreement_by_trial": {},
+  "index": 373
+ },
+ {
+  "case_id": "76f880826c3544c108871e069c171043411b5a5d",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "docs: state the two-host verification wording in DEVELOPMENT",
+  "committed_at": 1790421790,
+  "agreement_by_trial": {},
+  "index": 374
+ },
+ {
+  "case_id": "54b645caef01a0b9c6fb4426101eb48bb2f35568",
+  "partition": "PRIMARY",
+  "stratum": "all_commits",
+  "label": "MINOR",
+  "subject": "evidence: reseal inventory and root manifest for the S2-002 #41 two-host wording",
+  "committed_at": 1790421796,
+  "agreement_by_trial": {},
+  "index": 375
+ }
+]
