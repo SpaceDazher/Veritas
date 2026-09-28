@@ -254,13 +254,31 @@ partition, where the baseline was measured, all three arms were already below it
 
 ### 5.1 Two things about the frozen rule that the independent evaluation found
 
-1. **Every rejection in this campaign is a boundary rejection.** The confidence is
-   derived as `1 − α/m`, so the worst-case p bound *equals* the Holm threshold:
-   margin `5.2e-17`. The rejections hold only because the comparator decides a
-   bound landing exactly on the threshold in the comparison's favour, via a
-   documented `1e-12` relative epsilon. **A one-ULP change in the published
-   confidence flips all three outcomes.** That is a property of the frozen rule,
-   not of the data, and it is the rule this campaign was preregistered under.
+1. **The rule's feasibility margin is smaller than one floating-point ULP — and the
+   OUTCOMES are not affected by it.** The confidence is derived as `1 − α/m`, so the
+   worst-case p bound *equals* the Holm threshold: margin `5.2e-17` against a ULP of
+   `1.11e-16` at that magnitude, i.e. the ULP is 2.1× the whole margin. What that
+   means is that the *feasibility bookkeeping* is numerically meaningless: at
+   `+1 ULP` the margin changes sign (`−5.9e-17`), at `−1 ULP` it grows to `1.6e-16`.
+
+   **CORRECTION to an earlier draft of this section, measured before it was
+   published.** The first draft said a one-ULP change in the published confidence
+   *flips all three outcomes*. That was **not true, and it is falsified**: the
+   published confidence was perturbed at `+1 ULP`, `−1 ULP`, `−1e-11`, `−1e-6`-scale
+   and `0.98` (3.3e-3, about 3·10¹³ ULP) and the evaluation re-run each time. Every
+   run returned the same three arm outcomes (`NEGATIVE`, `UNRESOLVED`, `NEGATIVE`)
+   and the same pooled decision (`UNRESOLVED`). The arms are decided by their
+   intervals sitting far outside the band — e.g. `[0.1825, 0.3810]` against a
+   baseline of `0.8803` with a band of `0.0697`, which is a margin of half the
+   interval, not a boundary call.
+
+   So the honest statement is two separate things that the first draft merged into
+   one scary sentence: the **rule's achievable-resolution margin is degenerate**
+   (smaller than a ULP, sign-flipping — a property of a percentile rule with
+   `family_size = 3`, not of this data), while the **result is robust** to any
+   change in the published confidence that anyone would plausibly make. A reader
+   deciding whether more data would resolve this should know the null is not
+   waiting on a tighter interval.
 2. **The decision rests on a slightly optimistic interval.** The percentile
    bootstrap interval is *narrower* than the continuity-corrected Wilson interval
    at the same confidence for all three arms — the known under-coverage of the
@@ -306,6 +324,23 @@ named rather than quietly fixed.
 | decision digest | `5e925f4d407318d9…` | `5e925f4d407318d9…` |
 | verdict projection digest | equal | equal |
 | campaign decision | `UNRESOLVED` | `UNRESOLVED` |
+
+**One asymmetry, disclosed rather than smoothed over.** The two runs share the
+commit and the tree, but not the state of the working directory: run A recorded
+`base.worktree_dirty: false`, run B recorded `base.worktree_dirty: true`. The
+committed bytes both runs read are identical, and every substantive field of the
+two records agrees; what differed was uncommitted content present in the tree when
+run B executed. The two runs are therefore the same *base* in the sense that binds
+an artefact, and not the same *filesystem state*. A repeat on a clean base would
+settle it, and until one exists the witness is one host, one base commit, two
+processes — not a byte-identical filesystem.
+
+**And the base these runs are bound to is `e58ded2c`, three commits behind the
+`b4f0c85` that this report is delivered on** (the report and the reseals came
+after). A reader opening `evidence/s2-008-campaign/` should not expect
+`base.commit_sha` to equal the delivery HEAD: the records describe the tree they
+ran on, which is the point of binding them, and the gate was re-verified on the
+delivered HEAD separately.
 
 **Same base, same verdict digest, different raw run ids, different processes.**
 Both runs are bound to a commit SHA, a tree SHA and a raw run id, and each
