@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 913.
+Generated from `git ls-files`; count: 920.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -497,6 +497,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-comparison.json`
 - `evidence/s2-007r-host-unisolated.json`
 - `evidence/s2-007r-pilot.json`
+- `evidence/s2-007r-real-run-gate.json`
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
 - `evidence/sloqual-001-comparison.json`
@@ -599,6 +600,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-007r/cell-pia/run-01.json`
 - `results/s2-007r/cell-pia/run-02.json`
 - `results/s2-007r/cell-pia/run-record.json`
+- `results/s2-007r/cell-plant/campaign-ledger.json`
+- `results/s2-007r/cell-plant/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-plant/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json`
+- `results/s2-007r/cell-plant/run-01.json`
+- `results/s2-007r/cell-plant/run-record.json`
 - `results/s2-007r/cells-round2/cell-pa2/raw/pa2/bootstrap/codex/run-bootstrap-codex-pa2/raw/exec-000.log.json`
 - `results/s2-007r/cells-round2/cell-pa2/raw/pa2/bootstrap/pi/run-bootstrap-pi-pa2/raw/exec-000.log.json`
 - `results/s2-007r/cells-round2/cell-pa2/run-01.json`
@@ -686,6 +692,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007r-measure.mjs`
 - `scripts/s2-007r-measurement-set.mjs`
 - `scripts/s2-007r-probes.mjs`
+- `scripts/s2-007r-real-run-verify.mjs`
 - `scripts/s2-007r-run.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/sloqual-freeze.mjs`
