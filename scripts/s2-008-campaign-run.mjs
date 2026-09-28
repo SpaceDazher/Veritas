@@ -309,7 +309,9 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
         key: `launch:${reservationId}:${preregDigest}:${entry.trial_id}:${String(seed)}`,
         args: { reservation_id: reservationId, units: 1, currency: prereg.budget_reservation.currency, trial: entry.trial_id, seed, at: DECISION_POINT },
       });
-      charges.push({ trial: entry.trial_id, seed, units: 1, outcome: charge?.outcome ?? charge?.replayed ?? null });
+      // `replayed: false` is the ledger saying it CHARGED, and reporting that
+      // as `outcome: false` reads like a failure. It is named here.
+      charges.push({ trial: entry.trial_id, seed, units: 1, replayed: charge?.replayed === true, settled: charge?.replayed !== true });
       const row = {
         kind: 'TRIAL_EXECUTION',
         record_kind: 'TRIAL_EXECUTED',
@@ -389,7 +391,7 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
       key: `launch:${reservationId}:${preregDigest}:bootstrap`,
       args: { reservation_id: reservationId, units: 1, currency: prereg.budget_reservation.currency, trial: 'BOOTSTRAP', at: DECISION_POINT },
     });
-    charges.push({ trial: 'BOOTSTRAP', seed: null, units: 1, outcome: result.ok ? 'CHARGED' : 'CHARGED_LAUNCH_FAILED' });
+    charges.push({ trial: 'BOOTSTRAP', seed: null, units: 1, launch_succeeded: result.ok, settled: true, note: 'a launch that fails is still charged: the unit is the launch, not the answer' });
     appendRecord(registry, {
       kind: 'TRIAL_EXECUTION', record_kind: 'BOOTSTRAP_EXECUTED', trial: 'BOOTSTRAP',
       raw_run_id: runId, nonce: provenance.nonce, at: DECISION_POINT,
@@ -536,13 +538,40 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
   const latency = latencyRecorded(trials.map((item) => item.agreement ?? {}), prereg.noise_rule);
 
   const campaignRows = trials.filter((item) => item.agreement !== null);
-  const campaignDecision = decisionFromInterval({
-    observed: metrics.numerator / metrics.denominator,
-    lower: Math.min(...campaignRows.map((item) => item.agreement.interval.lower)),
-    upper: Math.max(...campaignRows.map((item) => item.agreement.interval.upper)),
-    noiseBand,
-    rule: { ...rules, subject_is_pooled_aggregate: true, subject: prereg.campaign_metric.name },
-  });
+  // The pooled aggregate is the family's own linear combination, and its
+  // interval is the UNION of the family intervals: every convex combination of
+  // the declared means lies inside the hull, so the hull is a CONSERVATIVE
+  // interval for the pooled rate and not a claim about its own precision. The
+  // width it ends up with is the between-arm heterogeneity, and that is the
+  // honest number - a pooled interval narrower than the spread of its own
+  // members would be a fiction.
+  const pooled_interval_construction = 'UNION_OF_THE_DECLARED_FAMILY_INTERVALS (conservative for a linear combination of the family means)';
+  // NO MEASURED ROW IS A NAMED ANSWER, NOT A CRASH. A campaign whose every
+  // trial was INFRA has no pooled rate to score, and `decisionFromInterval`
+  // refuses a non-finite `observed` by throwing - which, unhandled, is a stack
+  // trace where the reader expects a verdict. The first run of this campaign
+  // after a predictor defect hit exactly that, and the fix is to SAY the
+  // campaign measured nothing rather than to divide by a denominator of zero.
+  const campaignDecision = campaignRows.length === 0 || metrics.denominator === 0
+    ? {
+      decision: 'UNRESOLVED',
+      reason: 'no_trial_resolved: the campaign measured nothing, so there is no rate to score and no interval to correct; this is not a null result and not a pass',
+      measured_trials: 0,
+      declared_trials: prereg.trial_list.length,
+      numerator: metrics.numerator,
+      denominator: metrics.denominator,
+      correction: null,
+      interval_construction: pooled_interval_construction,
+    }
+    : decisionFromInterval({
+      observed: metrics.numerator / metrics.denominator,
+      lower: Math.min(...campaignRows.map((item) => item.agreement.interval.lower)),
+      upper: Math.max(...campaignRows.map((item) => item.agreement.interval.upper)),
+      noiseBand,
+      rule: { ...rules, subject_is_pooled_aggregate: true, subject: prereg.campaign_metric.name },
+    });
+  // `decisionFromInterval` returns a FROZEN object, so the construction note is
+  // carried beside it rather than added to it.
 
   const violations = trials.filter((item) => item.verdict !== undefined && item.verdict.verdict !== 'ALLOW');
   const campaignVerdict = resolveCampaignVerdict({
@@ -651,7 +680,7 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
     metrics,
     latency,
     seed_disclosure: seedDisclosure,
-    campaign_decision: campaignDecision,
+    campaign_decision: { ...campaignDecision, interval_construction: pooled_interval_construction },
     campaign_verdict: campaignVerdict,
     rule_feasibility: feasibility,
     registry: {
@@ -673,17 +702,22 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
     },
   };
 
-  const bound = bindArtefact(record, provenance);
-  assertArtefactBound(bound);
-  assertNoWallClockInVerdict(bound);
-  record.decision_digest = decisionDigest(bound);
-  record.verdict_projection = verdictProjection(bound);
+  // The decision digest is the digest of the verdict PROJECTION, and the
+  // projection names no artefact member, so it can be computed from a throwaway
+  // binding and then carried INSIDE the record. Binding last is what makes the
+  // file verify: `assertArtefactBound` re-digests the whole body, so a digest
+  // attached after the binding would be a digest of a document that no longer
+  // exists.
+  const probe = bindArtefact(record, provenance);
+  const projection = assertNoWallClockInVerdict(probe);
+  const artefact = bindArtefact({ ...record, decision_digest: decisionDigest(probe), verdict_projection: projection }, provenance);
+  assertArtefactBound(artefact);
 
   if (write) {
     const target = out ?? path.join(REPO_ROOT, `evidence/s2-008-campaign-run-${label}.json`);
-    writeArtefact(target, bound, {});
+    writeArtefact(target, artefact, {});
   }
-  return record;
+  return artefact;
 }
 
 function parseArgs(argv) {

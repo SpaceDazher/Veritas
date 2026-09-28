@@ -306,10 +306,19 @@ export function runBootstrap({ agreementFile, samples, confidence, timeoutMs, pi
   const observation = executeIsolated(invocation);
   const lines = observation.stdout.split('\n');
   const banner = lines.find((entry) => entry.startsWith('BOOTSTRAP_OK')) ?? null;
-  const joined = lines.filter((entry) => entry.startsWith('ADAPTER_JSON ')).map((entry) => entry.split(' ').slice(2).join(' ')).join('');
+  const chunks = lines.filter((entry) => entry.startsWith('ADAPTER_JSON '));
+  const endLine = lines.find((entry) => entry.startsWith('ADAPTER_JSON_END ')) ?? null;
   let output = null;
   let payloadError = null;
   try {
+    const declared = chunks.map((entry) => /^ADAPTER_JSON (\d+)\/(\d+) (.*)$/.exec(entry)).map((match) => ({ index: Number(match[1]), total: Number(match[2]), body: match[3] }));
+    const totals = [...new Set(declared.map((entry) => entry.total))];
+    if (totals.length !== 1) throw new Error(`chunks disagree on their count: ${totals.join(',')}`);
+    if (declared.length !== totals[0]) throw new Error(`${declared.length} chunks for a declared ${String(totals[0])}`);
+    if (declared.some((entry, position) => entry.index !== position + 1)) throw new Error('chunk indices are not 1..n in order');
+    const joined = declared.map((entry) => entry.body).join('');
+    if (endLine === null) throw new Error('no ADAPTER_JSON_END line: the payload was cut short');
+    if (Number(endLine.split(' ')[1]) !== joined.length) throw new Error(`payload is ${String(joined.length)} chars, the container declared ${String(endLine.split(' ')[1])}`);
     output = JSON.parse(Buffer.from(joined, 'base64').toString('utf8'));
   } catch (error) {
     payloadError = String(error?.message ?? error);
@@ -329,6 +338,7 @@ export function runBootstrap({ agreementFile, samples, confidence, timeoutMs, pi
       timed_out: observation.timedOut,
       stderr_excerpt: observation.stderr.slice(-400),
       banner,
+      payload_chunks: chunks.length,
       payload_error: payloadError,
       output_digest: output === null ? null : canonicalDigest(output),
       real_start: (() => {

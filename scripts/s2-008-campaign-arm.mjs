@@ -93,7 +93,7 @@ function main(argv) {
     kind: 's2-008-campaign-adapter-predict/1',
     arm_id: armId,
     seed,
-    n_cases: n,
+    n_cases: rows.length,
     predictions,
     // What the container can say about itself. `node_version` is the genuinely
     // installed runtime's own report, not a constant copied from a record.
@@ -112,7 +112,7 @@ function main(argv) {
   // exactly 65536 characters somewhere between the process and this host, and
   // a truncated payload parses as a corrupt one rather than as a short read —
   // so the payload is emitted as numbered 16 KB chunks and reassembled here.
-  process.stdout.write(`ADAPTER_OK arm=${armId} seed=${seed} n=${n} predictions=${predictions.length} pid=${process.pid} node=${process.version}\n`);
+  process.stdout.write(`ADAPTER_OK arm=${armId} seed=${seed} n=${rows.length} predictions=${predictions.length} pid=${process.pid} node=${process.version}\n`);
   const payload = Buffer.from(JSON.stringify(out), 'utf8').toString('base64');
   const CHUNK = 16384;
   const chunks = Math.ceil(payload.length / CHUNK);

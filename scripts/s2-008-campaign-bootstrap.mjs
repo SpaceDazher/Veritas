@@ -94,7 +94,7 @@ function main(argv) {
         max: sorted[sorted.length - 1],
         confidence,
         method: 'PERCENTILE_BOOTSTRAP_WITH_MULTIPLICITY',
-        sorted_rates_sha256: createHash('sha256').update(new Float64Array(sorted).buffer).digest('hex'),
+        sorted_rates_sha256: createHash('sha256').update(Buffer.from(new Float64Array(sorted).buffer)).digest('hex'),
         // The mean of a bootstrap of the data converges on the data's own mean.
         // If these two ever diverge by more than the sampling error, the
         // resampling is wrong, and the run says so instead of publishing an
@@ -112,9 +112,17 @@ function main(argv) {
     container: { node_version: process.version, pid: process.pid },
   };
   fs.writeFileSync(outPath, JSON.stringify(out));
-  process.stdout.write(`BOOTSTRAP_OK vectors=${vectors.length} seeds=${seeds.length} samples=${samples} pid=${process.pid} node=${process.version}\n`);
-  process.stdout.write(`ADAPTER_JSON ${Buffer.from(JSON.stringify(out), 'utf8').toString('base64')}\n`);
-  process.stdout.write('ADAPTER_JSON_END 0\n');
+  process.stdout.write(`BOOTSTRAP_OK vectors=${vectors.length} seeds=${seeds.length} samples=${samples} rows=${results.length} pid=${process.pid} node=${process.version}\n`);
+  // Chunked, for the same reason the predictor chunks: a single line longer than
+  // 65536 characters is truncated somewhere between this process and the host,
+  // and a truncated payload reads as a corrupt one rather than a short read.
+  const payload = Buffer.from(JSON.stringify(out), 'utf8').toString('base64');
+  const CHUNK = 16384;
+  const chunks = Math.ceil(payload.length / CHUNK);
+  for (let index = 0; index < chunks; index += 1) {
+    process.stdout.write(`ADAPTER_JSON ${index + 1}/${chunks} ${payload.slice(index * CHUNK, (index + 1) * CHUNK)}\n`);
+  }
+  process.stdout.write(`ADAPTER_JSON_END ${payload.length}\n`);
   return 0;
 }
 
