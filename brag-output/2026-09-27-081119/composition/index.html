@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>repovideo composition</title>
+<style>
+  html, body { margin: 0; background: #06060a; }
+  body { display: grid; place-items: center; min-height: 100vh; }
+  #hint { color: #7a8398; font: 13px/1.5 ui-monospace, monospace; padding: 24px; max-width: 70ch; }
+</style>
+</head>
+<body>
+<!--
+  Self-contained composition. Open this file in a browser to scrub the film:
+    * spec.js     -> window.__SPEC / window.__VOICE, written by scripts/render.mjs
+    * engine.js   -> the renderer; __frame(i) is a pure function of i
+  The page only exists to be driven headlessly; the mp4 is built by render.mjs.
+-->
+<div id="hint">composition loaded — drive it with <code>__frame(i)</code>, <code>__wav()</code>, <code>__contact()</code></div>
+<script src="fonts.js"></script>
+<script src="spec.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>

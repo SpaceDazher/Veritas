@@ -6,16 +6,16 @@
   "ok": true,
   "exitCode": 0,
   "base": {
-    "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-    "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+    "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 58,
+    "tracked_files_of_this_track": 70,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "invocation": {
-    "id": "b547ceed83a6960e0c637a3d5ee0755d",
+    "id": "a7d5c364d925d9f036d508c84cd1e504",
     "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
     "passed_to": [
       "scripts/s2-008-replay.mjs",
@@ -36,9 +36,16 @@
   "provability_exempt": [
     {
       "paths": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
         "evidence/s2-008-replay.json",
         "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json"
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json"
       ],
       "reason": "these are the records this chain's own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)"
     }
@@ -56,8 +63,13 @@
         "S1-004:BOUND",
         "S1-011:BOUND"
       ],
-      "track_files_tracked": 58,
+      "track_files_tracked": 70,
       "track_files_expected": [
+        "evidence/s2-008-campaign-evaluation.json",
+        "evidence/s2-008-campaign-probes.json",
+        "evidence/s2-008-campaign-run-a.json",
+        "evidence/s2-008-campaign-run-aborted-1.json",
+        "evidence/s2-008-campaign-run-b.json",
         "evidence/s2-008-comparison.json",
         "evidence/s2-008-controls.json",
         "evidence/s2-008-dependency-binding.json",
@@ -76,6 +88,13 @@
         "evidence/s2-008/corpus/preregistration.json",
         "evidence/s2-008/corpus/supersession-ledger.json",
         "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-campaign-adapter.mjs",
+        "scripts/s2-008-campaign-arm.mjs",
+        "scripts/s2-008-campaign-bootstrap.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
+        "scripts/s2-008-campaign-prepare.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-replay.mjs",
         "scripts/s2-008-run.mjs",
@@ -117,13 +136,20 @@
         "tests/research/replay-two-run.test.mjs",
         "tests/research/triage-hardening.test.mjs"
       ],
-      "track_files_expected_count": 58,
+      "track_files_expected_count": 70,
       "track_files_unaccounted": [],
       "track_files_untracked": [],
       "track_files_modified": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
         "evidence/s2-008-replay.json",
         "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json"
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json"
       ]
     },
     "corpus": {
@@ -320,10 +346,10 @@
       "floor_issues": [],
       "record_path": "evidence/s2-008-security-probes.json",
       "record_present": true,
-      "record_sha256": "592f69449056530f471893969d0e43d3c6e93078763832f4b757d88bc69d0081",
-      "record_bytes": 40347,
-      "record_digest": "2cc8b9125277d95e92f5d164c70bed770c924f256f6442d43ab6d44ff38e1d35",
-      "record_digest_reported": "2cc8b9125277d95e92f5d164c70bed770c924f256f6442d43ab6d44ff38e1d35",
+      "record_sha256": "7c3cbbcde6fbf445b2b813970473569bcceb782c466977ab11762e40e9cf9f1a",
+      "record_bytes": 40363,
+      "record_digest": "386245e2dd912a1e5778f1ed3ffdc7506dbdf8b7b44cc0b67c10afa81c282a20",
+      "record_digest_reported": "386245e2dd912a1e5778f1ed3ffdc7506dbdf8b7b44cc0b67c10afa81c282a20",
       "record_digest_agrees": true,
       "record_is_this_run": true,
       "record_issues": [],
@@ -342,8 +368,8 @@
       "reason": null,
       "source": "scripts/s2-008-replay.mjs",
       "overall": "PASS",
-      "invocation_id": "b547ceed83a6960e0c637a3d5ee0755d",
-      "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+      "invocation_id": "a7d5c364d925d9f036d508c84cd1e504",
+      "head_tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
       "campaign_verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
       "observed_campaign_decision": "UNRESOLVED",
@@ -352,25 +378,25 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-28T05:51:18.434Z",
-        "finished_at": "2026-09-28T05:51:20.807Z",
+        "observed_at": "2026-09-28T10:16:19.231Z",
+        "finished_at": "2026-09-28T10:16:21.501Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
-        "age_ms": 9
+        "age_ms": 12
       }
     },
     "harness": {
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-28T05:51:21.286Z",
-      "evidence_sha256": "6e17efb65f4b23d5cfbfaf51583baf458f32cbec14196ec62e80e9df468caf03",
-      "evidence_bytes": 71951,
+      "observed_at": "2026-09-28T10:16:22.045Z",
+      "evidence_sha256": "afd773fda5749f84f6ff36e13c991e82e81097176bb4ca1739920605d0576e0c",
+      "evidence_bytes": 71967,
       "record_is_this_run": true,
       "invocation_id_required": true,
-      "invocation_id": "b547ceed83a6960e0c637a3d5ee0755d",
-      "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+      "invocation_id": "a7d5c364d925d9f036d508c84cd1e504",
+      "head_tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
       "head_tree_sha_matches": true,
       "exit_code_recorded": null,
       "overall": "PASS",
@@ -397,13 +423,13 @@
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-28T05:51:21.288Z",
-    "started_at": "2026-09-28T05:51:04.707Z",
-    "replay_judged_at": "2026-09-28T05:51:20.816Z",
-    "harness_judged_at": "2026-09-28T05:51:21.286Z",
+    "observed_at": "2026-09-28T10:16:22.047Z",
+    "started_at": "2026-09-28T10:16:12.312Z",
+    "replay_judged_at": "2026-09-28T10:16:21.513Z",
+    "harness_judged_at": "2026-09-28T10:16:22.045Z",
     "window_ms": 21600000,
-    "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-    "replay_finished_at": "2026-09-28T05:51:20.807Z"
+    "head_tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+    "replay_finished_at": "2026-09-28T10:16:21.501Z"
   },
   "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
@@ -430,6 +456,6 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #12)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-28T05:51:21.288Z",
-  "startedAtIso": "2026-09-28T05:51:04.707Z"
+  "observedAtIso": "2026-09-28T10:16:22.047Z",
+  "startedAtIso": "2026-09-28T10:16:12.312Z"
 }

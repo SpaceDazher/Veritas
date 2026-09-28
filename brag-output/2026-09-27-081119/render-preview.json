@@ -1,0 +1,66 @@
+{
+  "mode": "preview",
+  "frames": 564,
+  "fps": 30,
+  "size": {
+    "w": 1920,
+    "h": 1080
+  },
+  "duration": 18.8,
+  "scenes": [
+    {
+      "kind": "title",
+      "start": 0,
+      "end": 2.4,
+      "headline": "Veritas"
+    },
+    {
+      "kind": "stat",
+      "start": 2.4,
+      "end": 4.8,
+      "headline": null
+    },
+    {
+      "kind": "code",
+      "start": 4.8,
+      "end": 7.8,
+      "headline": "The history is the audit trail"
+    },
+    {
+      "kind": "flow",
+      "start": 7.8,
+      "end": 10.4,
+      "headline": "From source to verdict"
+    },
+    {
+      "kind": "image",
+      "start": 10.4,
+      "end": 13.2,
+      "headline": "One shared board"
+    },
+    {
+      "kind": "quote",
+      "start": 13.2,
+      "end": 15.6,
+      "headline": "Ad Veritatem: от источников к знаниям, от гипотез к проверяемым решениям."
+    },
+    {
+      "kind": "outro",
+      "start": 15.6,
+      "end": 18,
+      "headline": "Veritas"
+    },
+    {
+      "kind": "brandcard",
+      "start": 18,
+      "end": 18.8,
+      "headline": null
+    }
+  ],
+  "imagesInlined": 1,
+  "shots": [
+    "frame-40.jpg",
+    "frame-189.jpg",
+    "frame-330.jpg"
+  ]
+}

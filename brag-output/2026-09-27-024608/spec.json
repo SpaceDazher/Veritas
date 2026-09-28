@@ -1,0 +1,288 @@
+{
+ "title": "Veritas",
+ "repo": "SpaceDazher/Veritas",
+ "tagline": "Evidence before claims",
+ "format": "landscape",
+ "fps": 30,
+ "palette": "paper",
+ "seed": 7,
+ "filename": "promo.mp4",
+ "loop": true,
+ "loopSeconds": 0.8,
+ "footer": true,
+ "grid": false,
+ "grain": true,
+ "scanlines": false,
+ "music": {
+  "style": "minimal",
+  "bpm": 96,
+  "root": 40,
+  "gain": 0.75
+ },
+ "sfx": true,
+ "scenes": [
+  {
+   "kind": "title",
+   "duration": 2.4,
+   "kicker": "EVIDENCE BEFORE CLAIMS",
+   "headline": "Veritas",
+   "sub": "Every claim needs a receipt.",
+   "subWidth": 0.56,
+   "badge": "S2-001 → S2-006",
+   "size": 150,
+   "weight": 800,
+   "glow": false
+  },
+  {
+   "kind": "stat",
+   "duration": 2.4,
+   "transition": "dissolve",
+   "value": 330,
+   "kicker": "18 days of history",
+   "label": "commits",
+   "comma": true,
+   "glow": false,
+   "items": [
+    {
+     "value": 80,
+     "label": "test files"
+    },
+    {
+     "value": 54690,
+     "label": "lines of code",
+     "comma": true
+    },
+    {
+     "value": 7,
+     "label": "ordered migrations"
+    }
+   ]
+  },
+  {
+   "kind": "image",
+   "duration": 2.8,
+   "transition": "push",
+   "kicker": "THE BOARD",
+   "headline": "One shared board",
+   "image": "board-crop.png",
+   "caption": "One shared board. Every agent. One source of truth.",
+   "ratio": 0.82
+  },
+  {
+   "kind": "flow",
+   "duration": 2.6,
+   "transition": "wipe",
+   "kicker": "PIPELINE",
+   "headline": "From source to verdict",
+   "nodes": [
+    {
+     "label": "Sources",
+     "sub": "versioned"
+    },
+    {
+     "label": "Ingestion",
+     "sub": "provenance"
+    },
+    {
+     "label": "Claims",
+     "sub": "atomic"
+    },
+    {
+     "label": "Synthesis",
+     "sub": "cross-domain"
+    },
+    {
+     "label": "Verdict",
+     "sub": "independent check",
+     "hot": true
+    }
+   ]
+  },
+  {
+   "kind": "code",
+   "duration": 2.6,
+   "transition": "dissolve",
+   "kicker": "IT SAYS NO FIRST",
+   "headline": "The board states its own limits",
+   "window": "veritas-cli.mjs — discovery",
+   "fontSize": 26,
+   "highlight": 2,
+   "lines": [
+    [
+     [
+      "$ ",
+      "dim"
+     ],
+     [
+      "VERITAS_URL=",
+      "dim"
+     ],
+     [
+      "… node ",
+      "plain"
+     ],
+     [
+      "scripts/veritas-cli.mjs",
+      "fn"
+     ],
+     [
+      " discovery",
+      "plain"
+     ]
+    ],
+    [
+     [
+      " { \"contractVersion\": ",
+      "plain"
+     ],
+     [
+      "\"1.0.0\"",
+      "string"
+     ],
+     [
+      ",",
+      "plain"
+     ]
+    ],
+    [
+     [
+      "   \"mode\": ",
+      "plain"
+     ],
+     [
+      "\"PUBLIC_SYNTHETIC_DEMO\"",
+      "accent"
+     ],
+     [
+      ",",
+      "plain"
+     ]
+    ],
+    [
+     [
+      "   \"executionEnabled\": ",
+      "plain"
+     ],
+     [
+      "false",
+      "number"
+     ],
+     [
+      ",",
+      "plain"
+     ]
+    ],
+    [
+     [
+      "   \"approvalEnabled\": ",
+      "plain"
+     ],
+     [
+      "false",
+      "number"
+     ],
+     [
+      ", \"privateDataAllowed\": ",
+      "plain"
+     ],
+     [
+      "false",
+      "number"
+     ],
+     [
+      ", ",
+      "plain"
+     ]
+    ],
+    [
+     [
+      "   \"adapters\": ",
+      "plain"
+     ],
+     [
+      "[]",
+      "number"
+     ],
+     [
+      ", \"limits\": \"Contract workspace only…\"",
+      "comment"
+     ]
+    ]
+   ],
+   "status": "✓ it refuses to pretend it is production"
+  },
+  {
+   "kind": "features",
+   "duration": 2.6,
+   "transition": "push",
+   "kicker": "METHOD",
+   "headline": "Bounded by construction",
+   "cols": 3,
+   "items": [
+    {
+     "title": "Fail closed",
+     "body": "Missing budget or access blocks the task.",
+     "tag": "policy",
+     "hot": true
+    },
+    {
+     "title": "Frozen contracts",
+     "body": "SLO contract and manifests hashed, not edited.",
+     "tag": "sloqual-001"
+    },
+    {
+     "title": "Tracked evidence",
+     "body": "Every claim lands in a sealed inventory.",
+     "tag": "evidence"
+    }
+   ]
+  },
+  {
+   "kind": "bars",
+   "duration": 2.2,
+   "transition": "dissolve",
+   "kicker": "MOMENTUM",
+   "headline": "Shipped daily",
+   "sub": "commits per day · five busiest of 18",
+   "labelWidth": 170,
+   "items": [
+    {
+     "label": "09-13",
+     "value": 56,
+     "display": "56"
+    },
+    {
+     "label": "09-19",
+     "value": 55,
+     "display": "55"
+    },
+    {
+     "label": "09-22",
+     "value": 44,
+     "display": "44"
+    },
+    {
+     "label": "09-26",
+     "value": 40,
+     "display": "40"
+    },
+    {
+     "label": "09-14",
+     "value": 39,
+     "display": "39"
+    }
+   ]
+  },
+  {
+   "kind": "outro",
+   "duration": 2.4,
+   "transition": "zoom",
+   "headline": "Veritas",
+   "sub": "Evidence before claims",
+   "url": "github.com/SpaceDazher/Veritas",
+   "cta": "clone · read the evidence",
+   "size": 132,
+   "glow": false
+  }
+ ]
+}

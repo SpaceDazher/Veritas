@@ -115,8 +115,8 @@ function parseArgs(argv) {
 }
 
 const args = parseArgs(process.argv);
-const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign-run-a.json'), 'utf8'));
-const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign-run-b.json'), 'utf8'));
+const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-a.json'), 'utf8'));
+const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-b.json'), 'utf8'));
 const prereg = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.json'), 'utf8'));
 const devCases = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'cases/dev.json'), 'utf8'));
 const holdoutCases = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'cases/holdout.json'), 'utf8'));
@@ -367,7 +367,7 @@ const record = {
   verdict: findings.length === 0 ? 'AGREES' : 'DISAGREES',
 };
 
-const out = typeof args.out === 'string' ? args.out : path.join(REPO_ROOT, 'evidence/s2-008-campaign-evaluation.json');
+const out = typeof args.out === 'string' ? args.out : path.join(REPO_ROOT, 'evidence/s2-008-campaign/evaluation.json');
 fs.writeFileSync(out, `${JSON.stringify(record, null, 1)}\n`);
 console.log(JSON.stringify({
   verdict: record.verdict,

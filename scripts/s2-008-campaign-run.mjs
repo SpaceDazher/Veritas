@@ -714,7 +714,7 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
   assertArtefactBound(artefact);
 
   if (write) {
-    const target = out ?? path.join(REPO_ROOT, `evidence/s2-008-campaign-run-${label}.json`);
+    const target = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-${label}.json`);
     writeArtefact(target, artefact, {});
   }
   return artefact;

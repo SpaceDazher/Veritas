@@ -12,11 +12,11 @@
     "multiplicity_family_size": 3
   },
   "base": {
-    "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-    "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+    "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 46,
+    "tracked_files_of_this_track": 53,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|evidence/s2-008/) — the TRACK sources and the corpus, without the s2-008 evidence records and without the verify-s2-008* aggregator scripts",
     "track_tracked": true
   },
@@ -64,10 +64,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-          "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-          "resolved_commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-          "resolved_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308"
+          "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+          "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+          "resolved_commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+          "resolved_tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd"
         },
         "missing": []
       },
@@ -280,8 +280,8 @@
         "label": "runA",
         "raw_run_id": "s2-008-run-a",
         "nonce": "n-a-0123456789abcdef",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -343,8 +343,8 @@
         "label": "runB",
         "raw_run_id": "s2-008-run-b",
         "nonce": "n-b-0123456789abcdef",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -464,10 +464,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-          "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-          "resolved_commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-          "resolved_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308"
+          "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+          "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+          "resolved_commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+          "resolved_tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd"
         },
         "missing": []
       },
@@ -717,8 +717,8 @@
         "label": "runA",
         "raw_run_id": "s2-008-run-a",
         "nonce": "n-a-0123456789abcdef",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
         "digest": "18cf76db7fa654d8aa56a619a4be69fc35027f0b3537334a6cb6fdfaef76c727",
         "trials": 4,
         "metric": {
@@ -780,8 +780,8 @@
         "label": "runB",
         "raw_run_id": "s2-008-run-b",
         "nonce": "n-b-0123456789abcdef",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
         "digest": "18cf76db7fa654d8aa56a619a4be69fc35027f0b3537334a6cb6fdfaef76c727",
         "trials": 4,
         "metric": {
@@ -879,7 +879,7 @@
       "id": "A5",
       "statement": "every artifact is bound to a commit SHA, a tree SHA and a raw run id, and survives a repeat run on the same base",
       "ok": true,
-      "evidence": "track_tracked=true tracked_files=46 base_binding=SATISFIED chain_verified=true phase2_saw_phase1=true crash_classified=PASS expired_settle=REFUSED/RECONCILIATION_REQUIRED reconciliation_rows=1 spend_advanced=false"
+      "evidence": "track_tracked=true tracked_files=53 base_binding=SATISFIED chain_verified=true phase2_saw_phase1=true crash_classified=PASS expired_settle=REFUSED/RECONCILIATION_REQUIRED reconciliation_rows=1 spend_advanced=false"
     }
   ],
   "holdout_access": {

@@ -6,23 +6,23 @@
   "evidence_eligible": true,
   "corpus": "evidence/s2-008/corpus",
   "base": {
-    "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-    "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+    "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 58,
+    "tracked_files_of_this_track": 70,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "provenance": {
     "version": "s2-008-runner-v1",
-    "commit": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-    "tree": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-    "run_id": "s2-008-run-b-0-p318681",
+    "commit": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+    "tree": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+    "run_id": "s2-008-run-b-0-p157097",
     "label": "b",
-    "executor_id": "exec-s2-008-b-0-p318681",
-    "pid": 318681,
-    "nonce": "n-b-6a6b09c0720c4e01",
+    "executor_id": "exec-s2-008-b-0-p157097",
+    "pid": 157097,
+    "nonce": "n-b-fbe0fb64cb14d73a",
     "clock": "2026-01-01T01:00:00.000Z",
     "started_at": "2026-01-01T01:00:00.000Z"
   },
@@ -68,11 +68,11 @@
   },
   "harness_findings": [],
   "version": "s2-008-runner-v1",
-  "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-  "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-  "raw_run_id": "s2-008-run-b-0-p318681",
-  "nonce": "n-b-6a6b09c0720c4e01",
-  "executor_id": "exec-s2-008-b-0-p318681",
+  "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+  "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+  "raw_run_id": "s2-008-run-b-0-p157097",
+  "nonce": "n-b-fbe0fb64cb14d73a",
+  "executor_id": "exec-s2-008-b-0-p157097",
   "output_root": ".bb/s2-008/run/out-b-0",
   "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
   "preregistration_digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
@@ -193,7 +193,7 @@
           "granted_units": 8,
           "spent_units": 1,
           "units": 1,
-          "settle_key": "c659967639c8211e4b2e8b11a159f626723b98e7ffec681cf506e3e993da7446",
+          "settle_key": "a71e6744c740ffd790fea20225ac1296df00607462e64ea40cc6ed823114efaa",
           "replayed": false
         },
         "evaluator": {
@@ -346,15 +346,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p318681",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-        "nonce": "n-b-6a6b09c0720c4e01",
-        "executor_id": "exec-s2-008-b-0-p318681"
+        "raw_run_id": "s2-008-run-b-0-p157097",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+        "nonce": "n-b-fbe0fb64cb14d73a",
+        "executor_id": "exec-s2-008-b-0-p157097"
       },
       "budget": {
         "units": 1,
-        "settle_key": "c659967639c8211e4b2e8b11a159f626723b98e7ffec681cf506e3e993da7446",
+        "settle_key": "a71e6744c740ffd790fea20225ac1296df00607462e64ea40cc6ed823114efaa",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -425,7 +425,7 @@
           "granted_units": 8,
           "spent_units": 2,
           "units": 1,
-          "settle_key": "6f32f4ec1e8d8a1e4324c17e373ddd5c476cd249cfc11a29a2a8f1ab0d2282f8",
+          "settle_key": "e1821fdc2f1c20def18189e71833bf1d35008362cff48b304b3f594a8c5a7577",
           "replayed": false
         },
         "evaluator": {
@@ -578,15 +578,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p318681",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-        "nonce": "n-b-6a6b09c0720c4e01",
-        "executor_id": "exec-s2-008-b-0-p318681"
+        "raw_run_id": "s2-008-run-b-0-p157097",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+        "nonce": "n-b-fbe0fb64cb14d73a",
+        "executor_id": "exec-s2-008-b-0-p157097"
       },
       "budget": {
         "units": 1,
-        "settle_key": "6f32f4ec1e8d8a1e4324c17e373ddd5c476cd249cfc11a29a2a8f1ab0d2282f8",
+        "settle_key": "e1821fdc2f1c20def18189e71833bf1d35008362cff48b304b3f594a8c5a7577",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -657,7 +657,7 @@
           "granted_units": 8,
           "spent_units": 3,
           "units": 1,
-          "settle_key": "09aba34bc46e47032971ac476c71c2a511bcd4b46728e2ed0ef911bf84c5721c",
+          "settle_key": "a6803c6718781995f2de57494ee6480d952e0d9a9b78edbac38b198c41a4c3a2",
           "replayed": false
         },
         "evaluator": {
@@ -810,15 +810,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p318681",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-        "nonce": "n-b-6a6b09c0720c4e01",
-        "executor_id": "exec-s2-008-b-0-p318681"
+        "raw_run_id": "s2-008-run-b-0-p157097",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+        "nonce": "n-b-fbe0fb64cb14d73a",
+        "executor_id": "exec-s2-008-b-0-p157097"
       },
       "budget": {
         "units": 1,
-        "settle_key": "09aba34bc46e47032971ac476c71c2a511bcd4b46728e2ed0ef911bf84c5721c",
+        "settle_key": "a6803c6718781995f2de57494ee6480d952e0d9a9b78edbac38b198c41a4c3a2",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -880,7 +880,7 @@
           "granted_units": 8,
           "spent_units": 4,
           "units": 1,
-          "settle_key": "b8000fabfc1c4209351d9e5f5069f31f4edd976fc325b64efedb3e409121f4da",
+          "settle_key": "8839ee0336e66d127b9263077a9ba8f8bbfe038f0a86f938f13dde9943b2d634",
           "replayed": false
         },
         "evaluator": {
@@ -1033,15 +1033,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p318681",
-        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-        "nonce": "n-b-6a6b09c0720c4e01",
-        "executor_id": "exec-s2-008-b-0-p318681"
+        "raw_run_id": "s2-008-run-b-0-p157097",
+        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
+        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+        "nonce": "n-b-fbe0fb64cb14d73a",
+        "executor_id": "exec-s2-008-b-0-p157097"
       },
       "budget": {
         "units": 1,
-        "settle_key": "b8000fabfc1c4209351d9e5f5069f31f4edd976fc325b64efedb3e409121f4da",
+        "settle_key": "8839ee0336e66d127b9263077a9ba8f8bbfe038f0a86f938f13dde9943b2d634",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -1128,7 +1128,7 @@
   },
   "ledger": {
     "chain_verified": true,
-    "snapshot_digest": "sha256:97942dd150519171643af4a8927cf7160c8db7ec5241c24233a0020e8f0f1431",
+    "snapshot_digest": "sha256:15c6d884c5e48aeb035dd8c92a738301d374162b86b798db5e3d5448b3c156ee",
     "record_kinds": [
       "ACCESS",
       "PREREGISTRATION_RECORDED",
@@ -1211,6 +1211,6 @@
       "verdict": "VIOLATION"
     }
   ],
-  "decision_digest": "84817268ca71124271059df4f5b79329ea4da5c0c51c1e21d42efb72f1965646",
-  "artefact_digest": "a2b16520787f0c2f0a2c1869522a345dc73b0b9a6677f1e1815b295762bdd91a"
+  "decision_digest": "457b531ef024bf95ba93eb28583576555f5d43815727538eabf95e9a6f1ef919",
+  "artefact_digest": "8d398f55ccba77f0bf7e43abc95013804dc5023c0cc21d4079f3a203dbce3d5a"
 }

@@ -573,7 +573,7 @@ if (isEntry && args.child === 'restart') {
       outcome_classes_exercised: [...new Set(probes.flatMap((probe) => (probe.observed?.outcome === undefined ? [] : [probe.observed.outcome])))].sort(),
     },
   };
-  const out = typeof args.out === 'string' ? args.out : path.join(REPO_ROOT, 'evidence/s2-008-campaign-probes.json');
+  const out = typeof args.out === 'string' ? args.out : path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes.json');
   fs.writeFileSync(out, `${JSON.stringify(record, null, 1)}\n`);
   console.log(JSON.stringify({
     probes: probes.map((probe) => ({ probe: probe.probe, held: probe.held, observed: probe.observed })),

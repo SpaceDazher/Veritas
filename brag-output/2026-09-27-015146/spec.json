@@ -1,0 +1,127 @@
+{
+  "title": "Veritas",
+  "repo": "SpaceDazher/Veritas",
+  "tagline": "evidence before claims",
+  "format": "landscape",
+  "fps": 30,
+  "palette": "paper",
+  "seed": 11,
+  "filename": "promo.mp4",
+  "loop": true,
+  "loopSeconds": 0.8,
+  "footer": true,
+  "grid": false,
+  "grain": true,
+  "scanlines": false,
+  "music": { "style": "minimal", "bpm": 96, "root": 40, "gain": 0.7 },
+  "sfx": true,
+  "scenes": [
+    {
+      "kind": "title",
+      "duration": 2.4,
+      "kicker": "Evidence before claims",
+      "headline": "Every claim needs a receipt.",
+      "sub": "Veritas — versioned sources, atomic claims, independent verification",
+      "subWidth": 0.58,
+      "badge": "S2-001 → S2-006",
+      "size": 104,
+      "weight": 800
+    },
+    {
+      "kind": "stat",
+      "duration": 2.4,
+      "transition": "dissolve",
+      "kicker": "The receipts",
+      "value": 330,
+      "label": "commits in 18 days",
+      "items": [
+        { "value": 80, "label": "test files" },
+        { "value": 53104, "label": "lines of code", "abbrev": true },
+        { "value": 7, "label": "ordered SQL migrations" }
+      ],
+      "size": 168,
+      "glow": true
+    },
+    {
+      "kind": "image",
+      "duration": 2.8,
+      "transition": "push",
+      "kicker": "The board",
+      "headline": "One shared board. Every agent.",
+      "image": "board.png",
+      "caption": "Veritas Agent Board — live app, synthetic demo workspace",
+      "ratio": 0.56
+    },
+    {
+      "kind": "flow",
+      "duration": 2.6,
+      "transition": "wipe",
+      "kicker": "The pipeline",
+      "headline": "Nothing skips a step",
+      "nodes": [
+        { "label": "Sources", "sub": "versioned corpus" },
+        { "label": "Ingestion", "sub": "provenance + dedup" },
+        { "label": "Claims", "sub": "atomic + invalidated" },
+        { "label": "Synthesis", "sub": "retrieval + evidence" },
+        { "label": "Verdict", "sub": "fail-closed" }
+      ]
+    },
+    {
+      "kind": "code",
+      "duration": 2.6,
+      "transition": "dissolve",
+      "kicker": "It states its own limits",
+      "window": "veritas-cli · discovery",
+      "fontSize": 26,
+      "lines": [
+        [["$ ", "dim"], ["node ", "plain"], ["scripts/veritas-cli.mjs ", "plain"], ["discovery", "fn"]],
+        [["{ ", "plain"], ["\"contractVersion\"", "string"], [": ", "plain"], ["\"1.0.0\"", "string"], [",", "plain"]],
+        [[".mode", "plain"], [": ", "plain"], ["\"PUBLIC_SYNTHETIC_DEMO\"", "accent"], [",", "plain"]],
+        [[".executionEnabled", "plain"], [": ", "plain"], ["false", "number"], [", ", "plain"], [".adapters", "plain"], [": [] }", "plain"]],
+        [["# the board tells you what it is before you ask", "comment"]]
+      ],
+      "highlight": 2,
+      "status": "✓ it refuses to pretend it is production"
+    },
+    {
+      "kind": "features",
+      "duration": 2.8,
+      "transition": "push",
+      "kicker": "The method",
+      "headline": "Boring on purpose",
+      "cols": 3,
+      "items": [
+        { "title": "Fail closed", "body": "Missing budget or unknown access blocks the run — it never passes quietly.", "tag": "POLICY", "hot": true },
+        { "title": "Frozen contracts", "body": "Machine contracts and a SHA-256 inventory re-sealed on every change.", "tag": "CONTRACTS" },
+        { "title": "Tracked evidence", "body": "Every gate leaves a replay record under evidence/ and results/.", "tag": "EVIDENCE" }
+      ]
+    },
+    {
+      "kind": "bars",
+      "duration": 2.6,
+      "transition": "dissolve",
+      "kicker": "Where the work lives",
+      "headline": "The receipts outnumber the code",
+      "sub": "732 tracked files — src/ is 69 of them",
+      "items": [
+        { "label": "corpus/", "value": 281, "display": "281 files" },
+        { "label": "evidence/", "value": 83, "display": "83" },
+        { "label": "tests/", "value": 80, "display": "80" },
+        { "label": "src/", "value": 69, "display": "69" },
+        { "label": "contracts/", "value": 59, "display": "59" },
+        { "label": "scripts/", "value": 55, "display": "55" }
+      ]
+    },
+    {
+      "kind": "outro",
+      "duration": 2.4,
+      "transition": "zoom",
+      "headline": "Veritas",
+      "sub": "evidence before claims",
+      "url": "github.com/SpaceDazher/Veritas",
+      "cta": "clone · read the evidence",
+      "size": 128,
+      "glow": true
+    }
+  ]
+}

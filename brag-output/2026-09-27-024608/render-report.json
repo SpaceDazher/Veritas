@@ -1,0 +1,83 @@
+{
+  "mode": "render",
+  "spec": "/home/daniil/Veritas/brag-output/2026-09-27-024608/spec.json",
+  "video": "/home/daniil/Veritas/brag-output/2026-09-27-024608/promo.mp4",
+  "posterFrame": 352,
+  "frames": 624,
+  "fps": 30,
+  "size": {
+    "w": 1920,
+    "h": 1080
+  },
+  "duration": 20.83,
+  "scenes": [
+    {
+      "kind": "title",
+      "start": 0,
+      "end": 2.4,
+      "headline": "Veritas"
+    },
+    {
+      "kind": "stat",
+      "start": 2.4,
+      "end": 4.8,
+      "headline": null
+    },
+    {
+      "kind": "image",
+      "start": 4.8,
+      "end": 7.6,
+      "headline": "One shared board"
+    },
+    {
+      "kind": "flow",
+      "start": 7.6,
+      "end": 10.2,
+      "headline": "From source to verdict"
+    },
+    {
+      "kind": "code",
+      "start": 10.2,
+      "end": 12.799999999999999,
+      "headline": "The board states its own limits"
+    },
+    {
+      "kind": "features",
+      "start": 12.799999999999999,
+      "end": 15.399999999999999,
+      "headline": "Bounded by construction"
+    },
+    {
+      "kind": "bars",
+      "start": 15.399999999999999,
+      "end": 17.599999999999998,
+      "headline": "Shipped daily"
+    },
+    {
+      "kind": "outro",
+      "start": 17.599999999999998,
+      "end": 19.999999999999996,
+      "headline": "Veritas"
+    },
+    {
+      "kind": "brandcard",
+      "start": 19.999999999999996,
+      "end": 20.799999999999997,
+      "headline": null
+    }
+  ],
+  "imagesInlined": 1,
+  "voiceLines": 0,
+  "audio": true,
+  "files": [
+    "promo.mp4",
+    "promo.jpg",
+    "score.wav"
+  ],
+  "frameSeconds": 72.7,
+  "totalSeconds": 72.9,
+  "title": "Veritas",
+  "repo": "SpaceDazher/Veritas",
+  "palette": "paper",
+  "tone": null
+}
