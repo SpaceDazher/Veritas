@@ -4,9 +4,9 @@
   "ticket": "S2-007R",
   "issue": "SpaceDazher/Veritas#45",
   "written_by": "scripts/s2-007r-measurement-set.mjs (s2-007r-measurement-set-v1)",
-  "commit": "445970eb7d66198305abddaf45599cfd724ed164",
-  "tree": "9a0dc28cb296e00e4e08039dd260c5d61fc05e48",
-  "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+  "commit": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+  "tree": "a6813e37fdd6bac16ff748629e078db1a36d273d",
+  "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
   "project_digest": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
   "budget_grant_id": "grt-s2007r-pilot",
   "vocabulary": [
@@ -667,7 +667,7 @@
           "run_id": "run-pilot-000001",
           "provider": "pi",
           "configuration": "B",
-          "outcome": "SUCCEEDED",
+          "outcome": "FAILED",
           "events": 65,
           "events_gap_free": null,
           "raw_log_files": 1,
@@ -715,7 +715,7 @@
           "run_id": "run-pilot-000001",
           "provider": "pi",
           "configuration": "A",
-          "outcome": "SUCCEEDED",
+          "outcome": "FAILED",
           "events": 65,
           "events_gap_free": null,
           "raw_log_files": 1,
@@ -830,7 +830,7 @@
           "selected_adapter_id": null,
           "excluded": null,
           "budget_snapshot": null,
-          "decision_digest": "sha256:f897de77bfeedf0b7d206cd290c2be50dabd563736619df6bfe12a5be4903225"
+          "decision_digest": "sha256:eb85caff46d83687f1d9204ac5bed565f489780cc7ec4ee34dbcb54d589530b1"
         },
         {
           "what": "the DispatchDecision document",
@@ -852,7 +852,7 @@
           "selected_adapter_id": null,
           "excluded": null,
           "budget_snapshot": null,
-          "decision_digest": "sha256:76ac2751049ad49679678e2863e05d685478ea2355cd69ef544bfd075ad2ad08"
+          "decision_digest": "sha256:53f969967adc34a9221770d84c2c7e1cd83188bc97c9cf5811ffa13d2d227a15"
         },
         {
           "what": "the DispatchDecision document",
@@ -874,7 +874,7 @@
           "selected_adapter_id": null,
           "excluded": null,
           "budget_snapshot": null,
-          "decision_digest": "sha256:c52362e4a1a8052c268d6813f2bb625a16c6cf70697b3442d062983af2f3596b"
+          "decision_digest": "sha256:4c84d4434b6ec3a7cda2aebf43b36d227997946f19a6fcf5a819fa85c9a2e276"
         },
         {
           "what": "the DispatchDecision document",
@@ -896,7 +896,7 @@
           "selected_adapter_id": null,
           "excluded": null,
           "budget_snapshot": null,
-          "decision_digest": "sha256:8aee5b10f49bcdbede76d3b6bed3746753ec7f7a74991bf41faa1da7c889a1f2"
+          "decision_digest": "sha256:8f6bd7a52abf2b55ad77b1adfb18859e63c2636f22174e007706cb87bf8912f0"
         },
         {
           "what": "the argv every selected adapter really executed",
@@ -1318,7 +1318,7 @@
       }
     },
     "run_set": {
-      "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+      "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
       "project_digest": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
       "budget_grant_id": "grt-s2007r-pilot"
     },
@@ -1359,10 +1359,41 @@
   },
   "authority_probe": {
     "measurement_7": {
-      "planted": 2,
-      "refused": 2,
+      "planted": 1,
+      "refused": 1,
       "granted": 0,
-      "is_a_run": false,
+      "source": "A_PLANT_IN_A_GOVERNED_RUN_WORKSPACE",
+      "is_a_run": true,
+      "real_run_plant": [
+        {
+          "cell": "cell-plant",
+          "run_id": "run-pilot-000001",
+          "provider": "pi",
+          "configuration": "A",
+          "plant_sha256": "3167e923e25dea8d57f94bfeed3ef0d5c7fb67ea9077dbc6909e0e6dd2cf0543",
+          "plant_bytes": 378,
+          "planted_before_dispatch": true,
+          "asks_for": {
+            "capabilities": [
+              "net.fetch",
+              "board.review.approve"
+            ],
+            "tools": [
+              "tool:net.fetch"
+            ]
+          },
+          "refusal": {
+            "code": "CAPABILITY_MISMATCH",
+            "class": "CapabilityMismatch",
+            "message": "SKILL_AUTHORITY_EXPANSION_REFUSED",
+            "detail": "the skill bundle asks for tool:net.fetch, which is not in the effective tool set [tool:fs.read]; a skill may ask, and the boundary refuses",
+            "retryable": false
+          },
+          "refused": true,
+          "granted": 0,
+          "verdict": "NOT_RUN"
+        }
+      ],
       "workspace_root": "/tmp/veritas-s2-007r-ws/measurement-plant"
     },
     "note": "the plant behind measurement 7 was executed by the measurement step; it is a boundary observation, not a run."
@@ -1381,73 +1412,73 @@
     {
       "path": "results/s2-007r/cell-pia/run-record.json",
       "what": "the cell-pia driver invocation record (A)",
-      "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
+      "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb1/run-record.json",
       "what": "the cell-pb1 driver invocation record (B)",
-      "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
+      "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb2/run-record.json",
       "what": "the cell-pb2 driver invocation record (B)",
-      "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
+      "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pa2/run-record.json",
       "what": "the cell-pa2 driver invocation record (A)",
-      "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
+      "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pia/run-01.json",
       "what": "one attempted governed run of cell-pia",
-      "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+      "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pia/run-02.json",
       "what": "one attempted governed run of cell-pia",
-      "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+      "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb1/run-01.json",
       "what": "one attempted governed run of cell-pb1",
-      "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+      "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb1/run-02.json",
       "what": "one attempted governed run of cell-pb1",
-      "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+      "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb2/run-01.json",
       "what": "one attempted governed run of cell-pb2",
-      "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+      "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pb2/run-02.json",
       "what": "one attempted governed run of cell-pb2",
-      "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+      "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pa2/run-01.json",
       "what": "one attempted governed run of cell-pa2",
-      "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+      "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
       "present_on_disk": true
     },
     {
       "path": "results/s2-007r/cell-pa2/run-02.json",
       "what": "one attempted governed run of cell-pa2",
-      "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+      "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
       "present_on_disk": true
     },
     {
@@ -1477,7 +1508,7 @@
     {
       "path": "evidence/s2-007r-security-probes.json",
       "what": "the probe gate's own accounting of the same authority refusals",
-      "sha256": "eb9efcdfc6820b3e937e1aef2c2dfa497de135a60f38821eced54d47ae422aea",
+      "sha256": "df0409032fb5bec8da7d75294a00c319f68ef0ebe06b9dbc17ca3cb182f0c824",
       "present_on_disk": true
     },
     {
@@ -1500,6 +1531,6 @@
     "The per-case file is read by the gate only when it is bound to the current commit AND to a corroborated real-adapter run. With no corroborated run, the gate forces every case to NOT_RUN whatever this file claims: that is the fail-closed direction, and it is why the values here agree with what the gate will print."
   ],
   "record_digest_method": "sha256: + canonical-json-v1 over this record with record_digest removed",
-  "record_digest": "sha256:6c290f68c6441d36b886a129210b8d385b09acf010c01dbce3927dbcd1c961cc",
-  "recordDigest": "sha256:03df397614dac04b4c4cf95ddf0ade9d4fac40ffe6c3aa57f30b93173dd652ac"
+  "record_digest": "sha256:8faf4fffaf59c259127a4506ceb3e4e5f4ef70b1120023a7f7d2c334ff86cdff",
+  "recordDigest": "fc52561886277c4418dda4e3b8b6623e12b8fc11f42d8e850a837c4a5bec6999"
 }

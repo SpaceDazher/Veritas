@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "ticket": "S2-007",
-  "title": "Agent Board: canonical orchestration and the execution boundary \u2014 dependency binding",
+  "title": "Agent Board: canonical orchestration and the execution boundary — dependency binding",
   "issue": "SpaceDazher/Veritas#7",
-  "scope": "Dependency gate for S2-007 (issue #7 \u00a71). Everything S2-007 builds on is bound here to the bytes of a pinned canonicalization commit in origin/main, to the digest of the S2-007 frozen contract foundation, and to a declarative expectation of what the upstream surfaces must still say. Nothing here is inferred from a previous task's description, from a local PASS, from a dirty worktree or from a matching branch name.",
+  "scope": "Dependency gate for S2-007 (issue #7 §1). Everything S2-007 builds on is bound here to the bytes of a pinned canonicalization commit in origin/main, to the digest of the S2-007 frozen contract foundation, and to a declarative expectation of what the upstream surfaces must still say. Nothing here is inferred from a previous task's description, from a local PASS, from a dirty worktree or from a matching branch name.",
   "rule": "A missing, drifted or unverifiable mandatory upstream binding is BLOCKED_DEPENDENCY (gate exit 1). A warning is never a substitute: either the binding is proven from Git bytes, or no S2-007 implementation result may be recorded. Green sub-checks are never inferred from a sibling check, and a check is never renamed to obtain a green status.",
   "gate": "scripts/verify-s2-007-dependencies.mjs",
   "base": {
@@ -570,13 +570,13 @@
     "gate": "scripts/verify-s2-007-dependencies.mjs",
     "mode": "FULL_GIT_BYTES",
     "ok": true,
-    "checkedCount": 157,
+    "checkedCount": 158,
     "issueCount": 0,
     "resolvedRefs": {
-      "originMain": "d23b289644ec5dede164c8707d975ac4792e51d5",
+      "originMain": "97ed8f6be8016c70b3bf204f0e0087678f5925fa",
       "canonicalizationCommit": "d23b289644ec5dede164c8707d975ac4792e51d5",
       "canonicalizationTree": "de27e5cb6906266ffa46c9465809e3c1da5cf123",
-      "implementationBaseCommit": "cd396e248bbcb67efde947f65a7951b31ce70a23"
+      "implementationBaseCommit": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6"
     },
     "rebaseBinding": {
       "previousCommit": "f590d37ea8e861431abf3f89f59e01a889ab903d",
@@ -613,6 +613,7 @@
     "restoredCanonicalEvidence": [
       "evidence/s2-002-run-a.json",
       "evidence/s2-002-run-b.json",
+      "evidence/s2-002-comparison.json",
       "evidence/s2-002-comparison-integrity.json",
       "results/s2-002/run-a/observations.json",
       "results/s2-002/run-a/summary.json",

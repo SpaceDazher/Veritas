@@ -46,6 +46,11 @@
       "--no-themes"
     ],
     "argv_allowlist_digest": "sha256:8a1c59271324befd36f1439462d78935b421600fe8908e2bbc8f90dd3bd4d020",
+    "request_allowed_tools": [
+      "tool:fs.read"
+    ],
+    "request_allowlist_digest": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
+    "tool_digest_of_argv": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
     "configuration": "A",
     "configuration_name": "HOST_DEFAULT_CONTEXT_SURFACE",
     "configuration_surface_flags": [],

@@ -46,6 +46,11 @@
       "--no-themes"
     ],
     "argv_allowlist_digest": "sha256:8a1c59271324befd36f1439462d78935b421600fe8908e2bbc8f90dd3bd4d020",
+    "request_allowed_tools": [
+      "tool:fs.read"
+    ],
+    "request_allowlist_digest": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
+    "tool_digest_of_argv": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
     "configuration": "A",
     "configuration_name": "HOST_DEFAULT_CONTEXT_SURFACE",
     "configuration_surface_flags": [],
@@ -168,26 +173,30 @@
   "exit_status": 0,
   "signal": null,
   "cause": null,
-  "stdout_sha256": "sha256:6c45256d3d4674690217c63de54d98b33ce22786b3129ca7adea7a1b80f2e347",
-  "stdout_bytes": 42630,
+  "stdout_sha256": "sha256:e1520ad698c2d970d8f8b7d5af61b1e43172e3162873eb16817ac52d305a91f3",
+  "stdout_bytes": 25211,
   "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "stderr_bytes": 0,
   "output_truncated": false,
-  "assistant_text_sha256": "sha256:c240a2358f5017b8ceb67277b27ec4b2e5f52181b02af160098a445936f70df9",
-  "assistant_text_bytes": 578,
-  "provider_error": null,
+  "assistant_text_sha256": "sha256:9569170ff880a2ea2bfd3e01698ec50b8565fe652adb5f9933f2f8b3a4a8fd45",
+  "assistant_text_bytes": 21,
+  "provider_error": {
+    "reason": "EXECUTOR_STOP_REASON_ERROR",
+    "message": "Request timed out.",
+    "credit_limited": false
+  },
   "usage": {
     "input_tokens": 1751,
-    "output_tokens": 198,
+    "output_tokens": 8,
     "reasoning_tokens": 0,
     "cache_read_tokens": 0,
     "cache_write_tokens": 0,
-    "proxy_tokens": 1949,
-    "cost_usd_micros": 153,
+    "proxy_tokens": 1759,
+    "cost_usd_micros": 107,
     "cost_basis": "EXECUTOR_REPORTED_USD",
     "model_id": "amazon/nova-lite-v1",
     "tool_calls": 0,
-    "executor_session_id": "01a0e346-7ee7-77c8-b5b9-2eda367f2385"
+    "executor_session_id": "01a0e5bb-dece-77a1-9003-8863381edc4c"
   },
   "exit_observed": true,
   "cancel_proof": null,

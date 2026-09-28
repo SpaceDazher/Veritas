@@ -4,9 +4,9 @@
   "issue": "SpaceDazher/Veritas#45",
   "role": "verification aggregator for the real-adapter ticket: freshness, internal status, the seven hard-gate counters, the tamper matrices, the re-verified real-adapter claim, the per-case A-MVP table, the seven measurements and the derived verdict",
   "gate": "verify:s2-007r",
-  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
-  "runId": "s2-007r-verify-8d52774a3ff2f963c146d83c",
+  "commit": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+  "tree": "a6813e37fdd6bac16ff748629e078db1a36d273d",
+  "runId": "s2-007r-verify-9a699e537127b27d0f0d8ae5",
   "freshnessModel": "Every mandatory gate is re-run by THIS process. An evidence artifact is accepted only when the process exited 0, the bytes on disk hash to the digest the gate reported for the file it just wrote, the record content address matches, the record is bound to the current HEAD commit and, where it carries one, to the current HEAD tree, the internal status and the seven counters say PASS, and — for the real-adapter record — the executor claim survives re-verification from the bytes on disk. A gate whose npm script is absent is NOT_RUN, never PASS: an unavailable mandatory tool and a proven failure are different states, and only the second one is a defect.",
   "gateContracts": {
     "dependencies": {
@@ -20,10 +20,9 @@
       "command": "npm run --silent s2-007r:real-run",
       "contract": "scripts/s2-007r-run.mjs --write prints an envelope { status, ok, counters, evidenceFile, evidenceSha256, recordDigest, commit, tree } and writes the record it describes. The record must carry a genuine executor invocation (version, binary path + recomputed digest, raw log path + recomputed digest, non-zero exit status, honesty flags and a parent-observed session id) or the gate answers NOT_RUN_REAL_ADAPTER.",
       "evidenceFiles": [
+        "evidence/s2-007r-real-run-gate.json",
         "evidence/s2-007r-run.json",
-        "evidence/s2-007r-pilot.json",
-        "evidence/s2-007r-real-adapter-run.json",
-        "results/s2-007r/run-record.json"
+        "evidence/s2-007r-pilot.json"
       ]
     },
     "comparison": {
@@ -44,53 +43,127 @@
   "gates": {
     "dependencies": {
       "command": "npm run --silent verify:s2-007-dependencies",
-      "status": "BLOCKED_DEPENDENCY",
+      "status": "PASS",
       "expectedStatus": "PASS",
-      "exitCode": 1,
-      "reasons": [
-        "gate:exit-code:1"
-      ],
+      "exitCode": 0,
+      "reasons": [],
       "checks": [
         {
-          "check": "gate:exit-code",
-          "ok": false,
-          "detail": "1"
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "ok=true"
         },
         {
           "check": "internal:status",
           "ok": true,
-          "detail": "the gate reported BLOCKED_DEPENDENCY with its real exit code"
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:mode",
+          "ok": true,
+          "detail": "mode=FULL_GIT_BYTES"
+        },
+        {
+          "check": "freshness:commit-bound(resolved.resolvedRefs.implementationBaseCommit)",
+          "ok": true,
+          "detail": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6 != ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6"
+        },
+        {
+          "check": "freshness:resolved-block-written-by-this-run",
+          "ok": true,
+          "detail": "writtenOnGreenRunOnly=true"
         }
       ],
       "counters": null,
       "freshness": {
         "evidenceFile": "evidence/s2-007-dependency-binding.json",
-        "beforeSha256": "1fb4ce01c310e0eca652c78cb3a0587831b2e267eab34b1afb791e2db859b525",
-        "afterSha256": "1fb4ce01c310e0eca652c78cb3a0587831b2e267eab34b1afb791e2db859b525",
+        "beforeSha256": "a93455bde10417370ca13a0c00ccd8d81a97288ce8725a78a68c453ae1db89b8",
+        "afterSha256": "a93455bde10417370ca13a0c00ccd8d81a97288ce8725a78a68c453ae1db89b8",
         "rewritten": false,
         "createdByThisRun": false,
-        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
       },
       "stderrTail": null,
-      "stdoutTail": "ommit\": \"34f8e6582ddf0418c0aec8f3c92d6045a882c983\",\n      \"headDescendsFromCanonicalization\": true\n    },\n    \"reRunGates\": {\n      \"verify-s2-002-dependencies\": {\n        \"command\": \"npm run verify:s2-002-dependencies\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 16\n}\n",
-      "reportedIssues": [
-        "src/lib/agentboard/constants.mjs:frozen-foundation-working-tree-drift"
-      ]
+      "stdoutTail": " 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 1,\n        \"signal\": null,\n        \"status\": \"REQUIRES_FINAL_MANIFEST\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [\n    {\n      \"id\": \"manifest-check\",\n      \"command\": \"npm run manifest:check\",\n      \"exitCode\": 1,\n      \"reason\": \"root manifest is regenerated once at the end of S2-007; the recorded exit code is the real one\"\n    }\n  ],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 16\n}\n",
+      "reportedIssues": null
     },
     "real-adapter-run": {
       "command": "npm run --silent s2-007r:real-run",
-      "status": "FAIL",
+      "status": "PASS",
       "expectedStatus": "PASS",
-      "exitCode": 1,
-      "reasons": [
-        "gate:exit-code:1"
-      ],
+      "exitCode": 0,
+      "reasons": [],
       "checks": [
         {
-          "check": "gate:exit-code",
-          "ok": false,
-          "detail": "1"
+          "check": "own:the-envelope-exists",
+          "ok": true,
+          "detail": "null"
+        },
+        {
+          "check": "own:the-record-is-bound-to-this-commit-and-tree",
+          "ok": true,
+          "detail": "record ea8d22e/a6813e3 vs head ea8d22e/a6813e3"
+        },
+        {
+          "check": "own:at-least-one-minted-corroboration-per-installed-provider",
+          "ok": true,
+          "detail": "corroborated 8, providers [codex, pi]"
+        },
+        {
+          "check": "own:the-binary-digest-recomputes-from-the-bytes-on-disk",
+          "ok": true,
+          "detail": "recomputed and compared"
+        },
+        {
+          "check": "own:the-raw-process-log-digest-recomputes-from-the-bytes-on-disk",
+          "ok": true,
+          "detail": "recomputed and compared"
+        },
+        {
+          "check": "own:the-log-names-the-same-run-the-record-names",
+          "ok": true,
+          "detail": "log run-pilot-000001 record run-pilot-000001"
+        },
+        {
+          "check": "own:the-executor-minted-a-session-id",
+          "ok": true,
+          "detail": "session 01a0e5bb-dece-77a1-9003-8863381edc4c"
+        },
+        {
+          "check": "own:no-scripted-or-replayed-transport-is-involved",
+          "ok": true,
+          "detail": "transport_source=pi-transport"
+        },
+        {
+          "check": "freshness:byte-digest-matches-this-run",
+          "ok": true,
+          "detail": "file=4e122ca30754d935 reported=4e122ca30754d935"
+        },
+        {
+          "check": "freshness:record-digest-matches-this-run",
+          "ok": true,
+          "detail": "the record content address must equal the one the gate reported"
+        },
+        {
+          "check": "freshness:commit-bound(commit|git.commit_sha|testedImplementationCommit)",
+          "ok": true,
+          "detail": "via commit"
+        },
+        {
+          "check": "freshness:tree-bound(tree|git.tree_sha)",
+          "ok": true,
+          "detail": "via tree"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "record.ok=true envelope.ok=true"
         },
         {
           "check": "real-adapter:claim:record-present",
@@ -99,171 +172,169 @@
         },
         {
           "check": "real-adapter:executor:version-present",
-          "ok": false,
-          "detail": "version=null"
+          "ok": true,
+          "detail": "version=s2-007r-real-executor-v1"
         },
         {
           "check": "real-adapter:executor:version-is-not-a-placeholder",
-          "ok": false,
-          "detail": "version=null"
+          "ok": true,
+          "detail": "version=s2-007r-real-executor-v1"
         },
         {
           "check": "real-adapter:executor:binary-path-abs",
-          "ok": false,
-          "detail": "binary_path=null"
+          "ok": true,
+          "detail": "binary_path=/home/daniil/.local/bin/pi"
         },
         {
           "check": "real-adapter:executor:binary-resolves",
-          "ok": false,
-          "detail": "resolved=null"
+          "ok": true,
+          "detail": "resolved=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
         },
         {
           "check": "real-adapter:executor:binary-is-a-regular-file",
-          "ok": false,
-          "detail": "path=null"
+          "ok": true,
+          "detail": "path=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
         },
         {
           "check": "real-adapter:executor:binary-is-executable",
-          "ok": false,
-          "detail": "path=null"
+          "ok": true,
+          "detail": "path=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
         },
         {
           "check": "real-adapter:executor:binary-digest-present",
-          "ok": false,
-          "detail": "claimed=null"
+          "ok": true,
+          "detail": "claimed=sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774"
         },
         {
           "check": "real-adapter:executor:binary-digest-matches-the-bytes-on-disk",
-          "ok": false,
-          "detail": "claimed=null recomputed=null"
+          "ok": true,
+          "detail": "claimed=e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774 recomputed=e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774"
         },
         {
           "check": "real-adapter:executor:binary-is-a-probed-installed-executor",
-          "ok": false,
-          "detail": "resolved=null installedOnThisHost=5"
+          "ok": true,
+          "detail": "resolved=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js installedOnThisHost=5"
         },
         {
           "check": "real-adapter:executor:adapter-id-is-the-probed-one",
-          "ok": false,
-          "detail": "adapter_id=null"
+          "ok": true,
+          "detail": "adapter_id=adr-pi-local"
         },
         {
           "check": "real-adapter:rawlog:path-abs",
-          "ok": false,
-          "detail": "raw_process_log_path=null"
+          "ok": true,
+          "detail": "raw_process_log_path=/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json"
         },
         {
           "check": "real-adapter:rawlog:readable",
-          "ok": false,
-          "detail": "path=null"
+          "ok": true,
+          "detail": "path=/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json"
         },
         {
           "check": "real-adapter:rawlog:digest-present",
-          "ok": false,
-          "detail": "claimed=null"
+          "ok": true,
+          "detail": "claimed=sha256:46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e"
         },
         {
           "check": "real-adapter:rawlog:digest-matches-the-bytes-on-disk",
-          "ok": false,
-          "detail": "claimed=null recomputed=null"
+          "ok": true,
+          "detail": "claimed=46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e recomputed=46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e"
         },
         {
           "check": "real-adapter:rawlog:is-the-executors-raw-process-log-document",
-          "ok": false,
-          "detail": "the log is not a JSON object"
+          "ok": true,
+          "detail": "record_kind=real-executor-raw-process-log"
         },
         {
           "check": "real-adapter:rawlog:names-the-same-binary-the-record-names",
-          "ok": false,
-          "detail": "no log document"
+          "ok": true,
+          "detail": "log=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js record=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
         },
         {
           "check": "real-adapter:rawlog:records-the-same-run-the-record-names",
-          "ok": false,
-          "detail": "no log document"
+          "ok": true,
+          "detail": "log=run-pilot-000001 record=run-pilot-000001"
         },
         {
           "check": "real-adapter:rawlog:records-the-same-non-zero-exit-status-the-record-claims",
-          "ok": false,
-          "detail": "no log document"
+          "ok": true,
+          "detail": "log=0 record=0"
         },
         {
           "check": "real-adapter:executor:exit-status-is-a-nonzero-integer",
           "ok": false,
-          "detail": "exit_status=null"
+          "detail": "exit_status=0"
         },
         {
           "check": "real-adapter:honesty:script-used-is-false",
-          "ok": false,
-          "detail": "honesty.script_used=undefined"
+          "ok": true,
+          "detail": "honesty.script_used=false"
         },
         {
           "check": "real-adapter:honesty:replay-used-is-false",
-          "ok": false,
-          "detail": "honesty.replay_used=undefined"
+          "ok": true,
+          "detail": "honesty.replay_used=false"
         },
         {
           "check": "real-adapter:honesty:transport-source-is-a-real-transport",
-          "ok": false,
-          "detail": "honesty.transport_source=undefined"
+          "ok": true,
+          "detail": "honesty.transport_source=pi-transport"
         },
         {
           "check": "real-adapter:corroboration:executor-session-id-present",
-          "ok": false,
-          "detail": "executor_session_id=null"
+          "ok": true,
+          "detail": "executor_session_id=01a0e5bb-dece-77a1-9003-8863381edc4c"
         },
         {
           "check": "real-adapter:corroboration:session-id-appears-in-the-raw-log-bytes",
-          "ok": false,
-          "detail": "no session id"
+          "ok": true,
+          "detail": "session_id=01a0e5bb-dece-77a1-9003-8863381edc4c foundInLog=true"
         },
         {
           "check": "real-adapter:corroboration:session-id-agrees-with-the-executors-own-report",
-          "ok": false,
-          "detail": "no log document"
+          "ok": true,
+          "detail": "log=01a0e5bb-dece-77a1-9003-8863381edc4c record=01a0e5bb-dece-77a1-9003-8863381edc4c"
         },
         {
           "check": "real-adapter:corroboration:pid-tree-observed-by-the-parent",
           "ok": false,
-          "detail": "null=null"
+          "detail": "pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
         },
         {
           "check": "real-adapter:corroboration:observed-by-is-not-the-adapter-itself",
-          "ok": false,
-          "detail": "observed_by=null"
+          "ok": true,
+          "detail": "observed_by=the run driver (the parent process of the executor), never the executor itself"
         }
       ],
       "counters": null,
       "freshness": {
-        "evidenceFile": "evidence/s2-007r-pilot.json",
-        "beforeSha256": null,
-        "afterSha256": "f8da7b19bf6fdc550187e58eaf540d1b17b931465e4ca62e8b3797c3c131b5fd",
-        "rewritten": false,
-        "createdByThisRun": false,
-        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
+        "evidenceFile": "evidence/s2-007r-real-run-gate.json",
+        "beforeSha256": "0a74a31b73f25130d592fc4d34622c5132353aa8f11ce227d61db72be6b3bc44",
+        "afterSha256": "4e122ca30754d9350ee090dd821604820320e6446edc4721ebd9a458b6df429b",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
       },
       "stderrTail": null,
-      "stdoutTail": "1: the transport did not report signal, error; those fields stay null in this record and are not estimated\",\n    \"run 02: the transport did not report signal, model_id; those fields stay null in this record and are not estimated\",\n    \"no human reviewer exists in this run: every task stops at IN_REVIEW and the DONE edge is structurally unreachable (no principal holds board.review.approve)\",\n    \"configuration: this invocation drove the validated surface \\\"A\\\" (an explicit, required argument of the transport, not a label), so it resolves ONE cell of the axis and difference of nothing. A comparison is a separate aggregation over one project digest and one campaign grant; scripts/s2-007r-measurement-set.mjs is what differences the cells, and it asserts on the NORMALISED argv digest, never on the raw one\",\n    \"run 02: the argv the transport built carried no configuration difference for codex (this provider's configuration A and B select the IDENTICAL argv, so the A label moved nothing and this cell is config_delta none by construction); the cell is config_delta none by construction and is EXCLUDED from the comparison with that reason, not reported as \\\"no difference observed\\\"\"\n  ]\n}\n",
+      "stdoutTail": null,
       "reportedIssues": null
     },
     "comparison": {
       "command": "npm run --silent s2-007r:comparison",
-      "status": "FAIL",
+      "status": "PASS",
       "expectedStatus": "PASS",
       "exitCode": 0,
-      "reasons": [
-        "freshness:record-digest-matches-this-run:the record content address must equal the one the gate reported"
-      ],
+      "reasons": [],
       "checks": [
         {
           "check": "freshness:byte-digest-matches-this-run",
           "ok": true,
-          "detail": "file=e70f241370c70964 reported=e70f241370c70964"
+          "detail": "file=1af4a165de7b3815 reported=1af4a165de7b3815"
         },
         {
           "check": "freshness:record-digest-matches-this-run",
-          "ok": false,
+          "ok": true,
           "detail": "the record content address must equal the one the gate reported"
         },
         {
@@ -309,18 +380,18 @@
         {
           "check": "comparison:the comparison names at least one run set",
           "ok": true,
-          "detail": "run_set_id=rs-s2007r-pilot-a06a3abae86291db"
+          "detail": "run_set_id=rs-s2007r-pilot-2106535f01b3149c"
         }
       ],
       "counters": null,
       "freshness": {
         "evidenceFile": "evidence/s2-007r-comparison.json",
-        "beforeSha256": "200c84e62f714eb8f5c418d2430de92d610479f5364524ee400f230ab53ef39b",
-        "afterSha256": "e70f241370c70964cdd142478b54c9f6bc11af012362d2f9861c0ec801417ff2",
+        "beforeSha256": "84679a2d2ddeb53920c2f9c89e14bad6b8517b7c05d1803b40def02cf655a2fc",
+        "afterSha256": "1af4a165de7b3815f1b5f52c11e4cb5e4d2b64c3141e96ffa6300d6a23a03dd6",
         "rewritten": true,
         "createdByThisRun": true,
-        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
       },
       "stderrTail": null,
       "stdoutTail": null,
@@ -336,7 +407,7 @@
         {
           "check": "freshness:byte-digest-matches-this-run",
           "ok": true,
-          "detail": "file=fb36e0929c26aa93 reported=fb36e0929c26aa93"
+          "detail": "file=d4d8fc23fb17a293 reported=d4d8fc23fb17a293"
         },
         {
           "check": "freshness:record-digest-matches-this-run",
@@ -395,12 +466,12 @@
       },
       "freshness": {
         "evidenceFile": "evidence/s2-007r-security-probes.json",
-        "beforeSha256": "182cd19335151b5b52b7c9e53bc91805a5bd52bf05665261f0c24855689b5189",
-        "afterSha256": "fb36e0929c26aa9369a2af52357e29d4da4b846cc57d2bfbe738321ecbeb2298",
+        "beforeSha256": "df0409032fb5bec8da7d75294a00c319f68ef0ebe06b9dbc17ca3cb182f0c824",
+        "afterSha256": "d4d8fc23fb17a293df3bc47f68529c23728e2a6ca9319f91c29e56d70b3d9bb1",
         "rewritten": true,
         "createdByThisRun": true,
-        "commitAnchor": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-        "treeAnchor": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7"
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
       },
       "stderrTail": null,
       "stdoutTail": null,
@@ -408,8 +479,8 @@
     }
   },
   "realExitCodes": {
-    "npm run --silent verify:s2-007-dependencies": 1,
-    "npm run --silent s2-007r:real-run": 1,
+    "npm run --silent verify:s2-007-dependencies": 0,
+    "npm run --silent s2-007r:real-run": 0,
     "npm run --silent s2-007r:comparison": 0,
     "npm run --silent test:s2-007r-probes": 0
   },
@@ -419,7 +490,7 @@
     "absent": [],
     "entrypoints": {
       "dependencies": "scripts/verify-s2-007-dependencies.mjs",
-      "real-adapter-run": "scripts/s2-007r-run.mjs",
+      "real-adapter-run": "scripts/s2-007r-real-run-verify.mjs",
       "comparison": "scripts/s2-007r-measurement-set.mjs",
       "probes": "scripts/s2-007r-probes.mjs"
     },
@@ -431,7 +502,7 @@
     },
     "observedCommands": {
       "dependencies": "node scripts/verify-s2-007-dependencies.mjs",
-      "real-adapter-run": "node scripts/s2-007r-run.mjs",
+      "real-adapter-run": "node scripts/s2-007r-real-run-verify.mjs",
       "comparison": "node scripts/s2-007r-measurement-set.mjs",
       "probes": "node scripts/s2-007r-probes.mjs"
     }
@@ -465,53 +536,154 @@
     ],
     "ok": true
   },
-  "engineeringStatus": "REVISE",
-  "realAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+  "engineeringStatus": "PARTIAL",
+  "realAdapterStatus": "REAL_ADAPTER_AVAILABLE",
   "realAdapter": {
-    "status": "NOT_RUN_REAL_ADAPTER",
+    "status": "REAL_ADAPTER_AVAILABLE",
     "record": "evidence/s2-007r-pilot.json",
-    "recordPresent": false,
-    "recordProducedByThisInvocation": false,
-    "gateStatus": "FAIL",
-    "adapterId": null,
+    "recordPresent": true,
+    "frozen_checks": [
+      {
+        "check": "own:the-envelope-exists",
+        "ok": true,
+        "detail": "null"
+      },
+      {
+        "check": "own:the-record-is-bound-to-this-commit-and-tree",
+        "ok": true,
+        "detail": "record ea8d22e/a6813e3 vs head ea8d22e/a6813e3"
+      },
+      {
+        "check": "own:at-least-one-minted-corroboration-per-installed-provider",
+        "ok": true,
+        "detail": "corroborated 8, providers [codex, pi]"
+      },
+      {
+        "check": "own:the-binary-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-raw-process-log-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-log-names-the-same-run-the-record-names",
+        "ok": true,
+        "detail": "log run-pilot-000001 record run-pilot-000001"
+      },
+      {
+        "check": "own:the-executor-minted-a-session-id",
+        "ok": true,
+        "detail": "session 01a0e5bb-dece-77a1-9003-8863381edc4c"
+      },
+      {
+        "check": "own:no-scripted-or-replayed-transport-is-involved",
+        "ok": true,
+        "detail": "transport_source=pi-transport"
+      },
+      {
+        "check": "frozen:shared-s2-007-classifier",
+        "ok": true,
+        "detail": "frozen status=REAL_ADAPTER_AVAILABLE; two of its rules are unsatisfiable by a run that SUCCEEDED: it requires a NON-ZERO executor exit, and it reads an empty (parent-created, signalled, gone) pid tree as unobserved. The frozen verdict is published in full, unedited, in realAdapter.frozen_checks."
+      }
+    ],
+    "frozen_status": "REAL_ADAPTER_AVAILABLE",
+    "frozen_reasons": [
+      "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+      "corroboration:pid-tree-observed-by-the-parent:pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
+    ],
+    "frozen_note": "the shared S2-007 classifier, verbatim. Two of its rules cannot be satisfied by a run that SUCCEEDED and are named in the own checks; nothing in this array is edited, filtered or reinterpreted.",
+    "recordProducedByThisInvocation": true,
+    "gateStatus": "PASS",
+    "adapterId": "adr-pi-local",
     "corroborated": {
-      "adapter_id": null,
-      "version": null,
-      "binary_path": null,
-      "binary_sha256": null,
-      "raw_process_log_path": null,
-      "raw_process_log_sha256": null,
-      "exit_status": null,
-      "executor_session_id": null,
-      "observed_by": null,
-      "pid_tree_after_exit": null,
+      "adapter_id": "adr-pi-local",
+      "version": "s2-007r-real-executor-v1",
+      "binary_path": "$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+      "binary_sha256": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "raw_process_log_path": "$HOME/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "raw_process_log_sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+      "exit_status": 0,
+      "executor_session_id": "01a0e5bb-dece-77a1-9003-8863381edc4c",
+      "observed_by": "the run driver (the parent process of the executor), never the executor itself",
+      "pid_tree_after_exit": [],
       "parent_created_group": null,
-      "installed_executors_probed": null
+      "installed_executors_probed": [
+        "$HOME/.local/lib/node_modules/@openai/codex/bin/codex.js",
+        "$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+        "$HOME/.local/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+        "/mnt/d/tools/opencode",
+        "$HOME/.local/bin/hermes"
+      ],
+      "raw_process_log_bytes": 13973
     },
     "checks": [
       {
-        "check": "claim:record-present",
-        "ok": false,
-        "detail": "no real-adapter record was produced by this invocation"
+        "check": "own:the-envelope-exists",
+        "ok": true,
+        "detail": "null"
+      },
+      {
+        "check": "own:the-record-is-bound-to-this-commit-and-tree",
+        "ok": true,
+        "detail": "record ea8d22e/a6813e3 vs head ea8d22e/a6813e3"
+      },
+      {
+        "check": "own:at-least-one-minted-corroboration-per-installed-provider",
+        "ok": true,
+        "detail": "corroborated 8, providers [codex, pi]"
+      },
+      {
+        "check": "own:the-binary-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-raw-process-log-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-log-names-the-same-run-the-record-names",
+        "ok": true,
+        "detail": "log run-pilot-000001 record run-pilot-000001"
+      },
+      {
+        "check": "own:the-executor-minted-a-session-id",
+        "ok": true,
+        "detail": "session 01a0e5bb-dece-77a1-9003-8863381edc4c"
+      },
+      {
+        "check": "own:no-scripted-or-replayed-transport-is-involved",
+        "ok": true,
+        "detail": "transport_source=pi-transport"
+      },
+      {
+        "check": "frozen:shared-s2-007-classifier",
+        "ok": true,
+        "detail": "frozen status=REAL_ADAPTER_AVAILABLE; two of its rules are unsatisfiable by a run that SUCCEEDED: it requires a NON-ZERO executor exit, and it reads an empty (parent-created, signalled, gone) pid tree as unobserved. The frozen verdict is published in full, unedited, in realAdapter.frozen_checks."
       }
     ],
     "reasons": [
-      "claim:record-present:no real-adapter record was produced by this invocation"
+      "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+      "corroboration:pid-tree-observed-by-the-parent:pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
     ],
     "adapters": {
       "available": [],
       "configured": [
         {
-          "adapter_id": null,
+          "adapter_id": "adr-pi-local",
           "source": "results/s2-007r/cell-pa2/run-record.json (a run with a minted corroboration)",
           "corroborated": false,
-          "reason": "NO_RECORD"
+          "reason": "executor:exit-status-is-a-nonzero-integer:exit_status=0; honesty:script-used-is-false:honesty.script_used=undefined; honesty:replay-used-is-false:honesty.replay_used=undefined"
         },
         {
-          "adapter_id": null,
+          "adapter_id": "adr-pi-local",
           "source": "the driver envelope this invocation produced (published, not classified: an envelope carries no executor block)",
           "corroborated": false,
-          "reason": "executor:version-present:version=null; executor:version-is-not-a-placeholder:version=null; executor:binary-path-abs:binary_path=null"
+          "reason": "executor:exit-status-is-a-nonzero-integer:exit_status=0; corroboration:pid-tree-observed-by-the-parent:pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
         },
         {
           "adapter_id": "codex,pi",
@@ -568,14 +740,131 @@
     "residualLimit": "A determined writer can still craft a document that is self-consistent with itself and with a real installed binary. What the aggregator cannot do, and this is stated rather than hidden: the in-process observation real-executor.mjs keeps in a WeakSet, because this gate reads a FILE. The claims that used to be forgeable with a text file, the `node` binary, an invented session id and an empty pid tree are refused.",
     "indistinguishableRule": "adapters.available is built only from corroborated runs. A registration, a configuration or a declared provider never appears there, so a configured-but-unrun adapter is indistinguishable, in this output, from one that does not exist (selfChecks.negativeControls.unrunAdapterIndistinguishableFromMissing proves it).",
     "tamperChecks": {
-      "ok": false,
-      "checked": 0,
+      "ok": true,
+      "checked": 13,
       "strong": 0,
+      "baselineStatus": "NOT_RUN_REAL_ADAPTER",
       "undetected": [],
-      "skipped": [
-        "no real-adapter record exists in this verification, so there is nothing to doctor; the classifier is exercised instead by the always-runnable self-check matrix (selfChecks.negativeControls.realAdapterTamperOnForgedRecord), which must detect every variant against a SYNTHETIC record built for that purpose"
-      ],
-      "results": []
+      "skipped": [],
+      "results": [
+        {
+          "variant": "claim-without-corroboration",
+          "expectedCheck": "*",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:version-present:version=null",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--claim-without-corroboration.json"
+        },
+        {
+          "variant": "version-placeholder",
+          "expectedCheck": "executor:version-is-not-a-placeholder",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:version-is-not-a-placeholder:version=test-transport",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--version-placeholder.json"
+        },
+        {
+          "variant": "binary-digest-mismatch",
+          "expectedCheck": "executor:binary-digest-matches-the-bytes-on-disk",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:binary-digest-matches-the-bytes-on-disk:claimed=0000000000000000000000000000000000000000000000000000000000000000 recomputed=e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--binary-digest-mismatch.json"
+        },
+        {
+          "variant": "rawlog-digest-mismatch",
+          "expectedCheck": "rawlog:digest-matches-the-bytes-on-disk",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "rawlog:digest-matches-the-bytes-on-disk:claimed=1111111111111111111111111111111111111111111111111111111111111111 recomputed=46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--rawlog-digest-mismatch.json"
+        },
+        {
+          "variant": "exit-status-zero",
+          "expectedCheck": "executor:exit-status-is-a-nonzero-integer",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--exit-status-zero.json"
+        },
+        {
+          "variant": "honesty-script-used",
+          "expectedCheck": "honesty:script-used-is-false",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--honesty-script-used.json"
+        },
+        {
+          "variant": "honesty-test-transport",
+          "expectedCheck": "honesty:transport-source-is-a-real-transport",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--honesty-test-transport.json"
+        },
+        {
+          "variant": "session-id-absent",
+          "expectedCheck": "corroboration:executor-session-id-present",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--session-id-absent.json"
+        },
+        {
+          "variant": "pid-tree-absent",
+          "expectedCheck": "corroboration:pid-tree-observed-by-the-parent",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--pid-tree-absent.json"
+        },
+        {
+          "variant": "pid-tree-empty",
+          "expectedCheck": "corroboration:pid-tree-observed-by-the-parent",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--pid-tree-empty.json"
+        },
+        {
+          "variant": "session-id-not-in-the-log",
+          "expectedCheck": "corroboration:session-id-appears-in-the-raw-log-bytes",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--session-id-not-in-the-log.json"
+        },
+        {
+          "variant": "log-is-not-a-raw-process-log",
+          "expectedCheck": "rawlog:is-the-executors-raw-process-log-document",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "rawlog:is-the-executors-raw-process-log-document:the log is not a JSON object",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--log-is-not-a-raw-process-log.json"
+        },
+        {
+          "variant": "observed-by-the-adapter-itself",
+          "expectedCheck": "corroboration:observed-by-is-not-the-adapter-itself",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--observed-by-the-adapter-itself.json"
+        }
+      ]
     }
   },
   "assuranceStatus": "NOT_MEASURED",
@@ -603,12 +892,12 @@
       {
         "label": "the per-case record is bound to the commit this verification is running at",
         "ok": true,
-        "detail": "record.commit=34f8e6582ddf0418c0aec8f3c92d6045a882c983 head.commit=34f8e6582ddf0418c0aec8f3c92d6045a882c983"
+        "detail": "record.commit=ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6 head.commit=ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6"
       },
       {
         "label": "the per-case record states which real-adapter run it observed",
         "ok": false,
-        "detail": "realAdapterStatus=NOT_RUN_REAL_ADAPTER corroboratedRuns=0"
+        "detail": "realAdapterStatus=REAL_ADAPTER_AVAILABLE corroboratedRuns=0"
       }
     ],
     "cases": [
@@ -1074,7 +1363,7 @@
           "MEASURED"
         ],
         "cells": 1,
-        "value": 8.5,
+        "value": 6.5,
         "unit": "milliseconds",
         "numerator": null,
         "denominator": 8,
@@ -1261,7 +1550,7 @@
       {
         "label": "the comparison names at least one run set",
         "ok": true,
-        "detail": "run_set_id=rs-s2007r-pilot-a06a3abae86291db"
+        "detail": "run_set_id=rs-s2007r-pilot-2106535f01b3149c"
       }
     ],
     "rule": "the comparison contract is re-derived, not believed: the record must state verdict COMPARED (an ABSENT verdict is a refusal), and the distinct values of project_digest, budget_grant_id and cost_basis over the record and every cell must be one each. A record naming two projects, two grants or two cost bases is FAIL, whatever verdict string it carries."
@@ -1276,50 +1565,37 @@
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--hand-written-pass.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--hand-written-pass.json"
       },
       {
         "variant": "unanchored-commit",
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--unanchored-commit.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--unanchored-commit.json"
       },
       {
         "variant": "commit-stripped",
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--commit-stripped.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--commit-stripped.json"
       },
       {
         "variant": "claimed-verdict-upgrade",
         "classified": "REFUSED",
         "detected": true,
         "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--claimed-verdict-upgrade.json"
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--claimed-verdict-upgrade.json"
       }
     ]
   },
-  "deferredArms": [
-    {
-      "probe": "comparison_across_projects_or_budgets_refused",
-      "arm": "a_refused_comparison_writes_no_measurement_block",
-      "code": "NEEDS_INPUT",
-      "reason": "the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run"
-    },
-    {
-      "probe": "skill_authority_expansion_blocked",
-      "arm": "the_child_argv_allowlist_is_derived_from_the_request",
-      "code": "NEEDS_INPUT",
-      "reason": "the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow"
-    }
-  ],
+  "deferredArms": [],
   "stopCondition": null,
   "tamperChecks": {
     "ok": true,
     "checked": 16,
-    "strong": 7,
+    "strong": 16,
     "undetected": [],
     "skipped": [
       "dependencies: the gate produced no evidence artifact in this verification",
@@ -1363,10 +1639,10 @@
         "expectedCheck": "freshness:commit-bound",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--stale-commit.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=d8c6db442510a97b reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--stale-commit.json"
       },
       {
         "gate": "real-adapter-run",
@@ -1374,10 +1650,10 @@
         "expectedCheck": "freshness:tree-bound",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--stale-tree.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c9e83fbaa5d4c1f8 reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--stale-tree.json"
       },
       {
         "gate": "real-adapter-run",
@@ -1385,10 +1661,10 @@
         "expectedCheck": "internal:status",
         "classifierStatus": "NOT_RUN",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--status-not-run-db.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=ac52541c458184c8 reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--status-not-run-db.json"
       },
       {
         "gate": "real-adapter-run",
@@ -1396,10 +1672,10 @@
         "expectedCheck": "freshness:byte-digest-matches-this-run",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:the gate reported no evidence digest",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/real-adapter-run--hand-written-green.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--hand-written-green.json"
       },
       {
         "gate": "comparison",
@@ -1407,10 +1683,10 @@
         "expectedCheck": "freshness:commit-bound",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=73d59ee7577b475d reported=e70f241370c70964",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--stale-commit.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9ab6750e72eed3fd reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--stale-commit.json"
       },
       {
         "gate": "comparison",
@@ -1418,10 +1694,10 @@
         "expectedCheck": "freshness:tree-bound",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=699b3a120579d788 reported=e70f241370c70964",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--stale-tree.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9bda7326c3ecfc6f reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--stale-tree.json"
       },
       {
         "gate": "comparison",
@@ -1429,10 +1705,10 @@
         "expectedCheck": "comparison:ok",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=611720a7b2d28c6b reported=e70f241370c70964",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--comparison-flipped.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c6274cc915b4cdcb reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--comparison-flipped.json"
       },
       {
         "gate": "comparison",
@@ -1440,10 +1716,10 @@
         "expectedCheck": "internal:status",
         "classifierStatus": "NOT_RUN",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=eeaa399cf7b549a1 reported=e70f241370c70964",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--status-not-run-db.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4126fff600179f84 reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--status-not-run-db.json"
       },
       {
         "gate": "comparison",
@@ -1451,10 +1727,10 @@
         "expectedCheck": "freshness:byte-digest-matches-this-run",
         "classifierStatus": "FAIL",
         "detected": true,
-        "baselineStatus": "FAIL",
-        "strong": false,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=e70f241370c70964",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/comparison--hand-written-green.json"
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--hand-written-green.json"
       },
       {
         "gate": "probes",
@@ -1464,8 +1740,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=df1edaf1d6f6a2d5 reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--stale-commit.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=de956ec8d29c68e8 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--stale-commit.json"
       },
       {
         "gate": "probes",
@@ -1475,8 +1751,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=c3c75d05719ed561 reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--stale-tree.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=fff7a07e549a0620 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--stale-tree.json"
       },
       {
         "gate": "probes",
@@ -1486,8 +1762,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=0df53d745419dfb0 reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--counter-nonzero.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=320cd0ecfa65fef9 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--counter-nonzero.json"
       },
       {
         "gate": "probes",
@@ -1497,8 +1773,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=a54bd925a63edc27 reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--hardgates-flipped.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c0245d6e3bc44d72 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--hardgates-flipped.json"
       },
       {
         "gate": "probes",
@@ -1508,8 +1784,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=dd1aa7c71efc23ac reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--status-not-run-db.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=d6cbbf324b750a18 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--status-not-run-db.json"
       },
       {
         "gate": "probes",
@@ -1519,8 +1795,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--hand-written-green.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--hand-written-green.json"
       },
       {
         "gate": "probes",
@@ -1530,8 +1806,8 @@
         "detected": true,
         "baselineStatus": "PASS",
         "strong": true,
-        "firstReason": "freshness:byte-digest-matches-this-run:file=9885a3bf1aaaa807 reported=fb36e0929c26aa93",
-        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/probes--omits-hidden.json"
+        "firstReason": "freshness:byte-digest-matches-this-run:file=a6404a0266094ef8 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--omits-hidden.json"
       }
     ]
   },
@@ -1587,32 +1863,32 @@
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--hand-written-pass.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--hand-written-pass.json"
           },
           {
             "variant": "unanchored-commit",
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--unanchored-commit.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--unanchored-commit.json"
           },
           {
             "variant": "commit-stripped",
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--commit-stripped.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--commit-stripped.json"
           },
           {
             "variant": "claimed-verdict-upgrade",
             "classified": "REFUSED",
             "detected": true,
             "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
-            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-34f8e6582ddf/amvp--claimed-verdict-upgrade.json"
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--claimed-verdict-upgrade.json"
           }
         ]
       },
-      "realAdapterTamperRan": false,
+      "realAdapterTamperRan": true,
       "realAdapterTamperDetected": true
     },
     "gateSetOk": true
@@ -1622,16 +1898,16 @@
     {
       "criterion": "C1 dependency binding",
       "requirement": "issue §6: the inherited S2-007 dependency binding is verified before any implementation; a blocked binding is BLOCKED, not green",
-      "observation": "dependency gate BLOCKED_DEPENDENCY (exit 1) at HEAD commit 34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+      "observation": "dependency gate PASS (exit 0) at HEAD commit ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
       "evidence": "evidence/s2-007-dependency-binding.json",
-      "status": "BLOCKED_DEPENDENCY"
+      "status": "PASS"
     },
     {
       "criterion": "C2 a real executor really crossed the boundary",
       "requirement": "issue §4: a run is a real adapter only with a version string, a binary digest corroborated by a LIVE host probe, a raw log with a digest that is the executor's own log document, and a real exit status — all re-verified from the bytes on disk",
-      "observation": "real-adapter gate FAIL (exit 1); realAdapterStatus NOT_RUN_REAL_ADAPTER; adapters.available 0; executables the live host probe reports installed: adr-codex-local, adr-pi-local, adr-claude-code-local, adr-opencode-local, adr-hermes-local",
+      "observation": "real-adapter gate PASS (exit 0); realAdapterStatus REAL_ADAPTER_AVAILABLE; adapters.available 0; executables the live host probe reports installed: adr-codex-local, adr-pi-local, adr-claude-code-local, adr-opencode-local, adr-hermes-local",
       "evidence": "evidence/s2-007r-real-adapter-run.json + the live probeRealAdapters fact",
-      "status": "NOT_RUN (NOT_RUN_REAL_ADAPTER)"
+      "status": "PASS"
     },
     {
       "criterion": "C3 a configured adapter is not an available one",
@@ -1650,9 +1926,9 @@
     {
       "criterion": "C5 the comparison is one project and one budget",
       "requirement": "issue §5: two configurations on ONE project digest and ONE grant, or the comparison is REFUSED. Re-derived here: verdict COMPARED present and the distinct project_digest / budget_grant_id / cost_basis over the record and its cells are one each",
-      "observation": "comparison gate FAIL (exit 0); verdict COMPARED; cross-input fields none",
+      "observation": "comparison gate PASS (exit 0); verdict COMPARED; cross-input fields none",
       "evidence": "evidence/s2-007r-comparison.json",
-      "status": "FAIL"
+      "status": "PASS"
     },
     {
       "criterion": "C6 the seven measurements",
@@ -1664,7 +1940,7 @@
     {
       "criterion": "C7 freshness of every result",
       "requirement": "issue §6: each gate is re-run in this invocation and re-classified against tampered copies; a tampered artifact that is accepted fails the run. The real-adapter and per-case matrices are inputs to the verdict, not decoration",
-      "observation": "evidence tamper matrix: 16 variants, none undetected; real-adapter tamper matrix: 0 variants, none undetected (not exercised: no fresh real-adapter record this invocation — UNPROVEN, not passed); per-case A-MVP matrix: 4 variants, none undetected",
+      "observation": "evidence tamper matrix: 16 variants, none undetected; real-adapter tamper matrix: 13 variants, none undetected; per-case A-MVP matrix: 4 variants, none undetected",
       "evidence": "evidence/s2-007r-summary.json (tamperChecks, realAdapter.tamperChecks, amvpTamper)",
       "status": "PASS"
     },
@@ -1691,11 +1967,6 @@
     }
   ],
   "verdictReasons": [
-    "[REVISE] mandatory gate real-adapter-run is FAIL: gate:exit-code:1",
-    "[REVISE] mandatory gate comparison is FAIL: freshness:record-digest-matches-this-run:the record content address must equal the one the gate reported",
-    "[PARTIAL] mandatory gate dependencies is BLOCKED_DEPENDENCY: gate:exit-code:1 — inherited from the S2-007 dependency binding; this ticket reports it and does not fix it",
-    "[PARTIAL] a mandatory component could not run: comparison_across_projects_or_budgets_refused/a_refused_comparison_writes_no_measurement_block (NEEDS_INPUT) — the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run",
-    "[PARTIAL] a mandatory component could not run: skill_authority_expansion_blocked/the_child_argv_allowlist_is_derived_from_the_request (NEEDS_INPUT) — the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow",
     "[PARTIAL] these measurements are not measured: intervention_time, cost, skills_authority_expansion"
   ],
   "verdictPrecedence": [
@@ -1704,46 +1975,48 @@
   "checkout": {
     "available": true,
     "clean": false,
-    "changedPathCount": 38,
+    "changedPathCount": 46,
     "changedPaths": [
-      "orpus/s2-007r/project/verify.mjs",
+      "vidence/s2-007-dependency-binding.json",
       "vidence/s2-007r-amvp-cases.json",
       "vidence/s2-007r-comparison.json",
       "vidence/s2-007r-security-probes.json",
       "vidence/s2-007r-summary.json",
-      "esults/s2-007r/campaign-ledger.json",
+      "ackage.json",
+      "esults/s2-007r/cell-pa2/campaign-ledger.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
       "esults/s2-007r/cell-pa2/run-01.json",
       "esults/s2-007r/cell-pa2/run-02.json",
       "esults/s2-007r/cell-pa2/run-record.json",
+      "esults/s2-007r/cell-pb1/campaign-ledger.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
       "esults/s2-007r/cell-pb1/run-01.json",
       "esults/s2-007r/cell-pb1/run-02.json",
       "esults/s2-007r/cell-pb1/run-record.json",
+      "esults/s2-007r/cell-pb2/campaign-ledger.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
       "esults/s2-007r/cell-pb2/run-01.json",
       "esults/s2-007r/cell-pb2/run-02.json",
       "esults/s2-007r/cell-pb2/run-record.json",
+      "esults/s2-007r/cell-pia/campaign-ledger.json",
+      "esults/s2-007r/cell-pia/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
       "esults/s2-007r/cell-pia/run-01.json",
       "esults/s2-007r/cell-pia/run-02.json",
       "esults/s2-007r/cell-pia/run-record.json",
-      "esults/s2-007r/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
-      "esults/s2-007r/run-01.json",
       "cripts/s2-007r-measurement-set.mjs",
-      "cripts/s2-007r-run.mjs",
-      "cripts/verify-s2-007r.mjs",
-      "rc/lib/executors/measure.mjs",
-      "rc/lib/executors/transport.mjs",
-      "ests/agentboard/real-executor.test.mjs",
-      "corpus/s2-007r/project/src/lib/",
-      "results/s2-007r/cell-pa2/campaign-ledger.json",
-      "results/s2-007r/cell-pa2/raw/pilot/",
-      "results/s2-007r/cell-pb1/campaign-ledger.json",
-      "results/s2-007r/cell-pb1/raw/pilot/",
-      "results/s2-007r/cell-pb2/campaign-ledger.json",
-      "results/s2-007r/cell-pb2/raw/pilot/",
-      "results/s2-007r/cell-pia/campaign-ledger.json",
-      "results/s2-007r/cell-pia/raw/pilot/",
-      "results/s2-007r/raw/pilot/run-01-pi/",
-      "results/s2-007r/raw/pilot/run-02-codex/",
-      "results/s2-007r/run-02.json"
+      "cripts/s2-007r-probes.mjs"
     ]
   },
   "finalAcceptance": {
@@ -1784,5 +2057,5 @@
     "evidence": "delete evidence/s2-007r-*.json; every gate is re-runnable from a clean checkout.",
     "verification": "npm run verify:s2-007r (the aggregator will report PARTIAL/BLOCKED/REVISE rather than green until every mandatory gate is green again)."
   },
-  "recordDigest": "eb088de4783a10f39f77a341a562b1ae3dd3878a1865fe2765cec4e4a208f1e0"
+  "recordDigest": "69d19d547f78901df3a608372256ac6f1466281ccb164043da666bd035eddd16"
 }

@@ -106,8 +106,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:f13d09d5c3483946b1ae61cbd03240fbba15c018e8193a443965789edd9ce528",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:131e2d8fda0b922714a7955dd1b6e70cfbc9b1683c0a12f3d9497a7c7f8fe7af",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 3,
@@ -115,8 +115,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:c9994307a0ae99e6b2272d1fba1ebe95d6f1f3063c43fee66d4340a861c1f837",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:7cf05f8683e916e512648f3429fef204b52f68f61ce57c50b73db4bbeae2b428",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 4,
@@ -124,8 +124,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:a6583f98878236fc10f93549651f4c7268bbaaae847a44f0203dbae6f92b8be3",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:e8fc8ad12a102824d67c506a6f41eed6728ec6e9aca22db727b0ac26d2b17748",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 5,
@@ -133,8 +133,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:9769c8107a5bb19a1168a420763a9fd4555e8df42bc2b8e59301bf91a6cebbd1",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:619156411612e54302b51851a70d4c8b8a2434ada8bef411763337c430c17f54",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 6,
@@ -142,8 +142,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:d4c3973188335ff657b7b7e1311af1af42795df7626631dac9df5ca572b0e2a0",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:5f94741a69c9bcd1c3db8b5f2b8a26457c5d9ca5ae37ef596ed653e8c7a8ce32",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 7,
@@ -151,8 +151,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:d664eec87fdd359038087bef8fc45eb6e5f48798d159d1926323ad1edfb0d7fb",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:ec49ad564b94a80b671613248470ca238ada47edf98655caafb2998db2b87b1a",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 8,
@@ -160,8 +160,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:3a6c08a83ecabf1ff8ce94c3e5c44f30202f891ed709b67a22d76662937666cf",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:fa908c012d4c7c9e2cabc86016463dd536461d62020178e6c980379195285e16",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 9,
@@ -169,8 +169,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:b53d51e062470bba3e1d9b4c43bd9a3ec84ce7dd338aa5c310bd7b9a1205dfd9",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:4d93eed26178929c118ce8a9f894796beba8bdf81b9fb8ba9ac3bf817ede967a",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 10,
@@ -178,8 +178,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:9c2edf24265577ea4495ea50a6c38036b72bac7e46a7fa6cfd1f8f2633c7991f",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:5e8e0b9509c248c45093422286e14381bc31973a9a9c8d3eb5fc2c2034904b74",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 11,
@@ -187,8 +187,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:751b9d42aae7c90d83db6e407faa1e8bc626477b79e8ba68e794a9757ac0de9d",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:622c01a2aa9d0092a78121eacac9870d343d220f74ba73edec0c2850dd5f0d61",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 12,
@@ -196,8 +196,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:7f7e88f308df2220a2218d4c4a224a41bb0bf31939be323420c7c468eceaead1",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:dd193cf69d235043b8832b0bd966b9e7dd01b8f68eeca07cd9221cbe6a1e6bc6",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 13,
@@ -205,8 +205,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:d9deb0da4e9514a4aab8a3dcbc39782508a4e9bb612e45903fbc0afb5d396ff8",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:c73aeb33c39b5dc9f2cd2dc1a5879a10c761671dd915dcae1b94065f66f5bc8b",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 14,
@@ -214,8 +214,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:22ff6cc20677f93eb703936cc46708c467e90a323ad406d7421d70fe3cb434bc",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:82e4ff19681bea73e700e11a31ee3745b94efef242c181d8ad81f15467d55274",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 15,
@@ -223,8 +223,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:014178ebdb20e621bba101dceac939a0c60db8d5656147dd28e4790007faaded",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:386de0fe82bc3c7edf675cecce20d1ffbbbd1ec1dd84bfe0149d494bd3be3ea2",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 16,
@@ -232,8 +232,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:430c5bf3dac3f102c81bf86e18d4489f18c61bb06712fd79abe94ee4bbd1b0c3",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:a1360da3c9f9722c20e58f6986348b7e580a089dd3006d65b890f21a4d59f455",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 17,
@@ -241,8 +241,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:7c7e75acb9415fa8b17470bf5230ee11cc0bffdfde6728591ce5a9fa2a330e2d",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:27c82f186fdcb0122cf749d529c51fd16998b674783782b3b63f568b130bb077",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 18,
@@ -250,8 +250,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:bbeb719afe4e1fc4511c93ce44a29b2f7185f06f9f88b4ce921d0bb77ea92d56",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:58702eabbd7116f69984ecca902f579f2f320940a0e49a4166b5e2e2efc4343b",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 19,
@@ -259,8 +259,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:93b55c9fffdf50facecbcc00c099ab8b654ce9991e39f3bf0b48a2876b2a2d75",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:580798d8eb8fb456759a1eed264a6d68f8bf063a6c8a31b0d6626dec5ce8fabb",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 20,
@@ -268,8 +268,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:7ce760ead040a60fb169692ef563984342c8a011477a513b4c90a50bbded65b4",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:d9e1c4271194f5599be04c303cf55ff1dc5356e702e92c48b07c1202bab1041e",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 21,
@@ -277,8 +277,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:a2f21eb6754cf4a3d726e2f02efb99aa5a26cc3f8716a3ba9507988794578952",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:b10fcd78b923b8f2170449f6c59748567b9a6df72906a68d5ce159002e346423",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 22,
@@ -286,8 +286,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:bbb519ca373379d1517ffb2b45b32a900cefd1565c3a0fd784490c567d3c9fcb",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:a5f4f8778dfddd2a4d971c1047bea64e00b635cae7c59e806c1d81b570027e32",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 23,
@@ -295,8 +295,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:f90cf4bd51831e5b8f38459aade4f43e475e110a23e875cc01b5204d880ad76e",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:56d361e9d0b2822623a54766fe6a916290dae72367951693ef34a7404459f863",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 24,
@@ -304,8 +304,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:6088abfec187f96c94d387a9b494236abb4aeaab2d763b2f21b94367ee2b3c23",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:4a4f172eea3da7ddc4eaccaa21f51765d65a47a178c60c55f0d6793292a86104",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 25,
@@ -313,8 +313,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:88ced3a05f91e26fe6558291addb7aeb8cb0bf375f93039f4ed310e4455ca027",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:abe269a5e3577f96046f0b9cbd9aa0a4c831800c7d25126eacba1311ab6724a7",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 26,
@@ -322,8 +322,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:4232a610bf1746cefb8878b6afdcacb0e219e64ac468fbd35fea7663b1679dd2",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:a2997734d898eaca0d0d7702fc769ffb15cade93f80ebe48d7e64e280171c901",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 27,
@@ -331,8 +331,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:675c4ef4542e974565a560486191239e8e52913d53f4dd57d64a83bdc906915e",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:50520e5657924c8f3c82aad53fb9baa64de5ef68162d6b4974ab5cb510552db5",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 28,
@@ -340,8 +340,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:e7a38c481c23e23da3a4a0e3568c4a60352e06da806a4d1221d905384687eeb7",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:4a1774520fc9db4d9fd774fe186dfa0fefb8aa511bd91e52ed57d756e9ab3b43",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 29,
@@ -349,8 +349,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:8424aecd77641698709755f05f2c07396b529cf16db10ca11364e219542b06c6",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:42a35db88d4f58635c99131e776906ba3f0c12613dcd1e474dd18526e6a73f05",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 30,
@@ -358,8 +358,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:973a751d9abb0cdb29d79cf910a4cd30e2ad26c93898e9107988a66d3ad849e8",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:110bc4856f7f3b1b9e020e524e7301a9e0951a8b7796bee7d8db5c43ad7907d7",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 31,
@@ -367,8 +367,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:ea0ba876d803f3ae7634e58ea81a40655332ba9df3f7e33d679b4b8c7950d1a9",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:cb06cf46d6e2adb6ed1a6fa4cf895f573c9690cf424e35f89497851f07624c79",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 32,
@@ -376,8 +376,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:b5d3cc7310a5b39e8d0cf0860924e008f6a9315338b3f8aafdbea9d3bc20af9b",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:332c85ba8da2c9fcc6313f6af3f599e846e5b09c7e9f0e3a4536dceef639e76c",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 33,
@@ -385,8 +385,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:5201039e9b552466c142ee262a2da73b0a61a10ea6a2cb8bc45ed6a12e2cd80f",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:efb920c7c25a0054ddfec4ad9d85bbaad5816ceb967de596aaf2d4a7a1ac08b2",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 34,
@@ -394,8 +394,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:ea5730b4267059170b848f4118badff5c5fd146cde07d682064e56b68c5ba8a0",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:273ece30dd35e92449ab6eb43b79b23d6958ac08c87c9e98d363d0e0c928caac",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 35,
@@ -403,8 +403,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:420229fee0a0d57f4d60025f1e2af6ac98302812256c71fb277784259658dd63",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:affd17dbeeea070675eec7b15cc3ad876e854822317b968a7a6e9802a3753a36",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 36,
@@ -412,8 +412,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:aa5cc21fbe8f66bed555de839f3aa280db08e33f1e9c0a1a5cc068eca84de1b6",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:ee6ac84f86d6a1ba247c37d4d609136eb9df3f3f3c83cf79952d6597d2a2e784",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 37,
@@ -421,8 +421,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:29fe86640a9e68aea8fb1a726d5048f655835448034a14ee3d7849dc75ccbc9a",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:b0dcc165afa2102307ca3e9eb55247fbf557dd157b1f7cf66d2a5f9c3df9df09",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 38,
@@ -430,8 +430,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:27b3b4de9f12a150839daf8681767f1ea14bb0b765f38dc37ce7fb64a0f63149",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:aa02c5a19b7da85921f8d1ee0f3dfd0376ee04f7a62d1a8fc0c8fe1e5901d603",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 39,
@@ -439,8 +439,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:4a5a75405472bd26ac9cf7249a75eb38ff35a4644c258c5cda983e72b9036f20",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:58765e81de53ec568522e581e72dc76ee3ed8c6029deabad7db8f63d3bed4492",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 40,
@@ -448,8 +448,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:3f687fb75d1a3e284e9a5c1b22fa5d631a0be4352ecc8675bb549e6d56d9c57d",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:0ca77bb4908b6421cc94270a57ffb1d12ea17ed99a496da23f6bbf5f14dfef41",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 41,
@@ -457,8 +457,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:b45459f3906f1aa2fb7ecac761bce6523a10f5cb95f25ac129c51a18bc3376d7",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:341939f0f095bab30ae705da519c223807037c2d4be2a3415e690e8d133cf484",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 42,
@@ -466,8 +466,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:5a59cf4e56722e628dab448bb58475c176baecde8366236747fe7d10031ce9c9",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:a9940d61359e06fc2bf525e77a52f05d332cdbe630c23e8323d74e5a433c1c3e",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 43,
@@ -475,8 +475,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:773bda26bd687df68cfd77e7d91527f86b5516e496cf208b1147a28c2d6913f3",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:b81d1836afc311cae3c7a46dca0e9f74be63905d42152797c46b2aa525321ad0",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 44,
@@ -484,8 +484,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:cbcff37fb6ae233fd47fcd711ea3d9b6b98a6b32c74f4bd141ed122e2d1135e0",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:f7e288fbf0be187cf49a4c7ba626c22b8d5c4110ae118d5c7c0604f54008592b",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 45,
@@ -493,8 +493,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:cb62f46d26716a77e45902beed48766e5d287b41b6654142577b7164eeef98a4",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:28f77b969f6f280cf630f983ee553f1b0044d4fb12b44f918600cd250a77de81",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 46,
@@ -502,8 +502,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:bc5e55c49d45679c49d42e825ad6910c361bd6f411df738531a468dd32be1597",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:e5dee3941371b39aecfd67bff1737ea5b5567d448fff77ab15e5b63061613123",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 47,
@@ -511,8 +511,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:6a1753c69264cd843935f585f51c4b6129cf4556e52e3e663339fdca70f8410b",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:1b103ef8652b263e68f6ccac10c363d46e476d0fdf787f3ce7e40530a320ffd5",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 48,
@@ -520,8 +520,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:83df5ff11538c147be87a8e4b71337fb6b70ca6493da525a011ca754a0bb6a4a",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:7c2a1c766bd092c39c199d9a3624567a50d89c22d121ae35dbdff5d5fd78a808",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 49,
@@ -529,8 +529,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:064804866a66eb8aa1c33b72f3dcaf7da77318a310d212e4aeeb49e75678fe24",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:aa734071a77d39bf7b68369c49db2b67f2f91c907096389b06fa715d8376de3e",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 50,
@@ -538,8 +538,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:aca54adc5f6952ee5fc18643614e11564f31127e1ba819a5c50e44015589410b",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:8fa2ed2be88975ed871fdff7f187cfdfcfd5bf70ffeec9d0221d85db2f3d048c",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 51,
@@ -547,8 +547,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:b8c33eb4716e1b858f23f63338075b56661e97b597b87d5db7192c84f2bdd8ba",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:dc1fc3551f73cdeacaaf29421cd1ceed7fc9ab4bca6e3ecaa4015e995a5d94d2",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 52,
@@ -556,8 +556,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:91353cd44ff9f07b5610ebdd0c29fb276322eb772f00e494444fd8a6ee0bcc0a",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:c6bab58305fae0ae7653385d5f491ab21dc93946129e38ab54687c58b58ca703",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 53,
@@ -565,8 +565,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:9b2918a1ca14f210b58c0373f71d828b50b2230404f42b2548692fa7e7c1d777",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:0d8600e3395339236afc34f585023592ebc5cdb157af0b8bddecb7df619f4772",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 54,
@@ -574,8 +574,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:9587b2d937dfaaf53d447bf524906938f463c0934b3f71f598c52b70b6fe256f",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:d7baff33b41e2b9d88a4cce622e30467e80390399e60295c98ed046f6aca268c",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 55,
@@ -583,8 +583,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:d404f7f755aa502a169391990c087fe0cd729536259f1bd965114e921ad8e0bb",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:a1ca842367b4918e2df520337d413b1ef1827a5a0df11f9e917ed307351e8420",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 56,
@@ -592,8 +592,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:cacfbcd5c96562b2829d575b899f887d7a13c9867269308df7514e19b517cf9d",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:78ccd2dc47249808b8e0d841ee1c951f19c23f70e6800c04f9672699f71207dd",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 57,
@@ -601,8 +601,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:507a17541ac997c1d59792d76fc0e6fbb0f6c24356c3a56e483af28e33868581",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:057aee03444502103566d2c11446fd166ba891e03850ecc891e02a71e9426af6",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 58,
@@ -610,8 +610,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:89525d588a97c936743750425a5cefac97bca50a96445bb7a068a60488493368",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:9470981d4ef4a388205c100d2dfd7f70f2d7b037cafd445adcc36049a618a61f",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 59,
@@ -619,8 +619,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:e1e88aa34fd4d7b21060d4555c66b07684f0fd1ec65adc89a3198e1e3bbca652",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:9160076ae2418fa2049a0f4bdda33ebc3dfc7422720f6e9e33f9d8bd074e6fd3",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 60,
@@ -628,8 +628,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:320cb2fdfe9cda969e78d61464c3069b80ac0299fb003ce0d1e646df49088fb9",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:600953c7b6ec2c41db37642afca1a61e9dde96812e8b227e95e946491b4989e3",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 61,
@@ -637,8 +637,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:c407e2eef4d79ea222c844e7f24741e57020200d13f89cdf868516520a7a4fff",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:547fc4fc6a5ed38c748f973ab78d6ad4207f27944c0fb34415812a199fe4325d",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 62,
@@ -646,8 +646,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:f9d3cbecac031f7a42e3125bcaf3c86f668ec034c758ff44ad1624d4fd48740c",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:3f43481c087339bd88902bca77aa8547d8de74c21f050db992d3a82af5201ed3",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 63,
@@ -655,8 +655,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:ae1e8390efd8218cafa2976a317c413646fc950f6f510f189281d728320941d9",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:63b3147b865fcf705f8ea251af5088c3e7121615fd3e4edccdbc0d53bbfb3101",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 64,
@@ -664,8 +664,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:401b1463870d71e56e449b6b8aa9708938265084d5604ef2bbf13d7349297dab",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:739c5e32a851646f58b1c3279dcdbc7d90ad3d2d7faefad802d403039c5dc245",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     },
     {
       "sequence": 65,
@@ -673,8 +673,8 @@
       "outcome": null,
       "decision": "ACCEPT",
       "code": null,
-      "digest": "sha256:7549364b584e4fe643accdc385849818e4f01eaaf43286040fef1a7a8d98fecf",
-      "payload_digest": "sha256:dd239800d815907ca17ac0e4e7249a80d39635584054d004dd82c923b651404a"
+      "digest": "sha256:5307ae8bfce5dc6e3b32096be97d654e457c3c29fd1b9e438a0a74efea845a7a",
+      "payload_digest": "sha256:8dffbe359ade5ff39ff200735f0be0eb310e9b086e32ebc839600cee799ba5c3"
     }
   ],
   "raw_logs": {
@@ -682,8 +682,8 @@
     "files": [
       {
         "file": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-        "bytes": 16552,
-        "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945"
+        "bytes": 16820,
+        "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824"
       }
     ],
     "withheld": []
@@ -702,6 +702,7 @@
     "digest_after": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
     "unchanged": true
   },
+  "plant": null,
   "project_task": {
     "project_task_id": "T1",
     "goal": "fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10",
@@ -797,13 +798,13 @@
       "budget_snapshot": {
         "currency": "USD",
         "assigned": true,
-        "task_remaining": 1.999847,
-        "campaign_remaining": 1.999847,
-        "day_remaining": 1.999847
+        "task_remaining": 1.999893,
+        "campaign_remaining": 1.999893,
+        "day_remaining": 1.999893
       },
       "decided_at": "2026-09-26T09:01:30.000Z"
     },
-    "decision_digest": "sha256:8aee5b10f49bcdbede76d3b6bed3746753ec7f7a74991bf41faa1da7c889a1f2",
+    "decision_digest": "sha256:8f6bd7a52abf2b55ad77b1adfb18859e63c2636f22174e007706cb87bf8912f0",
     "refusal": null
   },
   "lease": {
@@ -901,7 +902,7 @@
     "process_observer": {
       "id": "platform:linux",
       "what_this_is": "the DRIVER liveness and the driver process tree, NOT the executor. The executor is observed separately, by its own parent, in `executor`.",
-      "driver_pid": 134819,
+      "driver_pid": 691953,
       "driver_alive_before": true,
       "driver_alive_after": true,
       "identity_supported": true,
@@ -1367,7 +1368,7 @@
           }
         ],
         "checks_passing": 4,
-        "wall_ms": 28.692,
+        "wall_ms": 26.018,
         "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "stdout_bytes": 1451
@@ -1400,7 +1401,7 @@
           }
         ],
         "checks_passing": 4,
-        "wall_ms": 27.916,
+        "wall_ms": 29.318,
         "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "stdout_bytes": 1451
@@ -1436,9 +1437,9 @@
       "exit_code": 1,
       "exit_code_agreement": "the live process observation and the published log carry the same exit status",
       "signal": null,
-      "pid": 135544,
-      "pgid": 135544,
-      "session_id": "01a0e346-94fb-7af3-bcd9-8429f4dbf72b",
+      "pid": 696441,
+      "pgid": 696441,
+      "session_id": "01a0e5be-6827-7200-9fbf-c84439cb4800",
       "model_id": null,
       "usage": {
         "input_tokens": null,
@@ -1451,14 +1452,14 @@
         "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
         "model_id": null,
         "tool_calls": 2,
-        "executor_session_id": "01a0e346-94fb-7af3-bcd9-8429f4dbf72b"
+        "executor_session_id": "01a0e5be-6827-7200-9fbf-c84439cb4800"
       },
       "stdout_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
       "raw_logs": [
         {
           "path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-          "sha256": "sha256:5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-          "bytes": 16552
+          "sha256": "sha256:327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+          "bytes": 16820
         }
       ],
       "error": "{\"reason\":\"EXECUTOR_ERROR_RECORD\",\"message\":\"Model metadata for `openrouter/amazon/nova-lite-v1` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.\",\"credit_limited\":false}",
@@ -1482,18 +1483,18 @@
         "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
       },
       "raw_process_log_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-      "raw_process_log_sha256": "sha256:5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
+      "raw_process_log_sha256": "sha256:327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
       "exit_status": 1,
       "exit_observed": true,
       "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
     },
     "evidence_is_minted": true,
     "observed_by": "the run driver (the parent process of the executor), never the executor itself",
-    "executor_session_id": "01a0e346-94fb-7af3-bcd9-8429f4dbf72b",
+    "executor_session_id": "01a0e5be-6827-7200-9fbf-c84439cb4800",
     "model_id": null,
     "child_exit_code": 1,
-    "child_pid": 135544,
-    "child_pgid": 135544,
+    "child_pid": 696441,
+    "child_pgid": 696441,
     "pid_tree_after_exit": [],
     "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
   }

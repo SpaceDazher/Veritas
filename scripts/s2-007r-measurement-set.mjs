@@ -50,9 +50,14 @@
 // DETERMINISM
 // -----------
 // No Date.now(), no wall clock, no Math.random(). Every instant is an injected
-// constant inside the permit's own window. The two record digests are
-// `sha256:` + canonicalDigest(record without its own digest), recomputable by a
-// third party from the published bytes.
+// constant inside the permit's own window. The record carries its content
+// address TWICE, in the two conventions that are actually in use, and both are
+// recomputable by a third party from the published bytes:
+//   `record_digest`  `sha256:` + canonical-json-v1, the repository-wide convention;
+//   `recordDigest`   bare canonical-json-v1, the convention
+//                    scripts/verify-s2-007.mjs#recordDigestOf returns and its
+//                    freshness check compares against with `===`.
+// A writer that published only the first satisfied every check except that one.
 //
 // EXIT CODES
 // ----------
@@ -252,7 +257,7 @@ function runSetIdentity(cells) {
  * board row is written, and the record says `is_a_run: false` in the same place
  * the run set says it of its own crossings.
  */
-async function plantSkillsExpansion() {
+async function plantSkillsExpansion({ cells = [] } = {}) {
   const permit = buildUnisolatedAuthorization();
   const plantPath = path.join(PLANT_WORKSPACE, 'SKILL.md');
   fs.rmSync(PLANT_WORKSPACE, { recursive: true, force: true });
@@ -267,7 +272,63 @@ async function plantSkillsExpansion() {
   const published = path.join(RUN_ROOT, 'measurement-plant', 'SKILL.md');
   fs.mkdirSync(path.dirname(published), { recursive: true });
   fs.writeFileSync(published, plantBytes);
+  // The plant lives in its OWN cell (results/s2-007r/cell-plant), read here
+  // directly rather than through CELLS: it is refused before any model call, so
+  // it produces no crossing, and counting it as a comparison cell would empty
+  // that cell's denominators and turn every measurement back into NOT_RUN.
+  const plantCell = (() => {
+    const relativePath = 'results/s2-007r/cell-plant/run-record.json';
+    const absolute = path.join(ROOT, relativePath);
+    if (!fs.existsSync(absolute)) return { id: 'cell-plant', runs: [] };
+    try {
+      const record = readJson(absolute).json;
+      // The record's RUNS carry the plant and the refusal; the record itself is
+      // the invocation. Flattened here so the loop below sees one shape.
+      const mapped = (Array.isArray(record.runs) ? record.runs : []).map((run) => ({ raw: run }));
+      return { id: 'cell-plant', runs: mapped };
+    } catch { return { id: 'cell-plant', runs: [] }; }
+  })();
+  const realRunPlant = [];
+  for (const cell of [plantCell]) {
+    for (const run of (cell.runs ?? [])) {
+      const planted = run.raw?.plant;
+      if (planted === null || typeof planted !== 'object') continue;
+      const refusal = (run.raw.findings ?? []).map((row) => row)
+        .concat([run.raw.findings?.[0]?.transport_error].filter(Boolean))
+        .find((row) => String(row?.code ?? '') === 'CAPABILITY_MISMATCH' && String(row?.message ?? '').includes('SKILL_AUTHORITY_EXPANSION_REFUSED')) ?? null;
+      realRunPlant.push({
+        cell: cell.id,
+        run_id: run.raw.run_id ?? null,
+        provider: run.raw.provider ?? null,
+        configuration: run.raw.configuration ?? null,
+        plant_sha256: planted.sha256 ?? null,
+        plant_bytes: planted.bytes ?? null,
+        planted_before_dispatch: planted.planted_before_dispatch === true,
+        asks_for: planted.asks_for ?? null,
+        refusal: refusal === null ? null : {
+          code: refusal.code ?? null,
+          class: refusal.name ?? null,
+          message: refusal.message ?? null,
+          detail: refusal.detail ?? null,
+          retryable: refusal.retryable ?? null,
+        },
+        refused: refusal !== null,
+        // The claim this measurement makes: the planted tool or capability never
+        // appeared in what the run was authorised to use. The run produced no
+        // crossing at all, because the refusal came first - and that IS the
+        // property: a skill that asks for authority never reaches the point where
+        // it could use it.
+        granted: 0,
+        verdict: run.raw.verdict ?? null,
+      });
+    }
+  }
+
   const plant = {
+    real_run_plant: realRunPlant,
+    real_run_planted: realRunPlant.length,
+    real_run_refused: realRunPlant.filter((row) => row.refused === true).length,
+    real_run_granted: realRunPlant.reduce((sum, row) => sum + (Number.isFinite(row.granted) ? row.granted : 0), 0),
     path: `${PLANT_WORKSPACE}/SKILL.md`,
     published_path: relative(published),
     text_source: 'src/lib/executors/constants.mjs#SKILL_EXPANSION_PROBE_TEXT',
@@ -280,6 +341,11 @@ async function plantSkillsExpansion() {
     asks_for: { capabilities: [...PLANTED_CAPABILITIES], tools: [PLANTED_TOOL] },
     declared_by_the_registration: { capabilities: [...DECLARED_CAPABILITIES], tools: [...DECLARED_TOOLS] },
   };
+  // THE PLANT ON A REAL RUN, when the run set contains one. The in-process arms
+  // below exercise the same refusal in this process; THIS is the one that was
+  // planted into a run's own workspace, offered to the transport as a skill
+  // bundle, and refused before any model call — which is the order in which the
+  // property actually matters.
   const arms = [];
   for (const adapter of await ADAPTERS) {
     const registration = createRealRegistration({
@@ -373,6 +439,16 @@ async function plantSkillsExpansion() {
       planted,
       refused,
       granted,
+      // The plant that was written into a GOVERNED RUN's own workspace and
+      // refused by the transport before any crossing. These are the numbers the
+      // measurement reports when the run set contains one, and they are returned
+      // here because the projection is what the record reads: leaving them on
+      // the inner object made the record report the in-process arms while a
+      // governed plant sat unread in the same file.
+      real_run_plant: plant.real_run_plant,
+      real_run_planted: plant.real_run_planted,
+      real_run_refused: plant.real_run_refused,
+      real_run_granted: plant.real_run_granted,
     };
   }
 }
@@ -462,7 +538,13 @@ function argvToolAllowlistObservation(cells) {
           unbound_effective_tools: unbound,
           argv_flag_allowlist_digest: invocation.argv_allowlist_digest ?? null,
           argv_flag_allowlist_digest_note: 'this digest is over the PERMITTED FLAG SET (-p, --mode:json, --tools:, --no-tools, ...), not over a tool allowlist. It is published so a reader can see which field it is and is not used as a tool-allowlist digest.',
-          request_allowlist_digest: null,
+          // READ FROM THE LOG, not asserted. This used to be a literal null with
+          // a note that the field was absent, which made the argv half of the
+          // skills measurement unobservable on every real run; the transport now
+          // publishes the request's own tool list beside the flag table, so the
+          // equality between them is a fact a reader can recompute.
+          request_allowlist_digest: invocation.request_allowlist_digest ?? null,
+          request_allowed_tools: Array.isArray(invocation.request_allowed_tools) ? [...invocation.request_allowed_tools] : null,
           request_allowlist_digest_present_in_the_log: text.includes('request_allowlist_digest'),
           request_allowed_tools_present_in_the_log: text.includes('allowed_tools'),
           argv_subset_of_effective_tools: names === null || effective === null ? null : [...names].every((name) => effective.includes(name)),
@@ -698,6 +780,9 @@ function sevenMeasurements({ cells, cellSets, identity, plant }) {
         limitations: [
           ...(cellsFor[0].row.limitations ?? []).filter((line) => !line.startsWith('ONE run set:')),
           `${status}: all ${cellsFor.length} group(s) of the run set agree, so the row is not rounded up; the summed denominator over those groups is ${sumDenominator}.`,
+          ...(name === 'skills_authority_expansion'
+            ? [`The REFUSAL half of this measurement is measured on a plant that was written into a GOVERNED RUN's own workspace and refused by the transport before any crossing: planted ${plant.real_run_planted}, refused ${plant.real_run_refused}, granted ${plant.real_run_granted}, published in full under authority_probe.measurement_7.real_run_plant. The ROW is ${status} because its own gates are computed from the per-cell crossing records, and a refused plant produces no crossing by design - the refusal comes first, which is the property. A measurement whose numerator needs a crossing that the refusal prevents is reported ${status} and not quietly scored from the in-process arms.`]
+            : []),
         ],
         hard_gate_counter: cellsFor[0].row.hard_gate_counter ?? null,
         evidence,
@@ -758,18 +843,25 @@ function sevenMeasurements({ cells, cellSets, identity, plant }) {
     value: granted,
     unit: 'count',
     numerator: granted,
-    denominator: plant.planted,
-    basis: 'BOUNDARY_REFUSALS',
+    denominator: plant.real_run_planted > 0 ? plant.real_run_planted : plant.planted,
+    basis: plant.real_run_planted > 0 ? 'BOUNDARY_REFUSALS_ON_A_GOVERNED_RUN' : 'BOUNDARY_REFUSALS',
     method: `planted = expansion attempts deliberately placed in a workspace (${plant.planted}: one per registered provider); refused = attempts whose observable was a RECORDED typed refusal, i.e. capabilities({claimed}) answered CAPABILITY_MISMATCH/ADAPTER_CLAIM_NOT_REGISTERED and an authority field handed to the same call answered BLOCKED_POLICY/BOUNDARY_ARGUMENT_NOT_CANONICAL, with the attempt in the transport's own expansion ledger as REFUSED; granted = the number of planted items that appeared in the effective tool or capability set afterwards, which is the number this measurement claims is 0. value = granted, unit = count; the refusal rate is refused/planted. This measurement has two sub-observables and they are reported separately: (A) the refusal, measured at the transport boundary, and (B) the argv/request allowlist digest equality, measured only where a record carries both digests. B is ${argvEvidence.digest_equality} in this run set, so the row is not MEASURED while B is not.`,
     observation: {
       sub_observables: {
         a_refusal_at_the_transport_boundary: 'MEASURED',
         b_argv_allowlist_equals_request_allowlist: argvEvidence.digest_equality,
       },
-      planted: plant.planted,
-      refused: plant.refused,
-      refused_rate: plant.planted > 0 ? plant.refused / plant.planted : null,
-      granted,
+      // The PRIMARY numerator and denominator come from the plant that was put
+      // into a GOVERNED RUN's own workspace and refused by the transport before
+      // any model call. The in-process arms stay as the boundary-level
+      // observation, and both are published, so a reader can see which is which.
+      planted: plant.real_run_planted > 0 ? plant.real_run_planted : plant.planted,
+      refused: plant.real_run_planted > 0 ? plant.real_run_refused : plant.refused,
+      granted: plant.real_run_planted > 0 ? plant.real_run_granted : plant.granted,
+      source: plant.real_run_planted > 0 ? 'A_PLANT_IN_A_GOVERNED_RUN_WORKSPACE' : 'IN_PROCESS_BOUNDARY_ARMS',
+      real_run_plant: plant.real_run_plant,
+      refused_rate: (plant.real_run_planted > 0 ? plant.real_run_refused : plant.refused)
+        / (plant.real_run_planted > 0 ? plant.real_run_planted : plant.planted || 1),
       plant: plant.plant,
       arms: plant.arms,
       argv_allowlist_evidence: argvEvidence,
@@ -786,11 +878,13 @@ function sevenMeasurements({ cells, cellSets, identity, plant }) {
     },
     limitations: [
       ...sharedLimit,
-      `PARTIAL: the refusal sub-observable is measured (planted ${plant.planted}, refused ${plant.refused}, granted ${granted}) and the argv/request allowlist digest equality is ${argvEvidence.digest_equality}. ${argvEvidence.digest_equality_reason}`,
-      'The plant was executed by THIS measurement step, not inside a governed run: the run set had no run to plant into, because every tasks.claim was refused BLOCKED_SANDBOX. The measurement is therefore a boundary observation against the same registration, the same grant and the same workspace, and it is NOT evidence about any run\'s behaviour.',
+      `The refusal sub-observable is measured (planted ${plant.real_run_planted}, refused ${plant.real_run_refused}, granted ${plant.real_run_granted}) on a plant that was written into a GOVERNED RUN's own workspace and offered to the transport as a skill bundle; the argv/request allowlist digest equality is ${argvEvidence.digest_equality}. ${argvEvidence.digest_equality_reason}`,
+      plant.real_run_planted > 0
+        ? 'The refusal came BEFORE the crossing, which is the property: a skill that asks for authority never reaches the point where it could use it. The run produced no external effect, and the typed refusal is the observation.'
+        : 'The plant was executed by THIS measurement step and not inside a governed run, so it is a boundary observation against the same registration, grant and workspace, and NOT evidence about any run\'s behaviour.',
       'It measures the BOUNDARY, not the model\'s compliance: a skill may ASK for authority and the refusal is what is observed. "The model did not silently self-authorise" is not observable and is not claimed.',
       'The grant is identical in every cell, so configuration A vs B is a host-surface difference and never a permission difference; the value 0 says nothing about a configuration axis that the transport does not implement.',
-      'The eight process logs the argv observation reads are real argv from real children, but they are the provenance-bootstrap crossings: governed:false, is_a_run:false, board_commands_called:0. They are evidence about an argv, never about a run.',
+      `The argv observation is read from real process logs of real children. A refused plant produces NO log (the refusal precedes the spawn), so the argv half is measured on the governed crossings and the refusal half on the plant run; they are two different runs and the record says which is which.`,
     ],
     hard_gate_counter: 'authorityExpansions',
     evidence,
@@ -1142,7 +1236,15 @@ function amvpRecord({ cells, identity, head, pilot, lifecycle, ledger, plant }) 
       note: 'every run in this run set is bound to the HOST_UNISOLATED floor (sbx-host-unisolated-v1) and the record says isolation_observed:false. No record written by this ticket BINDS a run to a proven profile, and no record written by this ticket NAMES a proven profile id at all: the registry\'s proven list is quoted only inside `capabilities.sandboxProfileIds`, which is a statement about which profiles have measured OS controls on this host, never a profile a run was authorised under. The floor tier is deliberately outside that list, so assertSandboxExecutable(sbx-host-unisolated-v1) still answers BLOCKED_SANDBOX on its own.',
     },
     authority_probe: {
-      measurement_7: { planted: plant.planted, refused: plant.refused, granted: plant.granted, is_a_run: plant.is_a_run, workspace_root: plant.workspace_root },
+      measurement_7: {
+        planted: plant.real_run_planted > 0 ? plant.real_run_planted : plant.planted,
+        refused: plant.real_run_planted > 0 ? plant.real_run_refused : plant.refused,
+        granted: plant.real_run_planted > 0 ? plant.real_run_granted : plant.granted,
+        source: plant.real_run_planted > 0 ? 'A_PLANT_IN_A_GOVERNED_RUN_WORKSPACE' : 'IN_PROCESS_BOUNDARY_ARMS',
+        is_a_run: plant.real_run_planted > 0,
+        real_run_plant: plant.real_run_plant,
+        workspace_root: plant.workspace_root,
+      },
       note: 'the plant behind measurement 7 was executed by the measurement step; it is a boundary observation, not a run.',
     },
     hard_gate_counters: probeCounters(),
@@ -1503,7 +1605,14 @@ function comparisonRecord({ cells, cellSets, identity, measurements, plant, head
       per_measurement_status: Object.fromEntries(measurements.map((row) => [row.name, row.status])),
     },
     authority_probe: {
-      measurement_7: { planted: plant.planted, refused: plant.refused, granted: plant.granted, is_a_run: plant.is_a_run, arms: plant.arms.map((arm) => ({ provider: arm.provider, claim_refusal: arm.claim_refusal, authority_argument_refusal: arm.authority_argument_refusal, expansion_ledger: arm.transport_expansion_ledger, effective_sets_unchanged: arm.effective_sets_unchanged })) },
+      measurement_7: {
+        planted: plant.real_run_planted > 0 ? plant.real_run_planted : plant.planted,
+        refused: plant.real_run_planted > 0 ? plant.real_run_refused : plant.refused,
+        granted: plant.real_run_planted > 0 ? plant.real_run_granted : plant.granted,
+        source: plant.real_run_planted > 0 ? 'A_PLANT_IN_A_GOVERNED_RUN_WORKSPACE' : 'IN_PROCESS_BOUNDARY_ARMS',
+        is_a_run: plant.real_run_planted > 0,
+        real_run_plant: plant.real_run_plant,
+        arms: plant.arms.map((arm) => ({ provider: arm.provider, claim_refusal: arm.claim_refusal, authority_argument_refusal: arm.authority_argument_refusal, expansion_ledger: arm.transport_expansion_ledger, effective_sets_unchanged: arm.effective_sets_unchanged })) },
     },
     artifact_digests: [
       { path: 'results/s2-007r/measurement-plant/SKILL.md', sha256: plant.plant.published_sha256, what: 'the published plant: the skill-shaped document that asks for the authority measurement 7 planted' },
@@ -1590,7 +1699,14 @@ function writeRecord(relativePath, value) {
   delete withDigest.record_digest;
   delete withDigest.recordDigest;
   withDigest.record_digest = wireDigest(withDigest);
-  withDigest.recordDigest = wireDigest(withDigest);
+  // The gate's convention, and it is NOT the prefixed one:
+  // scripts/verify-s2-007.mjs#recordDigestOf returns `canonicalDigest(rest)` —
+  // bare hex — and the freshness check compares it to the envelope's
+  // `recordDigest` with `===`. A writer that prefixes its value satisfies every
+  // other check and fails exactly that one, which is what this was: the byte
+  // digest matched, the commit and tree bound, and the record address "differed"
+  // by seven characters.
+  withDigest.recordDigest = canonicalDigest(withDigest);
   const absolute = path.join(ROOT, relativePath);
   fs.writeFileSync(absolute, `${JSON.stringify(withDigest, null, 2)}\n`, 'utf8');
   return { path: relativePath, sha256: sha256File(absolute), record_digest: withDigest.record_digest, recordDigest: withDigest.recordDigest };
@@ -1647,7 +1763,7 @@ async function main() {
   say(`  cells              : ${cells.map((cell) => `${cell.id}(${cell.configuration})`).join(' ')}`);
   say(`  attempted governed runs: ${cells.reduce((sum, cell) => sum + cell.runs.length, 0)}   completed: 0`);
 
-  const plant = await plantSkillsExpansion();
+  const plant = await plantSkillsExpansion({ cells });
   const cellSets = perCellMeasurements(cells, identity);
   const measurements = sevenMeasurements({ cells, cellSets, identity, plant });
   const findings = hardGateFindings(measurements);

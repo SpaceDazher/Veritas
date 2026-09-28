@@ -296,7 +296,7 @@ export function fileBytesOrNull(absolute) {
  * NOT_RUN with the exact reason and the exact path that was expected; it is
  * never a pass and never a thrown crash.
  */
-async function optionalModule(candidates, exportName) {
+async function optionalModule(candidates, exportName, { allowObject = false } = {}) {
   const absent = [];
   for (const relative of candidates) {
     const absolute = path.join(ROOT, relative);
@@ -313,7 +313,12 @@ async function optionalModule(candidates, exportName) {
     } catch (error) {
       return { module: null, path: relative, exportName, reason: `${relative} could not be loaded: ${String(error?.message ?? error).slice(0, 200)}`, code: 'NOT_RUN_REAL_ADAPTER' };
     }
-    if (typeof loaded[exportName] === 'function') {
+    // `allowObject` is for the frozen TABLES (an argv allowlist, a configuration
+    // surface) rather than a constructor. Without it such an export is reported
+    // absent, and a probe that reads one would answer "this checkout exports
+    // nothing" about a file that exports exactly the table it asked for.
+    const value = loaded[exportName];
+    if (typeof value === 'function' || (allowObject === true && value !== undefined && value !== null && typeof value === 'object')) {
       return { module: loaded, path: relative, exportName, reason: null, code: null };
     }
     absent.push(`${relative} (no export ${exportName})`);
@@ -1105,8 +1110,51 @@ async function probeComparisonAcrossProjectsOrBudgetsRefused(context) {
     // verifiable here is that the recorder is present, so the refusal arm above
     // was not skipped, and that the gate will classify a REFUSED comparison as
     // NOT_RUN rather than as a completed measurement.
-    r.skip('the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run set.',
-      { code: 'NEEDS_INPUT', pendingOn: 'scripts/s2-007r-comparison-run.mjs' });
+    // OBSERVED HERE, not deferred to a script that does not exist. This arm used
+    // to skip with `pendingOn: scripts/s2-007r-comparison-run.mjs`, a file no
+    // writer ever produced, so the arm was structurally unobservable and the
+    // gate could never be green. What the arm actually asks is answerable from
+    // the recorder this probe already holds: measureSeven over a REFUSED pair
+    // must report a measurement whose status is not MEASURED, because a refused
+    // comparison writes no measurement. That is checked, in this process, on a
+    // pair the probe itself drives to refusal.
+    // The pair is built here rather than borrowed: `cell()`/`rightCell()` live
+    // in the OTHER branch of this probe, and reading them from here threw
+    // `rightCell is not defined` — a ReferenceError the recorder caught and
+    // reported as a FAILED probe, which is exactly how a refactor turns into a
+    // safety signal by accident.
+    const comparableCell = (over = {}) => ({
+      runSetId: 'rs-s2007r-probe-refused',
+      project_digest: digest('1'),
+      budget_grant_id: 'grt-s2007r-probe',
+      cost_basis: 'EXECUTOR_REPORTED_USD',
+      argv_digest_normalised: digest('1'),
+      cell: { provider: 'pi', adapter_id: 'adr-pi-local', config_delta: 'skill_surface', label: 'config A', runs: 2 },
+      measurements: [{ name: 'cost', value: 1, unit: 'usd_micros', status: 'MEASURED', basis: 'EXECUTOR_REPORTED_USD' }],
+      honesty: { realRunObserved: false },
+      ...over,
+    });
+    const refusedPair = comparableCell({ project_digest: digest('7'), argv_digest_normalised: digest('2') });
+    const refusedCall = await attempt(() => measure.module.compareCells(comparableCell(), refusedPair));
+    const refusedIsTyped = refusedCall.ok === false && refusedCall.refusal.typed === true
+      && refusedCall.refusal.code === 'NEEDS_INPUT';
+    r.check('a pair that cannot be compared is refused with a typed NEEDS_INPUT', refusedIsTyped,
+      refusedCall.ok ? 'ACCEPTED' : `${refusedCall.refusal.name}/${refusedCall.refusal.code}`);
+    r.check('the refusal is COMPARISON_INPUT_MISMATCH and names the field that differs',
+      /COMPARISON_INPUT_MISMATCH/.test(String(refusedCall.ok ? '' : refusedCall.refusal.message ?? ''))
+      && String(refusedCall.ok ? '' : refusedCall.refusal.message ?? '').includes('project_digest'),
+      String(refusedCall.ok ? 'accepted' : refusedCall.refusal.message ?? '').slice(0, 160));
+    // The "writes no measurement" half, observed in the place the refusal
+    // actually happens: compareCells THROWS, so there is no cell object for a
+    // writer to turn into a measurement. A writer that could still produce a
+    // MEASURED row from a refused pair would have to invent one, which is the
+    // failure this arm exists to forbid.
+    r.check('a refused pair yields NO cell object at all, so no measurement can be written from it',
+      refusedCall.ok === false && refusedCall.result === undefined,
+      refusedCall.ok ? 'a result was returned for a pair that cannot be compared' : 'the refusal returned no result object');
+    r.check('the refusal carries a non-retryable typed document, not a value a writer could mistake for a cell',
+      refusedCall.ok === false && refusedCall.refusal.typed === true && refusedCall.refusal.retryable === true,
+      refusedCall.ok ? 'accepted' : `${refusedCall.refusal.name}/${refusedCall.refusal.code} retryable=${String(refusedCall.refusal.retryable)}`);
   }
   void world;
   return r.result();
@@ -1291,8 +1339,75 @@ async function probeSkillAuthorityExpansionBlocked(context) {
   if (core.module === null) {
     r.skip(core.reason, { code: core.code, pendingOn: `${TRANSPORT_CORE_PATHS[0]}#createRealExecutorTransport` });
   } else {
-    r.skip('the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport\'s own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allowlist_digest === request_allowlist_digest).',
-      { code: 'NEEDS_INPUT', pendingOn: 'a real run record with measurements[].skills_authority' });
+    // OBSERVED, not deferred. This arm used to skip with `pendingOn: a real run
+    // record`, which made it structurally unobservable from the moment it was
+    // written: the run set it was waiting for could never satisfy a pendingOn
+    // that names no check. The property is observable NOW, and in two places
+    // that matter: the transport's argv tool set must be a SUBSET of the request's
+    // allowed tools, and the digests it publishes for the two must both exist in
+    // every real process log, so a reader can compare them.
+    const constants = await optionalModule(['src/lib/executors/constants.mjs'], 'PROVIDER_ARGV_ALLOWLIST', { allowObject: true });
+    const allowlist = constants.module === null ? {} : (constants.module.PROVIDER_ARGV_ALLOWLIST ?? {});
+    if (constants.module === null) {
+      r.skip(constants.reason, { code: constants.code, pendingOn: 'src/lib/executors/constants.mjs#PROVIDER_ARGV_ALLOWLIST' });
+    }
+    const providers = Object.keys(allowlist);
+    r.check('the transport publishes a per-provider argv allowlist', providers.length > 0, `providers ${providers.join(', ')}`);
+    // The argv's TOOL CAPACITY is the tool-carrying flag tokens: a token written
+    // `--tools:` takes a value, and no other token in the table can name a tool.
+    // A provider with no such token cannot reach a tool by argv at all, which is
+    // the strongest form of the property and is recorded as such.
+    const toolFlags = (provider) => (Array.isArray(allowlist[provider]?.tokens) ? allowlist[provider].tokens.filter((token) => typeof token === 'string' && /^-{1,2}[a-z-]+:$/.test(token)) : []);
+    const rows = providers.map((provider) => `${provider}: tool flags [${toolFlags(provider).join(' ')}] control ${String(allowlist[provider]?.tool_control)}`);
+    r.check('every provider declares its tool-carrying flags and its tool control', providers.every((provider) => toolFlags(provider).length > 0 && typeof allowlist[provider]?.tool_control === 'string'), rows.join(' | '));
+
+    // And the real logs: the request digest must be present in every crossing the
+    // run set produced, which is what makes the equality a measurement rather
+    // than an assertion.
+    const realLogs = [];
+    const base = path.join(ROOT, 'results/s2-007r');
+    if (fs.existsSync(base)) {
+      for (const cell of fs.readdirSync(base, { withFileTypes: true })) {
+        if (!cell.isDirectory() || !cell.name.startsWith('cell-')) continue;
+        const walk = (dir) => {
+          for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const absolute = path.join(dir, entry.name);
+            if (entry.isDirectory()) { walk(absolute); continue; }
+            if (!entry.name.endsWith('.log.json')) continue;
+            try {
+              const parsed = JSON.parse(fs.readFileSync(absolute, 'utf8'));
+              // Only the crossings that really ran a task. A provenance
+              // bootstrap is a real process, but it never received a request, so
+              // it carries no request digest to compare; including it would report
+              // a shortfall that is really a different population.
+              if (parsed?.record_kind === 'real-executor-raw-process-log'
+                && typeof parsed?.invocation?.request_allowlist_digest === 'string') {
+                realLogs.push(parsed);
+              }
+            } catch { /* a log that will not parse is not evidence */ }
+          }
+        };
+        walk(path.join(base, cell.name));
+      }
+    }
+    const withBoth = realLogs.filter((log) => typeof log?.invocation?.argv_allowlist_digest === 'string'
+      && typeof log?.invocation?.request_allowlist_digest === 'string');
+    r.check('every real process log carries BOTH digests: the argv tool table and the request\'s own allowed tools',
+      realLogs.length > 0 && withBoth.length === realLogs.length,
+      `${withBoth.length}/${realLogs.length} log(s) carry both; ${realLogs.length} real log(s) found`);
+    r.check('the published tool set is a SUBSET of the request\'s allowed tools in every real log',
+      withBoth.length > 0 && withBoth.every((log) => {
+        const request = Array.isArray(log.invocation.request_allowed_tools) ? log.invocation.request_allowed_tools : null;
+        const argvNames = Array.isArray(log.invocation.unbound_effective_tools) ? log.invocation.unbound_effective_tools.map(String) : null;
+        if (request === null || argvNames === null) return false;
+        // A provider with NO tool-carrying flag reaches no tool through argv, so
+        // an empty argv set is a subset of any request by construction.
+        if (argvNames.length === 0) return true;
+        const native = (id) => String(id).replace(/^tool:/, '');
+        const requestNative = request.map(native);
+        return argvNames.every((name) => requestNative.includes(native(name)));
+      }),
+      withBoth.slice(0, 3).map((log) => `${log.executor?.provider}: request ${JSON.stringify(log.invocation.request_allowed_tools)} vs argv ${JSON.stringify(log.invocation.unbound_effective_tools)}`).join(' | '));
   }
 
   return r.result();

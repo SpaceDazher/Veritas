@@ -1166,6 +1166,16 @@ export function createRealExecutorTransport({
         tool_control: PROVIDER_ARGV_ALLOWLIST[provider].tool_control,
         argv_allowlist: [...PROVIDER_ARGV_ALLOWLIST[provider].tokens],
         argv_allowlist_digest: wireDigest(PROVIDER_ARGV_ALLOWLIST[provider].tokens.join(' ')),
+        // THE REQUEST SIDE OF THE SAME CLAIM. The argv allowlist is the transport's
+        // own table; it is the REQUEST's `allowed_tools` that authorises a tool,
+        // and until both digests travel in the same log a reader cannot check
+        // that the child's flags were derived from the request rather than
+        // chosen by this file. The equality is a measurement (skills authority
+        // expansion) and a probe, and neither could observe it while the log
+        // carried only the left-hand side.
+        request_allowed_tools: [...(Array.isArray(run.request_allowed_tools) ? run.request_allowed_tools : [])],
+        request_allowlist_digest: wireDigest((Array.isArray(run.request_allowed_tools) ? run.request_allowed_tools : []).join(' ')),
+        tool_digest_of_argv: wireDigest([...effectiveNativeTools(run.effective_tools).unbound].join(' ')),
         // THE CONFIGURATION AXIS, as executed. `configuration` is which end of
         // the axis this invocation ran; `configuration_axis.distinguishable` is
         // whether this provider may be compared at all, and the reason is the
@@ -1566,6 +1576,11 @@ export function createRealExecutorTransport({
           budget_currency: preflight.budget_grant.currency,
           timeout_ms: preflight.budget_grant.timeout_ms,
           cwd: resolved.cwd,
+          // The request's OWN tool list, kept beside the effective intersection.
+          // The effective set is what the child may use; the request's list is
+          // what it was authorised to ask for, and the raw process log has to
+          // carry both so a reader can check the one was derived from the other.
+          request_allowed_tools: [...preflight.allowed_tools],
           effective_tools: effective,
           last_sequence: 0,
           cancelled: false,
@@ -1925,7 +1940,13 @@ export function createRealExecutorTransport({
     evidenceRecord() {
       const run = state.run;
       const [entry] = state.rawLogs;
-      if (run === null || entry === null) return null;
+      // `entry` is UNDEFINED, not null, when the crossing has no raw log yet, and
+      // the guard compared against null only — so the very next line dereferenced
+      // undefined and surfaced as an untyped TypeError in the driver, hundreds of
+      // lines away from the cause. No log means no corroboration: that is the
+      // fail-closed answer, and it is what a run whose log is still unwritten
+      // deserves.
+      if (run === null || entry === undefined || entry === null) return null;
       if (state.exit === null) return null;
       const record = {
         run_id: run.run_id,

@@ -2,7 +2,7 @@
   "contractVersion": "1.0.0",
   "record_kind": "real-executor-raw-process-log",
   "executor_version": "s2-007r-real-executor-v1",
-  "run_id": "run-pilot-000002",
+  "run_id": "run-bootstrap-codex-pilot",
   "executor": {
     "provider": "codex",
     "binary_path": "/home/daniil/.local/lib/node_modules/@openai/codex/bin/codex.js",
@@ -18,16 +18,16 @@
       "--sandbox",
       "read-only",
       "-C",
-      "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
+      "/tmp/veritas-s2-007r-ws/pilot/bootstrap",
       "--output-last-message",
-      "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/last-message.txt",
+      "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-plant/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/last-message.txt",
       "--model",
-      "openrouter/amazon/nova-lite-v1",
-      "You are executing one bounded unit of work for the Veritas Agent Board (S2-007R).\nWorkspace: /tmp/veritas-s2-007r-ws/pilot/run-02/project (the ONLY location you may read or write; every path below is relative to it).\nBoard task: abt-s2007r-pilot-02   Project task: T1\nGoal: fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\nAcceptance criteria:\n1. fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\n2. The deterministic oracle of the project (node verify.mjs T1) exits 0 on the workspace copy after the run.\n3. The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.\n4. The executor process is a real installed CLI, and its own output is recorded as the run record.\nWork on the files named by the goal. You MAY edit them: this is a write task, and a change\nthat makes the goal true is the point. Do not touch any other file, do not add dependencies,\ndo not use the network, and do not read or write anything outside the workspace.\nEnd your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>."
+      "veritas-s2-007r-nonexistent/no-such-model",
+      "Reply with exactly one token: PING."
     ],
     "argv_carries_prompt_in_cleartext": true,
-    "brief_digest": "sha256:d4e6659251556ddb7441b16a6a62d27495f993541b5d2f092a7cc8b29f9881f4",
-    "cwd": "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
+    "brief_digest": "sha256:2c4a8fbe5bced6d29a7e16c7c3e4b7a40dd665b113d2b0c824dd56d13b126c93",
+    "cwd": "/tmp/veritas-s2-007r-ws/pilot/bootstrap",
     "skills": null,
     "effective_tools": [
       "tool:fs.read"
@@ -52,10 +52,10 @@
     ],
     "request_allowlist_digest": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
     "tool_digest_of_argv": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
-    "configuration": "B",
-    "configuration_name": "LIMITED_BUILD",
+    "configuration": "A",
+    "configuration_name": "HOST_DEFAULT_CONTEXT_SURFACE",
     "configuration_surface_flags": [],
-    "configuration_note": "every context surface the executor discovers is explicitly suppressed",
+    "configuration_note": "the host default context surface: no suppression flag is passed, so the executor loads whatever the host has installed and the board grants exactly the same tools it grants in configuration B",
     "configuration_axis": {
       "axis": "context_surface",
       "provider": "codex",
@@ -74,8 +74,8 @@
       },
       "exclusion": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\"."
     },
-    "argv_digest_raw": "sha256:bc37a2ef087f95c38ddb26821b5f4a6f29f85be92590705c6cf3b2e0a6c483b8",
-    "argv_digest_normalised": "sha256:cadecd4b5098ec14deda2c683e5661179cf6621f8f149c884b115b1d6bbd38db",
+    "argv_digest_raw": "sha256:7b0ff7f5b3cb7bc3cbd0472ab30085f999d3e47c601e15c06132bf04ffbe7692",
+    "argv_digest_normalised": "sha256:6b0130c73fa70ca3ce4f3f517e8da4a309daea4becd9754c6318dc0c26ec3fcb",
     "argv_normalised": [
       "exec",
       "--json",
@@ -88,8 +88,8 @@
       "--output-last-message",
       "<evidence_dir>/<run_id>/raw/last-message.txt",
       "--model",
-      "openrouter/amazon/nova-lite-v1",
-      "You are executing one bounded unit of work for the Veritas Agent Board (S2-007R).\nWorkspace: <project_root> (the ONLY location you may read or write; every path below is relative to it).\nBoard task: abt-s2007r-pilot-02   Project task: T1\nGoal: fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\nAcceptance criteria:\n1. fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10\n2. The deterministic oracle of the project (node verify.mjs T1) exits 0 on the workspace copy after the run.\n3. The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.\n4. The executor process is a real installed CLI, and its own output is recorded as the run record.\nWork on the files named by the goal. You MAY edit them: this is a write task, and a change\nthat makes the goal true is the point. Do not touch any other file, do not add dependencies,\ndo not use the network, and do not read or write anything outside the workspace.\nEnd your answer with one line: MODIFIED: <comma-separated workspace-relative paths, or none>."
+      "veritas-s2-007r-nonexistent/no-such-model",
+      "Reply with exactly one token: PING."
     ],
     "argv_normalisation": {
       "rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
@@ -159,13 +159,13 @@
     ],
     "requested_read_only_paths": [],
     "read_only_paths_enforced": false,
-    "cwd": "/tmp/veritas-s2-007r-ws/pilot/run-02/project",
+    "cwd": "/tmp/veritas-s2-007r-ws/pilot/bootstrap",
     "cwd_inside_declared_roots": false,
     "os_controls_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
     "limit": "a real run on this host is HOST_UNISOLATED; the profile id is the request-side declaration only, and no A-MVP isolation clause may be scored against a run whose own evidence says isolation_applied:false"
   },
-  "started_at": "2026-09-26T09:01:36.000Z",
-  "ended_at": "2026-09-26T09:02:41.000Z",
+  "started_at": "2026-09-26T09:00:01.000Z",
+  "ended_at": "2026-09-26T09:00:01.000Z",
   "budget_grant": {
     "currency": "USD",
     "timeout_ms": 600000
@@ -173,8 +173,8 @@
   "exit_status": 1,
   "signal": null,
   "cause": null,
-  "stdout_sha256": "sha256:158aa01e118fd5a438db71752ea34a3591e332731771101699b923c7170c69d9",
-  "stdout_bytes": 1015,
+  "stdout_sha256": "sha256:465538831c2400cd276f87ff8240382c335b43e15c2b06534ebefdb96b07b19c",
+  "stdout_bytes": 1048,
   "stderr_sha256": "sha256:1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
   "stderr_bytes": 39,
   "output_truncated": false,
@@ -182,7 +182,7 @@
   "assistant_text_bytes": 0,
   "provider_error": {
     "reason": "EXECUTOR_ERROR_RECORD",
-    "message": "Model metadata for `openrouter/amazon/nova-lite-v1` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.",
+    "message": "Model metadata for `veritas-s2-007r-nonexistent/no-such-model` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.",
     "credit_limited": false
   },
   "usage": {
@@ -196,7 +196,7 @@
     "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
     "model_id": null,
     "tool_calls": 2,
-    "executor_session_id": "01a0e5ad-5a4e-71f3-b064-62fc9f87cfa0"
+    "executor_session_id": "01a0e5c1-00f2-7882-8f06-80445892087a"
   },
   "exit_observed": true,
   "cancel_proof": null,

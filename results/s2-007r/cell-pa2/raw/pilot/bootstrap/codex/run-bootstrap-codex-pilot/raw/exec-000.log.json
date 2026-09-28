@@ -47,6 +47,11 @@
       "--model:"
     ],
     "argv_allowlist_digest": "sha256:fbf360154b342aca785788b3129ecbad5d8defaf092245654c1d304fdacc4dac",
+    "request_allowed_tools": [
+      "tool:fs.read"
+    ],
+    "request_allowlist_digest": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
+    "tool_digest_of_argv": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
     "configuration": "A",
     "configuration_name": "HOST_DEFAULT_CONTEXT_SURFACE",
     "configuration_surface_flags": [],
@@ -168,7 +173,7 @@
   "exit_status": 1,
   "signal": null,
   "cause": null,
-  "stdout_sha256": "sha256:7198c4f06828e4a42ea9c6b0bc84e32d89ff5464c40eae43fb04b0c94997da43",
+  "stdout_sha256": "sha256:b29d45f90ac1ea75c142696bd7b888dfd5b337a9d7569e8e1029372dc15a81db",
   "stdout_bytes": 1048,
   "stderr_sha256": "sha256:1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
   "stderr_bytes": 39,
@@ -191,7 +196,7 @@
     "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
     "model_id": null,
     "tool_calls": 2,
-    "executor_session_id": "01a0e346-5f84-7cb1-a3ae-a1887e6fbc47"
+    "executor_session_id": "01a0e5ba-abd7-7d32-bd5b-294f303b92fa"
   },
   "exit_observed": true,
   "cancel_proof": null,

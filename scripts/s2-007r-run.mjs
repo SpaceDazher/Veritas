@@ -1854,6 +1854,29 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
 
   // --- 0. a fresh copy of the ONE project, and its digest, BEFORE anything ---
   const copy = materialiseRunProject(source, runRoot);
+
+  // THE PLANT, when asked for: written into THIS run's own copy, so the executor
+  // really sees it and the transport's refusal is really exercised. Its digest is
+  // published beside the run, because "a refusal happened" is only half the fact;
+  // the other half is which bytes were refused.
+  let plant = null;
+  if (typeof run.options.plant === 'string' && run.options.plant.length > 0) {
+    const plantSource = path.resolve(ROOT, run.options.plant);
+    if (!fs.existsSync(plantSource)) {
+      throw new NeedsInput('PLANT_ABSENT', `the planted skill ${displayPath(plantSource)} does not exist; a plant that is not in the workspace cannot be refused by a run`);
+    }
+    const plantPath = path.join(copy.realpath, 'SKILL.md');
+    fs.copyFileSync(plantSource, plantPath);
+    plant = {
+      path: displayPath(plantPath),
+      workspace_relative: 'SKILL.md',
+      source: displayPath(plantSource),
+      bytes: fs.statSync(plantPath).size,
+      sha256: createHash('sha256').update(fs.readFileSync(plantPath)).digest('hex'),
+      planted_before_dispatch: true,
+      asks_for: { capabilities: ['net.fetch', 'board.review.approve'], tools: ['tool:net.fetch'] },
+    };
+  }
   record.project = {
     source: source.requested,
     source_realpath: source.realpath,
@@ -1885,6 +1908,7 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
     'The project digest before and after the run is recorded, and the per-check verdicts the oracle printed are recorded with it.',
     'The executor process is a real installed CLI, and its own output is recorded as the run record.',
   ];
+  record.plant = plant;
   record.project_task = {
     project_task_id: projectTaskId,
     goal,
@@ -2119,6 +2143,12 @@ async function runOneTask({ run, index, source, budget, registration, rawLogDir 
     config: run.options.configuration,
     prompt,
     allowedTools: taskDocument.allowed_tools,
+    // The plant travels as a SKILL BUNDLE, so the transport parses it through the same
+    // path a real skill takes and refuses it in the same place.
+    // `paths`, plural: the transport's bundle shape takes a LIST, and a single
+    // string here is refused as malformed before the plant is ever read.
+    skillBundle: plant === null ? null : { paths: [plant.path], requested_tools: plant.asks_for.tools },
+    skillRoots: plant === null ? [] : [copy.realpath],
     toolBindings: {},
     model: run.options.model,
     timeoutMs: BUDGET_TIMEOUT_MS,
@@ -2695,6 +2725,12 @@ async function main() {
     // same parsed bag as every other option and passed through as a REQUIRED
     // value: the driver never picks a criterion for the operator.
     projectTask: value(args['project-task']),
+    // A skill-shaped file planted in the run's OWN workspace, asking for a tool
+    // and two capabilities the grant does not carry. It is planted BEFORE the run
+    // and passed to the transport as a skill bundle, so the transport's own
+    // authority-expansion refusal is exercised on a real crossing instead of only
+    // in a unit test.
+    plant: value(args.plant),
   };
 
   try {

@@ -25,6 +25,8 @@
       "openrouter/amazon/nova-lite-v1",
       "--project-task",
       "T1",
+      "--grant-id",
+      "grt-s2007r-pilot",
       "--budget",
       "2.00"
     ]
@@ -157,12 +159,12 @@
         {
           "adapter_id": "adr-opencode-local",
           "installed": true,
-          "detail": "opencode: executable found on PATH at /mnt/d/tools/opencode (1.18.27); a host fact only, not a registered veritas adapter and not a real-adapter run"
+          "detail": "opencode: executable found on PATH at /mnt/d/tools/opencode (version probe failed: spawnSync /mnt/d/tools/opencode ETIMEDOUT); a host fact only, not a registered veritas adapter and not a real-adapter run"
         },
         {
           "adapter_id": "adr-hermes-local",
           "installed": true,
-          "detail": "hermes: executable found on PATH at $HOME/.local/bin/hermes (Hermes Agent v0.21.3 (2026.9.14) · upstream 641f7c81); a host fact only, not a registered veritas adapter and not a real-adapter run"
+          "detail": "hermes: executable found on PATH at $HOME/.local/bin/hermes (version probe failed: spawnSync /home/daniil/.local/bin/hermes ETIMEDOUT); a host fact only, not a registered veritas adapter and not a real-adapter run"
         },
         {
           "adapter_id": "adr-generic-cli",
@@ -180,7 +182,7 @@
         "signal": null,
         "stdout": "0.87.1",
         "stderr": "",
-        "wall_ms": 230
+        "wall_ms": 1128
       },
       "codex": {
         "binary": "codex",
@@ -189,7 +191,7 @@
         "signal": null,
         "stdout": "codex-cli 0.157.1",
         "stderr": "",
-        "wall_ms": 38
+        "wall_ms": 237
       }
     },
     "version_process_note": "each entry is a REAL child process started by this driver (spawn with an argv array, no shell); it proves the executable starts and answers, and it does NOT prove a model call can complete — only a collected run result does that"
@@ -213,9 +215,9 @@
       "sandbox_profile_id": "sbx-host-unisolated-v1",
       "real_adapter_provenance": {
         "status": "REAL_ADAPTER_AVAILABLE",
-        "detail": "real pi executor s2-007r-real-executor-v1; corroborated on this host by run run-bootstrap-pi-pilot: binary sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774 and raw process log sha256:93f903203037ede46eb3dddbf3a578c4573ee033dc2ea28499b7d38bf203c6e6. That corroboration covers the process crossing only: the sandbox profile id on this document is a request-side declaration, and this transport spawns the child directly on the host, so no OS isolation was applied. Every run reco"
+        "detail": "real pi executor s2-007r-real-executor-v1; corroborated on this host by run run-bootstrap-pi-pilot: binary sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774 and raw process log sha256:32bad42b9cb2fd61ba2eaf1f04d651b819cdffb11251b7cab6e8a3688ac7cd08. That corroboration covers the process crossing only: the sandbox profile id on this document is a request-side declaration, and this transport spawns the child directly on the host, so no OS isolation was applied. Every run reco"
       },
-      "registration_digest": "sha256:2b0b17b7bded0f2f259592c7741fc87cbe380aa09661017514132fc0f3cf8337",
+      "registration_digest": "sha256:33fed74932a87f2dad9ec1ef2748d714c43c81ddb8a35b636f3e2cb26b9f9ffe",
       "schema_valid": true,
       "schema_source": "contracts/adapter-registration.schema.json via src/lib/agentboard/contracts.mjs#boardContractErrors",
       "register_decision": "ACCEPT",
@@ -231,7 +233,7 @@
         "provider": "pi",
         "binary_path": "/home/daniil/.local/bin/pi",
         "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
-        "raw_process_log_sha256": "sha256:93f903203037ede46eb3dddbf3a578c4573ee033dc2ea28499b7d38bf203c6e6",
+        "raw_process_log_sha256": "sha256:32bad42b9cb2fd61ba2eaf1f04d651b819cdffb11251b7cab6e8a3688ac7cd08",
         "exit_status": 1,
         "exit_observed": true
       }
@@ -254,9 +256,9 @@
       "sandbox_profile_id": "sbx-host-unisolated-v1",
       "real_adapter_provenance": {
         "status": "REAL_ADAPTER_AVAILABLE",
-        "detail": "real codex executor s2-007r-real-executor-v1; corroborated on this host by run run-bootstrap-codex-pilot: binary sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70 and raw process log sha256:42e3d288e19f7ebf2886f5f56e85bd57d75422436dd1ec90a48c8b23ca968da8. That corroboration covers the process crossing only: the sandbox profile id on this document is a request-side declaration, and this transport spawns the child directly on the host, so no OS isolation was applied. Every ru"
+        "detail": "real codex executor s2-007r-real-executor-v1; corroborated on this host by run run-bootstrap-codex-pilot: binary sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70 and raw process log sha256:4dda8fbab7f6793db0293f21bb452fd577339a403763e765504a06a565372a10. That corroboration covers the process crossing only: the sandbox profile id on this document is a request-side declaration, and this transport spawns the child directly on the host, so no OS isolation was applied. Every ru"
       },
-      "registration_digest": "sha256:90ec383123c880c3b4e2a084dd4d658a939ba5bb590f84fe38de033311aa0c05",
+      "registration_digest": "sha256:13de6996e3599c4a87787bab389fe36c3f1659341e3d05b1fc571e31eca07dcb",
       "schema_valid": true,
       "schema_source": "contracts/adapter-registration.schema.json via src/lib/agentboard/contracts.mjs#boardContractErrors",
       "register_decision": "ACCEPT",
@@ -272,7 +274,7 @@
         "provider": "codex",
         "binary_path": "/home/daniil/.local/bin/codex",
         "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
-        "raw_process_log_sha256": "sha256:42e3d288e19f7ebf2886f5f56e85bd57d75422436dd1ec90a48c8b23ca968da8",
+        "raw_process_log_sha256": "sha256:4dda8fbab7f6793db0293f21bb452fd577339a403763e765504a06a565372a10",
         "exit_status": 1,
         "exit_observed": true
       }
@@ -622,8 +624,8 @@
         "exit_status": 1,
         "exit_observed": true,
         "process": {
-          "pid": 132974,
-          "pgid": 132974,
+          "pid": 682446,
+          "pgid": 682446,
           "process_group_signalling": "POSIX_GROUP",
           "exit_code": 1,
           "signal": null,
@@ -634,8 +636,8 @@
         "raw_logs": [
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
-            "bytes": 11238,
-            "sha256": "sha256:93f903203037ede46eb3dddbf3a578c4573ee033dc2ea28499b7d38bf203c6e6"
+            "bytes": 11506,
+            "sha256": "sha256:32bad42b9cb2fd61ba2eaf1f04d651b819cdffb11251b7cab6e8a3688ac7cd08"
           }
         ],
         "evidence": {
@@ -643,7 +645,7 @@
           "provider": "pi",
           "binary_path": "/home/daniil/.local/bin/pi",
           "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
-          "raw_process_log_sha256": "sha256:93f903203037ede46eb3dddbf3a578c4573ee033dc2ea28499b7d38bf203c6e6",
+          "raw_process_log_sha256": "sha256:32bad42b9cb2fd61ba2eaf1f04d651b819cdffb11251b7cab6e8a3688ac7cd08",
           "exit_status": 1,
           "exit_observed": true
         },
@@ -654,7 +656,7 @@
           "tokens": null,
           "note": "the bootstrap crossing asks for a model id that cannot be resolved, so the measured expectation is 0 billed tokens; the value published here is what the executor itself reported, and a null means it reported no monetary cost at all"
         },
-        "wall_ms": 3006,
+        "wall_ms": 96349,
         "request_summary": {
           "task_id": "abt-bootstrap-pi-pilot",
           "lease_id": "lse-bootstrap-pi-pilot",
@@ -1017,8 +1019,8 @@
         "exit_status": 1,
         "exit_observed": true,
         "process": {
-          "pid": 133013,
-          "pgid": 133013,
+          "pid": 683898,
+          "pgid": 683898,
           "process_group_signalling": "POSIX_GROUP",
           "exit_code": 1,
           "signal": null,
@@ -1029,8 +1031,8 @@
         "raw_logs": [
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
-            "bytes": 14323,
-            "sha256": "sha256:42e3d288e19f7ebf2886f5f56e85bd57d75422436dd1ec90a48c8b23ca968da8"
+            "bytes": 14591,
+            "sha256": "sha256:4dda8fbab7f6793db0293f21bb452fd577339a403763e765504a06a565372a10"
           }
         ],
         "evidence": {
@@ -1038,7 +1040,7 @@
           "provider": "codex",
           "binary_path": "/home/daniil/.local/bin/codex",
           "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
-          "raw_process_log_sha256": "sha256:42e3d288e19f7ebf2886f5f56e85bd57d75422436dd1ec90a48c8b23ca968da8",
+          "raw_process_log_sha256": "sha256:4dda8fbab7f6793db0293f21bb452fd577339a403763e765504a06a565372a10",
           "exit_status": 1,
           "exit_observed": true
         },
@@ -1049,7 +1051,7 @@
           "tokens": null,
           "note": "the bootstrap crossing asks for a model id that cannot be resolved, so the measured expectation is 0 billed tokens; the value published here is what the executor itself reported, and a null means it reported no monetary cost at all"
         },
-        "wall_ms": 12082,
+        "wall_ms": 51926,
         "request_summary": {
           "task_id": "abt-bootstrap-codex-pilot",
           "lease_id": "lse-bootstrap-codex-pilot",
@@ -1575,8 +1577,8 @@
       "ledger": {
         "path": "results/s2-007r/cell-pb1/campaign-ledger.json",
         "existed": true,
-        "entries_before": 8,
-        "total_usd_before": 0.000352
+        "entries_before": 12,
+        "total_usd_before": 0.000561
       },
       "note": "the ledger is the enforcement, so it is read, quoted and written on every invocation"
     },
@@ -1606,7 +1608,7 @@
         "settle": {
           "decision": "ACCEPT",
           "code": null,
-          "amount": 0.000075,
+          "amount": 0.000065,
           "currency": "USD"
         }
       },
@@ -1649,7 +1651,7 @@
           "label": "01",
           "adapter": "adr-pi-local",
           "configuration": "B",
-          "usd": 0.000075,
+          "usd": 0.000065,
           "cost_basis": "EXECUTOR_REPORTED_USD"
         },
         {
@@ -1661,8 +1663,8 @@
           "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
         }
       ],
-      "total_usd": 0.000427,
-      "entries": 10
+      "total_usd": 0.000626,
+      "entries": 14
     },
     "campaign_ledger_note": "the ledger was appended before this record was published; the appended rows are exactly the runs' own settled amounts, and the sum is recomputable from `runs[].cost.settled_amount`"
   },
@@ -1881,12 +1883,12 @@
         {
           "adapter_id": "adr-opencode-local",
           "installed": true,
-          "detail": "opencode: executable found on PATH at /mnt/d/tools/opencode (1.18.27); a host fact only, not a registered veritas adapter and not a real-adapter run"
+          "detail": "opencode: executable found on PATH at /mnt/d/tools/opencode (version probe failed: spawnSync /mnt/d/tools/opencode ETIMEDOUT); a host fact only, not a registered veritas adapter and not a real-adapter run"
         },
         {
           "adapter_id": "adr-hermes-local",
           "installed": true,
-          "detail": "hermes: executable found on PATH at $HOME/.local/bin/hermes (Hermes Agent v0.21.3 (2026.9.14) · upstream 641f7c81); a host fact only, not a registered veritas adapter and not a real-adapter run"
+          "detail": "hermes: executable found on PATH at $HOME/.local/bin/hermes (version probe failed: spawnSync /home/daniil/.local/bin/hermes ETIMEDOUT); a host fact only, not a registered veritas adapter and not a real-adapter run"
         },
         {
           "adapter_id": "adr-generic-cli",
@@ -1902,7 +1904,7 @@
           "signal": null,
           "stdout": "0.87.1",
           "stderr": "",
-          "wall_ms": 230
+          "wall_ms": 1128
         },
         "codex": {
           "binary": "codex",
@@ -1911,7 +1913,7 @@
           "signal": null,
           "stdout": "codex-cli 0.157.1",
           "stderr": "",
-          "wall_ms": 38
+          "wall_ms": 237
         }
       }
     },
@@ -1920,14 +1922,14 @@
         "adapter_id": "adr-pi-local",
         "register_decision": "ACCEPT",
         "register_code": null,
-        "registration_digest": "sha256:2b0b17b7bded0f2f259592c7741fc87cbe380aa09661017514132fc0f3cf8337",
+        "registration_digest": "sha256:33fed74932a87f2dad9ec1ef2748d714c43c81ddb8a35b636f3e2cb26b9f9ffe",
         "schema_valid": true
       },
       {
         "adapter_id": "adr-codex-local",
         "register_decision": "ACCEPT",
         "register_code": null,
-        "registration_digest": "sha256:90ec383123c880c3b4e2a084dd4d658a939ba5bb590f84fe38de033311aa0c05",
+        "registration_digest": "sha256:13de6996e3599c4a87787bab389fe36c3f1659341e3d05b1fc571e31eca07dcb",
         "schema_valid": true
       }
     ],
@@ -2276,8 +2278,8 @@
         "exit_status": 1,
         "exit_observed": true,
         "process": {
-          "pid": 132974,
-          "pgid": 132974,
+          "pid": 682446,
+          "pgid": 682446,
           "process_group_signalling": "POSIX_GROUP",
           "exit_code": 1,
           "signal": null,
@@ -2288,8 +2290,8 @@
         "raw_logs": [
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
-            "bytes": 11238,
-            "sha256": "sha256:93f903203037ede46eb3dddbf3a578c4573ee033dc2ea28499b7d38bf203c6e6"
+            "bytes": 11506,
+            "sha256": "sha256:32bad42b9cb2fd61ba2eaf1f04d651b819cdffb11251b7cab6e8a3688ac7cd08"
           }
         ],
         "evidence": {
@@ -2297,7 +2299,7 @@
           "provider": "pi",
           "binary_path": "/home/daniil/.local/bin/pi",
           "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
-          "raw_process_log_sha256": "sha256:93f903203037ede46eb3dddbf3a578c4573ee033dc2ea28499b7d38bf203c6e6",
+          "raw_process_log_sha256": "sha256:32bad42b9cb2fd61ba2eaf1f04d651b819cdffb11251b7cab6e8a3688ac7cd08",
           "exit_status": 1,
           "exit_observed": true
         },
@@ -2308,7 +2310,7 @@
           "tokens": null,
           "note": "the bootstrap crossing asks for a model id that cannot be resolved, so the measured expectation is 0 billed tokens; the value published here is what the executor itself reported, and a null means it reported no monetary cost at all"
         },
-        "wall_ms": 3006,
+        "wall_ms": 96349,
         "request_summary": {
           "task_id": "abt-bootstrap-pi-pilot",
           "lease_id": "lse-bootstrap-pi-pilot",
@@ -2671,8 +2673,8 @@
         "exit_status": 1,
         "exit_observed": true,
         "process": {
-          "pid": 133013,
-          "pgid": 133013,
+          "pid": 683898,
+          "pgid": 683898,
           "process_group_signalling": "POSIX_GROUP",
           "exit_code": 1,
           "signal": null,
@@ -2683,8 +2685,8 @@
         "raw_logs": [
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
-            "bytes": 14323,
-            "sha256": "sha256:42e3d288e19f7ebf2886f5f56e85bd57d75422436dd1ec90a48c8b23ca968da8"
+            "bytes": 14591,
+            "sha256": "sha256:4dda8fbab7f6793db0293f21bb452fd577339a403763e765504a06a565372a10"
           }
         ],
         "evidence": {
@@ -2692,7 +2694,7 @@
           "provider": "codex",
           "binary_path": "/home/daniil/.local/bin/codex",
           "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
-          "raw_process_log_sha256": "sha256:42e3d288e19f7ebf2886f5f56e85bd57d75422436dd1ec90a48c8b23ca968da8",
+          "raw_process_log_sha256": "sha256:4dda8fbab7f6793db0293f21bb452fd577339a403763e765504a06a565372a10",
           "exit_status": 1,
           "exit_observed": true
         },
@@ -2703,7 +2705,7 @@
           "tokens": null,
           "note": "the bootstrap crossing asks for a model id that cannot be resolved, so the measured expectation is 0 billed tokens; the value published here is what the executor itself reported, and a null means it reported no monetary cost at all"
         },
-        "wall_ms": 12082,
+        "wall_ms": 51926,
         "request_summary": {
           "task_id": "abt-bootstrap-codex-pilot",
           "lease_id": "lse-bootstrap-codex-pilot",
@@ -2850,8 +2852,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:008a0d6e1dab254c2d401f29e38ada8c00b435210bd14b8f965b31bf61e0056f",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:b92ed9159ed455586b6203bbf3a29dd795deb5c52e878bdec92fed05fec8dbdb",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 3,
@@ -2859,8 +2861,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:c8b55c90c227ec72008bff95b404ab0607aa0a62a46e882327253dcb2824c904",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:8efafdb20b441fa60be8042191a79062c5d42bafc08b304948d826639e3b63b4",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 4,
@@ -2868,8 +2870,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:0ffa971fa4947e244ebcb6694ebfa6806a9f86c657beb89efba1f01636c2cbce",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:ae98cf9ad08be0d19d3edcee0f32cdca18fb643e5083f085bffa860d9e2d7fca",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 5,
@@ -2877,8 +2879,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:bdc9f963494e9324724040e12f895d73d253d5a50a42749a6118c73101a0c027",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:6520c30392908096d08f7f9185f25d9efa1cd3122865786be0badd0d7237aa5e",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 6,
@@ -2886,8 +2888,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:9cbd598ee377c8b15c74f19185f54145f79bcbe4f05a2a45fccaafa66018db7f",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:535d070168993dab52d869c7f5da6b30202683ceba45b9496516eff906e77665",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 7,
@@ -2895,8 +2897,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:fbfc5275d522b41c43ca2d937a10e3bbe4481bf7c1be620d6c22f6423c7b672c",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:ecfc77ee8994736616fcf217edc240719cb5f85e1b25e4977b925b0b91433806",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 8,
@@ -2904,8 +2906,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:ac545b2696076ce901c09915ab92ab47ede6b198526ebc67c463f2a434cfc4f5",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:be522b72bd753576848fa985e61cf944f1292d33f34ea891b227111933df2fc3",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 9,
@@ -2913,8 +2915,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:07d1e463a55ec1fed4088d1132879701950f9ea353275760d57c05ed0f480fe0",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:e4b0598d02cda78226a88d36444d88950d023ede6401fdcd8fcc00157213d8e5",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 10,
@@ -2922,8 +2924,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:ae8e1f83108f4dd2e47d998cef002274825f67fdae10dcacf4bbc2a1402d6cce",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:4f1f1aac81bc0c6265d244022361e6f89420c7c5ec08017d99241f267715a45e",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 11,
@@ -2931,8 +2933,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:e35bd1f3131ae0a2359e9f2f9ce72b1937cf2b028f2f203e7bf674d3fd26cb28",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:3fee21dbdf0ee65c1a92316b9b03b941752b5d3fab4a14fe670451ea331b66d9",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 12,
@@ -2940,8 +2942,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:93352fad278564f743e13000edc3831188e30053c7cfb9b670f08e3103de0157",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:400795a92bc432cb9d9f86ccb7569b0cfe5f66a1fc20d63019c749fa4d4af597",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 13,
@@ -2949,8 +2951,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:64df34ea5fe738647484d02594f1232bc71bbad64dd83ffe747eebf75e78c1b6",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:09bfc4f148a562b9f684702a55bd89d4f892793c2c95dc5808c4fc16b3809c05",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 14,
@@ -2958,8 +2960,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:bbfed9df2bb1a9e0532f4ca85d976fa88ad7b11c4736c14bbf2602265a6420f4",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:5672329c42e94a5e3561ca0ae8eeba18ef38f554b3f35ef3530385b3a925fe74",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 15,
@@ -2967,8 +2969,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:17ade776e2a3743cd733d8896e5ef3f43f7c0488d01a1ce2495f7c4b86f74db5",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:d99f29f5300120b292acd6c0d466e81da920e4125fc411b1800b1f764fee8ad5",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 16,
@@ -2976,8 +2978,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:2e0aa07609e7b54677d239003ac98650bd14bbbeff2b17bff7e9f68858d7b167",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:2c24853a6429e03f01ff05cefbd2f7f25d503dd2cbd1f22e908a56d9fec0ca51",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 17,
@@ -2985,8 +2987,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:94b1f535df4a353f2f3f6d82430da80f49b5b8c26e0fa4b019cfb5ffb21c3882",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:575704192b50aea0c7553a5cf76ae872eb42da8a0840d48ae12f3286a164a155",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 18,
@@ -2994,8 +2996,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:a29219ec020b3d98c1f6d1bfa9dfb149740f7b5d71746b1d63cc31125b51c249",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:d1f0f1e6c0dd05e3045ca9a8c1c74ee9f85a85109933d125dc14c7f4d6794b6a",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 19,
@@ -3003,8 +3005,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:3350f9b65ae6cd39a9e07809e0caf5072b9463f96fd318d66766e3db2c3e7dcc",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:1a7e20777f4a28d50d0b1250f52fc128c523eb901addc31c9052aad04abbe171",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 20,
@@ -3012,8 +3014,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:9d1d80bdf910b8130e2581a8fcf15cc0196fb2ce9540bc4ffda4864ef70e888a",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:a8c96dc2252529b81d79441325081f421d2f3019a60237bbcd96b44989fa010e",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 21,
@@ -3021,8 +3023,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f519be6ee1c904c3339ee94b0731a3ae8baf382290e528a882af801936f2dd39",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:bae3b808a24344fac3d52207e4fc18cdb0e7685939e62b5521f5ca615740fa88",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 22,
@@ -3030,8 +3032,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:9aece1deaa387c1ec1b9f0a39c59f1fa42eb335f86bb379292ad3dfca9cbd178",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:9469cf72ad8fa1f778c2e9868a79fc13a4622559905249da67bd7f2fbb1c676c",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 23,
@@ -3039,8 +3041,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:fa8d4c6e04a5d081aee91553f098930dcd41cd29df1a93c148220aae78fdd4e6",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:6c60e0200acb8833dd6db2ad13d49bd389429731b92de8aeebdcd6076846e41c",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 24,
@@ -3048,8 +3050,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f768df2341a2572e11f3bc568998eda526302e725de0ef443a136cd58b5a69bf",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:5293fdd5c1a164ab846104c98b096c6c8c9b740f93f86095440d05a5455325ee",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 25,
@@ -3057,8 +3059,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:27f66eb21d33fdd00b841014185f588415b0957350f90442299c8ab85d992478",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:dec63f0d0c40bd9997c1bb078a0bf8073a4bc1b51ea2d4cf3ec6148b1d6b0d22",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 26,
@@ -3066,8 +3068,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:4ff43703ffbe277e07b6e9016396754af0afe1f0ea389cb355822c85141bafad",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:ca01264fd020c0d2970c3e65192aed55221cc7e334707aecfc6d0217dc29b82d",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 27,
@@ -3075,8 +3077,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:5b2de80d2f7b56b8e3a85ee5ae756281d6272d5894d9176dfafdf55d9a7eecc3",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:ebda82b2869474521c46148aba91dcf3702bee693afdc52c5fa60dda54c4b416",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 28,
@@ -3084,8 +3086,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:4a995210092c36307c54c3fa769db8723145d5dd9e424284f343bbc2f9e393f2",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:f5e10c55c245d3fe63744a2ae5af8bcd6a8858419f1db1ad0f1f43691e642013",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 29,
@@ -3093,8 +3095,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:66fd0d54281c2a5a70c0cab446f4db57654f6b6bdd622b159d6fbc3130a5b6db",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:56e2db9a734db8fc87fdaa9809911f799d0254f0534ad621dc066082db0bd947",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 30,
@@ -3102,8 +3104,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:62cb3d315e0e11cf3b119ca3f8f6a19eda7816d06a7e77ffe362fe9e173d5d7e",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:a10b4a3d60a4fbfb5bb210685e7a4d62eeb086525cefa2e48e77d73361f1b66d",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 31,
@@ -3111,8 +3113,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:b108392398d3db6c2543d5383b97a12af32069f5b0954159964712ccebcc1b62",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:529aabcb6d1b9eaa259ceb7a08d938f0a46f00217b8e5f544a80ddf77b513d97",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 32,
@@ -3120,8 +3122,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:9309ac01e764006725ce4ce4199c4ff7775db6b8a292da7a1d72174c98ecd0d7",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:8abd366945ee60746a395fc16ed8420d9fecd001f54f9e6114db6c1c561461af",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 33,
@@ -3129,8 +3131,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:ed0a0e1b435a52673e13b79212965d7f4977435cf591e54a6c6967a3f53a28fc",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:9b885cbe2ee0c4634fec6ae32d6f217e5395a3c8032da8720155af9bc30bd30e",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 34,
@@ -3138,8 +3140,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:521fe44e692d6fbfe1257c898d77cd7d2fdebf11857effbaec7e0586f93ccd8f",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:e977abe98621faef48a1b9e87922480a9023ed7982603011d5d6f6afc108b74e",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 35,
@@ -3147,8 +3149,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:4e5bbb74e2d77188495f5e391410605118174362c3c979551d70ae314855c2b1",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:5fbab2b401cb0151882940970310e729e365b47b43a44c3423820abf00e4b36f",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 36,
@@ -3156,8 +3158,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:3b8824173bf55f1a52b92fad97891dc196a7dec7ee808b480ac23e8281fe6a9b",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:9a5d7ccf8c221bb1e5fc6ad609b3052b560ac1124772e19329478adee7369589",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 37,
@@ -3165,8 +3167,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f83ef545e8f4a2097d9c52724e3e4faae24201cf39c20f1466bce71de2221265",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:c9dd606e05c36424696ccac07b397909e1f700f5e3b26a0a5b0de4f0e508379a",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 38,
@@ -3174,8 +3176,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:3d40123566792fc826f7558f471539f1a6c44f9b773bb2bfffc474a5253f292e",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:66d0f53166b08ae3841c01d13d2a881fc941f31e242374b692e46ca52db707e2",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 39,
@@ -3183,8 +3185,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:c416415f2b0372450e5cc7f85c308e10be9650165649ce1112c4ac0c90dce57e",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:904221f32225f4672a7b05944053aa163bf5eaf78d43a89c8c157256896291a5",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 40,
@@ -3192,8 +3194,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:e6a79ce7ed49704f4685e5891e99422704dc18559a689a5b30873ee7102ed56e",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:752faa16ed02e6e9beca9f78f89dc7494da981096823e5e3f02ae19675835fda",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 41,
@@ -3201,8 +3203,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:2ad385c2714ccb59c92e7d489f5fb8d0c2630105c4df3d75c9e287f6e1aca2b8",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:4d6cd285ee2efc25f51dc544c2a9742a799a457fc14eafed9284dcfce50607c6",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 42,
@@ -3210,8 +3212,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:1639b2c753458aa189bc1914842c58ceb58b2549bf221631f077f97903d68b92",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:d96aa23cdc4a17d819385092dd6327e3fbdcaa13bf68bb8c36ebffd70ddb4f7c",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 43,
@@ -3219,8 +3221,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:5dd890f0afde0841ca20515fdc9f29b36534d74f17edc918c820ff100b4bb5ca",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:90e2e0ec64c6a41ef5e88ba2ff9af15cc21a18c74a0b018e8e904559aca7c122",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 44,
@@ -3228,8 +3230,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:ff60d1360b583d0349c55633013519c8dae08033ed538a74bde00f7e9c42eaf9",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:00bb4bd47d0869afe933b95589d870acf45d78bb9f92473093736f40866fd24a",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 45,
@@ -3237,8 +3239,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:63dd4b0488bbe19a56932de00f3147868a406c2c575b08a50b760b59e2a6dad8",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:e02a518dc4a3d81b0892f5a40b1461324cbb63a7da92741b3b1b139ca6edd845",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 46,
@@ -3246,8 +3248,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:2718a0404558f7d792c7d8f0f4edcdfdef1418ff0619daf6b15e808b16b32865",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:ecc01e73dd458039871319478b45fc6d1827e81131942e8bc8330226ffd74393",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 47,
@@ -3255,8 +3257,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:0b93af0e97fe139c0442639ee8a7985483ef24b22f3b5cd2831dbe7b1aaf9a72",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:ea9094fa768671c050b54ff58a0b9edbf7896df362e5c9a75aa628bcf04e49b9",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 48,
@@ -3264,8 +3266,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:40fd276bf0538ceefb5a48ac21a91eb8a62432f3e7ca2d62701cf481117d0404",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:2b69a9766089d29d844c9e014e57e8099e41df8a7fa75cc5c4c08a171cdf658d",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 49,
@@ -3273,8 +3275,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:41fedb838ff64b9c8ec3745125f6bc9c0799e759c656a857ed92fada9608538b",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:b8d69706b073ca08b64df8471259294f58328e629f0dfa3eebdd5d3c9e43d8b0",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 50,
@@ -3282,8 +3284,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:c32810d263f38c75be8d772aa06d68eabd435842d775912771b829da8f3dcb8b",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:b388272eee845061cf84e44d819e7e69baae72483e21b04adbbf3f6fc1734ce1",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 51,
@@ -3291,8 +3293,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:01a43f387aee0eafce0c8eeb1c22108b01d442e3427568be974c1fd3f0a27a36",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:b0befb3a15d85ecfdcb41a806a8584eb32a1c69d20a19e5ec3af64fa728b9c01",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 52,
@@ -3300,8 +3302,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f1a44b6a801cbf742b492d4985135e9ba60aef39b20f6e1d601079095f48a225",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:db2821bb0c1f18c20d0fdebe1944d143ac0d0562cf196005237884425d785e53",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 53,
@@ -3309,8 +3311,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:731723d462b9719c3510f8aebe0920bd5ba21f40bc23fe18265e19a66da4b985",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:3356b31f0bd1ec79e6f5380b55e1f684283163139b37e98ef925dc5cdfbc471c",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 54,
@@ -3318,8 +3320,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:59f44bf2b8db9df9a8732342c8232b1708bdab6c8233ffb2b3699167ed633ac5",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:c882cfeea47b7b875de728bcf2ea374d9597546492cd2d3b69a88d6cd58ca804",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 55,
@@ -3327,8 +3329,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:8de8b3e860784e759dd4838684e023d25ad4c97c9983104afa3988920de91b39",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:6238aa8ef77d2a2394cf22060d6b2c5e09b1510910a1cd8a1910497c77d63cea",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 56,
@@ -3336,8 +3338,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:d81de4fcabfb1f4b10a01c3f4e7726d84f8e71f9c1763a2ea0c655d051770484",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:a3640be3031353729939e55aace80ab2f0b2b7612556fede1bec7786663fe93b",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 57,
@@ -3345,8 +3347,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:1a92dae2f242d7d619bda8f644d268ef1165150387c8cf50c91b800be49bfd77",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:faab47cf332a51c7fe868a6a2cf9f9de3561aacdd69d87a08cb87cc5bee09a98",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 58,
@@ -3354,8 +3356,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:06886ecc93427877678c0c06bc61a6daab7469f73ede6e1de286acc033982c23",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:57af61fe94fce7c20b6bc944c16cd47fd3086b093e6297950a429e33c80dff1c",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 59,
@@ -3363,8 +3365,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:a0c1925b1c17c1c7f5787b239fee6d5b9d9171d4c46eb8c541b0128d188d759c",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:b6f6678c36229919000b1243a1950fd0ccd524d8960238a9a61f59858fd69754",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 60,
@@ -3372,8 +3374,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:cd4db6dd3d179cc6ef526b2243cab9eb08d533b33f287757fde530ab34fa32d8",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:094bcc5b2ef2cae4c2d9c30c81ef6dd3adac589a34a03c23923434fe71674531",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 61,
@@ -3381,8 +3383,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:862259a4fbc311aff769710727082eb57537060b9e9f6f70bfc6da8bf2227bb6",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:c6e38ae6d75c5aed75132da1c08728f59c4111b5fa5e595dbc6f235bdb2564ef",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 62,
@@ -3390,8 +3392,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:8be6375cca403e2be3507e47bc07c5457deed0ea1fca59643c4283fc95496a44",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:999e11a7dc3ad1c1f00937cfad7fdf8c497bc2a2ca34e47b7e7ff2688e35cba8",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 63,
@@ -3399,8 +3401,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:8a26f68b212590b16d4d9aca340b00a046924a37c9330ff859744eb392059e86",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:b34c678e236b6e9b8c0c7b81f10984ccf4961de2edf107dc11808807a8f3a08a",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 64,
@@ -3408,8 +3410,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:6f25a7ded275a1ff3c2118c1fab36f3a3bde8a11cf5b5796c228c56fe22698d4",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:f503d4c21e8aa681c5c09b49d2248c76f9d8a8cba5c91e67bffb13a5236d0a1b",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         },
         {
           "sequence": 65,
@@ -3417,8 +3419,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:826d9baa5012f20ebd550fab46e9d08890be7db1a8ff254d9d1be64c2708fb3e",
-          "payload_digest": "sha256:4f92500d1cac1a2b2b4c42241d2b7c7ae33d3fa768c68691cba84f43d4b8c93a"
+          "digest": "sha256:e8d3c78651433a30de94a61b4e6575c2d559e777a41abc69df08ddcb6da6828e",
+          "payload_digest": "sha256:c41d8b4ba95e87a7b5bd4db49623699bae6e953e11e69dac53d77b217e2ced15"
         }
       ],
       "raw_logs": {
@@ -3426,13 +3428,13 @@
         "files": [
           {
             "file": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "bytes": 13840,
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269"
+            "bytes": 14216,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5"
           }
         ],
         "withheld": []
       },
-      "verdict": "RUN_SUCCEEDED",
+      "verdict": "RUN_TERMINAL_NOT_REVIEW",
       "project": {
         "source": "corpus/s2-007r/project",
         "source_realpath": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/corpus/s2-007r/project",
@@ -3446,6 +3448,7 @@
         "digest_after": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
         "unchanged": true
       },
+      "plant": null,
       "project_task": {
         "project_task_id": "T1",
         "goal": "fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10",
@@ -3484,7 +3487,7 @@
         "settle": {
           "decision": "ACCEPT",
           "code": null,
-          "amount": 0.000075,
+          "amount": 0.000065,
           "currency": "USD"
         }
       },
@@ -3619,7 +3622,7 @@
           ]
         },
         "refusal": null,
-        "parent_wall_ms": 5
+        "parent_wall_ms": 4
       },
       "observed_by_driver": {
         "kind": "PARENT_SIDE_MEASUREMENT",
@@ -3628,7 +3631,7 @@
         "process_observer": {
           "id": "platform:linux",
           "what_this_is": "the DRIVER liveness and the driver process tree, NOT the executor. The executor is observed separately, by its own parent, in `executor`.",
-          "driver_pid": 132844,
+          "driver_pid": 682222,
           "driver_alive_before": true,
           "driver_alive_after": true,
           "identity_supported": true,
@@ -3646,13 +3649,20 @@
         "decision": "ACCEPT",
         "code": null,
         "replayed": false,
-        "outcome": "SUCCEEDED",
+        "outcome": "FAILED",
         "sequence": 66,
-        "digest": "sha256:b3596bc4fbcd16c3ef4ab1328cc3574de39b17d44fe3bf2fc519415a18ba988e",
-        "error": null,
+        "digest": "sha256:c66804c2ba72430ae84e4e2c6438b1a5f251281f1fa5f4f17828fdaaae3e1990",
+        "error": {
+          "contractVersion": "1.0.0",
+          "code": "PROVIDER_FAILURE",
+          "message": "PROVIDER_FAILURE",
+          "retryable": true,
+          "detail": "recorded terminal outcome FAILED",
+          "occurred_at": "2026-09-26T09:01:21.000Z"
+        },
         "measurements": {
           "duration_ms": 65000,
-          "spend": 0.000075,
+          "spend": 0.000065,
           "currency": "USD",
           "model_id": "amazon/nova-lite-v1",
           "tool_calls": 0
@@ -3662,7 +3672,7 @@
         "reconciliation_required": false
       },
       "cost": {
-        "settled_amount": 0.000075,
+        "settled_amount": 0.000065,
         "currency": "USD",
         "cost_basis": "EXECUTOR_REPORTED_USD",
         "note": "the settled amount is the executor's own reported cost, rounded to the grant currency by the boundary"
@@ -3670,7 +3680,7 @@
       "committed": {
         "task": {
           "task_id": "abt-s2007r-pilot-01",
-          "state": "IN_REVIEW",
+          "state": "FAILED",
           "revision": 5,
           "attempts": 1,
           "active_lease_id": null,
@@ -3681,11 +3691,11 @@
         },
         "run": {
           "run_id": "run-pilot-000001",
-          "run_state": "COLLECTED",
+          "run_state": "FAILED",
           "last_sequence": 65,
-          "spend": 0.000075,
+          "spend": 0.000065,
           "request_digest": "sha256:eb7ef87ad3ff190813c0c550029777bec8d457e158cc87f98f30129f39cc7839",
-          "result_digest": "sha256:b3596bc4fbcd16c3ef4ab1328cc3574de39b17d44fe3bf2fc519415a18ba988e"
+          "result_digest": "sha256:c66804c2ba72430ae84e4e2c6438b1a5f251281f1fa5f4f17828fdaaae3e1990"
         },
         "events": [
           {
@@ -4037,9 +4047,9 @@
         "spend": {
           "grant_id": "grt-s2007r-pilot-01",
           "day_key": "2026-09-26",
-          "spent_task": 0.000075,
-          "spent_campaign": 0.000075,
-          "spent_day": 0.000075,
+          "spent_task": 0.000065,
+          "spent_campaign": 0.000065,
+          "spent_day": 0.000065,
           "currency": "USD"
         }
       },
@@ -4087,7 +4097,7 @@
               }
             ],
             "checks_passing": 4,
-            "wall_ms": 30.971,
+            "wall_ms": 29.746,
             "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "stdout_bytes": 1451
@@ -4120,7 +4130,7 @@
               }
             ],
             "checks_passing": 4,
-            "wall_ms": 29.099,
+            "wall_ms": 27.12,
             "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "stdout_bytes": 1451
@@ -4156,40 +4166,39 @@
           "exit_code": 0,
           "exit_code_agreement": "the live process observation and the published log carry the same exit status",
           "signal": null,
-          "pid": 133543,
-          "pgid": 133543,
-          "session_id": "01a0e345-a182-7731-b0dd-a209e6a3aba8",
+          "pid": 684705,
+          "pgid": 684705,
+          "session_id": "01a0e5aa-12f1-7296-8951-827ec1e652d7",
           "model_id": "amazon/nova-lite-v1",
           "usage": {
             "input_tokens": 773,
-            "output_tokens": 119,
+            "output_tokens": 79,
             "reasoning_tokens": 0,
             "cache_read_tokens": 0,
             "cache_write_tokens": 0,
-            "proxy_tokens": 892,
-            "cost_usd_micros": 75,
+            "proxy_tokens": 852,
+            "cost_usd_micros": 65,
             "cost_basis": "EXECUTOR_REPORTED_USD",
             "model_id": "amazon/nova-lite-v1",
             "tool_calls": 0,
-            "executor_session_id": "01a0e345-a182-7731-b0dd-a209e6a3aba8"
+            "executor_session_id": "01a0e5aa-12f1-7296-8951-827ec1e652d7"
           },
           "stdout_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
           "raw_logs": [
             {
               "path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-              "sha256": "sha256:27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-              "bytes": 13840
+              "sha256": "sha256:069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+              "bytes": 14216
             }
           ],
-          "error": null,
+          "error": "{\"reason\":\"EXECUTOR_STOP_REASON_ERROR\",\"message\":\"Connection error.\",\"credit_limited\":false}",
           "observed_by": {
             "process_observation": "the transport's parent-side view of the child (pid, pgid, exit code, signal)",
             "raw_process_log": "re-read by this driver from the bytes it publishes, with the digest it records"
           }
         },
         "missing": [
-          "signal",
-          "error"
+          "signal"
         ]
       },
       "corroboration": {
@@ -4202,18 +4211,18 @@
             "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774"
           },
           "raw_process_log_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-          "raw_process_log_sha256": "sha256:27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
+          "raw_process_log_sha256": "sha256:069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
           "exit_status": 0,
           "exit_observed": true,
           "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
         },
         "evidence_is_minted": true,
         "observed_by": "the run driver (the parent process of the executor), never the executor itself",
-        "executor_session_id": "01a0e345-a182-7731-b0dd-a209e6a3aba8",
+        "executor_session_id": "01a0e5aa-12f1-7296-8951-827ec1e652d7",
         "model_id": "amazon/nova-lite-v1",
         "child_exit_code": 0,
-        "child_pid": 133543,
-        "child_pgid": 133543,
+        "child_pid": 684705,
+        "child_pgid": 684705,
         "pid_tree_after_exit": [],
         "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
       }
@@ -4326,8 +4335,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:d2f74263331e4cd324abbe1e59317b9efde5c422a439861935cf1230af1e8129",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:9ba31668491da353cb02a719a08d8bdddd75bb4310c151883d0b5265a828d489",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 3,
@@ -4335,8 +4344,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:b6d28acaee2549c8273870f0e20bdfee584644065631375c20033c1281dcde3d",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:99d8af8087628765b27bde11a3b1eb93880099bd2571d952fb85fa2101f536e9",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 4,
@@ -4344,8 +4353,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:aeecf39893f46f43f82c6a4328debcdfaeadcd6216bd39c00db0f76cf00ea81e",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:dac18cab738d388e8ad31bcd7535b6fd87dc6acc058b1d8a7e88ae2ded11b7cb",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 5,
@@ -4353,8 +4362,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:9e1c38cff3be60054e6e21b292e8f30ca3d13bd818ddcad8874dec95cadbe358",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:c438c3cb576e2f95d0b3b8357cf3778f1f4768dae114c73f583f20e23bfa8a1c",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 6,
@@ -4362,8 +4371,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:4342ac709eb57bab78d277d1e4becee91177c750c95fc2bbc22eb225d0a164f4",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:1304c98ce28c92a7a423bd6a5827d215049866f82a456124f46fdd5ca6e6dbfe",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 7,
@@ -4371,8 +4380,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:ed81b437941a29930262d879949e0c78850d7124ad1ff3ebc266054bb6249287",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:c8db68f9cc9dba9bb0b04b6b12a0933bff3d1ad600938fee00f43b1bbb0f20d5",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 8,
@@ -4380,8 +4389,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:6e649f9eea12fd3872759ece1a4629229adf10223699d41af83719f7cc4c1f3a",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:00cb0b3f27ad1f593835a716f9337f510d8f3ca681b946c3a1ee2b2384ce74ac",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 9,
@@ -4389,8 +4398,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:d593f47130be7ba1b93c0bb6db963dd854074bbc5cdb0e8b24a828e7f815f2a1",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:ef63ce1998797df67c38508c8f56709e2eacbf4f4fa66e2919e88c98ef1d71a8",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 10,
@@ -4398,8 +4407,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:70debfb641ab7d3e441d1710f030ef17d8ae3fa1ffef7656e7c2e70ed006dceb",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:2904b6ac68c85260946feca73357d9fdf66fa27ceb1b8034a75580272fbbb8e8",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 11,
@@ -4407,8 +4416,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:33cb0f68ecfc02a0ea892070c214fbc5b2be4749c7a0e8b7f0d585194e4ecd49",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:66bf40ce0e4d778f3a91904dee9f3a7dcd151a5de4b8b8858cfd1cc26a209fce",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 12,
@@ -4416,8 +4425,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f70fa0eba7db3c289d863dd59ecf07ab8df12373f3227efa1d5a7f09df2b9660",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:7f1b3549ab0ce5ff8b45d4ea0bbf731a972fbe7f3a487438d749493781818d71",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 13,
@@ -4425,8 +4434,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:7fce99753215d40f91732e265709e36bd8647b02c3d47fbcbbb0d8f5c807e817",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:626f6f189cfaf41ad29efb1a9904c0d94420e24a791b2d948af13e00ce34fff9",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 14,
@@ -4434,8 +4443,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:dc4383e5fd690373088f6f3c2fd590c6d395ed8dabc3b5b386f5acf9409e8e49",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:5a187d01090340cae32a28a42f4b8a58de906f9217d400c184d9e9770beb2960",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 15,
@@ -4443,8 +4452,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:1dfb30f857c3fd577a254158eee8f774b138aed3f38df5d2406a8cc558af2532",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:a7a359ef88e175e41eac86d23e2cb4ba1bfcaed03faec216b319a0d6cb5129d5",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 16,
@@ -4452,8 +4461,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:fdbada333a1c03fd8022a7fb03fd0f3fc4a5e2a6d4402232d299725a8cbe966d",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:047c4585b82afd6aa2ec8657d6053aa79c5fc9bc1f764ec0aa2497c5863d192f",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 17,
@@ -4461,8 +4470,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:0b681d9dde130810309afb746cea32097a70ab1c33366eca12b496a70fafa4b8",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:923ffaded6c2699403fba271993109c3c5904fb22daf71dd5954a815fd1c6e67",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 18,
@@ -4470,8 +4479,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:40797c3944aca261f2afa78b7488b46a5f89e3f53705b95058c0dbf13849b8a3",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:ccd44c4fe2e5535cde8aec123cc4844a42d39886e6e1efdcab9d4b9c44a6e3af",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 19,
@@ -4479,8 +4488,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:8ad7abf6dde8697618d0a278dcb9df3e96935424ea8b0ed823c3743770c1b400",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:56e14b451be64c68acc530092d7994036e38fe412a6d82d6d61f29a1897baa98",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 20,
@@ -4488,8 +4497,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:8b1b93640d421a858bd084e615560d903fd505853d931d1b5be893c8ecab0392",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:ff2dde5098c8a51888e16dc943b8b3b80341192e082934d624d983e9d348fd8d",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 21,
@@ -4497,8 +4506,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:196795a198791b8f2d4199020a5b49adb53834d000ba65684048f4098421ef97",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:94d51e6119c77cda4aea623e2b00cdb218eddf9684cf7fef5c7be6f4dc5eb34c",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 22,
@@ -4506,8 +4515,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f06a7d53a7814297a8201af441345ecfa523977ddca3bfcd3fb6052774e1ae65",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:a63f63afbc967ab258831c31178ed3e6a8c3103f955a389cc246ead621e0246e",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 23,
@@ -4515,8 +4524,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:90ea6e8a7d6cf095d57c5193402fcb449baea06c563dad384513cb850c0888f4",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:0db0fb4ec413bd5e341cd7c9779ec6f2158a0ba4e97626ddcd2a4ac3e1aa3bb2",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 24,
@@ -4524,8 +4533,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:8e4470f75fa8a22e16e1d0038d501d5e8e0b52e6582afda3e7dd7b70708cbe95",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:1212ec1b9c179c28b7f20dff959c681e79e468875254f3adc7db115353dd6d0f",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 25,
@@ -4533,8 +4542,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:d36dd52187cc00c70781e64dc0d4a09767a1e209290d9b21df345c38eeb03652",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:1e53bcac989a98231e7f89d4512e5b0872a3aaa638f8a965fe7bfee0fc1fbfa1",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 26,
@@ -4542,8 +4551,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:06d1cdb3e3cccf5fe1d87a61e032cefe011af2595e7e794519c823670dde0e18",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:7b785b85f21ef80363730a11a31a54bc37a236c50018fdb68cc6c907209e03b5",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 27,
@@ -4551,8 +4560,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:1be44293cb9d4e3dbca96ee25cd1531cd3108b079267aee7723b89f2d779d203",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:10c0934ff28c2d48dc0feb7f7b54166eca1ac0d18f71eb71db2a6135a9f26f73",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 28,
@@ -4560,8 +4569,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:611ea0041d88bf39cfc1ac34552c798623cefc73091f196f2afcc30532843e25",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:62615c4f0a00b772360d9d2e6c52788da43539d03d58230f7f67aa46c4d90a35",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 29,
@@ -4569,8 +4578,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:714a7c6a8cb57d94ef4824a7ea60a2970b273d524ceca8b716acbe921413805f",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:c24d4ddfb918a62e0c4a7c87f798df74775b032558838ee95b7982066021bdda",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 30,
@@ -4578,8 +4587,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:bc581d8cdf83a0f584b49838dab7d024aab0a443aef5661d0e6962b9561bd6a8",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:a7ff025b7a2e7326acd15344e67d6737b61a48b6fb8a65c9112db43807439d35",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 31,
@@ -4587,8 +4596,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:f58dc063d0b9fb7f3f6e67af59021e0545fc119f59bb4d10cc128fa1df237288",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:86a3b9d06f24fc664e472822a9c0853f9cfffba594438863b6d80a1472f3d818",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 32,
@@ -4596,8 +4605,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:9d586991f2f62325780f3a96cc88a3e307a8781d9a79edda385041cf300739d9",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:8f14ca1fffe6e267ac035835ff6285fed3bab5de666d67e865b4867b2523ee23",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 33,
@@ -4605,8 +4614,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:6f9587df3e927b5fbf02c8967172e5e24e03b97975783f9b99b9d9031612dc7a",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:88f634fa9b41f5f51cd8eb261d3f0e3da87f911fd617da7b9796ce0b4cd452f2",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 34,
@@ -4614,8 +4623,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:b2940168d0ad11b90db0cb4e448e020b361e9314eadd102c275cbb34d1e1d183",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:c802db3facf27f4bb574bb04169c16f8d937e738738c886283b820134cbac7a8",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 35,
@@ -4623,8 +4632,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:73f0883e9e0e82fa8b39d85dd0735671a856141761f9d929502f26ca0324faf0",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:e2bd9a7cc8fd15e07cdec3ace752ee8723dec8f73bef47bb13ed6d2d6ee491ea",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 36,
@@ -4632,8 +4641,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:ab8b983d8a0ce7d9b4a797e129d31708e17850e3e4d295d8eff36dda9220d167",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:1a0b3003552bd7927a463366b86c71232d3d5b5145cb190e469b96924494d606",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 37,
@@ -4641,8 +4650,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:bf53af5cfe1a8a2b34056b1edaf24c78faef416fdaa458c22ddfd6556ed7c5cd",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:73c67d8d571e182ab0f415a6b86cc136925b15f65f7124a161be09c0487fabe0",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 38,
@@ -4650,8 +4659,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:99f3ccc51251de4d69cab9c0ee01db09413699534294eed2fddf471c0e1e22b4",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:1057d536c619d9c3ac04141d4bbf4f819968c072864d0489364f71bf560d0adc",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 39,
@@ -4659,8 +4668,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:d06e99c5269f23c64d0e42be7c91665d9f16d3e46558a4a8cc154cb957d14450",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:9b0e1829d1b744c5029e159aa433c9ef4eee8240f3e0c672e7b7986a54d77a31",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 40,
@@ -4668,8 +4677,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:23b6106e3f6703f504ef8162263ca81e300b1300220551f48b9f7ec09c7cb0eb",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:3d5f81b693c3be78e5a2f7f192dec7c38eeddb2d16e01eaae6c4936d37f1db34",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 41,
@@ -4677,8 +4686,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:1b04f6450e0ef8b00725d2b2e51b90b8af82dbf97ef265eef89c53e7046d92e5",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:964bf5da083959e7b4e08395ff1bba3e4605178293b626682b4ad9dd7db538b5",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 42,
@@ -4686,8 +4695,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:77e80d440aeeb376c4d27173db3691f5f3ab4901591972b13a9d258d505f0e62",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:dc7fdee8faff88b9c1d0ed88a37cdbdf6d81cf954eed3aede16190cd1eebda0e",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 43,
@@ -4695,8 +4704,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:e92140ee3939f794d1699824ade86abc96c9bafd43a8b9163f55f303dda4453e",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:0551fd3166f9b4f86d1c57323013bcf848f2f8fb573cf34b0f4bca972bbaa301",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 44,
@@ -4704,8 +4713,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:fca40f805f4eec3fe7d625ca9461d97ca5a06f0895def41eb102bef38ae7d4bb",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:c3b9a3b059bd5687f8ef47e131df14ee9d647ca53984aa9a3c4e2ab9070f583a",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 45,
@@ -4713,8 +4722,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:4d1a375486d2ef8030690b2612cc309efdc21a22a22f98be84fb7b2182b304b4",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:6f560b6ba9134a395d742942661887debc052a16247ed9600ae0cf9542649fe6",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 46,
@@ -4722,8 +4731,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:6767e1e9763916e272d2622a8f85861823c004bec413e5793b73fbd375a12a8d",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:bcce87ea28b57e690784fdc976334177d334b837e68e4a4a14e65e0f9b1ace97",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 47,
@@ -4731,8 +4740,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:70bdb277e20a5cc466675b8f77837df36f2093da4422e5ff9cdccc4c7cb614e1",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:3cd589aaca3dabd9a78e8837f9e1c3917778ba51959fedae5047e8ec037ad71a",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 48,
@@ -4740,8 +4749,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:1f45a3abfaa175c7c7e19c8bebc42ada6255bb689369d15fc9504c4eff1cccf5",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:41ab6940beb1bc9d9259109495235b67c7308fcd6efcaa7fff8c8790962de240",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 49,
@@ -4749,8 +4758,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:fa85aca6cc14e6f70883c2eba8406de1c1dd401e9d2847f0d86ed0ca8fa15bed",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:54a69975963f8d66f45a1381a542adcc4030241e9b7854354c0c20d796298e10",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 50,
@@ -4758,8 +4767,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:6a34317db0a7bac5696a93e6489f221cad0697d864906b2f94ef13f5015fa7ec",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:eb660fcc26a9666eb9acefab91911301d40f43bf75643ea5b7c3a78e08de2509",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 51,
@@ -4767,8 +4776,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:cfb86857c231cc0031f14ee06cd099740975993059626baf7c680f7a5fbdbcd7",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:a71f78601ef859a58cd854b2c367da8d9c66e9f55891b19af81132f1174c7270",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 52,
@@ -4776,8 +4785,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:4a8404a4f3473d1d7f51fa7d5c569e2bb15f2ba5845dcb8d7cb1ea391e574268",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:d285fd04f8ab2916007a83c759af5719ea318856280b793b1832d896caa67a67",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 53,
@@ -4785,8 +4794,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:bf0831d1e0dbccdd658522e6be92157c59a5b2294b7015749bc1c304778ae7d2",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:acb2d24e4389140503e569302663fb8044ffd4a6d6bd4063edc94faedb894263",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 54,
@@ -4794,8 +4803,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:c5143ca2d91e5cc447a006ab5289e75d7ee044ce92d66d702122ca5057f77b46",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:ca1b626a7c921cc9ce7fab9ae3ff8a6e408de122763b4b782e292884d61515f6",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 55,
@@ -4803,8 +4812,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:c116f99693ac679d0bb10c2cccf2eb69fe34feea4c9a2451e8925b920719c3d4",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:020f41054b70fb284fc4bd0f3848aaf55c30578a5d9776048598d998ce3b23ac",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 56,
@@ -4812,8 +4821,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:762a4f6c8a3b3f697ec6b74afaeb4f7d8380ce769e3ba30f06390755cedbc9d0",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:5a1e243e49b5ddc9829b0c5f7ad24e464ca2f13a2d2bf62face528d1c0653c85",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 57,
@@ -4821,8 +4830,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:57a2fcde65beab95917b2e03f1837c686997975e21e37ab80960f8a32068c0f3",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:30e6690c22569ca60b076154a45d11d5154691da6a67e642be303cfb7de4f9d1",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 58,
@@ -4830,8 +4839,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:e614eb2dcc4e4131915d5201974e2406ab6eeec3de69f28d15f5899e52a5f170",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:4a9f1a3e5b277eb5da4fe3a8618c50c58735d9aac35f26f72b0ea0a2bf8fdf64",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 59,
@@ -4839,8 +4848,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:aaf515c56ea50f4752d26fe816f44b0a28e673b91e862bedb05fc68daa745efb",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:2713a069bb69c2a4d5e553679a8643e8af4a8ccf4c98e681a2f1302aab146505",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 60,
@@ -4848,8 +4857,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:35262e41929261777a7f58a8f1184e75b6d762f5614a2433a95272de9857a51e",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:e0719fb0dc286bbfbd6b5ac53ded3a717137d3607093763b90510b94890bc273",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 61,
@@ -4857,8 +4866,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:6d9ffed341fc757829d8b64e4e907fcbbcbfbaa9d58796b96f9e8022cfff107a",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:ebfa97e87708717cc7fc98214cf9159f80a5e43bac34bb4f9d7e4ceced90e4ba",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 62,
@@ -4866,8 +4875,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:99ac4f07efc5ac6f23a84745a1bc5518206fda47806d458026cbe860afb18838",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:b4e60b84880e2afbd920f51b935ca237a2e68535d093d8841866a594201dac0d",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 63,
@@ -4875,8 +4884,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:5c7fc139e4d3bd7f54db6a1fb42e2dbcbcb5bbd02a356a33d14bd4457f591ccd",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:494fd30e7c102d5650241f3162515d67faa7068f0980d005ad1c6ce4eaccd33d",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 64,
@@ -4884,8 +4893,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:68090a648a1c50e651c2c4aadc17736dd5b0ead62a600a96192507315d9d9acc",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:ec3053ea22a82a10b02d8c513a9575516cb9efcea3ea70da9367d2901320f167",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         },
         {
           "sequence": 65,
@@ -4893,8 +4902,8 @@
           "outcome": null,
           "decision": "ACCEPT",
           "code": null,
-          "digest": "sha256:402a1f002fca320c70a207baaa8bb7f411b88e0f46789865188187974303012c",
-          "payload_digest": "sha256:a718ec11defd781e82cde4f4a3a6923470e5d09f47b6057b4b98abde5b0d6584"
+          "digest": "sha256:a937d87f7014fce152d8b5831557b181789922131cadd1d124e07666499bb420",
+          "payload_digest": "sha256:37da8890454b70a531dd0cbff874a1e3c027af7902c2cfeeee145b3021f9dad4"
         }
       ],
       "raw_logs": {
@@ -4902,8 +4911,8 @@
         "files": [
           {
             "file": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "bytes": 16415,
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056"
+            "bytes": 16683,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3"
           }
         ],
         "withheld": []
@@ -4922,6 +4931,7 @@
         "digest_after": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
         "unchanged": true
       },
+      "plant": null,
       "project_task": {
         "project_task_id": "T1",
         "goal": "fix the off-by-one in sumRange; the five pre-existing tests pass and sumRange(1,4) === 10",
@@ -5017,13 +5027,13 @@
           "budget_snapshot": {
             "currency": "USD",
             "assigned": true,
-            "task_remaining": 1.999925,
-            "campaign_remaining": 1.999925,
-            "day_remaining": 1.999925
+            "task_remaining": 1.999935,
+            "campaign_remaining": 1.999935,
+            "day_remaining": 1.999935
           },
           "decided_at": "2026-09-26T09:01:30.000Z"
         },
-        "decision_digest": "sha256:76ac2751049ad49679678e2863e05d685478ea2355cd69ef544bfd075ad2ad08",
+        "decision_digest": "sha256:53f969967adc34a9221770d84c2c7e1cd83188bc97c9cf5811ffa13d2d227a15",
         "refusal": null
       },
       "lease": {
@@ -5112,7 +5122,7 @@
           ]
         },
         "refusal": null,
-        "parent_wall_ms": 8
+        "parent_wall_ms": 9
       },
       "observed_by_driver": {
         "kind": "PARENT_SIDE_MEASUREMENT",
@@ -5121,7 +5131,7 @@
         "process_observer": {
           "id": "platform:linux",
           "what_this_is": "the DRIVER liveness and the driver process tree, NOT the executor. The executor is observed separately, by its own parent, in `executor`.",
-          "driver_pid": 132844,
+          "driver_pid": 682222,
           "driver_alive_before": true,
           "driver_alive_after": true,
           "identity_supported": true,
@@ -5587,7 +5597,7 @@
               }
             ],
             "checks_passing": 4,
-            "wall_ms": 28.055,
+            "wall_ms": 28.876,
             "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "stdout_bytes": 1451
@@ -5620,7 +5630,7 @@
               }
             ],
             "checks_passing": 4,
-            "wall_ms": 27.426,
+            "wall_ms": 28.233,
             "stdout_sha256": "f251e675b150a595eee69ff93b48551e28f6e4251549e6ef414a5737192aa41c",
             "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "stdout_bytes": 1451
@@ -5656,9 +5666,9 @@
           "exit_code": 1,
           "exit_code_agreement": "the live process observation and the published log carry the same exit status",
           "signal": null,
-          "pid": 133662,
-          "pgid": 133662,
-          "session_id": "01a0e345-b45c-7a60-9723-272dfc0e5f60",
+          "pid": 686838,
+          "pgid": 686838,
+          "session_id": "01a0e5ad-5a4e-71f3-b064-62fc9f87cfa0",
           "model_id": null,
           "usage": {
             "input_tokens": null,
@@ -5671,14 +5681,14 @@
             "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
             "model_id": null,
             "tool_calls": 2,
-            "executor_session_id": "01a0e345-b45c-7a60-9723-272dfc0e5f60"
+            "executor_session_id": "01a0e5ad-5a4e-71f3-b064-62fc9f87cfa0"
           },
           "stdout_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
           "raw_logs": [
             {
               "path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-              "sha256": "sha256:8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-              "bytes": 16415
+              "sha256": "sha256:2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+              "bytes": 16683
             }
           ],
           "error": "{\"reason\":\"EXECUTOR_ERROR_RECORD\",\"message\":\"Model metadata for `openrouter/amazon/nova-lite-v1` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.\",\"credit_limited\":false}",
@@ -5702,18 +5712,18 @@
             "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
           },
           "raw_process_log_path": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-          "raw_process_log_sha256": "sha256:8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
+          "raw_process_log_sha256": "sha256:2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
           "exit_status": 1,
           "exit_observed": true,
           "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
         },
         "evidence_is_minted": true,
         "observed_by": "the run driver (the parent process of the executor), never the executor itself",
-        "executor_session_id": "01a0e345-b45c-7a60-9723-272dfc0e5f60",
+        "executor_session_id": "01a0e5ad-5a4e-71f3-b064-62fc9f87cfa0",
         "model_id": null,
         "child_exit_code": 1,
-        "child_pid": 133662,
-        "child_pgid": 133662,
+        "child_pid": 686838,
+        "child_pgid": 686838,
         "pid_tree_after_exit": [],
         "observation_trust": "COOPERATING_TRANSPORT_IN_THIS_PROCESS__NOT_AN_ADVERSARY_BOUNDARY"
       }
@@ -5741,7 +5751,7 @@
         "actor": "prn-s2007r-owner",
         "actor_kind": "human_owner",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "c69d009bb3c1bda15499e9e5a9714a98629947470a3f20e65647d2001defdfb5",
+        "idempotency_key": "aa740c412d3de6fc37be6c9c7d989b15fd4f992409f51d0744fb74846498532d",
         "board_instant": "2026-09-26T09:00:02.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -5755,7 +5765,7 @@
         "actor": "prn-s2007r-owner",
         "actor_kind": "human_owner",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "95b54ed9bb6ca1257130767bfd4933ae1a672b7f1220c4e2183cdf866622506c",
+        "idempotency_key": "796dccf4fde8b4db82ad84a88987ccefe662abaacd58c9b33057b7b3bde46c37",
         "board_instant": "2026-09-26T09:00:03.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -5951,7 +5961,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9565aa5714dba17d4d7560775744f034929b267f11da74db76e884fa27d67b6c",
+        "idempotency_key": "849cc774e05032f86940ac65ef63f8e037a103d2b1a2f044c8fe15b5c7db1a47",
         "board_instant": "2026-09-26T09:00:18.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -5965,7 +5975,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ce928d685052c71b1d48202cdbc849f6facbba226d5786c45d01d3c4dae58747",
+        "idempotency_key": "9c96611aecacc8e5585578d76feaa929a131496f502867b6ccf3f65e4e0a830a",
         "board_instant": "2026-09-26T09:00:19.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -5979,7 +5989,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0affe76e924a312fa93b6b6df0888f8ddba3c1cb24c6013380916a3f36cfa0c1",
+        "idempotency_key": "e0c8d8878773ff2996cc79c8f52abb9d7ae0e219de0b50acd00478ccab17e380",
         "board_instant": "2026-09-26T09:00:20.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -5993,7 +6003,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "8923e3aa9336eba34ed7d4f9eaa9f0820fac53c799769eb03af4c728923bae76",
+        "idempotency_key": "42818a4ae926c1aa1f3b9650a1bb95e83cc6efda3a6a5c4a258e66cd159f1a32",
         "board_instant": "2026-09-26T09:00:21.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6007,7 +6017,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "407fb0be1564958dfad4db364bfbb7bed26df1dd2f7ead01416edbb425e9b251",
+        "idempotency_key": "e57206f2b6cd8c972fa1a0758fa8a902dec97bab637f5cd57e1a8a098676293b",
         "board_instant": "2026-09-26T09:00:22.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6021,7 +6031,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "b03d24c39225eb67ea675c1eed767c01f423770cae2dafcbf0e54490207748c2",
+        "idempotency_key": "adc574c90fe2be2db69376734010b7a905f9054df8b28b1d78b0eed364b66552",
         "board_instant": "2026-09-26T09:00:23.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6035,7 +6045,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "176bde5c4a70721d8085e82a787c37cf7cabcbcce1a2749fa3e192911e916d00",
+        "idempotency_key": "25f5871a71ddd2e64a5bb5560eae98c7ca47b6324f640bee90acb0a08f6050d8",
         "board_instant": "2026-09-26T09:00:24.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6049,7 +6059,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f7edfe6e6aa5f25ee923321a8761570d9884fd0f40967308573696aa4e0809de",
+        "idempotency_key": "095f478ac85664b1c119941d20a5154618d28a465a18c3b0f5d3aa73976cb6e0",
         "board_instant": "2026-09-26T09:00:25.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6063,7 +6073,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "1def64c0ab8aeca4373b453815f3dc5f100f9c55476958372a70d387c6b90639",
+        "idempotency_key": "29147749ee5367a34c825448bf90c39c27532dfd005550c8d0247f946f18a74f",
         "board_instant": "2026-09-26T09:00:26.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6077,7 +6087,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "08831f2655b3db4b7f8edc25af1f0d05d26580209d473fdc8bdf1e3d5fc71015",
+        "idempotency_key": "6b38374eca865ed13080ed61fe22ca881914f68d721f2c9378c403376120b744",
         "board_instant": "2026-09-26T09:00:27.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6091,7 +6101,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "89440fc0b1ced962b2bcdba1e2dfbbcc33d2d0cc08dff9bf7992a4e36c624c56",
+        "idempotency_key": "13bc5097313a9b6148b7bd095d7cdf45c647235be0933a02e725bc1e05779782",
         "board_instant": "2026-09-26T09:00:28.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6105,7 +6115,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f7cd4f4c9479b068c138e47bf3cfbcb0e54cefa105a095543cc57d7aa377bcf9",
+        "idempotency_key": "af9c3111b134cb19d5e653a8a6e1e46cf09f9f175f6afaba7c72850e5248aa61",
         "board_instant": "2026-09-26T09:00:29.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6119,7 +6129,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "e9e91795903b7594bd7d9ad78642ea8dfa3705bd69db879f1c17e770a4a3bd6b",
+        "idempotency_key": "e8c0afe9907da828118a1c3b8046c04b2b60c1afe4a23dcaeb7f1d1506e838a9",
         "board_instant": "2026-09-26T09:00:30.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6133,7 +6143,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "4d5bf5512234035be834c23f4d8c174e6ab9717351c95b4abf9ddf4ea9c677bd",
+        "idempotency_key": "a6821944503dd2913f0cf83fec958ed6fca3e9b70a9ccc4b412ce84283e346d7",
         "board_instant": "2026-09-26T09:00:31.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6147,7 +6157,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "097cf7f90b75de91badd11883dd98b307d9b934df4672d830238dcf790bbbf1f",
+        "idempotency_key": "84c0d80570b92f41a4d1e553142599632fe578c380587cdf9b8db45f186f6b11",
         "board_instant": "2026-09-26T09:00:32.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6161,7 +6171,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "884998b240eafe5b648818b33ee50c8608ae24c54b0a9d47cbb6ac23ae3bd26f",
+        "idempotency_key": "88e2e1c5d9fd22809d9c7bf78b042d9978d563466c24d65a75d49a2300752768",
         "board_instant": "2026-09-26T09:00:33.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6175,7 +6185,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "3ee1ed0de56071236d975ec09ac776eb160c1bfc8449d3b9906fe1709e2f9e4b",
+        "idempotency_key": "0e4c888ac33fdbcec059e17fbdb4a27c177a4c06d17dd05738625e03458b3f89",
         "board_instant": "2026-09-26T09:00:34.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6189,7 +6199,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "c53d2f7da0d6d6a00cb9ac8a52a4f49379084e4ec9cb25e73405f5655b3e3695",
+        "idempotency_key": "9e7e57f1f38b72b6ccfb895fa98af21f682eb24035b65d114c215f6a5b7a4140",
         "board_instant": "2026-09-26T09:00:35.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6203,7 +6213,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "1fb9155ff8acc859e85dce67fcdae13c43ed714d2175282ebb5c3f7846fcdf70",
+        "idempotency_key": "f24f96e714a790b5bee4b2bf126a127c3a2bf0e641f1b0b3f6727469642aec85",
         "board_instant": "2026-09-26T09:00:36.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6217,7 +6227,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "8aa2ad658ea36cd09fdee3c03e514e1448882c0fdd92a2c383f588b2017d76ed",
+        "idempotency_key": "dc18295af2ee7ebd0cf87cbd0923be0e9779a9c96fadd50958079b844abe240f",
         "board_instant": "2026-09-26T09:00:37.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6231,7 +6241,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "fa98b4db0d08545b0fa1ef584cd363ea0193691ddb653b73f1498622f4644a6c",
+        "idempotency_key": "ecb3e8a4d3add1b08676dd0a0a1a034ac95eaa894107cc0c46abd2c881e6ff9e",
         "board_instant": "2026-09-26T09:00:38.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6245,7 +6255,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "04e6f7e89f1378e9f3a22370bdcb6d01e2cd0572e9f911dc6f3b40c143793b33",
+        "idempotency_key": "0c40a140e42b2b63ee02087b43a429ce7e5586e6dda8e82818beaf703d46ae5e",
         "board_instant": "2026-09-26T09:00:39.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6259,7 +6269,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "a6ad109eba0bfcdbaa729ba002958c722b99a77aca2eb99884eeb4790947b70b",
+        "idempotency_key": "8f254a1fcf5a3d60913ac58e6ef947b28d348d5f04fb39948b67b98363314088",
         "board_instant": "2026-09-26T09:00:40.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6273,7 +6283,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "c771f42699c33a0951b4ee2feacc24ca9c5a7c040fd0cb7bb1bff54d4b959b8c",
+        "idempotency_key": "9a3933655536c50cb0d5b1d9bc3d5d099207fde47106f334dce0b03cd03609bc",
         "board_instant": "2026-09-26T09:00:41.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6287,7 +6297,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "756bbac49f15c75a1c95fb02d564b55eedfb68e7705c65eb471dccf34f194a62",
+        "idempotency_key": "ea4d6783e69423d09d72a2bc7013d3b63dfa59341fe99689d09153a55640671e",
         "board_instant": "2026-09-26T09:00:42.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6301,7 +6311,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "3974a89224b51f859ae62258b70127f6c473a36e1fdc9a874daffa477ef8e48d",
+        "idempotency_key": "129ad03f240c1f5d9fbd2ee0e4d54f04398217f1c9e02502aa53cf3687266cb9",
         "board_instant": "2026-09-26T09:00:43.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6315,7 +6325,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "5ef839464f01254bad85b404f902ae39e38b3fc31511ed5105286b362665dc85",
+        "idempotency_key": "528125d6d50727a6ce359693b6e29eddcfd0001cc7004cecda98138a8a3c0542",
         "board_instant": "2026-09-26T09:00:44.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6329,7 +6339,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "aea8a7eed76cc95b10ff4ecca914f0216d635b4d26dad6dde291d772c4b5d31e",
+        "idempotency_key": "108bdfaf34709c9f84e4f4c066f168ac68312d2ae7ba86837b6d4fdc23473d1e",
         "board_instant": "2026-09-26T09:00:45.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6343,7 +6353,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f642acef9e671d8278ac5f76605da85ba1d4c6e031a1eca96b95a8e425edb014",
+        "idempotency_key": "6bb4b996b3aed6b1f6305d5fbf043ba2f132fff5384e1950c1d2e7b263aab488",
         "board_instant": "2026-09-26T09:00:46.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6357,7 +6367,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "d6c3071d737ca95cad99d9b3434d5b845d4f5b182cee374d33a9bfdda9d093ff",
+        "idempotency_key": "bcd330161f3d7dff660d8bf8a1daf189f545ce078d1694a613571ec0e98aa25b",
         "board_instant": "2026-09-26T09:00:47.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6371,7 +6381,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "361de6454376e1508da8e09484bcc3734a60607569cddff5c9a672bbe6fe94ea",
+        "idempotency_key": "50bbb02357c1dabf0e924dde3002ad48a7ab98573515fadcce38e25200411513",
         "board_instant": "2026-09-26T09:00:48.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6385,7 +6395,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f7e8649bd45b573e9b0d3272386bb86f242737c45dbf8120d2597c109eafdd02",
+        "idempotency_key": "a2b68a82a187c4a1a43ea897d59df044ae801706a07b9e21dbf58599c94525d5",
         "board_instant": "2026-09-26T09:00:49.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6399,7 +6409,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "6fdb4ec5019159e9b028234bf55eee2ee86129d223c80bc2cf95ef5395ef38c6",
+        "idempotency_key": "cfb46d67dc8a166bd2e75bb4d39cb911b9d5b6f3b5c5bb448820558c4058719d",
         "board_instant": "2026-09-26T09:00:50.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6413,7 +6423,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "87efe78f03597898f5f0a9a486df7a99b83ec474b2944dc14bd707512b826cb0",
+        "idempotency_key": "b4eee37ade107302a55d75c9d4bf6fa53eeb0bbf33405284493fd5e1d06301eb",
         "board_instant": "2026-09-26T09:00:51.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6427,7 +6437,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "3a3940974b8d5ef2345bf2cfb67e2445604f2071d51f3f74e9345d35f2a34f16",
+        "idempotency_key": "36fee268088b2af35418236057d819299f8d695a58c6328676610a8ccef088e8",
         "board_instant": "2026-09-26T09:00:52.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6441,7 +6451,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0bbcc85f824cae8a23f4c0fcfb5bbf0bf421c321e7badb5b88720b0b91062198",
+        "idempotency_key": "c4fc9f63779ff7a90b02519391a388bb5c766cc19a24ac7649a06fd7d259219a",
         "board_instant": "2026-09-26T09:00:53.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6455,7 +6465,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f5fe8703d63e2ec516b19dd581dad1e925f8be6985b27c866f60f1ec43a7cdbb",
+        "idempotency_key": "8119f3b3a5524195a49d0eac4ed949d4347b45525b89e5349a9164588dca8a64",
         "board_instant": "2026-09-26T09:00:54.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6469,7 +6479,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f75cbd5ef23f231c8565624a86e8a9339dc1112baaf171e14bcea9af68517655",
+        "idempotency_key": "2bf10ecbe256554825e7b0900115251b2ec3c4b5563845bd338a950e67ea00b8",
         "board_instant": "2026-09-26T09:00:55.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6483,7 +6493,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "449be77eda963c80f2810a2f317d82eb09df229b92795d02a8dfc3b7be9d1c98",
+        "idempotency_key": "47a5a2bb006d09e0a7eeaa76c037b8088c6d9c403058df661a3c5b0d674a7620",
         "board_instant": "2026-09-26T09:00:56.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6497,7 +6507,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "68692178a061a2b92326af60772e5869c851c9b7c6b04e4f1ed7f5b762efc11a",
+        "idempotency_key": "5a1bfc9dd702eb2249cf3ec6a15731a16f66517a56631c1ef30006355cdabc68",
         "board_instant": "2026-09-26T09:00:57.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6511,7 +6521,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "24886f76883d9f1c8db1d714c079ed36aadc9e8e92c2be6d168ec1ac34c10ef6",
+        "idempotency_key": "57fce55783ace27aeec3c52a01841e3ca6afcc042c0532800c5c5a2339e06eaa",
         "board_instant": "2026-09-26T09:00:58.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6525,7 +6535,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "2ac185b251772655fca50635b794d5357bec26c9b363fb2f088cf9e9da80b2a0",
+        "idempotency_key": "5be7fd64eb7aae72a6b19d29db2afc0d6a81c7b6c598c8f8c9bfd56f39f1e706",
         "board_instant": "2026-09-26T09:00:59.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6539,7 +6549,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9d41fbc554d1dcdddfe1a55e2728d6cc54d2a3c669a0cb24ed21c0f2a3272350",
+        "idempotency_key": "eea4a016f885d90f8faef9ed47afe8890d0c6ca4f97ab6e69cd74303631926a9",
         "board_instant": "2026-09-26T09:01:00.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6553,7 +6563,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "da7dffd39d4fe37471370ae56cac4c74661cb79332f655c1ad8bbaa55d98a91d",
+        "idempotency_key": "17683eddfe9789dfded927a0fc6373f66dd7d37384ae1b1748211d4137bc66ac",
         "board_instant": "2026-09-26T09:01:01.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6567,7 +6577,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "755c684f83d35839d4f506b80287bd44b6b37627756bba95c092a927c11fe333",
+        "idempotency_key": "32f385a418bf8be440179e171f99b57dc89273f34a3f838e3e96c8f005854749",
         "board_instant": "2026-09-26T09:01:02.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6581,7 +6591,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "24fccba8f12a7b98c30a554ba61f6103de61a1d4f104f412b666fc36c54561fe",
+        "idempotency_key": "888cfa28b9410adeb31ab6697b4304019f06393b686df53e5b64b400d303cc79",
         "board_instant": "2026-09-26T09:01:03.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6595,7 +6605,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "a5c145cd90b809de6bd7295d538a2e29b3858fcc708127cc924263ac5d17d4c2",
+        "idempotency_key": "0d607bafb7a904044dbc2c85e729bddf8d16cebe72cf1fdfa44798214105e921",
         "board_instant": "2026-09-26T09:01:04.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6609,7 +6619,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "a032db4bea37d0e4baaae4758edfa6061393747e14475af8a3f6d4eed61c989c",
+        "idempotency_key": "96b2b53b671d6c688c76c9f03778a4d77a24faff776acee1a9c545cc8b378868",
         "board_instant": "2026-09-26T09:01:05.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6623,7 +6633,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "8468fc5dd65fddd919e327b2958a8d10ba953f5f3d93fd064d47948c40818784",
+        "idempotency_key": "f68391cf39748c1831113b5ae4491a55e5d9ce56b185339f7c554a1525fcca19",
         "board_instant": "2026-09-26T09:01:06.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6637,7 +6647,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0645bc7961f051726ecebf29a5d3a450d1693fedda1973259fffeb7f322f136d",
+        "idempotency_key": "2da9266aea4c4fec30ce74fdf7361eb03b3a77b7740674c3fcfe0b38b4a40458",
         "board_instant": "2026-09-26T09:01:07.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6651,7 +6661,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "90aa43c4434d687d74748d49a43d2471ae5701a47c4b59fe4cc0c10cdfc71b06",
+        "idempotency_key": "52d67a92b4d434c21ed508464549f39a3af5a314e45db9f6e407cce22998e90b",
         "board_instant": "2026-09-26T09:01:08.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6665,7 +6675,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "91f3266f4611403cafe7a9c814585bc6f0fd958711f20f5db290fc8dfc5f5fca",
+        "idempotency_key": "76fc0bfbccefa2a25bdae296d5ab91969edadac7cf5da118da1aacf5ac827dae",
         "board_instant": "2026-09-26T09:01:09.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6679,7 +6689,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9b2000226c8d3441058c209f3b23315d1e105bc459a5e39dd0385c76449edb1b",
+        "idempotency_key": "bf6679719a8be1d0e6116aca023cde48afd4cbe0893f501c617785f47c7ac294",
         "board_instant": "2026-09-26T09:01:10.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6693,7 +6703,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "da3b8d4b762255d336cb96fb51c45f3a8621c7a453d618569cc296425ba330b3",
+        "idempotency_key": "2c8dd4e84caa14fc382840c28cf81df22fdf5a97ae952bdef52e21b9b17f9af1",
         "board_instant": "2026-09-26T09:01:11.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6707,7 +6717,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "b59f509157269fc605154f8f2706c32ca72a45c1c5c712a89e3002b46ce2ff72",
+        "idempotency_key": "1c2231427a7df728549118936772b3e71cb37f5df8d1a69065764b4398227041",
         "board_instant": "2026-09-26T09:01:12.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6721,7 +6731,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "93044d610f1389a26438a0fe79cf1c1523d636374dbf166a0ec85db50cef9966",
+        "idempotency_key": "5500bf8c2a7c9b0193430b3a2eb6aeea0eb1f5ba557b3f5006bc4872eb5aee56",
         "board_instant": "2026-09-26T09:01:13.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6735,7 +6745,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "676ce7b72019deceaa9a3154b00e271de49c16526e011d786bd72ee64785b168",
+        "idempotency_key": "90b0cce4859fc9763328b81723f9b13e2d96ba71fee4c24a8fdb63279400271b",
         "board_instant": "2026-09-26T09:01:14.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6749,7 +6759,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "a7b4477248068ea3c6562a36de085c4910e88198191fadb1d4c7cb80de8e5023",
+        "idempotency_key": "f11c904692155452976e08811a42f31f2d837638f152357c02353fd87f22bacc",
         "board_instant": "2026-09-26T09:01:15.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6763,7 +6773,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "fc24e541cbf2075094cc80af3ae471652ca121d7fb553d90274f2e6334579f0d",
+        "idempotency_key": "c1943544bbaada5ed42da48f000676fa4abf7472d5371f1a6cabe6050c18c0b2",
         "board_instant": "2026-09-26T09:01:16.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6777,7 +6787,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "b0027a70a7ef0fe669af063e3011f33c55ca6f50281c204cae03928478b51a89",
+        "idempotency_key": "fd7051eb2dd8a07fdff383e75508330481018dc076a20ca968e2e7bc636250aa",
         "board_instant": "2026-09-26T09:01:17.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6791,7 +6801,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9730b5f9a5014326a737b99f7d702a7efec0abc6290fb523933d71b7545c700a",
+        "idempotency_key": "db59b78713feaea79fc2893fdeb8f1b23fad90bca9752bf21032fe6ba4d005c3",
         "board_instant": "2026-09-26T09:01:18.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6805,7 +6815,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0733d25eca649b40bd526e23c9176ffce7ae432a5303309047772e692d179b1c",
+        "idempotency_key": "ebe57c9b4bf9fb236cdc2b5690256e6b44d429ec831d5383a8f2edb2f8526cf9",
         "board_instant": "2026-09-26T09:01:19.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6819,7 +6829,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "f8a3a0f671ab728dc01d3c64fda637decc0c7f4d153230ba8825cdf82141ae58",
+        "idempotency_key": "ae38f2a182434a7a6da3e1b3daa4cd7ce389fe18b7e110dfe144f37eeac2dfb0",
         "board_instant": "2026-09-26T09:01:20.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6833,7 +6843,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "bc475935ceed7a23da48e0bd02dce4a3b596f12bf4a417b2747d22dd76479147",
+        "idempotency_key": "e6e0648497a6ef68d8cf0592375f4b479edf6d5029487fe0e4e92132f476f5f9",
         "board_instant": "2026-09-26T09:01:21.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6847,7 +6857,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9ab68cf75273d1c3cc860102cd4b47629f39bdd09c63321f91fd12c75fc0f90f",
+        "idempotency_key": "451e674d1d9c545180d465c9070b1da9e2860d815758b3f2ec67eb83449cf244",
         "board_instant": "2026-09-26T09:01:22.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -6861,7 +6871,7 @@
         "actor": "prn-s2007r-owner",
         "actor_kind": "human_owner",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ee8c8c5a362dff37e192b203259b9d7b2ffb98c2f763ee5684337df9eec7f5fe",
+        "idempotency_key": "06dd76b95e3bb6798ef29845327c692314b735a42698083de7fc4dc11b6164ec",
         "board_instant": "2026-09-26T09:01:23.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7057,7 +7067,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "dbf9a0bdd988636d6c796780ef350f904262004d986047281b522f27d7384970",
+        "idempotency_key": "bac347f3c726b50d54c6a5c7982ceee1f57f893cd461950c6dc1972e07c462a5",
         "board_instant": "2026-09-26T09:01:38.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7071,7 +7081,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "afddb64a17586eaf88c4adfa16931e40586fd6c54435b3265aee853a588d659c",
+        "idempotency_key": "8d0adeb8ee5712a60d762881728ee02fd0ef8b3e482e31f1266c6446624a604c",
         "board_instant": "2026-09-26T09:01:39.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7085,7 +7095,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ef56cfc1caaca1004f2d3b1b556b21ae80eb99dfb571db6577cbe1f07832d41b",
+        "idempotency_key": "c9e726f18a92d6996df2dcb6c6e5456cbd948485fbedfd23e766aae1fe1fe74a",
         "board_instant": "2026-09-26T09:01:40.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7099,7 +7109,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "936631bc141afa93d77979b6ada7db72e83db5a76d13b9c55d634efb738a402a",
+        "idempotency_key": "76ec13f6b15f84f4abcbb827df88f468a3feae713dcb3a2c2401cd93bd0f3556",
         "board_instant": "2026-09-26T09:01:41.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7113,7 +7123,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "3a732a49720745e74b09b993b2ff7934fc23ba4c916e09639429ad3f97cdb590",
+        "idempotency_key": "8422d9b52a2f1cc843f47bd51eb5717ed8f151f3ad67dbe01b68e27f9173d12b",
         "board_instant": "2026-09-26T09:01:42.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7127,7 +7137,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "5b94f8545c93d17c9813d71fd4c9b9b3ea8bcddb7fa67affa25e7ba75bfa4ad8",
+        "idempotency_key": "5df2862f94266da822dfe734d2a334a7d2e7189ec8b8089abc64872e135eb3ef",
         "board_instant": "2026-09-26T09:01:43.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7141,7 +7151,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "60adee8030aec2a1a6eca54d4ef3d24ed724ec688fd45bcdee8979c4292ea7bf",
+        "idempotency_key": "980346fe91189716d3734d8b2a236f91b78e66624cde823ccbbe8fd1e1fdcc02",
         "board_instant": "2026-09-26T09:01:44.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7155,7 +7165,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "4f607ce5f6b1f0dce6ca656b75ed9e5badc398bab47bc597052972a4bbf2e4bc",
+        "idempotency_key": "4dd6aab4c90d946cfc910847f9504f8a6940fb028cb21f9e9a201c3c9d85ecf0",
         "board_instant": "2026-09-26T09:01:45.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7169,7 +7179,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0c3970340725ef65368822ad09ef484cad428e12bf0fe6ebf5d659994eacef03",
+        "idempotency_key": "0b3ded15a1ca8cb1fa842c65454ce505281292f4f46a046d95a8c8fe57eb44a2",
         "board_instant": "2026-09-26T09:01:46.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7183,7 +7193,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "3a9e682932e267ddda69239a45a8cc4a1cbd9a7da462b8e59f567121536a57fa",
+        "idempotency_key": "a41b599a459bad68b162baa556dbbb72a2d9d7ab6268936a4cfa4e2c23557ee7",
         "board_instant": "2026-09-26T09:01:47.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7197,7 +7207,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "48c77106dd41a21a96e1a6effb3da1412b63381c161d4b47912601a1013bf760",
+        "idempotency_key": "9d0b879aae2866def7cf2b59ec98ae94f195c3dacb807dccaaef877ff4def3c6",
         "board_instant": "2026-09-26T09:01:48.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7211,7 +7221,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "7ce1e53965531915aa2ccd9a3b0338f8c874163c3fc77197fdee4aa8b18270c9",
+        "idempotency_key": "a985e6672fdcffac04d70b63b07485061d25667c3e84b4c5a9def65580f1bd43",
         "board_instant": "2026-09-26T09:01:49.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7225,7 +7235,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9a0ea1a75feb75cf4f4073c28c2ce6ab5592a6ed0a16e714bd769dcce44048ec",
+        "idempotency_key": "e66b61095e6f82872c7b661962698b4aacb8b9fbc2358daf066b0d3812b6ae3b",
         "board_instant": "2026-09-26T09:01:50.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7239,7 +7249,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "51c295f4131b3e6747cf2b121aee5b5a611bc47637b424976cc82428583d1a50",
+        "idempotency_key": "1dacd4727315626d803b763f15442e03d5c51bf6cde5edbea3a88c1948a9561c",
         "board_instant": "2026-09-26T09:01:51.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7253,7 +7263,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "b159d44392dad6de283e7cd102156426e0e9e4cd31719a4d27788990e5605705",
+        "idempotency_key": "ffaeb7185def6d43832b4eb13fe5d3fa7fdda4a5ac3a89a9a1a2b4188099d81a",
         "board_instant": "2026-09-26T09:01:52.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7267,7 +7277,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "a536987bda8154595eb84aea4cc9d2205c56e27f421e1013b97e15e920fa8e53",
+        "idempotency_key": "f9950131f50f2f98cb95d7481686dadd4c9df5745665c40e6af181f8d7ebef11",
         "board_instant": "2026-09-26T09:01:53.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7281,7 +7291,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "6d94b054df16d8ea934d0a8f96ffaf43b6251a05fbcedb2cc2f0779f6ff29a25",
+        "idempotency_key": "7be596346e71840648cef522c7deb8d7803ec6d506afa1ee5fe2f3e53d58b90a",
         "board_instant": "2026-09-26T09:01:54.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7295,7 +7305,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "447e102967bee4ecaaeeed98b6fdef62f5e57bb33e1689d76c127a035c832405",
+        "idempotency_key": "250d9b9687820e23790e7ccae1be0ca360270c5c9b25e79d28f6b04f83c70a65",
         "board_instant": "2026-09-26T09:01:55.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7309,7 +7319,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "75c1f7a05d40b8ad4b571c97ca6ba59702c7bf277f6a37890a2939b5b4b9985d",
+        "idempotency_key": "50b9ebdaa7fa47a5be8701f1fcf6b6a6f032659375729f34ed15468be495f7be",
         "board_instant": "2026-09-26T09:01:56.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7323,7 +7333,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0cf01f4be8008572bed6201e05b0a803c96bf02c717e500947354a61d9ce01d8",
+        "idempotency_key": "be3d6891548c17ee62d8dee2e0d025cdbc9bec1c8aec2a3971979d3763aa1250",
         "board_instant": "2026-09-26T09:01:57.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7337,7 +7347,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "998f549fe0f5706d7ba6f65b54f7645a2dbd606515a53dfe4e35a0aec15a5d69",
+        "idempotency_key": "a01d00e902d9243fcc26018de10bdbd08d32a638aa0f356b76c85a639e91d7eb",
         "board_instant": "2026-09-26T09:01:58.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7351,7 +7361,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "a9d6a3d49fcdcf280ee256679e18f84ec734be722d124a031cf44663b3868573",
+        "idempotency_key": "794d5cb9244336d58f8f44f334f90d8e1d4ea090ed1fb7f947ba2a5a5f48ac10",
         "board_instant": "2026-09-26T09:01:59.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7365,7 +7375,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "aab2c4c4a4bdf7e4ee7a0886436e62033eb6ebde15b6a2c980440ae2ccbfdb89",
+        "idempotency_key": "1e6185151bbd2b9ac0f261ae7ec1349e8e515bb7211a56f95c586ee0dd12e251",
         "board_instant": "2026-09-26T09:02:00.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7379,7 +7389,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "bf31a5d8d28fddbfb29892dd899bcd26c3c7d9fbedf5affc65399c5180bc29e5",
+        "idempotency_key": "f982dc5cec58da2def97f3804505ebd33734b71ffce8b5ae47898446a0d92c6d",
         "board_instant": "2026-09-26T09:02:01.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7393,7 +7403,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "e959f9ce717df9ed2d7393d0f50fd5382700fc6e2e3c09519d8e36d0f7d81e0e",
+        "idempotency_key": "72ed14834dce5196a8ce968c048b0ff892053059da4d0cbe856bfdd68efeb9aa",
         "board_instant": "2026-09-26T09:02:02.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7407,7 +7417,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "1e9ce8429a5766107b27b3469ef03ae1ce0e8ffdbc35789cfebce73878c1c23b",
+        "idempotency_key": "ce7a9baadbfa3790bb20b51db0f91bbec3000d42d3c771923d13112ed3f31f35",
         "board_instant": "2026-09-26T09:02:03.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7421,7 +7431,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "95146726b5890c5827ab133f67e8ea6ad2b60a480aa1e3e0599e3eff4f785e80",
+        "idempotency_key": "0a2106d5959a1e67eb5c65781b87bf18b4780ec6943a191cc172ffd98dc58cf1",
         "board_instant": "2026-09-26T09:02:04.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7435,7 +7445,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "734616cdf3eec457d3293d5c343f43bca9b9a2ab2f7fe2716413a8cafac309c9",
+        "idempotency_key": "40377bb61dbc04db1f93b0074c30c9b5cb87e752d8bea22bac386f7b704f75cd",
         "board_instant": "2026-09-26T09:02:05.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7449,7 +7459,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "721b8e414e1c8c6ac5ddef9d8de38eff08fbf96892e728c266dc4650cfec1f9b",
+        "idempotency_key": "8fc6a123d091277fdde0aacd9fdf9badc4523c7dbdaf1b5e096ba115f8d4c333",
         "board_instant": "2026-09-26T09:02:06.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7463,7 +7473,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ccfe1c7a2ba7721dcc3a948ed52e2e2d4f2ea632da3a55c36e6cc3c693b96657",
+        "idempotency_key": "6de8c44588ab0472d280ff7dca681ecc313c66415dfa82c4480703e5c54942eb",
         "board_instant": "2026-09-26T09:02:07.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7477,7 +7487,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "c2f0db98ee30752961741c3f575c8291a42a287094dba15f936fbdf6f77d1c7b",
+        "idempotency_key": "d42484ff5c1750295bb5fc30cee940c666d724d003a1eeaed12836dc2d4ec021",
         "board_instant": "2026-09-26T09:02:08.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7491,7 +7501,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "b8e798a07c47eb29deccf1134ef8e1402eb7b1925f75e24fd06607f2e690af0c",
+        "idempotency_key": "3a21d4fc7707a5e0cf39653d4e4392752b7bdfbf2fb856951cf2307fc58456d3",
         "board_instant": "2026-09-26T09:02:09.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7505,7 +7515,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "b3fc3b26450f5bb1a509847c383d8b0710feb5016cb81c034de534bac9b4fe77",
+        "idempotency_key": "336922d3c749db66a35c6a07c1ae1c87adc4c8dda4ccffaafc09355b21f94f6a",
         "board_instant": "2026-09-26T09:02:10.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7519,7 +7529,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "14165bb855a23cdd174e32faad192dcabc00fcc25ea29d8236cda9006513ebb9",
+        "idempotency_key": "336257644174b8e9abf046b1aa55bc7b865e539773a414f32a401c38b41f7d69",
         "board_instant": "2026-09-26T09:02:11.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7533,7 +7543,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ba04eab7a9eb0d81492076f92c51c0fc72a02602b89cad18eaa7d660c0ccd23d",
+        "idempotency_key": "90db148bc6c30af8afcae4935659205b44946175bd990550e745df32d46a3328",
         "board_instant": "2026-09-26T09:02:12.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7547,7 +7557,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "e288492c9d443304389d1895a68abfa44299768f04d4d8b2c8b3b00fda3a9350",
+        "idempotency_key": "e4fbbd1cc445de667dc66139d438fd1db2c9cc280f8ac2b2c02cc4abdae71b39",
         "board_instant": "2026-09-26T09:02:13.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7561,7 +7571,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0f0e14f19151aabef2b0526c653998a1c3e346eb7ec3af1d61ccbde1c2d703e2",
+        "idempotency_key": "f593168b9a2c72a79c75ce2e650bde0a847d69cf19773c4f4533504a24095671",
         "board_instant": "2026-09-26T09:02:14.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7575,7 +7585,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "10f66cdd9b8f37db578a4a9cbf3298a5cfe0352174a4a81bad5c1ca9b102ecd4",
+        "idempotency_key": "92be2bdcc7041133ca05173e222d9dbab7c88062119c045d96751909efa2d80c",
         "board_instant": "2026-09-26T09:02:15.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7589,7 +7599,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "e4bd2a58aa1246434352d7cc5edcc36c53246d09fb025e7f9bbe702492dea4c5",
+        "idempotency_key": "661c89e5e2901b9e95c32b637e7ebea2de85300de1881dc8c9e39bb77fa55842",
         "board_instant": "2026-09-26T09:02:16.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7603,7 +7613,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "d23fd97c9b34741c66aedf4c44faf3c3d1a9320bd2b6cf666a24f1525e285c25",
+        "idempotency_key": "b2e31131cd07ac0fc5d8f82b9e918b1686a47ee0d50c7846402905ff191339fe",
         "board_instant": "2026-09-26T09:02:17.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7617,7 +7627,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9ae73b8030e09a654b5ee765116221c9dd08f68f758d54cc8d1d8b460eba9896",
+        "idempotency_key": "ce26f182d381fb6a8832d5f9a42c443b83d3a5aa170d4903467cd60c99cff743",
         "board_instant": "2026-09-26T09:02:18.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7631,7 +7641,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "73a336d10335108cafe56c5831a335a5d72a4c10492b362be4fa22a5438d7776",
+        "idempotency_key": "a5b28de25ef7577d0d7827b2fbe108d0f091f7a2eaa300326910072cd547272f",
         "board_instant": "2026-09-26T09:02:19.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7645,7 +7655,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "c4c89ec2f51e7ebb5a4d127905dfa1950e1d6e472860f1ab7c2e5bd69d8c8898",
+        "idempotency_key": "7700c279f20ed64e1bc2d08951bc6e3355b33215b6c15ffde8910fa3f4e30abf",
         "board_instant": "2026-09-26T09:02:20.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7659,7 +7669,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "0fea4cc6a5043e13e1b0d61524b9a931b8afc504716ce81902f8a5539901e782",
+        "idempotency_key": "36df3811599e452b8a49613f4d6cd0278b10f046b1af7bcb7785cc765b3a80f7",
         "board_instant": "2026-09-26T09:02:21.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7673,7 +7683,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "7201856df7c33a8c193b9989b785cc6d018b98c092cccde6c7d173a16c7307b1",
+        "idempotency_key": "87dc5eeed7d1d360d2e203dc83c54d678d4bfa151e3b7972e4f5221ef3d5eebe",
         "board_instant": "2026-09-26T09:02:22.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7687,7 +7697,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "42daf8b1ad6950fefc63b2bbdf7cf829c3d6af4652925d59bac30b6a91a390c7",
+        "idempotency_key": "df7b0f83875b6847c60b6a4d7e77a3384bb64d96ca0e5559b1a777b4522bca47",
         "board_instant": "2026-09-26T09:02:23.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7701,7 +7711,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "4205ce65ddca650fd0041595d307cb54bfc727fcab26a1dd9f64acbeb5454911",
+        "idempotency_key": "e7af7ae27f5cdec5ebf8b3b8bff9f6036c03583b82aae05afa7e758ad25e3be3",
         "board_instant": "2026-09-26T09:02:24.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7715,7 +7725,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "6fe2e9c0c563b8e058c3de537566025f41498a4ea8050c2b4649a86ccc146118",
+        "idempotency_key": "625b4a28e3d8213d91eed98aa43bbcc8cc36c7e4fce871da8be5ee6ec3709bbb",
         "board_instant": "2026-09-26T09:02:25.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7729,7 +7739,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "83144ae06607f37b44533083df59a45b75044b73789427550d68e7129f8e9aad",
+        "idempotency_key": "e88381e3a8e3fc204f2efb13a75adbdf54ae1c31ce0f370836458d42506d8e7d",
         "board_instant": "2026-09-26T09:02:26.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7743,7 +7753,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "6e6dff95cadc4192542df39d083cf411d76df40801b5bdb500d9bc48e9776f9a",
+        "idempotency_key": "b713b5f664bd14ee3a12eeaf0bfcd95bc2fe9cb57532f907af13b26b06f53a63",
         "board_instant": "2026-09-26T09:02:27.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7757,7 +7767,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "6bb6eff6c85920881ea533685ba4324c30b7b2d7f8a1722c17daa69ebee79aeb",
+        "idempotency_key": "d233d78589260d34a8dac21f10016224b150d1046bb58bb661b02292aff0e527",
         "board_instant": "2026-09-26T09:02:28.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7771,7 +7781,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "81a69a82100d07053ef4bd665c0f4067d014fb160b1e7be903f0c42843d65150",
+        "idempotency_key": "7a9c059fa9a6c0bfe0267c44673f8c6e0ed572180418c0253f0d4c8b1debda98",
         "board_instant": "2026-09-26T09:02:29.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7785,7 +7795,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "2096ac98bdb1dc0633e0c6f080797179e28ced51e386d0a04abe07d927e2870e",
+        "idempotency_key": "57b22fb26fcbb82ed199adf116fcb874597a45841d9fd739a0b98c5c7cb996dd",
         "board_instant": "2026-09-26T09:02:30.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7799,7 +7809,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "d817d49a47f731590fb539dc892b3dfd6cf61f43d814aa4afdcdff47f1e74e0d",
+        "idempotency_key": "ef8cce95fe76c305e56e8072e2ba8af8284161cde3323bec1c8acedc82bc64f0",
         "board_instant": "2026-09-26T09:02:31.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7813,7 +7823,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "5577faa8a15c3d60d0f9b405f3e74402187368e4c9a3a32b6a8711533b123218",
+        "idempotency_key": "7d763354231655af34f90e311c45b819496d8c99a4e747883f5b0df5ac10682c",
         "board_instant": "2026-09-26T09:02:32.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7827,7 +7837,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "afec5cbdf3cdf04566d0e668170669c1b0ff8081916ef38b972faf877ac33f88",
+        "idempotency_key": "269d26e429b84949512508bb08c82448d34cff3c9019f62daab16c3d1d765202",
         "board_instant": "2026-09-26T09:02:33.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7841,7 +7851,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "367189b3ec6e1ee60de83985f595c600b763a85635bb69db8899025b13fe0300",
+        "idempotency_key": "91a7e94df7803e360da00e3fc9dbaf90b786f39a39090cf3b84948dcbc10970b",
         "board_instant": "2026-09-26T09:02:34.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7855,7 +7865,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "7e00014f0a9bd914c2e3684cdc2cb0ef8672b6340b505512cc7b1ffa448928bd",
+        "idempotency_key": "8c34f38e24fb4b28786a7411c9f06cef0b69d58aa75e0aafc9320438a8180703",
         "board_instant": "2026-09-26T09:02:35.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7869,7 +7879,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "953b5b5a098a64a7b6744c653d8f5661c861f523219f0af506e41780db03d40c",
+        "idempotency_key": "bf89ef641c39040100b921b941ea7cb6f53b4608ec532efb27ee98ee6528c03b",
         "board_instant": "2026-09-26T09:02:36.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7883,7 +7893,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ccc0ab9df039354a4eda290badb5c5b114a4d194e8a9db46ac53f118ab056324",
+        "idempotency_key": "8ccd3b80d24f9a6b379f8f3d7ae649fe4531b643a78587e1a04f92490ae91a66",
         "board_instant": "2026-09-26T09:02:37.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7897,7 +7907,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "5242b12d2cde41566aea3437adf362519c3fc0557a8216bb4bdcef9d6eb0108e",
+        "idempotency_key": "1c95ed5e56e6d319cc36bb4a996f55060133a35eb6db22e42fb41ccc2cd24ee3",
         "board_instant": "2026-09-26T09:02:38.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7911,7 +7921,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "385517316f130235fac0da7ee13060e52efb14ed191b2d36970867b28023b258",
+        "idempotency_key": "325fd69c1bbe09216cd9240f8348455944957d7c815f2606f0a79ff038aa5ff4",
         "board_instant": "2026-09-26T09:02:39.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7925,7 +7935,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "ac6dddeb05878a6618d5ee84d00b00a6550df6e74a2d44c59b5fec14a61c4b71",
+        "idempotency_key": "5d40a1cbb0e8d8d3368f15b9619b166c5725dae3a65f84e89760e33ea4532ba7",
         "board_instant": "2026-09-26T09:02:40.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -7939,7 +7949,7 @@
         "actor": "prn-s2007r-producer",
         "actor_kind": "adapter",
         "workspace_id": "ws-s2007r-project",
-        "idempotency_key": "9485def1af49befd7edd8df87fb072bdbfb57a2ee034cd262998b13b19a8a7a3",
+        "idempotency_key": "34e08b04c9b9f9691c1e89fcb4f192cd61443d92de1b127fcee22e1064b54986",
         "board_instant": "2026-09-26T09:02:41.000Z",
         "outcome": "ACCEPT",
         "code": null,
@@ -8067,7 +8077,7 @@
     "status": "PARTIAL",
     "exit_code": 1,
     "hard_gates": [],
-    "succeeded": 1,
+    "succeeded": 0,
     "requested": 2
   },
   "limitations": [
@@ -8075,11 +8085,11 @@
     "store tier: memory. The in-memory store has no durability and no cross-process concurrency, so nothing in this record is evidence about a second process racing this run.",
     "wall clock: parent-side measurement with process.hrtime.bigint() around the outbox dispatch; it is startup-dominated and is meaningful only within one (adapter, configuration) cell. It is not model latency.",
     "executor argv, exit code and usage are REPORTED by the real transport, which is the executor's own parent process; this driver measured the wall clock and its own liveness independently and did not launder a reported value into an independent observation.",
-    "run 01: the transport did not report signal, error; those fields stay null in this record and are not estimated",
+    "run 01: the transport did not report signal; those fields stay null in this record and are not estimated",
     "run 02: the transport did not report signal, model_id; those fields stay null in this record and are not estimated",
     "no human reviewer exists in this run: every task stops at IN_REVIEW and the DONE edge is structurally unreachable (no principal holds board.review.approve)",
     "configuration: this invocation drove the validated surface \"B\" (an explicit, required argument of the transport, not a label), so it resolves ONE cell of the axis and difference of nothing. A comparison is a separate aggregation over one project digest and one campaign grant; scripts/s2-007r-measurement-set.mjs is what differences the cells, and it asserts on the NORMALISED argv digest, never on the raw one",
     "run 02: the argv the transport built carried no configuration difference for codex (this provider's configuration A and B select the IDENTICAL argv, so the B label moved nothing and this cell is config_delta none by construction); the cell is config_delta none by construction and is EXCLUDED from the comparison with that reason, not reported as \"no difference observed\""
   ],
-  "record_digest": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c"
+  "record_digest": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a"
 }

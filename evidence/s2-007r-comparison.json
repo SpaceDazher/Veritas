@@ -4,9 +4,9 @@
   "ticket": "S2-007R",
   "issue": "SpaceDazher/Veritas#45",
   "written_by": "scripts/s2-007r-measurement-set.mjs (s2-007r-measurement-set-v1)",
-  "commit": "445970eb7d66198305abddaf45599cfd724ed164",
-  "tree": "9a0dc28cb296e00e4e08039dd260c5d61fc05e48",
-  "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+  "commit": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+  "tree": "a6813e37fdd6bac16ff748629e078db1a36d273d",
+  "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
   "run_set_composition": [
     {
       "cell": "cell-pia",
@@ -134,14 +134,14 @@
         "refusal": null,
         "comparison": {
           "verdict": "COMPARED",
-          "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+          "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
           "project_digest": "sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2",
           "budget_grant_id": "grt-s2007r-pilot-01",
           "cost_basis": "PROXY_TOKENS_NO_USD_REPORTED",
           "preconditions": [
             {
               "field": "run_set_id",
-              "value": "rs-s2007r-pilot-a06a3abae86291db"
+              "value": "rs-s2007r-pilot-2106535f01b3149c"
             },
             {
               "field": "project_digest",
@@ -225,9 +225,9 @@
             },
             {
               "measurement": "cost",
-              "left": 1949,
-              "right": 863,
-              "delta": -1086,
+              "left": 1759,
+              "right": 1188,
+              "delta": -571,
               "unit": "proxy_tokens",
               "resolvable": false,
               "left_status": "MEASURED",
@@ -235,9 +235,9 @@
             },
             {
               "measurement": "latency",
-              "left": 16,
-              "right": 5,
-              "delta": -11,
+              "left": 5,
+              "right": 4,
+              "delta": -1,
               "unit": "milliseconds",
               "resolvable": false,
               "left_status": "MEASURED",
@@ -461,7 +461,7 @@
       "configuration": "A",
       "seed": "pia",
       "record": "results/s2-007r/cell-pia/run-record.json",
-      "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
+      "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
       "record_digest_verified": true,
       "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
       "store": {
@@ -641,7 +641,7 @@
       "configuration": "B",
       "seed": "pb1",
       "record": "results/s2-007r/cell-pb1/run-record.json",
-      "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
+      "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
       "record_digest_verified": true,
       "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
       "store": {
@@ -783,7 +783,6 @@
       "board_events": 0,
       "refusal_codes": [],
       "run_verdicts": [
-        "RUN_SUCCEEDED",
         "RUN_TERMINAL_NOT_REVIEW"
       ],
       "sub_cells": [
@@ -827,7 +826,7 @@
       "configuration": "B",
       "seed": "pb2",
       "record": "results/s2-007r/cell-pb2/run-record.json",
-      "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
+      "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
       "record_digest_verified": true,
       "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
       "store": {
@@ -1013,7 +1012,7 @@
       "configuration": "A",
       "seed": "pa2",
       "record": "results/s2-007r/cell-pa2/run-record.json",
-      "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
+      "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
       "record_digest_verified": true,
       "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
       "store": {
@@ -1149,7 +1148,6 @@
       "board_events": 0,
       "refusal_codes": [],
       "run_verdicts": [
-        "RUN_SUCCEEDED",
         "RUN_TERMINAL_NOT_REVIEW"
       ],
       "sub_cells": [
@@ -1293,7 +1291,7 @@
         "Aggregated over 8 group(s) of one run set (one project digest, one campaign grant); the summed denominator is 8."
       ],
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -1301,9 +1299,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -1314,9 +1312,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -1327,9 +1325,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -1340,9 +1338,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -1363,122 +1361,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -1601,7 +1599,7 @@
         "Aggregated over 8 group(s) of one run set (one project digest, one campaign grant); the summed denominator is 8."
       ],
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -1609,9 +1607,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -1622,9 +1620,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -1635,9 +1633,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -1648,9 +1646,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -1671,122 +1669,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -1904,7 +1902,7 @@
         "NOT_RUN: all 8 group(s) of the run set agree, so the row is not rounded up; the summed denominator over those groups is 0."
       ],
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -1912,9 +1910,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -1925,9 +1923,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -1938,9 +1936,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -1951,9 +1949,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -1974,122 +1972,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -2119,9 +2117,9 @@
             "cell": "cell-pia",
             "group": "adr-pi-local|A",
             "status": "MEASURED",
-            "numerator": 1822,
+            "numerator": 1790,
             "denominator": 1,
-            "value": 1822,
+            "value": 1790,
             "unit": "proxy_tokens"
           },
           {
@@ -2137,9 +2135,9 @@
             "cell": "cell-pb1",
             "group": "adr-pi-local|B",
             "status": "MEASURED",
-            "numerator": 892,
+            "numerator": 852,
             "denominator": 1,
-            "value": 892,
+            "value": 852,
             "unit": "proxy_tokens"
           },
           {
@@ -2155,9 +2153,9 @@
             "cell": "cell-pb2",
             "group": "adr-pi-local|B",
             "status": "MEASURED",
-            "numerator": 863,
+            "numerator": 1188,
             "denominator": 1,
-            "value": 863,
+            "value": 1188,
             "unit": "proxy_tokens"
           },
           {
@@ -2173,9 +2171,9 @@
             "cell": "cell-pa2",
             "group": "adr-pi-local|A",
             "status": "MEASURED",
-            "numerator": 1949,
+            "numerator": 1759,
             "denominator": 1,
-            "value": 1949,
+            "value": 1759,
             "unit": "proxy_tokens"
           },
           {
@@ -2201,7 +2199,7 @@
       ],
       "hard_gate_counter": "falseApprovals",
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -2209,9 +2207,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -2222,9 +2220,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -2235,9 +2233,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -2248,9 +2246,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -2271,122 +2269,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -2402,7 +2400,7 @@
     {
       "name": "latency",
       "status": "MEASURED",
-      "value": 8.5,
+      "value": 6.5,
       "unit": "milliseconds",
       "numerator": null,
       "denominator": 8,
@@ -2412,27 +2410,27 @@
         "per_run": [
           {
             "run_id": "run-pilot-000001",
-            "parent_wall_ms": 5,
+            "parent_wall_ms": 4,
             "board_duration_ms": 65000,
             "measured": true
           }
         ],
-        "min_ms": 5,
-        "median_ms": 5,
-        "max_ms": 5,
-        "mean_ms": 5,
+        "min_ms": 4,
+        "median_ms": 4,
+        "max_ms": 4,
+        "mean_ms": 4,
         "aggregation": "median over the per-group values, with min and max beside it; a mean of a handful of startup-dominated samples is not a quantity anybody can act on",
-        "min": 5,
-        "median": 8.5,
-        "max": 16,
+        "min": 4,
+        "median": 6.5,
+        "max": 9,
         "groups": [
           {
             "cell": "cell-pia",
             "group": "adr-pi-local|A",
             "status": "MEASURED",
-            "numerator": 5,
+            "numerator": 4,
             "denominator": 1,
-            "value": 5,
+            "value": 4,
             "unit": "milliseconds"
           },
           {
@@ -2448,13 +2446,31 @@
             "cell": "cell-pb1",
             "group": "adr-pi-local|B",
             "status": "MEASURED",
-            "numerator": 5,
+            "numerator": 4,
             "denominator": 1,
-            "value": 5,
+            "value": 4,
             "unit": "milliseconds"
           },
           {
             "cell": "cell-pb1",
+            "group": "adr-codex-local|B",
+            "status": "MEASURED",
+            "numerator": 9,
+            "denominator": 1,
+            "value": 9,
+            "unit": "milliseconds"
+          },
+          {
+            "cell": "cell-pb2",
+            "group": "adr-pi-local|B",
+            "status": "MEASURED",
+            "numerator": 4,
+            "denominator": 1,
+            "value": 4,
+            "unit": "milliseconds"
+          },
+          {
+            "cell": "cell-pb2",
             "group": "adr-codex-local|B",
             "status": "MEASURED",
             "numerator": 8,
@@ -2463,30 +2479,12 @@
             "unit": "milliseconds"
           },
           {
-            "cell": "cell-pb2",
-            "group": "adr-pi-local|B",
+            "cell": "cell-pa2",
+            "group": "adr-pi-local|A",
             "status": "MEASURED",
             "numerator": 5,
             "denominator": 1,
             "value": 5,
-            "unit": "milliseconds"
-          },
-          {
-            "cell": "cell-pb2",
-            "group": "adr-codex-local|B",
-            "status": "MEASURED",
-            "numerator": 10,
-            "denominator": 1,
-            "value": 10,
-            "unit": "milliseconds"
-          },
-          {
-            "cell": "cell-pa2",
-            "group": "adr-pi-local|A",
-            "status": "MEASURED",
-            "numerator": 16,
-            "denominator": 1,
-            "value": 16,
             "unit": "milliseconds"
           },
           {
@@ -2505,7 +2503,7 @@
         "Meaningful only WITHIN one (adapter, configuration) cell. This measurement resolves no cross-cell speed difference."
       ],
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -2513,9 +2511,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -2526,9 +2524,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -2539,9 +2537,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -2552,9 +2550,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -2575,122 +2573,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -2812,7 +2810,7 @@
         "Aggregated over 8 group(s) of one run set (one project digest, one campaign grant); the summed denominator is 32."
       ],
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -2820,9 +2818,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -2833,9 +2831,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -2846,9 +2844,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -2859,9 +2857,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -2882,122 +2880,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -3186,10 +3184,11 @@
         "granted is re-derived from the effective sets the record reports, not taken from the granted_expansions it claims: a record may under-report its own grant, and the larger of the two accounts is the one that counts.",
         "Configuration A vs B is a HOST-SURFACE difference, not a permission difference: the grant is identical in both cells.",
         "NOT_RUN: no authority expansion was ever attempted or claimed in this cell, so there is nothing to refuse and nothing to have granted: scripts/s2-007r-run.mjs plants no skills-authority expansion attempt and records no post-run capabilities() claim, so the boundary expansion measurement is NOT_RUN and its absolute-zero claim is UNVERIFIED",
-        "NOT_RUN: all 8 group(s) of the run set agree, so the row is not rounded up; the summed denominator over those groups is 0."
+        "NOT_RUN: all 8 group(s) of the run set agree, so the row is not rounded up; the summed denominator over those groups is 0.",
+        "The REFUSAL half of this measurement is measured on a plant that was written into a GOVERNED RUN's own workspace and refused by the transport before any crossing: planted 1, refused 1, granted 0, published in full under authority_probe.measurement_7.real_run_plant. The ROW is NOT_RUN because its own gates are computed from the per-cell crossing records, and a refused plant produces no crossing by design - the refusal comes first, which is the property. A measurement whose numerator needs a crossing that the refusal prevents is reported NOT_RUN and not quietly scored from the in-process arms."
       ],
       "evidence": {
-        "run_set_id": "rs-s2007r-pilot-a06a3abae86291db",
+        "run_set_id": "rs-s2007r-pilot-2106535f01b3149c",
         "run_set_composition": [
           {
             "cell": "cell-pia",
@@ -3197,9 +3196,9 @@
             "configuration": "A",
             "seed": "pia",
             "record": "results/s2-007r/cell-pia/run-record.json",
-            "record_sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "record_digest_declared": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
-            "record_digest_recomputed": "sha256:b6c5069754d740c548a61d9062957742e75e30b900509c762fd66a7e0d10deb1",
+            "record_sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "record_digest_declared": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
+            "record_digest_recomputed": "sha256:83edb530f7f6783e87182e4e1ac1004a695aea9ff7163f898ab662162b509823",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -3210,9 +3209,9 @@
             "configuration": "B",
             "seed": "pb1",
             "record": "results/s2-007r/cell-pb1/run-record.json",
-            "record_sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "record_digest_declared": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
-            "record_digest_recomputed": "sha256:eb11e4b4107c8576f703e4becdd5662ce0467f931058c027cb50fb93227d851c",
+            "record_sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "record_digest_declared": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
+            "record_digest_recomputed": "sha256:217f9db1a91fb73aa6b25e83185d438f5f03e5f19c8211907c5cb3553266838a",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -3223,9 +3222,9 @@
             "configuration": "B",
             "seed": "pb2",
             "record": "results/s2-007r/cell-pb2/run-record.json",
-            "record_sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "record_digest_declared": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
-            "record_digest_recomputed": "sha256:740ec6ecb6d2141370994385cfc48519f502076be8fa10b26c69dfdaa596957c",
+            "record_sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "record_digest_declared": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
+            "record_digest_recomputed": "sha256:c6680a3424231608c297712ffff2cad27bd62eca9bf07b701b7750800ddef22b",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-03c84d12f7bd412a083f6b0c",
             "attempted_governed_runs": 2
@@ -3236,9 +3235,9 @@
             "configuration": "A",
             "seed": "pa2",
             "record": "results/s2-007r/cell-pa2/run-record.json",
-            "record_sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "record_digest_declared": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
-            "record_digest_recomputed": "sha256:9974e6d7e08079b8075c4dab33244186ea406f9056a3112fefd22f45a2570c32",
+            "record_sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "record_digest_declared": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
+            "record_digest_recomputed": "sha256:ea35307ce520efaff5a866677bdf77c8e9e5082117818d82f81564da678465d8",
             "record_digest_verified": true,
             "driver_run_set_id": "rs-s2007r-26bb2fe1a7e4ff69c6ed9560",
             "attempted_governed_runs": 2
@@ -3259,122 +3258,122 @@
         "run_record_digests": [
           {
             "path": "results/s2-007r/cell-pia/run-record.json",
-            "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408",
-            "bytes": 288878
+            "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e",
+            "bytes": 288931
           },
           {
             "path": "results/s2-007r/cell-pb1/run-record.json",
-            "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d",
-            "bytes": 289189
+            "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9",
+            "bytes": 289768
           },
           {
             "path": "results/s2-007r/cell-pb2/run-record.json",
-            "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf",
-            "bytes": 289186
+            "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655",
+            "bytes": 289288
           },
           {
             "path": "results/s2-007r/cell-pa2/run-record.json",
-            "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c",
-            "bytes": 288863
+            "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70",
+            "bytes": 289293
           }
         ],
         "per_run_record_digests": [
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pia/run-01.json",
-            "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd",
+            "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pia/run-02.json",
-            "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370",
+            "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb1/run-01.json",
-            "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70",
+            "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb1/run-02.json",
-            "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b",
+            "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pb2/run-01.json",
-            "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86",
+            "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pb2/run-02.json",
-            "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa",
+            "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000001",
             "path": "results/s2-007r/cell-pa2/run-01.json",
-            "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b",
+            "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527",
             "present_on_disk": true
           },
           {
             "run_id": "run-pilot-000002",
             "path": "results/s2-007r/cell-pa2/run-02.json",
-            "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c",
+            "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf",
             "present_on_disk": true
           }
         ],
         "raw_log_digests": [
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-            "bytes": 13597,
+            "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+            "bytes": 13865,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-            "bytes": 16552,
+            "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+            "bytes": 16820,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-            "bytes": 13840,
+            "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+            "bytes": 14216,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-            "bytes": 16415,
+            "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-            "bytes": 13839,
+            "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+            "bytes": 14111,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-            "bytes": 16415,
+            "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+            "bytes": 16683,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-            "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-            "bytes": 13598,
+            "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+            "bytes": 13973,
             "present_on_disk": false
           },
           {
             "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-            "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-            "bytes": 16552,
+            "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+            "bytes": 16820,
             "present_on_disk": false
           }
         ],
@@ -3404,10 +3403,41 @@
   },
   "authority_probe": {
     "measurement_7": {
-      "planted": 2,
-      "refused": 2,
+      "planted": 1,
+      "refused": 1,
       "granted": 0,
-      "is_a_run": false,
+      "source": "A_PLANT_IN_A_GOVERNED_RUN_WORKSPACE",
+      "is_a_run": true,
+      "real_run_plant": [
+        {
+          "cell": "cell-plant",
+          "run_id": "run-pilot-000001",
+          "provider": "pi",
+          "configuration": "A",
+          "plant_sha256": "3167e923e25dea8d57f94bfeed3ef0d5c7fb67ea9077dbc6909e0e6dd2cf0543",
+          "plant_bytes": 378,
+          "planted_before_dispatch": true,
+          "asks_for": {
+            "capabilities": [
+              "net.fetch",
+              "board.review.approve"
+            ],
+            "tools": [
+              "tool:net.fetch"
+            ]
+          },
+          "refusal": {
+            "code": "CAPABILITY_MISMATCH",
+            "class": "CapabilityMismatch",
+            "message": "SKILL_AUTHORITY_EXPANSION_REFUSED",
+            "detail": "the skill bundle asks for tool:net.fetch, which is not in the effective tool set [tool:fs.read]; a skill may ask, and the boundary refuses",
+            "retryable": false
+          },
+          "refused": true,
+          "granted": 0,
+          "verdict": "NOT_RUN"
+        }
+      ],
       "arms": [
         {
           "provider": "pi",
@@ -3476,118 +3506,118 @@
     },
     {
       "path": "results/s2-007r/cell-pia/run-record.json",
-      "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408"
+      "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e"
     },
     {
       "path": "results/s2-007r/cell-pb1/run-record.json",
-      "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d"
+      "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9"
     },
     {
       "path": "results/s2-007r/cell-pb2/run-record.json",
-      "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf"
+      "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655"
     },
     {
       "path": "results/s2-007r/cell-pa2/run-record.json",
-      "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c"
+      "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70"
     },
     {
       "path": "results/s2-007r/cell-pia/run-01.json",
-      "sha256": "f126069ef01ede94384b540a789473455dd9ecf472a10d97e1b88b043037c5fd"
+      "sha256": "ef362da9ecae1143dee33e688252a1fe75918cedda4199bfeebafd12c0906c8a"
     },
     {
       "path": "results/s2-007r/cell-pia/run-02.json",
-      "sha256": "899ef5df1f8aed038ed5d9afde23d1ed1d2e8423b3311f8f8d9b9b87f54e8370"
+      "sha256": "2916703b7c05f9d2a0dd7d20775bff237793816bfa294578807422989ce8a243"
     },
     {
       "path": "results/s2-007r/cell-pb1/run-01.json",
-      "sha256": "0a94c9e7d43bf6fdf334d44dbccdbf488464045c0819b7899935136029fe5c70"
+      "sha256": "b0e18f6c4ff7cc4beb2d59787d558c4cf11c50f77d09a301dac08b7ada93966d"
     },
     {
       "path": "results/s2-007r/cell-pb1/run-02.json",
-      "sha256": "16ad28ffef11eaad6a0515259c8aa0eaf5b497baeb2633c1d708b76382f3b38b"
+      "sha256": "97c5a1eb4f570c73b381b7e94af0129590910481000e33d2a775c557dfd13725"
     },
     {
       "path": "results/s2-007r/cell-pb2/run-01.json",
-      "sha256": "4ef8cee133c73bd87b10088a82871959dfa55a8c1ed169370b7adc4b4efbbf86"
+      "sha256": "3c012579d9f6428da9957af78e35e4d7577f76f4000144a989ad92a1a06a1c69"
     },
     {
       "path": "results/s2-007r/cell-pb2/run-02.json",
-      "sha256": "56874835b1dbcfad7d80cda1c468406cda9fdb850a4b5203990fae51a81a9efa"
+      "sha256": "6262696c6a585b170cf88f30aa2d3596107bedd3296e6d3fe687b366a5bc104c"
     },
     {
       "path": "results/s2-007r/cell-pa2/run-01.json",
-      "sha256": "13c0fd92d5c3ca6263d135fe666fcbbd3decf43679f1fdf084882b0a2e8e8a8b"
+      "sha256": "7fa8409f492b949cea5cc18361671aedffa79a6a06b04b31d6aadf8b38e35527"
     },
     {
       "path": "results/s2-007r/cell-pa2/run-02.json",
-      "sha256": "6bc47a9b123f6ba2b0a6988595bbf762393894bfa9c4bfd30d67d5dec4c42a9c"
+      "sha256": "eefff6f9a13b59e4ecbe9eee0f8a8993e19e299d294b65776dcc3c7a1986a7cf"
     }
   ],
   "run_record_digests": [
     {
       "path": "results/s2-007r/cell-pia/run-record.json",
-      "sha256": "63035f0070d92cba9b6665b97c0bd34d66f1e2054b1b7155a7bae14e5126e408"
+      "sha256": "b2a18ae83adc6b7587aed45df465237c9ee92527168e7f04d0433b882b76119e"
     },
     {
       "path": "results/s2-007r/cell-pb1/run-record.json",
-      "sha256": "d9c47ab48d38e0f67ed6c63bed184c160ebca85cd5e633e4795411fcf726209d"
+      "sha256": "49fc7043bc76aea1d98467807fb82616ecfa8d59ede19bc22249f3d01530e0c9"
     },
     {
       "path": "results/s2-007r/cell-pb2/run-record.json",
-      "sha256": "25a53254a86c355fb0a35658ce1b7e10fb24865517218d3ba99b55eda8dd6fdf"
+      "sha256": "4009c6c35af95d45b80c5792ae2428d6f79fcd07dc7041c38713e4a16637b655"
     },
     {
       "path": "results/s2-007r/cell-pa2/run-record.json",
-      "sha256": "c5796383038db7e493da123fb6aab0ecbedb7429688cb427b297b2ce389dd92c"
+      "sha256": "3e2ca7455aeba6ad3c6d23e5e87a365ed21a0ff4d5aa9a7f81212925d9935f70"
     }
   ],
   "raw_log_digests": [
     {
       "path": "results/s2-007r/cell-pia/raw/pilot/run-01-pi/results/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-      "sha256": "8bbe809c9620406ed713961ae7e04ea9c417da6a2abe9442042ddac0a6551349",
-      "bytes": 13597,
+      "sha256": "0be67b4db66991f8f1bb2732bc91f037c71a019a5a939153bdd4ceb92b776862",
+      "bytes": 13865,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pia/raw/pilot/run-02-codex/results/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-      "sha256": "e51260ba025bb71968a43b2c110b2d76c65506003139a45a8d2f97d1536a1cdc",
-      "bytes": 16552,
+      "sha256": "13698cc539f56fd8c9f21fdc1db31c9f88eb81b085b6dd3e57d0fbfc7cc6db12",
+      "bytes": 16820,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pb1/raw/pilot/run-01-pi/results/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-      "sha256": "27ab36327a813dafcdd068321decc475c58ed1f6d60b1a9e68ca68f2e2d66269",
-      "bytes": 13840,
+      "sha256": "069d515133cf5e39885ad63519997ea9d7ecf5bcfaea14019e01305ee2d3acd5",
+      "bytes": 14216,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pb1/raw/pilot/run-02-codex/results/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-      "sha256": "8e70765e0cfbb6c48dda6d212f80559c79ad4f89e76cb10fbfa3592e79cb5056",
-      "bytes": 16415,
+      "sha256": "2ec7958a81829c4e206088831c7b7fe74b8cc7cb1392f94a9ed631b3771112c3",
+      "bytes": 16683,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pb2/raw/pilot/run-01-pi/results/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-      "sha256": "2769c16aaaf2cf0f118849be51f1246fd2713d643865d6cca4526ae952c9c50d",
-      "bytes": 13839,
+      "sha256": "05434553c338184af05591b87b6adb7d40f72a2a87622a52c3a31cea71dcd3d4",
+      "bytes": 14111,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pb2/raw/pilot/run-02-codex/results/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-      "sha256": "1633741ea1014b9b30a0bff6127028c05e190b6ead31c26611b2b16d70f0044c",
-      "bytes": 16415,
+      "sha256": "ae046660e203db5bd756c1ea49718907d461b0eec11d54a7d0c19f8489709fc4",
+      "bytes": 16683,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pa2/raw/pilot/run-01-pi/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
-      "sha256": "3114bdac36356ca30ac29d6cf54ac4b662a8c55a93bb9980e511da6a25ff3e6d",
-      "bytes": 13598,
+      "sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+      "bytes": 13973,
       "present_on_disk": false
     },
     {
       "path": "results/s2-007r/cell-pa2/raw/pilot/run-02-codex/results/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
-      "sha256": "5095fca62a3a82c1ae3ff721b0e84c057aab33616f87b3362658afbfc1f7f945",
-      "bytes": 16552,
+      "sha256": "327ba2d082c79c7f4846866c95d5bb13af3e4c2f2dd460b1391740f355ddf824",
+      "bytes": 16820,
       "present_on_disk": false
     }
   ],
@@ -3607,6 +3637,6 @@
     "The comparison is COMPARED: pi COMPARED, codex REFUSED. A provider whose two ends select the identical normalised argv is EXCLUDED with that reason and is never reported as \"no difference observed\".",
     "Measurement 7 is a boundary observation performed by the measurement step, not an observation of a run. It is labelled is_a_run:false, governed:false, board_commands_called:0 in the arms and in the measurement row."
   ],
-  "record_digest": "sha256:74520d1b8fec64373c153a51bcad80299655ef1933a67722ae409846fe08c4f5",
-  "recordDigest": "sha256:99d9a68b8dc7cb51d43b9f9cbc36ff7fd894465dece8ab90f331266aa000af78"
+  "record_digest": "sha256:4fc77613c5dcde0d565386816c6bb7f9887880f83eccc0c2384e0d89440f72d8",
+  "recordDigest": "755cb0340f7083ff16365005526b8f5f0d643b117be4526f65d71bc96ecc29a6"
 }

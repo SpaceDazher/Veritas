@@ -47,6 +47,11 @@
       "--model:"
     ],
     "argv_allowlist_digest": "sha256:fbf360154b342aca785788b3129ecbad5d8defaf092245654c1d304fdacc4dac",
+    "request_allowed_tools": [
+      "tool:fs.read"
+    ],
+    "request_allowlist_digest": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
+    "tool_digest_of_argv": "sha256:578959d0109c64321483768f2e306d84347ca722854b43ee89cf519a93960118",
     "configuration": "B",
     "configuration_name": "LIMITED_BUILD",
     "configuration_surface_flags": [],
@@ -168,7 +173,7 @@
   "exit_status": 1,
   "signal": null,
   "cause": null,
-  "stdout_sha256": "sha256:7ab76b087280489768cc7314778670bd8da06223584e427b59fe61bd1fa2858c",
+  "stdout_sha256": "sha256:4427e4bff5b83f7a1e745a8f0119f3499db1051d6d84afc65ad2911aa2517967",
   "stdout_bytes": 1015,
   "stderr_sha256": "sha256:1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
   "stderr_bytes": 39,
@@ -191,7 +196,7 @@
     "cost_basis": "NOT_REPORTED_BY_EXECUTOR",
     "model_id": null,
     "tool_calls": 2,
-    "executor_session_id": "01a0e346-36b3-79b2-a51d-17c18d46542d"
+    "executor_session_id": "01a0e5b6-a67c-7912-b9bf-fefc0fb3e671"
   },
   "exit_observed": true,
   "cancel_proof": null,

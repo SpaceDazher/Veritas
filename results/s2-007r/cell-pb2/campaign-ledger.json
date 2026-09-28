@@ -9,7 +9,7 @@
   "budget_authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
   "budget_approval_owner": "issue #12 (S2-012)",
   "accounting": "self-reported executor spend only; an executor that reports no monetary cost contributes 0 and is marked NO_USD_REPORTED_BY_EXECUTOR rather than being priced from a list",
-  "total_usd": 0.000369,
+  "total_usd": 0.000619,
   "entries": [
     {
       "run_id": "run-pilot-000001",
@@ -81,6 +81,38 @@
       "adapter": "adr-pi-local",
       "configuration": "B",
       "usd": 0.000068,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "B",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "B",
+      "usd": 0.000104,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "B",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "B",
+      "usd": 0.000146,
       "cost_basis": "EXECUTOR_REPORTED_USD"
     },
     {

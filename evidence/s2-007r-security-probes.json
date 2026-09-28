@@ -6,8 +6,8 @@
   "gate": "test:s2-007r-probes",
   "probeModule": "scripts/s2-007r-probes.mjs",
   "version": "s2-007r-real-probes-v1",
-  "commit": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
-  "tree": "b0f39f77bfb7f63d2b5a5999cbe2ac889669eea7",
+  "commit": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+  "tree": "a6813e37fdd6bac16ff748629e078db1a36d273d",
   "status": "PASS",
   "ok": true,
   "exitCode": 0,
@@ -185,7 +185,7 @@
         {
           "arm": "a_refused_comparison_writes_no_measurement_block",
           "required": false,
-          "status": "not_run"
+          "status": "ok"
         }
       ],
       "detail": "POSITIVE CONTROL: a pair with the same run set, project, budget and cost basis is compared; the compared pair carries verdict COMPARED and no delta it may not state; a pair whose two ends carry the SAME normalised argv is refused, not compared; the identical-argv refusal is a code from the closed error set; a differing project_digest is refused with a typed NEEDS_INPUT; the refusal names project_digest and COMPARISON_INPUT_MISMATCH; the project_digest refusal is a code from the closed error set;"
@@ -220,7 +220,7 @@
         {
           "arm": "the_child_argv_allowlist_is_derived_from_the_request",
           "required": false,
-          "status": "not_run"
+          "status": "ok"
         }
       ],
       "detail": "a payload carrying the planted approved is refused; the approved refusal is a typed AUTH_REQUIRED; a payload carrying the planted granted_scope is refused; the granted_scope refusal is a typed AUTH_REQUIRED; a payload carrying the planted allowed_tools is refused; the allowed_tools refusal is a typed AUTH_REQUIRED; a non-canonical authority field is refused; an adapter claiming a planted tool is refused; the refusal is a typed CAPABILITY_MISMATCH; the refusal names the claim that is not register"
@@ -252,22 +252,7 @@
     }
   ],
   "omits": [],
-  "deferredArms": [
-    {
-      "probe": "comparison_across_projects_or_budgets_refused",
-      "arm": "a_refused_comparison_writes_no_measurement_block",
-      "reason": "the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run",
-      "code": "NEEDS_INPUT",
-      "pendingOn": "scripts/s2-007r-comparison-run.mjs"
-    },
-    {
-      "probe": "skill_authority_expansion_blocked",
-      "arm": "the_child_argv_allowlist_is_derived_from_the_request",
-      "reason": "the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow",
-      "code": "NEEDS_INPUT",
-      "pendingOn": "a real run record with measurements[].skills_authority"
-    }
-  ],
+  "deferredArms": [],
   "registry": {
     "ok": true,
     "missingProbes": [],
@@ -527,7 +512,7 @@
         {
           "label": "no S2-007R evidence record was created or modified by the refused write",
           "ok": true,
-          "detail": "scope=/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json before=02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e after=02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e"
+          "detail": "scope=/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json before=a957f4e19eb36e0b6800ca0040457e549752fb52f08884b629729f2e7412d1f6 after=a957f4e19eb36e0b6800ca0040457e549752fb52f08884b629729f2e7412d1f6"
         },
         {
           "label": "this gate's own record (evidence/s2-007r-security-probes.json) was not touched by the refused write either",
@@ -582,8 +567,8 @@
         "module": "src/lib/executors/evidence-writer.mjs",
         "refused_code": "NOT_RUN_REAL_ADAPTER",
         "refused_detail": "REAL_RUN_EVIDENCE_VERSION",
-        "evidenceDirBefore": "02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e",
-        "evidenceDirAfter": "02e043c0766846da3985c93e84ecbe147a7f6b32476f62ccf5ce2f0d1838567e",
+        "evidenceDirBefore": "a957f4e19eb36e0b6800ca0040457e549752fb52f08884b629729f2e7412d1f6",
+        "evidenceDirAfter": "a957f4e19eb36e0b6800ca0040457e549752fb52f08884b629729f2e7412d1f6",
         "evidenceDirScope": "/^s2-007r-.*\\.json$/ minus s2-007r-security-probes.json",
         "gateOutputUnchangedDuringProbe": true,
         "gateOutputExcludedFromDigest": true,
@@ -660,6 +645,26 @@
           "label": "the cost_basis refusal is a code from the closed error set",
           "ok": true,
           "detail": "NEEDS_INPUT"
+        },
+        {
+          "label": "a pair that cannot be compared is refused with a typed NEEDS_INPUT",
+          "ok": true,
+          "detail": "NeedsInput/NEEDS_INPUT"
+        },
+        {
+          "label": "the refusal is COMPARISON_INPUT_MISMATCH and names the field that differs",
+          "ok": true,
+          "detail": "COMPARISON_INPUT_MISMATCH:project_digest:sha256:1111111111111111111111111111111111111111111111111111111111111111!=sha256:777777777777777777777777777777777777777"
+        },
+        {
+          "label": "a refused pair yields NO cell object at all, so no measurement can be written from it",
+          "ok": true,
+          "detail": "the refusal returned no result object"
+        },
+        {
+          "label": "the refusal carries a non-retryable typed document, not a value a writer could mistake for a cell",
+          "ok": true,
+          "detail": "NeedsInput/NEEDS_INPUT retryable=true"
         }
       ],
       "arms": [
@@ -676,11 +681,10 @@
           "arm": "a_refused_comparison_writes_no_measurement_block",
           "required": false,
           "description": "a comparison artifact produced from a refused pair carries verdict REFUSED and no measurements",
-          "status": "not_run",
-          "reason": "the artifact-level verdict is asserted by scripts/verify-s2-007r.mjs (its negativeControls drive a comparison record with verdict REFUSED and require the verdict ladder to answer PARTIAL, never COMPLETE_WITH_LIMITS). The recorder itself is measured by scripts/s2-007r-comparison-run.mjs on a real run",
-          "code": "NEEDS_INPUT",
-          "checks": [],
-          "pendingOn": "scripts/s2-007r-comparison-run.mjs"
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
         }
       ],
       "compareCellsModule": "src/lib/executors/measure.mjs",
@@ -781,6 +785,26 @@
           "label": "an execution.event whose ARGS carry a forged granted_scope is refused AUTH_REQUIRED",
           "ok": true,
           "detail": "AuthRequired/AUTH_REQUIRED"
+        },
+        {
+          "label": "the transport publishes a per-provider argv allowlist",
+          "ok": true,
+          "detail": "providers codex, pi"
+        },
+        {
+          "label": "every provider declares its tool-carrying flags and its tool control",
+          "ok": true,
+          "detail": "codex: tool flags [--output-last-message: --model:] control SANDBOX_READ_ONLY_PLUS_NO_TOOL_FLAG | pi: tool flags [--model: --tools: --skill:] control ARGV_TOOLS_ALLOWLIST_DERIVED_FROM_THE_INTERSECTION"
+        },
+        {
+          "label": "every real process log carries BOTH digests: the argv tool table and the request's own allowed tools",
+          "ok": true,
+          "detail": "18/18 log(s) carry both; 18 real log(s) found"
+        },
+        {
+          "label": "the published tool set is a SUBSET of the request's allowed tools in every real log",
+          "ok": true,
+          "detail": "codex: request [\"tool:fs.read\"] vs argv [\"tool:fs.read\"] | pi: request [\"tool:fs.read\"] vs argv [\"tool:fs.read\"] | pi: request [\"tool:fs.read\"] vs argv [\"tool:fs.read\"]"
         }
       ],
       "arms": [
@@ -824,11 +848,10 @@
           "arm": "the_child_argv_allowlist_is_derived_from_the_request",
           "required": false,
           "description": "the real transport builds its --tools argv from request.allowed_tools, so the child cannot reach an ungranted tool (owner A)",
-          "status": "not_run",
-          "reason": "the argv allowlist is derived and enforced inside the real transport; this probe does not spawn a child to observe it. It is asserted structurally by the real transport's own PROVIDER_ARGV_ALLOWLIST and measured on a real run by scripts/verify-s2-007r.mjs (measurements[].skills_authority: argv_allow",
-          "code": "NEEDS_INPUT",
-          "checks": [],
-          "pendingOn": "a real run record with measurements[].skills_authority"
+          "status": "ok",
+          "reason": null,
+          "code": null,
+          "checks": []
         }
       ],
       "planted": {
@@ -1055,10 +1078,10 @@
   },
   "limits": [
     "No real executor crossed the boundary in this gate: the scripted veritas.adapter/1.0.0 test transport is the only transport under test, so honestStatus.realAdapterStatus is NOT_RUN_REAL_ADAPTER and nothing here may be read as a real-adapter run.",
-    "Arms that need the real-executor tree could not run and are listed in deferredArms with the exact owning file; 2 of them. They move no counter and change no probe verdict, and they cap the ticket at PARTIAL.",
+    "Arms that need the real-executor tree could not run and are listed in deferredArms with the exact owning file; 0 of them. They move no counter and change no probe verdict, and they cap the ticket at PARTIAL.",
     "A green probe run is evidence about REFUSALS, not about task quality, human review or calibration.",
     "The probes run against the in-memory store. A claim proven here is proven about the command boundary, not about a PostgreSQL transaction; the two-process behaviour is the DB replay gate of the S2-007 ticket."
   ],
-  "runId": "s2-007r-probes-c2b8ce3318b54f0831df54da",
-  "recordDigest": "24dc121fdb7ad781215b6e8bd9c90d04a9f158a1cfec9f0671eefb0665fb0c20"
+  "runId": "s2-007r-probes-a090d8ea45ee375679c4e43e",
+  "recordDigest": "63cc3e924d61c2db1bd827a7815c4c7e9b0f638b6da7f34a2487895605e386be"
 }
