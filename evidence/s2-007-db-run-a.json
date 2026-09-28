@@ -15,8 +15,8 @@
   "database_engine": "PostgreSQL",
   "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
   "pids": {
-    "contended": 251047,
-    "crash": 251126
+    "contended": 435878,
+    "crash": 436191
   },
   "status": "RECORDED",
   "calls": [
@@ -773,14 +773,14 @@
       "audit": 32,
       "outbox": 1,
       "outbox_acked": 1,
-      "operations": 32,
+      "operations": 33,
       "spend_rows": 1
     },
-    "digest": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-    "rawDigest": "403bd4b433bf60cef4ceae1a5a6006742cffe3703ecabadb8f4e32d3e4a45a97"
+    "digest": "056d118f70e5be07c90347f8c9712238540afc9b51c94f63a6d29b8bdfe6f38e",
+    "rawDigest": "9deb7684d5f9bb95c6de522e34634341013d089dd700db8f1c5cffeeb7d1a3b4"
   },
   "contended": {
-    "barrierDir": "/tmp/s2-007-db-replay-Lk0kKR/barrier",
+    "barrierDir": "/tmp/s2-007-db-replay-yHhVGC/barrier",
     "label": "a",
     "contestedClaim": {
       "outcome": "REFUSE",
@@ -832,7 +832,7 @@
     "exitCode": null,
     "signal": "SIGKILL",
     "diedAsDesigned": true,
-    "pid": 251126,
+    "pid": 436191,
     "executorId": "exec-s2-007-db-a"
   }
 }
