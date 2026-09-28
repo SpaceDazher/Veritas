@@ -1,0 +1,613 @@
+{
+  "record_kind": "s2-007r-preflight",
+  "ticket": "S2-007R",
+  "run_round": 3,
+  "purpose": "the same preflight round 2 ran, before any governed crossing: both executables really answer, the workspace root is 0700 and symlink-free, exactly one grant exists, and the store is the digest-pinned rootless-podman PostgreSQL",
+  "host": {
+    "platform": "linux/x64",
+    "node": "v22.23.2",
+    "podman": "4.9.3"
+  },
+  "executables": [
+    {
+      "name": "codex",
+      "installed": true,
+      "named_path": "/home/daniil/.local/bin/codex",
+      "resolved_path": "/home/daniil/.local/lib/node_modules/@openai/codex/bin/codex.js",
+      "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+      "version_argv": [
+        "--version"
+      ],
+      "version_exit_code": 0,
+      "version_stdout": "codex-cli 0.157.1",
+      "version_note": "a real child process; it proves the executable starts and answers --version, and NOTHING about a model call"
+    },
+    {
+      "name": "pi",
+      "installed": true,
+      "named_path": "/home/daniil/.local/bin/pi",
+      "resolved_path": "/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+      "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "version_argv": [
+        "--version"
+      ],
+      "version_exit_code": 0,
+      "version_stdout": "0.87.1",
+      "version_note": "a real child process; it proves the executable starts and answers --version, and NOTHING about a model call"
+    }
+  ],
+  "model_pin": {
+    "pi": {
+      "model": "openrouter/amazon/nova-lite-v1",
+      "why": "a small-max-output model; this host's key returns HTTP 402 for 1M-max-output models"
+    },
+    "codex": {
+      "model": "the codex CLI's configured default; its JSONL reports no model id and no per-token cost"
+    }
+  },
+  "preflight_calls": {
+    "codex": {
+      "argv": [
+        "exec",
+        "--json",
+        "--skip-git-repo-check",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "/tmp/veritas-s2-007r-ws/preflight-r3",
+        "--output-last-message",
+        "/tmp/veritas-s2-007r-ws/preflight-r3/last-message.txt",
+        "Reply with exactly one token: PING."
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "wall_ms": 11864,
+      "thread_id": "01a0e208-9e5b-7851-ade2-6c95c852d138",
+      "answer": "PING",
+      "usage": {
+        "input_tokens": 20938,
+        "output_tokens": 5,
+        "reasoning_tokens": 0,
+        "cache_read_tokens": 12160,
+        "cache_write_tokens": 0,
+        "proxy_tokens": 20943,
+        "cost_usd_micros": null,
+        "cost_basis": "PROXY_TOKENS_NO_USD_REPORTED",
+        "model_id": null,
+        "tool_calls": 2,
+        "executor_session_id": "01a0e208-9e5b-7851-ade2-6c95c852d138"
+      },
+      "outcome_read_by_transport_parser": {
+        "records": [
+          {
+            "type": "thread.started",
+            "thread_id": "01a0e208-9e5b-7851-ade2-6c95c852d138"
+          },
+          {
+            "type": "turn.started"
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_0",
+              "type": "error",
+              "message": "Exceeded skills context budget. All skill descriptions were removed and 83 additional skills were not included in the model-visible skills list."
+            }
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_1",
+              "type": "agent_message",
+              "text": "PING"
+            }
+          },
+          {
+            "type": "turn.completed",
+            "usage": {
+              "input_tokens": 20938,
+              "cached_input_tokens": 12160,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 5,
+              "reasoning_output_tokens": 0
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 20938,
+          "output_tokens": 5,
+          "reasoning_tokens": 0,
+          "cache_read_tokens": 12160,
+          "cache_write_tokens": 0,
+          "proxy_tokens": 20943,
+          "cost_usd_micros": null,
+          "cost_basis": "PROXY_TOKENS_NO_USD_REPORTED",
+          "model_id": null,
+          "tool_calls": 2,
+          "executor_session_id": "01a0e208-9e5b-7851-ade2-6c95c852d138"
+        },
+        "failure": {
+          "reason": "EXECUTOR_ERROR_RECORD",
+          "message": "Exceeded skills context budget. All skill descriptions were removed and 83 additional skills were not included in the model-visible skills list.",
+          "credit_limited": false
+        },
+        "assistant_text": "PING",
+        "exit_code": 0,
+        "signal": null,
+        "stderr_digest": "sha256:1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "cost_usd": null,
+      "cost_basis": "PROXY_TOKENS_NO_USD_REPORTED",
+      "stdout_sha256": "sha256:8bc06defd7d0c7aefab6d1f263772567455bc7cbe2462548f4a3fb3928d0e7f7",
+      "stdout_bytes": 568,
+      "stderr_bytes": 39,
+      "answered": true
+    },
+    "pi": {
+      "argv": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "openrouter/amazon/nova-lite-v1",
+        "--no-session",
+        "--no-tools",
+        "Reply with exactly one token: PING."
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "wall_ms": 3980,
+      "session_id": null,
+      "model": null,
+      "stop_reason": null,
+      "answer": "",
+      "usage": {
+        "input_tokens": 1435,
+        "output_tokens": 5,
+        "reasoning_tokens": 0,
+        "cache_read_tokens": 0,
+        "cache_write_tokens": 0,
+        "proxy_tokens": 1440,
+        "cost_usd_micros": 87,
+        "cost_basis": "EXECUTOR_REPORTED_USD",
+        "model_id": "amazon/nova-lite-v1",
+        "tool_calls": 0,
+        "executor_session_id": "01a0e208-cb99-7059-a0fe-be388296ba69"
+      },
+      "outcome_read_by_transport_parser": {
+        "records": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "01a0e208-cb99-7059-a0fe-be388296ba69",
+            "timestamp": "2026-09-27T08:43:42.362Z",
+            "cwd": "/tmp/veritas-s2-007r-ws/preflight-r3"
+          },
+          {
+            "type": "agent_start"
+          },
+          {
+            "type": "turn_start"
+          },
+          {
+            "type": "message_start",
+            "message": {
+              "role": "system",
+              "content": "",
+              "sections": {
+                "preamble": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.",
+                "tools": "<tools>\n(none)\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>",
+                "rules": "<rules>\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>",
+                "docs": "<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/README.md\n- Additional docs: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/docs\n- Examples: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>",
+                "project_context": "<project_context>\nProject-specific instructions and guidelines:\n\n<project_instructions path=\"/home/daniil/.pi/agent/AGENTS.md\">\n# Global agent instructions\n\n## ECC (agent harness operating system) — use by default\n\n- The ECC repository is cloned at `D:/Soft/pi-agent/ECC`.\n- ALWAYS use ECC by default in every session: consult its agents (`ECC/agents/`), skills (`ECC/skills/`), commands (`ECC/commands/`), workflows (`ECC/workflows/`), rules (`ECC/rules/`), and context templates (`ECC/contexts/`) when planning and executing coding tasks.\n- Before starting a task, check whether ECC has a relevant skill/workflow/agent and follow it instead of improvising.\n- Addy Osmani's agent skills are installed at `D:/Soft/pi-agent/agent-skills/skills` (WSL: `/mnt/d/Soft/pi-agent/agent-skills/skills`; both paths are registered in pi settings). Use them by default alongside ECC — they cover the full dev lifecycle (spec, plan, build, test, review, ship, etc.). Prefer their workflows (e.g., test-driven-development, code-review-and-quality, spec-driven-development) for the matching phases of any task.\n- `llm-verifier` (LLM-as-a-Verifier, v0.2.0) is installed as a Python package (`py -m pip install -e .` from `D:/Soft/pi-agent/llm-as-a-verifier`; import as `import llm_verifier`). Use it by default for verification needs: best-of-N candidate selection (`llm_verifier.select`), pairwise comparison (`compare`), fine-grained progress tracking of agent steps (`track`). Needs DEEPSEEK_API_KEY / VERTEX_API_KEY or an OpenAI-compatible server with logprobs configured in `D:/Soft/pi-agent/llm-as-a-verifier/.env`.\n- Language preference: reply to the user in Russian.\n\n## Поиск по коду: `tg`, а не `grep -r`\n\n- `rg` в системе нет, а `grep -r` на деревьях вроде `D:/Soft/pi-agent` (17k файлов) и `.codex/plugins` (5k) стоит 20–50 с на запрос. Используй `tg` — обёртку над tgrep (trigram-индекс + сервер): `tg -l -F -- \"pattern\"`, путь можно не указывать, индекс подставляется по корню дерева.\n- Проиндексированы (WSL-сессии): `/mnt/d/Soft/pi-agent` (ECC, agent-skills, llm-verifier), `/mnt/c/Users/Daniil/.codex/plugins`, `/mnt/c/Users/Daniil/.codex/skills`, `/home/daniil/Plagin`. Список и состояние: `tg --trees`.\n- **Граница по хосту:** `tg` и `tgrep` установлены только в WSL. В Windows-сессиях pi (Git Bash, пути вида `/d/...`) их нет — там пока ищи обычным `grep`. Установка tgrep.exe на Windows отложена: в релизе v1.0.11 нет чексуммы для windows-ассетов.\n- После своих правок в дереве на D:/C: используй `tg --scan` (в `/mnt/d/...` новый файл не попал в индекс за 309 с, хотя watcher активен). В локальных деревьях ext4 задержка 3–4 с, `--scan` не нужен.\n- `node_modules`, `dist`, `.bb`, `.arch-map` в индекс не входят намеренно; по ним — обычный `grep`.\n- Подробности и замеры: `ECC/rules/common/code-search.md`.\n\n</project_instructions>\n</project_context>",
+                "cwd": "<cwd>\n/tmp/veritas-s2-007r-ws/preflight-r3\n</cwd>"
+              },
+              "timestamp": 1790498625069
+            }
+          },
+          {
+            "type": "message_end",
+            "message": {
+              "role": "system",
+              "content": "",
+              "sections": {
+                "preamble": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.",
+                "tools": "<tools>\n(none)\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>",
+                "rules": "<rules>\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>",
+                "docs": "<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/README.md\n- Additional docs: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/docs\n- Examples: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>",
+                "project_context": "<project_context>\nProject-specific instructions and guidelines:\n\n<project_instructions path=\"/home/daniil/.pi/agent/AGENTS.md\">\n# Global agent instructions\n\n## ECC (agent harness operating system) — use by default\n\n- The ECC repository is cloned at `D:/Soft/pi-agent/ECC`.\n- ALWAYS use ECC by default in every session: consult its agents (`ECC/agents/`), skills (`ECC/skills/`), commands (`ECC/commands/`), workflows (`ECC/workflows/`), rules (`ECC/rules/`), and context templates (`ECC/contexts/`) when planning and executing coding tasks.\n- Before starting a task, check whether ECC has a relevant skill/workflow/agent and follow it instead of improvising.\n- Addy Osmani's agent skills are installed at `D:/Soft/pi-agent/agent-skills/skills` (WSL: `/mnt/d/Soft/pi-agent/agent-skills/skills`; both paths are registered in pi settings). Use them by default alongside ECC — they cover the full dev lifecycle (spec, plan, build, test, review, ship, etc.). Prefer their workflows (e.g., test-driven-development, code-review-and-quality, spec-driven-development) for the matching phases of any task.\n- `llm-verifier` (LLM-as-a-Verifier, v0.2.0) is installed as a Python package (`py -m pip install -e .` from `D:/Soft/pi-agent/llm-as-a-verifier`; import as `import llm_verifier`). Use it by default for verification needs: best-of-N candidate selection (`llm_verifier.select`), pairwise comparison (`compare`), fine-grained progress tracking of agent steps (`track`). Needs DEEPSEEK_API_KEY / VERTEX_API_KEY or an OpenAI-compatible server with logprobs configured in `D:/Soft/pi-agent/llm-as-a-verifier/.env`.\n- Language preference: reply to the user in Russian.\n\n## Поиск по коду: `tg`, а не `grep -r`\n\n- `rg` в системе нет, а `grep -r` на деревьях вроде `D:/Soft/pi-agent` (17k файлов) и `.codex/plugins` (5k) стоит 20–50 с на запрос. Используй `tg` — обёртку над tgrep (trigram-индекс + сервер): `tg -l -F -- \"pattern\"`, путь можно не указывать, индекс подставляется по корню дерева.\n- Проиндексированы (WSL-сессии): `/mnt/d/Soft/pi-agent` (ECC, agent-skills, llm-verifier), `/mnt/c/Users/Daniil/.codex/plugins`, `/mnt/c/Users/Daniil/.codex/skills`, `/home/daniil/Plagin`. Список и состояние: `tg --trees`.\n- **Граница по хосту:** `tg` и `tgrep` установлены только в WSL. В Windows-сессиях pi (Git Bash, пути вида `/d/...`) их нет — там пока ищи обычным `grep`. Установка tgrep.exe на Windows отложена: в релизе v1.0.11 нет чексуммы для windows-ассетов.\n- После своих правок в дереве на D:/C: используй `tg --scan` (в `/mnt/d/...` новый файл не попал в индекс за 309 с, хотя watcher активен). В локальных деревьях ext4 задержка 3–4 с, `--scan` не нужен.\n- `node_modules`, `dist`, `.bb`, `.arch-map` в индекс не входят намеренно; по ним — обычный `grep`.\n- Подробности и замеры: `ECC/rules/common/code-search.md`.\n\n</project_instructions>\n</project_context>",
+                "cwd": "<cwd>\n/tmp/veritas-s2-007r-ws/preflight-r3\n</cwd>"
+              },
+              "timestamp": 1790498625069
+            }
+          },
+          {
+            "type": "message_start",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Reply with exactly one token: PING."
+                }
+              ],
+              "timestamp": 1790498625069
+            }
+          },
+          {
+            "type": "message_end",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Reply with exactly one token: PING."
+                }
+              ],
+              "timestamp": 1790498625069
+            }
+          },
+          {
+            "type": "message_start",
+            "message": {
+              "role": "assistant",
+              "content": [],
+              "api": "openai-completions",
+              "provider": "openrouter",
+              "model": "amazon/nova-lite-v1",
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "pending",
+              "timestamp": 1790498625081
+            }
+          },
+          {
+            "type": "message_update",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "assistantMessageEvent": {
+              "type": "text_start",
+              "contentIndex": 0
+            }
+          },
+          {
+            "type": "message_update",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "assistantMessageEvent": {
+              "type": "text_delta",
+              "contentIndex": 0,
+              "delta": "П"
+            }
+          },
+          {
+            "type": "message_update",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "assistantMessageEvent": {
+              "type": "text_delta",
+              "contentIndex": 0,
+              "delta": "ИН"
+            }
+          },
+          {
+            "type": "message_update",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "assistantMessageEvent": {
+              "type": "text_delta",
+              "contentIndex": 0,
+              "delta": "Г"
+            }
+          },
+          {
+            "type": "message_update",
+            "usage": {
+              "input": 1435,
+              "output": 5,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "reasoning": 0,
+              "totalTokens": 1440,
+              "cost": {
+                "input": 0.00008609999999999999,
+                "output": 0.0000012,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0.0000873
+              }
+            },
+            "assistantMessageEvent": {
+              "type": "text_end",
+              "contentIndex": 0,
+              "content": "ПИНГ"
+            }
+          },
+          {
+            "type": "message_end",
+            "message": {
+              "role": "assistant",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "ПИНГ"
+                }
+              ],
+              "api": "openai-completions",
+              "provider": "openrouter",
+              "model": "amazon/nova-lite-v1",
+              "usage": {
+                "input": 1435,
+                "output": 5,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "reasoning": 0,
+                "totalTokens": 1440,
+                "cost": {
+                  "input": 0.00008609999999999999,
+                  "output": 0.0000012,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0.0000873
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 1790498625081,
+              "responseId": "gen-1790498625-gTnu4cklZPUlSZ4DHe1k",
+              "rawStopReason": "stop"
+            }
+          },
+          {
+            "type": "turn_end",
+            "message": {
+              "role": "assistant",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "ПИНГ"
+                }
+              ],
+              "api": "openai-completions",
+              "provider": "openrouter",
+              "model": "amazon/nova-lite-v1",
+              "usage": {
+                "input": 1435,
+                "output": 5,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "reasoning": 0,
+                "totalTokens": 1440,
+                "cost": {
+                  "input": 0.00008609999999999999,
+                  "output": 0.0000012,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0.0000873
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 1790498625081,
+              "responseId": "gen-1790498625-gTnu4cklZPUlSZ4DHe1k",
+              "rawStopReason": "stop"
+            },
+            "toolResults": []
+          },
+          {
+            "type": "agent_end",
+            "messages": [
+              {
+                "role": "system",
+                "content": "",
+                "sections": {
+                  "preamble": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.",
+                  "tools": "<tools>\n(none)\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>",
+                  "rules": "<rules>\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>",
+                  "docs": "<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/README.md\n- Additional docs: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/docs\n- Examples: /home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>",
+                  "project_context": "<project_context>\nProject-specific instructions and guidelines:\n\n<project_instructions path=\"/home/daniil/.pi/agent/AGENTS.md\">\n# Global agent instructions\n\n## ECC (agent harness operating system) — use by default\n\n- The ECC repository is cloned at `D:/Soft/pi-agent/ECC`.\n- ALWAYS use ECC by default in every session: consult its agents (`ECC/agents/`), skills (`ECC/skills/`), commands (`ECC/commands/`), workflows (`ECC/workflows/`), rules (`ECC/rules/`), and context templates (`ECC/contexts/`) when planning and executing coding tasks.\n- Before starting a task, check whether ECC has a relevant skill/workflow/agent and follow it instead of improvising.\n- Addy Osmani's agent skills are installed at `D:/Soft/pi-agent/agent-skills/skills` (WSL: `/mnt/d/Soft/pi-agent/agent-skills/skills`; both paths are registered in pi settings). Use them by default alongside ECC — they cover the full dev lifecycle (spec, plan, build, test, review, ship, etc.). Prefer their workflows (e.g., test-driven-development, code-review-and-quality, spec-driven-development) for the matching phases of any task.\n- `llm-verifier` (LLM-as-a-Verifier, v0.2.0) is installed as a Python package (`py -m pip install -e .` from `D:/Soft/pi-agent/llm-as-a-verifier`; import as `import llm_verifier`). Use it by default for verification needs: best-of-N candidate selection (`llm_verifier.select`), pairwise comparison (`compare`), fine-grained progress tracking of agent steps (`track`). Needs DEEPSEEK_API_KEY / VERTEX_API_KEY or an OpenAI-compatible server with logprobs configured in `D:/Soft/pi-agent/llm-as-a-verifier/.env`.\n- Language preference: reply to the user in Russian.\n\n## Поиск по коду: `tg`, а не `grep -r`\n\n- `rg` в системе нет, а `grep -r` на деревьях вроде `D:/Soft/pi-agent` (17k файлов) и `.codex/plugins` (5k) стоит 20–50 с на запрос. Используй `tg` — обёртку над tgrep (trigram-индекс + сервер): `tg -l -F -- \"pattern\"`, путь можно не указывать, индекс подставляется по корню дерева.\n- Проиндексированы (WSL-сессии): `/mnt/d/Soft/pi-agent` (ECC, agent-skills, llm-verifier), `/mnt/c/Users/Daniil/.codex/plugins`, `/mnt/c/Users/Daniil/.codex/skills`, `/home/daniil/Plagin`. Список и состояние: `tg --trees`.\n- **Граница по хосту:** `tg` и `tgrep` установлены только в WSL. В Windows-сессиях pi (Git Bash, пути вида `/d/...`) их нет — там пока ищи обычным `grep`. Установка tgrep.exe на Windows отложена: в релизе v1.0.11 нет чексуммы для windows-ассетов.\n- После своих правок в дереве на D:/C: используй `tg --scan` (в `/mnt/d/...` новый файл не попал в индекс за 309 с, хотя watcher активен). В локальных деревьях ext4 задержка 3–4 с, `--scan` не нужен.\n- `node_modules`, `dist`, `.bb`, `.arch-map` в индекс не входят намеренно; по ним — обычный `grep`.\n- Подробности и замеры: `ECC/rules/common/code-search.md`.\n\n</project_instructions>\n</project_context>",
+                  "cwd": "<cwd>\n/tmp/veritas-s2-007r-ws/preflight-r3\n</cwd>"
+                },
+                "timestamp": 1790498625069
+              },
+              {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Reply with exactly one token: PING."
+                  }
+                ],
+                "timestamp": 1790498625069
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "ПИНГ"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "openrouter",
+                "model": "amazon/nova-lite-v1",
+                "usage": {
+                  "input": 1435,
+                  "output": 5,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "reasoning": 0,
+                  "totalTokens": 1440,
+                  "cost": {
+                    "input": 0.00008609999999999999,
+                    "output": 0.0000012,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0.0000873
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 1790498625081,
+                "responseId": "gen-1790498625-gTnu4cklZPUlSZ4DHe1k",
+                "rawStopReason": "stop"
+              }
+            ],
+            "willRetry": false
+          },
+          {
+            "type": "agent_settled"
+          }
+        ],
+        "usage": {
+          "input_tokens": 1435,
+          "output_tokens": 5,
+          "reasoning_tokens": 0,
+          "cache_read_tokens": 0,
+          "cache_write_tokens": 0,
+          "proxy_tokens": 1440,
+          "cost_usd_micros": 87,
+          "cost_basis": "EXECUTOR_REPORTED_USD",
+          "model_id": "amazon/nova-lite-v1",
+          "tool_calls": 0,
+          "executor_session_id": "01a0e208-cb99-7059-a0fe-be388296ba69"
+        },
+        "failure": null,
+        "assistant_text": "ПИНГ",
+        "exit_code": 0,
+        "signal": null,
+        "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cost_usd": 0.000087,
+      "cost_basis": "EXECUTOR_REPORTED_USD",
+      "stdout_sha256": "sha256:c64aa15441ecd59b47174e3dd8ea243d0653d1d73470c4c3be3bd95c8e3772f6",
+      "stdout_bytes": 19447,
+      "stderr_bytes": 0,
+      "answered": true
+    },
+    "honesty": "these two calls are OUTSIDE the board: no task, no lease, no grant row, no outbox and no board row exists for either. They establish that a provider really answers on this host at this moment, and their cost is reported here and nowhere else. The codex call is the ChatGPT-account quota path: the CLI reports no monetary cost, so its figure is null and is never estimated from a price list.",
+    "invocation_count_of_this_script": "each execution of this script spawns ONE codex preflight call and ONE pi preflight call; the count of executions this campaign needed is reported in the run report, not hidden here"
+  },
+  "credential_locations": {
+    "codex": "~/.codex (the CLI's own auth store; the pilot never reads a value from it)",
+    "pi": "~/.pi (the CLI's own config store; the pilot never reads a value from it)",
+    "postgres": "a random per-invocation password held only in the container's own environment; read back with `podman container inspect <name> --format \"{{range .Config.Env}}{{println .}}{{end}}\"` and never printed into a record",
+    "read_by_this_pilot": false
+  },
+  "workspace_root": {
+    "path": "/tmp/veritas-s2-007r-ws",
+    "exists": true,
+    "mode": "0700",
+    "uid": 1000,
+    "symlink_free": true,
+    "inside_tmp": true,
+    "segments": [
+      {
+        "path": "/tmp/veritas-s2-007r-ws",
+        "is_symlink": false,
+        "is_dir": true,
+        "mode": "0700",
+        "uid": 1000
+      },
+      {
+        "path": "/tmp",
+        "is_symlink": false,
+        "is_dir": true,
+        "mode": "01777",
+        "uid": 0
+      }
+    ],
+    "realpath": "/tmp/veritas-s2-007r-ws",
+    "realpath_equals_requested": true
+  },
+  "grants": {
+    "ledger_path": "results/s2-007r/campaign-ledger.json",
+    "ledger_grant_id": "grt-s2007r-pilot",
+    "distinct_grant_ids": [
+      "grt-s2007r-pilot"
+    ],
+    "count": 1,
+    "entries_without_own_grant_id": 8,
+    "entries_without_own_grant_id_note": "these rows carry no grant_id field, so they inherit the ledger's single id; they are not additional grants",
+    "cap_usd": 2,
+    "stop_fraction": 0.8,
+    "stop_at_usd": 1.6,
+    "total_usd_before_this_campaign": 0,
+    "fraction_of_cap_before": 0,
+    "authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+    "approval_owner": "issue #12 (S2-012)"
+  },
+  "store": {
+    "container": "veritas-s2-007r-db-r3",
+    "inspect": [
+      "46fd3c3fc0e1bfef17518e54b89828199eadc7a3958c10ba7cffee12f34ca480",
+      "1bea307dfb3ee30541a7acf7de14b58bcd6948da98e5d31a04c627c4d35ec64b",
+      "running",
+      "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73"
+    ],
+    "pg_isready_exit": 0,
+    "pg_isready_stdout": "/var/run/postgresql:5432 - accepting connections",
+    "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "recipe": "scripts/s2-007-db-replay.mjs's: digest-pinned image, --pull=never, --read-only root, --user=70:70, --cap-drop all, --security-opt no-new-privileges, --pids-limit=64, --memory=384m, tmpfs PGDATA, loopback-only publish, random runtime credentials",
+    "removal": "the container is removed at the end of this campaign and `podman container exists` is asserted to FAIL afterwards"
+  },
+  "stdout_digest_note": "the raw stdout of each preflight call is NOT copied into this record; its sha256 and byte length are, so a third party can bind the call without the file being republished here"
+}

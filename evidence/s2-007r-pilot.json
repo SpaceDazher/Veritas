@@ -1,0 +1,1044 @@
+{
+  "schemaVersion": 1,
+  "record_kind": "s2-007r-pilot-campaign-record",
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#45",
+  "written_by": "the S2-007R pilot run, this process, from the raw records named in `sources`; every number here is read from those bytes, none is typed by hand",
+  "verdict": {
+    "status": "PARTIAL",
+    "real_runs_completed": 0,
+    "reason": "the per-edge sandbox gate refuses the HOST_UNISOLATED floor tier, so no task edge opens and no governed run exists; everything that does not need a task edge really ran",
+    "a_mvp_status": "NOT_CLAIMED",
+    "assurance_status": "NOT_MEASURED",
+    "real_adapter_status_of_any_run": "NOT_RUN_REAL_ADAPTER",
+    "engineering_status": "PARTIAL",
+    "engineering_status_semantics": "the registration half of the pilot really executed and is published; the run half could not start, and the reason is one function in a frozen file, named and measured below"
+  },
+  "preflight": {
+    "host": {
+      "platform": "linux/x64",
+      "node": "v22.23.2",
+      "podman": "podman version 4.9.3"
+    },
+    "executables": [
+      {
+        "name": "codex",
+        "version": "codex-cli 0.157.1",
+        "named_path": "/home/daniil/.local/bin/codex",
+        "resolved_path": "/home/daniil/.local/lib/node_modules/@openai/codex/bin/codex.js",
+        "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
+      },
+      {
+        "name": "pi",
+        "version": "0.87.1",
+        "named_path": "/home/daniil/.local/bin/pi",
+        "resolved_path": "/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+        "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774"
+      }
+    ],
+    "model_pin": {
+      "pi": "openrouter/amazon/nova-lite-v1",
+      "why": "a small-max-output model. This host's key returns HTTP 402 for 1M-max-output models; openrouter/amazon/nova-lite-v1 is the operator-verified one and it answered.",
+      "answers": true,
+      "preflight_call": {
+        "exit_code": 0,
+        "session_id": "01a0e16b-4d68-707f-b0ed-b6042d8e2ec6",
+        "model": "amazon/nova-lite-v1",
+        "usage": {
+          "input": 1427,
+          "output": 51,
+          "reasoning": 0
+        },
+        "cost_usd": 0.00009786,
+        "note": "one direct preflight call outside the board, before any grant was drawn on; its cost is reported here and it is the only spend this pilot caused outside the board"
+      },
+      "codex": {
+        "model": "the codex CLI's configured default; its JSONL reports no model id and no per-token cost",
+        "answers": true,
+        "preflight_call": {
+          "exit_code": 0,
+          "thread_id": "01a0e16b-51fa-7923-a944-37b54437779e",
+          "answer": "PING",
+          "usage": {
+            "input_tokens": 20936,
+            "cached_input_tokens": 12160,
+            "output_tokens": 5
+          },
+          "cost_usd": null,
+          "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+        }
+      }
+    },
+    "credential_locations": {
+      "codex": "~/.codex (the CLI's own auth store; contents never read)",
+      "pi": "~/.pi (the CLI's own config store; contents never read)",
+      "read_by_this_pilot": false
+    },
+    "workspace_root": {
+      "path": "/tmp/veritas-s2-007r-ws",
+      "mode": "0700",
+      "uid": 1000,
+      "symlink_free": true,
+      "inside_tmp": true,
+      "verified_by": "scripts/s2-007r-run.mjs#prepareWorkspaceRoot (mode, owner and a per-segment lstat symlink walk) and independently by stat/readlink before the run"
+    },
+    "grants_present": {
+      "count": 1,
+      "id": "grt-s2007r-pilot",
+      "other_grants_found": 0,
+      "how_established": "the campaign ledger is the single source of self-reported spend and it accumulates exactly one grant_id; a ledger naming a different grant id is refused with CAMPAIGN_LEDGER_GRANT_MISMATCH"
+    }
+  },
+  "store": {
+    "tier": "postgres",
+    "class": "PostgresAgentBoardStore",
+    "provisioning": "the repository's own rootless-podman recipe (scripts/s2-007-db-replay.mjs): digest-pinned image, --pull=never, --read-only root, --user=70:70, --cap-drop all, --security-opt no-new-privileges, --pids-limit=64, --memory=384m, tmpfs PGDATA, loopback-only publish, random runtime credentials",
+    "image": "docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73",
+    "server": "PostgreSQL 17.11 on x86_64-pc-linux-musl",
+    "credentials": "random per invocation, held in a 0600 file outside the repository under /tmp, referenced by variable name in every record; no value was read, printed, hashed or recorded",
+    "migrations_applied": 9,
+    "schemas": [
+      "s2_007r_pia",
+      "s2_007r_pb1",
+      "s2_007r_pb2",
+      "s2_007r_pa2"
+    ],
+    "removal": "CONTAINER_REMOVED_AFTER_THE_PILOT: the container is removed and `podman container exists` is asserted to FAIL afterwards; a PGDATA that lived in tmpfs is gone with it",
+    "in_memory_would_not_have_been_enough": "A-MVP-06 and A-MVP-07 are two-OS-process cases; the in-memory store has an injected clock and an in-process fence counter and expresses neither. They are NOT_RUN for a different reason on this checkout (the per-edge gate), and that is stated per case.",
+    "sql_observation": {
+      "read_from": "the live PostgreSQL, after all four cells, before the container was removed",
+      "schemas": [
+        "s2_007r_pia",
+        "s2_007r_pb1",
+        "s2_007r_pb2",
+        "s2_007r_pa2"
+      ],
+      "tables_per_schema": 55,
+      "per_schema": "tasks 2, runs 0, agentboard_execution_event 0",
+      "adapters_committed": [
+        {
+          "adapter_id": "adr-codex-local",
+          "adapter_kind": "real",
+          "health": "healthy",
+          "sandbox_profile_id": "sbx-host-unisolated-v1",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE"
+        },
+        {
+          "adapter_id": "adr-pi-local",
+          "adapter_kind": "real",
+          "health": "healthy",
+          "sandbox_profile_id": "sbx-host-unisolated-v1",
+          "provenance_status": "REAL_ADAPTER_AVAILABLE"
+        }
+      ],
+      "grant_scopes_committed": {
+        "currency": "USD",
+        "task_limit": 0.5,
+        "campaign_limit": 2,
+        "day_limit": 2,
+        "timeout_ms": 600000,
+        "note": "one row per task, all four schemas carrying the identical three limits; the store resolves a run's grant by task_id, so one campaign-wide row cannot back a run at this HEAD"
+      },
+      "what_this_proves": "the registrations and the grant rows really committed to a real PostgreSQL, and zero runs and zero execution events exist, which is the same statement the records make",
+      "what_it_does_not_prove": "nothing about a run: a run is exactly what did not happen"
+    }
+  },
+  "registration": {
+    "both_adapters_registered": true,
+    "boundary": "adapters.register (src/lib/agentboard/commands.mjs#execute), actor prn-s2007r-owner, actor_kind human_owner",
+    "schema": "contracts/adapter-registration.schema.json, checked by the driver via boardContractErrors and by the registration module via assertBoardContract",
+    "declared": {
+      "adr_codex_local": {
+        "provider": "codex",
+        "declared_capabilities": [
+          "task.read",
+          "artifact.write",
+          "source.read",
+          "code.write"
+        ],
+        "declared_tools": [
+          "tool:fs.read",
+          "tool:fs.write",
+          "tool:test.run"
+        ],
+        "sandbox_profile_id": "sbx-host-unisolated-v1"
+      },
+      "adr_pi_local": {
+        "provider": "pi",
+        "declared_capabilities": [
+          "task.read",
+          "artifact.write",
+          "source.read",
+          "code.write"
+        ],
+        "declared_tools": [
+          "tool:fs.read",
+          "tool:fs.write",
+          "tool:test.run"
+        ],
+        "sandbox_profile_id": "sbx-host-unisolated-v1"
+      }
+    },
+    "declared_capabilities_note": "the registration must cover the scope the BOARD grants a run (DEFAULT_RUN_SCOPE = [task.read, artifact.write], src/lib/agentboard/commands.mjs:380), because the transport cross-checks the request's granted_scope against the registration before the spawn. A registration that declared only the task vocabulary was measured to be refused with ADAPTER_CLAIM_NOT_REGISTERED. A registration may declare a superset of the current grant; the surplus is never used to widen anything.",
+    "provenance": "REAL_ADAPTER_AVAILABLE for both, each derived from ITS OWN real observed crossing (not from a probe, not from a registration, not from a fixture): the transport minted the record from the exit this process observed, and evidence-writer.assertRealRunEvidence re-derived it from the bytes on disk"
+  },
+  "comparison": {
+    "design": "one project, one budget, configurations A and B on the same tasks, paired order A->B then B->A",
+    "cells": [
+      {
+        "order": 1,
+        "cell": "A#1",
+        "dir": "results/s2-007r/cell-pia",
+        "configuration": "A",
+        "seed": "pia",
+        "record_path": "results/s2-007r/cell-pia/run-record.json",
+        "record_sha256": "sha256:9c4e0d4c82c148dfb36e83d9511e2fb2aa9d1f050c7fcdb846f73dc0fc8315be",
+        "record_digest_own": "sha256:353092d8ce97b3c7b4cf0081e2d317d1a01f1a8a3c41510af343845c6d8cdeff",
+        "store": {
+          "tier": "postgres",
+          "class": "PostgresAgentBoardStore",
+          "schema": "s2_007r_pia",
+          "migrations_applied": 9
+        },
+        "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+        "project_file_count": 7,
+        "grant_id": "grt-s2007r-pilot",
+        "grant_limits": {
+          "task_limit": 0.5,
+          "campaign_limit": 2,
+          "day_limit": 2,
+          "timeout_ms": 600000,
+          "currency": "USD"
+        },
+        "budget_authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+        "budget_approval_owner": "issue #12 (S2-012)",
+        "configuration_detail": "the transport tree exports no CONFIG_SURFACES; the name was passed through unchanged and the argv as executed is the only record of what it selected",
+        "sandbox_profile": {
+          "profile_id": "sbx-host-unisolated-v1",
+          "tier": "HOST_UNISOLATED",
+          "isolation_observed": false,
+          "os_controls_absence_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f"
+        },
+        "registrations": [
+          {
+            "adapter_id": "adr-codex-local",
+            "provider": "codex",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-codex-pia",
+            "corroborated_by_log_sha256": "sha256:5a3bdf52fe9ddda51952207522c459745aa4f5942a4be0ea9bfb3ebf3f5f8d67",
+            "corroborated_by_exit": 1
+          },
+          {
+            "adapter_id": "adr-pi-local",
+            "provider": "pi",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-pi-pia",
+            "corroborated_by_log_sha256": "sha256:fdbd17850d690c16803d78d97fb6e7fd8cb04755591948713225f363454eea00",
+            "corroborated_by_exit": 1
+          }
+        ],
+        "bootstrap_crossings": [
+          {
+            "provider": "codex",
+            "run_id": "run-bootstrap-codex-pia",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:5a3bdf52fe9ddda51952207522c459745aa4f5942a4be0ea9bfb3ebf3f5f8d67",
+            "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+            "spend_usd": 0
+          },
+          {
+            "provider": "pi",
+            "run_id": "run-bootstrap-pi-pia",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:fdbd17850d690c16803d78d97fb6e7fd8cb04755591948713225f363454eea00",
+            "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+            "spend_usd": 0
+          }
+        ],
+        "realAdapterStatus": "REAL_ADAPTER_AVAILABLE",
+        "runs": [
+          {
+            "label": "01",
+            "task_id": "abt-s2007r-pia-01",
+            "adapter_id": "adr-codex-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          },
+          {
+            "label": "02",
+            "task_id": "abt-s2007r-pia-02",
+            "adapter_id": "adr-pi-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          }
+        ],
+        "refused_calls": [
+          {
+            "step": "claim.01",
+            "code": "BLOCKED_SANDBOX"
+          },
+          {
+            "step": "claim.02",
+            "code": "BLOCKED_SANDBOX"
+          }
+        ],
+        "dispatch_decision": {
+          "decision_id": "dsc-pia-000001",
+          "selected_task_id": null,
+          "excluded": [
+            {
+              "subject_kind": "task",
+              "subject_id": "abt-s2007r-pia-01",
+              "reasons": [
+                "SANDBOX_NOT_PROVEN"
+              ]
+            }
+          ],
+          "budget_snapshot": {
+            "currency": "USD",
+            "assigned": true,
+            "task_remaining": 0.5,
+            "campaign_remaining": 2,
+            "day_remaining": 2
+          }
+        },
+        "hard_gates": [
+          "EXECUTOR_NOT_INDEPENDENTLY_OBSERVED",
+          "NO_RAW_PROCESS_LOG_PUBLISHED"
+        ],
+        "status": "FAIL",
+        "exit_code": 1
+      },
+      {
+        "order": 2,
+        "cell": "B#1",
+        "dir": "results/s2-007r/cell-pb1",
+        "configuration": "B",
+        "seed": "pb1",
+        "record_path": "results/s2-007r/cell-pb1/run-record.json",
+        "record_sha256": "sha256:588d7a0107f8c28ea446359a8fe0a70459475afcdc6f15d6c4cc3ec68755f97c",
+        "record_digest_own": "sha256:4bdbb74105e502c66b8c8c963a564e3bebabbacfa892fbb65ac3ddbe257888f0",
+        "store": {
+          "tier": "postgres",
+          "class": "PostgresAgentBoardStore",
+          "schema": "s2_007r_pb1",
+          "migrations_applied": 9
+        },
+        "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+        "project_file_count": 7,
+        "grant_id": "grt-s2007r-pilot",
+        "grant_limits": {
+          "task_limit": 0.5,
+          "campaign_limit": 2,
+          "day_limit": 2,
+          "timeout_ms": 600000,
+          "currency": "USD"
+        },
+        "budget_authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+        "budget_approval_owner": "issue #12 (S2-012)",
+        "configuration_detail": "the transport tree exports no CONFIG_SURFACES; the name was passed through unchanged and the argv as executed is the only record of what it selected",
+        "sandbox_profile": {
+          "profile_id": "sbx-host-unisolated-v1",
+          "tier": "HOST_UNISOLATED",
+          "isolation_observed": false,
+          "os_controls_absence_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f"
+        },
+        "registrations": [
+          {
+            "adapter_id": "adr-codex-local",
+            "provider": "codex",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-codex-pb1",
+            "corroborated_by_log_sha256": "sha256:6db7248e301870096b9c01e231452f47a0e51673cf936eb3572a9fa247d29dd6",
+            "corroborated_by_exit": 1
+          },
+          {
+            "adapter_id": "adr-pi-local",
+            "provider": "pi",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-pi-pb1",
+            "corroborated_by_log_sha256": "sha256:37551168780acd4f562e97b9b97cce89ae3e20ce46e98abb37b6e17fbc14e284",
+            "corroborated_by_exit": 1
+          }
+        ],
+        "bootstrap_crossings": [
+          {
+            "provider": "codex",
+            "run_id": "run-bootstrap-codex-pb1",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:6db7248e301870096b9c01e231452f47a0e51673cf936eb3572a9fa247d29dd6",
+            "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+            "spend_usd": 0
+          },
+          {
+            "provider": "pi",
+            "run_id": "run-bootstrap-pi-pb1",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:37551168780acd4f562e97b9b97cce89ae3e20ce46e98abb37b6e17fbc14e284",
+            "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+            "spend_usd": 0
+          }
+        ],
+        "realAdapterStatus": "REAL_ADAPTER_AVAILABLE",
+        "runs": [
+          {
+            "label": "01",
+            "task_id": "abt-s2007r-pb1-01",
+            "adapter_id": "adr-codex-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          },
+          {
+            "label": "02",
+            "task_id": "abt-s2007r-pb1-02",
+            "adapter_id": "adr-pi-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          }
+        ],
+        "refused_calls": [
+          {
+            "step": "claim.01",
+            "code": "BLOCKED_SANDBOX"
+          },
+          {
+            "step": "claim.02",
+            "code": "BLOCKED_SANDBOX"
+          }
+        ],
+        "dispatch_decision": {
+          "decision_id": "dsc-pb1-000001",
+          "selected_task_id": null,
+          "excluded": [
+            {
+              "subject_kind": "task",
+              "subject_id": "abt-s2007r-pb1-01",
+              "reasons": [
+                "SANDBOX_NOT_PROVEN"
+              ]
+            }
+          ],
+          "budget_snapshot": {
+            "currency": "USD",
+            "assigned": true,
+            "task_remaining": 0.5,
+            "campaign_remaining": 2,
+            "day_remaining": 2
+          }
+        },
+        "hard_gates": [
+          "EXECUTOR_NOT_INDEPENDENTLY_OBSERVED",
+          "NO_RAW_PROCESS_LOG_PUBLISHED"
+        ],
+        "status": "FAIL",
+        "exit_code": 1
+      },
+      {
+        "order": 3,
+        "cell": "B#2",
+        "dir": "results/s2-007r/cell-pb2",
+        "configuration": "B",
+        "seed": "pb2",
+        "record_path": "results/s2-007r/cell-pb2/run-record.json",
+        "record_sha256": "sha256:a12e4f9391cbb3eab0cdd200105c819ddd157654b35e9b475578d56f971973a9",
+        "record_digest_own": "sha256:69481830d413f857bc47f10c7377a2404e3db08a35b3c96dfc8724a44860a6a0",
+        "store": {
+          "tier": "postgres",
+          "class": "PostgresAgentBoardStore",
+          "schema": "s2_007r_pb2",
+          "migrations_applied": 9
+        },
+        "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+        "project_file_count": 7,
+        "grant_id": "grt-s2007r-pilot",
+        "grant_limits": {
+          "task_limit": 0.5,
+          "campaign_limit": 2,
+          "day_limit": 2,
+          "timeout_ms": 600000,
+          "currency": "USD"
+        },
+        "budget_authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+        "budget_approval_owner": "issue #12 (S2-012)",
+        "configuration_detail": "the transport tree exports no CONFIG_SURFACES; the name was passed through unchanged and the argv as executed is the only record of what it selected",
+        "sandbox_profile": {
+          "profile_id": "sbx-host-unisolated-v1",
+          "tier": "HOST_UNISOLATED",
+          "isolation_observed": false,
+          "os_controls_absence_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f"
+        },
+        "registrations": [
+          {
+            "adapter_id": "adr-codex-local",
+            "provider": "codex",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-codex-pb2",
+            "corroborated_by_log_sha256": "sha256:123f25a7663e59a4f3993130e41da11c7c4bd1a6ac329247888d1d5fdae66a7d",
+            "corroborated_by_exit": 1
+          },
+          {
+            "adapter_id": "adr-pi-local",
+            "provider": "pi",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-pi-pb2",
+            "corroborated_by_log_sha256": "sha256:deee5c0abb64abf5f95fc4f3de0021526e24290789a4d899beb0994ba3aa8201",
+            "corroborated_by_exit": 1
+          }
+        ],
+        "bootstrap_crossings": [
+          {
+            "provider": "codex",
+            "run_id": "run-bootstrap-codex-pb2",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:123f25a7663e59a4f3993130e41da11c7c4bd1a6ac329247888d1d5fdae66a7d",
+            "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+            "spend_usd": 0
+          },
+          {
+            "provider": "pi",
+            "run_id": "run-bootstrap-pi-pb2",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:deee5c0abb64abf5f95fc4f3de0021526e24290789a4d899beb0994ba3aa8201",
+            "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+            "spend_usd": 0
+          }
+        ],
+        "realAdapterStatus": "REAL_ADAPTER_AVAILABLE",
+        "runs": [
+          {
+            "label": "01",
+            "task_id": "abt-s2007r-pb2-01",
+            "adapter_id": "adr-codex-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          },
+          {
+            "label": "02",
+            "task_id": "abt-s2007r-pb2-02",
+            "adapter_id": "adr-pi-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          }
+        ],
+        "refused_calls": [
+          {
+            "step": "claim.01",
+            "code": "BLOCKED_SANDBOX"
+          },
+          {
+            "step": "claim.02",
+            "code": "BLOCKED_SANDBOX"
+          }
+        ],
+        "dispatch_decision": {
+          "decision_id": "dsc-pb2-000001",
+          "selected_task_id": null,
+          "excluded": [
+            {
+              "subject_kind": "task",
+              "subject_id": "abt-s2007r-pb2-01",
+              "reasons": [
+                "SANDBOX_NOT_PROVEN"
+              ]
+            }
+          ],
+          "budget_snapshot": {
+            "currency": "USD",
+            "assigned": true,
+            "task_remaining": 0.5,
+            "campaign_remaining": 2,
+            "day_remaining": 2
+          }
+        },
+        "hard_gates": [
+          "EXECUTOR_NOT_INDEPENDENTLY_OBSERVED",
+          "NO_RAW_PROCESS_LOG_PUBLISHED"
+        ],
+        "status": "FAIL",
+        "exit_code": 1
+      },
+      {
+        "order": 4,
+        "cell": "A#2",
+        "dir": "results/s2-007r/cell-pa2",
+        "configuration": "A",
+        "seed": "pa2",
+        "record_path": "results/s2-007r/cell-pa2/run-record.json",
+        "record_sha256": "sha256:b43bba6840bc1962c32ed47498adf318ae6c5163f5918551710f188a37b954d3",
+        "record_digest_own": "sha256:36b8966008b8fd6e24be10bfa07ecc6a4cf412274c651b3e64e8a9f2b0108c1a",
+        "store": {
+          "tier": "postgres",
+          "class": "PostgresAgentBoardStore",
+          "schema": "s2_007r_pa2",
+          "migrations_applied": 9
+        },
+        "project_digest": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+        "project_file_count": 7,
+        "grant_id": "grt-s2007r-pilot",
+        "grant_limits": {
+          "task_limit": 0.5,
+          "campaign_limit": 2,
+          "day_limit": 2,
+          "timeout_ms": 600000,
+          "currency": "USD"
+        },
+        "budget_authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+        "budget_approval_owner": "issue #12 (S2-012)",
+        "configuration_detail": "the transport tree exports no CONFIG_SURFACES; the name was passed through unchanged and the argv as executed is the only record of what it selected",
+        "sandbox_profile": {
+          "profile_id": "sbx-host-unisolated-v1",
+          "tier": "HOST_UNISOLATED",
+          "isolation_observed": false,
+          "os_controls_absence_evidence": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f"
+        },
+        "registrations": [
+          {
+            "adapter_id": "adr-codex-local",
+            "provider": "codex",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-codex-pa2",
+            "corroborated_by_log_sha256": "sha256:832b629b0636323dd40802952e0bc0972e307e5991eebf92e423472ae9452724",
+            "corroborated_by_exit": 1
+          },
+          {
+            "adapter_id": "adr-pi-local",
+            "provider": "pi",
+            "adapter_kind": "real",
+            "sandbox_profile_id": "sbx-host-unisolated-v1",
+            "schema_valid": true,
+            "register_decision": "ACCEPT",
+            "provenance_status": "REAL_ADAPTER_AVAILABLE",
+            "corroborated_by_run": "run-bootstrap-pi-pa2",
+            "corroborated_by_log_sha256": "sha256:b5db4d680a074c72186ae3d23466014659138142aa878b99e71eb544502a8adb",
+            "corroborated_by_exit": 1
+          }
+        ],
+        "bootstrap_crossings": [
+          {
+            "provider": "codex",
+            "run_id": "run-bootstrap-codex-pa2",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:832b629b0636323dd40802952e0bc0972e307e5991eebf92e423472ae9452724",
+            "binary_sha256": "sha256:61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+            "spend_usd": 0
+          },
+          {
+            "provider": "pi",
+            "run_id": "run-bootstrap-pi-pa2",
+            "governed": false,
+            "exit_status": 1,
+            "exit_observed": true,
+            "outcome": "FAILED",
+            "raw_log_sha256": "sha256:b5db4d680a074c72186ae3d23466014659138142aa878b99e71eb544502a8adb",
+            "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+            "spend_usd": 0
+          }
+        ],
+        "realAdapterStatus": "REAL_ADAPTER_AVAILABLE",
+        "runs": [
+          {
+            "label": "01",
+            "task_id": "abt-s2007r-pa2-01",
+            "adapter_id": "adr-codex-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          },
+          {
+            "label": "02",
+            "task_id": "abt-s2007r-pa2-02",
+            "adapter_id": "adr-pi-local",
+            "verdict": "NOT_RUN",
+            "findings": [
+              "claim-refused"
+            ]
+          }
+        ],
+        "refused_calls": [
+          {
+            "step": "claim.01",
+            "code": "BLOCKED_SANDBOX"
+          },
+          {
+            "step": "claim.02",
+            "code": "BLOCKED_SANDBOX"
+          }
+        ],
+        "dispatch_decision": {
+          "decision_id": "dsc-pa2-000001",
+          "selected_task_id": null,
+          "excluded": [
+            {
+              "subject_kind": "task",
+              "subject_id": "abt-s2007r-pa2-01",
+              "reasons": [
+                "SANDBOX_NOT_PROVEN"
+              ]
+            }
+          ],
+          "budget_snapshot": {
+            "currency": "USD",
+            "assigned": true,
+            "task_remaining": 0.5,
+            "campaign_remaining": 2,
+            "day_remaining": 2
+          }
+        },
+        "hard_gates": [
+          "EXECUTOR_NOT_INDEPENDENTLY_OBSERVED",
+          "NO_RAW_PROCESS_LOG_PUBLISHED"
+        ],
+        "status": "FAIL",
+        "exit_code": 1
+      }
+    ],
+    "assertions": {
+      "distinct_project_digests": 1,
+      "distinct_project_digest_value": [
+        "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b"
+      ],
+      "distinct_budget_grant_ids": 1,
+      "distinct_budget_grant_id_value": [
+        "grt-s2007r-pilot"
+      ],
+      "fresh_project_copy_per_run": true,
+      "verdict": "both assertions HOLD across the four invocations: one project digest and one grant id"
+    },
+    "cells_executed": 0,
+    "cells_not_executed": 4,
+    "why": "every cell refused tasks.claim with BLOCKED_SANDBOX before a fence existed, so no cell produced a run. The cell records exist and are published anyway: a NOT_RUN cell with its exact refusal is the honest artefact, and hiding them would make the comparison look absent rather than refused.",
+    "surface_axis": [
+      {
+        "provider": "codex",
+        "configuration_a": {
+          "run_id": "run-surface-codex-a",
+          "argv": [
+            "exec",
+            "--json",
+            "--skip-git-repo-check",
+            "--ephemeral",
+            "--sandbox",
+            "read-only",
+            "-C",
+            "/tmp/veritas-s2-007r-ws/lifecycle/project",
+            "--output-last-message",
+            "<evidence_dir>/<run_id>/raw/last-message.txt",
+            "--model",
+            "veritas-s2-007r-nonexistent/no-such-model",
+            "Say PING."
+          ],
+          "argv_digest_raw": "sha256:e1146e5e983d6cf350452908cf0ad2a59ac8ed9f1207cb14b28650f7caa86410",
+          "argv_digest": "sha256:8c746a6fe27306be40e89b202f9ac07cb8669a12962da089b024d8e8235d0cfd",
+          "exit_status": 1
+        },
+        "configuration_b": {
+          "run_id": "run-surface-codex-b",
+          "argv": [
+            "exec",
+            "--json",
+            "--skip-git-repo-check",
+            "--ephemeral",
+            "--sandbox",
+            "read-only",
+            "-C",
+            "/tmp/veritas-s2-007r-ws/lifecycle/project",
+            "--output-last-message",
+            "<evidence_dir>/<run_id>/raw/last-message.txt",
+            "--model",
+            "veritas-s2-007r-nonexistent/no-such-model",
+            "Say PING."
+          ],
+          "argv_digest_raw": "sha256:2ea32cc6604b8d0902aed3951f80fbfb0a89fcb97a56a8863dc19642d6a6bf12",
+          "argv_digest": "sha256:8c746a6fe27306be40e89b202f9ac07cb8669a12962da089b024d8e8235d0cfd",
+          "exit_status": 1
+        },
+        "argv_identical": true,
+        "surface_axis_exists": false,
+        "comparison_basis": "the normalised argv, with the run id and the per-run evidence directory folded out; the raw digests are beside it so a reader can see that the difference was only the run-specific file name",
+        "finding": "the two configurations produced identical normalised argv, so the SPEC §4 axis (baseline host surface vs limited build) does not exist in the transport as built: the factory takes no surface argument and pi's argv always carries the minimised surface when no skill bundle is requested. A comparison across A and B would be a comparison of a cell with itself."
+      },
+      {
+        "provider": "pi",
+        "configuration_a": {
+          "run_id": "run-surface-pi-a",
+          "argv": [
+            "-p",
+            "--mode",
+            "json",
+            "--model",
+            "veritas-s2-007r-nonexistent/no-such-model",
+            "--no-session",
+            "--no-tools",
+            "--no-skills",
+            "--no-extensions",
+            "--no-prompt-templates",
+            "--no-context-files",
+            "--no-themes",
+            "Say PING."
+          ],
+          "argv_digest_raw": "sha256:3712be703af890019d229b2a441dfc1808c4da161f905830d1db55abc0420fe4",
+          "argv_digest": "sha256:3712be703af890019d229b2a441dfc1808c4da161f905830d1db55abc0420fe4",
+          "exit_status": 1
+        },
+        "configuration_b": {
+          "run_id": "run-surface-pi-b",
+          "argv": [
+            "-p",
+            "--mode",
+            "json",
+            "--model",
+            "veritas-s2-007r-nonexistent/no-such-model",
+            "--no-session",
+            "--no-tools",
+            "--no-skills",
+            "--no-extensions",
+            "--no-prompt-templates",
+            "--no-context-files",
+            "--no-themes",
+            "Say PING."
+          ],
+          "argv_digest_raw": "sha256:3712be703af890019d229b2a441dfc1808c4da161f905830d1db55abc0420fe4",
+          "argv_digest": "sha256:3712be703af890019d229b2a441dfc1808c4da161f905830d1db55abc0420fe4",
+          "exit_status": 1
+        },
+        "argv_identical": true,
+        "surface_axis_exists": false,
+        "comparison_basis": "the normalised argv, with the run id and the per-run evidence directory folded out; the raw digests are beside it so a reader can see that the difference was only the run-specific file name",
+        "finding": "the two configurations produced identical normalised argv, so the SPEC §4 axis (baseline host surface vs limited build) does not exist in the transport as built: the factory takes no surface argument and pi's argv always carries the minimised surface when no skill bundle is requested. A comparison across A and B would be a comparison of a cell with itself."
+      }
+    ],
+    "surface_axis_finding": "the A/B axis does not exist in the transport as built: the factory takes no surface argument, the tree exports no CONFIG_SURFACES, and both providers' normalised argv are identical across A and B. A comparison across A and B would have been a comparison of a cell with itself. Measured with four real crossings (codex A/B, pi A/B) and published in results/s2-007r/lifecycle-record.json#surface_comparison."
+  },
+  "budget": {
+    "grant_id": "grt-s2007r-pilot",
+    "currency": "USD",
+    "task_limit": 0.5,
+    "campaign_limit": 2,
+    "day_limit": 2,
+    "timeout_ms": 600000,
+    "authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+    "approval_owner": "issue #12 (S2-012)",
+    "authority_note": "the repository owner authorised this pilot as run operator. It is not a product approval and it approves no acceptance criterion.",
+    "enforcement": "the board grant row is task-scoped at this HEAD, so a campaign cap is enforced by results/s2-007r/campaign-ledger.json: a run whose ledger total would pass 80% of the cap is refused with CAMPAIGN_STOP_REACHED before any executor is dispatched",
+    "stop_at_usd": 1.6,
+    "cap_usd": 2,
+    "campaign_spend_usd": 0,
+    "fraction_of_cap": 0,
+    "settled": "nothing to settle: every governed run was refused before a run existed, and every self-reported spend in this campaign is 0.00 USD",
+    "preflight_spend_outside_the_board_usd": 0.00009786,
+    "preflight_spend_note": "one direct pi call, made before any grant was drawn on, to establish that the pinned model answers. codex reported no monetary cost at all (a ChatGPT-account quota, not a per-token figure) and none was estimated.",
+    "never_exceeded": true
+  },
+  "lifecycle": {
+    "harness": "scripts/s2-007r-lifecycle.mjs",
+    "record": {
+      "path": "results/s2-007r/lifecycle-record.json",
+      "sha256": "sha256:d1f390014d7c4f58d1bfe671ff4d5e24276ca06446588aed112c4bfd3bf18603",
+      "record_digest": "sha256:ed7e49a85cee7b7ac2dab0a69a17d2a51de90688db36cffaccdc383535679776"
+    },
+    "arms": [
+      {
+        "arm": "cancel",
+        "provider": "pi",
+        "run_id": "run-lifecycle-cancel-pi",
+        "clause": "NOT_RUN",
+        "clause_reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "proof": "SURVIVORS_REMAINING",
+        "survivors": 1,
+        "surviving_pids": [
+          264242
+        ],
+        "pid_resolvable_two_seconds_later": false,
+        "result_outcome": "UNKNOWN_OUTCOME",
+        "spend_usd": null,
+        "raw_log_sha256": "sha256:b184f645f011a6253eca475a92f00ffaeeaded82b2b4db8573305f4108caca8e"
+      },
+      {
+        "arm": "timeout",
+        "provider": "pi",
+        "run_id": "run-lifecycle-timeout-pi",
+        "clause": "NOT_RUN",
+        "clause_reason": "NO_TERMINATION_PROOF_PUBLISHED: the arm reached a terminal outcome but the transport published no termination proof for it",
+        "proof": null,
+        "survivors": null,
+        "surviving_pids": null,
+        "pid_resolvable_two_seconds_later": false,
+        "result_outcome": "TIMEOUT",
+        "spend_usd": 0,
+        "raw_log_sha256": "sha256:9a855ba7525307e8d9075ac24c135ddad10df9bd0718475b8bb40ad63cdcb4cb"
+      },
+      {
+        "arm": "sigkill",
+        "provider": "pi",
+        "run_id": "run-lifecycle-sigkill-pi",
+        "clause": "OBSERVED",
+        "clause_reason": null,
+        "proof": "EXTERNAL_GROUP_SIGKILL",
+        "survivors": null,
+        "surviving_pids": null,
+        "pid_resolvable_two_seconds_later": false,
+        "result_outcome": "RECONCILIATION_REQUIRED",
+        "spend_usd": 0,
+        "raw_log_sha256": "sha256:ebf764a819fa404797d7d5cf9c2ecf6a76ab2d8ba07c037829cb65abdd8734e8"
+      }
+    ],
+    "findings": [
+      {
+        "id": "TRANSPORT_PUBLISHES_NO_TERMINATION_PROOF_ON_TIMEOUT",
+        "detail": "the timeout arm reached outcome TIMEOUT with transport.cancelProof === null; the group kill ran but nothing publishes the observer's verdict for it",
+        "consequence": "A-MVP-04's timeout clause is NOT_RUN: the proof the SPEC asks for does not exist to be quoted"
+      }
+    ],
+    "findings_also": [
+      {
+        "id": "TRANSPORT_TIMER_NEVER_CLEARED",
+        "detail": "the transport's granted-deadline timer is not cleared when a run reaches a terminal state, so a process whose work finished in 4s stayed alive for the full timeout_ms (measured: 5m01s wall for 4s of work)",
+        "owner": "src/lib/executors/transport.mjs"
+      },
+      {
+        "id": "CANCEL_PROOF_IS_A_REAPING_RACE",
+        "detail": "the observer's survivor count is taken before the killed child is reaped, so a dead-but-unreaped child is counted as a survivor and a correct cancel is reported as SURVIVORS_REMAINING. The transport then escalates to UNKNOWN_OUTCOME, which is fail-closed and safe, but it makes A-MVP-04's cancel clause unobservable as TERMINATED on this host.",
+        "owner": "src/lib/executors/transport.mjs + src/lib/identity/process-observer.mjs"
+      }
+    ]
+  },
+  "the_blocker": {
+    "what": "policy.assertSandboxExecutable refuses the HOST_UNISOLATED floor tier, and policy.assertAdapterCoversTask calls it for every task edge",
+    "where": "src/lib/agentboard/policy.mjs:777 (assertSandboxExecutable) called from src/lib/agentboard/policy.mjs:1263 (assertAdapterCoversTask)",
+    "measured": {
+      "assertLiveExecutionAuthorized(sbx-host-unisolated-v1, {authorization: <permit>, now: <injected>})": "ADMITTED, tier HOST_UNISOLATED, authorization_id aut-hu-s2-007r-01",
+      "assertSandboxExecutable(sbx-host-unisolated-v1)": "BLOCKED_SANDBOX",
+      "tasks.claim on a floor-tier task": "REFUSE / BLOCKED_SANDBOX (all four cells, both tasks each)",
+      "dispatch.plan": "excluded the only candidate with the closed-set reason SANDBOX_NOT_PROVEN",
+      "reproduced_in": "results/s2-007r/lifecycle-record.json#board_gate"
+    },
+    "consequence": "READY->CLAIMED, CLAIMED->RUNNING and RUNNING->IN_REVIEW are all unreachable on this profile, so there is no governed run, no A-MVP-06 race, no A-MVP-07 replay, and no comparison cell",
+    "why_it_was_not_worked_around": "the only two ways forward are (a) edit a frozen S2-002/S2-007 target that is digest-bound in evidence/frozen-manifest.json, which this pilot may not do and which the orchestrator reseals by its own procedure, or (b) name a PROVEN profile for a process that never entered a container, which is the one thing rule 2 of this ticket forbids. Neither was done.",
+    "the_one_line_that_would_unblock_it": "in assertSandboxExecutable, admit the floor tier as a DECLARED tier (isHostUnisolatedSandboxProfile) instead of requiring isExecutableSandboxProfile, and leave assertLiveExecutionAuthorized as the single live gate that demands the permit. That keeps the floor out of PROVEN_SANDBOX_PROFILE_IDS, keeps the permit mandatory at execution.start and dispatch.tick, and changes no existing control for a proven profile. It is a one-line change to a frozen file and it is the owner's call, not this pilot's."
+  },
+  "sources": [
+    {
+      "path": "results/s2-007r/cell-pia/run-record.json",
+      "sha256": "sha256:9c4e0d4c82c148dfb36e83d9511e2fb2aa9d1f050c7fcdb846f73dc0fc8315be"
+    },
+    {
+      "path": "results/s2-007r/cell-pb1/run-record.json",
+      "sha256": "sha256:588d7a0107f8c28ea446359a8fe0a70459475afcdc6f15d6c4cc3ec68755f97c"
+    },
+    {
+      "path": "results/s2-007r/cell-pb2/run-record.json",
+      "sha256": "sha256:a12e4f9391cbb3eab0cdd200105c819ddd157654b35e9b475578d56f971973a9"
+    },
+    {
+      "path": "results/s2-007r/cell-pa2/run-record.json",
+      "sha256": "sha256:b43bba6840bc1962c32ed47498adf318ae6c5163f5918551710f188a37b954d3"
+    },
+    {
+      "path": "results/s2-007r/lifecycle-record.json",
+      "sha256": "sha256:d1f390014d7c4f58d1bfe671ff4d5e24276ca06446588aed112c4bfd3bf18603"
+    },
+    {
+      "path": "results/s2-007r/campaign-ledger.json",
+      "sha256": "sha256:b804757f6a36df002e53b648ad351e8f3589f9ce220e070f240a99761caed7fa"
+    },
+    {
+      "path": "evidence/s2-007r-amvp-cases.json",
+      "sha256": "sha256:fb99c13b2f1473dc91c1e618ed9496cc5046bcb5107f3c0bad3407a8a6bd825e"
+    },
+    {
+      "path": "evidence/s2-007r-host-unisolated.json",
+      "sha256": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f"
+    }
+  ],
+  "files_this_pilot_touched": {
+    "modified": [
+      "scripts/s2-007r-run.mjs"
+    ],
+    "created": [
+      "scripts/s2-007r-lifecycle.mjs",
+      "evidence/s2-007r-amvp-cases.json"
+    ],
+    "written_output": "results/s2-007r/** (raw run records, per-run raw process logs with digests, the campaign ledger, the lifecycle record)",
+    "not_touched": [
+      "pilots/scenario-a/acceptance-cases.json (quoted verbatim, sha256 above)",
+      "evidence/{root-manifest,frozen-manifest,FILE_INVENTORY,closure-record,commit-record}.*",
+      "src/lib/agentboard/**",
+      "src/lib/identity/**",
+      "contracts/**",
+      "migrations/**",
+      "src/lib/executors/**"
+    ],
+    "git": "no git command was run except read-only `git status --porcelain` and `git rev-parse HEAD` for this report",
+    "reseal_needed": "the orchestrator must rewrite evidence/root-manifest.json, evidence/FILE_INVENTORY.md and evidence/frozen-manifest.json to include the new files; this pilot did not touch them"
+  },
+  "not_done": [
+    "the governed run itself, and with it the seven measurements of SPEC §5 (every numerator needs a collected ExecutionResult, and there is none)",
+    "the five negative probes of SPEC §6 are scripts/s2-007r-probes.mjs's work and were not re-run by this pilot; evidence/s2-007r-security-probes.json is from an earlier stage",
+    "the package.json npm scripts of file-plan row 20 (ORCH-owned)",
+    "the scheduler permit-plumbing defect: scheduler.mjs reads context.unisolatedExecutionAuthorization in its own preconditions, and commands.mjs#guardContextFor does not forward the execute() option into the guard context, so the permit reaches execution.start and dispatch.tick but not the per-edge guards"
+  ],
+  "record_digest_method": "record_digest is sha256 over the canonical-json-v1 form (src/lib/verifier/canonical-json.mjs#canonicalDigest) of this document with the record_digest field removed, which is the same convention the four cell run records and the lifecycle record use. Recompute: node -e \"import('./src/lib/verifier/canonical-json.mjs').then(m=>{const d=JSON.parse(require('fs').readFileSync(process.argv[1]));delete d.record_digest;console.log('sha256:'+m.canonicalDigest(d))})\" <file>",
+  "record_digest": "sha256:39341ed93cc70b4db5f6c1625fa38e6dd43ea0db9cb6a01b4343a24f13c11113"
+}

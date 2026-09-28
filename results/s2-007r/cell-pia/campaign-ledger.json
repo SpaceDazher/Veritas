@@ -1,0 +1,319 @@
+{
+  "record_kind": "s2-007r-campaign-ledger",
+  "ticket": "S2-007R",
+  "grant_id": "grt-s2007r-pilot",
+  "currency": "USD",
+  "cap_usd": 2,
+  "stop_fraction": 0.8,
+  "stop_at_usd": 1.6,
+  "budget_authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+  "budget_approval_owner": "issue #12 (S2-012)",
+  "accounting": "self-reported executor spend only; an executor that reports no monetary cost contributes 0 and is marked NO_USD_REPORTED_BY_EXECUTOR rather than being priced from a list",
+  "total_usd": 0.002306,
+  "entries": [
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000115,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.00015,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000144,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000119,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000107,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000214,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000122,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.00014,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000108,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000119,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000107,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000108,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000112,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000157,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000147,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": null
+    },
+    {
+      "run_id": null,
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": null
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000108,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000115,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    },
+    {
+      "run_id": "run-pilot-000001",
+      "label": "01",
+      "adapter": "adr-pi-local",
+      "configuration": "A",
+      "usd": 0.000114,
+      "cost_basis": "EXECUTOR_REPORTED_USD"
+    },
+    {
+      "run_id": "run-pilot-000002",
+      "label": "02",
+      "adapter": "adr-codex-local",
+      "configuration": "A",
+      "usd": 0,
+      "cost_basis": "NO_USD_REPORTED_BY_EXECUTOR"
+    }
+  ]
+}

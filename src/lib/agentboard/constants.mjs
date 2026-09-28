@@ -11,6 +11,7 @@ import {
   SANDBOX_UNTRUSTED_CODE_GVISOR,
   SANDBOX_LOCAL_RESTRICTED_BLOCKED,
   SANDBOX_NO_EXEC,
+  SANDBOX_HOST_UNISOLATED,
 } from '../identity/sandbox-profiles.mjs';
 
 export const BOARD_CONTRACT_VERSION = '1.0.0';
@@ -168,6 +169,7 @@ export const SANDBOX_PROFILES = Object.freeze([
   SANDBOX_UNTRUSTED_CODE_GVISOR,
   SANDBOX_LOCAL_RESTRICTED_BLOCKED,
   SANDBOX_NO_EXEC,
+  SANDBOX_HOST_UNISOLATED,
 ]);
 
 // The two profiles whose OS controls are backed by measured S2-002 evidence.
@@ -181,6 +183,36 @@ export const PROVEN_SANDBOX_PROFILE_IDS = Object.freeze([
 
 export function isExecutableSandboxProfile(profileId) {
   return PROVEN_SANDBOX_PROFILE_IDS.includes(profileId);
+}
+
+// The HOST_UNISOLATED floor tier (issue #45). It is deliberately NOT in
+// PROVEN_SANDBOX_PROFILE_IDS: nothing about it is proven to be isolated, and
+// `isExecutableSandboxProfile` must keep meaning "this tier has measured OS
+// controls". A run may still be bound to it, but only through
+// policy.assertLiveExecutionAuthorized, which demands a separate named human
+// authorisation document that the server resolves and that no adapter, task or
+// executor can supply. An A-MVP isolation clause may never be scored against it.
+export const HOST_UNISOLATED_SANDBOX_PROFILE_IDS = Object.freeze([
+  SANDBOX_HOST_UNISOLATED.profile_id,
+]);
+
+export function isHostUnisolatedSandboxProfile(profileId) {
+  return HOST_UNISOLATED_SANDBOX_PROFILE_IDS.includes(profileId);
+}
+
+// What a live execution needs, before the run starts. An isolated tier with
+// proven OS controls needs nothing extra. The host-unisolated floor needs a
+// named human authorisation; everything else is refused exactly as before.
+export const SANDBOX_TIERS = Object.freeze({
+  ISOLATED: 'ISOLATED',
+  HOST_UNISOLATED: 'HOST_UNISOLATED',
+  BLOCKED: 'BLOCKED',
+});
+
+export function classifySandboxProfile(profileId) {
+  if (isExecutableSandboxProfile(profileId)) return SANDBOX_TIERS.ISOLATED;
+  if (isHostUnisolatedSandboxProfile(profileId)) return SANDBOX_TIERS.HOST_UNISOLATED;
+  return SANDBOX_TIERS.BLOCKED;
 }
 
 // Digest conventions. `sha256:<64 hex>` on the wire; bare 64-hex when stored

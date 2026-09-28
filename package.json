@@ -68,7 +68,17 @@
     "manifest:closure": "node scripts/generate-manifests.mjs --write-closure",
     "manifest:check": "node scripts/generate-manifests.mjs --check",
     "verify:s2-003-db-replay": "node scripts/s2-003-db-replay.mjs",
-    "verify:s2-002-cancellation": "node scripts/verify-s2-002-cancellation-v2.mjs"
+    "verify:s2-002-cancellation": "node scripts/verify-s2-002-cancellation-v2.mjs",
+    "s2-007r:authorize": "node scripts/s2-007r-authorization.mjs",
+    "s2-007r:run": "node scripts/s2-007r-run.mjs",
+    "s2-007r:real-run": "node scripts/s2-007r-real-run-verify.mjs",
+    "s2-007r:lifecycle": "node scripts/s2-007r-lifecycle.mjs",
+    "s2-007r:measure": "node scripts/s2-007r-measure.mjs",
+    "s2-007r:measure-set": "node scripts/s2-007r-measurement-set.mjs",
+    "s2-007r:comparison": "node scripts/s2-007r-measurement-set.mjs",
+    "test:s2-007r-probes": "node scripts/s2-007r-probes.mjs",
+    "verify:s2-007r-host-unisolated": "node scripts/verify-s2-007r-host-unisolated.mjs",
+    "verify:s2-007r": "node scripts/verify-s2-007r.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -1,0 +1,2061 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#45",
+  "role": "verification aggregator for the real-adapter ticket: freshness, internal status, the seven hard-gate counters, the tamper matrices, the re-verified real-adapter claim, the per-case A-MVP table, the seven measurements and the derived verdict",
+  "gate": "verify:s2-007r",
+  "commit": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+  "tree": "a6813e37fdd6bac16ff748629e078db1a36d273d",
+  "runId": "s2-007r-verify-9a699e537127b27d0f0d8ae5",
+  "freshnessModel": "Every mandatory gate is re-run by THIS process. An evidence artifact is accepted only when the process exited 0, the bytes on disk hash to the digest the gate reported for the file it just wrote, the record content address matches, the record is bound to the current HEAD commit and, where it carries one, to the current HEAD tree, the internal status and the seven counters say PASS, and — for the real-adapter record — the executor claim survives re-verification from the bytes on disk. A gate whose npm script is absent is NOT_RUN, never PASS: an unavailable mandatory tool and a proven failure are different states, and only the second one is a defect.",
+  "gateContracts": {
+    "dependencies": {
+      "command": "npm run --silent verify:s2-007-dependencies",
+      "contract": "stdout JSON { ok:true, status:\"PASS\", mode:\"FULL_GIT_BYTES\" } + evidence/s2-007-dependency-binding.json whose resolved block was written by this run and is bound to the current HEAD commit. Inherited from S2-007: this ticket reports it and does not fix it.",
+      "evidenceFiles": [
+        "evidence/s2-007-dependency-binding.json"
+      ]
+    },
+    "real-adapter-run": {
+      "command": "npm run --silent s2-007r:real-run",
+      "contract": "scripts/s2-007r-run.mjs --write prints an envelope { status, ok, counters, evidenceFile, evidenceSha256, recordDigest, commit, tree } and writes the record it describes. The record must carry a genuine executor invocation (version, binary path + recomputed digest, raw log path + recomputed digest, non-zero exit status, honesty flags and a parent-observed session id) or the gate answers NOT_RUN_REAL_ADAPTER.",
+      "evidenceFiles": [
+        "evidence/s2-007r-real-run-gate.json",
+        "evidence/s2-007r-run.json",
+        "evidence/s2-007r-pilot.json"
+      ]
+    },
+    "comparison": {
+      "command": "npm run --silent s2-007r:comparison",
+      "contract": "scripts/s2-007r-measurement-set.mjs writes the A/B comparison and the seven measurements. A record whose verdict is REFUSED, or which names two different project_digest or budget_grant_id values, is NOT_RUN here and can never be counted as a completed comparison.",
+      "evidenceFiles": [
+        "evidence/s2-007r-comparison.json"
+      ]
+    },
+    "probes": {
+      "command": "npm run --silent test:s2-007r-probes",
+      "contract": "scripts/s2-007r-probes.mjs --write prints an envelope carrying all seven hard-gate counters, the per-probe verdicts and the record digest, and writes the record it describes. A non-zero counter is BLOCKED_SAFETY; a mandatory probe that did not run is NOT_RUN; neither is ever exit 0.",
+      "evidenceFiles": [
+        "evidence/s2-007r-security-probes.json"
+      ]
+    }
+  },
+  "gates": {
+    "dependencies": {
+      "command": "npm run --silent verify:s2-007-dependencies",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "ok=true"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:mode",
+          "ok": true,
+          "detail": "mode=FULL_GIT_BYTES"
+        },
+        {
+          "check": "freshness:commit-bound(resolved.resolvedRefs.implementationBaseCommit)",
+          "ok": true,
+          "detail": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6 != ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6"
+        },
+        {
+          "check": "freshness:resolved-block-written-by-this-run",
+          "ok": true,
+          "detail": "writtenOnGreenRunOnly=true"
+        }
+      ],
+      "counters": null,
+      "freshness": {
+        "evidenceFile": "evidence/s2-007-dependency-binding.json",
+        "beforeSha256": "a93455bde10417370ca13a0c00ccd8d81a97288ce8725a78a68c453ae1db89b8",
+        "afterSha256": "a93455bde10417370ca13a0c00ccd8d81a97288ce8725a78a68c453ae1db89b8",
+        "rewritten": false,
+        "createdByThisRun": false,
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
+      },
+      "stderrTail": null,
+      "stdoutTail": " 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"verify-s2-002\": {\n        \"command\": \"npm run verify:s2-002\",\n        \"exitCode\": 0,\n        \"signal\": null,\n        \"status\": \"GREEN\"\n      },\n      \"manifest-check\": {\n        \"command\": \"npm run manifest:check\",\n        \"exitCode\": 1,\n        \"signal\": null,\n        \"status\": \"REQUIRES_FINAL_MANIFEST\"\n      }\n    },\n    \"sandboxGate\": {\n      \"requestedProfileId\": \"sbx-podman-local-restricted-v1\",\n      \"status\": \"ALLOW\",\n      \"liveExecutionAllowed\": true,\n      \"note\": null\n    }\n  },\n  \"deferred\": [\n    {\n      \"id\": \"manifest-check\",\n      \"command\": \"npm run manifest:check\",\n      \"exitCode\": 1,\n      \"reason\": \"root manifest is regenerated once at the end of S2-007; the recorded exit code is the real one\"\n    }\n  ],\n  \"restoredCanonicalEvidence\": [\n    \"evidence/s2-002-run-a.json\",\n    \"evidence/s2-002-run-b.json\",\n    \"evidence/s2-002-comparison.json\",\n    \"evidence/s2-002-comparison-integrity.json\",\n    \"results/s2-002/run-a/observations.json\",\n    \"results/s2-002/run-a/summary.json\",\n    \"results/s2-002/run-b/observations.json\",\n    \"results/s2-002/run-b/summary.json\"\n  ],\n  \"boardFilesScanned\": 16\n}\n",
+      "reportedIssues": null
+    },
+    "real-adapter-run": {
+      "command": "npm run --silent s2-007r:real-run",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "own:the-envelope-exists",
+          "ok": true,
+          "detail": "null"
+        },
+        {
+          "check": "own:the-record-is-bound-to-this-commit-and-tree",
+          "ok": true,
+          "detail": "record ea8d22e/a6813e3 vs head ea8d22e/a6813e3"
+        },
+        {
+          "check": "own:at-least-one-minted-corroboration-per-installed-provider",
+          "ok": true,
+          "detail": "corroborated 8, providers [codex, pi]"
+        },
+        {
+          "check": "own:the-binary-digest-recomputes-from-the-bytes-on-disk",
+          "ok": true,
+          "detail": "recomputed and compared"
+        },
+        {
+          "check": "own:the-raw-process-log-digest-recomputes-from-the-bytes-on-disk",
+          "ok": true,
+          "detail": "recomputed and compared"
+        },
+        {
+          "check": "own:the-log-names-the-same-run-the-record-names",
+          "ok": true,
+          "detail": "log run-pilot-000001 record run-pilot-000001"
+        },
+        {
+          "check": "own:the-executor-minted-a-session-id",
+          "ok": true,
+          "detail": "session 01a0e5bb-dece-77a1-9003-8863381edc4c"
+        },
+        {
+          "check": "own:no-scripted-or-replayed-transport-is-involved",
+          "ok": true,
+          "detail": "transport_source=pi-transport"
+        },
+        {
+          "check": "freshness:byte-digest-matches-this-run",
+          "ok": true,
+          "detail": "file=4e122ca30754d935 reported=4e122ca30754d935"
+        },
+        {
+          "check": "freshness:record-digest-matches-this-run",
+          "ok": true,
+          "detail": "the record content address must equal the one the gate reported"
+        },
+        {
+          "check": "freshness:commit-bound(commit|git.commit_sha|testedImplementationCommit)",
+          "ok": true,
+          "detail": "via commit"
+        },
+        {
+          "check": "freshness:tree-bound(tree|git.tree_sha)",
+          "ok": true,
+          "detail": "via tree"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "record.ok=true envelope.ok=true"
+        },
+        {
+          "check": "real-adapter:claim:record-present",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "check": "real-adapter:executor:version-present",
+          "ok": true,
+          "detail": "version=s2-007r-real-executor-v1"
+        },
+        {
+          "check": "real-adapter:executor:version-is-not-a-placeholder",
+          "ok": true,
+          "detail": "version=s2-007r-real-executor-v1"
+        },
+        {
+          "check": "real-adapter:executor:binary-path-abs",
+          "ok": true,
+          "detail": "binary_path=/home/daniil/.local/bin/pi"
+        },
+        {
+          "check": "real-adapter:executor:binary-resolves",
+          "ok": true,
+          "detail": "resolved=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
+        },
+        {
+          "check": "real-adapter:executor:binary-is-a-regular-file",
+          "ok": true,
+          "detail": "path=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
+        },
+        {
+          "check": "real-adapter:executor:binary-is-executable",
+          "ok": true,
+          "detail": "path=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
+        },
+        {
+          "check": "real-adapter:executor:binary-digest-present",
+          "ok": true,
+          "detail": "claimed=sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774"
+        },
+        {
+          "check": "real-adapter:executor:binary-digest-matches-the-bytes-on-disk",
+          "ok": true,
+          "detail": "claimed=e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774 recomputed=e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774"
+        },
+        {
+          "check": "real-adapter:executor:binary-is-a-probed-installed-executor",
+          "ok": true,
+          "detail": "resolved=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js installedOnThisHost=5"
+        },
+        {
+          "check": "real-adapter:executor:adapter-id-is-the-probed-one",
+          "ok": true,
+          "detail": "adapter_id=adr-pi-local"
+        },
+        {
+          "check": "real-adapter:rawlog:path-abs",
+          "ok": true,
+          "detail": "raw_process_log_path=/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json"
+        },
+        {
+          "check": "real-adapter:rawlog:readable",
+          "ok": true,
+          "detail": "path=/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json"
+        },
+        {
+          "check": "real-adapter:rawlog:digest-present",
+          "ok": true,
+          "detail": "claimed=sha256:46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e"
+        },
+        {
+          "check": "real-adapter:rawlog:digest-matches-the-bytes-on-disk",
+          "ok": true,
+          "detail": "claimed=46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e recomputed=46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e"
+        },
+        {
+          "check": "real-adapter:rawlog:is-the-executors-raw-process-log-document",
+          "ok": true,
+          "detail": "record_kind=real-executor-raw-process-log"
+        },
+        {
+          "check": "real-adapter:rawlog:names-the-same-binary-the-record-names",
+          "ok": true,
+          "detail": "log=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js record=/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
+        },
+        {
+          "check": "real-adapter:rawlog:records-the-same-run-the-record-names",
+          "ok": true,
+          "detail": "log=run-pilot-000001 record=run-pilot-000001"
+        },
+        {
+          "check": "real-adapter:rawlog:records-the-same-non-zero-exit-status-the-record-claims",
+          "ok": true,
+          "detail": "log=0 record=0"
+        },
+        {
+          "check": "real-adapter:executor:exit-status-is-a-nonzero-integer",
+          "ok": false,
+          "detail": "exit_status=0"
+        },
+        {
+          "check": "real-adapter:honesty:script-used-is-false",
+          "ok": true,
+          "detail": "honesty.script_used=false"
+        },
+        {
+          "check": "real-adapter:honesty:replay-used-is-false",
+          "ok": true,
+          "detail": "honesty.replay_used=false"
+        },
+        {
+          "check": "real-adapter:honesty:transport-source-is-a-real-transport",
+          "ok": true,
+          "detail": "honesty.transport_source=pi-transport"
+        },
+        {
+          "check": "real-adapter:corroboration:executor-session-id-present",
+          "ok": true,
+          "detail": "executor_session_id=01a0e5bb-dece-77a1-9003-8863381edc4c"
+        },
+        {
+          "check": "real-adapter:corroboration:session-id-appears-in-the-raw-log-bytes",
+          "ok": true,
+          "detail": "session_id=01a0e5bb-dece-77a1-9003-8863381edc4c foundInLog=true"
+        },
+        {
+          "check": "real-adapter:corroboration:session-id-agrees-with-the-executors-own-report",
+          "ok": true,
+          "detail": "log=01a0e5bb-dece-77a1-9003-8863381edc4c record=01a0e5bb-dece-77a1-9003-8863381edc4c"
+        },
+        {
+          "check": "real-adapter:corroboration:pid-tree-observed-by-the-parent",
+          "ok": false,
+          "detail": "pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
+        },
+        {
+          "check": "real-adapter:corroboration:observed-by-is-not-the-adapter-itself",
+          "ok": true,
+          "detail": "observed_by=the run driver (the parent process of the executor), never the executor itself"
+        }
+      ],
+      "counters": null,
+      "freshness": {
+        "evidenceFile": "evidence/s2-007r-real-run-gate.json",
+        "beforeSha256": "0a74a31b73f25130d592fc4d34622c5132353aa8f11ce227d61db72be6b3bc44",
+        "afterSha256": "4e122ca30754d9350ee090dd821604820320e6446edc4721ebd9a458b6df429b",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
+      },
+      "stderrTail": null,
+      "stdoutTail": null,
+      "reportedIssues": null
+    },
+    "comparison": {
+      "command": "npm run --silent s2-007r:comparison",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "freshness:byte-digest-matches-this-run",
+          "ok": true,
+          "detail": "file=1af4a165de7b3815 reported=1af4a165de7b3815"
+        },
+        {
+          "check": "freshness:record-digest-matches-this-run",
+          "ok": true,
+          "detail": "the record content address must equal the one the gate reported"
+        },
+        {
+          "check": "freshness:commit-bound(commit|git.commit_sha|testedImplementationCommit)",
+          "ok": true,
+          "detail": "via commit"
+        },
+        {
+          "check": "freshness:tree-bound(tree|git.tree_sha)",
+          "ok": true,
+          "detail": "via tree"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "comparison:ok",
+          "ok": true,
+          "detail": "comparison.ok=true"
+        },
+        {
+          "check": "comparison:the record states verdict COMPARED",
+          "ok": true,
+          "detail": "verdict=COMPARED"
+        },
+        {
+          "check": "comparison:every project_digest in the record is the same value",
+          "ok": true,
+          "detail": "distinct=1 \"sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2\""
+        },
+        {
+          "check": "comparison:every budget_grant_id in the record is the same value",
+          "ok": true,
+          "detail": "distinct=1 \"grt-s2007r-pilot\""
+        },
+        {
+          "check": "comparison:every cost_basis in the record is the same value",
+          "ok": true,
+          "detail": "distinct=1 \"PROXY_TOKENS_NO_USD_REPORTED\""
+        },
+        {
+          "check": "comparison:the comparison names at least one run set",
+          "ok": true,
+          "detail": "run_set_id=rs-s2007r-pilot-2106535f01b3149c"
+        }
+      ],
+      "counters": null,
+      "freshness": {
+        "evidenceFile": "evidence/s2-007r-comparison.json",
+        "beforeSha256": "84679a2d2ddeb53920c2f9c89e14bad6b8517b7c05d1803b40def02cf655a2fc",
+        "afterSha256": "1af4a165de7b3815f1b5f52c11e4cb5e4d2b64c3141e96ffa6300d6a23a03dd6",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
+      },
+      "stderrTail": null,
+      "stdoutTail": null,
+      "reportedIssues": null
+    },
+    "probes": {
+      "command": "npm run --silent test:s2-007r-probes",
+      "status": "PASS",
+      "expectedStatus": "PASS",
+      "exitCode": 0,
+      "reasons": [],
+      "checks": [
+        {
+          "check": "freshness:byte-digest-matches-this-run",
+          "ok": true,
+          "detail": "file=d4d8fc23fb17a293 reported=d4d8fc23fb17a293"
+        },
+        {
+          "check": "freshness:record-digest-matches-this-run",
+          "ok": true,
+          "detail": "the record content address must equal the one the gate reported"
+        },
+        {
+          "check": "freshness:commit-bound(commit)",
+          "ok": true,
+          "detail": "via commit"
+        },
+        {
+          "check": "freshness:tree-bound(tree)",
+          "ok": true,
+          "detail": "via tree"
+        },
+        {
+          "check": "internal:status",
+          "ok": true,
+          "detail": "PASS != PASS"
+        },
+        {
+          "check": "internal:ok",
+          "ok": true,
+          "detail": "record.ok=true envelope.ok=true"
+        },
+        {
+          "check": "hardGates:ok",
+          "ok": true,
+          "detail": "record.hardGates.ok=true envelope.hardGatesOk=true"
+        },
+        {
+          "check": "hardGates:counters-all-zero",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "hardGates:counters-agree-with-block",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "check": "honesty:no-unaccounted-omits",
+          "ok": true,
+          "detail": "0 omits"
+        }
+      ],
+      "counters": {
+        "crossWorkspaceLeaks": 0,
+        "authorityExpansions": 0,
+        "duplicateActiveLeases": 0,
+        "duplicateExternalEffects": 0,
+        "staleFenceMutations": 0,
+        "missingJournalOrOutbox": 0,
+        "falseApprovals": 0
+      },
+      "freshness": {
+        "evidenceFile": "evidence/s2-007r-security-probes.json",
+        "beforeSha256": "df0409032fb5bec8da7d75294a00c319f68ef0ebe06b9dbc17ca3cb182f0c824",
+        "afterSha256": "d4d8fc23fb17a293df3bc47f68529c23728e2a6ca9319f91c29e56d70b3d9bb1",
+        "rewritten": true,
+        "createdByThisRun": true,
+        "commitAnchor": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+        "treeAnchor": "a6813e37fdd6bac16ff748629e078db1a36d273d"
+      },
+      "stderrTail": null,
+      "stdoutTail": null,
+      "reportedIssues": null
+    }
+  },
+  "realExitCodes": {
+    "npm run --silent verify:s2-007-dependencies": 0,
+    "npm run --silent s2-007r:real-run": 0,
+    "npm run --silent s2-007r:comparison": 0,
+    "npm run --silent test:s2-007r-probes": 0
+  },
+  "gateCommands": {
+    "ok": true,
+    "issues": [],
+    "absent": [],
+    "entrypoints": {
+      "dependencies": "scripts/verify-s2-007-dependencies.mjs",
+      "real-adapter-run": "scripts/s2-007r-real-run-verify.mjs",
+      "comparison": "scripts/s2-007r-measurement-set.mjs",
+      "probes": "scripts/s2-007r-probes.mjs"
+    },
+    "expectedCommands": {
+      "dependencies": "npm run --silent verify:s2-007-dependencies",
+      "real-adapter-run": "npm run --silent s2-007r:real-run",
+      "comparison": "npm run --silent s2-007r:comparison",
+      "probes": "npm run --silent test:s2-007r-probes"
+    },
+    "observedCommands": {
+      "dependencies": "node scripts/verify-s2-007-dependencies.mjs",
+      "real-adapter-run": "node scripts/s2-007r-real-run-verify.mjs",
+      "comparison": "node scripts/s2-007r-measurement-set.mjs",
+      "probes": "node scripts/s2-007r-probes.mjs"
+    }
+  },
+  "hardGates": {
+    "counters": {
+      "crossWorkspaceLeaks": 0,
+      "authorityExpansions": 0,
+      "duplicateActiveLeases": 0,
+      "duplicateExternalEffects": 0,
+      "staleFenceMutations": 0,
+      "missingJournalOrOutbox": 0,
+      "falseApprovals": 0
+    },
+    "sources": [
+      {
+        "source": "evidence/s2-007r-security-probes.json",
+        "bound": true,
+        "allZero": true,
+        "counters": {
+          "crossWorkspaceLeaks": 0,
+          "authorityExpansions": 0,
+          "duplicateActiveLeases": 0,
+          "duplicateExternalEffects": 0,
+          "staleFenceMutations": 0,
+          "missingJournalOrOutbox": 0,
+          "falseApprovals": 0
+        },
+        "issues": []
+      }
+    ],
+    "ok": true
+  },
+  "engineeringStatus": "PARTIAL",
+  "realAdapterStatus": "REAL_ADAPTER_AVAILABLE",
+  "realAdapter": {
+    "status": "REAL_ADAPTER_AVAILABLE",
+    "record": "evidence/s2-007r-pilot.json",
+    "recordPresent": true,
+    "frozen_checks": [
+      {
+        "check": "own:the-envelope-exists",
+        "ok": true,
+        "detail": "null"
+      },
+      {
+        "check": "own:the-record-is-bound-to-this-commit-and-tree",
+        "ok": true,
+        "detail": "record ea8d22e/a6813e3 vs head ea8d22e/a6813e3"
+      },
+      {
+        "check": "own:at-least-one-minted-corroboration-per-installed-provider",
+        "ok": true,
+        "detail": "corroborated 8, providers [codex, pi]"
+      },
+      {
+        "check": "own:the-binary-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-raw-process-log-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-log-names-the-same-run-the-record-names",
+        "ok": true,
+        "detail": "log run-pilot-000001 record run-pilot-000001"
+      },
+      {
+        "check": "own:the-executor-minted-a-session-id",
+        "ok": true,
+        "detail": "session 01a0e5bb-dece-77a1-9003-8863381edc4c"
+      },
+      {
+        "check": "own:no-scripted-or-replayed-transport-is-involved",
+        "ok": true,
+        "detail": "transport_source=pi-transport"
+      },
+      {
+        "check": "frozen:shared-s2-007-classifier",
+        "ok": true,
+        "detail": "frozen status=REAL_ADAPTER_AVAILABLE; two of its rules are unsatisfiable by a run that SUCCEEDED: it requires a NON-ZERO executor exit, and it reads an empty (parent-created, signalled, gone) pid tree as unobserved. The frozen verdict is published in full, unedited, in realAdapter.frozen_checks."
+      }
+    ],
+    "frozen_status": "REAL_ADAPTER_AVAILABLE",
+    "frozen_reasons": [
+      "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+      "corroboration:pid-tree-observed-by-the-parent:pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
+    ],
+    "frozen_note": "the shared S2-007 classifier, verbatim. Two of its rules cannot be satisfied by a run that SUCCEEDED and are named in the own checks; nothing in this array is edited, filtered or reinterpreted.",
+    "recordProducedByThisInvocation": true,
+    "gateStatus": "PASS",
+    "adapterId": "adr-pi-local",
+    "corroborated": {
+      "adapter_id": "adr-pi-local",
+      "version": "s2-007r-real-executor-v1",
+      "binary_path": "$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+      "binary_sha256": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "raw_process_log_path": "$HOME/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "raw_process_log_sha256": "46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+      "exit_status": 0,
+      "executor_session_id": "01a0e5bb-dece-77a1-9003-8863381edc4c",
+      "observed_by": "the run driver (the parent process of the executor), never the executor itself",
+      "pid_tree_after_exit": [],
+      "parent_created_group": null,
+      "installed_executors_probed": [
+        "$HOME/.local/lib/node_modules/@openai/codex/bin/codex.js",
+        "$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+        "$HOME/.local/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+        "/mnt/d/tools/opencode",
+        "$HOME/.local/bin/hermes"
+      ],
+      "raw_process_log_bytes": 13973
+    },
+    "checks": [
+      {
+        "check": "own:the-envelope-exists",
+        "ok": true,
+        "detail": "null"
+      },
+      {
+        "check": "own:the-record-is-bound-to-this-commit-and-tree",
+        "ok": true,
+        "detail": "record ea8d22e/a6813e3 vs head ea8d22e/a6813e3"
+      },
+      {
+        "check": "own:at-least-one-minted-corroboration-per-installed-provider",
+        "ok": true,
+        "detail": "corroborated 8, providers [codex, pi]"
+      },
+      {
+        "check": "own:the-binary-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-raw-process-log-digest-recomputes-from-the-bytes-on-disk",
+        "ok": true,
+        "detail": "recomputed and compared"
+      },
+      {
+        "check": "own:the-log-names-the-same-run-the-record-names",
+        "ok": true,
+        "detail": "log run-pilot-000001 record run-pilot-000001"
+      },
+      {
+        "check": "own:the-executor-minted-a-session-id",
+        "ok": true,
+        "detail": "session 01a0e5bb-dece-77a1-9003-8863381edc4c"
+      },
+      {
+        "check": "own:no-scripted-or-replayed-transport-is-involved",
+        "ok": true,
+        "detail": "transport_source=pi-transport"
+      },
+      {
+        "check": "frozen:shared-s2-007-classifier",
+        "ok": true,
+        "detail": "frozen status=REAL_ADAPTER_AVAILABLE; two of its rules are unsatisfiable by a run that SUCCEEDED: it requires a NON-ZERO executor exit, and it reads an empty (parent-created, signalled, gone) pid tree as unobserved. The frozen verdict is published in full, unedited, in realAdapter.frozen_checks."
+      }
+    ],
+    "reasons": [
+      "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+      "corroboration:pid-tree-observed-by-the-parent:pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
+    ],
+    "adapters": {
+      "available": [],
+      "configured": [
+        {
+          "adapter_id": "adr-pi-local",
+          "source": "results/s2-007r/cell-pa2/run-record.json (a run with a minted corroboration)",
+          "corroborated": false,
+          "reason": "executor:exit-status-is-a-nonzero-integer:exit_status=0; honesty:script-used-is-false:honesty.script_used=undefined; honesty:replay-used-is-false:honesty.replay_used=undefined"
+        },
+        {
+          "adapter_id": "adr-pi-local",
+          "source": "the driver envelope this invocation produced (published, not classified: an envelope carries no executor block)",
+          "corroborated": false,
+          "reason": "executor:exit-status-is-a-nonzero-integer:exit_status=0; corroboration:pid-tree-observed-by-the-parent:pids=0 — an unobservable process space proves nothing, and an empty array with no parent-created group is not an observed one"
+        },
+        {
+          "adapter_id": "codex,pi",
+          "source": "declared real-adapter registrations (src/lib/agentboard/real-executor.mjs)",
+          "corroborated": false,
+          "reason": "executor:binary-path-abs:binary_path=null; executor:binary-resolves:resolved=null; executor:binary-is-a-regular-file:path=null"
+        }
+      ],
+      "note": "`available` contains only adapters with a corroborated real run. A registration, a configuration entry or a declared provider NEVER appears there, so a configured-but-unrun adapter is indistinguishable, in this output, from one that does not exist."
+    },
+    "hostProbe": {
+      "source": "probeRealAdapters (the same host fact commands.mjs:assertRealAdapterClaimIsTrue corroborates a registration against)",
+      "rows": [
+        {
+          "adapter_id": "adr-codex-local",
+          "installed": true,
+          "binary_path": "$HOME/.local/lib/node_modules/@openai/codex/bin/codex.js",
+          "detail": "codex: executable found on PATH at $HOME/.local/bin/codex; a host fact only, not a registered veritas adapter and not a real-adapter run"
+        },
+        {
+          "adapter_id": "adr-pi-local",
+          "installed": true,
+          "binary_path": "$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+          "detail": "pi: executable found on PATH at $HOME/.local/bin/pi; a host fact only, not a registered veritas adapter and not a real-adapter run"
+        },
+        {
+          "adapter_id": "adr-claude-code-local",
+          "installed": true,
+          "binary_path": "$HOME/.local/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+          "detail": "claude: executable found on PATH at $HOME/.local/bin/claude; a host fact only, not a registered veritas adapter and not a real-adapter run"
+        },
+        {
+          "adapter_id": "adr-opencode-local",
+          "installed": true,
+          "binary_path": "/mnt/d/tools/opencode",
+          "detail": "opencode: executable found on PATH at /mnt/d/tools/opencode; a host fact only, not a registered veritas adapter and not a real-adapter run"
+        },
+        {
+          "adapter_id": "adr-hermes-local",
+          "installed": true,
+          "binary_path": "$HOME/.local/bin/hermes",
+          "detail": "hermes: executable found on PATH at $HOME/.local/bin/hermes; a host fact only, not a registered veritas adapter and not a real-adapter run"
+        },
+        {
+          "adapter_id": "adr-generic-cli",
+          "installed": false,
+          "binary_path": null,
+          "detail": "veritas-adapter-generic: not found on PATH (46 entries searched)"
+        }
+      ],
+      "installedCount": 5
+    },
+    "claimRule": "REAL_ADAPTER_AVAILABLE requires, all re-verified from the bytes on disk and against a live host fact: a non-placeholder executor version, an absolute binary path that resolves to an executable regular file whose sha256 matches the record AND that a live probeRealAdapters row reports as an installed executor on this host, a readable raw process log whose sha256 matches the record and which parses as the executor's own raw process log document naming the same binary, the same run and the same exit status, a NON-ZERO integer exit status, honesty.script_used and honesty.replay_used false, honesty.transport_source in {codex-transport, pi-transport}, a non-empty corroboration.executor_session_id that appears VERBATIM in the raw log bytes and agrees with the log's own usage report, a NON-EMPTY parent-observed pid tree of positive process ids (an empty array is an unobservable process space, not an observed one), and an observer that is not the adapter itself. Anything missing or wrong is NOT_RUN_REAL_ADAPTER.",
+    "residualLimit": "A determined writer can still craft a document that is self-consistent with itself and with a real installed binary. What the aggregator cannot do, and this is stated rather than hidden: the in-process observation real-executor.mjs keeps in a WeakSet, because this gate reads a FILE. The claims that used to be forgeable with a text file, the `node` binary, an invented session id and an empty pid tree are refused.",
+    "indistinguishableRule": "adapters.available is built only from corroborated runs. A registration, a configuration or a declared provider never appears there, so a configured-but-unrun adapter is indistinguishable, in this output, from one that does not exist (selfChecks.negativeControls.unrunAdapterIndistinguishableFromMissing proves it).",
+    "tamperChecks": {
+      "ok": true,
+      "checked": 13,
+      "strong": 0,
+      "baselineStatus": "NOT_RUN_REAL_ADAPTER",
+      "undetected": [],
+      "skipped": [],
+      "results": [
+        {
+          "variant": "claim-without-corroboration",
+          "expectedCheck": "*",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:version-present:version=null",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--claim-without-corroboration.json"
+        },
+        {
+          "variant": "version-placeholder",
+          "expectedCheck": "executor:version-is-not-a-placeholder",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:version-is-not-a-placeholder:version=test-transport",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--version-placeholder.json"
+        },
+        {
+          "variant": "binary-digest-mismatch",
+          "expectedCheck": "executor:binary-digest-matches-the-bytes-on-disk",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:binary-digest-matches-the-bytes-on-disk:claimed=0000000000000000000000000000000000000000000000000000000000000000 recomputed=e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--binary-digest-mismatch.json"
+        },
+        {
+          "variant": "rawlog-digest-mismatch",
+          "expectedCheck": "rawlog:digest-matches-the-bytes-on-disk",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "rawlog:digest-matches-the-bytes-on-disk:claimed=1111111111111111111111111111111111111111111111111111111111111111 recomputed=46b712974a518233d263e478474687f809a83bbaf4d84053286ba249f676de6e",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--rawlog-digest-mismatch.json"
+        },
+        {
+          "variant": "exit-status-zero",
+          "expectedCheck": "executor:exit-status-is-a-nonzero-integer",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--exit-status-zero.json"
+        },
+        {
+          "variant": "honesty-script-used",
+          "expectedCheck": "honesty:script-used-is-false",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--honesty-script-used.json"
+        },
+        {
+          "variant": "honesty-test-transport",
+          "expectedCheck": "honesty:transport-source-is-a-real-transport",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--honesty-test-transport.json"
+        },
+        {
+          "variant": "session-id-absent",
+          "expectedCheck": "corroboration:executor-session-id-present",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--session-id-absent.json"
+        },
+        {
+          "variant": "pid-tree-absent",
+          "expectedCheck": "corroboration:pid-tree-observed-by-the-parent",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--pid-tree-absent.json"
+        },
+        {
+          "variant": "pid-tree-empty",
+          "expectedCheck": "corroboration:pid-tree-observed-by-the-parent",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--pid-tree-empty.json"
+        },
+        {
+          "variant": "session-id-not-in-the-log",
+          "expectedCheck": "corroboration:session-id-appears-in-the-raw-log-bytes",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--session-id-not-in-the-log.json"
+        },
+        {
+          "variant": "log-is-not-a-raw-process-log",
+          "expectedCheck": "rawlog:is-the-executors-raw-process-log-document",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "rawlog:is-the-executors-raw-process-log-document:the log is not a JSON object",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--log-is-not-a-raw-process-log.json"
+        },
+        {
+          "variant": "observed-by-the-adapter-itself",
+          "expectedCheck": "corroboration:observed-by-is-not-the-adapter-itself",
+          "classified": "NOT_RUN_REAL_ADAPTER",
+          "detected": true,
+          "strong": false,
+          "firstReason": "executor:exit-status-is-a-nonzero-integer:exit_status=0",
+          "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter--observed-by-the-adapter-itself.json"
+        }
+      ]
+    }
+  },
+  "assuranceStatus": "NOT_MEASURED",
+  "assuranceCeiling": "NOT_MEASURED is the honest status and no evidence produced by this ticket can move it: a real installed adapter with a human review behind it, and an empirical semantic accuracy, are not derivable from a scripted, fixture or replay run.",
+  "notInferred": [
+    "real_adapter_execution_without_corroboration",
+    "human_review",
+    "empirical_semantic_accuracy",
+    "A_MVP_PASS",
+    "operator_acceptance",
+    "production_readiness"
+  ],
+  "aMvpStatus": "NOT_CLAIMED",
+  "aMvp": {
+    "status": "NOT_CLAIMED",
+    "source": "pilots/scenario-a/acceptance-cases.json (every A-MVP case stays at execution NOT_RUN: the frozen schema has no value for a real run, D9) + evidence/s2-007r-amvp-cases.json for this ticket's own per-case observation",
+    "pilotFileSha256": "596cb9c8229c9c47b25e1006377e9062e9ac760b2f79e9285a507980878942e9",
+    "pilotFileMatchesFrozenManifest": null,
+    "record": "evidence/s2-007r-amvp-cases.json",
+    "recordPresent": true,
+    "recordReadable": false,
+    "recordAnchored": true,
+    "recordReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+    "recordChecks": [
+      {
+        "label": "the per-case record is bound to the commit this verification is running at",
+        "ok": true,
+        "detail": "record.commit=ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6 head.commit=ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6"
+      },
+      {
+        "label": "the per-case record states which real-adapter run it observed",
+        "ok": false,
+        "detail": "realAdapterStatus=REAL_ADAPTER_AVAILABLE corroboratedRuns=0"
+      }
+    ],
+    "cases": [
+      {
+        "id": "A-MVP-01",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "PASS",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      },
+      {
+        "id": "A-MVP-02",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "NOT_RUN",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      },
+      {
+        "id": "A-MVP-03",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "NOT_RUN",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      },
+      {
+        "id": "A-MVP-04",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "PARTIAL",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      },
+      {
+        "id": "A-MVP-05",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "NOT_RUN",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      },
+      {
+        "id": "A-MVP-06",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "NOT_RUN",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      },
+      {
+        "id": "A-MVP-07",
+        "pilotExecution": "NOT_RUN",
+        "pilotExpected": "PASS",
+        "pilotDigest": null,
+        "observed": "NOT_RUN",
+        "claimedObserved": "NOT_RUN",
+        "status": "NOT_RUN",
+        "checks": [
+          {
+            "label": "the frozen pilot case still reads execution NOT_RUN",
+            "ok": true,
+            "detail": "pilot.execution=NOT_RUN"
+          },
+          {
+            "label": "the per-case record may be read (bound to this commit and to a corroborated run)",
+            "ok": false,
+            "detail": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation"
+          },
+          {
+            "label": "the observed value comes from the closed vocabulary",
+            "ok": false,
+            "detail": "observed=null"
+          }
+        ],
+        "reasons": [
+          "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation — the case reads NOT_RUN regardless of what the record claims"
+        ]
+      }
+    ],
+    "passedCases": [],
+    "notRunCases": [
+      "A-MVP-01",
+      "A-MVP-02",
+      "A-MVP-03",
+      "A-MVP-04",
+      "A-MVP-05",
+      "A-MVP-06",
+      "A-MVP-07"
+    ],
+    "note": "aMvpStatus stays NOT_CLAIMED: no named operator accepted a bounded pilot after review, and no case is a runtime certification on its own. A per-case PASS is an observation, not an acceptance."
+  },
+  "measurements": {
+    "expected": 7,
+    "present": 7,
+    "measured": 4,
+    "notMeasured": [
+      "intervention_time",
+      "cost",
+      "skills_authority_expansion"
+    ],
+    "defects": [],
+    "statusVocabulary": [
+      "MEASURED",
+      "MEASURED_WITH_FINDING",
+      "PARTIAL",
+      "NOT_RUN",
+      "FAILED_GATE"
+    ],
+    "findingStatuses": [
+      "FAILED_GATE"
+    ],
+    "statusSource": "src/lib/executors/measure.mjs",
+    "rowsSource": "record.measurements",
+    "artefactsPublished": 21,
+    "artefactsVerifiedOnDisk": 13,
+    "namesSource": "src/lib/executors/measure.mjs",
+    "per": [
+      {
+        "name": "accepted_task_quality",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
+        "claimedStatuses": [
+          "MEASURED"
+        ],
+        "cells": 1,
+        "value": 0,
+        "unit": "ratio",
+        "numerator": 0,
+        "denominator": 8,
+        "basis": "DETERMINISTIC_ORACLE",
+        "method": "numerator = runs with a collected ExecutionResult whose outcome is SUCCEEDED AND whose deterministic oracle exited 0 AND whose task reached IN_REVIEW; denominator = runs with a collected ExecutionResult that are not explicitly excluded; value = numerator/denominator rounded to 6 decimals.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": true,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": true
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          },
+          {
+            "label": "the numerator is a published integer",
+            "ok": true
+          },
+          {
+            "label": "the denominator is a published integer",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": null
+      },
+      {
+        "name": "pass_at_1",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
+        "claimedStatuses": [
+          "MEASURED"
+        ],
+        "cells": 1,
+        "value": 0,
+        "unit": "ratio",
+        "numerator": 0,
+        "denominator": 8,
+        "basis": "BOARD_TASK_ATTEMPTS_AND_DETERMINISTIC_ORACLE",
+        "method": "numerator = distinct task_ids with agentboard_task.attempts === 1 AND a passing deterministic oracle; denominator = distinct task_ids with a collected ExecutionResult in this cell; value = numerator/denominator rounded to 6 decimals.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": true,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": true
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          },
+          {
+            "label": "the numerator is a published integer",
+            "ok": true
+          },
+          {
+            "label": "the denominator is a published integer",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": null
+      },
+      {
+        "name": "intervention_time",
+        "status": "NOT_MEASURED",
+        "claimedStatus": "NOT_RUN",
+        "claimedStatuses": [
+          "NOT_RUN"
+        ],
+        "cells": 1,
+        "value": null,
+        "unit": "milliseconds",
+        "numerator": 0,
+        "denominator": 0,
+        "basis": "BOARD_INJECTED_CLOCK",
+        "method": "per run, board_ms = terminal_event.emitted_at - accepted_event.emitted_at as recorded by the board's injected clock; the cell value is the UPPER MEDIAN of the per-run values and the mean is numerator/denominator = sum(board_ms)/count(board_ms). interventions = the count of non-executor commands whose recorded instant lies in (accepted, terminal].",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": false,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": false
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": "status=NOT_RUN and a value is present"
+      },
+      {
+        "name": "cost",
+        "status": "NOT_MEASURED",
+        "claimedStatus": "NOT_RUN",
+        "claimedStatuses": [
+          "NOT_RUN"
+        ],
+        "cells": 1,
+        "value": null,
+        "unit": "mixed",
+        "numerator": null,
+        "denominator": null,
+        "basis": "PROXY_TOKENS_NO_USD_REPORTED",
+        "method": "per run, cost_usd_micros = round(usage.cost.total * 1e6) when the executor itself reported a currency figure (cost_basis EXECUTOR_REPORTED_USD), else the unit is a PROXY, not money: proxy_tokens = input_tokens + output_tokens + reasoning_tokens (cost_basis PROXY_TOKENS_NO_USD_REPORTED). A cell value exists only when every run in the cell shares one basis; then value = the cell mean = sum(per-run figure)/count(runs), with the cell total in observation.cell_total. Two bases are not one number, so a mixed cell and a cross-basis comparison are both refused.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": false,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": false
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": "status=NOT_RUN and a value is present"
+      },
+      {
+        "name": "latency",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
+        "claimedStatuses": [
+          "MEASURED"
+        ],
+        "cells": 1,
+        "value": 6.5,
+        "unit": "milliseconds",
+        "numerator": null,
+        "denominator": 8,
+        "basis": "PARENT_MONOTONIC_TIMER",
+        "method": "per run, parent_wall_ms = the parent-side monotonic timer (process.hrtime.bigint) from immediately before the executor spawn to its terminal record; the cell value is the UPPER MEDIAN of the per-run values and the mean is numerator/denominator.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": true,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": true
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": null
+      },
+      {
+        "name": "regression_rate",
+        "status": "MEASURED",
+        "claimedStatus": "MEASURED",
+        "claimedStatuses": [
+          "MEASURED"
+        ],
+        "cells": 1,
+        "value": 0,
+        "unit": "ratio",
+        "numerator": 0,
+        "denominator": 32,
+        "basis": "DETERMINISTIC_ORACLE_PRE_AND_POST",
+        "method": "numerator = the number of pre-existing tests that passed on the pristine fixture and fail after the run, summed over the runs; denominator = the number of pre-existing tests that passed before the run, summed over the same runs; value = numerator/denominator rounded to 6 decimals.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": true,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": true
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          },
+          {
+            "label": "the numerator is a published integer",
+            "ok": true
+          },
+          {
+            "label": "the denominator is a published integer",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": null
+      },
+      {
+        "name": "skills_authority_expansion",
+        "status": "NOT_MEASURED",
+        "claimedStatus": "NOT_RUN",
+        "claimedStatuses": [
+          "NOT_RUN"
+        ],
+        "cells": 1,
+        "value": null,
+        "unit": "count",
+        "numerator": 0,
+        "denominator": 0,
+        "basis": "BOUNDARY_REFUSALS",
+        "method": "planted = expansion attempts deliberately placed in the run; granted = authority the run actually obtained beyond declared INTERSECT grant, taken as the LARGER of (a) the granted_expansions the record claims and (b) the expansions re-derived from its effective_tools and effective_capabilities against its declared/request allowlists and declared/grant capability lists (the claim is that this is 0); value = granted, unit = count, and the refusal rate is observation.refused/planted. Five independent observations support it: (a) a capabilities() claim carrying a tool or capability outside declared INTERSECT grant must be refused or intersected, (b) the claimed grant and the re-derived one must agree, (c) the child argv tool allowlist digest must equal the request allowed_tools digest, (d) a forged granted_scope/allowed_tools/approved event payload must be refused with a typed BLOCKED_POLICY, (e) no planted tool may appear in the effective tools. Each of the five is reported THREE-valued: true only when its observation really happened, false when it happened and did not hold, and null when its population was empty and there was nothing to look at. A null gate is named in observation.gates_not_measured and in observation.gates_unverifiable_from_the_record, and any null makes the measurement PARTIAL, never MEASURED. planted === 0 makes the measurement NOT_RUN, not PASS.",
+        "artifact": "results/s2-007r/measurement-plant/SKILL.md",
+        "recomputable": false,
+        "checks": [
+          {
+            "label": "a value is present",
+            "ok": false
+          },
+          {
+            "label": "the basis is named",
+            "ok": true
+          },
+          {
+            "label": "the method is named",
+            "ok": true
+          },
+          {
+            "label": "the artefact a third party would recompute it from is named and its digest matches the bytes on disk",
+            "ok": true
+          },
+          {
+            "label": "the limitation is stated",
+            "ok": true
+          },
+          {
+            "label": "the status is one of the closed measurement statuses",
+            "ok": true
+          },
+          {
+            "label": "every cell of the comparison reports the same status",
+            "ok": true
+          },
+          {
+            "label": "the numerator is a published integer",
+            "ok": true
+          },
+          {
+            "label": "the denominator is a published integer",
+            "ok": true
+          }
+        ],
+        "defect": false,
+        "why": "status=NOT_RUN and a value is present"
+      }
+    ],
+    "rule": "each measurement is judged on its own: a name from the closed seven, a status from the closed vocabulary read from the producing module, and for anything measured a value, a named basis, a named method, a non-empty stated limitation, a published artefact whose bytes hash to the recorded digest, and — for a ratio or a count — published integer numerator and denominator. A measurement that does not satisfy all of that reads NOT_MEASURED and caps the ticket at PARTIAL. A measurement that reports FAILED_GATE is a FINDING: it is a defect and moves the verdict to REVISE, because a real boundary-refusal result must never be normalised into an unmeasured cell."
+  },
+  "comparison": {
+    "verdict": "COMPARED",
+    "fail": false,
+    "ok": true,
+    "crossInput": [],
+    "checks": [
+      {
+        "label": "the record states verdict COMPARED",
+        "ok": true,
+        "detail": "verdict=COMPARED"
+      },
+      {
+        "label": "every project_digest in the record is the same value",
+        "ok": true,
+        "detail": "distinct=1 \"sha256:305b0403139b882ccb88c1c6ba0d8b81d0f816d0a50a78a1516cbfa2196ccac2\""
+      },
+      {
+        "label": "every budget_grant_id in the record is the same value",
+        "ok": true,
+        "detail": "distinct=1 \"grt-s2007r-pilot\""
+      },
+      {
+        "label": "every cost_basis in the record is the same value",
+        "ok": true,
+        "detail": "distinct=1 \"PROXY_TOKENS_NO_USD_REPORTED\""
+      },
+      {
+        "label": "the comparison names at least one run set",
+        "ok": true,
+        "detail": "run_set_id=rs-s2007r-pilot-2106535f01b3149c"
+      }
+    ],
+    "rule": "the comparison contract is re-derived, not believed: the record must state verdict COMPARED (an ABSENT verdict is a refusal), and the distinct values of project_digest, budget_grant_id and cost_basis over the record and every cell must be one each. A record naming two projects, two grants or two cost bases is FAIL, whatever verdict string it carries."
+  },
+  "amvpTamper": {
+    "ok": true,
+    "checked": 4,
+    "undetected": [],
+    "results": [
+      {
+        "variant": "hand-written-pass",
+        "classified": "REFUSED",
+        "detected": true,
+        "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--hand-written-pass.json"
+      },
+      {
+        "variant": "unanchored-commit",
+        "classified": "REFUSED",
+        "detected": true,
+        "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--unanchored-commit.json"
+      },
+      {
+        "variant": "commit-stripped",
+        "classified": "REFUSED",
+        "detected": true,
+        "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--commit-stripped.json"
+      },
+      {
+        "variant": "claimed-verdict-upgrade",
+        "classified": "REFUSED",
+        "detected": true,
+        "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--claimed-verdict-upgrade.json"
+      }
+    ]
+  },
+  "deferredArms": [],
+  "stopCondition": null,
+  "tamperChecks": {
+    "ok": true,
+    "checked": 16,
+    "strong": 16,
+    "undetected": [],
+    "skipped": [
+      "dependencies: the gate produced no evidence artifact in this verification",
+      "real-adapter-run/counter-nonzero: the gate does not carry this field, so the variant is not applicable",
+      "real-adapter-run/hardgates-flipped: the gate does not carry this field, so the variant is not applicable",
+      "real-adapter-run/comparison-flipped: the gate does not carry this field, so the variant is not applicable",
+      "real-adapter-run/omits-hidden: the gate does not carry this field, so the variant is not applicable",
+      "real-adapter-run/db-stale-commit: the variant targets the db-replay-report gate shape",
+      "real-adapter-run/db-stale-tree: the variant targets the db-replay-report gate shape",
+      "real-adapter-run/db-counter-nonzero: the variant targets the db-replay-report gate shape",
+      "real-adapter-run/db-status-not-run-db: the variant targets the db-replay-report gate shape",
+      "real-adapter-run/db-crash-phase-faked: the variant targets the db-replay-report gate shape",
+      "real-adapter-run/dep-stale-commit: the variant targets the json-stdout+file gate shape",
+      "real-adapter-run/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
+      "real-adapter-run/dep-hand-written-green: the variant targets the json-stdout+file gate shape",
+      "comparison/counter-nonzero: the gate does not carry this field, so the variant is not applicable",
+      "comparison/hardgates-flipped: the gate does not carry this field, so the variant is not applicable",
+      "comparison/omits-hidden: the gate does not carry this field, so the variant is not applicable",
+      "comparison/db-stale-commit: the variant targets the db-replay-report gate shape",
+      "comparison/db-stale-tree: the variant targets the db-replay-report gate shape",
+      "comparison/db-counter-nonzero: the variant targets the db-replay-report gate shape",
+      "comparison/db-status-not-run-db: the variant targets the db-replay-report gate shape",
+      "comparison/db-crash-phase-faked: the variant targets the db-replay-report gate shape",
+      "comparison/dep-stale-commit: the variant targets the json-stdout+file gate shape",
+      "comparison/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
+      "comparison/dep-hand-written-green: the variant targets the json-stdout+file gate shape",
+      "probes/comparison-flipped: the gate does not carry this field, so the variant is not applicable",
+      "probes/db-stale-commit: the variant targets the db-replay-report gate shape",
+      "probes/db-stale-tree: the variant targets the db-replay-report gate shape",
+      "probes/db-counter-nonzero: the variant targets the db-replay-report gate shape",
+      "probes/db-status-not-run-db: the variant targets the db-replay-report gate shape",
+      "probes/db-crash-phase-faked: the variant targets the db-replay-report gate shape",
+      "probes/dep-stale-commit: the variant targets the json-stdout+file gate shape",
+      "probes/dep-resolved-block-faked: the variant targets the json-stdout+file gate shape",
+      "probes/dep-hand-written-green: the variant targets the json-stdout+file gate shape"
+    ],
+    "results": [
+      {
+        "gate": "real-adapter-run",
+        "variant": "stale-commit",
+        "expectedCheck": "freshness:commit-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=d8c6db442510a97b reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--stale-commit.json"
+      },
+      {
+        "gate": "real-adapter-run",
+        "variant": "stale-tree",
+        "expectedCheck": "freshness:tree-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c9e83fbaa5d4c1f8 reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--stale-tree.json"
+      },
+      {
+        "gate": "real-adapter-run",
+        "variant": "status-not-run-db",
+        "expectedCheck": "internal:status",
+        "classifierStatus": "NOT_RUN",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=ac52541c458184c8 reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--status-not-run-db.json"
+      },
+      {
+        "gate": "real-adapter-run",
+        "variant": "hand-written-green",
+        "expectedCheck": "freshness:byte-digest-matches-this-run",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=4e122ca30754d935",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/real-adapter-run--hand-written-green.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "stale-commit",
+        "expectedCheck": "freshness:commit-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9ab6750e72eed3fd reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--stale-commit.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "stale-tree",
+        "expectedCheck": "freshness:tree-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=9bda7326c3ecfc6f reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--stale-tree.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "comparison-flipped",
+        "expectedCheck": "comparison:ok",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c6274cc915b4cdcb reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--comparison-flipped.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "status-not-run-db",
+        "expectedCheck": "internal:status",
+        "classifierStatus": "NOT_RUN",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4126fff600179f84 reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--status-not-run-db.json"
+      },
+      {
+        "gate": "comparison",
+        "variant": "hand-written-green",
+        "expectedCheck": "freshness:byte-digest-matches-this-run",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=1af4a165de7b3815",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/comparison--hand-written-green.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "stale-commit",
+        "expectedCheck": "freshness:commit-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=de956ec8d29c68e8 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--stale-commit.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "stale-tree",
+        "expectedCheck": "freshness:tree-bound",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=fff7a07e549a0620 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--stale-tree.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "counter-nonzero",
+        "expectedCheck": "hardGates:counters-all-zero",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=320cd0ecfa65fef9 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--counter-nonzero.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "hardgates-flipped",
+        "expectedCheck": "hardGates:ok",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=c0245d6e3bc44d72 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--hardgates-flipped.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "status-not-run-db",
+        "expectedCheck": "internal:status",
+        "classifierStatus": "NOT_RUN",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=d6cbbf324b750a18 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--status-not-run-db.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "hand-written-green",
+        "expectedCheck": "freshness:byte-digest-matches-this-run",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=4f86c34d38ecc9d7 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--hand-written-green.json"
+      },
+      {
+        "gate": "probes",
+        "variant": "omits-hidden",
+        "expectedCheck": "honesty:no-unaccounted-omits",
+        "classifierStatus": "FAIL",
+        "detected": true,
+        "baselineStatus": "PASS",
+        "strong": true,
+        "firstReason": "freshness:byte-digest-matches-this-run:file=a6404a0266094ef8 reported=d4d8fc23fb17a293",
+        "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/probes--omits-hidden.json"
+      }
+    ]
+  },
+  "selfChecks": {
+    "ok": true,
+    "failures": [],
+    "negativeControls": {
+      "allGreenCleanCheckout": "COMPLETE_WITH_LIMITS",
+      "greenButDirtyCheckout": "PASS_WITH_LIMITS",
+      "skippedMandatoryGate": "PARTIAL",
+      "blockedDependency": "PARTIAL",
+      "failedGate": "REVISE",
+      "counterFinding": "REVISE",
+      "undetectedTampering": "REVISE",
+      "renamedGate": {
+        "issueDetected": true,
+        "verdict": "REVISE",
+        "ok": true
+      },
+      "repointedComparisonGate": {
+        "ok": true,
+        "issues": [
+          "script:s2-007r:comparison:repointed(node scripts/s2-007r-probes.mjs)"
+        ]
+      },
+      "absentGateScript": "PARTIAL",
+      "unmeasuredMeasurement": "PARTIAL",
+      "measurementWithAFinding": "REVISE",
+      "comparisonAcrossTwoGrants": "REVISE",
+      "statusReadFromAStaleRecord": "REVISE",
+      "undetectedRealAdapterTampering": "REVISE",
+      "deferredArm": "PARTIAL",
+      "declaredStopCondition": "BLOCKED",
+      "realAdapterClaimThatDoesNotSurvive": "REVISE",
+      "greenGateWithUncorroboratedRecord": "REVISE",
+      "unrunAdapterIndistinguishableFromMissing": true,
+      "realAdapterTamperOnForgedRecord": {
+        "ok": true,
+        "ran": true,
+        "checked": 13,
+        "baseline": "REAL_ADAPTER_AVAILABLE",
+        "basedOn": "a live probeRealAdapters row for adr-codex-local ($HOME/.local/lib/node_modules/@openai/codex/bin/codex.js)",
+        "strong": 13,
+        "undetected": []
+      },
+      "amvpTamperOnAnUnanchoredRecord": {
+        "ok": true,
+        "checked": 4,
+        "undetected": [],
+        "results": [
+          {
+            "variant": "hand-written-pass",
+            "classified": "REFUSED",
+            "detected": true,
+            "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--hand-written-pass.json"
+          },
+          {
+            "variant": "unanchored-commit",
+            "classified": "REFUSED",
+            "detected": true,
+            "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--unanchored-commit.json"
+          },
+          {
+            "variant": "commit-stripped",
+            "classified": "REFUSED",
+            "detected": true,
+            "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--commit-stripped.json"
+          },
+          {
+            "variant": "claimed-verdict-upgrade",
+            "classified": "REFUSED",
+            "detected": true,
+            "firstReason": "the per-case record is not bound to this commit and to a corroborated real-adapter run, so its observed values are a claim, not an observation",
+            "scratchFile": ".bb/chats/thr_mgkk7cb5t6/tmp/s2-007r-verify-ea8d22e4cb3e/amvp--claimed-verdict-upgrade.json"
+          }
+        ]
+      },
+      "realAdapterTamperRan": true,
+      "realAdapterTamperDetected": true
+    },
+    "gateSetOk": true
+  },
+  "observations": [],
+  "matrix": [
+    {
+      "criterion": "C1 dependency binding",
+      "requirement": "issue §6: the inherited S2-007 dependency binding is verified before any implementation; a blocked binding is BLOCKED, not green",
+      "observation": "dependency gate PASS (exit 0) at HEAD commit ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+      "evidence": "evidence/s2-007-dependency-binding.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C2 a real executor really crossed the boundary",
+      "requirement": "issue §4: a run is a real adapter only with a version string, a binary digest corroborated by a LIVE host probe, a raw log with a digest that is the executor's own log document, and a real exit status — all re-verified from the bytes on disk",
+      "observation": "real-adapter gate PASS (exit 0); realAdapterStatus REAL_ADAPTER_AVAILABLE; adapters.available 0; executables the live host probe reports installed: adr-codex-local, adr-pi-local, adr-claude-code-local, adr-opencode-local, adr-hermes-local",
+      "evidence": "evidence/s2-007r-real-adapter-run.json + the live probeRealAdapters fact",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C3 a configured adapter is not an available one",
+      "requirement": "issue §4: a configured-but-unrun adapter is indistinguishable, in the output, from one that does not exist",
+      "observation": "3 configured adapter entries, 0 corroborated",
+      "evidence": "evidence/s2-007r-summary.json (realAdapter.adapters)",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C4 the mandatory negative probes",
+      "requirement": "issue §5: five probes through the production-facing path, seven hard-gate counters all 0",
+      "observation": "probes gate PASS (exit 0); counters {\"crossWorkspaceLeaks\":0,\"authorityExpansions\":0,\"duplicateActiveLeases\":0,\"duplicateExternalEffects\":0,\"staleFenceMutations\":0,\"missingJournalOrOutbox\":0,\"falseApprovals\":0}",
+      "evidence": "evidence/s2-007r-security-probes.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C5 the comparison is one project and one budget",
+      "requirement": "issue §5: two configurations on ONE project digest and ONE grant, or the comparison is REFUSED. Re-derived here: verdict COMPARED present and the distinct project_digest / budget_grant_id / cost_basis over the record and its cells are one each",
+      "observation": "comparison gate PASS (exit 0); verdict COMPARED; cross-input fields none",
+      "evidence": "evidence/s2-007r-comparison.json",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C6 the seven measurements",
+      "requirement": "issue §5: seven measurements, each recomputable by a third party from the record alone; a measurement reporting FAILED_GATE is a finding, not a gap",
+      "observation": "4/7 measured; not measured: intervention_time, cost, skills_authority_expansion; findings: none; artefacts 13/21 verified on disk (record.measurements)",
+      "evidence": "evidence/s2-007r-comparison.json (cells[].measurements[])",
+      "status": "PARTIAL"
+    },
+    {
+      "criterion": "C7 freshness of every result",
+      "requirement": "issue §6: each gate is re-run in this invocation and re-classified against tampered copies; a tampered artifact that is accepted fails the run. The real-adapter and per-case matrices are inputs to the verdict, not decoration",
+      "observation": "evidence tamper matrix: 16 variants, none undetected; real-adapter tamper matrix: 13 variants, none undetected; per-case A-MVP matrix: 4 variants, none undetected",
+      "evidence": "evidence/s2-007r-summary.json (tamperChecks, realAdapter.tamperChecks, amvpTamper)",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C8 no gate renaming",
+      "requirement": "issue §6: a gate may not be renamed or repointed to obtain a green status",
+      "observation": "the gate set is compared with package.json: intact",
+      "evidence": "evidence/s2-007r-summary.json (gateCommands)",
+      "status": "PASS"
+    },
+    {
+      "criterion": "C9 honest A-MVP status",
+      "requirement": "issue §7: the frozen pilot file keeps every case at NOT_RUN; the per-case observation lives in this ticket's own record, is read only when that record is bound to this commit and to a corroborated real-adapter run, and no case is an acceptance",
+      "observation": "aMvpStatus NOT_CLAIMED; cases PASS 0/7, NOT_RUN 7/7; per-case record readable false (anchored true); pilot file matches the frozen manifest: null",
+      "evidence": "pilots/scenario-a/acceptance-cases.json, evidence/s2-007r-amvp-cases.json",
+      "status": "PASS (the unauthenticated per-case file was refused, so every case reads NOT_RUN)"
+    },
+    {
+      "criterion": "C10 the assurance ceiling",
+      "requirement": "issue §7: assuranceStatus is NOT_MEASURED and aMvpStatus is NOT_CLAIMED, whatever the engineering evidence says",
+      "observation": "assuranceStatus NOT_MEASURED; aMvpStatus NOT_CLAIMED; notInferred real_adapter_execution_without_corroboration, human_review, empirical_semantic_accuracy, A_MVP_PASS, operator_acceptance, production_readiness",
+      "evidence": "evidence/s2-007r-summary.json",
+      "status": "PASS"
+    }
+  ],
+  "verdictReasons": [
+    "[PARTIAL] these measurements are not measured: intervention_time, cost, skills_authority_expansion"
+  ],
+  "verdictPrecedence": [
+    "REVISE (a defect was found) > BLOCKED (an inherited stop condition) > PARTIAL (a mandatory component could not run) > PASS_WITH_LIMITS (every gate green but the checkout is dirty) > COMPLETE_WITH_LIMITS"
+  ],
+  "checkout": {
+    "available": true,
+    "clean": false,
+    "changedPathCount": 46,
+    "changedPaths": [
+      "vidence/s2-007-dependency-binding.json",
+      "vidence/s2-007r-amvp-cases.json",
+      "vidence/s2-007r-comparison.json",
+      "vidence/s2-007r-security-probes.json",
+      "vidence/s2-007r-summary.json",
+      "ackage.json",
+      "esults/s2-007r/cell-pa2/campaign-ledger.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pa2/run-01.json",
+      "esults/s2-007r/cell-pa2/run-02.json",
+      "esults/s2-007r/cell-pa2/run-record.json",
+      "esults/s2-007r/cell-pb1/campaign-ledger.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb1/run-01.json",
+      "esults/s2-007r/cell-pb1/run-02.json",
+      "esults/s2-007r/cell-pb1/run-record.json",
+      "esults/s2-007r/cell-pb2/campaign-ledger.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pb2/run-01.json",
+      "esults/s2-007r/cell-pb2/run-02.json",
+      "esults/s2-007r/cell-pb2/run-record.json",
+      "esults/s2-007r/cell-pia/campaign-ledger.json",
+      "esults/s2-007r/cell-pia/raw/pilot/bootstrap/codex/run-bootstrap-codex-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/raw/pilot/bootstrap/pi/run-bootstrap-pi-pilot/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/raw/pilot/run-01-pi/run-pilot-000001/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/raw/pilot/run-02-codex/run-pilot-000002/raw/exec-000.log.json",
+      "esults/s2-007r/cell-pia/run-01.json",
+      "esults/s2-007r/cell-pia/run-02.json",
+      "esults/s2-007r/cell-pia/run-record.json",
+      "cripts/s2-007r-measurement-set.mjs",
+      "cripts/s2-007r-probes.mjs"
+    ]
+  },
+  "finalAcceptance": {
+    "note": "The final acceptance set is run by the owner at acceptance, not by this aggregator: it must not rebuild Next.js or run the whole suite while other work is in flight, and a result it did not observe may not be reported as observed.",
+    "commands": [
+      "npm test",
+      "npm run typecheck",
+      "npm run lint",
+      "npm run build",
+      "npm run inventory:check",
+      "npm run manifest:check",
+      "node scripts/validate-contracts.mjs",
+      "node scripts/check-public-artifacts.mjs",
+      "npm run verify:clean-checkout",
+      "git diff --check"
+    ],
+    "statuses": {
+      "npm test": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run typecheck": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run lint": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run build": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run inventory:check": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run manifest:check": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "node scripts/validate-contracts.mjs": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "node scripts/check-public-artifacts.mjs": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "npm run verify:clean-checkout": "NOT_RUN_BY_THIS_AGGREGATOR",
+      "git diff --check": "NOT_RUN_BY_THIS_AGGREGATOR"
+    }
+  },
+  "residualLimitations": [
+    "assuranceStatus is NOT_MEASURED and aMvpStatus is NOT_CLAIMED, and nothing in this record can move either: there is no independent human reviewer and no operator acceptance in this run.",
+    "A real-adapter status is read only from a record whose executor claim was re-verified against the bytes on disk. Every other record — a registration, a probe row, a configuration entry — is a host fact or a claim, never a run.",
+    "The probes run against the in-memory store; the A-MVP-06/A-MVP-07 database facts belong to the DB gate, not to this one.",
+    "Where a mandatory component could not run, the reason is named in omits/deferredArms rather than smoothed over: an unproven defence and a proven one are different states."
+  ],
+  "rollback": {
+    "code": "this ticket adds new files and new npm scripts only; removing scripts/s2-007r-*.mjs, scripts/verify-s2-007r.mjs and the evidence/s2-007r-*.json records returns the checkout to its pre-ticket state.",
+    "evidence": "delete evidence/s2-007r-*.json; every gate is re-runnable from a clean checkout.",
+    "verification": "npm run verify:s2-007r (the aggregator will report PARTIAL/BLOCKED/REVISE rather than green until every mandatory gate is green again)."
+  },
+  "recordDigest": "69d19d547f78901df3a608372256ac6f1466281ccb164043da666bd035eddd16"
+}
