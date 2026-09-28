@@ -8,11 +8,11 @@
   "exitCode": 0,
   "reasons": [],
   "base": {
-    "commit_sha": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
-    "tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
+    "commit_sha": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+    "tree_sha": "7df789057ca55c5bb48262291113f77e144eca14",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 57,
+    "tracked_files_of_this_track": 58,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },

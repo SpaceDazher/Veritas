@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 848.
+Generated from `git ls-files`; count: 849.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -691,6 +691,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
+- `src/lib/research/campaign-decision.mjs`
 - `src/lib/research/campaign-expectation.mjs`
 - `src/lib/research/causality.mjs`
 - `src/lib/research/comparator.mjs`

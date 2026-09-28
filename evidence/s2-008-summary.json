@@ -6,16 +6,16 @@
   "ok": true,
   "exitCode": 0,
   "base": {
-    "commit_sha": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
-    "tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
+    "commit_sha": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+    "tree_sha": "7df789057ca55c5bb48262291113f77e144eca14",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
-    "worktree_dirty": false,
-    "tracked_files_of_this_track": 57,
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 58,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "invocation": {
-    "id": "20271860904a8bc83a2243cd7a42ec61",
+    "id": "288d1e3f234c1fdd344c014155ff6e5c",
     "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
     "passed_to": [
       "scripts/s2-008-replay.mjs",
@@ -33,7 +33,23 @@
   "boundaries": [
     "BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it. What covers the working tree is per SURFACE, and this one is not the corpus: the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) re-derives tests/research/fixtures/**, so it covers the working tree of the CORPUS, not of the summary; the working-tree surface of the summary is covered by the fact that NOTHING in this chain reads it back (no gate, no property, no verdict term consumes evidence/s2-008-summary.json) and that the next write run overwrites it. That is a stated boundary, not a check, and it is stated here so a reader never has to open the report to learn it"
   ],
-  "provability_exempt": [],
+  "provability_exempt": [
+    {
+      "paths": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
+        "evidence/s2-008-replay.json",
+        "evidence/s2-008-run-a.json",
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json"
+      ],
+      "reason": "these are the records this chain's own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)"
+    }
+  ],
   "gates": {
     "dependency": {
       "status": "PASS",
@@ -47,7 +63,7 @@
         "S1-004:BOUND",
         "S1-011:BOUND"
       ],
-      "track_files_tracked": 57,
+      "track_files_tracked": 58,
       "track_files_expected": [
         "evidence/s2-008-comparison.json",
         "evidence/s2-008-controls.json",
@@ -73,6 +89,7 @@
         "scripts/s2-008-security-probes.mjs",
         "scripts/verify-s2-008-dependencies.mjs",
         "scripts/verify-s2-008.mjs",
+        "src/lib/research/campaign-decision.mjs",
         "src/lib/research/campaign-expectation.mjs",
         "src/lib/research/causality.mjs",
         "src/lib/research/comparator.mjs",
@@ -107,10 +124,21 @@
         "tests/research/replay-two-run.test.mjs",
         "tests/research/triage-hardening.test.mjs"
       ],
-      "track_files_expected_count": 57,
+      "track_files_expected_count": 58,
       "track_files_unaccounted": [],
       "track_files_untracked": [],
-      "track_files_modified": []
+      "track_files_modified": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
+        "evidence/s2-008-replay.json",
+        "evidence/s2-008-run-a.json",
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json"
+      ]
     },
     "corpus": {
       "status": "PASS",
@@ -306,10 +334,10 @@
       "floor_issues": [],
       "record_path": "evidence/s2-008-security-probes.json",
       "record_present": true,
-      "record_sha256": "7d0d0c87084985ea27e576eaef041f24e0d0da2e62ec70a2b39530bfc33a34d8",
+      "record_sha256": "fbccf7fed0c6ad6b811cbe01d482b94205b6af7f6fbcb1203ba298c720b43a9d",
       "record_bytes": 40347,
-      "record_digest": "1e9e7603d52d03f4736169256348aba17be5675c0ed896199615b6ce8bf8d657",
-      "record_digest_reported": "1e9e7603d52d03f4736169256348aba17be5675c0ed896199615b6ce8bf8d657",
+      "record_digest": "c6b740ea1c0f652405c411ce45cc79e313c758b36c3d4516dee5cdf7852f8375",
+      "record_digest_reported": "c6b740ea1c0f652405c411ce45cc79e313c758b36c3d4516dee5cdf7852f8375",
       "record_digest_agrees": true,
       "record_is_this_run": true,
       "record_issues": [],
@@ -328,8 +356,8 @@
       "reason": null,
       "source": "scripts/s2-008-replay.mjs",
       "overall": "PASS",
-      "invocation_id": "20271860904a8bc83a2243cd7a42ec61",
-      "head_tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
+      "invocation_id": "288d1e3f234c1fdd344c014155ff6e5c",
+      "head_tree_sha": "7df789057ca55c5bb48262291113f77e144eca14",
       "campaign_verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
       "observed_campaign_decision": "UNRESOLVED",
@@ -338,25 +366,25 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-28T00:41:01.069Z",
-        "finished_at": "2026-09-28T00:41:03.692Z",
+        "observed_at": "2026-09-28T01:04:50.921Z",
+        "finished_at": "2026-09-28T01:05:06.090Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
-        "age_ms": 11
+        "age_ms": 9
       }
     },
     "harness": {
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-28T00:41:04.319Z",
-      "evidence_sha256": "84def4e93b7041c99a9ff11744b9ef64b7a79b66576f87ad390eac48b619c2bc",
+      "observed_at": "2026-09-28T01:05:06.594Z",
+      "evidence_sha256": "a49e6aee5a760edd914bbd3df92577d28957342df34d659d66230dbd90ce5345",
       "evidence_bytes": 71951,
       "record_is_this_run": true,
       "invocation_id_required": true,
-      "invocation_id": "20271860904a8bc83a2243cd7a42ec61",
-      "head_tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
+      "invocation_id": "288d1e3f234c1fdd344c014155ff6e5c",
+      "head_tree_sha": "7df789057ca55c5bb48262291113f77e144eca14",
       "head_tree_sha_matches": true,
       "exit_code_recorded": null,
       "overall": "PASS",
@@ -383,13 +411,13 @@
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-28T00:41:04.321Z",
-    "started_at": "2026-09-28T00:40:54.252Z",
-    "replay_judged_at": "2026-09-28T00:41:03.703Z",
-    "harness_judged_at": "2026-09-28T00:41:04.319Z",
+    "observed_at": "2026-09-28T01:05:06.597Z",
+    "started_at": "2026-09-28T01:04:38.143Z",
+    "replay_judged_at": "2026-09-28T01:05:06.099Z",
+    "harness_judged_at": "2026-09-28T01:05:06.594Z",
     "window_ms": 21600000,
-    "head_tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
-    "replay_finished_at": "2026-09-28T00:41:03.692Z"
+    "head_tree_sha": "7df789057ca55c5bb48262291113f77e144eca14",
+    "replay_finished_at": "2026-09-28T01:05:06.090Z"
   },
   "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
@@ -416,6 +444,6 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-28T00:41:04.321Z",
-  "startedAtIso": "2026-09-28T00:40:54.252Z"
+  "observedAtIso": "2026-09-28T01:05:06.597Z",
+  "startedAtIso": "2026-09-28T01:04:38.143Z"
 }

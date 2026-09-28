@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
-  "head_tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
-  "invocation_id": "20271860904a8bc83a2243cd7a42ec61",
+  "head": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+  "head_tree_sha": "7df789057ca55c5bb48262291113f77e144eca14",
+  "invocation_id": "288d1e3f234c1fdd344c014155ff6e5c",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -75,6 +75,7 @@
       "scripts/s2-008-security-probes.mjs",
       "scripts/verify-s2-008-dependencies.mjs",
       "scripts/verify-s2-008.mjs",
+      "src/lib/research/campaign-decision.mjs",
       "src/lib/research/campaign-expectation.mjs",
       "src/lib/research/causality.mjs",
       "src/lib/research/comparator.mjs",
@@ -109,14 +110,37 @@
       "tests/research/replay-two-run.test.mjs",
       "tests/research/triage-hardening.test.mjs"
     ],
-    "track_files_expected_count": 57,
+    "track_files_expected_count": 58,
     "track_files_expected_source": "the WORKING TREE, walked over src/lib/research, tests/research, scripts, evidence/s2-008, evidence and filtered with the same regex the tracked/untracked/modified views use: ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008)",
     "track_files_unaccounted": [],
-    "track_files_tracked": 57,
+    "track_files_tracked": 58,
     "track_files_untracked": [],
-    "track_files_modified": [],
-    "track_files_modified_by_the_chain": [],
-    "track_files_modified_other": [],
+    "track_files_modified": [
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-dependency-binding.json",
+      "evidence/s2-008-harness.json",
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-security-probes.json",
+      "evidence/s2-008-summary.json"
+    ],
+    "track_files_modified_by_the_chain": [
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-dependency-binding.json",
+      "evidence/s2-008-harness.json",
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-security-probes.json"
+    ],
+    "track_files_modified_other": [
+      "evidence/s2-008-summary.json"
+    ],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
   },
@@ -237,8 +261,14 @@
     }
   ],
   "modules": {
-    "modules": 15,
+    "modules": 16,
     "importers": {
+      "src/lib/research/campaign-decision.mjs": [
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/verify-s2-008.mjs",
+        "tests/research/gate-semantics.test.mjs"
+      ],
       "src/lib/research/campaign-expectation.mjs": [
         "scripts/s2-008-build-corpus.mjs",
         "scripts/s2-008-harness.mjs",
@@ -324,6 +354,7 @@
         "tests/research/comparator-probes.test.mjs"
       ],
       "src/lib/research/expected-values.mjs": [
+        "src/lib/research/campaign-decision.mjs",
         "src/lib/research/campaign-expectation.mjs",
         "src/lib/research/comparator.mjs",
         "src/lib/research/index.mjs",
@@ -436,8 +467,8 @@
     "issues": []
   },
   "syntax": {
-    "modules": 34,
-    "parsed": 34,
+    "modules": 35,
+    "parsed": 35,
     "issues": [],
     "note": "node --check proves the file PARSES; it is not type checking, and tsconfig.json excludes .mjs from `tsc` entirely"
   },
@@ -506,7 +537,7 @@
       "path": "evidence/s2-008-replay.json",
       "required": false,
       "present": true,
-      "bytes": 36849,
+      "bytes": 36789,
       "issues": [],
       "excluded_from_required": true,
       "chain_produced": true,
@@ -530,7 +561,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 18620,
+      "bytes": 19103,
       "issues": []
     },
     {
