@@ -1,12 +1,83 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1005.
+Generated from `git ls-files`; count: 1104.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
+- `.arch-map/policy.json`
+- `.arch-map/snapshot.json`
+- `.arch-map/snapshot.prev.json`
 - `.env.example`
 - `.gitattributes`
 - `.gitignore`
 - `AGENTS.md`
+- `brag-output/2026-09-27-015146/board.png`
+- `brag-output/2026-09-27-015146/composition/engine.js`
+- `brag-output/2026-09-27-015146/composition/fonts.js`
+- `brag-output/2026-09-27-015146/composition/index.html`
+- `brag-output/2026-09-27-015146/composition/spec.js`
+- `brag-output/2026-09-27-015146/contact.jpg`
+- `brag-output/2026-09-27-015146/facts.json`
+- `brag-output/2026-09-27-015146/frame-0130.png`
+- `brag-output/2026-09-27-015146/frame-0285.png`
+- `brag-output/2026-09-27-015146/frame-0355.png`
+- `brag-output/2026-09-27-015146/frame-0440.png`
+- `brag-output/2026-09-27-015146/frame-0500.png`
+- `brag-output/2026-09-27-015146/frame-0505.png`
+- `brag-output/2026-09-27-015146/plan.md`
+- `brag-output/2026-09-27-015146/render-preview.json`
+- `brag-output/2026-09-27-015146/spec.json`
+- `brag-output/2026-09-27-024608/board-crop.png`
+- `brag-output/2026-09-27-024608/board.png`
+- `brag-output/2026-09-27-024608/composition/engine.js`
+- `brag-output/2026-09-27-024608/composition/fonts.js`
+- `brag-output/2026-09-27-024608/composition/index.html`
+- `brag-output/2026-09-27-024608/composition/spec.js`
+- `brag-output/2026-09-27-024608/contact.jpg`
+- `brag-output/2026-09-27-024608/facts.json`
+- `brag-output/2026-09-27-024608/plan.md`
+- `brag-output/2026-09-27-024608/promo.jpg`
+- `brag-output/2026-09-27-024608/promo.mp4`
+- `brag-output/2026-09-27-024608/render-report.json`
+- `brag-output/2026-09-27-024608/score.wav`
+- `brag-output/2026-09-27-024608/share-copy.md`
+- `brag-output/2026-09-27-024608/spec.json`
+- `brag-output/2026-09-27-081119/board-crop.png`
+- `brag-output/2026-09-27-081119/board.png`
+- `brag-output/2026-09-27-081119/composition/engine.js`
+- `brag-output/2026-09-27-081119/composition/fonts.js`
+- `brag-output/2026-09-27-081119/composition/index.html`
+- `brag-output/2026-09-27-081119/composition/spec.js`
+- `brag-output/2026-09-27-081119/contact.jpg`
+- `brag-output/2026-09-27-081119/facts.json`
+- `brag-output/2026-09-27-081119/plan.md`
+- `brag-output/2026-09-27-081119/promo.jpg`
+- `brag-output/2026-09-27-081119/promo.mp4`
+- `brag-output/2026-09-27-081119/render-preview.json`
+- `brag-output/2026-09-27-081119/render-report.json`
+- `brag-output/2026-09-27-081119/render.log`
+- `brag-output/2026-09-27-081119/render2.log`
+- `brag-output/2026-09-27-081119/score.wav`
+- `brag-output/2026-09-27-081119/share-copy.md`
+- `brag-output/2026-09-27-081119/spec.json`
+- `brag-output/2026-09-27-120000/board-full.png`
+- `brag-output/2026-09-27-120000/board.png`
+- `brag-output/2026-09-27-120000/composition/engine.js`
+- `brag-output/2026-09-27-120000/composition/fonts.js`
+- `brag-output/2026-09-27-120000/composition/index.html`
+- `brag-output/2026-09-27-120000/composition/spec.js`
+- `brag-output/2026-09-27-120000/contact.jpg`
+- `brag-output/2026-09-27-120000/facts.json`
+- `brag-output/2026-09-27-120000/frame-0200.jpg`
+- `brag-output/2026-09-27-120000/frame-0350.jpg`
+- `brag-output/2026-09-27-120000/frame-0560.jpg`
+- `brag-output/2026-09-27-120000/plan.md`
+- `brag-output/2026-09-27-120000/promo.jpg`
+- `brag-output/2026-09-27-120000/promo.mp4`
+- `brag-output/2026-09-27-120000/render-preview.json`
+- `brag-output/2026-09-27-120000/render-report.json`
+- `brag-output/2026-09-27-120000/score.wav`
+- `brag-output/2026-09-27-120000/share-copy.md`
+- `brag-output/2026-09-27-120000/spec.json`
 - `CLAUDE.md`
 - `contracts/acceptance-cases.schema.json`
 - `contracts/adapter-registration.schema.json`
@@ -364,6 +435,16 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-007r/project/src/parse.js`
 - `corpus/s2-007r/project/src/parse.test.js`
 - `corpus/s2-007r/project/verify.mjs`
+- `corpus/s2-008-campaign/cases/dev.json`
+- `corpus/s2-008-campaign/cases/holdout.blind.json`
+- `corpus/s2-008-campaign/cases/holdout.json`
+- `corpus/s2-008-campaign/frozen-table.json`
+- `corpus/s2-008-campaign/manifest.json`
+- `corpus/s2-008-campaign/preregistration-superseded.json`
+- `corpus/s2-008-campaign/preregistration-supersession.json`
+- `corpus/s2-008-campaign/preregistration.json`
+- `corpus/s2-008-campaign/preregistration.v2.draft.json`
+- `corpus/s2-008-campaign/source-ledger.json`
 - `docs/ARCHITECTURE.md`
 - `docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md`
 - `docs/claims/S2-004-EXPERT-LENS-POLICY.md`
@@ -390,6 +471,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
 - `docs/decisions/S2-007-EVALUATION-REPORT.md`
+- `docs/decisions/S2-008-ACCEPTANCE-REPORT.md`
 - `docs/decisions/S2-008-EVALUATION-REPORT.md`
 - `docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md`
 - `docs/DEVELOPMENT.md`
@@ -505,6 +587,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-real-run-gate.json`
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
+- `evidence/s2-008-campaign/evaluation.json`
+- `evidence/s2-008-campaign/probes.json`
+- `evidence/s2-008-campaign/run-a.json`
+- `evidence/s2-008-campaign/run-aborted-1.json`
+- `evidence/s2-008-campaign/run-b.json`
 - `evidence/s2-008-comparison.json`
 - `evidence/s2-008-controls.json`
 - `evidence/s2-008-dependency-binding.json`
@@ -529,6 +616,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
+- `libpod/tmp/pause.pid`
 - `migrations/0001_veritas_board.sql`
 - `migrations/0002_source_ingestion.sql`
 - `migrations/0003_claim_graph.sql`
@@ -722,6 +810,14 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007r-real-run-verify.mjs`
 - `scripts/s2-007r-run.mjs`
 - `scripts/s2-008-build-corpus.mjs`
+- `scripts/s2-008-campaign-adapter.mjs`
+- `scripts/s2-008-campaign-arm-model.mjs`
+- `scripts/s2-008-campaign-arm.mjs`
+- `scripts/s2-008-campaign-bootstrap.mjs`
+- `scripts/s2-008-campaign-evaluate.mjs`
+- `scripts/s2-008-campaign-prepare.mjs`
+- `scripts/s2-008-campaign-probes.mjs`
+- `scripts/s2-008-campaign-run.mjs`
 - `scripts/s2-008-harness.mjs`
 - `scripts/s2-008-replay.mjs`
 - `scripts/s2-008-run.mjs`
@@ -879,6 +975,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/verifier/rubric.mjs`
 - `src/lib/verifier/signature.mjs`
 - `src/lib/verifier/store.mjs`
+- `Stage 2/AGENTS.md`
+- `Stage 2/CLAUDE.md`
 - `tasks/S2_AUTONOMOUS_DELIVERY_PLAN.md`
 - `tasks/S2-002_IDENTITY_SANDBOX.md`
 - `tasks/S2-003_SOURCE_INGESTION.md`
@@ -940,6 +1038,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/isolation/credential-provision.test.mjs`
 - `tests/isolation/live-evidence.test.mjs`
 - `tests/isolation/profile-axes.test.mjs`
+- `tests/research/campaign-arm-model.test.mjs`
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`
