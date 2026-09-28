@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 920.
+Generated from `git ls-files`; count: 925.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -495,6 +495,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007-summary.json`
 - `evidence/s2-007r-amvp-cases.json`
 - `evidence/s2-007r-comparison.json`
+- `evidence/s2-007r-derived-selection.json`
 - `evidence/s2-007r-host-unisolated.json`
 - `evidence/s2-007r-pilot.json`
 - `evidence/s2-007r-real-run-gate.json`
@@ -559,6 +560,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-005/smoke.json`
 - `results/s2-006/model-assisted-pilot-pool.json`
 - `results/s2-006/s2-006-db-comparison.json`
+- `results/s2-007r-derived-selection/codex-version.log`
 - `results/s2-007r/campaign-ledger.json`
 - `results/s2-007r/cell-pa2/campaign-ledger.json`
 - `results/s2-007r/cell-pa2/raw/pa2/bootstrap/codex/run-bootstrap-codex-pa2/raw/exec-000.log.json`
@@ -688,6 +690,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007-run.mjs`
 - `scripts/s2-007-security-probes.mjs`
 - `scripts/s2-007r-authorization.mjs`
+- `scripts/s2-007r-derived-selection.mjs`
 - `scripts/s2-007r-lifecycle.mjs`
 - `scripts/s2-007r-measure.mjs`
 - `scripts/s2-007r-measurement-set.mjs`
@@ -749,6 +752,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/agentboard/policy.mjs`
 - `src/lib/agentboard/probes.mjs`
 - `src/lib/agentboard/scheduler.mjs`
+- `src/lib/agentboard/selection.mjs`
 - `src/lib/agentboard/store.mjs`
 - `src/lib/board.ts`
 - `src/lib/claims/contracts.d.ts`
@@ -830,6 +834,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/agentboard/contracts-drift.test.mjs`
 - `tests/agentboard/contracts.test.mjs`
 - `tests/agentboard/dependency-runner.test.mjs`
+- `tests/agentboard/derived-selection.test.mjs`
 - `tests/agentboard/execution-callbacks.test.mjs`
 - `tests/agentboard/fixtures/claim-race-child.mjs`
 - `tests/agentboard/fixtures/real-executor-stub.mjs`
