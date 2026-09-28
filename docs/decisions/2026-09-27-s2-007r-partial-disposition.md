@@ -78,10 +78,14 @@ Three controls were refusing to look at themselves:
 
 ## What remains, and where it goes
 
-#47 carries the remainder, with an owner and an unblock condition for each:
+The remainder was handed to **#12 (S2-012)**, which already owns pilot
+acceptance and the operator's approval, and #47 was closed on that transfer
+(2026-09-28). #12 is where the items below are tracked; this document is their
+engineering record.
 
 * **A-MVP-05** — an authenticated human reviewer who is not the producer. This is
   structurally unreachable in an agent run and is the work #12 was created for.
+
 * **A-MVP-02 (c)** — the tracked diff of this ticket touches `contracts/`,
   `src/lib/agentboard/` and `src/lib/identity/`, because the owner's
   `HOST_UNISOLATED` decision did. Either the case is restated for a sanctioned
