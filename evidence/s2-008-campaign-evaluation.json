@@ -1,0 +1,221 @@
+{
+ "kind": "s2-008-campaign-evaluation/1",
+ "ticket": "S2-008",
+ "subject": "an independent re-derivation of the real campaign, from the primary evidence and not from the run record",
+ "method": [
+  "the holdout and dev labels are RE-DERIVED from the git trees with the label rule restated here, and compared to the corpus",
+  "the per-arm agreement counts are recomputed from the corpus labels and the arm rules restated here, and compared to the run record",
+  "the interval is checked against an INDEPENDENT continuity-corrected Wilson score written out in this file, not imported",
+  "the decision is recomputed from the preregistration's own constants with the frozen rule written out in this file",
+  "the one-shot holdout rule is re-proved on a throwaway registry: one open permitted, a second refused, a forged digest refused",
+  "the repeat run is compared on base, decision digest, verdict projection and raw run id"
+ ],
+ "base": {
+  "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
+  "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8"
+ },
+ "preregistration_digest": "9379e329315edb8fc4b84d8e7c73ca24d5ea7303f5c9c85769630ace6b76f802",
+ "frozen_constants": {
+  "baseline": 0.8803191489361702,
+  "band": 0.06969570950743816,
+  "alpha": 0.05,
+  "family_size": 3,
+  "confidence": 0.9833333333333333,
+  "direction": "increase",
+  "null_value": 0.8803191489361702,
+  "seeds": [
+   20260926,
+   20260927,
+   20260928
+  ],
+  "holdout_case_count": 126
+ },
+ "labels": {
+  "holdout_cases": 126,
+  "holdout_mismatches": 0,
+  "dev_cases": 376,
+  "dev_mismatches": 0,
+  "rederived_label_digest": "8e279e8ffed4763b01f23ad6c6571e06e47838a60f43ebc8ef10e3bc87cb8ff4",
+  "corpus_label_digest": "8e279e8ffed4763b01f23ad6c6571e06e47838a60f43ebc8ef10e3bc87cb8ff4"
+ },
+ "base_rate": {
+  "dev_major": 45,
+  "dev_minor": 331,
+  "dev_majority_baseline": 0.8803191489361702,
+  "holdout_major": 12,
+  "holdout_minor": 114,
+  "base_rate_moved_between_partitions": 0.02444275582573456
+ },
+ "dev_arm_rates": {
+  "arm-scope-present": {
+   "agreeing": 49,
+   "denominator": 376,
+   "rate": 0.13031914893617022
+  },
+  "arm-type-feat-fix": {
+   "agreeing": 326,
+   "denominator": 376,
+   "rate": 0.8670212765957447
+  },
+  "arm-type-chore": {
+   "agreeing": 130,
+   "denominator": 376,
+   "rate": 0.34574468085106386
+  }
+ },
+ "trials": [
+  {
+   "trial_id": "trl-s2-008c-01",
+   "arm_id": "arm-scope-present",
+   "agreeing": 35,
+   "denominator": 126,
+   "measured": 0.2777777777777778,
+   "run_agreeing": 35,
+   "run_measured": 0.2777777777777778,
+   "run_outcome": "NEGATIVE",
+   "agrees_with_run_counts": true,
+   "run_interval": {
+    "lower": 0.18253968253968253,
+    "upper": 0.38095238095238093
+   },
+   "independent_wilson": {
+    "lower": 0.1935225074694371,
+    "upper": 0.38136919769338773,
+    "z": 2.3939798012415405,
+    "confidence": 0.9833333333333333
+   },
+   "wilson_contains_bootstrap": false,
+   "independent_decision": {
+    "decision": "NEGATIVE",
+    "reason": "significant_effect_in_the_other_direction",
+    "pUpper": 0.01666666666666672,
+    "floor": 0.016666666666666666,
+    "atBoundary": true,
+    "margin_to_floor": -5.204170427930421e-17,
+    "epsilon": 1e-12
+   },
+   "agrees_with_run_outcome": true,
+   "interval_note": "the percentile bootstrap interval is narrower than the continuity-corrected Wilson interval at the same confidence; this is the known under-coverage of the percentile bootstrap at n = 126, and it means the decision rests on a slightly OPTIMISTIC interval"
+  },
+  {
+   "trial_id": "trl-s2-008c-02",
+   "arm_id": "arm-type-feat-fix",
+   "agreeing": 115,
+   "denominator": 126,
+   "measured": 0.9126984126984127,
+   "run_agreeing": 115,
+   "run_measured": 0.9126984126984127,
+   "run_outcome": "UNRESOLVED",
+   "agrees_with_run_counts": true,
+   "run_interval": {
+    "lower": 0.8492063492063492,
+    "upper": 0.9682539682539683
+   },
+   "independent_wilson": {
+    "lower": 0.8331888257239428,
+    "upper": 0.9562980075450971,
+    "z": 2.3939798012415405,
+    "confidence": 0.9833333333333333
+   },
+   "wilson_contains_bootstrap": false,
+   "independent_decision": {
+    "decision": "UNRESOLVED",
+    "reason": "interval_straddles_null_outside_noise_band"
+   },
+   "agrees_with_run_outcome": true,
+   "interval_note": "the percentile bootstrap interval is narrower than the continuity-corrected Wilson interval at the same confidence; this is the known under-coverage of the percentile bootstrap at n = 126, and it means the decision rests on a slightly OPTIMISTIC interval"
+  },
+  {
+   "trial_id": "trl-s2-008c-03",
+   "arm_id": "arm-type-chore",
+   "agreeing": 51,
+   "denominator": 126,
+   "measured": 0.40476190476190477,
+   "run_agreeing": 51,
+   "run_measured": 0.40476190476190477,
+   "run_outcome": "NEGATIVE",
+   "agrees_with_run_counts": true,
+   "run_interval": {
+    "lower": 0.30158730158730157,
+    "upper": 0.5079365079365079
+   },
+   "independent_wilson": {
+    "lower": 0.30644006823258196,
+    "upper": 0.5113706625514859,
+    "z": 2.3939798012415405,
+    "confidence": 0.9833333333333333
+   },
+   "wilson_contains_bootstrap": false,
+   "independent_decision": {
+    "decision": "NEGATIVE",
+    "reason": "significant_effect_in_the_other_direction",
+    "pUpper": 0.01666666666666672,
+    "floor": 0.016666666666666666,
+    "atBoundary": true,
+    "margin_to_floor": -5.204170427930421e-17,
+    "epsilon": 1e-12
+   },
+   "agrees_with_run_outcome": true,
+   "interval_note": "the percentile bootstrap interval is narrower than the continuity-corrected Wilson interval at the same confidence; this is the known under-coverage of the percentile bootstrap at n = 126, and it means the decision rests on a slightly OPTIMISTIC interval"
+  }
+ ],
+ "pooled": {
+  "numerator": 201,
+  "denominator": 378,
+  "observed": 0.5317460317460317,
+  "interval": {
+   "lower": 0.18253968253968253,
+   "upper": 0.9682539682539683
+  },
+  "independent_decision": {
+   "decision": "UNRESOLVED",
+   "reason": "interval_straddles_null_outside_noise_band"
+  },
+  "run_decision": "UNRESOLVED",
+  "agrees": true
+ },
+ "rule_margin": {
+  "worst_case_p_bound": 0.01666666666666672,
+  "rejection_floor": 0.016666666666666666,
+  "margin": 5.204170427930421e-17,
+  "at_boundary": true,
+  "consequence": "the confidence is DERIVED as 1 - alpha/m, so the worst-case p bound sits exactly on the Holm threshold. Every rejection this campaign produced is a boundary rejection decided by a 1e-12 relative epsilon; a one-ULP change in the published confidence would flip all three arm outcomes. That is a property of the frozen rule, not of the data, and it is the rule this campaign was preregistered under."
+ },
+ "holdout_one_shot": {
+  "access_rows_on_a_scratch_registry": 1,
+  "second_open": {
+   "refused": true,
+   "error_class": "BlockedPolicy",
+   "code": "BLOCKED_POLICY",
+   "message": "HOLDOUT_UNSEAL_DIGEST_REPLAYED"
+  },
+  "forged_unseal": {
+   "refused": true,
+   "error_class": "BlockedPolicy",
+   "code": "BLOCKED_POLICY",
+   "message": "HOLDOUT_UNSEAL_DIGEST_FORGED"
+  }
+ },
+ "reproducibility": {
+  "a": {
+   "raw_run_id": "s2-008-campaign-a-550556",
+   "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
+   "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8",
+   "decision_digest": "5e925f4d407318d9a24e45d2d472134cd3cce199601b4c3550cc627acaeca0bc",
+   "campaign_decision": "UNRESOLVED"
+  },
+  "b": {
+   "raw_run_id": "s2-008-campaign-b-549854",
+   "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
+   "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8",
+   "decision_digest": "5e925f4d407318d9a24e45d2d472134cd3cce199601b4c3550cc627acaeca0bc",
+   "campaign_decision": "UNRESOLVED"
+  },
+  "same_base": true,
+  "same_decision_digest": true,
+  "verdict_projection_digest_equal": true,
+  "distinct_raw_run_ids": true
+ },
+ "findings": [],
+ "verdict": "AGREES"
+}
