@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "370eaa0920b07add7ba9764c1889dc7a7e907370",
-  "head_tree_sha": "687c419dd3f729dfcc6cf434ad301247eb8a0fec",
-  "invocation_id": "9ea1746a2a850430757ce5d0cc866f80",
+  "head": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
+  "head_tree_sha": "cc36496e7de7b46027dad8aa577bfbd0ea0f4bdc",
+  "invocation_id": "20271860904a8bc83a2243cd7a42ec61",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -114,38 +114,9 @@
     "track_files_unaccounted": [],
     "track_files_tracked": 57,
     "track_files_untracked": [],
-    "track_files_modified": [
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-dependency-binding.json",
-      "evidence/s2-008-harness.json",
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-replay.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json",
-      "evidence/s2-008-summary.json",
-      "scripts/verify-s2-008-dependencies.mjs",
-      "scripts/verify-s2-008.mjs",
-      "tests/research/gate-semantics.test.mjs"
-    ],
-    "track_files_modified_by_the_chain": [
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-dependency-binding.json",
-      "evidence/s2-008-harness.json",
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-replay.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json"
-    ],
-    "track_files_modified_other": [
-      "evidence/s2-008-summary.json",
-      "scripts/verify-s2-008-dependencies.mjs",
-      "scripts/verify-s2-008.mjs",
-      "tests/research/gate-semantics.test.mjs"
-    ],
+    "track_files_modified": [],
+    "track_files_modified_by_the_chain": [],
+    "track_files_modified_other": [],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
   },
@@ -535,7 +506,7 @@
       "path": "evidence/s2-008-replay.json",
       "required": false,
       "present": true,
-      "bytes": 36789,
+      "bytes": 36849,
       "issues": [],
       "excluded_from_required": true,
       "chain_produced": true,
@@ -566,7 +537,7 @@
       "path": "evidence/s2-008-harness.json",
       "required": false,
       "present": true,
-      "bytes": 71891,
+      "bytes": 71951,
       "issues": [],
       "excluded_from_required": true,
       "chain_produced": true,
