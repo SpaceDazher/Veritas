@@ -1,0 +1,194 @@
+{
+  "record_kind": "s2-007r-sql-observations",
+  "ticket": "S2-007R",
+  "run_round": 3,
+  "read_from": {
+    "server": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "container": "veritas-s2-007r-db-r3",
+    "container_image_digest": "1bea307dfb3ee30541a7acf7de14b58bcd6948da98e5d31a04c627c4d35ec64b",
+    "published_on": "127.0.0.1:PORT_REDACTED_IN_RECORD",
+    "published_on_note": "the port is a random per-invocation loopback port; it is named in the pilot run report, not in this record, and it dies with the container",
+    "credentials": "random per-invocation password, read from the container's own environment into this process and passed to psql through the PGPASSWORD of a child process. Variable name S2_007R_DB_PASSWORD; the value is never printed, never written into the repository and never hashed into this record.",
+    "when": "after all four cells, before the container was removed"
+  },
+  "per_schema": [
+    {
+      "schema": "s2_007r_pia",
+      "present": true,
+      "tables_in_schema": 55,
+      "rows": {
+        "tasks": {
+          "count": 2,
+          "rows": [
+            "abt-s2007r-pia-01\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:45:33.707+00\u001f2026-09-27 08:45:33.758+00",
+            "abt-s2007r-pia-02\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:45:33.803+00\u001f2026-09-27 08:45:33.836+00"
+          ]
+        },
+        "runs": 0,
+        "execution_events": 0,
+        "leases": 0,
+        "outbox": 0,
+        "audit_journal": 9,
+        "budget_spend": {
+          "total_amount": null,
+          "rows": null
+        }
+      },
+      "adapters": {
+        "count": 2,
+        "rows": [
+          "adr-codex-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:45:33.588+00",
+          "adr-pi-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:45:33.494+00"
+        ]
+      },
+      "grants": {
+        "count": 2,
+        "rows": [
+          "grt-s2007r-pilot-01\u001fabt-s2007r-pia-01\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner",
+          "grt-s2007r-pilot-02\u001fabt-s2007r-pia-02\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner"
+        ]
+      }
+    },
+    {
+      "schema": "s2_007r_pb1",
+      "present": true,
+      "tables_in_schema": 55,
+      "rows": {
+        "tasks": {
+          "count": 2,
+          "rows": [
+            "abt-s2007r-pb1-01\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:51:28.155+00\u001f2026-09-27 08:51:28.196+00",
+            "abt-s2007r-pb1-02\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:51:28.229+00\u001f2026-09-27 08:51:28.258+00"
+          ]
+        },
+        "runs": 0,
+        "execution_events": 0,
+        "leases": 0,
+        "outbox": 0,
+        "audit_journal": 9,
+        "budget_spend": {
+          "total_amount": null,
+          "rows": null
+        }
+      },
+      "adapters": {
+        "count": 2,
+        "rows": [
+          "adr-codex-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:51:28.045+00",
+          "adr-pi-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:51:27.966+00"
+        ]
+      },
+      "grants": {
+        "count": 2,
+        "rows": [
+          "grt-s2007r-pilot-01\u001fabt-s2007r-pb1-01\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner",
+          "grt-s2007r-pilot-02\u001fabt-s2007r-pb1-02\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner"
+        ]
+      }
+    },
+    {
+      "schema": "s2_007r_pb2",
+      "present": true,
+      "tables_in_schema": 55,
+      "rows": {
+        "tasks": {
+          "count": 2,
+          "rows": [
+            "abt-s2007r-pb2-01\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:51:45.274+00\u001f2026-09-27 08:51:45.31+00",
+            "abt-s2007r-pb2-02\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:51:45.341+00\u001f2026-09-27 08:51:45.362+00"
+          ]
+        },
+        "runs": 0,
+        "execution_events": 0,
+        "leases": 0,
+        "outbox": 0,
+        "audit_journal": 9,
+        "budget_spend": {
+          "total_amount": null,
+          "rows": null
+        }
+      },
+      "adapters": {
+        "count": 2,
+        "rows": [
+          "adr-codex-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:51:45.207+00",
+          "adr-pi-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:51:45.15+00"
+        ]
+      },
+      "grants": {
+        "count": 2,
+        "rows": [
+          "grt-s2007r-pilot-01\u001fabt-s2007r-pb2-01\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner",
+          "grt-s2007r-pilot-02\u001fabt-s2007r-pb2-02\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner"
+        ]
+      }
+    },
+    {
+      "schema": "s2_007r_pa2",
+      "present": true,
+      "tables_in_schema": 55,
+      "rows": {
+        "tasks": {
+          "count": 2,
+          "rows": [
+            "abt-s2007r-pa2-01\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:52:01.82+00\u001f2026-09-27 08:52:01.869+00",
+            "abt-s2007r-pa2-02\u001fREADY\u001f2\u001f0\u001fNULL\u001fNULL\u001fNULL\u001f2026-09-27 08:52:01.916+00\u001f2026-09-27 08:52:01.952+00"
+          ]
+        },
+        "runs": 0,
+        "execution_events": 0,
+        "leases": 0,
+        "outbox": 0,
+        "audit_journal": 9,
+        "budget_spend": {
+          "total_amount": null,
+          "rows": null
+        }
+      },
+      "adapters": {
+        "count": 2,
+        "rows": [
+          "adr-codex-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:52:01.728+00",
+          "adr-pi-local\u001freal\u001fhealthy\u001fsbx-host-unisolated-v1\u001fREAL_ADAPTER_AVAILABLE\u001f2026-09-27 08:52:01.638+00"
+        ]
+      },
+      "grants": {
+        "count": 2,
+        "rows": [
+          "grt-s2007r-pilot-01\u001fabt-s2007r-pa2-01\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner",
+          "grt-s2007r-pilot-02\u001fabt-s2007r-pa2-02\u001fUSD\u001f0.5\u001f2\u001f2\u001f600000\u001fprn-s2007r-owner"
+        ]
+      }
+    }
+  ],
+  "cross_schema": {
+    "distinct_grant_ids": [
+      "grt-s2007r-pilot-01",
+      "grt-s2007r-pilot-02"
+    ],
+    "distinct_task_states": [
+      "READY"
+    ],
+    "total_runs": 0,
+    "total_execution_events": 0,
+    "total_leases": 0,
+    "total_outbox": 0,
+    "total_audit_rows": 36,
+    "total_spend_amount": 0
+  },
+  "what_this_proves": [
+    "each of the four cells applied the nine ordered migrations into its own schema and really committed its rows to a real PostgreSQL 17.11 (55 tables per schema)",
+    "both adapters committed with adapter_kind=real and provenance status REAL_ADAPTER_AVAILABLE, and the grant rows committed with the ONE campaign grant id in every cell",
+    "the tasks committed in state READY, and the claim edge left no lease, no run, no outbox row and no execution event behind"
+  ],
+  "what_this_does_not_prove": [
+    "nothing about a run: a run is exactly what did not happen. total_runs and total_execution_events above are the measurement of that, read from the database rather than asserted by a record."
+  ],
+  "honesty": {
+    "this_file_written_by": ".bb/chats/thr_9ae88w3yuu/tmp/sql-observations-r3.mjs (the campaign run itself; the board's own writers are the four cell run records)",
+    "every_value_is_a_query_answer": true,
+    "hand_typed_values": 0,
+    "digest": "sha256 over this document with the `digest` field removed"
+  },
+  "digest": "sha256:81c993d341d2b3a1b77d417f3cb3443e72ad05164ef291357a8a1dd82c7b93a1"
+}

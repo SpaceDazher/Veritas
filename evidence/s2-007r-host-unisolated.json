@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#45",
+  "profileId": "sbx-host-unisolated-v1",
+  "tier": "HOST_UNISOLATED",
+  "boundary": "HOST_PROCESS_SPACE",
+  "decision": "A run bound to this tier is authorised ONLY by an explicit, named human authorisation document resolved server-side. The tier exists so that the authorization tier, the observed execution context and the written record are the same true statement; it is NOT an isolation tier and may never be counted as one.",
+  "host": {
+    "platform": "linux",
+    "release": "6.18.33.2-microsoft-standard-WSL2",
+    "arch": "x64",
+    "cpus": 16,
+    "totalMemoryBytes": 8180621312
+  },
+  "measurements": {
+    "shippedRuntimeVerdict": {
+      "probed": true,
+      "tier": "LOCAL_RESTRICTED",
+      "profileId": "sbx-podman-local-restricted-v1",
+      "executionAllowed": false,
+      "blockedReason": "SBX_NO_KERNEL_NETWORK_BOUNDARY",
+      "blockedDetailPresent": true,
+      "interpretation": "the S2-002 runtime REFUSES executable-tier execution on this host, so a run declared under a proven isolation profile could not be executed by that runtime here"
+    },
+    "pinnedIsolationImage": {
+      "image": "docker.io/library/alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc",
+      "probed": true,
+      "exitStatus": 2,
+      "runtimesInImage": {},
+      "agentRuntimePresent": [],
+      "routeLines": null,
+      "dns": null,
+      "conclusion": "the pinned isolation image contains no agent runtime, so a model-calling executor cannot run inside it"
+    },
+    "credentialPath": {
+      "injectedEnvironment": null,
+      "mounts": null,
+      "networkInterfaces": null,
+      "profileSecretHandles": [],
+      "conclusion": "with zero injected environment, zero mounts and an empty secret_handles allowlist, no host credential can be presented to a containerised executor, so even an agent-capable image could not authenticate"
+    },
+    "hostEgress": {
+      "probe": "https GET openrouter.ai/api/v1/models (no credentials sent)",
+      "exitStatus": 0,
+      "httpCode": "200",
+      "conclusion": "the host process space has outbound network access, which is exactly the capability the isolation profiles deny"
+    }
+  },
+  "notControlled": [
+    "kernel_process_isolation: there is no AppContainer, no user namespace, no seccomp filter and no read-only root for the child; it is an ordinary host process",
+    "filesystem_containment: the declared roots are the only boundary, enforced by the board ACL, not by the OS; the child can read anything the operator account can read",
+    "network_egress: unrestricted, including the model provider endpoint; no allowlist, no deny rule, no DNS policy",
+    "environment_and_secrets: the child inherits the operator environment; no allowlist, no secret handles, no injection control",
+    "process_recourse: killing the process group is under this repository's control (POSIX group signal plus the shipped process observer), not under an OS-enforced boundary"
+  ],
+  "unblockingRequires": [
+    "a digest-pinned image that contains the node runtime and the executor binaries",
+    "a network allowlist that replaces --network=none with the model provider endpoint and nothing else",
+    "a secret-handle mechanism in the profile, so a credential can be presented to the container without exporting the operator environment"
+  ],
+  "isolationClaim": false,
+  "aMvpIsolationClauses": "NOT_RUN",
+  "scope": "Evidence of the ABSENCE of OS-level isolation controls for a model-calling executor on this host. It is not a permit: the permit is the named human authorisation document, quoted by digest in the run record.",
+  "recordDigest": "464137ebb6640808d7b15cf761bd177ab7d3a3ab64f1173ad77c0698c100456f"
+}

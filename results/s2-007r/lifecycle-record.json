@@ -1,0 +1,4320 @@
+{
+  "contractVersion": "1.0.0",
+  "record_kind": "s2-007r-lifecycle-record",
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#45",
+  "harness": {
+    "version": "s2-007r-lifecycle-v1",
+    "file": "scripts/s2-007r-lifecycle.mjs",
+    "node": "v22.23.2",
+    "platform": "linux/x64",
+    "argv": [
+      "--arms",
+      "cancel,timeout,sigkill",
+      "--surfaces",
+      "codex,pi",
+      "--model",
+      "openrouter/amazon/nova-lite-v1",
+      "--out",
+      "results/s2-007r/lifecycle-record.json"
+    ],
+    "clock_base": "2026-09-26T09:00:00.000Z",
+    "clock_step_ms": 1000,
+    "clock_semantics": "a counter over a fixed base; the only real time source in this file is process.hrtime.bigint(), used to MEASURE a wall clock, never to decide an instant"
+  },
+  "what_this_is_not": {
+    "not_a_run": "no board command is called from this file: no task, no lease, no grant, no outbox row, no agentboard_* write",
+    "not_a_status": "nothing here may move realAdapterStatus, assuranceStatus or aMvpStatus; only src/lib/executors/evidence-writer.mjs reads a real crossing and decides what it means",
+    "not_isolation": "every child below is an ordinary host process under sbx-host-unisolated-v1 with isolation_observed:false",
+    "not_a_comparison_cell": "a SPEC §4 comparison cell is a governed run on a board row; the surface measurement below is a transport-level argv measurement and is labelled as such"
+  },
+  "sandbox": {
+    "profile_id": "sbx-host-unisolated-v1",
+    "tier": "HOST_UNISOLATED",
+    "isolation_observed": false,
+    "authorization": {
+      "authorization_id": "aut-hu-s2-007r-01",
+      "authorised_by_principal_id": "prn-s2007r-owner",
+      "authorised_by_label": "SpaceDazher (repository owner, BB thread thr_mgkk7cb5t6)",
+      "authority": "HUMAN_OWNER",
+      "scope": "SINGLE_PILOT_RUN",
+      "profile_id": "sbx-host-unisolated-v1",
+      "issued_at": "2026-09-26T00:00:00.000Z",
+      "expires_at": "2026-09-27T00:00:00.000Z",
+      "body_digest": "sha256:9e7fbcf23fb426af39233b188bf2b21a7e52cb0873fdbdea6206d7f67bddcc54",
+      "source": "scripts/s2-007r-authorization.mjs#buildUnisolatedAuthorization"
+    },
+    "os_controls_absence_evidence": {
+      "path": "evidence/s2-007r-host-unisolated.json",
+      "sha256": "sha256:5e253d183824c5d60d4d9e707adbf879f5ed048df4bcd70f1b739ff145967f1f",
+      "note": "the profile's own os_controls_evidence: the content address of the record that measured that no OS isolation control is available to a model-calling executor on this host"
+    }
+  },
+  "board_gate": {
+    "floor_profile": "sbx-host-unisolated-v1",
+    "floor_tier": "HOST_UNISOLATED",
+    "live_gate": {
+      "function": "policy.assertLiveExecutionAuthorized(profileId, {authorization, now})",
+      "admitted": true,
+      "tier": "HOST_UNISOLATED",
+      "authorization_id": "aut-hu-s2-007r-01",
+      "authorization_body_digest": "sha256:9e7fbcf23fb426af39233b188bf2b21a7e52cb0873fdbdea6206d7f67bddcc54"
+    },
+    "per_edge_gate": {
+      "function": "policy.assertSandboxExecutable(profileId), called for EVERY task edge by policy.assertAdapterCoversTask (src/lib/agentboard/policy.mjs:1263)",
+      "admitted": false,
+      "code": "BLOCKED_SANDBOX",
+      "message": "BLOCKED_SANDBOX"
+    },
+    "consequence": "the per-edge gate refuses the floor tier, so READY->CLAIMED, CLAIMED->RUNNING and RUNNING->IN_REVIEW are all refused BLOCKED_SANDBOX and no governed run exists on this checkout. The two gates disagree: the live gate admits the tier with the named permit, the per-edge gate admits no tier that isExecutableSandboxProfile reports, and the floor tier is deliberately NOT in that set.",
+    "the_two_agree": true,
+    "fix_owner": "src/lib/agentboard/policy.mjs is a frozen target of the S2-007/S2-002 units and is digest-bound in evidence/frozen-manifest.json; this harness does not edit it and this pilot does not ship a patch for it"
+  },
+  "workspace_root": {
+    "absolute": "/tmp/veritas-s2-007r-ws/lifecycle",
+    "mode": "0700",
+    "owner_uid": 1000,
+    "symlink_free": true,
+    "source": "INJECTED_NOT_REGISTRY",
+    "note": "the cwd of every child below; a real, 0700, symlink-free directory under /tmp, resolved by the board's own workspace guard"
+  },
+  "fixture": {
+    "source": "corpus/s2-007r/project",
+    "exists": true
+  },
+  "arms": [
+    {
+      "arm": "cancel",
+      "provider": "pi",
+      "adapter_id": "adr-pi-local",
+      "run_id": "run-lifecycle-cancel-pi",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "profile_id": "sbx-host-unisolated-v1",
+      "isolation_observed": false,
+      "prompt": "Read src/calc.js in this workspace and reply with only the number of lines it has.",
+      "model": "openrouter/amazon/nova-lite-v1",
+      "started_at": "2026-09-26T09:00:01.000Z",
+      "events": [
+        {
+          "refused": true,
+          "code": "UNKNOWN_OUTCOME",
+          "message": "RUN_OUTCOME_UNKNOWN"
+        }
+      ],
+      "terminal_event": null,
+      "cancel_proof": {
+        "verdict": "SURVIVORS_REMAINING",
+        "survivors": 1,
+        "remaining_process_ids": [
+          68331
+        ],
+        "reason": "PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "reaped_before_accounting": true,
+        "accounting": "AFTER_THE_CHILD_EXIT_WAS_OBSERVED",
+        "observer_read_staleness": "the shipped observer memoises its /proc snapshot for a short TTL (src/lib/identity/process-observer.mjs#procTable), so a survivor count taken within that window of a reap can name a pid that is already gone. A survivor set consisting only of pids this transport captured, with no process ever seen alive before the kill, must be read against an independent parent-side check of the same pids.",
+        "readings_disagree": false,
+        "pre_accounting_reading": {
+          "when": "immediately after the group signal, before the child was reaped",
+          "verdict": "SURVIVORS_REMAINING",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68331
+          ],
+          "reason": "PROCESSES_SURVIVED_THE_GROUP_KILL"
+        },
+        "accounting_reading": {
+          "when": "after the child exit was observed",
+          "verdict": "SURVIVORS_REMAINING",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68331
+          ]
+        },
+        "pids_before_kill": [],
+        "pids_after_kill": [
+          68331
+        ],
+        "signals": [
+          "SIGTERM",
+          "SIGKILL"
+        ],
+        "kill_was_needed": true,
+        "caveat": "NO_PROCESS_WAS_OBSERVED_BEFORE_THE_KILL: the survivor count covers only the processes already seen"
+      },
+      "process_before_signal": {
+        "pid": 68331,
+        "pgid": 68331,
+        "process_group_signalling": "POSIX_GROUP",
+        "exit_code": null,
+        "signal": null,
+        "cause": null,
+        "started_at": "2026-09-26T09:00:10.000Z",
+        "observed_pids": []
+      },
+      "process_after_signal": {
+        "pid": 68331,
+        "pgid": 68331,
+        "process_group_signalling": "POSIX_GROUP",
+        "exit_code": null,
+        "signal": "SIGKILL",
+        "cause": "cancel",
+        "started_at": "2026-09-26T09:00:10.000Z",
+        "observed_pids": []
+      },
+      "parent_sightings": [
+        {
+          "when": "after start() returned",
+          "pid": 68331,
+          "alive": true,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was still resolvable at the moment of this read"
+        },
+        {
+          "when": "after 900 ms",
+          "pid": 68331,
+          "alive": true,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was still resolvable at the moment of this read"
+        },
+        {
+          "when": "after the arm settled",
+          "pid": 68331,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was no longer resolvable at the moment of this read"
+        }
+      ],
+      "late_callbacks": [
+        {
+          "probe": "checkpoint with a stale expected_sequence",
+          "kind": "write",
+          "accepted": false,
+          "code": "UNKNOWN_OUTCOME",
+          "message": "RUN_OUTCOME_UNKNOWN"
+        },
+        {
+          "probe": "second cancel after the arm settled",
+          "kind": "write",
+          "accepted": false,
+          "code": "UNKNOWN_OUTCOME",
+          "message": "RUN_OUTCOME_UNKNOWN"
+        },
+        {
+          "probe": "status after the arm settled",
+          "kind": "read",
+          "accepted": false,
+          "code": "UNKNOWN_OUTCOME",
+          "message": "RUN_OUTCOME_UNKNOWN"
+        }
+      ],
+      "result": {
+        "submitted": false,
+        "refused": true,
+        "code": "UNKNOWN_OUTCOME",
+        "message": "RUN_OUTCOME_UNKNOWN"
+      },
+      "spend": {
+        "usd": null,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/cancel/pi/run-lifecycle-cancel-pi/raw/exec-000.log.json",
+          "bytes": 8588,
+          "sha256": "sha256:b3e764c3c497780c36592f16217d717783e1b0c74c4cf402a0228552e56ea633"
+        }
+      ],
+      "argv": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "openrouter/amazon/nova-lite-v1",
+        "--no-session",
+        "--no-tools",
+        "Read src/calc.js in this workspace and reply with only the number of lines it has."
+      ],
+      "error": null,
+      "wall_ms": 3243,
+      "what_this_establishes": "a real installed executor was really spawned as a POSIX process-group leader, a caller really asked the boundary to stop it, the group was really signalled, and the shipped process observer really accounted for the result",
+      "cancel_call": {
+        "accepted": false,
+        "code": "UNKNOWN_OUTCOME",
+        "message": "CANCEL_UNPROVEN:SURVIVORS_REMAINING"
+      },
+      "termination_on_terminal_event": null,
+      "reap_check": {
+        "when": "2000 ms after the arm settled",
+        "pid": 68331,
+        "alive": false,
+        "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+        "note": "the pid was no longer resolvable at the moment of this read",
+        "why": "a killed child that has not been reaped is still in the process table, so a survivor count taken at the instant of the kill can name a process that is already gone; this later reading is the independent one"
+      },
+      "readings": {
+        "observer": {
+          "when": "at the accounting point, after the child exit was observed",
+          "verdict": "SURVIVORS_REMAINING",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68331
+          ],
+          "snapshot_staleness": "the shipped observer memoises its /proc snapshot for a short TTL (src/lib/identity/process-observer.mjs#procTable), so a survivor count taken within that window of a reap can name a pid that is already gone. A survivor set consisting only of pids this transport captured, with no process ever seen alive before the kill, must be read against an independent parent-side check of the same pids."
+        },
+        "parent": {
+          "when": "2000 ms after the arm settled",
+          "pid": 68331,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process"
+        },
+        "agree": false,
+        "independent_reading_contradicts_the_observer": true,
+        "if_they_disagree": "the observer answer is KEPT as the transport's proof; the parent-side reading is published beside it. Neither is overwritten, and the clause is NOT_RUN with the observer's exact reason: a proof this transport cannot stand behind is not rounded up to a pass.",
+        "root_cause_of_the_staleness": "the shipped observer memoises its /proc snapshot for SNAPSHOT_TTL_MS (src/lib/identity/process-observer.mjs:191), so a survivor count taken inside that window of a reap can name a pid that is already gone. Measured on this host with no model involved: after the child's exit event had fired in the parent, listExisting still reported the pid alive and 1.5 s later reported it gone, while process.kill(pid, 0) answered ESRCH throughout."
+      },
+      "errors_reported_by_transport": [
+        {
+          "code": "UNKNOWN_OUTCOME",
+          "class": null,
+          "message": "CANCEL_UNPROVEN:SURVIVORS_REMAINING"
+        },
+        {
+          "code": "UNKNOWN_OUTCOME",
+          "class": null,
+          "message": "RUN_OUTCOME_UNKNOWN"
+        },
+        {
+          "code": "UNKNOWN_OUTCOME",
+          "class": null,
+          "message": "RUN_OUTCOME_UNKNOWN"
+        },
+        {
+          "code": "UNKNOWN_OUTCOME",
+          "class": null,
+          "message": "RUN_OUTCOME_UNKNOWN"
+        },
+        {
+          "code": "UNKNOWN_OUTCOME",
+          "class": null,
+          "message": "RUN_OUTCOME_UNKNOWN"
+        },
+        {
+          "code": "UNKNOWN_OUTCOME",
+          "class": null,
+          "message": "RUN_OUTCOME_UNKNOWN"
+        }
+      ],
+      "evidence": {
+        "run_id": "run-lifecycle-cancel-pi",
+        "provider": "pi",
+        "binary_path": "/home/daniil/.local/bin/pi",
+        "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+        "raw_process_log_sha256": "sha256:b3e764c3c497780c36592f16217d717783e1b0c74c4cf402a0228552e56ea633",
+        "exit_status": null,
+        "exit_observed": true
+      },
+      "clause": {
+        "observed": "NOT_RUN",
+        "reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "survivors": 1,
+        "remaining_process_ids": [
+          68331
+        ],
+        "caveat": "NO_PROCESS_WAS_OBSERVED_BEFORE_THE_KILL: the survivor count covers only the processes already seen",
+        "independent_later_reading": {
+          "when": "2000 ms after the arm settled",
+          "pid": 68331,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was no longer resolvable at the moment of this read",
+          "why": "a killed child that has not been reaped is still in the process table, so a survivor count taken at the instant of the kill can name a process that is already gone; this later reading is the independent one"
+        },
+        "why_not_a_pass": "SPEC §7 A-MVP-04: a proof of SURVIVORS_REMAINING or UNVERIFIED makes the arm NOT_RUN with that exact reason, never a CANCELLED-as-pass. This harness reports it and does not upgrade it."
+      }
+    },
+    {
+      "arm": "timeout",
+      "provider": "pi",
+      "adapter_id": "adr-pi-local",
+      "run_id": "run-lifecycle-timeout-pi",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "profile_id": "sbx-host-unisolated-v1",
+      "isolation_observed": false,
+      "prompt": "Read src/calc.js in this workspace and reply with only the number of lines it has.",
+      "model": "openrouter/amazon/nova-lite-v1",
+      "started_at": "2026-09-26T09:00:25.000Z",
+      "events": [
+        {
+          "sequence": 2,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 3,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 4,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 5,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 6,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 7,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 8,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 9,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 10,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 11,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 12,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 13,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 14,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 15,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 16,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 17,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 18,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 19,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 20,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 21,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 22,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 23,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 24,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 25,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 26,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 27,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 28,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 29,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 30,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 31,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 32,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 33,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 34,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 35,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 36,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 37,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 38,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 39,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 40,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 41,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 42,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 43,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 44,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 45,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 46,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 47,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 48,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 49,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 50,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 51,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 52,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 53,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 54,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 55,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 56,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 57,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 58,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 59,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 60,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 61,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 62,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 63,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 64,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 65,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 66,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 67,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 68,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 69,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 70,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 71,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 72,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 73,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 74,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 75,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 76,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 77,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 78,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 79,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 80,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 81,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 82,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 83,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 84,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 85,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 86,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 87,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 88,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 89,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 90,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 91,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 92,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 93,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 94,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 95,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 96,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 97,
+          "event_type": "PROGRESS",
+          "outcome": null
+        }
+      ],
+      "terminal_event": {
+        "sequence": 97,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      "cancel_proof": {
+        "verdict": "SURVIVORS_REMAINING",
+        "survivors": 1,
+        "remaining_process_ids": [
+          68478
+        ],
+        "reason": "PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "reaped_before_accounting": true,
+        "accounting": "AFTER_THE_CHILD_EXIT_WAS_OBSERVED",
+        "observer_read_staleness": "the shipped observer memoises its /proc snapshot for a short TTL (src/lib/identity/process-observer.mjs#procTable), so a survivor count taken within that window of a reap can name a pid that is already gone. A survivor set consisting only of pids this transport captured, with no process ever seen alive before the kill, must be read against an independent parent-side check of the same pids.",
+        "readings_disagree": false,
+        "pre_accounting_reading": {
+          "when": "immediately after the group signal, before the child was reaped",
+          "verdict": "SURVIVORS_REMAINING",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68478
+          ],
+          "reason": "PROCESSES_SURVIVED_THE_GROUP_KILL"
+        },
+        "accounting_reading": {
+          "when": "after the child exit was observed",
+          "verdict": "SURVIVORS_REMAINING",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68478
+          ]
+        },
+        "pids_before_kill": [],
+        "pids_after_kill": [
+          68478
+        ],
+        "signals": [
+          "SIGTERM",
+          "SIGKILL"
+        ],
+        "kill_was_needed": true,
+        "caveat": "NO_PROCESS_WAS_OBSERVED_BEFORE_THE_KILL: the survivor count covers only the processes already seen"
+      },
+      "process_before_signal": {
+        "pid": 68478,
+        "pgid": 68478,
+        "process_group_signalling": "POSIX_GROUP",
+        "exit_code": null,
+        "signal": null,
+        "cause": null,
+        "started_at": "2026-09-26T09:00:34.000Z",
+        "observed_pids": []
+      },
+      "process_after_signal": {
+        "pid": 68478,
+        "pgid": 68478,
+        "process_group_signalling": "POSIX_GROUP",
+        "exit_code": null,
+        "signal": "SIGKILL",
+        "cause": "timeout",
+        "started_at": "2026-09-26T09:00:34.000Z",
+        "observed_pids": []
+      },
+      "parent_sightings": [
+        {
+          "when": "after start() returned",
+          "pid": 68478,
+          "alive": true,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was still resolvable at the moment of this read"
+        },
+        {
+          "when": "after the arm settled",
+          "pid": 68478,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was no longer resolvable at the moment of this read"
+        }
+      ],
+      "late_callbacks": [
+        {
+          "probe": "checkpoint with a stale expected_sequence",
+          "kind": "write",
+          "accepted": false,
+          "code": "MALFORMED_RESULT",
+          "message": "CALL_SEQUENCE_DUPLICATE:expected 99 got 1"
+        },
+        {
+          "probe": "second cancel after the arm settled",
+          "kind": "write",
+          "accepted": false,
+          "code": "MALFORMED_RESULT",
+          "message": "CANCEL_AFTER_TERMINAL"
+        },
+        {
+          "probe": "status after the arm settled",
+          "kind": "read",
+          "accepted": true,
+          "note": "accepted: this is a read, and delivering the terminal event to a reader is what it is for",
+          "value": {
+            "sequence": 98,
+            "event_type": "UNKNOWN"
+          }
+        }
+      ],
+      "result": {
+        "submitted": true,
+        "outcome": "RECONCILIATION_REQUIRED",
+        "sequence": 98,
+        "error": {
+          "code": "RECONCILIATION_REQUIRED",
+          "message": "RECONCILIATION_REQUIRED"
+        },
+        "measurements": {
+          "duration_ms": 199000,
+          "spend": 0,
+          "currency": "USD",
+          "model_id": null,
+          "tool_calls": 0
+        },
+        "document": {
+          "contract_version": "veritas.execution/1.0.0",
+          "run_id": "run-lifecycle-timeout-pi",
+          "task_id": "abt-lc-timeout-pi",
+          "workspace_id": "ws-s2007r-lifecycle",
+          "lease_id": "lse-lc-timeout-pi",
+          "fencing_token": 1,
+          "sequence": 98,
+          "outcome": "RECONCILIATION_REQUIRED",
+          "checkpoints": [],
+          "artifact_hashes": [],
+          "measurements": {
+            "duration_ms": 199000,
+            "spend": 0,
+            "currency": "USD",
+            "model_id": null,
+            "tool_calls": 0
+          },
+          "error": {
+            "contractVersion": "1.0.0",
+            "code": "RECONCILIATION_REQUIRED",
+            "message": "RECONCILIATION_REQUIRED",
+            "retryable": false,
+            "detail": "recorded terminal outcome RECONCILIATION_REQUIRED",
+            "occurred_at": "2026-09-26T09:03:51.000Z"
+          },
+          "reconciliation_required": true,
+          "completed_at": "2026-09-26T09:03:53.000Z"
+        }
+      },
+      "spend": {
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR",
+        "note": "the executor's own reported figure; nothing here is priced from a published rate card"
+      },
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/timeout/pi/run-lifecycle-timeout-pi/raw/exec-000.log.json",
+          "bytes": 14916,
+          "sha256": "sha256:bec6d865e39aaea2f78a809234808de1db7c251a4a81dbbb08c35ed52f55a926"
+        }
+      ],
+      "argv": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "openrouter/amazon/nova-lite-v1",
+        "--no-session",
+        "--no-tools",
+        "Read src/calc.js in this workspace and reply with only the number of lines it has."
+      ],
+      "error": null,
+      "wall_ms": 7514,
+      "what_this_establishes": "a real installed executor really ran under a granted deadline and really was stopped by the transport's own timer, with the same group proof",
+      "wait_note": "no call was made after start(): the granted timeout_ms (1500) is the transport's own deadline",
+      "termination_on_terminal_event": null,
+      "reap_check": {
+        "when": "2000 ms after the arm settled",
+        "pid": 68478,
+        "alive": false,
+        "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+        "note": "the pid was no longer resolvable at the moment of this read",
+        "why": "a killed child that has not been reaped is still in the process table, so a survivor count taken at the instant of the kill can name a process that is already gone; this later reading is the independent one"
+      },
+      "readings": {
+        "observer": {
+          "when": "at the accounting point, after the child exit was observed",
+          "verdict": "SURVIVORS_REMAINING",
+          "survivors": 1,
+          "remaining_process_ids": [
+            68478
+          ],
+          "snapshot_staleness": "the shipped observer memoises its /proc snapshot for a short TTL (src/lib/identity/process-observer.mjs#procTable), so a survivor count taken within that window of a reap can name a pid that is already gone. A survivor set consisting only of pids this transport captured, with no process ever seen alive before the kill, must be read against an independent parent-side check of the same pids."
+        },
+        "parent": {
+          "when": "2000 ms after the arm settled",
+          "pid": 68478,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process"
+        },
+        "agree": false,
+        "independent_reading_contradicts_the_observer": true,
+        "if_they_disagree": "the observer answer is KEPT as the transport's proof; the parent-side reading is published beside it. Neither is overwritten, and the clause is NOT_RUN with the observer's exact reason: a proof this transport cannot stand behind is not rounded up to a pass.",
+        "root_cause_of_the_staleness": "the shipped observer memoises its /proc snapshot for SNAPSHOT_TTL_MS (src/lib/identity/process-observer.mjs:191), so a survivor count taken inside that window of a reap can name a pid that is already gone. Measured on this host with no model involved: after the child's exit event had fired in the parent, listExisting still reported the pid alive and 1.5 s later reported it gone, while process.kill(pid, 0) answered ESRCH throughout."
+      },
+      "errors_reported_by_transport": [
+        {
+          "code": "MALFORMED_RESULT",
+          "class": null,
+          "message": "CALL_SEQUENCE_DUPLICATE:expected 99 got 1"
+        },
+        {
+          "code": "MALFORMED_RESULT",
+          "class": null,
+          "message": "CANCEL_AFTER_TERMINAL"
+        }
+      ],
+      "evidence": {
+        "run_id": "run-lifecycle-timeout-pi",
+        "provider": "pi",
+        "binary_path": "/home/daniil/.local/bin/pi",
+        "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+        "raw_process_log_sha256": "sha256:bec6d865e39aaea2f78a809234808de1db7c251a4a81dbbb08c35ed52f55a926",
+        "exit_status": null,
+        "exit_observed": true
+      },
+      "clause": {
+        "observed": "NOT_RUN",
+        "reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL",
+        "survivors": 1,
+        "remaining_process_ids": [
+          68478
+        ],
+        "caveat": "NO_PROCESS_WAS_OBSERVED_BEFORE_THE_KILL: the survivor count covers only the processes already seen",
+        "independent_later_reading": {
+          "when": "2000 ms after the arm settled",
+          "pid": 68478,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was no longer resolvable at the moment of this read",
+          "why": "a killed child that has not been reaped is still in the process table, so a survivor count taken at the instant of the kill can name a process that is already gone; this later reading is the independent one"
+        },
+        "why_not_a_pass": "SPEC §7 A-MVP-04: a proof of SURVIVORS_REMAINING or UNVERIFIED makes the arm NOT_RUN with that exact reason, never a CANCELLED-as-pass. This harness reports it and does not upgrade it."
+      }
+    },
+    {
+      "arm": "sigkill",
+      "provider": "pi",
+      "adapter_id": "adr-pi-local",
+      "run_id": "run-lifecycle-sigkill-pi",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "profile_id": "sbx-host-unisolated-v1",
+      "isolation_observed": false,
+      "prompt": "Read src/calc.js in this workspace and reply with only the number of lines it has.",
+      "model": "openrouter/amazon/nova-lite-v1",
+      "started_at": "2026-09-26T09:03:59.000Z",
+      "events": [
+        {
+          "sequence": 2,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 3,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 4,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 5,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 6,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 7,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 8,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 9,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 10,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 11,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 12,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 13,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 14,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 15,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 16,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 17,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 18,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 19,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 20,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 21,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 22,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 23,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 24,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 25,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 26,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 27,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 28,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 29,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 30,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 31,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 32,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 33,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 34,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 35,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 36,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 37,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 38,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 39,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 40,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 41,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 42,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 43,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 44,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 45,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 46,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 47,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 48,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 49,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 50,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 51,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 52,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 53,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 54,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 55,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 56,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 57,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 58,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 59,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 60,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 61,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 62,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 63,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 64,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 65,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 66,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 67,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 68,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 69,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 70,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 71,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 72,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 73,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 74,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 75,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 76,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 77,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 78,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 79,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 80,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 81,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 82,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 83,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 84,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 85,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 86,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 87,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 88,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 89,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 90,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 91,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 92,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 93,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 94,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 95,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 96,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 97,
+          "event_type": "PROGRESS",
+          "outcome": null
+        }
+      ],
+      "terminal_event": {
+        "sequence": 97,
+        "event_type": "PROGRESS",
+        "outcome": null
+      },
+      "cancel_proof": null,
+      "process_before_signal": {
+        "pid": 68799,
+        "pgid": 68799,
+        "process_group_signalling": "POSIX_GROUP",
+        "exit_code": null,
+        "signal": null,
+        "cause": null,
+        "started_at": "2026-09-26T09:04:08.000Z",
+        "observed_pids": []
+      },
+      "process_after_signal": {
+        "pid": 68799,
+        "pgid": 68799,
+        "process_group_signalling": "POSIX_GROUP",
+        "exit_code": null,
+        "signal": "SIGKILL",
+        "cause": null,
+        "started_at": "2026-09-26T09:04:08.000Z",
+        "observed_pids": []
+      },
+      "parent_sightings": [
+        {
+          "when": "after start() returned",
+          "pid": 68799,
+          "alive": true,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was still resolvable at the moment of this read"
+        },
+        {
+          "when": "after 900 ms",
+          "pid": 68799,
+          "alive": true,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was still resolvable at the moment of this read"
+        },
+        {
+          "when": "after the arm settled",
+          "pid": 68799,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+          "note": "the pid was no longer resolvable at the moment of this read"
+        }
+      ],
+      "late_callbacks": [
+        {
+          "probe": "checkpoint with a stale expected_sequence",
+          "kind": "write",
+          "accepted": false,
+          "code": "MALFORMED_RESULT",
+          "message": "CALL_SEQUENCE_DUPLICATE:expected 99 got 1"
+        },
+        {
+          "probe": "second cancel after the arm settled",
+          "kind": "write",
+          "accepted": false,
+          "code": "MALFORMED_RESULT",
+          "message": "CANCEL_AFTER_TERMINAL"
+        },
+        {
+          "probe": "status after the arm settled",
+          "kind": "read",
+          "accepted": true,
+          "note": "accepted: this is a read, and delivering the terminal event to a reader is what it is for",
+          "value": {
+            "sequence": 98,
+            "event_type": "UNKNOWN"
+          }
+        }
+      ],
+      "result": {
+        "submitted": true,
+        "outcome": "RECONCILIATION_REQUIRED",
+        "sequence": 98,
+        "error": {
+          "code": "RECONCILIATION_REQUIRED",
+          "message": "RECONCILIATION_REQUIRED"
+        },
+        "measurements": {
+          "duration_ms": 200000,
+          "spend": 0,
+          "currency": "USD",
+          "model_id": null,
+          "tool_calls": 0
+        },
+        "document": {
+          "contract_version": "veritas.execution/1.0.0",
+          "run_id": "run-lifecycle-sigkill-pi",
+          "task_id": "abt-lc-sigkill-pi",
+          "workspace_id": "ws-s2007r-lifecycle",
+          "lease_id": "lse-lc-sigkill-pi",
+          "fencing_token": 1,
+          "sequence": 98,
+          "outcome": "RECONCILIATION_REQUIRED",
+          "checkpoints": [],
+          "artifact_hashes": [],
+          "measurements": {
+            "duration_ms": 200000,
+            "spend": 0,
+            "currency": "USD",
+            "model_id": null,
+            "tool_calls": 0
+          },
+          "error": {
+            "contractVersion": "1.0.0",
+            "code": "RECONCILIATION_REQUIRED",
+            "message": "RECONCILIATION_REQUIRED",
+            "retryable": false,
+            "detail": "recorded terminal outcome RECONCILIATION_REQUIRED",
+            "occurred_at": "2026-09-26T09:07:26.000Z"
+          },
+          "reconciliation_required": true,
+          "completed_at": "2026-09-26T09:07:28.000Z"
+        }
+      },
+      "spend": {
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR",
+        "note": "the executor's own reported figure; nothing here is priced from a published rate card"
+      },
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/sigkill/pi/run-lifecycle-sigkill-pi/raw/exec-000.log.json",
+          "bytes": 13435,
+          "sha256": "sha256:014ee3597c2b0add8f1b440b4ed9b8dfbb4589d51b59e4c014de9a184db1ad6c"
+        }
+      ],
+      "argv": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "openrouter/amazon/nova-lite-v1",
+        "--no-session",
+        "--no-tools",
+        "Read src/calc.js in this workspace and reply with only the number of lines it has."
+      ],
+      "error": null,
+      "wall_ms": 6916,
+      "what_this_establishes": "a real installed executor's process group really was killed by a third party with no call into the boundary, and the boundary really accounted for the crossing it could not acknowledge",
+      "external_signal": {
+        "attempted": true,
+        "target": "process group",
+        "pgid": 68799,
+        "method": "process.kill(-pgid, \"SIGKILL\") from the harness process",
+        "sent": "SIGKILL"
+      },
+      "termination_on_terminal_event": null,
+      "proof_absent_reason": "the child was killed by a signal this transport never sent, so it ran no kill of its own and there is no kill of ITSS to prove; the boundary's job here is to reconcile the crossing it cannot acknowledge",
+      "reap_check": {
+        "when": "2000 ms after the arm settled",
+        "pid": 68799,
+        "alive": false,
+        "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process",
+        "note": "the pid was no longer resolvable at the moment of this read",
+        "why": "a killed child that has not been reaped is still in the process table, so a survivor count taken at the instant of the kill can name a process that is already gone; this later reading is the independent one"
+      },
+      "readings": {
+        "observer": {
+          "when": "at the accounting point, after the child exit was observed",
+          "verdict": null,
+          "survivors": null,
+          "remaining_process_ids": null,
+          "snapshot_staleness": null
+        },
+        "parent": {
+          "when": "2000 ms after the arm settled",
+          "pid": 68799,
+          "alive": false,
+          "method": "process.kill(pid, 0) from the PARENT of the transport, i.e. this harness process"
+        },
+        "agree": null,
+        "independent_reading_contradicts_the_observer": null,
+        "if_they_disagree": "the observer answer is KEPT as the transport's proof; the parent-side reading is published beside it. Neither is overwritten, and the clause is NOT_RUN with the observer's exact reason: a proof this transport cannot stand behind is not rounded up to a pass.",
+        "root_cause_of_the_staleness": "the shipped observer memoises its /proc snapshot for SNAPSHOT_TTL_MS (src/lib/identity/process-observer.mjs:191), so a survivor count taken inside that window of a reap can name a pid that is already gone. Measured on this host with no model involved: after the child's exit event had fired in the parent, listExisting still reported the pid alive and 1.5 s later reported it gone, while process.kill(pid, 0) answered ESRCH throughout."
+      },
+      "errors_reported_by_transport": [
+        {
+          "code": "MALFORMED_RESULT",
+          "class": null,
+          "message": "CALL_SEQUENCE_DUPLICATE:expected 99 got 1"
+        },
+        {
+          "code": "MALFORMED_RESULT",
+          "class": null,
+          "message": "CANCEL_AFTER_TERMINAL"
+        }
+      ],
+      "evidence": {
+        "run_id": "run-lifecycle-sigkill-pi",
+        "provider": "pi",
+        "binary_path": "/home/daniil/.local/bin/pi",
+        "binary_sha256": "sha256:e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+        "raw_process_log_sha256": "sha256:014ee3597c2b0add8f1b440b4ed9b8dfbb4589d51b59e4c014de9a184db1ad6c",
+        "exit_status": null,
+        "exit_observed": true
+      },
+      "clause": {
+        "observed": "OBSERVED",
+        "external_signal": {
+          "attempted": true,
+          "target": "process group",
+          "pgid": 68799,
+          "method": "process.kill(-pgid, \"SIGKILL\") from the harness process",
+          "sent": "SIGKILL"
+        },
+        "process_resolvable_later": false,
+        "note": "a third party killed the process group with no call into the boundary, and the boundary accounted for the crossing it could not acknowledge"
+      }
+    }
+  ],
+  "surfaces": [
+    {
+      "provider": "codex",
+      "configuration": "A",
+      "requested_surface": "A",
+      "run_id": "run-surface-codex-a",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "isolation_observed": false,
+      "model": "veritas-s2-007r-nonexistent/no-such-model",
+      "model_rationale": "unresolvable on purpose: a real process, a real argv and a real non-zero exit, with no billable token",
+      "argv": [
+        "exec",
+        "--json",
+        "--skip-git-repo-check",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "/tmp/veritas-s2-007r-ws/lifecycle/project",
+        "--output-last-message",
+        "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/lifecycle/surface/codex/a/run-surface-codex-a/raw/last-message.txt",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "Say PING."
+      ],
+      "argv_digest": "sha256:94c14e6ddf7f51c2ca8ea66084fd4843b4dba9765489602bd85ee5ab077fe266",
+      "exit_status": 1,
+      "outcome": "FAILED",
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/surface/codex/a/run-surface-codex-a/raw/exec-000.log.json",
+          "bytes": 16368,
+          "sha256": "sha256:9c30b5ef1828d995f18db0c4d7ff87d54b8ec85adac75b7156d61140c406442e"
+        }
+      ],
+      "spend": {
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR",
+        "note": "the executor's own reported figure; nothing here is priced from a published rate card"
+      },
+      "events": [
+        {
+          "sequence": 2,
+          "event_type": "STARTED",
+          "outcome": null
+        },
+        {
+          "sequence": 3,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 4,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 5,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 6,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 7,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 8,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 9,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 10,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 11,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 12,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 13,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 14,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 15,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 16,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 17,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 18,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 19,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 20,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 21,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 22,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 23,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 24,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 25,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 26,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 27,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 28,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 29,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 30,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 31,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 32,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 33,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 34,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 35,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 36,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 37,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 38,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 39,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 40,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 41,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 42,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 43,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 44,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 45,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 46,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 47,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 48,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 49,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 50,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 51,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 52,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 53,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 54,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 55,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 56,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 57,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 58,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 59,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 60,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 61,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 62,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 63,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 64,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 65,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 66,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 67,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 68,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 69,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 70,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 71,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 72,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 73,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 74,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 75,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 76,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 77,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 78,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 79,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 80,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 81,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 82,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 83,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 84,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 85,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 86,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 87,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 88,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 89,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 90,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 91,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 92,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 93,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 94,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 95,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 96,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 97,
+          "event_type": "PROGRESS",
+          "outcome": null
+        }
+      ],
+      "error": null,
+      "note": "the surface is a required, validated argument of the transport (issue #45, round 3): this arm names the end of the axis it is measuring, and the transport publishes the flags it selected plus BOTH argv digests in its own raw process log. The normalised digest is what the comparison below asserts on.",
+      "argv_digest_raw": "sha256:e5740348141722a66d25ca25015893efef6b1757b09dabfd3094664d8696d19a",
+      "argv_normalised": [
+        "exec",
+        "--json",
+        "--skip-git-repo-check",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "<project_root>",
+        "--output-last-message",
+        "<evidence_dir>/<run_id>/raw/last-message.txt",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "Say PING."
+      ],
+      "argv_normalisation_rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
+      "argv_digest_recomputed_by_this_harness": "sha256:94c14e6ddf7f51c2ca8ea66084fd4843b4dba9765489602bd85ee5ab077fe266",
+      "argv_digest_agrees": true,
+      "selected_configuration": "A",
+      "selected_surface_flags": [],
+      "configuration_axis": {
+        "axis": "context_surface",
+        "provider": "codex",
+        "configurations": [
+          "A",
+          "B"
+        ],
+        "configuration_a_flags": [],
+        "configuration_b_flags": [],
+        "distinguishable": false,
+        "reason": "codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\".",
+        "measured": {
+          "measured_on": "this host, codex-cli 0.157.1",
+          "evidence": "`codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch",
+          "distinguishable": false
+        },
+        "exclusion": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\"."
+      }
+    },
+    {
+      "provider": "codex",
+      "configuration": "B",
+      "requested_surface": "B",
+      "run_id": "run-surface-codex-b",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "isolation_observed": false,
+      "model": "veritas-s2-007r-nonexistent/no-such-model",
+      "model_rationale": "unresolvable on purpose: a real process, a real argv and a real non-zero exit, with no billable token",
+      "argv": [
+        "exec",
+        "--json",
+        "--skip-git-repo-check",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "/tmp/veritas-s2-007r-ws/lifecycle/project",
+        "--output-last-message",
+        "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/results/s2-007r/lifecycle/surface/codex/b/run-surface-codex-b/raw/last-message.txt",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "Say PING."
+      ],
+      "argv_digest": "sha256:94c14e6ddf7f51c2ca8ea66084fd4843b4dba9765489602bd85ee5ab077fe266",
+      "exit_status": 1,
+      "outcome": "FAILED",
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/surface/codex/b/run-surface-codex-b/raw/exec-000.log.json",
+          "bytes": 16231,
+          "sha256": "sha256:cb0852fb4a055b76da1f48184cea71fb7a162ce16cfa29449bd12b8abd676a45"
+        }
+      ],
+      "spend": {
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR",
+        "note": "the executor's own reported figure; nothing here is priced from a published rate card"
+      },
+      "events": [
+        {
+          "sequence": 2,
+          "event_type": "STARTED",
+          "outcome": null
+        },
+        {
+          "sequence": 3,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 4,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 5,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 6,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 7,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 8,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 9,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 10,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 11,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 12,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 13,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 14,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 15,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 16,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 17,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 18,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 19,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 20,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 21,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 22,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 23,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 24,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 25,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 26,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 27,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 28,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 29,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 30,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 31,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 32,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 33,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 34,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 35,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 36,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 37,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 38,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 39,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 40,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 41,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 42,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 43,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 44,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 45,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 46,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 47,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 48,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 49,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 50,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 51,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 52,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 53,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 54,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 55,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 56,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 57,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 58,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 59,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 60,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 61,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 62,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 63,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 64,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 65,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 66,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 67,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 68,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 69,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 70,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 71,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 72,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 73,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 74,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 75,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 76,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 77,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 78,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 79,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 80,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 81,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 82,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 83,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 84,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 85,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 86,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 87,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 88,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 89,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 90,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 91,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 92,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 93,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 94,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 95,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 96,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 97,
+          "event_type": "PROGRESS",
+          "outcome": null
+        }
+      ],
+      "error": null,
+      "note": "the surface is a required, validated argument of the transport (issue #45, round 3): this arm names the end of the axis it is measuring, and the transport publishes the flags it selected plus BOTH argv digests in its own raw process log. The normalised digest is what the comparison below asserts on.",
+      "argv_digest_raw": "sha256:1453a976bc96a2db82410043434c00045993a37da8e33ef94ce749a0764f04dd",
+      "argv_normalised": [
+        "exec",
+        "--json",
+        "--skip-git-repo-check",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "<project_root>",
+        "--output-last-message",
+        "<evidence_dir>/<run_id>/raw/last-message.txt",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "Say PING."
+      ],
+      "argv_normalisation_rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
+      "argv_digest_recomputed_by_this_harness": "sha256:94c14e6ddf7f51c2ca8ea66084fd4843b4dba9765489602bd85ee5ab077fe266",
+      "argv_digest_agrees": true,
+      "selected_configuration": "B",
+      "selected_surface_flags": [],
+      "configuration_axis": {
+        "axis": "context_surface",
+        "provider": "codex",
+        "configurations": [
+          "A",
+          "B"
+        ],
+        "configuration_a_flags": [],
+        "configuration_b_flags": [],
+        "distinguishable": false,
+        "reason": "codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\".",
+        "measured": {
+          "measured_on": "this host, codex-cli 0.157.1",
+          "evidence": "`codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch",
+          "distinguishable": false
+        },
+        "exclusion": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\"."
+      }
+    },
+    {
+      "provider": "pi",
+      "configuration": "A",
+      "requested_surface": "A",
+      "run_id": "run-surface-pi-a",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "isolation_observed": false,
+      "model": "veritas-s2-007r-nonexistent/no-such-model",
+      "model_rationale": "unresolvable on purpose: a real process, a real argv and a real non-zero exit, with no billable token",
+      "argv": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "--no-session",
+        "--no-tools",
+        "Say PING."
+      ],
+      "argv_digest": "sha256:865eb6834905a0f58c354ef3af0928f8442339c0acbabe91b4a1f52380dd9d04",
+      "exit_status": 1,
+      "outcome": "TIMEOUT",
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/surface/pi/a/run-surface-pi-a/raw/exec-000.log.json",
+          "bytes": 13296,
+          "sha256": "sha256:8fadc438a391c1d028705db8dff60a1622bf4e1be075b97272baaa33d5ad1396"
+        }
+      ],
+      "spend": {
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR",
+        "note": "the executor's own reported figure; nothing here is priced from a published rate card"
+      },
+      "events": [
+        {
+          "sequence": 2,
+          "event_type": "STARTED",
+          "outcome": null
+        },
+        {
+          "sequence": 3,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 4,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 5,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 6,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 7,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 8,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 9,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 10,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 11,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 12,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 13,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 14,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 15,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 16,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 17,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 18,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 19,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 20,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 21,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 22,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 23,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 24,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 25,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 26,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 27,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 28,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 29,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 30,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 31,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 32,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 33,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 34,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 35,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 36,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 37,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 38,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 39,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 40,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 41,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 42,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 43,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 44,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 45,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 46,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 47,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 48,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 49,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 50,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 51,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 52,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 53,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 54,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 55,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 56,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 57,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 58,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 59,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 60,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 61,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 62,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 63,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 64,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 65,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 66,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 67,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 68,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 69,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 70,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 71,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 72,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 73,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 74,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 75,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 76,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 77,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 78,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 79,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 80,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 81,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 82,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 83,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 84,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 85,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 86,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 87,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 88,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 89,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 90,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 91,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 92,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 93,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 94,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 95,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 96,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 97,
+          "event_type": "PROGRESS",
+          "outcome": null
+        }
+      ],
+      "error": null,
+      "note": "the surface is a required, validated argument of the transport (issue #45, round 3): this arm names the end of the axis it is measuring, and the transport publishes the flags it selected plus BOTH argv digests in its own raw process log. The normalised digest is what the comparison below asserts on.",
+      "argv_digest_raw": "sha256:865eb6834905a0f58c354ef3af0928f8442339c0acbabe91b4a1f52380dd9d04",
+      "argv_normalised": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "--no-session",
+        "--no-tools",
+        "Say PING."
+      ],
+      "argv_normalisation_rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
+      "argv_digest_recomputed_by_this_harness": "sha256:865eb6834905a0f58c354ef3af0928f8442339c0acbabe91b4a1f52380dd9d04",
+      "argv_digest_agrees": true,
+      "selected_configuration": "A",
+      "selected_surface_flags": [],
+      "configuration_axis": {
+        "axis": "context_surface",
+        "provider": "pi",
+        "configurations": [
+          "A",
+          "B"
+        ],
+        "configuration_a_flags": [],
+        "configuration_b_flags": [
+          "--no-skills",
+          "--no-extensions",
+          "--no-prompt-templates",
+          "--no-context-files",
+          "--no-themes"
+        ],
+        "distinguishable": true,
+        "reason": null,
+        "measured": {
+          "measured_on": "this host, pi 0.87.1",
+          "evidence": "`pi --help` documents --no-skills, --no-extensions, --no-prompt-templates, --no-context-files and --no-themes",
+          "distinguishable": true
+        },
+        "exclusion": null
+      }
+    },
+    {
+      "provider": "pi",
+      "configuration": "B",
+      "requested_surface": "B",
+      "run_id": "run-surface-pi-b",
+      "board_commands_called": 0,
+      "governed": false,
+      "is_a_run": false,
+      "isolation_observed": false,
+      "model": "veritas-s2-007r-nonexistent/no-such-model",
+      "model_rationale": "unresolvable on purpose: a real process, a real argv and a real non-zero exit, with no billable token",
+      "argv": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "--no-session",
+        "--no-tools",
+        "--no-skills",
+        "--no-extensions",
+        "--no-prompt-templates",
+        "--no-context-files",
+        "--no-themes",
+        "Say PING."
+      ],
+      "argv_digest": "sha256:d03454b68b61ab71561bed7bf857998308956f8806c32a774ca2ceb74fe6d92d",
+      "exit_status": 1,
+      "outcome": "TIMEOUT",
+      "raw_logs": [
+        {
+          "path": "results/s2-007r/lifecycle/surface/pi/b/run-surface-pi-b/raw/exec-000.log.json",
+          "bytes": 13541,
+          "sha256": "sha256:dfe77ab22d999c17df79bf7f22ce2ec2067b1d77a0f9c6abe9f308b4a89d4680"
+        }
+      ],
+      "spend": {
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR",
+        "note": "the executor's own reported figure; nothing here is priced from a published rate card"
+      },
+      "events": [
+        {
+          "sequence": 2,
+          "event_type": "STARTED",
+          "outcome": null
+        },
+        {
+          "sequence": 3,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 4,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 5,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 6,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 7,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 8,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 9,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 10,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 11,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 12,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 13,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 14,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 15,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 16,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 17,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 18,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 19,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 20,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 21,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 22,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 23,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 24,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 25,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 26,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 27,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 28,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 29,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 30,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 31,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 32,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 33,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 34,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 35,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 36,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 37,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 38,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 39,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 40,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 41,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 42,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 43,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 44,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 45,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 46,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 47,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 48,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 49,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 50,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 51,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 52,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 53,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 54,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 55,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 56,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 57,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 58,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 59,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 60,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 61,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 62,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 63,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 64,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 65,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 66,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 67,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 68,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 69,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 70,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 71,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 72,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 73,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 74,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 75,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 76,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 77,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 78,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 79,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 80,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 81,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 82,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 83,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 84,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 85,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 86,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 87,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 88,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 89,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 90,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 91,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 92,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 93,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 94,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 95,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 96,
+          "event_type": "PROGRESS",
+          "outcome": null
+        },
+        {
+          "sequence": 97,
+          "event_type": "PROGRESS",
+          "outcome": null
+        }
+      ],
+      "error": null,
+      "note": "the surface is a required, validated argument of the transport (issue #45, round 3): this arm names the end of the axis it is measuring, and the transport publishes the flags it selected plus BOTH argv digests in its own raw process log. The normalised digest is what the comparison below asserts on.",
+      "argv_digest_raw": "sha256:d03454b68b61ab71561bed7bf857998308956f8806c32a774ca2ceb74fe6d92d",
+      "argv_normalised": [
+        "-p",
+        "--mode",
+        "json",
+        "--model",
+        "veritas-s2-007r-nonexistent/no-such-model",
+        "--no-session",
+        "--no-tools",
+        "--no-skills",
+        "--no-extensions",
+        "--no-prompt-templates",
+        "--no-context-files",
+        "--no-themes",
+        "Say PING."
+      ],
+      "argv_normalisation_rule": "per-run values are folded out (the resolved project directory, the evidence root, the injected containment roots, the run id); nothing else is touched, so a difference that survives normalisation is a difference in the command itself",
+      "argv_digest_recomputed_by_this_harness": "sha256:d03454b68b61ab71561bed7bf857998308956f8806c32a774ca2ceb74fe6d92d",
+      "argv_digest_agrees": true,
+      "selected_configuration": "B",
+      "selected_surface_flags": [
+        "--no-skills",
+        "--no-extensions",
+        "--no-prompt-templates",
+        "--no-context-files",
+        "--no-themes"
+      ],
+      "configuration_axis": {
+        "axis": "context_surface",
+        "provider": "pi",
+        "configurations": [
+          "A",
+          "B"
+        ],
+        "configuration_a_flags": [],
+        "configuration_b_flags": [
+          "--no-skills",
+          "--no-extensions",
+          "--no-prompt-templates",
+          "--no-context-files",
+          "--no-themes"
+        ],
+        "distinguishable": true,
+        "reason": null,
+        "measured": {
+          "measured_on": "this host, pi 0.87.1",
+          "evidence": "`pi --help` documents --no-skills, --no-extensions, --no-prompt-templates, --no-context-files and --no-themes",
+          "distinguishable": true
+        },
+        "exclusion": null
+      }
+    }
+  ],
+  "surface_comparison": [
+    {
+      "provider": "codex",
+      "configuration_a": {
+        "run_id": "run-surface-codex-a",
+        "selected_configuration": "A",
+        "surface_flags": [],
+        "argv": [
+          "exec",
+          "--json",
+          "--skip-git-repo-check",
+          "--ephemeral",
+          "--sandbox",
+          "read-only",
+          "-C",
+          "<project_root>",
+          "--output-last-message",
+          "<evidence_dir>/<run_id>/raw/last-message.txt",
+          "--model",
+          "veritas-s2-007r-nonexistent/no-such-model",
+          "Say PING."
+        ],
+        "argv_digest_raw": "sha256:e5740348141722a66d25ca25015893efef6b1757b09dabfd3094664d8696d19a",
+        "argv_digest": "sha256:94c14e6ddf7f51c2ca8ea66084fd4843b4dba9765489602bd85ee5ab077fe266",
+        "argv_digest_agrees": true,
+        "exit_status": 1
+      },
+      "configuration_b": {
+        "run_id": "run-surface-codex-b",
+        "selected_configuration": "B",
+        "surface_flags": [],
+        "argv": [
+          "exec",
+          "--json",
+          "--skip-git-repo-check",
+          "--ephemeral",
+          "--sandbox",
+          "read-only",
+          "-C",
+          "<project_root>",
+          "--output-last-message",
+          "<evidence_dir>/<run_id>/raw/last-message.txt",
+          "--model",
+          "veritas-s2-007r-nonexistent/no-such-model",
+          "Say PING."
+        ],
+        "argv_digest_raw": "sha256:1453a976bc96a2db82410043434c00045993a37da8e33ef94ce749a0764f04dd",
+        "argv_digest": "sha256:94c14e6ddf7f51c2ca8ea66084fd4843b4dba9765489602bd85ee5ab077fe266",
+        "argv_digest_agrees": true,
+        "exit_status": 1
+      },
+      "argv_identical": true,
+      "surface_axis_exists": false,
+      "configuration_axis": {
+        "axis": "context_surface",
+        "provider": "codex",
+        "configurations": [
+          "A",
+          "B"
+        ],
+        "configuration_a_flags": [],
+        "configuration_b_flags": [],
+        "distinguishable": false,
+        "reason": "codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\".",
+        "measured": {
+          "measured_on": "this host, codex-cli 0.157.1",
+          "evidence": "`codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch",
+          "distinguishable": false
+        },
+        "exclusion": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\"."
+      },
+      "excluded_from_comparison": "EXCLUDED_FROM_COMPARISON:codex:codex exposes no flag that suppresses a context surface, so configuration A and configuration B select the identical argv and a comparison between them would difference one command with itself. Measured: `codex exec --help` lists 27 flags (--add-dir, --approve-for-me, --color, --dangerously-bypass-approvals-and-sandbox, --dangerously-bypass-hook-trust, --disable, --enable, --ephemeral, --ignore-rules, --ignore-user-config, --json, --local-provider, --oss, --output-schema, --skip-git-repo-check, --strict-config, --thread-source, --worktree, -C/--cd, -V/--version, -c/--config, -h/--help, -i/--image, -m/--model, -o/--output-last-message, -p/--profile, -s/--sandbox) and none of them suppresses a skill, an extension, a prompt template, a context file or a theme; the two nearest are -c/--config and --ignore-user-config, and neither is a documented context-surface switch. The provider is recorded as EXCLUDED from the comparison for this reason, not as \"no difference observed\".",
+      "comparable": false,
+      "comparison_basis": "the normalised argv, with the run id and the per-run evidence directory folded out; the raw digests are beside it so a reader can see that the difference was only the run-specific file name",
+      "both_digests_recomputed_and_agreeing": true,
+      "finding": "the two configurations produced IDENTICAL normalised argv, so this provider cannot take part in an A/B comparison: it would be a cell differenced against itself. That is an EXCLUSION with a reason, never a \"no difference observed\".",
+      "what_this_does_not_settle": "a different argv is a different COMMAND, not a different RESULT. These two crossings used an unresolvable model id on purpose, so neither spent a token, and this record differences the commands only. Any quality, cost or latency statement needs governed runs and is the measurement set's work, not this harness's."
+    },
+    {
+      "provider": "pi",
+      "configuration_a": {
+        "run_id": "run-surface-pi-a",
+        "selected_configuration": "A",
+        "surface_flags": [],
+        "argv": [
+          "-p",
+          "--mode",
+          "json",
+          "--model",
+          "veritas-s2-007r-nonexistent/no-such-model",
+          "--no-session",
+          "--no-tools",
+          "Say PING."
+        ],
+        "argv_digest_raw": "sha256:865eb6834905a0f58c354ef3af0928f8442339c0acbabe91b4a1f52380dd9d04",
+        "argv_digest": "sha256:865eb6834905a0f58c354ef3af0928f8442339c0acbabe91b4a1f52380dd9d04",
+        "argv_digest_agrees": true,
+        "exit_status": 1
+      },
+      "configuration_b": {
+        "run_id": "run-surface-pi-b",
+        "selected_configuration": "B",
+        "surface_flags": [
+          "--no-skills",
+          "--no-extensions",
+          "--no-prompt-templates",
+          "--no-context-files",
+          "--no-themes"
+        ],
+        "argv": [
+          "-p",
+          "--mode",
+          "json",
+          "--model",
+          "veritas-s2-007r-nonexistent/no-such-model",
+          "--no-session",
+          "--no-tools",
+          "--no-skills",
+          "--no-extensions",
+          "--no-prompt-templates",
+          "--no-context-files",
+          "--no-themes",
+          "Say PING."
+        ],
+        "argv_digest_raw": "sha256:d03454b68b61ab71561bed7bf857998308956f8806c32a774ca2ceb74fe6d92d",
+        "argv_digest": "sha256:d03454b68b61ab71561bed7bf857998308956f8806c32a774ca2ceb74fe6d92d",
+        "argv_digest_agrees": true,
+        "exit_status": 1
+      },
+      "argv_identical": false,
+      "surface_axis_exists": true,
+      "configuration_axis": {
+        "axis": "context_surface",
+        "provider": "pi",
+        "configurations": [
+          "A",
+          "B"
+        ],
+        "configuration_a_flags": [],
+        "configuration_b_flags": [
+          "--no-skills",
+          "--no-extensions",
+          "--no-prompt-templates",
+          "--no-context-files",
+          "--no-themes"
+        ],
+        "distinguishable": true,
+        "reason": null,
+        "measured": {
+          "measured_on": "this host, pi 0.87.1",
+          "evidence": "`pi --help` documents --no-skills, --no-extensions, --no-prompt-templates, --no-context-files and --no-themes",
+          "distinguishable": true
+        },
+        "exclusion": null
+      },
+      "excluded_from_comparison": null,
+      "comparable": true,
+      "comparison_basis": "the normalised argv, with the run id and the per-run evidence directory folded out; the raw digests are beside it so a reader can see that the difference was only the run-specific file name",
+      "both_digests_recomputed_and_agreeing": true,
+      "finding": "the two configurations produced different normalised argv, so the axis exists on this provider: configuration A leaves the host default context surface alone and configuration B suppresses every surface it discovers",
+      "what_this_does_not_settle": "a different argv is a different COMMAND, not a different RESULT. These two crossings used an unresolvable model id on purpose, so neither spent a token, and this record differences the commands only. Any quality, cost or latency statement needs governed runs and is the measurement set's work, not this harness's."
+    }
+  ],
+  "spend": {
+    "total_usd": 0,
+    "currency": "USD",
+    "basis": "EXECUTOR_REPORTED_USD",
+    "rows": [
+      {
+        "arm": "cancel",
+        "provider": "pi",
+        "run_id": "run-lifecycle-cancel-pi",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      {
+        "arm": "timeout",
+        "provider": "pi",
+        "run_id": "run-lifecycle-timeout-pi",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      {
+        "arm": "sigkill",
+        "provider": "pi",
+        "run_id": "run-lifecycle-sigkill-pi",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      {
+        "arm": "surface",
+        "provider": "codex",
+        "configuration": "A",
+        "run_id": "run-surface-codex-a",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      {
+        "arm": "surface",
+        "provider": "codex",
+        "configuration": "B",
+        "run_id": "run-surface-codex-b",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      {
+        "arm": "surface",
+        "provider": "pi",
+        "configuration": "A",
+        "run_id": "run-surface-pi-a",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      },
+      {
+        "arm": "surface",
+        "provider": "pi",
+        "configuration": "B",
+        "run_id": "run-surface-pi-b",
+        "usd": 0,
+        "basis": "NO_USD_REPORTED_BY_EXECUTOR"
+      }
+    ],
+    "accounting": "only what an executor itself reported; an executor that reports no monetary cost contributes 0 and is marked NO_USD_REPORTED_BY_EXECUTOR rather than being priced from a list"
+  },
+  "hard_gates": [],
+  "gate_detail": [],
+  "findings": [],
+  "clauses_not_run": [
+    {
+      "arm": "cancel",
+      "provider": "pi",
+      "reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL"
+    },
+    {
+      "arm": "timeout",
+      "provider": "pi",
+      "reason": "SURVIVORS_REMAINING: PROCESSES_SURVIVED_THE_GROUP_KILL"
+    }
+  ],
+  "verdict": {
+    "status": "PARTIAL",
+    "exit_code": 1,
+    "hard_gates": [],
+    "defects": 0,
+    "clauses_not_run": 2,
+    "arms_requested": 3,
+    "arms_executed": 3
+  },
+  "limitations": [
+    "every child in this record ran as an ordinary host process under sbx-host-unisolated-v1: no OS isolation control was in force, isolation_observed is false in every row, and A-MVP-04's ISOLATION clause is NOT_RUN on this host",
+    "this is NOT a governed run: no board command is called from this harness, so no arm here is a task, a lease, a grant, an outbox row or an A-MVP PASS. A-MVP-04's board clauses (the fence in the terminal event, byte-identical audit/outbox row counts) are NOT_RUN because the task edges are refused on this checkout; see board_gate",
+    "the process-group proof is the shipped observer's own verdict; this harness adds an independent parent-side pid reading and never overwrites the observer's answer with it",
+    "the surface measurement runs one real crossing per (provider, configuration) with an unresolvable model id, so it measures the argv the transport builds and nothing about model behaviour, cost or quality",
+    "a lifecycle arm that is stopped before the model answers bills nothing, and an arm that is not stopped in time reports whatever the executor reported; both are published as measured"
+  ],
+  "observer": {
+    "id": "platform:linux",
+    "what_this_is": "the SHIPPED process observer of src/lib/identity/process-observer.mjs, used both by the transport and by this harness for an independent parent-side reading"
+  },
+  "record_digest": "sha256:1a40fd292d2cfe8bd199c65ef580d5a1862c2356e6332288cc84fa643ad988be"
+}

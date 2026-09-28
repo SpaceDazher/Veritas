@@ -1,0 +1,104 @@
+{
+  "index": 2,
+  "label": "02",
+  "task_id": "abt-s2007r-pia-02",
+  "adapter_id": "adr-pi-local",
+  "provider": "pi",
+  "configuration": "A",
+  "findings": [
+    {
+      "id": "claim-refused",
+      "code": "BLOCKED_SANDBOX",
+      "message": "BLOCKED_SANDBOX"
+    }
+  ],
+  "events": [],
+  "raw_logs": null,
+  "verdict": "NOT_RUN",
+  "project": {
+    "source": "corpus/s2-007r/project",
+    "source_realpath": "/home/daniil/.bb/plugins/environment-git-worktree/host-data/worktrees/thr_mgkk7cb5t6-1/Veritas/corpus/s2-007r/project",
+    "workspace_root_ref": "run-02/project",
+    "workspace_root_absolute": "/tmp/veritas-s2-007r-ws/pia/run-02/project",
+    "workspace_root_source": "INJECTED_NOT_REGISTRY",
+    "workspace_root_note": "the S2-002 workspace registry holds Windows roots only (src/lib/identity/principals.mjs), so containment came from the documented execute({workspaceRoots, realpath}) injection point; the registry did not authorise this root",
+    "digest_before": "sha256:de3ea3de04daa3e8fa22d819fff92e844cf9a434ea2bc0085f68776102581a1b",
+    "file_count": 7,
+    "total_bytes": 12694
+  },
+  "task_document_digest": "sha256:0a65e5f3ff6a7a08d210a277ffd224ab7390ff8ad905a4a3be6191cb199cdb08",
+  "budget": {
+    "grant_id": "grt-s2007r-pilot-02",
+    "one_budget_number": 0.5,
+    "currency": "USD",
+    "task_limit": 0.5,
+    "campaign_limit": 0.5,
+    "day_limit": 0.5,
+    "timeout_ms": 600000,
+    "authority": "RUN_OPERATOR_DECLARED_NOT_PRODUCT_APPROVED",
+    "approval_owner": "issue #12 (S2-012)",
+    "grant_scope": "TASK_SCOPED_ROW",
+    "grant_scope_reason": "store.createRun resolves the grant by task_id and refuses a workspace-scoped row (BUDGET_NOT_ASSIGNED), so one task needs one grant row; every row carries the identical --budget number",
+    "grant_digest": "sha256:da5f2bf0d8e9844940f6874aec477a835b82f1d2ffca067f30d87867cae4e461"
+  },
+  "dispatched_decision": {
+    "derived_by": "dispatch.plan (the scheduler's own deterministic order)",
+    "followed": false,
+    "reason_not_followed": "selectAdapter sorts registered adapters by adapter_id ascending, so the derived decision can only ever reach adr-codex-local; the requested adapter is bound explicitly on the claim edge instead",
+    "decision": {
+      "contractVersion": "1.0.0",
+      "decision_id": "dsc-pia-000002",
+      "workspace_id": "ws-s2007r-project",
+      "max_concurrency": 1,
+      "selected_task_id": null,
+      "selected_adapter_id": null,
+      "selected_lease_id": null,
+      "selected_fencing_token": null,
+      "candidates": [
+        {
+          "task_id": "abt-s2007r-pia-01",
+          "priority": "HIGH",
+          "eligible": false,
+          "exclusion_reasons": [
+            "SANDBOX_NOT_PROVEN"
+          ]
+        },
+        {
+          "task_id": "abt-s2007r-pia-02",
+          "priority": "HIGH",
+          "eligible": false,
+          "exclusion_reasons": [
+            "SANDBOX_NOT_PROVEN"
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "subject_kind": "task",
+          "subject_id": "abt-s2007r-pia-01",
+          "reasons": [
+            "SANDBOX_NOT_PROVEN"
+          ]
+        },
+        {
+          "subject_kind": "task",
+          "subject_id": "abt-s2007r-pia-02",
+          "reasons": [
+            "SANDBOX_NOT_PROVEN"
+          ]
+        }
+      ],
+      "reason": "no selection: every candidate was excluded, see candidates/excluded",
+      "budget_snapshot": {
+        "currency": "USD",
+        "assigned": true,
+        "task_remaining": 0.5,
+        "campaign_remaining": 2,
+        "day_remaining": 2
+      },
+      "decided_at": "2026-09-26T09:00:18.000Z"
+    },
+    "decision_digest": "sha256:3801df038d35edcec7330585fbf5fd6e324d01b87c172362df7d68368d61d19c",
+    "refusal": null
+  }
+}
