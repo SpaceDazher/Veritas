@@ -17,12 +17,13 @@
 // string the script never prints would pass without proving anything.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import {
+  APPROVED,
   ARM_ERRORS,
   LABEL_SET,
   UNPARSED,
@@ -53,6 +54,7 @@ function prereg(overrides = {}) {
   return {
     budget_reservation: { currency: 'tokens', granted_units: 100_000_000, trial_timeout_ms: 120000 },
     executor: { provider: 'zai-coding-cn', model: 'glm-5.3-flash', credential_env_name: ENV_NAME },
+    approval: { status: APPROVED, required_from: 'the repository owner' },
     ...overrides,
   };
 }
@@ -259,6 +261,58 @@ test('the five situations get five outcome classes, and none of them is a pass',
     classifyOutcome({ dryRun: true, stopped: true, measured: false }),
   ]);
   assert.equal(all.size, 5, 'two of the five situations collapse into one class');
+});
+
+test('an UNAPPROVED preregistration is refused before the budget is even read', () => {
+  // v2 exists on disk as a draft with approval.status null. A run that could pick
+  // a draft up would turn "the owner has not signed this" into "the run happened
+  // anyway" — so the check comes FIRST, ahead of the budget, because an
+  // unapproved document has no budget worth reading.
+  for (const approval of [undefined, {}, { status: null }, { status: 'AWAITING_OWNER_APPROVAL' }, { status: 'DRAFT' }]) {
+    withDir((dir) => {
+      const input = path.join(dir, 'in.json');
+      const out = path.join(dir, 'out.json');
+      const pre = path.join(dir, 'prereg.json');
+      writeFileSync(input, JSON.stringify(blindInput(2)));
+      writeFileSync(pre, JSON.stringify(prereg({ approval })));
+      const run = runScript([input, out, ARM_ID, pre, '20260926', '--dry-run']);
+      assert.notEqual(run.status, 0, `approval ${JSON.stringify(approval)} was accepted`);
+      assert.match(run.output, new RegExp(ARM_ERRORS.PREREG_NOT_APPROVED));
+      assert.equal(existsSync(out), false, 'a refused run still wrote a record');
+    });
+  }
+  // And the approved shape is accepted, so the check is not simply refusing
+  // everything — otherwise it would be untested and untrustworthy.
+  withDir((dir) => {
+    const input = path.join(dir, 'in.json');
+    const out = path.join(dir, 'out.json');
+    const pre = path.join(dir, 'prereg.json');
+    writeFileSync(input, JSON.stringify(blindInput(2)));
+    writeFileSync(pre, JSON.stringify(prereg()));
+    assert.equal(runScript([input, out, ARM_ID, pre, '20260926', '--dry-run']).status, 0, 'an APPROVED preregistration was refused');
+  });
+});
+
+test('the shipped v2 DRAFT is refused as written, on the real document', () => {
+  // Not a synthetic approval object: the actual file on disk, with its actual
+  // null approval. If someone later fills the status in, this case starts failing
+  // and says why — which is the point of pinning the shipped state.
+  const draftPath = path.resolve(import.meta.dirname, '../../corpus/s2-008-campaign/preregistration.v2.draft.json');
+  const draft = JSON.parse(readFileSync(draftPath, 'utf8'));
+  assert.equal(draft.approval?.status, null, 'the draft on disk is already approved, so it is no longer a draft');
+  assert.equal(draft.approval?.runnable_now, false);
+  assert.equal(draft.status, 'AWAITING_OWNER_APPROVAL');
+  assert.equal(draft.budget_reservation.currency, 'tokens');
+  assert.equal(draft.budget_reservation.granted_units, 100000000);
+  // The supersession must name what it replaces and what it does NOT touch.
+  assert.equal(draft.supersession.supersedes, 'xpr-s2-008c-01');
+  assert.ok(draft.supersession.unchanged.includes('multiplicity_rule'),
+    'the supersession does not state that the multiplicity rule is unchanged, so a reader cannot tell a predictor change from a rule change');
+  // And the rule itself is carried, not restated differently.
+  const v1 = JSON.parse(readFileSync(path.resolve(import.meta.dirname, '../../corpus/s2-008-campaign/preregistration.json'), 'utf8'));
+  for (const field of ['metric', 'frozen_baseline', 'noise_rule', 'multiplicity_rule', 'seed_rule', 'seeds', 'holdout_access', 'card']) {
+    assert.deepEqual(draft[field], v1[field], `${field} moved in v2, which is a rule change and not a supersession`);
+  }
 });
 
 test('an unknown arm id is refused, so a mis-typed id cannot spend anything', () => {

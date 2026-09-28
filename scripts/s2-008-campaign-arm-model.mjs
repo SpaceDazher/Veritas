@@ -42,7 +42,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+/** The only value that lets a preregistration be run under. */
+export const APPROVED = 'APPROVED';
+
 export const ARM_ERRORS = Object.freeze({
+  PREREG_NOT_APPROVED: 'PREREGISTRATION_NOT_APPROVED',
   USAGE: 'arm-model-usage',
   BLIND_INPUT_EMPTY: 'BLIND_INPUT_EMPTY',
   BLIND_INPUT_CARRIES_LABEL: 'BLIND_INPUT_CARRIES_LABEL',
@@ -202,6 +206,17 @@ export function main(argv, env = process.env) {
   }
 
   const prereg = JSON.parse(fs.readFileSync(preregPath, 'utf8'));
+
+  // AN UNAPPROVED PREREGISTRATION IS NOT A PREREGISTRATION. v2 exists on disk as a
+  // draft with `approval.status: null`, and a draft that a run could pick up would
+  // turn "the owner has not signed this" into "the run happened anyway". The
+  // approval is checked BEFORE the budget, because an unapproved document has no
+  // budget worth reading.
+  if (prereg.approval?.status !== APPROVED) {
+    process.stderr.write(`${ARM_ERRORS.PREREG_NOT_APPROVED}:${String(prereg.preregistration_id ?? 'unknown')}:${String(prereg.approval?.status ?? 'none')}\n`);
+    return 7;
+  }
+
   const reservation = prereg.budget_reservation ?? {};
   const granted = Number(reservation.granted_units);
   const currency = String(reservation.currency ?? '');
