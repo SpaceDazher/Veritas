@@ -8,8 +8,8 @@
   "exitCode": 0,
   "reasons": [],
   "base": {
-    "commit_sha": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
-    "tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
+    "commit_sha": "5c60e35daf98c446c64bcb91def042e920ddd101",
+    "tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 58,

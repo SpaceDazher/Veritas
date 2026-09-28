@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
-  "head_tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
-  "invocation_id": null,
+  "head": "5c60e35daf98c446c64bcb91def042e920ddd101",
+  "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
+  "invocation_id": "037a51b9a680c2c57073032405d342c2",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -475,52 +475,73 @@
   "evidence": [
     {
       "path": "evidence/s2-008-probes.json",
-      "required": true,
+      "required": false,
       "present": true,
       "bytes": 26097,
-      "issues": []
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-controls.json",
-      "required": true,
+      "required": false,
       "present": true,
       "bytes": 7355,
-      "issues": []
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-comparison.json",
-      "required": true,
+      "required": false,
       "present": true,
       "bytes": 28677,
-      "issues": []
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-security-probes.json",
-      "required": true,
+      "required": false,
       "present": true,
       "bytes": 40347,
-      "issues": []
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-run-a.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 37907,
-      "issues": []
+      "bytes": 37920,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-run-b.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 37907,
-      "issues": []
+      "bytes": 37920,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-replay.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 36824,
-      "issues": []
+      "bytes": 36849,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008/corpus/manifest.json",
@@ -540,7 +561,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 17488,
+      "bytes": 18378,
       "issues": []
     },
     {
@@ -548,7 +569,10 @@
       "required": false,
       "present": true,
       "bytes": 71951,
-      "issues": []
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-negative-controls.json",
@@ -560,7 +584,7 @@
   ],
   "chain_run": {
     "flag": "--chain-produced <comma-separated paths>",
-    "flag_seen": false,
+    "flag_seen": true,
     "allowed": [
       "evidence/s2-008-dependency-binding.json",
       "evidence/s2-008-probes.json",
@@ -572,8 +596,19 @@
       "evidence/s2-008-replay.json",
       "evidence/s2-008-security-probes.json"
     ],
-    "excluded": [],
-    "excluded_had_no_effect": [],
+    "excluded": [
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-security-probes.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-harness.json"
+    ],
+    "excluded_had_no_effect": [
+      "evidence/s2-008-harness.json"
+    ],
     "refused": [],
     "required": [
       "evidence/s2-008-probes.json",
@@ -587,13 +622,6 @@
       "evidence/s2-008/corpus/preregistration.json"
     ],
     "required_effective": [
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-security-probes.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-replay.json",
       "evidence/s2-008/corpus/manifest.json",
       "evidence/s2-008/corpus/preregistration.json"
     ],

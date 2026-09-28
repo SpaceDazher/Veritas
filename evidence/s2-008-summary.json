@@ -6,8 +6,8 @@
   "ok": true,
   "exitCode": 0,
   "base": {
-    "commit_sha": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
-    "tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
+    "commit_sha": "5c60e35daf98c446c64bcb91def042e920ddd101",
+    "tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 58,
@@ -15,7 +15,7 @@
     "track_tracked": true
   },
   "invocation": {
-    "id": "31eedff703d5a1b585163167cf70dbe3",
+    "id": "037a51b9a680c2c57073032405d342c2",
     "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
     "passed_to": [
       "scripts/s2-008-replay.mjs",
@@ -36,9 +36,16 @@
   "provability_exempt": [
     {
       "paths": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
         "evidence/s2-008-replay.json",
         "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json"
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json"
       ],
       "reason": "these are the records this chain's own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)"
     }
@@ -121,9 +128,16 @@
       "track_files_unaccounted": [],
       "track_files_untracked": [],
       "track_files_modified": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
         "evidence/s2-008-replay.json",
         "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json"
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json"
       ]
     },
     "corpus": {
@@ -320,10 +334,10 @@
       "floor_issues": [],
       "record_path": "evidence/s2-008-security-probes.json",
       "record_present": true,
-      "record_sha256": "7cadf529b516cbf1855811c5bf8114d52e53381741d76df28d58eed8bce40e9d",
+      "record_sha256": "bd831d2907f7fd4a5ab89dd792e331072e4b47ad1a0c22416e036821e58d1317",
       "record_bytes": 40347,
-      "record_digest": "d78469b78fce16a6081a37d44e626a7bca7ddd384893b51695a9bf6ec031edea",
-      "record_digest_reported": "d78469b78fce16a6081a37d44e626a7bca7ddd384893b51695a9bf6ec031edea",
+      "record_digest": "a7c33fcaac193f88b823fe44af9455db31db4814cdc92f2216bc101958d52980",
+      "record_digest_reported": "a7c33fcaac193f88b823fe44af9455db31db4814cdc92f2216bc101958d52980",
       "record_digest_agrees": true,
       "record_is_this_run": true,
       "record_issues": [],
@@ -342,8 +356,8 @@
       "reason": null,
       "source": "scripts/s2-008-replay.mjs",
       "overall": "PASS",
-      "invocation_id": "31eedff703d5a1b585163167cf70dbe3",
-      "head_tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
+      "invocation_id": "037a51b9a680c2c57073032405d342c2",
+      "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
       "campaign_verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
       "observed_campaign_decision": "UNRESOLVED",
@@ -352,8 +366,8 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-28T03:37:19.482Z",
-        "finished_at": "2026-09-28T03:37:22.065Z",
+        "observed_at": "2026-09-28T04:15:56.381Z",
+        "finished_at": "2026-09-28T04:15:58.542Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
@@ -364,13 +378,13 @@
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-28T03:37:22.545Z",
-      "evidence_sha256": "32172a60e77e445cedf006db290289a303c2e29f2c435f8e69fb10ae95e4ee63",
+      "observed_at": "2026-09-28T04:15:58.975Z",
+      "evidence_sha256": "240821c81fb3b573dfedc99dd50d3ce9f7283ca89e538165c4e3e65319565fca",
       "evidence_bytes": 71951,
       "record_is_this_run": true,
       "invocation_id_required": true,
-      "invocation_id": "31eedff703d5a1b585163167cf70dbe3",
-      "head_tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
+      "invocation_id": "037a51b9a680c2c57073032405d342c2",
+      "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
       "head_tree_sha_matches": true,
       "exit_code_recorded": null,
       "overall": "PASS",
@@ -392,18 +406,18 @@
   "notRun": [],
   "scopeNotes": [
     "the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
-    "the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket's own scope"
+    "the campaign behind #12 is NOT_RUN, so this deterministic track does not decide the ticket's own scope; #45 carried that scope and is now CLOSED (PARTIAL) with its remainder in #12"
   ],
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-28T03:37:22.547Z",
-    "started_at": "2026-09-28T03:37:12.595Z",
-    "replay_judged_at": "2026-09-28T03:37:22.073Z",
-    "harness_judged_at": "2026-09-28T03:37:22.545Z",
+    "observed_at": "2026-09-28T04:15:58.977Z",
+    "started_at": "2026-09-28T04:15:49.357Z",
+    "replay_judged_at": "2026-09-28T04:15:58.550Z",
+    "harness_judged_at": "2026-09-28T04:15:58.975Z",
     "window_ms": 21600000,
-    "head_tree_sha": "b7c2755c87cf0efc601dd80b896ee8e5c017fc7e",
-    "replay_finished_at": "2026-09-28T03:37:22.065Z"
+    "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
+    "replay_finished_at": "2026-09-28T04:15:58.542Z"
   },
   "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
@@ -428,8 +442,8 @@
   "engineering_status": "BLOCKED_DEPENDENCY",
   "assurance_status": "NOT_MEASURED",
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
-  "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #45)",
+  "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #12)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-28T03:37:22.547Z",
-  "startedAtIso": "2026-09-28T03:37:12.595Z"
+  "observedAtIso": "2026-09-28T04:15:58.977Z",
+  "startedAtIso": "2026-09-28T04:15:49.357Z"
 }
