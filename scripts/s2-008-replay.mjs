@@ -71,6 +71,21 @@ import {
   EXPECTED_LEDGER_SHAPE, EXPECTED_METRIC, EXPECTED_TRIAL_DECISIONS, assertTableFrozen,
   expectedTableDigest, unexpectedComparatorFailures,
 } from '../src/lib/research/expected-values.mjs';
+// The three PURE verdict helpers now live in src/lib/research/campaign-decision.mjs.
+// This module IMPORTS them (its own body calls them) and RE-EXPORTS them, so
+// every existing call site keeps working while the dependency direction is
+// one-way: the gates that JUDGE a run import pure functions, never a run gate.
+// Before this, `scripts/s2-008-harness.mjs` and `scripts/verify-s2-008.mjs` both
+// statically imported THIS module, so a top-level `process.exit(0)` here killed
+// both of them inside their own processes with no report and exit 0 — a gate
+// that the code it judges can silence into a pass.
+import {
+  campaignDecisionAgreement, frozenCampaignDecision, ledgerShapeIssues,
+} from '../src/lib/research/campaign-decision.mjs';
+
+export {
+  campaignDecisionAgreement, frozenCampaignDecision, ledgerShapeIssues,
+};
 // A NAMESPACE import, on purpose. The frozen CAMPAIGN decision
 // (`EXPECTED_CAMPAIGN`) is the R-C agreement target, and the two gates that read
 // it (this replay, the harness) must not stop LOADING when the member is
@@ -239,101 +254,11 @@ function readEvidence(relativePath, child = null) {
   };
 }
 
-/**
- * A ledger-shape check against the frozen `EXPECTED_LEDGER_SHAPE`, read from
- * the run record's own journal. The table declares the shape; nothing in the
- * track consumed it before, so the declaration had no teeth.
- *
- * EXPORTED (R-C): the ledger-shape gate term is one rule with one definition,
- * used by the replay over the real engine's journal and by the harness over its
- * own run journal. A second implementation would be a second opinion about the
- * same table, which is the exact shape of drift this table exists to catch.
- *
- * @param {object} runRecord A run record carrying `ledger.record_kinds`.
- * @returns {ReadonlyArray<object>} Empty when the journal matches the table.
- *   A run record with NO readable `record_kinds` reports all four kinds as
- *   `observed: 0`, never as a pass: an absent journal is a missing
- *   measurement, not a satisfied one.
- */
-export function ledgerShapeIssues(runRecord) {
-  const observed = Array.isArray(runRecord?.ledger?.record_kinds) ? runRecord.ledger.record_kinds : [];
-  const issues = [];
-  for (const row of EXPECTED_LEDGER_SHAPE) {
-    const seen = observed.filter((kind) => kind === row.kind).length;
-    if (seen !== row.count) {
-      issues.push({ code: 'LEDGER_SHAPE_DIVERGES_FROM_TABLE', kind: row.kind, expected: row.count, observed: seen, note: row.note });
-    }
-  }
-  return issues;
-}
 
-/**
- * The frozen CAMPAIGN decision the track is scored against, read from
- * `EXPECTED_CAMPAIGN` in src/lib/research/expected-values.mjs.
- * @returns {string|null} The declared decision, or null when the module
- *   publishes no campaign expectation. Null is NOT "anything agrees": it is the
- *   input to a named refusal.
- */
-export function frozenCampaignDecision() {
-  const declared = expectedValues.EXPECTED_CAMPAIGN;
-  return isPlainObject(declared) && typeof declared.decision === 'string' && declared.decision !== ''
-    ? declared.decision
-    : null;
-}
 
-/**
- * R-C: THE GATE CHECKS AGREEMENT WITH THE FROZEN CAMPAIGN DECISION, NEVER
- * `ALLOW`.
- *
- * With eight synthetic cases the honest campaign answer is a null, so a
- * `verdict_is_pass` requirement is unsatisfiable without tuning the fixtures
- * until a fabricated effect looked legitimate. This is the one place the
- * condition is DEFINED, and all three gates (replay, harness, aggregator) call
- * it, so "four coupled sites" cannot drift apart again. A `POSITIVE` observed
- * against a non-positive frozen expectation is a refusal, not a pass: that is
- * the anti-goal, executed.
- *
- * @param {{observed?: string|null, expected?: string|null}} args
- * @returns {{expected: string|null, observed: string|null, agrees: boolean,
- *   findings: ReadonlyArray<object>}} `agrees` is true only when BOTH are
- *   strings and they are equal.
- */
-export function campaignDecisionAgreement({ observed = null, expected = null } = {}) {
-  const observedDecision = typeof observed === 'string' && observed !== '' ? observed : null;
-  const expectedDecision = typeof expected === 'string' && expected !== '' ? expected : null;
-  const findings = [];
-  if (expectedDecision === null) {
-    findings.push({
-      code: 'EXPECTED_CAMPAIGN_ABSENT',
-      field: 'expected_campaign_decision',
-      expected: 'a frozen campaign decision in EXPECTED_CAMPAIGN',
-      observed: expectedDecision,
-      detail: 'src/lib/research/expected-values.mjs publishes no EXPECTED_CAMPAIGN, so the campaign decision has nothing to agree with; a gate with no expectation is not green',
-    });
-  } else if (observedDecision === null) {
-    findings.push({
-      code: 'CAMPAIGN_DECISION_ABSENT',
-      field: 'observed_campaign_decision',
-      expected: expectedDecision,
-      observed: observedDecision,
-      detail: 'the comparator produced no campaign decision, so nothing was measured to agree with',
-    });
-  } else if (observedDecision !== expectedDecision) {
-    findings.push({
-      code: 'CAMPAIGN_DECISION_DIVERGES_FROM_FROZEN_TABLE',
-      field: 'observed_campaign_decision',
-      expected: expectedDecision,
-      observed: observedDecision,
-      detail: `the campaign decided ${observedDecision} while the frozen expected-value table declares ${expectedDecision}; a decision the table does not declare is not a pass`,
-    });
-  }
-  return Object.freeze({
-    expected: expectedDecision,
-    observed: observedDecision,
-    agrees: findings.length === 0,
-    findings: Object.freeze(findings),
-  });
-}
+
+
+
 
 /** The identical-wrong control, run through the SAME comparator call on the
  *  SAME two runs: both receive the SAME corruption, so their digests stay equal

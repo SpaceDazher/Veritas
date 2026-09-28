@@ -1501,3 +1501,106 @@ test('G7/G5b a CHECK run on a base with no record stays RED, and a record this r
     );
   });
 });
+
+// =============================================================================
+// THE SHARED ADDRESS SPACE (issue #8, A3/A5) — the class that produced a SILENT
+// GREEN, and the static invariant that keeps it closed.
+//
+// WHAT WAS OBSERVED, on this tree, before the invariant existed:
+// `scripts/verify-s2-008.mjs` reached into `scripts/s2-008-replay.mjs` and
+// STATICALLY IMPORTED `campaignDecisionAgreement` and `frozenCampaignDecision`
+// from it (`scripts/s2-008-harness.mjs` imported three helpers the same way).
+// The aggregator is supposed to SPAWN the replay and judge the bytes it wrote,
+// but with that import edge the "process-separated" replay ran inside the
+// aggregator's own process. A stub replay whose top level called
+// `process.exit(0)` therefore terminated the aggregator from the inside: no
+// report on stdout, no summary written, and the shell saw exit 0. Observed with
+// `node --trace-exit`, whose stack named the stub's own `process.exit` as the
+// exit site of the VERIFIER's process.
+//
+// A gate that the code it judges can silence into a green is not a gate, so the
+// edge is gone: the three helpers live in the pure module
+// `src/lib/research/campaign-decision.mjs`, the run gates share those, and
+// nothing that EXECUTES a run is imported by anything that VERIFIES it. The two
+// cases below are what stops the edge from coming back.
+// =============================================================================
+
+test('the no-shared-address-space invariant: a verifier imports no run gate, and the one allowed import cannot exit', () => {
+  const root = new URL('../../', import.meta.url).pathname.replace(/\/$/, '');
+  const read = (relative) => readFileSync(path.join(root, relative), 'utf8');
+
+  // The gates that EXECUTE a run must not be imported by the things that JUDGE
+  // one. These two are the run gates whose top-level code is the run itself.
+  const forbidden = ['./s2-008-replay.mjs', './s2-008-harness.mjs'];
+  for (const [consumer, target] of [
+    ['scripts/verify-s2-008.mjs', forbidden],
+    ['scripts/s2-008-harness.mjs', forbidden],
+  ]) {
+    const source = read(consumer);
+    const importSpecifiers = [...source.matchAll(/(?:^|\n)\s*(?:import|export)[^;\n]*?from\s+'([^']+)'/g)].map((m) => m[1]);
+    for (const specifier of importSpecifiers) {
+      assert.ok(
+        !target.includes(specifier),
+        `${consumer} imports the run gate ${specifier}: a gate must not share an address space with the code it judges (a top-level process.exit there killed this consumer with exit 0 and no report)`,
+      );
+    }
+  }
+
+  // `scripts/s2-008-run.mjs` IS still imported by the aggregator, for its
+  // argument parser and its base resolver, and that is deliberate: it is allowed
+  // only because its top level is inert. The exemption is a CLAIM about that
+  // file, so the claim is checked here rather than trusted: no explicit
+  // `process.exit(` (which truncates and skips the rest of the module), and its
+  // body guarded by an `isMain` check.
+  const runScript = read('scripts/s2-008-run.mjs');
+  assert.ok(!/(^|[^.\w])process\.exit\s*\(/.test(runScript), 'scripts/s2-008-run.mjs calls process.exit(), which can truncate its module before the report; the aggregator imports it, so that is a shared-process risk again');
+  assert.match(runScript, /const isMain = /, 'scripts/s2-008-run.mjs has no isMain guard, so importing it would execute its run body inside the aggregator');
+
+  // And the pure module is genuinely pure: no process, no filesystem, no child
+  // process, no clock. Only WHOLE-LINE comments are dropped first, so a mention
+  // of `process.exit` in a comment that explains WHY this module exists cannot
+  // fail the check — and a mention inside real code still does.
+  const sharedCode = read('src/lib/research/campaign-decision.mjs')
+    .split('\n')
+    .filter((line) => !/^\s*(?:\/\/|\*|\/\*)/.test(line))
+    .join('\n');
+  for (const banned of ['node:child_process', 'node:fs', 'process.exit', 'Date.now', 'new Date(', 'Math.random']) {
+    assert.ok(!sharedCode.includes(banned), `src/lib/research/campaign-decision.mjs contains ${banned} outside a comment, so the module the verifier imports is not inert`);
+  }
+});
+
+test('a replay whose top level exits cannot turn the aggregator green, and the aggregator always speaks', () => {
+  // The exact forgery that produced the silent green: a replay module that
+  // writes nothing anybody can use and kills its own process at the top level.
+  // Before the import edge was removed, `process.exit(0)` in this file ran
+  // INSIDE the aggregator, so the aggregator printed no report and the shell saw
+  // exit 0. Two things must hold now, and both are asserted separately because
+  // they fail differently: the aggregator must always produce a report (a gate
+  // that cannot speak must not exit 0), and the chain must not be green.
+  withChainCopy((root) => {
+    const scripts = path.join(root, 'scripts');
+    writeFileSync(
+      path.join(scripts, 's2-008-replay.mjs'),
+      [
+        '// TOP-LEVEL-EXIT STUB: kills its own process before doing anything.',
+        "import { pathToFileURL } from 'node:url';",
+        "import path from 'node:path';",
+        'process.exit(0);',
+        'export const campaignDecisionAgreement = () => ({ agrees: true, findings: [] });',
+        'export const frozenCampaignDecision = () => null;',
+        'export const ledgerShapeIssues = () => [];',
+        'export const readInvocationId = () => null;',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
+    commitAll(root, 'a replay gate that exits at the top level, before it does anything');
+  }, (root) => {
+    // `chainWriteRun` is the one that proves the aggregator SPOKE: it asserts a
+    // summary JSON was printed, so a silent exit fails here first, by name.
+    const run = chainWriteRun(root);
+    assert.ok(run.summary !== null, 'the aggregator exited without printing a report at all; silence is not a verdict');
+    assert.notEqual(run.exitCode, 0, `the chain exited 0 against a replay that did nothing: ${verdictOf(run)}`);
+    assert.notEqual(run.summary.status, 'PASS', `the chain reported PASS against a replay that exited before it started: ${verdictOf(run)}`);
+  });
+});

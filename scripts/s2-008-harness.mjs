@@ -95,8 +95,14 @@ import { HOLDOUT_LABELS, HOLDOUT_UNSEAL_DIGEST, PREREGISTRATION } from '../tests
 // ledger-shape check and the campaign-decision agreement. The replay owns them
 // and the harness calls them, so "the harness checks the ledger shape its own
 // way" is not a state this repository can be in. See
-// `scripts/s2-008-replay.mjs#ledgerShapeIssues` and `#campaignDecisionAgreement`.
-import { campaignDecisionAgreement, frozenCampaignDecision, ledgerShapeIssues } from './s2-008-replay.mjs';
+// src/lib/research/campaign-decision.mjs (ledgerShapeIssues and
+// campaignDecisionAgreement).
+//
+// From the PURE module, not from './s2-008-replay.mjs': the harness and the
+// replay used to import each other's code, so a top-level `process.exit(0)` in
+// either run gate could terminate the other inside its own process, leaving no
+// report and exit 0. The run gates share pure functions now, not a runtime.
+import { campaignDecisionAgreement, frozenCampaignDecision, ledgerShapeIssues } from '../src/lib/research/campaign-decision.mjs';
 import { assertFrozenCampaignDerivable } from '../src/lib/research/campaign-expectation.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

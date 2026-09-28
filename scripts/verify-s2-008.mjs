@@ -158,10 +158,19 @@ import { HARD_GATE_COUNTERS, PROBE_FAMILIES, PROBE_NAMES } from '../src/lib/rese
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 
 import { parseArgs, resolveBase } from './s2-008-run.mjs';
-// R-C: the campaign-decision rule is DEFINED ONCE, in the replay, and this
-// aggregator CALLS it rather than re-typing the comparison. Four coupled sites
-// is how `verdict_is_pass` came back; one definition is how it stays gone.
-import { campaignDecisionAgreement, frozenCampaignDecision } from './s2-008-replay.mjs';
+// R-C: the campaign-decision rule is DEFINED ONCE, in the pure module
+// src/lib/research/campaign-decision.mjs, and this aggregator CALLS it rather
+// than re-typing the comparison. Four coupled sites is how `verdict_is_pass` came
+// back; one definition is how it stays gone.
+//
+// NOT from './s2-008-replay.mjs', which is the change that matters: this
+// aggregator SPAWNS the replay and judges its bytes, and while it statically
+// imported the replay it shared an address space with the run it judges. A
+// top-level `process.exit(0)` in the replay module terminated the aggregator
+// inside its own process — no report, no summary, exit 0. A gate the code it
+// judges can silence into a pass is not a gate. Nothing that EXECUTES a run is
+// imported by anything that VERIFIES it any more.
+import { campaignDecisionAgreement, frozenCampaignDecision } from '../src/lib/research/campaign-decision.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
