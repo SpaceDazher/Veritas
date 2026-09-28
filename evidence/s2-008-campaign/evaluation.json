@@ -11,8 +11,8 @@
   "the repeat run is compared on base, decision digest, verdict projection and raw run id"
  ],
  "base": {
-  "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
-  "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8"
+  "commit_sha": "e58ded2c49767d0bd76759ca3623eaf935239428",
+  "tree_sha": "2b15a041db6b5ace4f066a001874264598d1e247"
  },
  "preregistration_digest": "9379e329315edb8fc4b84d8e7c73ca24d5ea7303f5c9c85769630ace6b76f802",
  "frozen_constants": {
@@ -198,16 +198,16 @@
  },
  "reproducibility": {
   "a": {
-   "raw_run_id": "s2-008-campaign-a-550556",
-   "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
-   "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8",
+   "raw_run_id": "s2-008-campaign-a-171768",
+   "commit_sha": "e58ded2c49767d0bd76759ca3623eaf935239428",
+   "tree_sha": "2b15a041db6b5ace4f066a001874264598d1e247",
    "decision_digest": "5e925f4d407318d9a24e45d2d472134cd3cce199601b4c3550cc627acaeca0bc",
    "campaign_decision": "UNRESOLVED"
   },
   "b": {
-   "raw_run_id": "s2-008-campaign-b-549854",
-   "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
-   "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8",
+   "raw_run_id": "s2-008-campaign-b-172532",
+   "commit_sha": "e58ded2c49767d0bd76759ca3623eaf935239428",
+   "tree_sha": "2b15a041db6b5ace4f066a001874264598d1e247",
    "decision_digest": "5e925f4d407318d9a24e45d2d472134cd3cce199601b4c3550cc627acaeca0bc",
    "campaign_decision": "UNRESOLVED"
   },

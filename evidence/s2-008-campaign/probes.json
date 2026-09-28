@@ -2,8 +2,8 @@
  "kind": "s2-008-campaign-probes/1",
  "ticket": "S2-008",
  "subject": "the real campaign adapter and the frozen corpus",
- "commit_sha": "0ac485bd099ee5566bc90bfea8c4052e6a70139f",
- "tree_sha": "8cbb2f9e4872edfda8ffa51434eed1ec219991b8",
+ "commit_sha": "e58ded2c49767d0bd76759ca3623eaf935239428",
+ "tree_sha": "2b15a041db6b5ace4f066a001874264598d1e247",
  "preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58",
  "rule_feasibility": {
   "rejection_floor": 0.016667,
@@ -24,7 +24,7 @@
      "proven": false,
      "note": "the INFRA probe names an image that is not on this host; no start is expected"
     },
-    "stderr_excerpt": " using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T05:13:30-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly a"
+    "stderr_excerpt": " using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T05:24:29-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly a"
    },
    "requires": "INFRA_ERROR / INFRA, never a zero, never a skip, no reconciliation (a definite failure is not an unknown effect)",
    "observed": {
@@ -144,7 +144,7 @@
    "observed": {
     "rows_seen_by_restart": 4,
     "crashed_run_id": "s2-008-probe-interrupted-p1",
-    "restart_run_id": "s2-008-probe-restart-p149767",
+    "restart_run_id": "s2-008-probe-restart-p173274",
     "interrupted_trial_status": "UNRESOLVED",
     "interrupted_trial_outcome": "UNRESOLVED",
     "interrupted_trial_measured": null,
@@ -157,7 +157,7 @@
     "blind_retry": false,
     "implicit_zero": false,
     "chain_verified": true,
-    "head_digest": "sha256:619357ec234e378e6fbe56d363022f101574bc5b5d38336e15131bd41d954fba"
+    "head_digest": "sha256:74b1e718bcdcc18fea2bb1dff4b47914d955d2d2300d5e192c9eff8be44c0830"
    },
    "held": true
   }
