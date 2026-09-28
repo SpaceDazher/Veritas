@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "3df812cf36f3ef1b3c4739a783013d6c464372bc",
-  "sourceTree": "0bdfa3ac46e10fd8b5feed3d2e5861374007259b",
+  "sourceCommit": "1923dc99d3e5e6e714f3ccb6580269c96a6822d4",
+  "sourceTree": "370a0df9308e29292b86d54c11890aac67a89eb6",
   "trackedFileCount": 920,
   "manifestFileCount": 915,
-  "payloadManifestSha256": "f4fa01ac762884d64549aa7c9a7f25f87b9e861211c2afcfc8f35423317388a8",
-  "fileManifestSha256": "a35257b923cf8f1dc4f036d7379e2a006722d6d30478254a8d020c4b6d2b5ec3",
+  "payloadManifestSha256": "8a0c493a8bd5b96194f30ba98f786fd51df766f1b709e56bde3c0b9b5081cadc",
+  "fileManifestSha256": "7c8b16fc82fc45d20dec2f06adcb0b7507c053653f08bd4771abfee52b82ffcc",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -1853,8 +1853,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-s2-007r-partial-disposition.md",
-      "sha256": "25eef3bfa7870031a02e56c940d260ad4b9ec2c065dfedb993cb5eeb7d526117",
-      "bytes": 6650
+      "sha256": "e48bc863b3d4588dd1cf32c2a87e5ba864eb3ba767ed0ec114e9fafb817cfbb0",
+      "bytes": 7157
     },
     {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
@@ -2028,8 +2028,8 @@
     },
     {
       "path": "docs/stages/S2-007R.md",
-      "sha256": "cbb0490c4df4814de124567b5a71fb8fa8cab50368299901ae8ae36dc88e9b61",
-      "bytes": 56684
+      "sha256": "6ad1e674d6ba76f9fabba37954b2161421a055d0c672f2dfa021405e9938274a",
+      "bytes": 57618
     },
     {
       "path": "docs/stages/stage-1.md",
