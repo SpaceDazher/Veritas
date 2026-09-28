@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "51832cd24fba9fedf4876d1449acd5f8f8db2aee",
-  "sourceTree": "f44714fbc154352d51d401924406504228f65042",
-  "trackedFileCount": 1104,
-  "manifestFileCount": 1099,
-  "payloadManifestSha256": "8b94ef1c4fe02cb05bd782277ece082c0e90900545c5b0777d27343c965358c7",
-  "fileManifestSha256": "f23f1a40e9759c3e195407e97f55c6b051ce872c0e4c09cad26ade7314f15603",
+  "sourceCommit": "c85a9ddc72c9311e26fcb4ac1940980d013eaa87",
+  "sourceTree": "c70470e47d50546eb186d348a05c85cbf4a06d11",
+  "trackedFileCount": 1100,
+  "manifestFileCount": 1095,
+  "payloadManifestSha256": "61bd91011bf7d115de89f3796aa82c477b5ff788ccc891ed794e7de658b4e83c",
+  "fileManifestSha256": "8b6b5f44bbd1fa46f6b7b3cc26295296c81b38e3dad5d3a2360e26aa55a9f797",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -16,21 +16,6 @@
     "evidence/s2-005-commit-manifest.json"
   ],
   "files": [
-    {
-      "path": ".arch-map/policy.json",
-      "sha256": "6d82c7b38dbd3989cf4f029061cc7bf99094c63d2d29b49dd2da59649f84db95",
-      "bytes": 2282
-    },
-    {
-      "path": ".arch-map/snapshot.json",
-      "sha256": "4de4d7f1f26c651eac9dd89732d50d07fd33cb2975dd3eb918997f9f92d82ba8",
-      "bytes": 761669
-    },
-    {
-      "path": ".arch-map/snapshot.prev.json",
-      "sha256": "fe687dc9efb13db559a8a2c08cbf377cbd6ece1983ef98e34b59b6ab75594906",
-      "bytes": 761669
-    },
     {
       "path": ".env.example",
       "sha256": "45f5aff555cf6aa40db7138a8561af10a87c72f02390fd4c4fd000d3b4a5ce40",
@@ -43,8 +28,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "5d4415bb6d244ed72c04c267fb551c2d1a5239da8b36594b9e077d2114de99d2",
-      "bytes": 153
+      "sha256": "7fa9fc408e3d5de86d1568f26235cfd7b163aef9b2193b296d5b41429ea4a215",
+      "bytes": 172
     },
     {
       "path": "AGENTS.md",
@@ -2528,8 +2513,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "90927a43bcba44f4ce0563d6b20acfa073fc64a2745ce7c0ab38e4d256e5ab60",
-      "bytes": 49330
+      "sha256": "608eeb97cc98d480af75714a50c344bcbf5ee33d026bb474969fb2d330aea130",
+      "bytes": 49218
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3057,11 +3042,6 @@
       "bytes": 3275
     },
     {
-      "path": "libpod/tmp/pause.pid",
-      "sha256": "6a175db84aeefddbe58bf92a5d67b372c78505c75b079912b89a0e599fe91317",
-      "bytes": 4
-    },
-    {
       "path": "migrations/0001_veritas_board.sql",
       "sha256": "d30bb7d17c941c20fa3a55305a6661e1b488e761535c4e99461a808284b7c898",
       "bytes": 949
@@ -3183,8 +3163,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "1ef2cb623ae4f1e96b792249b0da17f96f6bba44a069046e615425824a89f96a",
-      "bytes": 16489
+      "sha256": "84f9779a98e2d567868039ca528758d15101dc34735a4e9fa74a67f4565f4d62",
+      "bytes": 17203
     },
     {
       "path": "results/s2-002/isolation/live/raw-run.log.json",
