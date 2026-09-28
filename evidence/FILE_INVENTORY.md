@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1658.
+Generated from `git ls-files`; count: 1661.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.arch-map/policy.json`
@@ -1008,6 +1008,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration-superseded.json`
 - `corpus/s2-008-campaign/preregistration-supersession.json`
 - `corpus/s2-008-campaign/preregistration.json`
+- `corpus/s2-008-campaign/preregistration.v2.draft.json`
 - `corpus/s2-008-campaign/source-ledger.json`
 - `docs/ARCHITECTURE.md`
 - `docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md`
@@ -1372,6 +1373,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007r-run.mjs`
 - `scripts/s2-008-build-corpus.mjs`
 - `scripts/s2-008-campaign-adapter.mjs`
+- `scripts/s2-008-campaign-arm-model.mjs`
 - `scripts/s2-008-campaign-arm.mjs`
 - `scripts/s2-008-campaign-bootstrap.mjs`
 - `scripts/s2-008-campaign-evaluate.mjs`
@@ -1593,6 +1595,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/transactional-audit.test.mjs`
 - `tests/isolation/live-evidence.test.mjs`
 - `tests/isolation/profile-axes.test.mjs`
+- `tests/research/campaign-arm-model.test.mjs`
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`
