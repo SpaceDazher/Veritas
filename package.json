@@ -88,6 +88,7 @@
     "s2-007r:authorize": "node scripts/s2-007r-authorization.mjs",
     "s2-007r:run": "node scripts/s2-007r-run.mjs",
     "s2-007r:real-run": "node scripts/s2-007r-real-run-verify.mjs",
+    "s2-007r:derived-selection": "node scripts/s2-007r-derived-selection.mjs",
     "s2-007r:lifecycle": "node scripts/s2-007r-lifecycle.mjs",
     "s2-007r:measure": "node scripts/s2-007r-measure.mjs",
     "s2-007r:measure-set": "node scripts/s2-007r-measurement-set.mjs",

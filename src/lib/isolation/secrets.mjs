@@ -36,7 +36,7 @@
 // plaintext, so this module never has to hold it longer than the launch.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { closeSync, openSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { closeSync, openSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 
 export const SECRET_ERRORS = Object.freeze({
   HANDLE_INVALID: 'SECRET_HANDLE_INVALID',
@@ -145,7 +145,7 @@ export function disposeSecret(handle, { podman = spawnSync, podmanArgv = [] } = 
  * itself a failure. An empty-string value would match everywhere, which is
  * exactly why `materializeSecret` refuses one.
  */
-export function assertNoSecretLeak(surfaces, { value, required = ['argv', 'env', 'stdout', 'stderr', 'record'] } = {}) {
+export function assertNoSecretLeak(surfaces, { value, required = ['argv', 'env', 'stdout', 'stderr', 'record'], expected = [] } = {}) {
   if (typeof value !== 'string' || value.length < 8) {
     // Too short to search for without matching by accident. Refusing is the
     // honest answer: a 3-character "secret" would make the detector useless.
@@ -154,6 +154,14 @@ export function assertNoSecretLeak(surfaces, { value, required = ['argv', 'env',
   if (!surfaces || typeof surfaces !== 'object') {
     return Object.freeze({ ok: false, leaks: Object.freeze(['surfaces:missing']) });
   }
+  // The ONE surface that is expected to carry the value, named explicitly by
+  // the caller. An authenticated run cannot avoid this: pi reads its
+  // credential from the environment, and A-MVP-04 proved no value ever
+  // reaches the executor, so a paid run is the deliberate exception and the
+  // detector is TOLD about it rather than switched off. Anything else that
+  // carries the value is still a leak, and a caller that forgets to declare
+  // the exception gets a FAIL, not a pass.
+  const declared = new Set(expected);
   const leaks = [];
   for (const name of required) {
     if (!(name in surfaces)) leaks.push(`${name}:surface-not-supplied`);
@@ -162,12 +170,13 @@ export function assertNoSecretLeak(surfaces, { value, required = ['argv', 'env',
     if (surface === undefined || surface === null) continue;
     const haystack = typeof surface === 'string' ? surface : JSON.stringify(surface);
     if (typeof haystack !== 'string') continue;
-    if (haystack.includes(value)) leaks.push(name);
+    if (haystack.includes(value) && !declared.has(name)) leaks.push(name);
   }
   return Object.freeze({
     ok: leaks.length === 0,
     leaks: Object.freeze([...new Set(leaks)]),
     searched: Object.freeze(Object.keys(surfaces)),
+    expectedToCarry: Object.freeze([...declared]),
   });
 }
 
@@ -184,4 +193,104 @@ export function readSecretFromObservation(stdout) {
 
 export function readHostSecretFile(path) {
   return readFileSync(path, 'utf8');
+}
+
+// ---------------------------------------------------------------------------
+// THE CREDENTIAL BRIDGE (paid leg, A-MVP-03 + A-MVP-04).
+//
+// A-MVP-04 proves that NO value reaches the executor: seven surfaces, a detector
+// that plants a canary to prove it still fires, and a descriptor at
+// /run/secrets/<handle>. An authenticated run cannot keep that property: pi reads
+// its credential from the ENVIRONMENT (`--api-key` defaults to env vars, and a
+// value on argv is exactly what A-MVP-04 forbids). So the executor's env must
+// carry the value, and that is a DECLARED exception, not a disabled detector.
+//
+// The delivery channel is podman's --env-file, not --env NAME=value: an --env
+// pair puts the value in the argv of podman on the host, which a process list
+// on this machine can read. --env-file passes a PATH. The file is written 0600,
+// in a temp dir, with exactly one line, and unlinked in a finally.
+//
+// The newline guard is not decoration. An env file is line-oriented, so a value
+// containing a newline would inject a second variable — an attacker who can
+// choose the value would choose the executor's environment. Refused outright.
+// ---------------------------------------------------------------------------
+
+export const CREDENTIAL_ERRORS = Object.freeze({
+  HANDLE_INVALID: 'CREDENTIAL_HANDLE_INVALID',
+  ENV_NAME_INVALID: 'CREDENTIAL_ENV_NAME_INVALID',
+  VALUE_INVALID: 'CREDENTIAL_VALUE_INVALID',
+  VALUE_INJECTED: 'CREDENTIAL_VALUE_CONTAINS_NEWLINE',
+  SPOOL_FAILED: 'CREDENTIAL_SPOOL_FAILED',
+});
+
+let credentialSpoolCounter = 0;
+
+/** POSIX-portable env name: a shell identifier, nothing that could smuggle a flag. */
+export function assertCredentialEnvName(name) {
+  if (typeof name !== 'string' || !/^[A-Z_][A-Z0-9_]{0,63}$/.test(name)) {
+    throw new Error(`${CREDENTIAL_ERRORS.ENV_NAME_INVALID}:${String(name)}`);
+  }
+  return name;
+}
+
+/**
+ * Write the one-line env file that delivers the credential to the executor.
+ *
+ * @returns {{path: string, envName: string, bytes: number, unlink: () => boolean}}
+ *   `unlink` is idempotent and must be called in a finally: the file holds the
+ *   value, so leaving it behind would be the same leak as leaving it in argv.
+ */
+export function spoolCredentialEnvFile(handle, envName, value, { spoolDir } = {}) {
+  assertHandleId(handle);
+  assertCredentialEnvName(envName);
+  if (typeof value !== 'string' || value.length < 8) {
+    throw new Error(`${CREDENTIAL_ERRORS.VALUE_INVALID}:too-short-to-deliver-safely`);
+  }
+  // The whole reason the file is one line: refuse rather than sanitise, because a
+  // value that needed sanitising was never a credential, it was an injection.
+  if (/[\n\r\0]/.test(value)) {
+    throw new Error(`${CREDENTIAL_ERRORS.VALUE_INJECTED}:${handle}:${envName}`);
+  }
+  if (typeof spoolDir !== 'string' || spoolDir.length === 0) {
+    throw new Error(`${CREDENTIAL_ERRORS.SPOOL_FAILED}:spoolDir-required`);
+  }
+  const body = `${envName}=${value}\n`;
+  const path = `${spoolDir}/.${handle}.${process.pid}.${credentialSpoolCounter++}.env`;
+  const fd = openSync(path, 'wx', 0o600);
+  try {
+    writeFileSync(fd, body, { encoding: 'utf8', mode: 0o600 });
+  } finally {
+    closeSync(fd);
+  }
+  let gone = false;
+  return Object.freeze({
+    path,
+    envName,
+    bytes: Buffer.byteLength(body),
+    unlink() {
+      if (gone) return true;
+      try {
+        rmSync(path, { force: true });
+        gone = true;
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  });
+}
+
+/**
+ * The declaration a run must publish for the detector: which surface is allowed
+ * to carry the value, and under which variable name. A run that delivers a
+ * credential and does not call this has declared nothing, and `assertNoSecretLeak`
+ * will then report the env surface as a leak — which is the safe direction.
+ */
+export function credentialDeclaration({ envFile, surfaces = {} } = {}) {
+  return Object.freeze({
+    delivered_by: 'podman --env-file (a PATH on the host argv, never a NAME=VALUE pair)',
+    env_name: envFile?.envName ?? null,
+    env_file: envFile?.path ?? null,
+    expected_surfaces: Object.freeze([...surfaces]),
+  });
 }

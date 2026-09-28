@@ -419,6 +419,7 @@ export function evaluateTaskCandidates(tasks, options = {}) {
     briefValidatedFor = null,
     principalId = null,
     sandbox = null,
+    unisolatedExecutionAuthorization = null,
     grantFor = null,
     spentFor = null,
     activeLeaseTaskIds = null,
@@ -427,7 +428,19 @@ export function evaluateTaskCandidates(tasks, options = {}) {
   const dayKey = now ? dayKeyOf(toInjectedInstant(now, 'now')) : null;
 
   const known = tasks.filter((task) => isPlainObject(task) && typeof task.task_id === 'string');
-  const context = { tasks: known, now };
+  // The context is what the per-task gates read. It used to carry only
+  // `{ tasks, now }`, so the authorisation option the caller had just passed in
+  // was dropped on the floor and the HOST_UNISOLATED floor tier could never be
+  // proven here — the decision came back empty and the caller reached for a
+  // hand-picked adapter instead. The declaration's own authorisation is the
+  // fallback, so a caller that simply forwards the sandbox still gets it.
+  const declaredSandbox = sandboxDeclaration(sandbox);
+  const context = {
+    tasks: known,
+    now,
+    unisolatedExecutionAuthorization: unisolatedExecutionAuthorization
+      ?? authorizationFor(declaredSandbox, null),
+  };
   const ordered = [...known].sort(compareTasks);
   const evaluated = ordered.slice(0, MAX_CANDIDATE_TASKS);
   const isVisible = principalId ? policyFunction('isVisible') : null;
@@ -460,7 +473,7 @@ export function evaluateTaskCandidates(tasks, options = {}) {
     if (isVisible && isVisible(task, principalId) !== true) reasons.push(EXCLUSION_REASONS.ACL_DENIED);
     if (leaseHeld.has(task.task_id)) reasons.push(EXCLUSION_REASONS.ACTIVE_LEASE_EXISTS);
 
-    if (sandbox && !sandboxProvenFor(sandbox, task, { authorization: context.unisolatedExecutionAuthorization ?? null, now: context.now ?? null })) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
+    if (sandbox && !sandboxProvenFor(declaredSandbox, task, { authorization: context.unisolatedExecutionAuthorization, now: context.now })) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
 
     if (grantFor) {
       const grant = grantFor(task);
@@ -498,15 +511,62 @@ export function eligibleTasks(tasks, { dependenciesSatisfiedFor } = {}) {
  * exist exactly because that tier could not be proven on this host. A missing
  * sandbox context is NOT proven.
  */
+/**
+ * Normalise whatever the caller called "the sandbox" into ONE declaration that
+ * carries both the profile and the server-resolved authorisation that admits
+ * it.
+ *
+ * WHY THE AUTHORISATION RIDES INSIDE THE DECLARATION
+ * --------------------------------------------------
+ * The HOST_UNISOLATED floor tier (issue #45) is dispatchable only under a valid
+ * named human authorisation, and that authorisation is server-resolved — never
+ * a request argument. Every consumer on the decision path already receives the
+ * sandbox declaration, so carrying the permit there is what makes it reach the
+ * whole path at once. Before this, three separate call sites each rebuilt the
+ * declaration from the profile id alone and therefore always evaluated the
+ * floor tier as unauthorised: the decision came back with
+ * `selected_adapter_id: null` and the operator had to bind an adapter by hand
+ * outside the decision.
+ *
+ * This widens nothing. A string still means "the profile, no permit", so a
+ * caller that passes only a profile id keeps getting the refusal it got before;
+ * an invalid or missing permit still fails closed inside
+ * `assertLiveExecutionAuthorized`. An explicit `options.authorization` still
+ * wins over the declaration, so the server-resolved value the command boundary
+ * resolves for a live run keeps its precedence.
+ */
+function sandboxDeclaration(sandbox) {
+  if (typeof sandbox === 'string') return { profile_id: sandbox, proven: true, authorization: null };
+  // The historical boolean form: a bare claim that the context is proven. It
+  // carries no profile and no permit, exactly as before.
+  if (typeof sandbox === 'boolean') return { profile_id: null, proven: sandbox, authorization: null };
+  if (!isPlainObject(sandbox)) return null;
+  return {
+    ...sandbox,
+    profile_id: sandbox.profile_id ?? null,
+    proven: sandbox.proven !== false,
+    authorization: sandbox.authorization ?? null,
+  };
+}
+
+// The effective authorisation for one executability check: an explicit,
+// caller-resolved value first, the declaration's own second. Anything that is
+// neither is null, and null is a refusal.
+function authorizationFor(declared, explicit) {
+  if (explicit !== undefined && explicit !== null) return explicit;
+  return isPlainObject(declared) ? (declared.authorization ?? null) : null;
+}
+
 function sandboxProvenFor(sandbox, task, options = {}) {
-  const declared = typeof sandbox === 'string' ? { profile_id: sandbox, proven: true } : sandbox;
-  if (!isPlainObject(declared)) return false;
+  const declared = sandboxDeclaration(sandbox);
+  if (declared === null) return false;
   if (declared.proven === false) return false;
   const taskProfile = task?.workspace_ref?.isolation_profile_id ?? null;
   const contextProfile = declared.profile_id ?? null;
   if (contextProfile && taskProfile && contextProfile !== taskProfile) return false;
   const effective = taskProfile ?? contextProfile;
   if (typeof effective !== 'string' || effective.length === 0) return false;
+  const authorization = authorizationFor(declared, options.authorization);
   // A profile with measured OS controls needs nothing beyond the proven set.
   if (PROVEN_SANDBOX_PROFILE_IDS.includes(effective)) return sandboxProfileExecutable(effective);
   // The HOST_UNISOLATED floor (issue #45) is dispatchable only with a valid
@@ -514,7 +574,7 @@ function sandboxProvenFor(sandbox, task, options = {}) {
   // never reported as proven: the decision that admits it is the same
   // assertLiveExecutionAuthorized gate the command boundary uses, so a tick and
   // a manual execution.start can never disagree about whether a run is allowed.
-  return sandboxProfileExecutable(effective, options);
+  return sandboxProfileExecutable(effective, { ...options, authorization });
 }
 
 /**
@@ -710,9 +770,19 @@ function adapterExclusionReasons(adapter, task, context) {
 
   const taskProfile = task?.workspace_ref?.isolation_profile_id ?? null;
   const adapterProfile = adapter.sandbox_profile_id ?? null;
-  if (context.sandbox && !sandboxProvenFor(context.sandbox, task, { authorization: context.unisolatedExecutionAuthorization ?? null, now: context.now ?? null })) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
+  // One declaration for every executability question on this pair, so the
+  // profile match, the task profile and the adapter profile are all adjudicated
+  // under the SAME authorisation. Before this the two blanket checks below ran
+  // `sandboxProfileExecutable(profile)` with no options at all, which made the
+  // HOST_UNISOLATED floor permanently unexecutable here and emptied every
+  // decision no matter which permit the operator had resolved.
+  const declared = sandboxDeclaration(context.sandbox);
+  const authorization = context.unisolatedExecutionAuthorization
+    ?? authorizationFor(declared, context.authorization);
+  if (declared && !sandboxProvenFor(declared, task, { authorization, now: context.now ?? null })) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
   if (taskProfile && adapterProfile && taskProfile !== adapterProfile) reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
-  if (!sandboxProfileExecutable(taskProfile) || !sandboxProfileExecutable(adapterProfile)) {
+  if (!sandboxProfileExecutable(taskProfile, { authorization, now: context.now ?? null })
+    || !sandboxProfileExecutable(adapterProfile, { authorization, now: context.now ?? null })) {
     reasons.push(EXCLUSION_REASONS.SANDBOX_NOT_PROVEN);
   }
 
@@ -748,12 +818,24 @@ function adapterExclusionReasons(adapter, task, context) {
  * Returns `{ selected, candidates, excluded }` where `candidates` is the
  * evaluation order and `excluded` records every refused adapter with reasons.
  */
-export function selectAdapter(adapters, task, { budgetAvailable, sandboxProven } = {}) {
+export function selectAdapter(adapters, task, { budgetAvailable, sandboxProven, unisolatedExecutionAuthorization = null, now = null } = {}) {
   if (!Array.isArray(adapters)) throw new NeedsInput('ADAPTERS_MISSING');
   if (!isPlainObject(task)) throw new NeedsInput('TASK_MISSING');
-  const sandboxContext = sandboxProven === undefined ? null
-    : (typeof sandboxProven === 'boolean' ? { proven: sandboxProven } : sandboxProven);
-  const context = { sandbox: sandboxContext, budgetAvailable: budgetAvailable ?? null };
+  // The declaration keeps its own authorisation, so a caller that hands the
+  // sandbox straight through does not have to know about the permit at all.
+  const declaredSandbox = sandboxDeclaration(sandboxProven);
+  const sandboxContext = sandboxProven === undefined || sandboxProven === null
+    ? null
+    : declaredSandbox;  const context = {
+    sandbox: sandboxContext,
+    budgetAvailable: budgetAvailable ?? null,
+    unisolatedExecutionAuthorization: unisolatedExecutionAuthorization
+      ?? authorizationFor(declaredSandbox, null),
+    // The authorisation gate is time-scoped, so the adapter-side executability
+    // check needs the same injected instant the task gate used. Without it the
+    // gate refuses with INJECTED_CLOCK_MISSING rather than reading a clock.
+    now,
+  };
 
   const assigned = task.assigned_adapter_id ?? null;
   const pool = assigned
@@ -869,6 +951,10 @@ export function planDispatch({
           ? { assigned: true, exhausted: isBudgetExhausted(grant, spentForGrant(spent, grant, dayKey)) }
           : false,
         sandboxProven: sandbox,
+        // The same server-resolved permit the task gate above was given, so the
+        // task and the adapter it picked are adjudicated under one authorisation.
+        unisolatedExecutionAuthorization,
+        now: instant,
       });
       for (const refused of outcome.excluded) {
         // The exclusion list carries no task reference (the frozen schema has

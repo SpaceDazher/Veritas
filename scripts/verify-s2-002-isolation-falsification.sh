@@ -198,6 +198,26 @@ run_mutation "15-writable-root-fs-allowed" \
   "  if (false) {" \
   "tests/isolation/*.test.mjs"
 
+# 16. THE RECORD ASKS FOR A NETWORK IT NEVER GOT. The fifteen mutations above all
+#     remove a CONTROL from the code. This one mutates the EVIDENCE instead: the
+#     published record claims `declared: allowlist` while the raw log it points at
+#     still shows `--network=none`. It passed all seventeen checks with exit 0
+#     before the gate learned to compare the declared policy with the argv, so
+#     without this case the fix would be free to rot.
+run_mutation "16-record-claims-a-network-it-never-had" \
+  "evidence/s2-002-isolation-live.json" \
+  '"declared": "deny_all"' \
+  '"declared": "allowlist"' \
+  "scripts/verify-s2-002-isolation.mjs"
+
+# 17. Same shape, one axis further: the record keeps its numbers and its declared
+#     policy but stops naming what it denies, which is prose without a measurement.
+run_mutation "17-record-names-nothing-it-denies" \
+  "evidence/s2-002-isolation-live.json" \
+  '"any destination at all"' \
+  '"nothing in particular"' \
+  "scripts/verify-s2-002-isolation.mjs"
+
 echo
 for line in "${RESULTS[@]}"; do echo "$line"; done
 echo

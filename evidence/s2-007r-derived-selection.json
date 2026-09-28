@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "record_kind": "s2-007r-derived-selection-gate",
+  "gate": "s2-007r:derived-selection",
+  "ticket": "S2-007R",
+  "issue": "SpaceDazher/Veritas#12",
+  "acceptance_case": "A-MVP-03",
+  "written_by": "scripts/s2-007r-derived-selection.mjs (s2-007r-derived-selection-v1)",
+  "gate_version": "s2-007r-derived-selection-v1",
+  "derivation": {
+    "decision_digest": "sha256:198d9b259b6bc25910776ea02e1cc5efdd21e77222ecb4c37987f52ce15d9d30",
+    "selected_task_id": "abt-derived-1",
+    "selected_adapter_id": "adr-codex-local",
+    "decision_reason": "selected abt-derived-1 (HIGH) on adr-codex-local",
+    "decided_at": "2026-09-26T12:00:00.000Z",
+    "candidates": [
+      {
+        "task_id": "abt-derived-1",
+        "priority": "HIGH",
+        "eligible": true,
+        "exclusion_reasons": []
+      }
+    ],
+    "excluded": [],
+    "stable_across_registration_order": true,
+    "contested_decision": {
+      "contractVersion": "1.0.0",
+      "decision_id": "dsc-000001",
+      "workspace_id": "ws-s2-007r-derived-selection",
+      "max_concurrency": 1,
+      "selected_task_id": "abt-high",
+      "selected_adapter_id": "adr-codex-local",
+      "selected_lease_id": null,
+      "selected_fencing_token": null,
+      "candidates": [
+        {
+          "task_id": "abt-high",
+          "priority": "HIGH",
+          "eligible": true,
+          "exclusion_reasons": []
+        },
+        {
+          "task_id": "abt-low",
+          "priority": "LOW",
+          "eligible": false,
+          "exclusion_reasons": [
+            "BUDGET_NOT_ASSIGNED"
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "subject_kind": "task",
+          "subject_id": "abt-low",
+          "reasons": [
+            "BUDGET_NOT_ASSIGNED"
+          ]
+        }
+      ],
+      "reason": "selected abt-high (HIGH) on adr-codex-local",
+      "budget_snapshot": {
+        "currency": "USD",
+        "assigned": true,
+        "task_remaining": 5,
+        "campaign_remaining": 5,
+        "day_remaining": 5
+      },
+      "decided_at": "2026-09-26T12:00:00.000Z"
+    },
+    "counts": {
+      "candidates": 2,
+      "excluded": 1,
+      "with_selected_adapter": 1
+    }
+  },
+  "selection": {
+    "adapter_id": "adr-codex-local",
+    "provider": "codex",
+    "adapter_kind": "real",
+    "decision_digest": "sha256:198d9b259b6bc25910776ea02e1cc5efdd21e77222ecb4c37987f52ce15d9d30",
+    "decision_id": "dsc-000001",
+    "rule": {
+      "rule_id": "decision.selected_adapter_id/v1",
+      "source_field": "DispatchDecision.selected_adapter_id",
+      "statement": "the adapter of record is the adapter the accepted decision selected; a caller-supplied adapter_id never overrides it and is refused when it disagrees",
+      "ordered_by": "the candidate order the decision itself published (priority rank, then task_id)"
+    },
+    "crossing_before_observation": "NOT_RUN_REAL_ADAPTER",
+    "provenance": {
+      "derived_from": "an accepted DispatchDecision",
+      "derived_by": "src/lib/agentboard/selection.mjs (a pure function of the decision and the registration set)",
+      "transport": "none — this module spawns no process and runs no model",
+      "note": "a selected adapter is a decision about an executor, never evidence that one ran"
+    }
+  },
+  "negative_controls": [
+    {
+      "id": "decision-selected-nothing",
+      "expect_code": "AGENT_UNAVAILABLE",
+      "ok": true,
+      "observed": "typed=true code=AGENT_UNAVAILABLE",
+      "note": "no adapter may serve this decision, and the scheduler may not substitute one"
+    },
+    {
+      "id": "manual-adapter-contradicts-decision",
+      "expect_code": "BLOCKED_POLICY",
+      "ok": true,
+      "observed": "typed=true code=BLOCKED_POLICY",
+      "note": "a hand-picked adapter that the decision did not select is the defect this ticket closes"
+    },
+    {
+      "id": "missing-permit-yields-no-selection",
+      "expect_code": null,
+      "ok": true,
+      "observed": "selected_adapter_id=null",
+      "note": "the floor tier without a server-resolved permit selects nothing at all"
+    },
+    {
+      "id": "forged-permit-is-refused",
+      "expect_code": null,
+      "ok": true,
+      "observed": "selected_adapter_id=null",
+      "note": "a permit whose digest does not verify never opens the floor tier"
+    },
+    {
+      "id": "test-transport-is-never-upgraded",
+      "expect_code": null,
+      "ok": true,
+      "observed": "status=NOT_RUN_REAL_ADAPTER",
+      "note": "a scripted observation over a real adapter_id is still not a crossing"
+    }
+  ],
+  "crossing": {
+    "attempted": true,
+    "scope": {
+      "crossing_kind": "version_handshake",
+      "argv": [
+        "--version"
+      ],
+      "is_a_governed_task_run": false,
+      "spends_a_model_invocation": false,
+      "statement": "this spawns a really installed CLI and records the version it printed; it is a process crossing, NOT a governed task execution, and it says nothing about run quality"
+    },
+    "handshakes": [
+      {
+        "provider": "codex",
+        "ok": true,
+        "binary_path": "/home/daniil/.local/bin/codex",
+        "binary_sha256": "61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+        "agent_version": "codex-cli 0.157.1",
+        "child_exit_code": 0,
+        "child_signal": null,
+        "raw_process_log_path": "results/s2-007r-derived-selection/codex-version.log",
+        "raw_process_log_sha256": "sha256:711e5ffe302c2ca04ac9744ea1d9bbe45bbe1b4ceb37ea26c01d32448f20114c",
+        "wall_ms": 57,
+        "scope": {
+          "crossing_kind": "version_handshake",
+          "argv": [
+            "--version"
+          ],
+          "is_a_governed_task_run": false,
+          "spends_a_model_invocation": false,
+          "statement": "this spawns a really installed CLI and records the version it printed; it is a process crossing, NOT a governed task execution, and it says nothing about run quality"
+        },
+        "selected_adapter_id": "adr-codex-local"
+      }
+    ],
+    "classified": {
+      "selection_version": "s2-007-selection-v1",
+      "decision_digest": "sha256:198d9b259b6bc25910776ea02e1cc5efdd21e77222ecb4c37987f52ce15d9d30",
+      "adapter_id": "adr-codex-local",
+      "provider": "codex",
+      "provenance": {
+        "method": "parent-process observation of a directly spawned child",
+        "observation_trust": "cooperating_transport_observation",
+        "causal_claim": "none — this records that a child process was spawned and exited, not that the run was any good"
+      },
+      "status": "REAL_ADAPTER_CROSSING",
+      "crossing_observed": true,
+      "detail": "a real child process was spawned, exited, and left a raw process log"
+    },
+    "provenance": {
+      "method": "parent-process observation of a directly spawned child",
+      "observation_trust": "cooperating_transport_observation",
+      "causal_claim": "none — this records that a child process was spawned and exited, not that the run was any good"
+    },
+    "host_probe": {
+      "candidates": 6,
+      "installed": 5,
+      "installed_ids": [
+        "adr-codex-local",
+        "adr-pi-local",
+        "adr-claude-code-local",
+        "adr-opencode-local",
+        "adr-hermes-local"
+      ],
+      "note": "probeRealAdapters reports ONE fact per candidate — an executable is on PATH. An installed executable is a host fact, never evidence that an adapter ran a task."
+    }
+  },
+  "checks": [
+    {
+      "id": "decision-selects-an-adapter",
+      "ok": true,
+      "fact": "selected_task_id=abt-derived-1 selected_adapter_id=adr-codex-local"
+    },
+    {
+      "id": "choice-is-stable-across-registration-order",
+      "ok": true,
+      "fact": "forward=adr-codex-local reversed=adr-codex-local"
+    },
+    {
+      "id": "the-excluded-list-is-populated",
+      "ok": true,
+      "fact": "candidates=2 excluded=1"
+    },
+    {
+      "id": "every-excluded-entry-carries-a-reason",
+      "ok": true,
+      "fact": "abt-low:BUDGET_NOT_ASSIGNED"
+    },
+    {
+      "id": "the-selected-candidate-is-argmin-priority-then-task-id",
+      "ok": true,
+      "fact": "selected_task_id=abt-high candidates=abt-high(HIGH),abt-low(LOW)"
+    },
+    {
+      "id": "selection-cites-the-decision-digest",
+      "ok": true,
+      "fact": "sha256:198d9b259b6bc25910776ea02e1cc5efdd21e77222ecb4c37987f52ce15d9d30"
+    },
+    {
+      "id": "selection-names-its-rule",
+      "ok": true,
+      "fact": "decision.selected_adapter_id/v1"
+    },
+    {
+      "id": "selection-carries-the-decision-basis",
+      "ok": true,
+      "fact": "basis_candidates=1 basis_excluded=0"
+    },
+    {
+      "id": "a-fresh-selection-claims-no-crossing",
+      "ok": true,
+      "fact": "crossing=NOT_RUN_REAL_ADAPTER observed=false"
+    },
+    {
+      "id": "decision-selected-nothing",
+      "ok": true,
+      "fact": "threw=true typed=true code=AGENT_UNAVAILABLE"
+    },
+    {
+      "id": "manual-adapter-contradicts-decision",
+      "ok": true,
+      "fact": "threw=true typed=true code=BLOCKED_POLICY"
+    },
+    {
+      "id": "missing-permit-yields-no-selection",
+      "ok": true,
+      "fact": "selected_adapter_id=null"
+    },
+    {
+      "id": "forged-permit-is-refused",
+      "ok": true,
+      "fact": "selected_adapter_id=null"
+    },
+    {
+      "id": "test-transport-is-never-upgraded",
+      "ok": true,
+      "fact": "status=NOT_RUN_REAL_ADAPTER"
+    },
+    {
+      "id": "real-child-spawned:codex",
+      "ok": true,
+      "fact": "adapter_id=adr-codex-local exit_code=0 log=results/s2-007r-derived-selection/codex-version.log"
+    },
+    {
+      "id": "crossing-classified",
+      "ok": true,
+      "fact": "status=REAL_ADAPTER_CROSSING provider=codex agent_version=codex-cli 0.157.1"
+    }
+  ],
+  "summary": {
+    "checks": 16,
+    "passed": 16,
+    "failed": 0,
+    "crossing_status": "REAL_ADAPTER_CROSSING"
+  },
+  "ok": true,
+  "status": "PASS",
+  "limits": [
+    "The crossing is a version handshake, not a governed task run: it proves a real child process was spawned, ran and exited. It does not measure the executor's ability to do the work.",
+    "The governed money-spending run path is scripts/s2-007r-run.mjs behind s2-007r-real-run-verify.mjs; this gate does not replace it and spends no model invocation.",
+    "The crossing observation is made by the same cooperating parent that spawned the child. It is not an adversarial boundary and carries no causal claim about run quality."
+  ]
+}
