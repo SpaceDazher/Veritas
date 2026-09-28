@@ -6,8 +6,8 @@
   "evidence_eligible": true,
   "corpus": "evidence/s2-008/corpus",
   "base": {
-    "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-    "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
+    "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+    "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
     "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 70,
@@ -16,13 +16,13 @@
   },
   "provenance": {
     "version": "s2-008-runner-v1",
-    "commit": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-    "tree": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-    "run_id": "s2-008-run-b-0-p157097",
+    "commit": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+    "tree": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+    "run_id": "s2-008-run-b-0-p196059",
     "label": "b",
-    "executor_id": "exec-s2-008-b-0-p157097",
-    "pid": 157097,
-    "nonce": "n-b-fbe0fb64cb14d73a",
+    "executor_id": "exec-s2-008-b-0-p196059",
+    "pid": 196059,
+    "nonce": "n-b-56ff3b967e7befd9",
     "clock": "2026-01-01T01:00:00.000Z",
     "started_at": "2026-01-01T01:00:00.000Z"
   },
@@ -68,11 +68,11 @@
   },
   "harness_findings": [],
   "version": "s2-008-runner-v1",
-  "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-  "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-  "raw_run_id": "s2-008-run-b-0-p157097",
-  "nonce": "n-b-fbe0fb64cb14d73a",
-  "executor_id": "exec-s2-008-b-0-p157097",
+  "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+  "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+  "raw_run_id": "s2-008-run-b-0-p196059",
+  "nonce": "n-b-56ff3b967e7befd9",
+  "executor_id": "exec-s2-008-b-0-p196059",
   "output_root": ".bb/s2-008/run/out-b-0",
   "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
   "preregistration_digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
@@ -193,7 +193,7 @@
           "granted_units": 8,
           "spent_units": 1,
           "units": 1,
-          "settle_key": "a71e6744c740ffd790fea20225ac1296df00607462e64ea40cc6ed823114efaa",
+          "settle_key": "9d3cb50f1b6842400e0931da98e844a886f5419a41e597e7c020ac498d234160",
           "replayed": false
         },
         "evaluator": {
@@ -346,15 +346,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p157097",
-        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-        "nonce": "n-b-fbe0fb64cb14d73a",
-        "executor_id": "exec-s2-008-b-0-p157097"
+        "raw_run_id": "s2-008-run-b-0-p196059",
+        "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+        "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+        "nonce": "n-b-56ff3b967e7befd9",
+        "executor_id": "exec-s2-008-b-0-p196059"
       },
       "budget": {
         "units": 1,
-        "settle_key": "a71e6744c740ffd790fea20225ac1296df00607462e64ea40cc6ed823114efaa",
+        "settle_key": "9d3cb50f1b6842400e0931da98e844a886f5419a41e597e7c020ac498d234160",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -425,7 +425,7 @@
           "granted_units": 8,
           "spent_units": 2,
           "units": 1,
-          "settle_key": "e1821fdc2f1c20def18189e71833bf1d35008362cff48b304b3f594a8c5a7577",
+          "settle_key": "c0e1f83073f0854fe2d4ec72378ce9ab2efb691deed864278bec1f7c89bf26d4",
           "replayed": false
         },
         "evaluator": {
@@ -578,15 +578,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p157097",
-        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-        "nonce": "n-b-fbe0fb64cb14d73a",
-        "executor_id": "exec-s2-008-b-0-p157097"
+        "raw_run_id": "s2-008-run-b-0-p196059",
+        "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+        "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+        "nonce": "n-b-56ff3b967e7befd9",
+        "executor_id": "exec-s2-008-b-0-p196059"
       },
       "budget": {
         "units": 1,
-        "settle_key": "e1821fdc2f1c20def18189e71833bf1d35008362cff48b304b3f594a8c5a7577",
+        "settle_key": "c0e1f83073f0854fe2d4ec72378ce9ab2efb691deed864278bec1f7c89bf26d4",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -657,7 +657,7 @@
           "granted_units": 8,
           "spent_units": 3,
           "units": 1,
-          "settle_key": "a6803c6718781995f2de57494ee6480d952e0d9a9b78edbac38b198c41a4c3a2",
+          "settle_key": "4440c5c99eb61fcd448468717c1336c0acfd5adab72877c8fc3f8668aeef0b39",
           "replayed": false
         },
         "evaluator": {
@@ -810,15 +810,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p157097",
-        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-        "nonce": "n-b-fbe0fb64cb14d73a",
-        "executor_id": "exec-s2-008-b-0-p157097"
+        "raw_run_id": "s2-008-run-b-0-p196059",
+        "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+        "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+        "nonce": "n-b-56ff3b967e7befd9",
+        "executor_id": "exec-s2-008-b-0-p196059"
       },
       "budget": {
         "units": 1,
-        "settle_key": "a6803c6718781995f2de57494ee6480d952e0d9a9b78edbac38b198c41a4c3a2",
+        "settle_key": "4440c5c99eb61fcd448468717c1336c0acfd5adab72877c8fc3f8668aeef0b39",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -880,7 +880,7 @@
           "granted_units": 8,
           "spent_units": 4,
           "units": 1,
-          "settle_key": "8839ee0336e66d127b9263077a9ba8f8bbfe038f0a86f938f13dde9943b2d634",
+          "settle_key": "caf0261c60611a0a819f88d260e567c4278b88b267c583801db3d2426b737548",
           "replayed": false
         },
         "evaluator": {
@@ -1033,15 +1033,15 @@
         }
       },
       "provenance": {
-        "raw_run_id": "s2-008-run-b-0-p157097",
-        "commit_sha": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-        "tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-        "nonce": "n-b-fbe0fb64cb14d73a",
-        "executor_id": "exec-s2-008-b-0-p157097"
+        "raw_run_id": "s2-008-run-b-0-p196059",
+        "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+        "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+        "nonce": "n-b-56ff3b967e7befd9",
+        "executor_id": "exec-s2-008-b-0-p196059"
       },
       "budget": {
         "units": 1,
-        "settle_key": "8839ee0336e66d127b9263077a9ba8f8bbfe038f0a86f938f13dde9943b2d634",
+        "settle_key": "caf0261c60611a0a819f88d260e567c4278b88b267c583801db3d2426b737548",
         "replayed": false
       },
       "elapsed_ms": 0,
@@ -1128,7 +1128,7 @@
   },
   "ledger": {
     "chain_verified": true,
-    "snapshot_digest": "sha256:15c6d884c5e48aeb035dd8c92a738301d374162b86b798db5e3d5448b3c156ee",
+    "snapshot_digest": "sha256:a7da4c3bde0ced5c21777d4a31a1b98753692207aa675432e7b728935bc57cbe",
     "record_kinds": [
       "ACCESS",
       "PREREGISTRATION_RECORDED",
@@ -1211,6 +1211,6 @@
       "verdict": "VIOLATION"
     }
   ],
-  "decision_digest": "457b531ef024bf95ba93eb28583576555f5d43815727538eabf95e9a6f1ef919",
-  "artefact_digest": "8d398f55ccba77f0bf7e43abc95013804dc5023c0cc21d4079f3a203dbce3d5a"
+  "decision_digest": "7b0724aa6aa6cadc6145e4b5a395f3861df3f0a19aa26d19e4bd3ba5c31f5dc9",
+  "artefact_digest": "adfc9630bf8da6e1c7a8a283c8c794c80b19f48140ad94ddf70a36bc40054547"
 }

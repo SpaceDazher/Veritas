@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "e9f0c37af0957b58ecc1c27bc0fb91667420fdf8",
-  "head_tree_sha": "0a411fdec43166b17d7e1deef860b1bb5a1561dd",
-  "invocation_id": "a7d5c364d925d9f036d508c84cd1e504",
+  "head": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
+  "head_tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+  "invocation_id": "6375c25ff20abe26a367b425ab093d9b",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -51,11 +51,6 @@
     "issues": [],
     "untracked_in_frozen_trees": [],
     "track_files_expected": [
-      "evidence/s2-008-campaign-evaluation.json",
-      "evidence/s2-008-campaign-probes.json",
-      "evidence/s2-008-campaign-run-a.json",
-      "evidence/s2-008-campaign-run-aborted-1.json",
-      "evidence/s2-008-campaign-run-b.json",
       "evidence/s2-008-comparison.json",
       "evidence/s2-008-controls.json",
       "evidence/s2-008-dependency-binding.json",
@@ -122,37 +117,14 @@
       "tests/research/replay-two-run.test.mjs",
       "tests/research/triage-hardening.test.mjs"
     ],
-    "track_files_expected_count": 70,
+    "track_files_expected_count": 65,
     "track_files_expected_source": "the WORKING TREE, walked over src/lib/research, tests/research, scripts, evidence/s2-008, evidence and filtered with the same regex the tracked/untracked/modified views use: ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008)",
     "track_files_unaccounted": [],
     "track_files_tracked": 70,
     "track_files_untracked": [],
-    "track_files_modified": [
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-dependency-binding.json",
-      "evidence/s2-008-harness.json",
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-replay.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json",
-      "evidence/s2-008-summary.json"
-    ],
-    "track_files_modified_by_the_chain": [
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-dependency-binding.json",
-      "evidence/s2-008-harness.json",
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-replay.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json"
-    ],
-    "track_files_modified_other": [
-      "evidence/s2-008-summary.json"
-    ],
+    "track_files_modified": [],
+    "track_files_modified_by_the_chain": [],
+    "track_files_modified_other": [],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
   },
@@ -605,7 +577,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 17081,
+      "bytes": 18759,
       "issues": []
     },
     {

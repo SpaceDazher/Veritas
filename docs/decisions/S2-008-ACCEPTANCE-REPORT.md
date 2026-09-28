@@ -145,7 +145,7 @@ and the two-process bootstrap. **The band was not moved to make an arm clear it.
 | bootstrap image | `sha256:2c063dfa6af6afb4cf0c4491967b3ad152fe66413a95c80210fb2a547dce0f56` |
 | pin is a pin | identical content built twice with `--timestamp 0` → identical `Id` **and** `Digest` (`identical: true`, `context_digest ba3f1ae1…`) |
 | axes enforced | network `deny_all` (`--network=none`), filesystem read-only root + `/tmp` tmpfs, environment allowlist of 4 names with nothing inherited, process ceilings 32 pids / 256 MB / 0.5 CPU |
-| start proof | exit 0 **and** a banner carrying the container's own pid (`1`) and runtime version, a payload that parses, and the pin re-checked by `assertImageMatchesPin`; host pid 550556 ≠ container pid 1 |
+| start proof | exit 0 **and** a banner carrying the container's own pid (`1`) and runtime version, a payload that parses, and the pin re-checked by `assertImageMatchesPin`; host pid 171768 ≠ container pid 1 |
 | launches | 10 per run: 9 blind predictions (3 arms × 3 frozen seeds) + 1 post-reveal bootstrap |
 
 **The blindness is structural, not a promise.** The predictor is handed
@@ -300,9 +300,9 @@ named rather than quietly fixed.
 
 | | run A | run B |
 | --- | --- | --- |
-| commit SHA | `0ac485bd099ee5566bc90bfea8c4052e6a70139f` | *same* |
-| tree SHA | `8cbb2f9e4872edfda8ffa51434eed1ec219991b8` | *same* |
-| raw run id | `s2-008-campaign-a-550556` | `s2-008-campaign-b-549854` |
+| commit SHA | `e58ded2c49767d0bd76759ca3623eaf935239428` | *same* |
+| tree SHA | `2b15a041db6b5ace4f066a001874264598d1e247` | *same* |
+| raw run id | `s2-008-campaign-a-171768` | `s2-008-campaign-b-172532` |
 | decision digest | `5e925f4d407318d9…` | `5e925f4d407318d9…` |
 | verdict projection digest | equal | equal |
 | campaign decision | `UNRESOLVED` | `UNRESOLVED` |
@@ -379,6 +379,18 @@ reseal of the four derived records.
 `verify-s2-008-dependencies.mjs`, `src/lib/agentboard/**`, `contracts/**` (the
 three frozen digests are byte-identical to the #8 tip), and every other branch.
 The campaign imports the machinery; it never reimplemented it.
+
+**One thing this campaign broke, and how it was handled.** The first delivery put
+its records at `evidence/s2-008-*.json`, which matches the glob in
+`tests/research/gate-semantics.test.mjs` G7/G5a — the set that test `git rm`s to
+build a base on which *no* chain record was ever produced, and then requires the
+chain's first WRITE run to produce every one of them. The campaign records are not
+chain records, so that test went red on 259/260 with *"the first chain run
+produced no `evidence/s2-008-campaign-evaluation.json`"*. The test is not mine to
+weaken, so the records moved to `evidence/s2-008-campaign/` — a name the
+name-based glob does not match — and every script was repointed. **No assertion,
+threshold, negation, test or line of `src/lib/research/**` was changed.** The
+suite is back to 260/260.
 
 **Regression check on the base**: `test:research` 260/260 · `lint` exit 0 ·
 `typecheck` exit 0 · `validate-contracts` exit 0 · `check-corpus` exit 0 ·
