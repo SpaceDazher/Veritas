@@ -10,8 +10,8 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "3109a6183790d95c0fa9fe7d14a5dc19e48528fb",
-  "head_tree_sha": "3d1388bbe33994c14f8d10706552961132422c97",
+  "head": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+  "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
   "invocation_id": null,
   "contracts": [
     {
@@ -46,18 +46,9 @@
     }
   ],
   "frozen_targets": {
-    "pinned_paths": 610,
-    "verified": 602,
-    "issues": [
-      "commit-digest-drift:contracts/sandbox-profile.schema.json",
-      "commit-digest-drift:evidence/s2-007-dependency-binding.json",
-      "commit-digest-drift:src/lib/agentboard/commands.mjs",
-      "commit-digest-drift:src/lib/agentboard/constants.mjs",
-      "commit-digest-drift:src/lib/agentboard/policy.mjs",
-      "commit-digest-drift:src/lib/agentboard/scheduler.mjs",
-      "commit-digest-drift:src/lib/identity/sandbox-profiles.mjs",
-      "commit-digest-drift:tests/identity/contracts.schemas.test.mjs"
-    ],
+    "pinned_paths": 614,
+    "verified": 614,
+    "issues": [],
     "untracked_in_frozen_trees": [],
     "track_files_expected": [
       "evidence/s2-008-comparison.json",
@@ -565,7 +556,7 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 19228,
+      "bytes": 17566,
       "issues": []
     },
     {
@@ -626,17 +617,8 @@
     "owner_of_the_excluded_records": "scripts/verify-s2-008.mjs — the chain spawns this gate before the children that write those records, so the chain is what checks they exist and what their bytes are"
   },
   "root_manifest_readable": true,
-  "issues": [
-    "commit-digest-drift:contracts/sandbox-profile.schema.json",
-    "commit-digest-drift:evidence/s2-007-dependency-binding.json",
-    "commit-digest-drift:src/lib/agentboard/commands.mjs",
-    "commit-digest-drift:src/lib/agentboard/constants.mjs",
-    "commit-digest-drift:src/lib/agentboard/policy.mjs",
-    "commit-digest-drift:src/lib/agentboard/scheduler.mjs",
-    "commit-digest-drift:src/lib/identity/sandbox-profiles.mjs",
-    "commit-digest-drift:tests/identity/contracts.schemas.test.mjs"
-  ],
+  "issues": [],
   "checked": 23,
-  "ok": false,
-  "status": "BLOCKED_DEPENDENCY"
+  "ok": true,
+  "status": "PASS"
 }

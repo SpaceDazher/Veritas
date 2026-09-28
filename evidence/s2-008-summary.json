@@ -6,8 +6,8 @@
   "ok": true,
   "exitCode": 0,
   "base": {
-    "commit_sha": "5c60e35daf98c446c64bcb91def042e920ddd101",
-    "tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
+    "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+    "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
     "tracked_files_of_this_track": 58,
@@ -15,7 +15,7 @@
     "track_tracked": true
   },
   "invocation": {
-    "id": "037a51b9a680c2c57073032405d342c2",
+    "id": "b547ceed83a6960e0c637a3d5ee0755d",
     "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
     "passed_to": [
       "scripts/s2-008-replay.mjs",
@@ -36,16 +36,9 @@
   "provability_exempt": [
     {
       "paths": [
-        "evidence/s2-008-comparison.json",
-        "evidence/s2-008-controls.json",
-        "evidence/s2-008-dependency-binding.json",
-        "evidence/s2-008-harness.json",
-        "evidence/s2-008-probes.json",
         "evidence/s2-008-replay.json",
         "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json",
-        "evidence/s2-008-security-probes.json",
-        "evidence/s2-008-summary.json"
+        "evidence/s2-008-run-b.json"
       ],
       "reason": "these are the records this chain's own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)"
     }
@@ -128,16 +121,9 @@
       "track_files_unaccounted": [],
       "track_files_untracked": [],
       "track_files_modified": [
-        "evidence/s2-008-comparison.json",
-        "evidence/s2-008-controls.json",
-        "evidence/s2-008-dependency-binding.json",
-        "evidence/s2-008-harness.json",
-        "evidence/s2-008-probes.json",
         "evidence/s2-008-replay.json",
         "evidence/s2-008-run-a.json",
-        "evidence/s2-008-run-b.json",
-        "evidence/s2-008-security-probes.json",
-        "evidence/s2-008-summary.json"
+        "evidence/s2-008-run-b.json"
       ]
     },
     "corpus": {
@@ -334,10 +320,10 @@
       "floor_issues": [],
       "record_path": "evidence/s2-008-security-probes.json",
       "record_present": true,
-      "record_sha256": "bd831d2907f7fd4a5ab89dd792e331072e4b47ad1a0c22416e036821e58d1317",
+      "record_sha256": "592f69449056530f471893969d0e43d3c6e93078763832f4b757d88bc69d0081",
       "record_bytes": 40347,
-      "record_digest": "a7c33fcaac193f88b823fe44af9455db31db4814cdc92f2216bc101958d52980",
-      "record_digest_reported": "a7c33fcaac193f88b823fe44af9455db31db4814cdc92f2216bc101958d52980",
+      "record_digest": "2cc8b9125277d95e92f5d164c70bed770c924f256f6442d43ab6d44ff38e1d35",
+      "record_digest_reported": "2cc8b9125277d95e92f5d164c70bed770c924f256f6442d43ab6d44ff38e1d35",
       "record_digest_agrees": true,
       "record_is_this_run": true,
       "record_issues": [],
@@ -356,8 +342,8 @@
       "reason": null,
       "source": "scripts/s2-008-replay.mjs",
       "overall": "PASS",
-      "invocation_id": "037a51b9a680c2c57073032405d342c2",
-      "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
+      "invocation_id": "b547ceed83a6960e0c637a3d5ee0755d",
+      "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
       "campaign_verdict": "FAIL",
       "expected_campaign_decision": "UNRESOLVED",
       "observed_campaign_decision": "UNRESOLVED",
@@ -366,25 +352,25 @@
         "A5:HELD"
       ],
       "freshness": {
-        "observed_at": "2026-09-28T04:15:56.381Z",
-        "finished_at": "2026-09-28T04:15:58.542Z",
+        "observed_at": "2026-09-28T05:51:18.434Z",
+        "finished_at": "2026-09-28T05:51:20.807Z",
         "source": "wall_clock",
         "decides": false,
         "excluded_from_repeatability": true,
-        "age_ms": 8
+        "age_ms": 9
       }
     },
     "harness": {
       "status": "PASS",
       "exitCode": 0,
       "source": "scripts/s2-008-harness.mjs",
-      "observed_at": "2026-09-28T04:15:58.975Z",
-      "evidence_sha256": "240821c81fb3b573dfedc99dd50d3ce9f7283ca89e538165c4e3e65319565fca",
+      "observed_at": "2026-09-28T05:51:21.286Z",
+      "evidence_sha256": "6e17efb65f4b23d5cfbfaf51583baf458f32cbec14196ec62e80e9df468caf03",
       "evidence_bytes": 71951,
       "record_is_this_run": true,
       "invocation_id_required": true,
-      "invocation_id": "037a51b9a680c2c57073032405d342c2",
-      "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
+      "invocation_id": "b547ceed83a6960e0c637a3d5ee0755d",
+      "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
       "head_tree_sha_matches": true,
       "exit_code_recorded": null,
       "overall": "PASS",
@@ -411,13 +397,13 @@
   "blockingGates": [],
   "notRunGates": [],
   "freshness": {
-    "observed_at": "2026-09-28T04:15:58.977Z",
-    "started_at": "2026-09-28T04:15:49.357Z",
-    "replay_judged_at": "2026-09-28T04:15:58.550Z",
-    "harness_judged_at": "2026-09-28T04:15:58.975Z",
+    "observed_at": "2026-09-28T05:51:21.288Z",
+    "started_at": "2026-09-28T05:51:04.707Z",
+    "replay_judged_at": "2026-09-28T05:51:20.816Z",
+    "harness_judged_at": "2026-09-28T05:51:21.286Z",
     "window_ms": 21600000,
-    "head_tree_sha": "63c0da9138bd77fba4f1cc6a217a8f440a131a4c",
-    "replay_finished_at": "2026-09-28T04:15:58.542Z"
+    "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+    "replay_finished_at": "2026-09-28T05:51:20.807Z"
   },
   "track_status": "TRACK_PROPERTIES_HELD",
   "authoritative": {
@@ -444,6 +430,6 @@
   "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
   "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #12)",
   "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
-  "observedAtIso": "2026-09-28T04:15:58.977Z",
-  "startedAtIso": "2026-09-28T04:15:49.357Z"
+  "observedAtIso": "2026-09-28T05:51:21.288Z",
+  "startedAtIso": "2026-09-28T05:51:04.707Z"
 }
