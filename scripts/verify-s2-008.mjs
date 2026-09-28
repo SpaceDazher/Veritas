@@ -61,8 +61,11 @@
 // THE FIX, and it is five checks, all of them strengthening:
 //   1. INVOCATION BINDING (G1). This aggregator mints ONE invocation id per run
 //      (`randomBytes`, node:crypto), passes it to all three child gates as
-//      `--invocation-id <id>`, and REFUSES a child record that does not carry
-//      it, or whose tree is not the tree this checkout is on. A record copied
+//      `--invocation-id <id>`, and REFUSES a RUN-GATE record that does not carry
+//      it, or whose tree is not the tree this checkout is on. (The dependency
+//      gate is handed the same id and records it; it is not judged on it,
+//      because it is the gate that OWNS the binding of its own record to the
+//      base.) A record copied
 //      from an earlier run cannot match, so the A3 stub dies here. WHERE the
 //      binding can be required is stated rather than assumed: the REPLAY record
 //      is written by a child this aggregator spawns in this run, so the id is
@@ -97,9 +100,12 @@
 //      the same ORDERING statement the dependency gate's `--chain-produced`
 //      makes; a modified CORPUS file is not exempt.
 //   5. G5, BOOTSTRAP ORDERING. This chain spawns the dependency gate BEFORE it
-//      spawns the replay that writes `evidence/s2-008-replay.json`, so that gate
-//      is told, with its own `--chain-produced` flag, which records this run
-//      produces itself. Without the flag the gate's standalone contract is
+//      spawns the children that write `evidence/s2-008-replay.json` and
+//      `evidence/s2-008-security-probes.json`, so that gate is told, with its
+//      own `--chain-produced` flag, which records this run produces itself — and
+//      the probes gate is spawned in this run's own mode, so the security-probes
+//      record is one THIS RUN writes rather than one it has to find before it
+//      starts. Without the flag the gate's standalone contract is
 //      byte-for-byte unchanged.
 //
 // THE INVOCATION ID IS EXCLUDED FROM REPEATABILITY, ON PURPOSE, AND IT IS THE
@@ -118,11 +124,14 @@
 // and `scripts/check-inventory.mjs` reads `git ls-files` — so a hand-edited
 // `evidence/s2-008-summary.json` in the WORKING TREE is invisible to them until
 // the next chain run rewrites it. That is not closed here and is not claimed to
-// be: the working-tree surface is what `scripts/s2-008-build-corpus.mjs --check`
-// (the corpus drift gate) covers, and this aggregator's own reading of the
-// child records is over the bytes on disk at judging time. The boundary is
-// printed by every run (`boundaries`), so a reader never has to open the report
-// to learn what this gate does not see.
+// be, and the protection is named per SURFACE rather than in one breath: the
+// corpus drift gate re-derives `tests/research/fixtures/**`, so it covers the
+// working tree of the CORPUS and not of the summary, and what covers the
+// summary is that nothing in this chain reads it back and that the next write
+// run overwrites it. This aggregator's own reading of the child records is over
+// the bytes on disk at judging time. The boundary is printed by every run
+// (`boundaries`), so a reader never has to open the report to learn what this
+// gate does not see.
 //
 //   node scripts/verify-s2-008.mjs
 //   node scripts/verify-s2-008.mjs --print-summary
@@ -142,6 +151,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { EXPECTED_CONTROLS } from '../src/lib/research/expected-values.mjs';
 import { EXTRA_CONTROL_IDS } from '../src/lib/research/negative-controls.mjs';
 import { HARD_GATE_COUNTERS, PROBE_FAMILIES, PROBE_NAMES } from '../src/lib/research/probes.mjs';
+// The digest the probes gate prints over the record it wrote, computed the same
+// way here: `canonicalDigest` over the parsed bytes is the child's own function
+// of the same document, so the comparison is between two readings of one file
+// and not between a claim and a fact.
+import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 
 import { parseArgs, resolveBase } from './s2-008-run.mjs';
 // R-C: the campaign-decision rule is DEFINED ONCE, in the replay, and this
@@ -158,14 +172,24 @@ const FRESHNESS_WINDOW_MS = Number(process.env.S2_008_FRESHNESS_WINDOW_MS ?? 6 *
 const SUMMARY_RELATIVE = 'evidence/s2-008-summary.json';
 const REPLAY_RELATIVE = 'evidence/s2-008-replay.json';
 const HARNESS_RELATIVE = 'evidence/s2-008-harness.json';
+const PROBES_RECORD_RELATIVE = 'evidence/s2-008-security-probes.json';
 /** THE RECORDS THIS CHAIN'S CHILDREN WRITE, AFTER the dependency gate has run.
  *  Passed as that gate's `--chain-produced` (G5): it makes the FIRST run on a
  *  clean base green instead of red for a file the chain had not written yet, and
  *  it excludes them from REQUIRED only — they are still read and still reported.
  *  A frozen list, because a list read off the filesystem is a list that shrinks
- *  when the filesystem does. `evidence/s2-008-security-probes.json` is NOT in it:
- *  the probes gate is spawned without `--write`, so that record has to exist
- *  before the chain runs. */
+ *  when the filesystem does.
+ *
+ *  `evidence/s2-008-security-probes.json` IS in it, and that is the last row
+ *  G5 needed. It was the one record the chain could not produce — the probes
+ *  gate is spawned by step 2, AFTER the dependency gate has run, and it was
+ *  spawned without `--write`, so a base on which the record had never been
+ *  produced was red on its FIRST run for a file the chain writes itself
+ *  (reproduced, observed exit 1, defect
+ *  `dependency gate: BLOCKED_DEPENDENCY
+ *  (evidence-absent:evidence/s2-008-security-probes.json)`). It is written in
+ *  this run's own mode now (see step 2), so the ordering statement is true
+ *  rather than aspirational. */
 const CHAIN_PRODUCED_RECORDS = Object.freeze([
   REPLAY_RELATIVE,
   'evidence/s2-008-run-a.json',
@@ -174,6 +198,7 @@ const CHAIN_PRODUCED_RECORDS = Object.freeze([
   'evidence/s2-008-controls.json',
   'evidence/s2-008-comparison.json',
   HARNESS_RELATIVE,
+  PROBES_RECORD_RELATIVE,
   // The dependency gate's OWN record: it writes that file itself, at step 1 of
   // this run, so it is the chain's business exactly like the others.
   'evidence/s2-008-dependency-binding.json',
@@ -199,7 +224,7 @@ export const DECLARED_CONTROL_COUNT = EXPECTED_CONTROLS.length + EXTRA_CONTROL_I
 /** The working-tree boundary (B-low), stated where every run prints it. It is a
  *  boundary and not a defect: nothing here can be false, and a statement that
  *  cannot be false must not decide anything. */
-const WORKING_TREE_BOUNDARY = 'BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it; the WORKING-TREE surface is what the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) covers, and this aggregator judges the child records from the bytes on disk at judging time';
+const WORKING_TREE_BOUNDARY = 'BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it. What covers the working tree is per SURFACE, and this one is not the corpus: the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) re-derives tests/research/fixtures/**, so it covers the working tree of the CORPUS, not of the summary; the working-tree surface of the summary is covered by the fact that NOTHING in this chain reads it back (no gate, no property, no verdict term consumes evidence/s2-008-summary.json) and that the next write run overwrites it. That is a stated boundary, not a check, and it is stated here so a reader never has to open the report to learn it';
 
 /** The invocation id: the one random value on this path, and the only one.
  *  16 bytes from `node:crypto`, minted once per `verify()` call, handed to both
@@ -653,6 +678,100 @@ export function probeFloorIssues(record, {
     }
   }
   return { defects, notRun, declared: { probes: declaredProbes, controls: declaredControls, hard_gate_counters: hardGateCounters.length } };
+}
+
+/**
+ * THE SECURITY-PROBES RECORD, READ BY THE CHAIN THAT OWNS IT (G5).
+ *
+ * `evidence/s2-008-security-probes.json` is the one record the chain writes
+ * itself and therefore the one record no gate can require of a base it has not
+ * been written on: the dependency gate excludes it from REQUIRED (the same
+ * ORDERING statement `--chain-produced` makes for the other records), so the
+ * chain owns whether it is there, and owning a record means reading it. Three
+ * shapes, three answers:
+ *   * ABSENT, on any run. The chain judged a probes gate from its stdout and
+ *     published `probes PASS(exit=0)` beside a base that holds no security-probes
+ *     evidence at all. That is the green-with-a-disclaimer shape this file
+ *     exists to remove, so absence is a defect and not a note. A CHECK run on
+ *     such a base stays red: it may not refresh the record it is reporting on,
+ *     and the next WRITE run is the one that produces it.
+ *   * PRESENT and, on a WRITE run, REPORTED. The child prints the record's path
+ *     and its canonical digest when it writes it; the aggregator computes the
+ *     canonical digest of the bytes it read and the two must be equal. The
+ *     child cannot be asked to vouch for a file it did not write, and this way
+ *     it does not have to: the aggregator reads the file itself.
+ *   * PRESENT on a CHECK run, unbound. The chain did not ask for that record in
+ *     this run, so provenance is PUBLISHED (`record_is_this_run: false`) and not
+ *     demanded — the same asymmetry the harness record is judged under (see 3b),
+ *     and for the same reason.
+ *
+ * Exported so `tests/research/gate-semantics.test.mjs` can drive the refusal
+ * without spawning the chain.
+ * @param {object|null} reported The child gate's own JSON summary, as parsed.
+ * @param {{requireWrittenByThisRun?: boolean, read?: () => Buffer|null}} [options]
+ * @returns {{present: boolean, readable: boolean, sha256: string|null, bytes: number|null,
+ *   canonical_digest: string|null, reported_path: string|null, reported_digest: string|null,
+ *   digest_agrees: boolean|null, issues: string[]}}
+ */
+export function classifyProbesRecord(reported, { requireWrittenByThisRun = false, read = readProbesRecordBytes } = {}) {
+  const issues = [];
+  const reportedPath = typeof reported?.path === 'string' ? reported.path : null;
+  const reportedDigest = typeof reported?.digest === 'string' ? reported.digest : null;
+  const empty = {
+    present: false, readable: false, sha256: null, bytes: null, canonical_digest: null,
+    reported_path: reportedPath, reported_digest: reportedDigest, digest_agrees: null, issues,
+  };
+  let bytes = null;
+  try {
+    bytes = read();
+  } catch {
+    bytes = null;
+  }
+  if (bytes === null) {
+    issues.push(`the security-probes record (${PROBES_RECORD_RELATIVE}) is absent, so this run publishes no security-probes evidence for a base a reader can check; the next WRITE run produces it`);
+    return empty;
+  }
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  let parsed = null;
+  try {
+    parsed = JSON.parse(bytes.toString('utf8'));
+  } catch {
+    issues.push(`the security-probes record (${PROBES_RECORD_RELATIVE}) is not readable JSON (sha256 ${sha256.slice(0, 12)}, ${bytes.length} bytes), so nothing in it can be read as this run's evidence`);
+    return { ...empty, present: true, sha256, bytes: bytes.length };
+  }
+  const canonical = canonicalDigest(parsed);
+  if (requireWrittenByThisRun) {
+    if (reportedPath !== PROBES_RECORD_RELATIVE) {
+      issues.push(`the probes gate reported writing ${reportedPath === null ? 'no record' : `\`${reportedPath}\``} while this run asked for ${PROBES_RECORD_RELATIVE}, so the record this chain owns was not written`);
+    }
+    if (reportedDigest === null) {
+      issues.push(`the probes gate reported no digest for the record it wrote, so the bytes on disk cannot be matched against the run that produced them`);
+    } else if (reportedDigest !== canonical) {
+      issues.push(`the record on disk is not the one the probes gate reported writing (reported ${reportedDigest.slice(0, 12)}, on disk ${canonical.slice(0, 12)})`);
+    }
+  }
+  return {
+    present: true,
+    readable: true,
+    sha256,
+    bytes: bytes.length,
+    canonical_digest: canonical,
+    reported_path: reportedPath,
+    reported_digest: reportedDigest,
+    digest_agrees: reportedDigest === null ? null : reportedDigest === canonical,
+    issues,
+  };
+}
+
+/** The security-probes record's bytes, exactly as they are on disk. The
+ *  aggregator hashes and parses these itself; it never accepts a digest the
+ *  record states about itself. */
+function readProbesRecordBytes() {
+  try {
+    return readFileSync(path.join(REPO_ROOT, PROBES_RECORD_RELATIVE));
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -1162,7 +1281,22 @@ export function verify(args = {}) {
   }
 
   // 2. the probes gate
-  const probes = runNode('scripts/s2-008-security-probes.mjs', args.corpus === undefined ? [] : ['--corpus', String(args.corpus)]);
+  //
+  // G5, THE MODE FOLLOWS THIS RUN'S MODE, for the same reason the harness's
+  // does (see 3b): a CHECK run must not rewrite a record it is about to judge,
+  // and a WRITE run must produce the record the chain then owns. This gate used
+  // to be spawned with no mode at all, and `scripts/s2-008-security-probes.mjs`
+  // writes its record ONLY under `--write` — so that record was the one
+  // REQUIRED record the chain could not produce, and a base on which it had
+  // never been written was red on its FIRST run for a file the chain writes
+  // itself (reproduced, observed exit 1, defect `dependency gate:
+  // BLOCKED_DEPENDENCY (evidence-absent:evidence/s2-008-security-probes.json)`,
+  // and the second and third runs exit 0). The fix is not a wider exemption: it
+  // is that the chain writes the record.
+  const probes = runNode('scripts/s2-008-security-probes.mjs', [
+    ...(args.corpus === undefined ? [] : ['--corpus', String(args.corpus)]),
+    ...(noWrite ? [] : ['--write']),
+  ]);
   const probesRecord = parseLastJson(probes.stdout);
   // G3, THE FLOORS. The numbers the record reports are compared with the numbers
   // the FROZEN probe list and control list declare in the CODE. Before this, the
@@ -1172,6 +1306,14 @@ export function verify(args = {}) {
   // "totals":{"probes_ran":0,"controls_ran":0}}` and exited 0 was a PASS gate
   // (reproduced, observed exit 0, and the summary published those zeroes).
   const floors = probeFloorIssues(probesRecord);
+  // G5, THE RECORD THE CHAIN OWNS. `evidence/s2-008-security-probes.json` is in
+  // `CHAIN_PRODUCED_RECORDS`, so the dependency gate no longer REQUIRES it and
+  // the chain is what owns it. Owning a record means reading it, and the reading
+  // is the aggregator's own: the bytes on disk, their sha256, and — on a WRITE
+  // run, the one that produced them — the canonical digest the child reported
+  // compared with the canonical digest the aggregator computes over the bytes it
+  // read. A child that says it wrote one record and leaves another is refused.
+  const probesFile = classifyProbesRecord(probesRecord, { requireWrittenByThisRun: !noWrite });
   // The GATE's own status is the aggregator's judgement of that gate, not a copy
   // of the child's exit code: a probes gate that ran nothing exits 0, and
   // publishing `PASS(exit=0)` beside a chain that is red over it would be the
@@ -1187,6 +1329,19 @@ export function verify(args = {}) {
     reasons: probesRecord?.reasons ?? null,
     // WHY the status above is not the child's exit code, when it is not.
     floor_issues: [...floors.defects, ...floors.notRun],
+    // G5: the record this chain owns, read by this file. `record_is_this_run`
+    // is `false` on a check run — the chain spawned the gate with no `--write`,
+    // so the file is an EARLIER run's committed artefact and is judged for
+    // presence and readability, not for provenance.
+    record_path: PROBES_RECORD_RELATIVE,
+    record_present: probesFile.present,
+    record_sha256: probesFile.sha256,
+    record_bytes: probesFile.bytes,
+    record_digest: probesFile.canonical_digest,
+    record_digest_reported: probesFile.reported_digest,
+    record_digest_agrees: probesFile.digest_agrees,
+    record_is_this_run: !noWrite,
+    record_issues: probesFile.issues,
     // Published so a reader sees WHERE the floor came from: a number out of the
     // record is not a floor, it is a claim.
     floor: {
@@ -1201,6 +1356,13 @@ export function verify(args = {}) {
   // own report and compared against the code — never against the record.
   defects.push(...floors.defects);
   notRun.push(...floors.notRun);
+  // G5, THE RECORD. Its issues are DEFECTS, and they decide the run (see
+  // `deriveVerdict`) without being folded into `gates.probes.status`: that
+  // status is the aggregator's reading of the CHILD, and a defect about the
+  // file the child left on disk is a different statement. The two are printed
+  // side by side on purpose — a reader sees the gate was green AND sees why the
+  // chain was not.
+  defects.push(...probesFile.issues.map((issue) => `probes record: ${issue}`));
 
   // 3. the cross-process replay, spawned BY THE AGGREGATOR, with THIS
   //    invocation's id (G1).

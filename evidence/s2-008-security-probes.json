@@ -8,11 +8,12 @@
   "exitCode": 0,
   "reasons": [],
   "base": {
-    "commit_sha": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
-    "tree_sha": "64f7c99ba376cb400225cce1868b3cffd430c587",
+    "commit_sha": "370eaa0920b07add7ba9764c1889dc7a7e907370",
+    "tree_sha": "687c419dd3f729dfcc6cf434ad301247eb8a0fec",
     "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 51,
+    "tracked_files_of_this_track": 57,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
   "corpus": "evidence/s2-008/corpus",
@@ -510,7 +511,7 @@
             {
               "label": "control_flips: post_result_rewrite flips ADMITTED -> REFUSED",
               "ok": true,
-              "detail": "injected digest 4ab7a0b53aa244e8321979f code=BLOCKED_POLICY"
+              "detail": "injected digest 73a1b4f797d68422daacb3e code=BLOCKED_POLICY"
             }
           ],
           "id": "P3",
@@ -1037,5 +1038,12 @@
   "control_fixtures": {
     "trial": "synthetic: one ALLOW trial with four satisfied bindings",
     "run": "synthetic: projected from EXPECTED_TRIAL_DECISIONS"
+  },
+  "comparator_integrity": {
+    "ok": true,
+    "decision": "UNRESOLVED",
+    "declared": "UNRESOLVED",
+    "reason": "interval_straddles_null_outside_noise_band",
+    "refusal": null
   }
 }

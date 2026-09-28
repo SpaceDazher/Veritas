@@ -1189,6 +1189,32 @@ function withChainCopy(mutate, fn) {
   }
 }
 
+/**
+ * The chain in WRITE mode, in the copy, with the verdict on stdout.
+ *
+ * `--no-write` is deliberately NOT passed here: the case this serves is the
+ * FIRST run on a base that has never produced a record, and a check run is
+ * forbidden to produce one (it must not rewrite the evidence it judges), so the
+ * first run of a base is a WRITE run. `--print-summary` still makes stdout the
+ * summary itself.
+ */
+function chainWriteRun(root, extraArgs = []) {
+  const result = spawnSync(
+    process.execPath,
+    [path.join(root, 'scripts', 'verify-s2-008.mjs'), '--print-summary', ...extraArgs],
+    { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 900_000 },
+  );
+  const stdout = String(result.stdout ?? '');
+  let summary = null;
+  try {
+    summary = JSON.parse(stdout.trim());
+  } catch {
+    summary = null;
+  }
+  assert.ok(summary !== null, `the aggregator printed no summary JSON (exit ${String(result.status)}); stdout: ${stdout.slice(0, 400)}; stderr: ${String(result.stderr ?? '').slice(0, 400)}`);
+  return { exitCode: typeof result.status === 'number' ? result.status : null, summary, stderr: String(result.stderr ?? '') };
+}
+
 /** The verdict a reader sees: the status, the defects and the process exit. */
 function verdictOf(run) {
   return JSON.stringify({ status: run.summary.status, exit: run.exitCode, defects: run.summary.defects, notRun: run.summary.notRun });
@@ -1391,5 +1417,87 @@ test('G7 the controls the repair must not break: a fabricated POSITIVE, an untra
     assert.equal(run.exitCode, 0, `the control run on a clean tree was red: ${verdictOf(run)}`);
     const after = JSON.parse(readFileSync(file, 'utf8'));
     assert.equal(after.s2_008_gate_semantics_marker, 'MUST-SURVIVE-A-CHECK-RUN', 'a CHECK run rewrote the harness record it was judging');
+  });
+});
+
+test('G7/G5a a base on which NO chain record was ever produced goes green on the FIRST run', () => {
+  // The bootstrap hole G5 left open for exactly one record. The dependency gate
+  // listed `evidence/s2-008-security-probes.json` as REQUIRED, the chain spawns
+  // that gate as its step 2 — after the dependency gate has run — and it was
+  // spawned with no mode, while the gate writes its record ONLY under
+  // `--write`. So the one record the chain could not produce was also the one
+  // record it was required to find, and a base on which it had never been
+  // written was red on its FIRST run and green from the second (reproduced by
+  // hand: exit 1, defect `dependency gate: BLOCKED_DEPENDENCY
+  // (evidence-absent:evidence/s2-008-security-probes.json)`, then exit 0). The
+  // fix is not a wider exemption: the chain WRITES the record, in the run's own
+  // mode, and reads back what it wrote.
+  //
+  // The deletion is a COMMIT, not a working-tree `rm`, for the reason the case
+  // above gives: this is a base on which the records were never produced, and a
+  // working-tree deletion would be a second, unrelated thing for the new
+  // provability rule to report. Every `evidence/s2-008-*.json` record goes, so
+  // the run has to produce all of them itself — which is the whole claim.
+  const RECORDS = readdirSync(path.join(REPO, 'evidence'))
+    .filter((name) => /^s2-008-.*\.json$/.test(name))
+    .map((name) => `evidence/${name}`);
+  assert.ok(RECORDS.includes('evidence/s2-008-security-probes.json'), 'the record the hole was about is not in the set this case removes, so the case would be vacuous');
+  withChainCopy((root) => {
+    execFileSync('git', ['rm', '-q', '-f', ...RECORDS], { cwd: root, encoding: 'utf8' });
+    commitAll(root, 'G7/G5a: a base on which no record of this chain was ever produced');
+  }, (root) => {
+    const run = chainWriteRun(root);
+    assert.equal(run.exitCode, 0, `the FIRST chain run on a base with no record was red: ${verdictOf(run)}`);
+    assert.equal(run.summary.status, 'PASS', `the first chain run on a base with no record reported ${String(run.summary.status)}: ${verdictOf(run)}`);
+    assert.deepEqual(run.summary.defects, [], `the first chain run on a base with no record reported defects: ${JSON.stringify(run.summary.defects)}`);
+    // A green first run that produced no evidence is not a green first run, and
+    // the record the hole was about is the one the chain now owns: it is on
+    // disk, and it is the record the gate said it wrote.
+    for (const relPath of RECORDS) {
+      assert.ok(existsSync(path.join(root, relPath)), `the first chain run produced no ${relPath}`);
+    }
+    const probesGate = run.summary.gates.probes;
+    assert.equal(probesGate.record_present, true, 'the security-probes record the chain owns was not read back');
+    assert.equal(probesGate.record_digest_agrees, true, `the record on disk is not the one the probes gate reported writing: ${JSON.stringify(probesGate.record_issues)}`);
+  });
+});
+
+test('G7/G5b a CHECK run on a base with no record stays RED, and a record this run did not write is not held to the digest of this run', () => {
+  // The other half of the same rule, and the direction it must not drift in. A
+  // check run may not refresh the record it is reporting on, so on a base that
+  // has none it is red — permanently, and correctly: the fix for G5a is that a
+  // WRITE run produces the record, not that a check run pretends one exists.
+  // And on a base that HAS one, the committed record is an EARLIER run's
+  // artefact, so it is published (`record_is_this_run: false`) and not held to
+  // this run's digest: demanding a digest of a record the chain did not ask for
+  // would make every check run red after every commit, which is the ordering
+  // trap G5 exists to remove.
+  const ABSENT = aggregator.classifyProbesRecord(null, { requireWrittenByThisRun: false, read: () => null });
+  assert.deepEqual(ABSENT.issues.length, 1, `an absent security-probes record produced ${ABSENT.issues.length} issue(s)`);
+  assert.match(String(ABSENT.issues[0]), /absent/, `the issue does not name the condition: ${String(ABSENT.issues[0])}`);
+  const CHECK_RUN_OK = aggregator.classifyProbesRecord(
+    { path: 'evidence/s2-008-security-probes.json', digest: 'a'.repeat(64) },
+    { requireWrittenByThisRun: false, read: () => Buffer.from('{"totals":{"probes_ran":6}}') },
+  );
+  assert.deepEqual(CHECK_RUN_OK.issues, [], `a check run refused a record it did not ask to be written: ${JSON.stringify(CHECK_RUN_OK.issues)}`);
+  assert.equal(CHECK_RUN_OK.digest_agrees, false, 'the case above is only meaningful if the reported digest really disagrees with the bytes');
+  const WRITE_RUN_MISMATCH = aggregator.classifyProbesRecord(
+    { path: 'evidence/s2-008-security-probes.json', digest: 'b'.repeat(64) },
+    { requireWrittenByThisRun: true, read: () => Buffer.from('{"totals":{"probes_ran":6}}') },
+  );
+  assert.ok(WRITE_RUN_MISMATCH.issues.some((issue) => /not the one the probes gate reported writing/.test(issue)), `a WRITE run accepted a record the gate did not report writing: ${JSON.stringify(WRITE_RUN_MISMATCH.issues)}`);
+  withChainCopy((root) => {
+    for (const relPath of readdirSync(path.join(REPO, 'evidence')).filter((name) => /^s2-008-.*\.json$/.test(name))) {
+      execFileSync('git', ['rm', '-q', '-f', `evidence/${relPath}`], { cwd: root, encoding: 'utf8' });
+    }
+    commitAll(root, 'G7/G5b: a base with no record, inspected by a check run');
+  }, (root) => {
+    const run = chainRun(root);
+    assert.notEqual(run.exitCode, 0, `a CHECK run on a base with no record reported green: ${verdictOf(run)}`);
+    assert.ok(run.summary.defects.length > 0, `a check run on a base with no record produced no defect: ${verdictOf(run)}`);
+    assert.ok(
+      run.summary.defects.some((defect) => /security-probes record/.test(defect)),
+      `no defect named the security-probes record: ${JSON.stringify(run.summary.defects)}`,
+    );
   });
 });

@@ -353,9 +353,31 @@ first run on a clean base red: the dependency gate listed
 `evidence/s2-008-replay.json` as `REQUIRED` while gate 1 runs *before* the aggregator
 spawns the replay that writes it. Observed pre-fix: run 1 **exit 1**
 (`dependency BLOCKED_DEPENDENCY`, `evidence-absent:evidence/s2-008-replay.json`),
-runs 2 and 3 **exit 0**. Fixed and re-observed on a fresh copy of the tree with no
-`evidence/s2-008-*.json`: the **first** `npm run verify:s2-008` is **exit 0**,
-`status PASS`, `defects []`, five gates `PASS(exit=0)`, both `scopeNotes` present.
+runs 2 and 3 **exit 0**.
+
+**The first round closed that record and left one open, and the acceptance sentence
+was false because of it.** `evidence/s2-008-security-probes.json` was `REQUIRED` too,
+and the chain **could not produce it**: `scripts/s2-008-security-probes.mjs` writes that
+file only under `--write`, and the aggregator spawned it with no mode at all. A triage
+reproduced the residue and this report's own claim — *"the **first**
+`npm run verify:s2-008` on a fresh copy with no `evidence/s2-008-*.json` is **exit
+0**"* — was wrong for one record. Both halves, observed by hand:
+
+| base with no `evidence/s2-008-*.json` at all (deleted **in a commit**, so this is a base on which the records were never produced) | before the relief round | after the relief round |
+| --- | --- | --- |
+| the **first** `node scripts/verify-s2-008.mjs` (a WRITE run — a check run may not refresh a record it judges) | **exit 1**, `status FAIL`, one defect `dependency gate: BLOCKED_DEPENDENCY (evidence-absent:evidence/s2-008-security-probes.json)` | **exit 0**, `status PASS`, `defects []`, five gates `PASS(exit=0)`, both `scopeNotes`, and all ten records produced by that one run |
+| a **check** run on the same bare base | **exit 1** | **exit 1**, and it now says so for this record too: `probes record: the security-probes record … is absent, so this run publishes no security-probes evidence for a base a reader can check` beside the harness's own refusal. Fail-closed, and it stays that way: the fix is that a WRITE run produces the record, not that a check run pretends one exists. |
+
+The fix is not a wider exemption — it is that the chain **writes** the record. The
+probes gate is now spawned in the run's own mode (`--write` on a write run, nothing on
+a check run, the same rule the harness record follows), the record joins
+`CHAIN_PRODUCED_RECORDS` and `CHAIN_PRODUCED_ALLOWED`, and the aggregator **reads back
+what it wrote**: `gates.probes.record_present`, `record_sha256`, `record_digest`
+(the canonical digest **the aggregator computes over the bytes it read**),
+`record_digest_reported`, `record_digest_agrees`, `record_is_this_run` and
+`record_issues []`. An absent record is a defect on any run, and on a write run a
+record that is not the one the gate reported writing is a defect too — so the chain
+owns the record instead of merely tolerating its absence.
 
 **The fix is five strengthenings, none of them a relaxation.** None of it touches
 the comparator, the six probes, the two run gates or `contracts/`; the round is about
@@ -397,41 +419,52 @@ the aggregator’s trust model, and a child’s account of itself is untrusted i
    its contract (`chain_run.flag_seen false` in the committed record), and the
    aggregator owns the presence of the records it wrote — which it already enforced.
 
-**Six negative tests hold the trust model in place** in
+**Eight negative tests hold the trust model in place** in
 `tests/research/gate-semantics.test.mjs` — the `A3` stub, the `A1a` no-op probes, the
 doctored harness record, the partially untracked track, the first-run-on-a-clean-base
-bootstrap, and one case that bundles the three controls this round must not break (a
+bootstrap, the one this round added (**`G5a`**, a base on which *no* record was ever
+produced goes green on the FIRST run; and **`G5b`**, a check run on such a base stays
+red and a record the chain did not ask to be written is not held to this run's digest),
+and one case that bundles the three controls this round must not break (a
 fabricated `POSITIVE`, a wholly untracked track, and a check run that does not launder
-what it judges). The suite is 256 tests now, 250 before this round and 246 before the
-third step; the vacuity proof is in the chat artifact — the same suite run against the
-pre-fix bytes fails the soundness section. Each case spawns the real chain in a
-throwaway clone and reads the process exit code; none of them asserts about a mock.
+what it judges). The suite is 258 tests now, 256 before this round, 250 before the
+soundness round and 246 before the third step. **The vacuity proof, observed:** the same
+32-case file against the two aggregator scripts as they stood at `370eaa0` (the fix
+reverted, the tests kept) → **exit 1, `# tests 32 / # pass 30 / # fail 2`**, the two
+being `G7/G5a` (`the FIRST chain run on a base with no record was red: … evidence-absent:evidence/s2-008-security-probes.json`)
+and `G7/G5b` (`aggregator.classifyProbesRecord is not a function`, i.e. the check does
+not exist yet); against the fixed bytes → **exit 0, `# tests 32 / # pass 32 / # fail 0`**.
+Each case spawns the real chain in a throwaway clone and reads the process exit code;
+none of them asserts about a mock.
 
 **The working-tree boundary, stated and not closed (B-low).** A doctored
 `evidence/s2-008-summary.json` **in the working tree** survives both
 `npm run manifest:check` and `npm run inventory:check`, because they read **committed**
 bytes — `scripts/generate-manifests.mjs` uses `git show HEAD:<file>` and
 `scripts/check-inventory.mjs` uses `git ls-files`. This is recorded as a **design
-boundary, not a defect closed**: the next chain run rewrites the summary, and the
-working-tree surface is what the corpus drift gate
-(`scripts/s2-008-build-corpus.mjs --check`) covers. The statement is not only in this
-report — the aggregator publishes it in the record and in its own printed output, so a
-reader of `evidence/s2-008-summary.json` alone sees it (`boundaries[0]`, verbatim in
-`evidence/s2-008-summary.json`).
+boundary, not a defect closed**. What covers the working tree is per **surface**, and
+this report previously named the wrong one: the corpus drift gate
+(`scripts/s2-008-build-corpus.mjs --check`) re-derives `tests/research/fixtures/**`, so
+it covers the working tree of the **corpus** and not of the summary — what covers the
+summary is that **nothing in the chain reads it back** (no gate, no property and no
+verdict term consumes `evidence/s2-008-summary.json`) and that the next write run
+overwrites it. The statement is not only in this report — the aggregator publishes it in
+the record and in its own printed output, so a reader of
+`evidence/s2-008-summary.json` alone sees it (`boundaries[0]`, verbatim in
+`evidence/s2-008-summary.json`, and reworded in this round so that it names the right
+protector).
 
-**One residual bootstrap hole is reported, not fixed, because the file is not this
-round’s.** `evidence/s2-008-security-probes.json` is `REQUIRED` by the dependency
-gate, and the chain **cannot produce it**: `scripts/s2-008-security-probes.mjs` writes
-that file only when it is given `--write`, and the aggregator spawns it without one
-(`scripts/verify-s2-008.mjs` documents the choice at its `CHAIN_PRODUCED_RECORDS`
-comment). Observed on a fresh copy with no `evidence/s2-008-*.json`: a bare
-`npm run verify:s2-008` is **exit 1**,
-`dependency gate: BLOCKED_DEPENDENCY (evidence-absent:evidence/s2-008-security-probes.json)`;
-after the one command that writes it (`node scripts/s2-008-security-probes.mjs
---write`, **exit 0**), the **first** `npm run verify:s2-008` is **exit 0**. Making that
-record chain-produced is a one-line change in `scripts/verify-s2-008.mjs` and
-`scripts/verify-s2-008-dependencies.mjs`; both files belong to the round’s other
-owners and neither is edited here.
+**One residual bootstrap hole survived the first round and is closed here, in the
+files the round's own file list names.** The paragraph this replaces reported
+`evidence/s2-008-security-probes.json` as *reported, not fixed, because the file is not
+this round's*. It is now this round's: the aggregator spawns the probes gate in the
+run's own mode, the record joins the chain-produced sets on both sides of the
+`--chain-produced` flag, and the aggregator reads the record back. The observation that
+made the fix necessary, re-run by hand on both sides of it, is the table in the `G`
+paragraph above. The standalone contract of the dependency gate is unchanged: without
+the flag its behaviour is byte-for-byte what it was, so `npm run
+verify:s2-008-dependencies` still answers for a base that has no records
+(**exit 0**, `chain_run.flag_seen false` on this tree).
 
 **Verified now — the reseal of the soundness round, every number traceable to a named
 evidence file.** The command list below was run in this order on this tree; the exit
@@ -461,16 +494,48 @@ hard-gate counters with `read_from`, and `gates.probes.floor_issues []`; and
 
 One reader's question is answered in the record rather than left to be discovered:
 `gates.dependency.track_files_modified` is **not** empty on a write run — it names the
-**9 records the chain itself rewrote in that same run**
-(`comparison`, `controls`, `dependency-binding`, `harness`, `probes`, `replay`,
-`run-a`, `run-b`, `summary`). Those are exempt by name, because a chain that refused to
+**10 records the chain itself rewrote** (`comparison`, `controls`, `dependency-binding`,
+`harness`, `probes`, `replay`, `run-a`, `run-b`, `security-probes`, `summary`; the
+security-probes record joined the list when the chain started writing it, in the relief
+round). Those are exempt by name, because a chain that refused to
 tolerate its own output would be red on every run; everything else in the track is not
-exempt, which is why the five **uncommitted source** files were a defect before the
+exempt, which is why the **uncommitted source** files were a defect before the
 commit above and are not a defect after it.
 
-`npm run manifest:write` / `manifest:check` were deliberately **not** run: they seal at
+`npm run manifest:write` / `manifest:check` were deliberately **not** run **in that round**:
+they seal at
 HEAD and pin the commit in `evidence/closure-record.json`, and the Seal worker owns
-that order after the commit.
+that order after the commit. (`manifest:check` is read-only and **was** run in the
+relief round below, where it answers **exit 1** for exactly the reason given here.)
+
+### 0.5d The relief round — the one confirmed claim the first round had not closed
+
+**Scope.** The triage confirmed every claim of the round and found one of them not
+actually closed: **G**, the bootstrap ordering. Everything else the triage confirmed
+about `A3`, `A1a`, `F` and `E1/E-MOD` was already fixed at `370eaa0` and was left
+alone, and `B-low` is still **stated, not closed** (see above). This round changed three
+files — `scripts/verify-s2-008.mjs`, `scripts/verify-s2-008-dependencies.mjs`,
+`tests/research/gate-semantics.test.mjs` — and the two documents. Nothing became more
+permissive: the two new refusals (an absent record, a record the gate did not report
+writing) can only turn a run red, and the standalone dependency-gate contract is
+byte-for-byte unchanged.
+
+| command | observed exit | what the run printed |
+| --- | --- | --- |
+| `node --test --test-concurrency=1 "tests/research/*.test.mjs"` | **0** | `# tests 258 / # suites 11 / # pass 258 / # fail 0 / # cancelled 0 / # skipped 0` |
+| `node --test --test-concurrency=1 tests/research/gate-semantics.test.mjs` | **0** | `# tests 32 / # pass 32 / # fail 0 / # duration_ms 142251` |
+| the same 32 cases against the two scripts as they stood at `370eaa0` | **1** | `# tests 32 / # pass 30 / # fail 2` — `G7/G5a` and `G7/G5b`; the vacuity proof |
+| `npm run s2-008:check-corpus` | **0** | the corpus check's own report, `wilson_score` tail |
+| `npm run test:s2-008-security-probes` | **0** | `reasons: []` |
+| `npm run verify:s2-008-dependencies` | **0** | `wrote evidence/s2-008-dependency-binding.json bytes=23919`, `chain_run.flag_seen false` |
+| `npm run verify:s2-008-replay` | **0** | `A3 separation fields_distinct=true separate_pids=true`, `A5 repeat child pid=… exit=0` |
+| `npm run s2-008:harness` | **0** | `RESULT properties_held=5/5 not_run=0 broken=0 verdict=FAIL overall=PASS`, `RESULT exit_code=0` |
+| `npm run verify:s2-008` on **this** worktree | **1** | five gates `PASS(exit=0)`, `defects []` from the gates, and the single defect `provability: 3 modified file(s) of this track are not bound to a base a reader can check (track_files_modified): scripts/verify-s2-008-dependencies.mjs, scripts/verify-s2-008.mjs, tests/research/gate-semantics.test.mjs` — the `G4` rule against this round's own uncommitted fix, which is where the green of the next line comes from |
+| the same command in a copy where those three files **are committed** | **0** | `status PASS`, `defects []`, `notRun []`, `scopeNotes` 2, five gates `PASS(exit=0)` |
+| `npm run lint` | **0** | `eslint .` clean |
+| `npm run typecheck` | **0** | `tsc --noEmit` clean |
+| `npm run inventory:check` | **0** | `missingFromGit: []`, `source: git ls-files -z` |
+| `npm run manifest:check` | **1** | `AssertionError: root manifest file records differ from git inventory` — the seal obligation, not a gate defect: the manifests pin a commit and this tree carries the round's edits. The Seal worker rebinds the closure and reseals after the commit; `manifest:write` was deliberately not run. |
 
 **One precondition went the other way — stricter, and it is what made the delivery
 possible.** The untracked-track rule of the third step fired on a *dirty* tree as well

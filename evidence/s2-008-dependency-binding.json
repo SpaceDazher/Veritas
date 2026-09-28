@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
-  "head_tree_sha": "869655bb82367b69ca6ab28951da65f48c0f65ac",
-  "invocation_id": "3965f4d42301f9b1a066aacd4a5625b8",
+  "head": "370eaa0920b07add7ba9764c1889dc7a7e907370",
+  "head_tree_sha": "687c419dd3f729dfcc6cf434ad301247eb8a0fec",
+  "invocation_id": "9ea1746a2a850430757ce5d0cc866f80",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -114,9 +114,38 @@
     "track_files_unaccounted": [],
     "track_files_tracked": 57,
     "track_files_untracked": [],
-    "track_files_modified": [],
-    "track_files_modified_by_the_chain": [],
-    "track_files_modified_other": [],
+    "track_files_modified": [
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-dependency-binding.json",
+      "evidence/s2-008-harness.json",
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-security-probes.json",
+      "evidence/s2-008-summary.json",
+      "scripts/verify-s2-008-dependencies.mjs",
+      "scripts/verify-s2-008.mjs",
+      "tests/research/gate-semantics.test.mjs"
+    ],
+    "track_files_modified_by_the_chain": [
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-dependency-binding.json",
+      "evidence/s2-008-harness.json",
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-security-probes.json"
+    ],
+    "track_files_modified_other": [
+      "evidence/s2-008-summary.json",
+      "scripts/verify-s2-008-dependencies.mjs",
+      "scripts/verify-s2-008.mjs",
+      "tests/research/gate-semantics.test.mjs"
+    ],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
   },
@@ -474,10 +503,13 @@
     },
     {
       "path": "evidence/s2-008-security-probes.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 39907,
-      "issues": []
+      "bytes": 40347,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-run-a.json",
@@ -503,7 +535,7 @@
       "path": "evidence/s2-008-replay.json",
       "required": false,
       "present": true,
-      "bytes": 36849,
+      "bytes": 36789,
       "issues": [],
       "excluded_from_required": true,
       "chain_produced": true,
@@ -527,14 +559,14 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 16043,
+      "bytes": 18620,
       "issues": []
     },
     {
       "path": "evidence/s2-008-harness.json",
       "required": false,
       "present": true,
-      "bytes": 71951,
+      "bytes": 71891,
       "issues": [],
       "excluded_from_required": true,
       "chain_produced": true,
@@ -559,12 +591,14 @@
       "evidence/s2-008-harness.json",
       "evidence/s2-008-run-a.json",
       "evidence/s2-008-run-b.json",
-      "evidence/s2-008-replay.json"
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-security-probes.json"
     ],
     "excluded": [
       "evidence/s2-008-probes.json",
       "evidence/s2-008-controls.json",
       "evidence/s2-008-comparison.json",
+      "evidence/s2-008-security-probes.json",
       "evidence/s2-008-run-a.json",
       "evidence/s2-008-run-b.json",
       "evidence/s2-008-replay.json",
@@ -586,7 +620,6 @@
       "evidence/s2-008/corpus/preregistration.json"
     ],
     "required_effective": [
-      "evidence/s2-008-security-probes.json",
       "evidence/s2-008/corpus/manifest.json",
       "evidence/s2-008/corpus/preregistration.json"
     ],

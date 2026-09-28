@@ -141,9 +141,12 @@ const CHAIN_PRODUCED_REASON = 'excluded from REQUIRED by --chain-produced: the c
  *  security-probes record and call it a bootstrap: the flag is an ORDERING
  *  statement ("this run writes these itself"), not a way to shorten the required
  *  list. Every row is produced by a child `scripts/verify-s2-008.mjs` spawns
- *  after this gate. `evidence/s2-008-security-probes.json` is deliberately NOT
- *  in the set: the chain spawns that gate WITHOUT `--write`, so it writes
- *  nothing and the file has to exist before the chain runs.
+ *  after this gate — including `evidence/s2-008-security-probes.json`, which the
+ *  chain used to spawn WITHOUT `--write` and therefore could not produce. That
+ *  made the exclusion a lie and the first run on a clean base red (reproduced,
+ *  observed exit 1, defect `evidence-absent:evidence/s2-008-security-probes.json`).
+ *  The chain spawns that gate in the run's own mode now, so the row is true, and
+ *  the chain reads the record it wrote (`gates.probes.record_*` in the summary).
  */
 const CHAIN_PRODUCED_ALLOWED = Object.freeze([
   OUT_RELATIVE,
@@ -154,6 +157,7 @@ const CHAIN_PRODUCED_ALLOWED = Object.freeze([
   'evidence/s2-008-run-a.json',
   'evidence/s2-008-run-b.json',
   'evidence/s2-008-replay.json',
+  'evidence/s2-008-security-probes.json',
 ]);
 
 function isPlainObject(value) {
