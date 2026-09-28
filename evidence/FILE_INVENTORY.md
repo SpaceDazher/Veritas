@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 986.
+Generated from `git ls-files`; count: 939.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -390,7 +390,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/S2-006M-PROVIDER-PILOT.md`
 - `docs/decisions/S2-006M-SOURCE-REVIEW.md`
 - `docs/decisions/S2-007-EVALUATION-REPORT.md`
-- `docs/decisions/S2-008-EVALUATION-REPORT.md`
 - `docs/decisions/SLOQUAL-001-EVALUATION-REPORT.md`
 - `docs/DEVELOPMENT.md`
 - `docs/ingestion/S2-003-CONNECTOR-CONTRACT.md`
@@ -407,7 +406,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/security/S2-002-THREAT-MODEL.md`
 - `docs/stages/S2-007.md`
 - `docs/stages/S2-007R.md`
-- `docs/stages/S2-008.md`
 - `docs/stages/stage-1.md`
 - `eslint.config.mjs`
 - `evidence/clean-checkout.json`
@@ -443,6 +441,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-002-comparison.json`
 - `evidence/s2-002-dependency-binding.json`
 - `evidence/s2-002-gvisor-sandbox.json`
+- `evidence/s2-002-isolation-image.json`
+- `evidence/s2-002-isolation-live.json`
 - `evidence/s2-002-podman-sandbox.json`
 - `evidence/s2-002-run-a.json`
 - `evidence/s2-002-run-b.json`
@@ -497,29 +497,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007-summary.json`
 - `evidence/s2-007r-amvp-cases.json`
 - `evidence/s2-007r-comparison.json`
-- `evidence/s2-007r-derived-selection.json`
 - `evidence/s2-007r-host-unisolated.json`
 - `evidence/s2-007r-pilot.json`
 - `evidence/s2-007r-real-run-gate.json`
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
-- `evidence/s2-008-comparison.json`
-- `evidence/s2-008-controls.json`
-- `evidence/s2-008-dependency-binding.json`
-- `evidence/s2-008-harness.json`
-- `evidence/s2-008-probes.json`
-- `evidence/s2-008-replay.json`
-- `evidence/s2-008-run-a.json`
-- `evidence/s2-008-run-b.json`
-- `evidence/s2-008-security-probes.json`
-- `evidence/s2-008-summary.json`
-- `evidence/s2-008/corpus/cases/dev.json`
-- `evidence/s2-008/corpus/cases/holdout.json`
-- `evidence/s2-008/corpus/manifest.json`
-- `evidence/s2-008/corpus/preregistration-superseded.json`
-- `evidence/s2-008/corpus/preregistration-supersession.json`
-- `evidence/s2-008/corpus/preregistration.json`
-- `evidence/s2-008/corpus/supersession-ledger.json`
 - `evidence/sloqual-001-comparison.json`
 - `evidence/sloqual-001-integrity.json`
 - `evidence/sloqual-001-run-a.json`
@@ -552,6 +534,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `pilots/scenario-b/task-brief.json`
 - `postcss.config.mjs`
 - `README.md`
+- `results/s2-002/isolation/live/raw-run.log.json`
 - `results/s2-002/run-a/observations.json`
 - `results/s2-002/run-a/summary.json`
 - `results/s2-002/run-b/observations.json`
@@ -579,7 +562,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-005/smoke.json`
 - `results/s2-006/model-assisted-pilot-pool.json`
 - `results/s2-006/s2-006-db-comparison.json`
-- `results/s2-007r-derived-selection/codex-version.log`
 - `results/s2-007r/campaign-ledger.json`
 - `results/s2-007r/cell-pa2/campaign-ledger.json`
 - `results/s2-007r/cell-pa2/raw/pa2/bootstrap/codex/run-bootstrap-codex-pa2/raw/exec-000.log.json`
@@ -690,6 +672,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/generate-verifier-types.mjs`
 - `scripts/git-client.mjs`
 - `scripts/policy-probes.mjs`
+- `scripts/s2-002-isolation-image.mjs`
+- `scripts/s2-002-isolation-run.mjs`
 - `scripts/s2-002-run.mjs`
 - `scripts/s2-003-db-replay.mjs`
 - `scripts/s2-003-run.mjs`
@@ -709,18 +693,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007-run.mjs`
 - `scripts/s2-007-security-probes.mjs`
 - `scripts/s2-007r-authorization.mjs`
-- `scripts/s2-007r-derived-selection.mjs`
 - `scripts/s2-007r-lifecycle.mjs`
 - `scripts/s2-007r-measure.mjs`
 - `scripts/s2-007r-measurement-set.mjs`
 - `scripts/s2-007r-probes.mjs`
 - `scripts/s2-007r-real-run-verify.mjs`
 - `scripts/s2-007r-run.mjs`
-- `scripts/s2-008-build-corpus.mjs`
-- `scripts/s2-008-harness.mjs`
-- `scripts/s2-008-replay.mjs`
-- `scripts/s2-008-run.mjs`
-- `scripts/s2-008-security-probes.mjs`
 - `scripts/security-probes.mjs`
 - `scripts/sloqual-freeze.mjs`
 - `scripts/sloqual-run.mjs`
@@ -735,6 +713,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-postgres-smoke.mjs`
 - `scripts/verify-s2-002-cancellation-v2.mjs`
 - `scripts/verify-s2-002-dependencies.mjs`
+- `scripts/verify-s2-002-isolation-falsification.sh`
+- `scripts/verify-s2-002-isolation.mjs`
 - `scripts/verify-s2-002.mjs`
 - `scripts/verify-s2-003-dependencies.mjs`
 - `scripts/verify-s2-003.mjs`
@@ -748,12 +728,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-s2-007.mjs`
 - `scripts/verify-s2-007r-host-unisolated.mjs`
 - `scripts/verify-s2-007r.mjs`
-- `scripts/verify-s2-008-dependencies.mjs`
-- `scripts/verify-s2-008.mjs`
 - `scripts/verify-sloqual-001.mjs`
 - `scripts/verify.mjs`
 - `scripts/veritas-board-cli.mjs`
 - `scripts/veritas-cli.mjs`
+- `scripts/veritas-credential-provision.mjs`
 - `src/app/api/agent-board/[...path]/route.ts`
 - `src/app/api/agent-board/route.ts`
 - `src/app/api/board/route.ts`
@@ -778,7 +757,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/agentboard/policy.mjs`
 - `src/lib/agentboard/probes.mjs`
 - `src/lib/agentboard/scheduler.mjs`
-- `src/lib/agentboard/selection.mjs`
 - `src/lib/agentboard/store.mjs`
 - `src/lib/board.ts`
 - `src/lib/claims/contracts.d.ts`
@@ -824,22 +802,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
-- `src/lib/research/campaign-decision.mjs`
-- `src/lib/research/campaign-expectation.mjs`
-- `src/lib/research/causality.mjs`
-- `src/lib/research/comparator.mjs`
-- `src/lib/research/constants.mjs`
-- `src/lib/research/contracts.mjs`
-- `src/lib/research/dataset.mjs`
-- `src/lib/research/executor.mjs`
-- `src/lib/research/expected-values.mjs`
-- `src/lib/research/index.mjs`
-- `src/lib/research/negative-controls.mjs`
-- `src/lib/research/policy.mjs`
-- `src/lib/research/preregistration.mjs`
-- `src/lib/research/probes.mjs`
-- `src/lib/research/registry.mjs`
-- `src/lib/research/runner.mjs`
+- `src/lib/isolation/Containerfile.executor`
+- `src/lib/isolation/egress.mjs`
+- `src/lib/isolation/image.mjs`
+- `src/lib/isolation/launch.mjs`
+- `src/lib/isolation/profile.mjs`
+- `src/lib/isolation/README.md`
+- `src/lib/isolation/secrets.mjs`
 - `src/lib/sloqual/comparator.mjs`
 - `src/lib/sloqual/contract.mjs`
 - `src/lib/sloqual/index.mjs`
@@ -871,13 +840,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-006_INDEPENDENT_SEMANTIC_VERIFIER.md`
 - `tasks/S2-006E_ENGINEERING_CLOSURE.md`
 - `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
-- `tasks/S2-008_RD_EXPERIMENT_CYCLE.md`
 - `tasks/SLOQUAL-001_SLO_QUALIFICATION.md`
 - `tests/agentboard/concurrency.test.mjs`
 - `tests/agentboard/contracts-drift.test.mjs`
 - `tests/agentboard/contracts.test.mjs`
 - `tests/agentboard/dependency-runner.test.mjs`
-- `tests/agentboard/derived-selection.test.mjs`
 - `tests/agentboard/execution-callbacks.test.mjs`
 - `tests/agentboard/fixtures/claim-race-child.mjs`
 - `tests/agentboard/fixtures/real-executor-stub.mjs`
@@ -921,24 +888,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/security-hardening.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
 - `tests/ingestion/transactional-audit.test.mjs`
-- `tests/research/comparator-probes.test.mjs`
-- `tests/research/comparator.test.mjs`
-- `tests/research/dataset.test.mjs`
-- `tests/research/fixtures/fixture-corrupted-variants.mjs`
-- `tests/research/fixtures/fixture-digest.mjs`
-- `tests/research/fixtures/fixture-expected-values.mjs`
-- `tests/research/fixtures/fixture-fixed-clock.mjs`
-- `tests/research/fixtures/fixture-measurement-set.mjs`
-- `tests/research/fixtures/fixture-preregistration.mjs`
-- `tests/research/fixtures/fixture-run-identity.mjs`
-- `tests/research/fixtures/fixture-temp-base.mjs`
-- `tests/research/fixtures/index.mjs`
-- `tests/research/fixtures/README.md`
-- `tests/research/gate-semantics.test.mjs`
-- `tests/research/harness.test.mjs`
-- `tests/research/registry-prereg.test.mjs`
-- `tests/research/replay-two-run.test.mjs`
-- `tests/research/triage-hardening.test.mjs`
+- `tests/isolation/credential-bridge.test.mjs`
+- `tests/isolation/credential-provision.test.mjs`
+- `tests/isolation/live-evidence.test.mjs`
+- `tests/isolation/profile-axes.test.mjs`
 - `tests/sloqual/comparator.test.mjs`
 - `tests/sloqual/contract.test.mjs`
 - `tests/sloqual/harness.test.mjs`

@@ -1,0 +1,35 @@
+# The executor image, built from a digest-pinned base.
+#
+# Read-only. Every instruction is a literal in this file or in
+# `src/lib/isolation/image.mjs`; nothing is passed as a build argument, so the
+# build has no free-form surface and `podman build` on this file produces the
+# same image on any host that has the same base digest and the same executor
+# bytes.
+#
+# `--timestamp 0` is what makes the derived digest a PIN rather than a
+# coincidence. Without it buildah stamps each layer with the wall clock, so two
+# builds of identical content get different layer digests and different image
+# digests — measured here, and the reason the first derived image had to be
+# replaced. With it, two independent builds of this file and the same executor
+# tree produced the identical image digest both times.
+#
+# There is no `RUN` step. The base's `node` is the only runtime the image needs
+# and it is already there; adding a RUN would add a layer whose contents depend
+# on the base image's own environment, which is one more thing to reproduce for
+# no benefit. The executor is proven to run by the live run
+# (`scripts/s2-002-isolation-run.mjs`), not by a build step that could cache.
+
+FROM docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2
+
+# The installed executor, staged into the build context by
+# `scripts/s2-002-isolation-image.mjs` from the host's real installation. The
+# `COPY` is the whole point: the image contains a genuinely installed executor,
+# not a shell that could plausibly host one.
+COPY opt/veritas-executor /opt/veritas-executor
+
+# Declared, not executed. The entrypoint is fixed here so the run never has to
+# name it in an argv, and so `podman inspect` reports what the image is.
+LABEL org.veritas.subject="A-MVP-04" \
+      org.veritas.executor.package="@earendil-works/pi-coding-agent" \
+      org.veritas.executor.entrypoint="/opt/veritas-executor/dist/bundle/cli.js" \
+      org.veritas.base.digest="sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"

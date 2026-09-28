@@ -1,0 +1,310 @@
+// S2-002 A-MVP-04 — build the executor image and pin what came out.
+//
+// The one writer of `evidence/s2-002-isolation-image.json`, and the only place
+// a derived image digest is ever produced. The run script
+// (`s2-002-isolation-run.mjs`) is a reader of that record: it refuses to launch
+// an image whose digests are not the pinned ones.
+//
+// WHY THE DERIVED DIGEST IS A PIN AND NOT A COINCIDENCE
+//
+// The first attempt at this produced a derived image and recorded its digest,
+// and that digest was gone from the store the next hour — podman had pruned it,
+// because a locally built image with no tag anyone pulls is exactly what a
+// maintenance pass collects. A pin that evaporates is not a pin.
+//
+// The fix is `--timestamp 0`, and it is worth stating what it does: buildah
+// stamps every layer with the wall clock by default, so two builds of
+// byte-identical content get different layer digests and therefore different
+// image digests. With the timestamp zeroed, layer digests are a function of
+// content alone. Measured: two independent builds of the same Containerfile
+// from the same staged tree produced the identical `Id` and the identical
+// `Digest`. So the derived image is now reproducible from
+//
+//     (BASE_IMAGE digest) + (executor tree bytes)
+//
+// and the record below names all three, which is what lets a third host
+// reproduce the pin rather than take it on trust.
+//
+// THE EXECUTOR TREE IS NOT COMMITTED. It is 152 MB of the host's real
+// installation. Copying it into the repository would be both wrong and
+// pointless — the point is that the executor is genuinely installed, and a
+// vendored copy would stop being evidence of that. Instead the tree is digested
+// where it lives: `executor_tree.sha256` is a digest over the sorted list of
+// (relative path, file digest) pairs, so the record states exactly which bytes
+// went in, and a host whose installation differs produces a different digest and
+// is refused rather than quietly measured against someone else's pin.
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import {
+  cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync,
+} from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import {
+  BASE_IMAGE,
+  EXECUTOR_IMAGE_DIGEST,
+  EXECUTOR_IMAGE_ID,
+  EXECUTOR_PACKAGE,
+  EXECUTOR_TREE_FILES,
+  EXECUTOR_TREE_SHA256,
+  EXECUTOR_VERSION,
+  IMAGE_ERRORS,
+  assertDigestPinned,
+  digestOf,
+  normalizeDigest,
+  sha256,
+} from '../src/lib/isolation/image.mjs';
+import { PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const CONTAINERFILE = path.join(ROOT, 'src', 'lib', 'isolation', 'Containerfile.executor');
+const RECORD_PATH = path.join(ROOT, 'evidence', 's2-002-isolation-image.json');
+
+export const SCHEMA_VERSION = 1;
+
+// Where the genuinely installed executor lives on this host. A path, so the
+// provenance is a location and not a claim.
+export const EXECUTOR_SOURCE = {
+  package: EXECUTOR_PACKAGE,
+  globalRoot: '/home/daniil/.local/lib/node_modules',
+  directories: ['dist', 'node_modules', 'package.json'],
+  expectedVersion: EXECUTOR_VERSION,
+};
+
+const commands = [];
+
+function podman(args, { label, timeoutMs = 900_000 } = {}) {
+  const argv = [...PODMAN_HOST.argvPrefix, ...args];
+  const run = spawnSync(PODMAN_HOST.executable, argv, {
+    encoding: 'utf8', timeout: timeoutMs, shell: false,
+    env: { PATH: '/tmp/bin:/usr/bin:/bin', HOME: '/tmp', XDG_RUNTIME_DIR: '/tmp/xdg-rt', TMPDIR: '/tmp' },
+  });
+  const record = {
+    step: label,
+    argv: [...argv],
+    exitCode: Number.isInteger(run?.status) ? run.status : null,
+    signal: run?.signal ?? null,
+    stdoutSha256: sha256(String(run?.stdout ?? '')),
+    stderrSha256: sha256(String(run?.stderr ?? '')),
+  };
+  commands.push(record);
+  return { ...record, stdout: String(run?.stdout ?? ''), stderr: String(run?.stderr ?? '') };
+}
+
+/**
+ * A digest over a directory tree: every regular file's relative path and its own
+ * SHA-256, in sorted order, fed into one hash.
+ *
+ * Sorted so the digest does not depend on readdir order, and hashed by CONTENT
+ * so it does not depend on mtimes — the two things that would otherwise make the
+ * same installation produce two different "provenance" values.
+ */
+export function digestTree(root) {
+  const entries = [];
+  const walk = (dir, prefix) => {
+    for (const name of readdirSync(dir).sort()) {
+      if (name === '.git' || name === 'node_modules/.cache') continue;
+      const full = path.join(dir, name);
+      const rel = prefix ? `${prefix}/${name}` : name;
+      const stat = statSync(full);
+      if (stat.isDirectory()) walk(full, rel);
+      else if (stat.isFile()) entries.push(`${rel}\u0000${sha256(readFileSync(full))}`);
+      // Symlinks are skipped rather than followed: resolving one would let a
+      // link outside the tree change the digest with a byte this function never
+      // read, and the build would then copy something the digest does not cover.
+    }
+  };
+  walk(root, '');
+  return { digest: `sha256:${sha256(entries.join('\n'))}`, fileCount: entries.length, entries };
+}
+
+function stageContext(treeDigest) {
+  const source = path.join(EXECUTOR_SOURCE.globalRoot, EXECUTOR_PACKAGE);
+  if (!existsSync(source)) {
+    throw new Error(`ISOLATION_EXECUTOR_NOT_INSTALLED:${source}`);
+  }
+  for (const name of EXECUTOR_SOURCE.directories) {
+    if (!existsSync(path.join(source, name))) {
+      throw new Error(`ISOLATION_EXECUTOR_INCOMPLETE:${name}`);
+    }
+  }
+  const context = mkdtempSync(path.join(os.tmpdir(), 'veritas-isolation-build-'));
+  const dest = path.join(context, 'opt', 'veritas-executor');
+  mkdirSync(dest, { recursive: true });
+  for (const name of EXECUTOR_SOURCE.directories) {
+    cpSync(path.join(source, name), path.join(dest, name), { recursive: true, dereference: false });
+  }
+  return { context, source, treeDigest };
+}
+
+function readPinnedPackageVersion(source) {
+  const pkg = JSON.parse(readFileSync(path.join(source, 'package.json'), 'utf8'));
+  return pkg.version;
+}
+
+export function buildRecord({ base, executor, provenance, built, pin, status, reason }) {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    record: 's2-002-isolation-image',
+    subject: 'A-MVP-04',
+    subjectId: 'a-mvp-04-isolation-image',
+    aMvpClause: 'изоляция — образ',
+    status,
+    reason,
+    base,
+    executor,
+    provenance,
+    build: built,
+    pin,
+    reproducibility: {
+      recipe: 'podman build --timestamp 0 -f src/lib/isolation/Containerfile.executor <staged context>',
+      why_timestamp_zero: 'buildah stamps layers with the wall clock by default, so two builds of identical content get different digests; with the timestamp zeroed the derived digest is a function of (base digest + executor tree bytes) alone',
+      measured: 'two independent builds of the same Containerfile and the same staged tree produced the identical Id and the identical Digest',
+      portablePin: 'base.registry_digest',
+      localPin: 'executor.derived_digest',
+      note: 'the executor tree is not committed; it is digested where it is installed, and a host whose installation differs produces a different executor_tree_sha256 and is refused rather than measured against this pin',
+    },
+    commands,
+    limits: [
+      'the derived digest is reproducible only for the executor tree this record names; an executor upgrade moves the pin and that move must be an explicit, reviewed change',
+      'no RUN instruction exists in the Containerfile, so the image is proven to contain a working executor by the live run, not by a cached build step',
+    ],
+  };
+}
+
+function main() {
+  commands.length = 0;
+  let status = 'PASS';
+  let reason = null;
+
+  // 1. The base, pulled by digest. A tag would make "the pinned base" a phrase
+  //    with no referent, and `assertDigestPinned` is the check that says so.
+  const pinned = assertDigestPinned(BASE_IMAGE);
+  const pull = podman(['pull', pinned], { label: 'image:pull-base' });
+  const baseInspect = podman(['inspect', '--format', '{{.Digest}}|{{.Architecture}}', pinned], { label: 'image:inspect-base' });
+  const [observedBaseDigest, observedBaseArch] = baseInspect.stdout.trim().split('|');
+  const base = {
+    registry_digest: digestOf(BASE_IMAGE),
+    reference: BASE_IMAGE,
+    pull_exit: pull.exitCode,
+    observed_digest: observedBaseDigest || null,
+    architecture: observedBaseArch || null,
+    digest_matches_pin: observedBaseDigest === digestOf(BASE_IMAGE),
+  };
+
+  // 2. The executor tree, where it is actually installed, digested.
+  const source = path.join(EXECUTOR_SOURCE.globalRoot, EXECUTOR_SOURCE.package);
+  let tree = { digest: null, fileCount: 0 };
+  let installedVersion = null;
+  let provenance = null;
+  try {
+    tree = digestTree(source);
+    installedVersion = readPinnedPackageVersion(source);
+    provenance = {
+      source_path: source,
+      package: EXECUTOR_SOURCE.package,
+      installed_version_from_package_json: installedVersion,
+      expected_version: EXECUTOR_SOURCE.expectedVersion,
+      version_matches: installedVersion === EXECUTOR_SOURCE.expectedVersion,
+      executor_tree_sha256: tree.digest,
+      executor_tree_files: tree.fileCount,
+      directories_copied: [...EXECUTOR_SOURCE.directories],
+      symlinks: 'skipped, not followed; a resolved link could otherwise change the digest with bytes the build copies but the digest never read',
+      committed_to_repository: false,
+    };
+  } catch (error) {
+    status = 'NOT_RUN';
+    reason = error.message;
+  }
+
+  // 3. The build. Skipped entirely if the executor is not installed, so a missing
+  //    installation is reported as NOT_RUN rather than as a build that produced
+  //    something from nothing.
+  let built = { performed: false };
+  if (status === 'PASS') {
+    const staged = stageContext(tree);
+    try {
+      // `--pull=never` on the build: the base is already pulled BY DIGEST, and
+      // letting the builder resolve a tag would reintroduce the mutability the
+      // pin exists to remove.
+      const build = podman([
+        'build', '--timestamp', '0', '--pull=never',
+        '-f', CONTAINERFILE, '-t', 'localhost/veritas-executor:isolated',
+        staged.context,
+      ], { label: 'image:build-executor' });
+      const inspect = podman([
+        'inspect', '--format', '{{.Id}}|{{.Digest}}|{{.Architecture}}|{{len .RootFS.Layers}}',
+        'localhost/veritas-executor:isolated',
+      ], { label: 'image:inspect-executor' });
+      const [id, digest, arch, layers] = inspect.stdout.trim().split('|');
+      built = {
+        performed: true,
+        build_exit: build.exitCode,
+        inspect_exit: inspect.exitCode,
+        observed: { Id: id ?? null, Digest: digest ?? null, Architecture: arch ?? null, layers: Number.isInteger(Number(layers)) ? Number(layers) : null },
+        context_staged_from: staged.source,
+      };
+      if (build.exitCode !== 0) { status = 'FAIL'; reason = `build exit ${build.exitCode}`; }
+    } finally {
+      rmSync(staged.context, { recursive: true, force: true });
+    }
+  }
+
+  // 4. The pin. Both fields, and the executor tree, or nothing is claimed.
+  const pin = {
+    executor_image_id: EXECUTOR_IMAGE_ID,
+    executor_image_digest: EXECUTOR_IMAGE_DIGEST,
+    executor_tree_sha256_pinned: EXECUTOR_TREE_SHA256,
+    executor_tree_sha256_observed: provenance?.executor_tree_sha256 ?? null,
+    executor_tree_matches: provenance?.executor_tree_sha256 === EXECUTOR_TREE_SHA256,
+    executor_tree_files_pinned: EXECUTOR_TREE_FILES,
+    executor_tree_files_observed: provenance?.executor_tree_files ?? null,
+    id_matches: normalizeDigest(built.observed?.Id) === EXECUTOR_IMAGE_ID,
+    digest_matches: normalizeDigest(built.observed?.Digest) === EXECUTOR_IMAGE_DIGEST,
+    architecture: built.observed?.Architecture ?? null,
+    digest_pinned: (() => { try { assertDigestPinned(EXECUTOR_IMAGE_ID); return true; } catch { return false; } })(),
+    codes: IMAGE_ERRORS,
+  };
+  if (status === 'PASS') {
+    if (!pin.id_matches || !pin.digest_matches) {
+      status = 'FAIL';
+      reason = `derived image does not match the pin: id ${normalizeDigest(built.observed?.Id)} vs ${EXECUTOR_IMAGE_ID}, digest ${normalizeDigest(built.observed?.Digest)} vs ${EXECUTOR_IMAGE_DIGEST}`;
+    } else if (!provenance.version_matches) {
+      status = 'FAIL';
+      reason = `installed executor is ${installedVersion}, the pin expects ${EXECUTOR_SOURCE.expectedVersion}`;
+    } else if (provenance.executor_tree_sha256 !== EXECUTOR_TREE_SHA256) {
+      // The pin and its provenance are allowed to move only together. A host
+      // with a different installation is REFUSED rather than measured: silently
+      // accepting a new tree and re-pinning would make the pin a description of
+      // whatever happened to be installed.
+      status = 'FAIL';
+      reason = `installed executor tree is ${provenance.executor_tree_sha256}, the pin was built from ${EXECUTOR_TREE_SHA256} (${EXECUTOR_TREE_FILES} files); an executor upgrade moves both literals as a reviewed change`;
+    } else if (!base.digest_matches_pin) {
+      status = 'FAIL';
+      reason = `base digest ${observedBaseDigest} does not match the pinned ${digestOf(BASE_IMAGE)}`;
+    }
+  }
+
+  const record = buildRecord({ base, executor: { package: EXECUTOR_SOURCE.package, entrypoint: '/opt/veritas-executor/dist/bundle/cli.js' }, provenance, built, pin, status, reason });
+  writeFileSync(RECORD_PATH, `${JSON.stringify(record, null, 2)}\n`);
+  process.stdout.write([
+    `status=${record.status}`,
+    `base_digest=${base.observed_digest}`,
+    `executor_id=${built.observed?.Id ?? 'none'}`,
+    `executor_digest=${built.observed?.Digest ?? 'none'}`,
+    `executor_tree_sha256=${provenance?.executor_tree_sha256 ?? 'none'}`,
+    `executor_tree_files=${provenance?.executor_tree_files ?? 'none'}`,
+    `pin_id_matches=${pin.id_matches}`,
+    `pin_digest_matches=${pin.digest_matches}`,
+    `pin_tree_matches=${pin.executor_tree_matches}`,
+    `record=evidence/s2-002-isolation-image.json`,
+  ].join(' ') + '\n');
+  if (status !== 'PASS') process.stderr.write(`${status} reason=${reason}\n`);
+  return status === 'PASS' ? 0 : 1;
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  process.exitCode = main();
+}
