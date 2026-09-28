@@ -1,11 +1,8 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1104.
+Generated from `git ls-files`; count: 1100.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
-- `.arch-map/policy.json`
-- `.arch-map/snapshot.json`
-- `.arch-map/snapshot.prev.json`
 - `.env.example`
 - `.gitattributes`
 - `.gitignore`
@@ -616,7 +613,6 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/synthetic-smoke.json`
 - `evidence/tooling-advisory-risk-record.json`
 - `evidence/validation-summary.json`
-- `libpod/tmp/pause.pid`
 - `migrations/0001_veritas_board.sql`
 - `migrations/0002_source_ingestion.sql`
 - `migrations/0003_claim_graph.sql`

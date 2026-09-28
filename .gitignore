@@ -10,3 +10,5 @@ next-env.d.ts
 results/s2-003/
 results/sloqual-001/
 brag-output/**/.render-*/
+.arch-map/
+libpod/
