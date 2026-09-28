@@ -27,6 +27,11 @@ const COUNTER_LIMITS = Object.freeze({
   missing_or_censored_trials: 0,
 });
 
+// The sandbox trials that back a hard counter. If one of these cannot be
+// exercised on the current platform, the run has not proven the property and
+// the gate must say so instead of passing on an absent measurement.
+export const HARD_COUNTER_TRIALS = Object.freeze(new Set(['sandbox/cancellation-survivors']));
+
 const REVOCATION_MIN_TRIALS = 100;
 const REVOCATION_MAX_MS = 5000;
 
@@ -74,6 +79,27 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
         continue;
       }
       seen.add(observation.trialId);
+      // An EXERCISED sandbox control that did not behave as expected blocks the
+      // gate, under its own name. It is derived from the observations rather
+      // than required as a summary counter, so the committed Windows evidence —
+      // which has every sandbox control matching — still verifies, while a
+      // surviving child process is reported as a violated control instead of
+      // being folded into the filesystem/secret-escape counter.
+      if (observation.kind === 'sandbox' && observation.match === false && observation.notRun !== true) {
+        counterViolations.push(`${label}/sandboxControlViolated=${observation.trialId}:${String(observation.observed)}`);
+      }
+      // A hard-counter control that this platform could not exercise is NOT a
+      // pass. Without this rule a host could decline the measurement — and the
+      // gate would still be green, which is precisely how a false pass reaches
+      // a record. The tier stays blocked instead.
+      if (observation.notRun === true) {
+        if (HARD_COUNTER_TRIALS.has(observation.trialId)) {
+          counterViolations.push(`${label}/hardControlNotRun=${observation.trialId}`);
+        } else {
+          expectedOracleViolations.push({ run: label, trialId: observation.trialId, reason: 'NOT_RUN_ON_THIS_PLATFORM' });
+        }
+        continue;
+      }
       const oracleExpected = oracle.expectedByTrialId[observation.trialId];
       if (oracleExpected === undefined) {
         expectedOracleViolations.push({ run: label, trialId: observation.trialId, reason: 'UNKNOWN_TRIAL' });
@@ -119,6 +145,14 @@ export function compareRuns(summaryA, summaryB, observationsA, observationsB) {
     }
     for (const [counter, limit] of counterLimitEntries) {
       const value = counters[counter];
+      // The `value < 0` guard this branch had written for the same defect was
+      // deliberately NOT carried over: the check below came from the #41
+      // review fixes on main and is strictly stronger (`Number.isInteger` as
+      // well as `value < 0`, so a fractional sentinel cannot pass either).
+      // `Number.isInteger(null)` is false, so the explicitly-unmeasured
+      // `survivors_after_cancellation: null` that this branch's accounting
+      // produces still fails closed here, which is what the not-run branch
+      // further down depends on.
       // Fail closed: a missing, non-numeric, non-integer or negative counter is
       // a violation, never an implicit pass. A negative value used to slip
       // through a `value > limit` test and launder an unobserved process

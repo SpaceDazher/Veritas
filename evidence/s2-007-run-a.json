@@ -1,0 +1,1678 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-007",
+  "harness": "s2-007-run-v1",
+  "role": "deterministic offline acceptance run of the live Agent Board through commands.execute",
+  "run": "A",
+  "status": "ENGINEERING_GATES_OK",
+  "statusSemantics": "ENGINEERING_GATES_OK means every deterministic engineering gate of THIS harness held. It is not an A-MVP PASS, not a real-adapter PASS and not an assurance result.",
+  "identity": {
+    "letter": "A",
+    "run_id": "s2-007-run-a",
+    "executor_id": "exec-s2-007-a",
+    "store_seed": "s2-007-run-a",
+    "id_offset": 0
+  },
+  "spec": {
+    "revision": "s2-007-module-spec-frozen@d7ea79f",
+    "contractVersion": "1.0.0",
+    "executionVersion": "veritas.execution/1.0.0",
+    "adapterVersion": "veritas.adapter/1.0.0"
+  },
+  "honestStatus": {
+    "realAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+    "engineeringStatus": "GATES_OK",
+    "assuranceStatus": "NOT_MEASURED",
+    "aMvpStatus": "NOT_CLAIMED",
+    "note": "No genuinely installed, genuinely distinct executor backs any run in this record. Every execution is a scripted veritas.adapter/1.0.0 test transport, and fixture or scripted evidence never upgrades NOT_RUN_REAL_ADAPTER."
+  },
+  "hostProbe": {
+    "installedCandidates": [
+      "adr-codex-local",
+      "adr-pi-local",
+      "adr-claude-code-local",
+      "adr-opencode-local",
+      "adr-hermes-local"
+    ],
+    "probed": [
+      {
+        "adapter_id": "adr-codex-local",
+        "installed": true
+      },
+      {
+        "adapter_id": "adr-pi-local",
+        "installed": true
+      },
+      {
+        "adapter_id": "adr-claude-code-local",
+        "installed": true
+      },
+      {
+        "adapter_id": "adr-opencode-local",
+        "installed": true
+      },
+      {
+        "adapter_id": "adr-hermes-local",
+        "installed": true
+      },
+      {
+        "adapter_id": "adr-generic-cli",
+        "installed": false
+      }
+    ]
+  },
+  "boundary": {
+    "entryPoint": "src/lib/agentboard/commands.mjs#execute",
+    "note": "Every mutation and every read in this run went through execute(). The store was used only to OBSERVE committed run rows, never to drive a decision.",
+    "commandsExercised": [
+      "adapters.health",
+      "adapters.list",
+      "adapters.register",
+      "audit.list",
+      "budget.grant",
+      "budget.settle",
+      "capabilities",
+      "dispatch.plan",
+      "dispatch.tick",
+      "execution.cancel",
+      "execution.collect_result",
+      "execution.event",
+      "execution.start",
+      "outbox.dispatch",
+      "outbox.list",
+      "outbox.recover",
+      "reconciliation.record",
+      "tasks.cancel",
+      "tasks.claim",
+      "tasks.create",
+      "tasks.get",
+      "tasks.lease.release",
+      "tasks.lease.renew",
+      "tasks.lease.revoke",
+      "tasks.list",
+      "tasks.transition"
+    ],
+    "refusalCodes": [
+      "ACL_DENIED",
+      "AUTH_REQUIRED",
+      "BLOCKED_POLICY",
+      "BLOCKED_SANDBOX",
+      "NOT_RUN_REAL_ADAPTER",
+      "RECONCILIATION_REQUIRED",
+      "STALE_FENCE",
+      "TRANSITION_NOT_ALLOWED"
+    ]
+  },
+  "inputs": {
+    "workspaces": {
+      "ws-s2007-alpha": [
+        "/srv/workspaces/veritas-s2007"
+      ],
+      "ws-s2007-beta": [
+        "/srv/workspaces/veritas-s2007-beta"
+      ]
+    },
+    "isolationProfile": "sbx-podman-local-restricted-v1",
+    "blockedIsolationProfile": "sbx-no-exec-default",
+    "principals": [
+      "prn-s2007-owner",
+      "prn-s2007-reviewer",
+      "prn-s2007-scheduler",
+      "prn-s2007-producer",
+      "prn-s2007-gate",
+      "prn-s2007-verifier",
+      "prn-s2007-outsider",
+      "prn-s2007-beta-only"
+    ],
+    "principalGrants": {
+      "owner": [
+        "board.task.read",
+        "board.task.create",
+        "board.task.transition",
+        "board.task.claim",
+        "board.task.release",
+        "board.execution.start",
+        "board.execution.cancel",
+        "board.result.collect",
+        "board.evidence.submit",
+        "board.review.challenge",
+        "board.adapter.register",
+        "board.budget.grant",
+        "board.reconciliation.decide"
+      ],
+      "reviewer": [
+        "board.task.read",
+        "board.task.transition",
+        "board.review.approve",
+        "board.review.challenge"
+      ],
+      "scheduler": [
+        "board.task.read",
+        "board.task.claim",
+        "board.task.release",
+        "board.execution.start",
+        "board.execution.cancel",
+        "board.result.collect"
+      ],
+      "producer": [
+        "board.task.read",
+        "board.task.transition",
+        "board.execution.start",
+        "board.result.collect",
+        "board.evidence.submit"
+      ],
+      "producerWithApprove": [
+        "board.task.read",
+        "board.task.transition",
+        "board.execution.start",
+        "board.result.collect",
+        "board.evidence.submit",
+        "board.review.approve"
+      ],
+      "verifierNarrow": [
+        "board.task.read",
+        "board.task.transition"
+      ],
+      "verifierWithApprove": [
+        "board.task.read",
+        "board.task.transition",
+        "board.review.approve"
+      ],
+      "gate": [
+        "board.task.read",
+        "board.task.transition",
+        "board.reconciliation.decide",
+        "board.review.approve"
+      ],
+      "betaOnly": [
+        "board.task.read",
+        "board.task.transition",
+        "board.review.approve"
+      ]
+    },
+    "adapters": [
+      {
+        "adapter_id": "adr-s2007-a-collector",
+        "workspace_id": "ws-s2007-alpha",
+        "adapter_kind": "test",
+        "real_adapter_provenance": "NOT_RUN_REAL_ADAPTER"
+      },
+      {
+        "adapter_id": "adr-s2007-b-bulk",
+        "workspace_id": "ws-s2007-alpha",
+        "adapter_kind": "test",
+        "real_adapter_provenance": "NOT_RUN_REAL_ADAPTER"
+      },
+      {
+        "adapter_id": "adr-s2007-c-timeout",
+        "workspace_id": "ws-s2007-alpha",
+        "adapter_kind": "test",
+        "real_adapter_provenance": "NOT_RUN_REAL_ADAPTER"
+      },
+      {
+        "adapter_id": "adr-s2007-x-blocked",
+        "workspace_id": "ws-s2007-alpha",
+        "adapter_kind": "test",
+        "real_adapter_provenance": "NOT_RUN_REAL_ADAPTER"
+      },
+      {
+        "adapter_id": "adr-s2007-d-tick",
+        "workspace_id": "ws-s2007-beta",
+        "adapter_kind": "test",
+        "real_adapter_provenance": "NOT_RUN_REAL_ADAPTER"
+      }
+    ],
+    "adapterRegistrationClaimRefused": {
+      "adapter_id": "adr-s2007-r-real-claim",
+      "claimed": "REAL_ADAPTER_AVAILABLE",
+      "refused_code": "NOT_RUN_REAL_ADAPTER"
+    },
+    "tasks": [
+      {
+        "task_id": "abt-s2007-01-open-dep",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-02-ready",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-03-done",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-04-challenge",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-05-blocked",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-06-unblock",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-07-collect-failed",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-08-requeue",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-09-release",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-10-timeout",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-11-cancel",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-12-tick",
+        "workspace_id": "ws-s2007-beta"
+      },
+      {
+        "task_id": "abt-s2007-13-guard-fail",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-14-claimed",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-15-blocked-sandbox",
+        "workspace_id": "ws-s2007-alpha"
+      },
+      {
+        "task_id": "abt-s2007-16-running",
+        "workspace_id": "ws-s2007-beta"
+      }
+    ],
+    "taskDigests": {
+      "brief": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policy": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "manifest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "clock": {
+      "base": "2026-09-25T12:00:00.000Z",
+      "step_ms": 1000,
+      "ticks": 183,
+      "source": "injected"
+    },
+    "idFactory": {
+      "kind": "injected prefixed monotonic counter",
+      "offset": 0
+    },
+    "store": {
+      "backend": "InMemoryAgentBoardStore",
+      "reason": "this harness is the offline, non-database acceptance tier; the PostgreSQL gate is a separate run"
+    }
+  },
+  "discovery": {
+    "executionEnabled": false,
+    "realAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+    "approvalEnabled": true,
+    "mode": "LIVE_AGENT_BOARD",
+    "states": [
+      "BACKLOG",
+      "READY",
+      "CLAIMED",
+      "RUNNING",
+      "BLOCKED",
+      "IN_REVIEW",
+      "DONE",
+      "FAILED",
+      "CANCELLED"
+    ],
+    "commandCount": 27,
+    "contractDigests": {
+      "board-error": "sha256:dfa6a568d18aab4d2a156be435f34f3bd1b95700f960c18035f28a9e493893c8",
+      "board-task": "sha256:c8919f918d61f1eba039b50a89d79027e412ad5d0b2705e8ffa260bac1a63983",
+      "board-transition": "sha256:ea0c4831127aa936566782118a609c5726df96e67c5abd9c0d4eb40eee01e14e",
+      "adapter-registration": "sha256:b00493951c3c8bdeea5a30fa9ff8543ddd2b36b5f6ea4ad7a8a3404b817fa7ce",
+      "dispatch-decision": "sha256:a5d695dca5fa1ff1d8029312e86b3bb86e026beb7784340e2b57c490d247ae02",
+      "execution-request": "sha256:33b4d9324dba3885a375280c0598f2d629067284c5b08942e54ab8f7c30f6f37",
+      "execution-event": "sha256:26b4eba1ffd6fd98de64750eec8ff44dcde19269fe242911e498b1f189cfd38b",
+      "execution-result": "sha256:8e0211f1d56059a0055a17c85a9145dc4b8fc522bd47aab2f5586def851f291d"
+    },
+    "finalExecutionEnabled": false,
+    "finalRealAdapterStatus": "NOT_RUN_REAL_ADAPTER",
+    "dispatchPlanDigest": "95dfcfc6fc28e6ea54694b99bd5349475e656203dd2392e3ddca4f18ff789f4d",
+    "dispatchTickDecisionDigest": "327efd1c939fafda64db2a6b68f33fec754f72f2cb88ec96dcd1d04ae37a79de"
+  },
+  "expectedValueTable": {
+    "declared": 118,
+    "matched": 118,
+    "ok": true,
+    "mismatches": [],
+    "source": "preregistered in scripts/s2-007-run.mjs, derived from the frozen transition table and the closed error set"
+  },
+  "finalStates": [
+    {
+      "task_id": "abt-s2007-01-open-dep",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "BACKLOG",
+      "revision": 1,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-02-ready",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "READY",
+      "revision": 2,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-03-done",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "DONE",
+      "revision": 6,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-04-challenge",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "BLOCKED",
+      "revision": 6,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-05-blocked",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "BLOCKED",
+      "revision": 3,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-06-unblock",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "READY",
+      "revision": 4,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-07-collect-failed",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "FAILED",
+      "revision": 5,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-08-requeue",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "CANCELLED",
+      "revision": 6,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-09-release",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "READY",
+      "revision": 4,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-10-timeout",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "CANCELLED",
+      "revision": 5,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-11-cancel",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "CANCELLED",
+      "revision": 3,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-12-tick",
+      "workspace_id": "ws-s2007-beta",
+      "state": "IN_REVIEW",
+      "revision": 5,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-13-guard-fail",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "FAILED",
+      "revision": 6,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-14-claimed",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "CLAIMED",
+      "revision": 3,
+      "priority": "HIGH",
+      "active_lease": "held",
+      "fencing_token": "held"
+    },
+    {
+      "task_id": "abt-s2007-15-blocked-sandbox",
+      "workspace_id": "ws-s2007-alpha",
+      "state": "READY",
+      "revision": 2,
+      "priority": "HIGH",
+      "active_lease": "none",
+      "fencing_token": "none"
+    },
+    {
+      "task_id": "abt-s2007-16-running",
+      "workspace_id": "ws-s2007-beta",
+      "state": "RUNNING",
+      "revision": 4,
+      "priority": "HIGH",
+      "active_lease": "held",
+      "fencing_token": "held"
+    }
+  ],
+  "finalStateCheck": {
+    "ok": true,
+    "problems": [],
+    "coveredStates": [
+      "BACKLOG",
+      "READY",
+      "CLAIMED",
+      "RUNNING",
+      "BLOCKED",
+      "IN_REVIEW",
+      "DONE",
+      "FAILED",
+      "CANCELLED"
+    ]
+  },
+  "guardCoverage": {
+    "ok": true,
+    "guards": [
+      "guardBacklogToReady",
+      "guardBlock",
+      "guardCancel",
+      "guardClaimedToRunning",
+      "guardFail",
+      "guardInReviewToDone",
+      "guardReadyToClaimed",
+      "guardRelease",
+      "guardRequeueAfterReconciliation",
+      "guardRunningToInReview",
+      "guardUnblock"
+    ],
+    "coverage": {
+      "guardBacklogToReady": {
+        "accepted": 15,
+        "refused": 1
+      },
+      "guardBlock": {
+        "accepted": 3,
+        "refused": 0
+      },
+      "guardCancel": {
+        "accepted": 3,
+        "refused": 0
+      },
+      "guardClaimedToRunning": {
+        "accepted": 8,
+        "refused": 0
+      },
+      "guardFail": {
+        "accepted": 1,
+        "refused": 0
+      },
+      "guardInReviewToDone": {
+        "accepted": 1,
+        "refused": 3
+      },
+      "guardReadyToClaimed": {
+        "accepted": 10,
+        "refused": 0
+      },
+      "guardRelease": {
+        "accepted": 1,
+        "refused": 0
+      },
+      "guardRequeueAfterReconciliation": {
+        "accepted": 0,
+        "refused": 2
+      },
+      "guardRunningToInReview": {
+        "accepted": 3,
+        "refused": 0
+      },
+      "guardUnblock": {
+        "accepted": 1,
+        "refused": 0
+      }
+    },
+    "missing": []
+  },
+  "externalEffects": {
+    "ok": true,
+    "crossings": {
+      "run-run-000001": 1,
+      "run-run-000002": 1,
+      "run-run-000003": 1,
+      "run-run-000004": 1,
+      "run-run-000005": 1,
+      "run-run-000006": 1,
+      "run-run-000008": 1
+    },
+    "totalCrossings": 7,
+    "dispatchedRuns": 8,
+    "duplicateCrossings": 0
+  },
+  "transitions": [
+    {
+      "step": "deps.open-backlog-to-ready",
+      "task_id": "abt-s2007-01-open-dep",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "REFUSE",
+      "code": "TRANSITION_NOT_ALLOWED",
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "ready.backlog-to-ready",
+      "task_id": "abt-s2007-02-ready",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "sandbox.blocked-profile-ready",
+      "task_id": "abt-s2007-15-blocked-sandbox",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "tick.ready",
+      "task_id": "abt-s2007-12-tick",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "tick.execute",
+      "task_id": "abt-s2007-12-tick",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "tick.execute",
+      "task_id": "abt-s2007-12-tick",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "tick.collect",
+      "task_id": "abt-s2007-12-tick",
+      "from_state": "RUNNING",
+      "to_state": "IN_REVIEW",
+      "guard": "guardRunningToInReview",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "done.ready",
+      "task_id": "abt-s2007-03-done",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "done.start",
+      "task_id": "abt-s2007-03-done",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "done.start",
+      "task_id": "abt-s2007-03-done",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "done.collect",
+      "task_id": "abt-s2007-03-done",
+      "from_state": "RUNNING",
+      "to_state": "IN_REVIEW",
+      "guard": "guardRunningToInReview",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "done.approve-by-producer",
+      "task_id": "abt-s2007-03-done",
+      "from_state": "IN_REVIEW",
+      "to_state": "DONE",
+      "guard": "guardInReviewToDone",
+      "decision": "REFUSE",
+      "code": "BLOCKED_POLICY",
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "done.approve-by-human",
+      "task_id": "abt-s2007-03-done",
+      "from_state": "IN_REVIEW",
+      "to_state": "DONE",
+      "guard": "guardInReviewToDone",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-reviewer",
+      "actor_kind": "human_reviewer"
+    },
+    {
+      "step": "review.ready",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "review.start",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "review.start",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "review.collect",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "RUNNING",
+      "to_state": "IN_REVIEW",
+      "guard": "guardRunningToInReview",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "review.approve-by-uncalibrated-verifier-without-capability",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "IN_REVIEW",
+      "to_state": "DONE",
+      "guard": "guardInReviewToDone",
+      "decision": "REFUSE",
+      "code": "AUTH_REQUIRED",
+      "actor": "prn-s2007-verifier",
+      "actor_kind": "system"
+    },
+    {
+      "step": "review.approve-by-uncalibrated-verifier-with-capability",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "IN_REVIEW",
+      "to_state": "DONE",
+      "guard": "guardInReviewToDone",
+      "decision": "REFUSE",
+      "code": "BLOCKED_POLICY",
+      "actor": "prn-s2007-verifier",
+      "actor_kind": "system"
+    },
+    {
+      "step": "review.challenge",
+      "task_id": "abt-s2007-04-challenge",
+      "from_state": "IN_REVIEW",
+      "to_state": "BLOCKED",
+      "guard": "guardBlock",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-reviewer",
+      "actor_kind": "human_reviewer"
+    },
+    {
+      "step": "closed-dep.backlog-to-ready",
+      "task_id": "abt-s2007-05-blocked",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "blocked.block",
+      "task_id": "abt-s2007-05-blocked",
+      "from_state": "READY",
+      "to_state": "BLOCKED",
+      "guard": "guardBlock",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "unblock.ready",
+      "task_id": "abt-s2007-06-unblock",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "unblock.block",
+      "task_id": "abt-s2007-06-unblock",
+      "from_state": "READY",
+      "to_state": "BLOCKED",
+      "guard": "guardBlock",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "unblock.unblock",
+      "task_id": "abt-s2007-06-unblock",
+      "from_state": "BLOCKED",
+      "to_state": "READY",
+      "guard": "guardUnblock",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "collect-failed.ready",
+      "task_id": "abt-s2007-07-collect-failed",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "collect-failed.start",
+      "task_id": "abt-s2007-07-collect-failed",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "collect-failed.start",
+      "task_id": "abt-s2007-07-collect-failed",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "requeue.ready",
+      "task_id": "abt-s2007-08-requeue",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "requeue.claim",
+      "task_id": "abt-s2007-08-requeue",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "requeue.to-running",
+      "task_id": "abt-s2007-08-requeue",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "requeue.requeue-with-live-lease",
+      "task_id": "abt-s2007-08-requeue",
+      "from_state": "RUNNING",
+      "to_state": "READY",
+      "guard": "guardRequeueAfterReconciliation",
+      "decision": "REFUSE",
+      "code": "TRANSITION_NOT_ALLOWED",
+      "actor": "prn-s2007-gate",
+      "actor_kind": "human_reviewer"
+    },
+    {
+      "step": "requeue.requeue-without-lease",
+      "task_id": "abt-s2007-08-requeue",
+      "from_state": "RUNNING",
+      "to_state": "READY",
+      "guard": "guardRequeueAfterReconciliation",
+      "decision": "REFUSE",
+      "code": "STALE_FENCE",
+      "actor": "prn-s2007-gate",
+      "actor_kind": "human_reviewer"
+    },
+    {
+      "step": "requeue.cancel",
+      "task_id": "abt-s2007-08-requeue",
+      "from_state": "RUNNING",
+      "to_state": "CANCELLED",
+      "guard": "guardCancel",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "release.ready",
+      "task_id": "abt-s2007-09-release",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "release.claim",
+      "task_id": "abt-s2007-09-release",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "release.release",
+      "task_id": "abt-s2007-09-release",
+      "from_state": "CLAIMED",
+      "to_state": "READY",
+      "guard": "guardRelease",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "timeout.ready",
+      "task_id": "abt-s2007-10-timeout",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "timeout.claim",
+      "task_id": "abt-s2007-10-timeout",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "timeout.to-running",
+      "task_id": "abt-s2007-10-timeout",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "timeout.cancel",
+      "task_id": "abt-s2007-10-timeout",
+      "from_state": "RUNNING",
+      "to_state": "CANCELLED",
+      "guard": "guardCancel",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "cancel.ready",
+      "task_id": "abt-s2007-11-cancel",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "cancel.cancel",
+      "task_id": "abt-s2007-11-cancel",
+      "from_state": "READY",
+      "to_state": "CANCELLED",
+      "guard": "guardCancel",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "guard-fail.ready",
+      "task_id": "abt-s2007-13-guard-fail",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "guard-fail.claim",
+      "task_id": "abt-s2007-13-guard-fail",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "guard-fail.to-running",
+      "task_id": "abt-s2007-13-guard-fail",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    },
+    {
+      "step": "guard-fail.fail",
+      "task_id": "abt-s2007-13-guard-fail",
+      "from_state": "RUNNING",
+      "to_state": "FAILED",
+      "guard": "guardFail",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "claimed.ready",
+      "task_id": "abt-s2007-14-claimed",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "claimed.claim",
+      "task_id": "abt-s2007-14-claimed",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "running.ready",
+      "task_id": "abt-s2007-16-running",
+      "from_state": "BACKLOG",
+      "to_state": "READY",
+      "guard": "guardBacklogToReady",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-owner",
+      "actor_kind": "human_owner"
+    },
+    {
+      "step": "running.claim",
+      "task_id": "abt-s2007-16-running",
+      "from_state": "READY",
+      "to_state": "CLAIMED",
+      "guard": "guardReadyToClaimed",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-scheduler",
+      "actor_kind": "scheduler"
+    },
+    {
+      "step": "running.to-running",
+      "task_id": "abt-s2007-16-running",
+      "from_state": "CLAIMED",
+      "to_state": "RUNNING",
+      "guard": "guardClaimedToRunning",
+      "decision": "ACCEPT",
+      "code": null,
+      "actor": "prn-s2007-producer",
+      "actor_kind": "adapter"
+    }
+  ],
+  "escalations": [
+    {
+      "task_id": "abt-s2007-08-requeue",
+      "resolution": "OBSERVED_EFFECT_COMPLETED",
+      "decided_by": "prn-s2007-owner",
+      "closed_by": "human",
+      "requeue_attempts": [
+        {
+          "ordering": "lease-live",
+          "outcome": "REFUSE",
+          "code": "TRANSITION_NOT_ALLOWED"
+        },
+        {
+          "ordering": "lease-withdrawn",
+          "outcome": "REFUSE",
+          "code": "STALE_FENCE"
+        }
+      ]
+    },
+    {
+      "task_id": "abt-s2007-09-release",
+      "resolution": "OBSERVED_NO_EFFECT",
+      "decided_by": "prn-s2007-owner",
+      "closed_by": "human",
+      "release_code": null
+    },
+    {
+      "task_id": "abt-s2007-10-timeout",
+      "resolution": "OBSERVED_NO_EFFECT",
+      "decided_by": "prn-s2007-owner",
+      "closed_by": "human",
+      "dispatch_code": "RECONCILIATION_REQUIRED",
+      "repeat_dispatch_inspected": 0,
+      "repeat_dispatch_effects": 0,
+      "recover_escalated": 0
+    }
+  ],
+  "metrics": {
+    "acceptedTaskQualityProxy": {
+      "value": 0.75,
+      "numerator": 3,
+      "denominator": 4,
+      "measurementKind": "engineering_proxy",
+      "empirical": false,
+      "definition": "share of COLLECTED ExecutionResults whose recorded outcome is SUCCEEDED",
+      "limitation": "a PROCESS measure of the board (a run was collected and its outcome recorded). It is NOT a measure of research quality, correctness or human acceptance: no independent reviewer judged any output in this run, and a SUCCEEDED result is evidence, not correctness."
+    },
+    "passAt1": {
+      "value": 1,
+      "numerator": 16,
+      "denominator": 16,
+      "measurementKind": "engineering_proxy",
+      "empirical": false,
+      "definition": "share of tasks that reached their preregistered final state on the first attempt, with no expectation-table mismatch anywhere in the run",
+      "limitation": "measures determinism and state-machine convergence of the board, not task success in the field"
+    },
+    "interventionTime": {
+      "valueMs": 15000,
+      "tasksMeasured": 15,
+      "stepMs": 1000,
+      "measurementKind": "engineering_proxy",
+      "empirical": false,
+      "definition": "sum over tasks of (injected-clock steps from the task's first accepted READY transition to the next authenticated human command) x STEP_MS",
+      "limitation": "the clock is injected and advances one fixed step per boundary call, so this is a CALL-COUNT proxy for operator attention. It is NOT a measured human response time."
+    },
+    "cost": {
+      "settled": 0.25,
+      "executorReportedSpend": 0.85,
+      "currency": "USD",
+      "measurementKind": "board_recorded_synthetic",
+      "empirical": false,
+      "definition": "sum of the amounts committed through budget.settle, next to the spend the scripted executor reported in ExecutionResult.measurements",
+      "limitation": "both numbers come from the fixture. No provider was called, no money moved, and this is NOT a measured cost of any real work."
+    },
+    "latency": {
+      "reportedMs": [
+        1200,
+        1200,
+        1200,
+        900
+      ],
+      "p50Ms": 1200,
+      "maxMs": 1200,
+      "measurementKind": "engineering_proxy",
+      "empirical": false,
+      "definition": "the duration_ms the scripted executor wrote into each collected ExecutionResult.measurements",
+      "limitation": "these are fixture literals, NOT wall-clock latencies of any process."
+    },
+    "regressionRate": {
+      "value": 0,
+      "unexpectedRefusals": 0,
+      "totalCalls": 183,
+      "measurementKind": "engineering_proxy",
+      "empirical": false,
+      "definition": "share of boundary calls whose outcome contradicted the preregistered expectation table (a refused call the table did not name, or an accepted call it declared refused)",
+      "limitation": "a regression against a FIXTURE expectation table. It says nothing about behaviour on inputs this harness never generated."
+    },
+    "activity": {
+      "acceptedCalls": 170,
+      "refusedCalls": 13,
+      "humanCalls": 141,
+      "transitions": 52,
+      "guardsExercised": 11,
+      "externalEffectCrossings": 7,
+      "tasksListed": 14,
+      "finalStatesByState": {
+        "BACKLOG": [
+          "abt-s2007-01-open-dep"
+        ],
+        "READY": [
+          "abt-s2007-02-ready",
+          "abt-s2007-06-unblock",
+          "abt-s2007-09-release",
+          "abt-s2007-15-blocked-sandbox"
+        ],
+        "CLAIMED": [
+          "abt-s2007-14-claimed"
+        ],
+        "RUNNING": [
+          "abt-s2007-16-running"
+        ],
+        "BLOCKED": [
+          "abt-s2007-04-challenge",
+          "abt-s2007-05-blocked"
+        ],
+        "IN_REVIEW": [
+          "abt-s2007-12-tick"
+        ],
+        "DONE": [
+          "abt-s2007-03-done"
+        ],
+        "FAILED": [
+          "abt-s2007-07-collect-failed",
+          "abt-s2007-13-guard-fail"
+        ],
+        "CANCELLED": [
+          "abt-s2007-08-requeue",
+          "abt-s2007-10-timeout",
+          "abt-s2007-11-cancel"
+        ]
+      },
+      "terminalTasks": 6
+    }
+  },
+  "probes": {
+    "version": "s2-007-probes-v1",
+    "status": "NOT_RUN",
+    "counters": {
+      "crossWorkspaceLeaks": 0,
+      "authorityExpansions": 0,
+      "duplicateActiveLeases": 0,
+      "duplicateExternalEffects": 0,
+      "staleFenceMutations": 0,
+      "missingJournalOrOutbox": 0,
+      "falseApprovals": 0
+    },
+    "totals": {
+      "probes": 41,
+      "passed": 40,
+      "failed": 0,
+      "notRun": 1,
+      "families": 6,
+      "countersWithFindings": []
+    },
+    "registry": {
+      "missingProbes": [],
+      "counterMismatches": [],
+      "unknownCounters": [],
+      "emptyFamilies": []
+    },
+    "probes": [
+      {
+        "family": "principal_forgery",
+        "probe": "forged_principal_in_body",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "forged_principal_in_header",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "forged_principal_in_options_env",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "forged_principal_in_prompt_text",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "cross_workspace_read_is_empty",
+        "status": "pass",
+        "counter": "crossWorkspaceLeaks",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "cross_workspace_write_refused",
+        "status": "pass",
+        "counter": "crossWorkspaceLeaks",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "cross_workspace_discovery_is_empty",
+        "status": "pass",
+        "counter": "crossWorkspaceLeaks",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "forged_grant_in_arguments",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "principal_forgery",
+        "probe": "forged_lease_and_fence_in_arguments",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "concurrent_claim",
+        "probe": "two_process_claim_race",
+        "status": "not_run",
+        "counter": "duplicateActiveLeases",
+        "counted": 0
+      },
+      {
+        "family": "concurrent_claim",
+        "probe": "concurrent_claims_in_one_workspace",
+        "status": "pass",
+        "counter": "duplicateActiveLeases",
+        "counted": 0
+      },
+      {
+        "family": "concurrent_claim",
+        "probe": "stale_fence_after_reassign",
+        "status": "pass",
+        "counter": "staleFenceMutations",
+        "counted": 0
+      },
+      {
+        "family": "concurrent_claim",
+        "probe": "stale_fence_after_expiry",
+        "status": "pass",
+        "counter": "staleFenceMutations",
+        "counted": 0
+      },
+      {
+        "family": "concurrent_claim",
+        "probe": "stale_fence_after_cancel",
+        "status": "pass",
+        "counter": "staleFenceMutations",
+        "counted": 0
+      },
+      {
+        "family": "concurrent_claim",
+        "probe": "stale_fence_after_restart",
+        "status": "pass",
+        "counter": "staleFenceMutations",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "same_key_different_payload",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "mutating_command_requires_idempotency_key",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "replayed_dispatch_sends_once",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "crash_after_send_before_ack",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "crash_before_intent_is_redispatchable",
+        "status": "pass",
+        "counter": "missingJournalOrOutbox",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "committed_side_effects_are_journalled",
+        "status": "pass",
+        "counter": "missingJournalOrOutbox",
+        "counted": 0
+      },
+      {
+        "family": "idempotency_and_crash",
+        "probe": "refused_side_effects_write_nothing",
+        "status": "pass",
+        "counter": "missingJournalOrOutbox",
+        "counted": 0
+      },
+      {
+        "family": "substitution_and_approval",
+        "probe": "substituted_task_brief",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "substitution_and_approval",
+        "probe": "swapped_policy_and_manifest_digest",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "substitution_and_approval",
+        "probe": "hidden_budget_change",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "substitution_and_approval",
+        "probe": "producer_cannot_approve",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "substitution_and_approval",
+        "probe": "uncalibrated_verifier_cannot_approve",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "substitution_and_approval",
+        "probe": "self_approval_is_refused",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "malformed_callback_refused",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "out_of_order_callback_refused",
+        "status": "pass",
+        "counter": "missingJournalOrOutbox",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "duplicate_callback_refused",
+        "status": "pass",
+        "counter": "missingJournalOrOutbox",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "unknown_outcome_is_not_retried",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "timeout_is_not_retried",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "cancel_then_callback_refused",
+        "status": "pass",
+        "counter": "duplicateExternalEffects",
+        "counted": 0
+      },
+      {
+        "family": "callback_integrity",
+        "probe": "no_false_state_advance",
+        "status": "pass",
+        "counter": "falseApprovals",
+        "counted": 0
+      },
+      {
+        "family": "injection_and_traversal",
+        "probe": "injection_in_prompt_text_grants_nothing",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "injection_and_traversal",
+        "probe": "injection_in_source_and_log_grants_nothing",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      },
+      {
+        "family": "injection_and_traversal",
+        "probe": "secret_never_reaches_a_record",
+        "status": "pass",
+        "counter": "crossWorkspaceLeaks",
+        "counted": 0
+      },
+      {
+        "family": "injection_and_traversal",
+        "probe": "workspace_traversal_refused",
+        "status": "pass",
+        "counter": "crossWorkspaceLeaks",
+        "counted": 0
+      },
+      {
+        "family": "injection_and_traversal",
+        "probe": "symlink_escape_refused",
+        "status": "pass",
+        "counter": "crossWorkspaceLeaks",
+        "counted": 0
+      },
+      {
+        "family": "injection_and_traversal",
+        "probe": "forbidden_sandbox_blocked",
+        "status": "pass",
+        "counter": "authorityExpansions",
+        "counted": 0
+      }
+    ],
+    "notRun": [
+      {
+        "probe": "two_process_claim_race",
+        "family": "concurrent_claim",
+        "code": "NOT_RUN_DB"
+      }
+    ]
+  },
+  "hardGates": {
+    "counters": {
+      "crossWorkspaceLeaks": 0,
+      "authorityExpansions": 0,
+      "duplicateActiveLeases": 0,
+      "duplicateExternalEffects": 0,
+      "staleFenceMutations": 0,
+      "missingJournalOrOutbox": 0,
+      "falseApprovals": 0
+    },
+    "ok": true
+  },
+  "findings": [
+    {
+      "id": "real-adapter-not-run",
+      "severity": "declared-limit",
+      "detail": "host probe found 5 installed candidate executor(s); every run below is a scripted transport",
+      "realAdapterStatus": "NOT_RUN_REAL_ADAPTER"
+    }
+  ],
+  "violations": [],
+  "reproduce": {
+    "command": "npm run s2-007:run",
+    "node": ">=22",
+    "deterministic": true,
+    "determinismNotes": [
+      "no Date.now(), no Math.random(), no bare new Date() and no process.hrtime in this file",
+      "every instant is injected; the store clock and the boundary `now` share one counter",
+      "every identifier comes from one prefixed monotonic factory whose only per-run difference is its offset",
+      "no wall clock, no pid, no temp path and no host fact is written into the identity-free projection"
+    ],
+    "excludedFromComparison": [
+      "run_id / executor_id / store seed / id-factory offset: the identities that make run A and run B different runs",
+      "every generated lease / run / transition / event / outbox identifier, for the same reason"
+    ]
+  },
+  "limits": [
+    "No real adapter ran: the only execution boundary model is a scripted veritas.adapter/1.0.0 test transport (NOT_RUN_REAL_ADAPTER).",
+    "No PostgreSQL: the store tier exercised is the in-memory twin; the database gate, the cross-process claim race and the crash/restart replay are separate runs, and probes.runAllProbes reports the race NOT_RUN_DB here.",
+    "Every metric in this record is an engineering proxy over contract documents and an injected clock. None is an empirical human-quality, cost or latency measurement.",
+    "assuranceStatus is NOT_MEASURED: nothing here establishes accuracy, calibration, SLO or production readiness.",
+    "A metric named acceptedTaskQualityProxy is NOT a human-quality metric and is never presented as one."
+  ]
+}

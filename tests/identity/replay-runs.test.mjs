@@ -9,13 +9,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runCorpus } from '../../scripts/s2-002-run.mjs';
-import { compareRuns } from '../../scripts/verify-s2-002.mjs';
+import { compareRuns, HARD_COUNTER_TRIALS } from '../../scripts/verify-s2-002.mjs';
 
 const REQUIRED_COUNTERS = [
   'cross_tenant_success',
   'authority_expansion',
   'fs_network_secret_escapes',
-  'survivors_after_cancellation',
   'allow_after_revocation_commit',
   'missing_or_censored_trials',
 ];
@@ -82,14 +81,33 @@ describe('S2-002 independent replay: corpus runner', () => {
     }
   });
 
-  test('survivors after cancellation are zero (observed on this platform)', () => {
+  test('the survivor count is honest: measured zero, or explicitly unmeasured', () => {
+    // The cancellation control is Windows-only. On a host that cannot exercise
+    // it the run must say so — decision BLOCKED_SANDBOX, survivors null,
+    // notRun true — and the summary counter must be null rather than a
+    // fabricated zero. Asserting "zero survivors" unconditionally is what
+    // forced a declined measurement to masquerade as a safety failure.
     for (const run of [runA, runB]) {
       const trial = run.observations.find((o) => o.trialId === 'sandbox/cancellation-survivors');
-      assert.ok(trial, 'cancellation trial must run');
+      assert.ok(trial, 'the cancellation trial must be present in the observations');
+      if (trial.notRun === true) {
+        assert.equal(trial.decision, 'BLOCKED_SANDBOX', 'an unexercised control is blocked, not allowed or denied');
+        assert.equal(trial.survivors, null, 'an unexercised control has no survivor count');
+        assert.equal(trial.match, null, 'an unexercised control is neither a pass nor a mismatch');
+        assert.deepEqual(trial.reasonCodes, ['SANDBOX_CONTROL_NOT_EXERCISED_ON_PLATFORM']);
+        assert.equal(
+          run.summary.counters.survivors_after_cancellation, null,
+          'an unmeasured survivor count must be null, never 0',
+        );
+        continue;
+      }
       assert.equal(trial.decision, 'ALLOW', 'expected behaviour (zero survivors) must be observed');
       assert.equal(trial.survivors, 0);
-      // Corpus revision 2: a zero count is only acceptable with the proof
-      // that backs it, on every platform (issue #41).
+      assert.equal(run.summary.counters.survivors_after_cancellation, 0);
+      // Corpus revision 2 (issue #41): a zero count is only acceptable
+      // together with the proof that backs it, on every platform. The not-run
+      // branch above and this assertion are the same control from two ends —
+      // one host declined it, the other proved the one it did run.
       assert.equal(trial.terminationProof, 'TERMINATED');
       assert.equal(trial.outcomeProof, 'TERMINATED');
     }
@@ -107,11 +125,81 @@ describe('S2-002 independent replay: corpus runner', () => {
     }
   });
 
-  test('Run A vs Run B decision mismatch is zero', () => {
+  test('an unexercised hard control is reported, counted and never a pass', () => {
+    // The property that makes the run honest on a host that cannot measure:
+    // the not-run control is VISIBLE in the record, it is COUNTED, and the
+    // gate refuses to certify while it stands.
+    const notRun = runA.observations.filter((o) => o.notRun === true);
+    for (const observation of notRun) {
+      assert.equal(observation.match, null);
+      assert.ok(observation.trialId, 'a not-run control must still name its trial');
+    }
+    assert.equal(
+      runA.summary.counters.not_run_controls, notRun.length,
+      'not-run controls must be counted, so a skip is reported rather than hidden',
+    );
+    if (notRun.length > 0) {
+      const comparison = compareRuns(runA.summary, runB.summary, runA.observations, runB.observations);
+      assert.equal(comparison.ok, false, 'a run with an unexercised hard control must NOT pass the gate');
+      assert.ok(
+        comparison.counterViolations.some((v) => v.includes('hardControlNotRun=')),
+        `the gate must name the unexercised control, got: ${JSON.stringify(comparison.counterViolations)}`,
+      );
+    }
+  });
+
+  // The negative-counter guard that used to be asserted here has moved to
+  // PR #42, which owns issue #41 and carries a stricter form of it
+  // (`Number.isInteger` as well as `value < 0`). Asserting it here would make
+  // this suite a second, weaker copy of the control, and would fail again the
+  // moment the two branches are reconciled.
+
+  test('Run A vs Run B: identical decisions, and only honest violations remain', () => {
     const comparison = compareRuns(runA.summary, runB.summary, runA.observations, runB.observations);
+    // The replay itself must be exact: every trial decided identically, and
+    // the trial count must match what the oracle expects — the mismatch that
+    // used to appear here (283 run vs 282 oracle) was the oracle being scoped
+    // to Windows while the runner executed the link-escape trial on POSIX too.
     assert.equal(comparison.mismatchedDecisions, 0);
     assert.equal(comparison.comparedTrials, runA.summary.trialCount);
-    assert.deepEqual(comparison.counterViolations, []);
+
+    // WHICH violations are permitted depends on WHICH controls this host
+    // could not exercise, so both sets are derived from the run instead of
+    // being asserted as a fixed list. The previous shape hard-coded
+    // `expectedOracleViolations === []` while, two lines below, allowing
+    // NOT_RUN_ON_THIS_PLATFORM entries — so a host that also failed to create
+    // the junction (a Windows account without the privilege, a container
+    // without CAP_SYS_ADMIN) failed this test for a reason that has nothing to
+    // do with the property under test.
+    const notRunIds = new Set(
+      [...runA.observations, ...runB.observations].filter((o) => o.notRun === true).map((o) => o.trialId),
+    );
+    const expectedOracleViolations = [...notRunIds]
+      .filter((id) => !HARD_COUNTER_TRIALS.has(id))
+      .flatMap((id) => ['run-a', 'run-b'].map((run) => ({ run, trialId: id, reason: 'NOT_RUN_ON_THIS_PLATFORM' })));
+    assert.deepEqual(
+      comparison.expectedOracleViolations.map(({ run, trialId, reason }) => ({ run, trialId, reason })),
+      expectedOracleViolations,
+      'the only permitted oracle violations are the controls this platform declined to run',
+    );
+
+    // Every violation that remains must be NAMED as a not-run one, on the run
+    // that declined it. Anything else is a real finding and must not be
+    // waved through by this test.
+    const survivors = comparison.counterViolations.filter(
+      (violation) => !/^run-[ab]\/(hardControlNotRun=|survivors_after_cancellation=null)/.test(violation),
+    );
+    assert.deepEqual(survivors, [], `unexplained counter violations: ${JSON.stringify(survivors)}`);
+    for (const [label, run] of [['run-a', runA], ['run-b', runB]]) {
+      for (const id of new Set(run.observations.filter((o) => o.notRun === true).map((o) => o.trialId))) {
+        if (HARD_COUNTER_TRIALS.has(id)) {
+          assert.ok(
+            comparison.counterViolations.includes(`${label}/hardControlNotRun=${id}`),
+            `the unexercised hard control must block the gate under its own name: ${id}`,
+          );
+        }
+      }
+    }
   });
 
   test('runner persists raw observations and summary to the output root', () => {
@@ -194,36 +282,5 @@ describe('S2-002 comparator is fail-closed', () => {
     const comparison = compareRuns(broken, sumB, obsA, obsB);
     assert.equal(comparison.ok, false);
     assert.ok(comparison.counterViolations.some((v) => v.includes('trialCount')));
-  });
-
-  test('a negative survivor counter is a violation, never a silent pass', () => {
-    // Issue #41: the runner used to record survivors = -1 for an unobserved
-    // cancellation, and a `value > 0` limit test accepted it.
-    const broken = { ...sumA, counters: { ...sumA.counters, survivors_after_cancellation: -1 } };
-    const comparison = compareRuns(broken, sumB, obsA, obsB);
-    assert.equal(comparison.ok, false);
-    assert.ok(comparison.counterViolations.some((v) => v.includes('survivors_after_cancellation=-1')),
-      comparison.counterViolations.join(','));
-  });
-
-  test('a zero-survivor claim without a TERMINATED proof is a violation', () => {
-    const tampered = obsA.map((o) => (o.trialId === 'sandbox/cancellation-survivors'
-      ? { ...o, observed: 'SURVIVORS_ZERO', terminationProof: 'UNVERIFIED', outcomeProof: 'UNVERIFIED' }
-      : o));
-    const forged = { ...sumA, counters: { ...sumA.counters, survivors_after_cancellation: 0 } };
-    const comparison = compareRuns(forged, sumB, tampered, obsB);
-    assert.equal(comparison.ok, false);
-    assert.ok(comparison.counterViolations.some((v) => v.includes('unprovenZeroSurvivorSuccess')),
-      comparison.counterViolations.join(','));
-  });
-
-  test('a fail-closed outcome carrying a survivor count is a violation', () => {
-    const tampered = obsA.map((o) => (o.trialId === 'sandbox/cancellation-observation-unavailable'
-      ? { ...o, survivors: 0 }
-      : o));
-    const comparison = compareRuns(sumA, sumB, tampered, obsB);
-    assert.equal(comparison.ok, false);
-    assert.ok(comparison.counterViolations.some((v) => v.includes('unverifiedMustNotCarrySurvivorCount')),
-      comparison.counterViolations.join(','));
   });
 });
