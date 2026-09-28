@@ -1,0 +1,435 @@
+{
+  "ticket": "S2-008",
+  "gate": "scripts/verify-s2-008.mjs",
+  "role": "verification aggregator: dependency gate, probes gate, the cross-process replay it spawns itself, the invocation binding, the freshness refusal, and the derived status",
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0,
+  "base": {
+    "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+    "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 58,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
+    "track_tracked": true
+  },
+  "invocation": {
+    "id": "b547ceed83a6960e0c637a3d5ee0755d",
+    "minted_by": "scripts/verify-s2-008.mjs (node:crypto randomBytes, 16 bytes)",
+    "passed_to": [
+      "scripts/s2-008-replay.mjs",
+      "scripts/s2-008-harness.mjs"
+    ],
+    "required_in": [
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-harness.json"
+    ],
+    "required_when": "this WRITE run",
+    "excluded_from_repeatability": true,
+    "decides": false,
+    "note": "the only random value on this path. It is not part of any decision about a measurement, and nothing else in the summary changes between two runs of one tree because of it"
+  },
+  "boundaries": [
+    "BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it. What covers the working tree is per SURFACE, and this one is not the corpus: the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) re-derives tests/research/fixtures/**, so it covers the working tree of the CORPUS, not of the summary; the working-tree surface of the summary is covered by the fact that NOTHING in this chain reads it back (no gate, no property, no verdict term consumes evidence/s2-008-summary.json) and that the next write run overwrites it. That is a stated boundary, not a check, and it is stated here so a reader never has to open the report to learn it"
+  ],
+  "provability_exempt": [
+    {
+      "paths": [
+        "evidence/s2-008-replay.json",
+        "evidence/s2-008-run-a.json",
+        "evidence/s2-008-run-b.json"
+      ],
+      "reason": "these are the records this chain's own children write in the same run, so the chain owns whether they are tracked and clean; every other file of the track is still blocking (a modified corpus file included)"
+    }
+  ],
+  "gates": {
+    "dependency": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "scripts/verify-s2-008-dependencies.mjs",
+      "issues": [],
+      "bindings": [
+        "S2-002:BOUND",
+        "S2-006:BOUND",
+        "S2-007:BOUND",
+        "S1-004:BOUND",
+        "S1-011:BOUND"
+      ],
+      "track_files_tracked": 58,
+      "track_files_expected": [
+        "evidence/s2-008-comparison.json",
+        "evidence/s2-008-controls.json",
+        "evidence/s2-008-dependency-binding.json",
+        "evidence/s2-008-harness.json",
+        "evidence/s2-008-probes.json",
+        "evidence/s2-008-replay.json",
+        "evidence/s2-008-run-a.json",
+        "evidence/s2-008-run-b.json",
+        "evidence/s2-008-security-probes.json",
+        "evidence/s2-008-summary.json",
+        "evidence/s2-008/corpus/cases/dev.json",
+        "evidence/s2-008/corpus/cases/holdout.json",
+        "evidence/s2-008/corpus/manifest.json",
+        "evidence/s2-008/corpus/preregistration-superseded.json",
+        "evidence/s2-008/corpus/preregistration-supersession.json",
+        "evidence/s2-008/corpus/preregistration.json",
+        "evidence/s2-008/corpus/supersession-ledger.json",
+        "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-harness.mjs",
+        "scripts/s2-008-replay.mjs",
+        "scripts/s2-008-run.mjs",
+        "scripts/s2-008-security-probes.mjs",
+        "scripts/verify-s2-008-dependencies.mjs",
+        "scripts/verify-s2-008.mjs",
+        "src/lib/research/campaign-decision.mjs",
+        "src/lib/research/campaign-expectation.mjs",
+        "src/lib/research/causality.mjs",
+        "src/lib/research/comparator.mjs",
+        "src/lib/research/constants.mjs",
+        "src/lib/research/contracts.mjs",
+        "src/lib/research/dataset.mjs",
+        "src/lib/research/executor.mjs",
+        "src/lib/research/expected-values.mjs",
+        "src/lib/research/index.mjs",
+        "src/lib/research/negative-controls.mjs",
+        "src/lib/research/policy.mjs",
+        "src/lib/research/preregistration.mjs",
+        "src/lib/research/probes.mjs",
+        "src/lib/research/registry.mjs",
+        "src/lib/research/runner.mjs",
+        "tests/research/comparator-probes.test.mjs",
+        "tests/research/comparator.test.mjs",
+        "tests/research/dataset.test.mjs",
+        "tests/research/fixtures/README.md",
+        "tests/research/fixtures/fixture-corrupted-variants.mjs",
+        "tests/research/fixtures/fixture-digest.mjs",
+        "tests/research/fixtures/fixture-expected-values.mjs",
+        "tests/research/fixtures/fixture-fixed-clock.mjs",
+        "tests/research/fixtures/fixture-measurement-set.mjs",
+        "tests/research/fixtures/fixture-preregistration.mjs",
+        "tests/research/fixtures/fixture-run-identity.mjs",
+        "tests/research/fixtures/fixture-temp-base.mjs",
+        "tests/research/fixtures/index.mjs",
+        "tests/research/gate-semantics.test.mjs",
+        "tests/research/harness.test.mjs",
+        "tests/research/registry-prereg.test.mjs",
+        "tests/research/replay-two-run.test.mjs",
+        "tests/research/triage-hardening.test.mjs"
+      ],
+      "track_files_expected_count": 58,
+      "track_files_unaccounted": [],
+      "track_files_untracked": [],
+      "track_files_modified": [
+        "evidence/s2-008-replay.json",
+        "evidence/s2-008-run-a.json",
+        "evidence/s2-008-run-b.json"
+      ]
+    },
+    "corpus": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "scripts/s2-008-build-corpus.mjs --check",
+      "drift": null,
+      "refusal": null,
+      "reads": "the working tree, re-derived from tests/research/fixtures/**"
+    },
+    "probes": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "scripts/s2-008-security-probes.mjs",
+      "counters": {
+        "holdoutPeek": 0,
+        "seedSubstitution": 0,
+        "hypothesisRewrite": 0,
+        "budgetOpacity": 0,
+        "causalUpgrade": 0,
+        "missingEvaluator": 0
+      },
+      "totals": {
+        "families": 6,
+        "probes": 6,
+        "probes_ran": 6,
+        "passed": 6,
+        "failed": 0,
+        "not_run": 0,
+        "broken": 0,
+        "controls_declared": 6,
+        "controls_extra_declared": 1,
+        "controls_extra_ids": [
+          "ledger_spelling_holdout_peek"
+        ],
+        "controls_ran": 7,
+        "controls_flipped": 7,
+        "controls_unaccounted": [],
+        "corruption_variants_declared": [
+          "trial_status_skip",
+          "counter_nudge",
+          "metric_altered",
+          "provenance_field"
+        ],
+        "corruption_variants_injected": [
+          "trial_status_skip",
+          "counter_nudge",
+          "metric_altered",
+          "provenance_field"
+        ],
+        "corruption_variants_unproductive": [],
+        "sensitivity": {
+          "comparator": "PROVEN: every control mutates a trial and reads resolveTrialVerdict back, so allFlipped is a measurement of the comparator",
+          "pipeline": {
+            "runs_examined": 2,
+            "mutations": [
+              {
+                "letter": "a",
+                "control": "holdout_peek",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "seed_substitution",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "budget_opacity",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "missing_evaluator",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:trial_status_skip",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:counter_nudge",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 12,
+                "detected": true
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:metric_altered",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "a",
+                "control": "corrupted_data:provenance_field",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "holdout_peek",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "seed_substitution",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "budget_opacity",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "missing_evaluator",
+                "layer": "TRIAL_BINDING",
+                "findings_before": 6,
+                "findings_after": 6,
+                "detected": false
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:trial_status_skip",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:counter_nudge",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 12,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:metric_altered",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              },
+              {
+                "letter": "b",
+                "control": "corrupted_data:provenance_field",
+                "layer": "RUN_RECORD",
+                "findings_before": 6,
+                "findings_after": 7,
+                "detected": true
+              }
+            ],
+            "any_run_sensitive": true,
+            "note": "comparator-level sensitivity is demonstrated for all six controls; at RUN level the frozen corruption classes changed the findings 8 time(s) out of 8, and the trial-binding mutations changed them 0 time(s) out of 8 — a binding mutation is caught by the COMPARATOR, not by the expected-value table, and the record now says which is which",
+            "detected_at_run_level": 8,
+            "detected_at_comparator_level_only": 8
+          }
+        }
+      },
+      "reasons": [],
+      "floor_issues": [],
+      "record_path": "evidence/s2-008-security-probes.json",
+      "record_present": true,
+      "record_sha256": "592f69449056530f471893969d0e43d3c6e93078763832f4b757d88bc69d0081",
+      "record_bytes": 40347,
+      "record_digest": "2cc8b9125277d95e92f5d164c70bed770c924f256f6442d43ab6d44ff38e1d35",
+      "record_digest_reported": "2cc8b9125277d95e92f5d164c70bed770c924f256f6442d43ab6d44ff38e1d35",
+      "record_digest_agrees": true,
+      "record_is_this_run": true,
+      "record_issues": [],
+      "floor": {
+        "probes": 6,
+        "controls": 7,
+        "hard_gate_counters": 6,
+        "read_from": "src/lib/research/probes.mjs (PROBE_FAMILIES, PROBE_NAMES, HARD_GATE_COUNTERS) and the frozen control list (EXPECTED_CONTROLS + EXTRA_CONTROL_IDS)",
+        "rule": "fewer probes or fewer controls than the code declares is a defect; a counter map that reports none of the declared counters is a defect, not a pass"
+      }
+    },
+    "replay": {
+      "status": "PASS",
+      "exitCode": 0,
+      "stale": false,
+      "reason": null,
+      "source": "scripts/s2-008-replay.mjs",
+      "overall": "PASS",
+      "invocation_id": "b547ceed83a6960e0c637a3d5ee0755d",
+      "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+      "campaign_verdict": "FAIL",
+      "expected_campaign_decision": "UNRESOLVED",
+      "observed_campaign_decision": "UNRESOLVED",
+      "properties": [
+        "A3:HELD",
+        "A5:HELD"
+      ],
+      "freshness": {
+        "observed_at": "2026-09-28T05:51:18.434Z",
+        "finished_at": "2026-09-28T05:51:20.807Z",
+        "source": "wall_clock",
+        "decides": false,
+        "excluded_from_repeatability": true,
+        "age_ms": 9
+      }
+    },
+    "harness": {
+      "status": "PASS",
+      "exitCode": 0,
+      "source": "scripts/s2-008-harness.mjs",
+      "observed_at": "2026-09-28T05:51:21.286Z",
+      "evidence_sha256": "6e17efb65f4b23d5cfbfaf51583baf458f32cbec14196ec62e80e9df468caf03",
+      "evidence_bytes": 71951,
+      "record_is_this_run": true,
+      "invocation_id_required": true,
+      "invocation_id": "b547ceed83a6960e0c637a3d5ee0755d",
+      "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+      "head_tree_sha_matches": true,
+      "exit_code_recorded": null,
+      "overall": "PASS",
+      "verdict": "FAIL",
+      "expected_campaign_decision": "UNRESOLVED",
+      "observed_campaign_decision": "UNRESOLVED",
+      "decision_agrees_with_table": true,
+      "properties": [
+        "A1:HELD",
+        "A2:HELD",
+        "A3:HELD",
+        "A4:HELD",
+        "A5:HELD"
+      ],
+      "reason": null
+    }
+  },
+  "defects": [],
+  "notRun": [],
+  "scopeNotes": [
+    "the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
+    "the campaign behind #12 is NOT_RUN, so this deterministic track does not decide the ticket's own scope; #45 carried that scope and is now CLOSED (PARTIAL) with its remainder in #12"
+  ],
+  "blockingGates": [],
+  "notRunGates": [],
+  "freshness": {
+    "observed_at": "2026-09-28T05:51:21.288Z",
+    "started_at": "2026-09-28T05:51:04.707Z",
+    "replay_judged_at": "2026-09-28T05:51:20.816Z",
+    "harness_judged_at": "2026-09-28T05:51:21.286Z",
+    "window_ms": 21600000,
+    "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+    "replay_finished_at": "2026-09-28T05:51:20.807Z"
+  },
+  "track_status": "TRACK_PROPERTIES_HELD",
+  "authoritative": {
+    "a3": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
+    "a5": "evidence/s2-008-replay.json (the cross-process replay the aggregator spawned)",
+    "harness_a3_is": "TABLE_DERIVED_NOT_A_MEASUREMENT",
+    "cross_record_agreement": {
+      "verdict": "NOT_COMPARABLE_DISCLOSED",
+      "issues": [],
+      "note": "the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one",
+      "harness_findings": {
+        "findingsA": 0,
+        "findingsB": 0
+      },
+      "replay_findings": {
+        "findingsA": 0,
+        "findingsB": 0
+      }
+    }
+  },
+  "ticket_preconditions_not_met": [],
+  "engineering_status": "BLOCKED_DEPENDENCY",
+  "assurance_status": "NOT_MEASURED",
+  "real_adapter_status": "NOT_RUN_REAL_ADAPTER",
+  "a_mvp_status": "NOT_RUN (A-MVP-01..07, behind #12)",
+  "note": "engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket's own scope into done.",
+  "observedAtIso": "2026-09-28T05:51:21.288Z",
+  "startedAtIso": "2026-09-28T05:51:04.707Z"
+}

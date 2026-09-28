@@ -1,0 +1,1216 @@
+{
+  "ticket": "S2-008",
+  "kind": "RUN",
+  "label": "b",
+  "attempt": 0,
+  "evidence_eligible": true,
+  "corpus": "evidence/s2-008/corpus",
+  "base": {
+    "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+    "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+    "branch": "bb/spacedazher-veritas-8-s2-008-r-d-thr_4etd4uwcke",
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 58,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
+    "track_tracked": true
+  },
+  "provenance": {
+    "version": "s2-008-runner-v1",
+    "commit": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+    "tree": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+    "run_id": "s2-008-run-b-0-p318681",
+    "label": "b",
+    "executor_id": "exec-s2-008-b-0-p318681",
+    "pid": 318681,
+    "nonce": "n-b-6a6b09c0720c4e01",
+    "clock": "2026-01-01T01:00:00.000Z",
+    "started_at": "2026-01-01T01:00:00.000Z"
+  },
+  "preregistration": {
+    "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
+    "metric_name": "case_agreement_rate",
+    "seed_count": 5,
+    "trial_count": 4
+  },
+  "lawful_window": {
+    "decision_point": "2026-01-01T01:00:00.000Z",
+    "reservation_expires_at": "2026-01-01T02:00:00.000Z",
+    "from": "2026-01-01T01:00:00.000Z",
+    "until": "2026-01-01T02:00:00.000Z",
+    "window_ms": 3600000,
+    "empty": false,
+    "rule": "a holdout read is lawful at or after the decision point; a reservation is live strictly before its expiry"
+  },
+  "purge": {
+    "registry_root": ".bb/s2-008/run/b-0",
+    "executor_fixtures": {
+      "dir": ".bb/s2-008/run/out-b-0/executor-fixtures/b-0",
+      "present": false,
+      "purged": false,
+      "dry_run": false,
+      "removed": [],
+      "removed_count": 0,
+      "kept": [],
+      "other_labels": []
+    }
+  },
+  "holdout_access": {
+    "access_record_id": "rec-df6574c60001",
+    "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+    "opened_case": "s2-008-case-01",
+    "opened_cases": 1,
+    "partition_case_count": 8,
+    "opens": 1,
+    "max_opens": 1,
+    "read_at": "2026-01-01T01:00:00.000Z",
+    "decision_at": "2026-01-01T01:00:00.000Z"
+  },
+  "harness_findings": [],
+  "version": "s2-008-runner-v1",
+  "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+  "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+  "raw_run_id": "s2-008-run-b-0-p318681",
+  "nonce": "n-b-6a6b09c0720c4e01",
+  "executor_id": "exec-s2-008-b-0-p318681",
+  "output_root": ".bb/s2-008/run/out-b-0",
+  "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
+  "preregistration_digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
+  "run": {
+    "version": "s2-008-runner-v1",
+    "ticket": "S2-008",
+    "label": "b",
+    "status": "COMPLETED",
+    "started_at": "2026-01-01T01:00:00.000Z",
+    "finished_at": "2026-01-01T01:00:00.000Z",
+    "engine": {
+      "units_per_trial": 1,
+      "trial_timeout_ms": 3600000,
+      "trial_timeout_source": "budget_reservation.trial_timeout_ms",
+      "trial_count": 4,
+      "sequential": true,
+      "retriable": false
+    }
+  },
+  "preregistration_in_force": {
+    "digest": "b3ae2a638f52c9505642348e04ae8d2bf5cf6c623eb819b3d43651913b522207",
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
+    "seed_count": 5,
+    "trial_count": 4,
+    "stopping_rule": {
+      "early_stop": false,
+      "kind": "FIXED_TRIALS",
+      "max_trials": 4,
+      "on_infra": "RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO",
+      "on_negative": "RECORD_AND_CONTINUE",
+      "on_null": "RECORD_AND_CONTINUE"
+    },
+    "noise_rule": {
+      "source": "noise_rule.band + metric.noiseBand",
+      "band": 0.02
+    },
+    "decision_rule": {
+      "alpha": 0.05,
+      "method": "holm_bonferroni",
+      "confidence": 0.9833333333333333,
+      "direction": "increase",
+      "null_value": 0.75,
+      "null_value_source": "frozen_baseline.value (the preregistered noise rule names the baseline as its reference point)",
+      "comparisons": [
+        "trl-s2-008-01",
+        "trl-s2-008-02",
+        "trl-s2-008-03"
+      ]
+    },
+    "inference_mode": "ASSOCIATIONAL",
+    "budget": {
+      "reservation_id": "rsv-s2-008-01",
+      "granted_units": 8,
+      "spent_units": 4,
+      "currency": "trial_runs",
+      "expires_at": "2026-01-01T02:00:00.000Z"
+    }
+  },
+  "run_status": "COMPLETED",
+  "engine_error": null,
+  "trials": [
+    {
+      "index": 0,
+      "trial": "trl-s2-008-01",
+      "seeds": [
+        101,
+        202,
+        303,
+        404,
+        505
+      ],
+      "metric": "case_agreement_rate",
+      "numerator": 7,
+      "denominator": 8,
+      "case_record_rate": 1,
+      "status": "RESOLVED",
+      "outcome": "UNRESOLVED",
+      "reason_codes": [],
+      "observed": 0.875,
+      "interval": {
+        "lower": 0.45362450010939603,
+        "upper": 0.9833385697376568,
+        "method": "wilson_score",
+        "confidence": 0.9833333333333333
+      },
+      "noise_band": 0.02,
+      "decision": {
+        "decision": "UNRESOLVED",
+        "reason": "interval_straddles_null_outside_noise_band",
+        "insideNoiseBand": false,
+        "intervalClearsNoise": false,
+        "correction": null
+      },
+      "bindings": {
+        "seed": {
+          "seeds": [
+            101,
+            202,
+            303,
+            404,
+            505
+          ],
+          "source": "PREREGISTERED"
+        },
+        "holdout": {
+          "partition": "HOLDOUT",
+          "read_at": "2026-01-01T01:00:00.000Z",
+          "decision_at": "2026-01-01T01:00:00.000Z",
+          "opened_before_decision_point": false,
+          "opens": 1,
+          "max_opens": 1,
+          "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+          "access_record_id": "rec-df6574c60001",
+          "case_id": "s2-008-case-01"
+        },
+        "budget": {
+          "reservation_id": "rsv-s2-008-01",
+          "granted_units": 8,
+          "spent_units": 1,
+          "units": 1,
+          "settle_key": "c659967639c8211e4b2e8b11a159f626723b98e7ffec681cf506e3e993da7446",
+          "replayed": false
+        },
+        "evaluator": {
+          "evaluator_id": "evl-s2-008-runner",
+          "independent": true,
+          "blind_to_producer": true
+        }
+      },
+      "seedBinding": {
+        "seeds": [
+          101,
+          202,
+          303,
+          404,
+          505
+        ],
+        "source": "PREREGISTERED"
+      },
+      "holdoutBinding": {
+        "partition": "HOLDOUT",
+        "read_at": "2026-01-01T01:00:00.000Z",
+        "decision_at": "2026-01-01T01:00:00.000Z",
+        "opened_before_decision_point": false,
+        "opens": 1,
+        "max_opens": 1,
+        "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+        "access_record_id": "rec-df6574c60001",
+        "case_id": "s2-008-case-01"
+      },
+      "budgetBinding": {
+        "reservation_id": "rsv-s2-008-01",
+        "granted_units": 8,
+        "spent_units": 1,
+        "currency": "trial_runs"
+      },
+      "evaluatorBinding": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "evaluator": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "calibration": {
+        "status": "MEASURED",
+        "not_measured_reason": null,
+        "evaluator_independence": {
+          "independent_evaluators": 1,
+          "blind_to_producer": true,
+          "separate_processes": true
+        }
+      },
+      "card": {
+        "alternative_explanations": [
+          {
+            "claim_id": null,
+            "description": "the filter changed which spans were labelled rather than which were bound"
+          }
+        ],
+        "assumptions": [
+          "the holdout partition is exchangeable with the dev partition",
+          "the evaluator is blind to the filter under test"
+        ],
+        "card_id": "hyc-s2-008-01",
+        "card_type": "HYPOTHESIS",
+        "confounders": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "description": "cohort difficulty drifts between the dev partition and the holdout partition",
+            "status": "IDENTIFIED"
+          }
+        ],
+        "contractVersion": "1.0.0",
+        "counterevidence": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "relation": "bounds"
+          }
+        ],
+        "created_at": "2026-01-01T00:00:00.000Z",
+        "created_by": "s2-008-fixture-author",
+        "falsifiers": [
+          {
+            "description": "the holdout agreement interval lies inside the preregistered noise band",
+            "observable": "holdout agreement interval against the frozen baseline 0.75 with a 0.02 band"
+          }
+        ],
+        "mediators": [],
+        "nodes": [
+          {
+            "claim_id": "clm-s2-008-01",
+            "domain": "coherence-triage",
+            "revision": 1,
+            "role": "source"
+          },
+          {
+            "claim_id": "clm-s2-008-02",
+            "domain": "span-extraction",
+            "revision": 1,
+            "role": "target"
+          }
+        ],
+        "novelty": {
+          "assessment": "NOT_ASSESSED",
+          "corpus": null,
+          "search_horizon": null,
+          "similar_prior_refs": []
+        },
+        "originating_domains": [
+          "span-extraction",
+          "coherence-triage"
+        ],
+        "proposed_relation": {
+          "causal_assertion": null,
+          "object": "span binding agreement on the holdout partition",
+          "predicate": "is associated with",
+          "relation_strength": "CORRELATION_EVIDENCE",
+          "subject": "deterministic coherence triage filter"
+        },
+        "scope": {
+          "domain_limits": [
+            "the eight hand-authored fixture cases only; no production span stream was measured",
+            "association only; no causal effect is claimed or measurable on this corpus"
+          ],
+          "geography": null,
+          "period": null,
+          "population": null,
+          "units": "span"
+        },
+        "stale": {
+          "invalidation_event_ids": [],
+          "is_stale": false,
+          "stale_claim_ids": []
+        },
+        "status": "FRESH",
+        "temporal_ordering": {
+          "established": false,
+          "event_times": [],
+          "evidence_claim_ids": []
+        },
+        "test_design": "One seeded percentile-bootstrap interval per enumerated trial over the eight fixture cases, compared against the frozen baseline 0.75 with a preregistered noise band of 0.02, Holm-Bonferroni over the three declared comparisons. Observational corpus; inference_mode ASSOCIATIONAL.",
+        "type_promotion": null,
+        "uncertainty": {
+          "author_confidence": null,
+          "evidence_support": 0,
+          "expert_trust": null,
+          "measured_calibration": null
+        }
+      },
+      "provenance": {
+        "raw_run_id": "s2-008-run-b-0-p318681",
+        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "nonce": "n-b-6a6b09c0720c4e01",
+        "executor_id": "exec-s2-008-b-0-p318681"
+      },
+      "budget": {
+        "units": 1,
+        "settle_key": "c659967639c8211e4b2e8b11a159f626723b98e7ffec681cf506e3e993da7446",
+        "replayed": false
+      },
+      "elapsed_ms": 0,
+      "latency_ms": 0,
+      "latency_source": "executor_reported",
+      "infra": null,
+      "reconciliation_id": null,
+      "detail": "",
+      "verdict": "ALLOW",
+      "verdict_reasons": []
+    },
+    {
+      "index": 1,
+      "trial": "trl-s2-008-02",
+      "seeds": [
+        101,
+        202,
+        303,
+        404,
+        505
+      ],
+      "metric": "case_agreement_rate",
+      "numerator": 6,
+      "denominator": 8,
+      "case_record_rate": 1,
+      "status": "RESOLVED",
+      "outcome": "UNRESOLVED",
+      "reason_codes": [],
+      "observed": 0.75,
+      "interval": {
+        "lower": 0.3470789962265127,
+        "upper": 0.9442297170048558,
+        "method": "wilson_score",
+        "confidence": 0.9833333333333333
+      },
+      "noise_band": 0.02,
+      "decision": {
+        "decision": "UNRESOLVED",
+        "reason": "interval_straddles_null_outside_noise_band",
+        "insideNoiseBand": false,
+        "intervalClearsNoise": false,
+        "correction": null
+      },
+      "bindings": {
+        "seed": {
+          "seeds": [
+            101,
+            202,
+            303,
+            404,
+            505
+          ],
+          "source": "PREREGISTERED"
+        },
+        "holdout": {
+          "partition": "HOLDOUT",
+          "read_at": "2026-01-01T01:00:00.000Z",
+          "decision_at": "2026-01-01T01:00:00.000Z",
+          "opened_before_decision_point": false,
+          "opens": 1,
+          "max_opens": 1,
+          "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+          "access_record_id": "rec-df6574c60001",
+          "case_id": "s2-008-case-01"
+        },
+        "budget": {
+          "reservation_id": "rsv-s2-008-01",
+          "granted_units": 8,
+          "spent_units": 2,
+          "units": 1,
+          "settle_key": "6f32f4ec1e8d8a1e4324c17e373ddd5c476cd249cfc11a29a2a8f1ab0d2282f8",
+          "replayed": false
+        },
+        "evaluator": {
+          "evaluator_id": "evl-s2-008-runner",
+          "independent": true,
+          "blind_to_producer": true
+        }
+      },
+      "seedBinding": {
+        "seeds": [
+          101,
+          202,
+          303,
+          404,
+          505
+        ],
+        "source": "PREREGISTERED"
+      },
+      "holdoutBinding": {
+        "partition": "HOLDOUT",
+        "read_at": "2026-01-01T01:00:00.000Z",
+        "decision_at": "2026-01-01T01:00:00.000Z",
+        "opened_before_decision_point": false,
+        "opens": 1,
+        "max_opens": 1,
+        "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+        "access_record_id": "rec-df6574c60001",
+        "case_id": "s2-008-case-01"
+      },
+      "budgetBinding": {
+        "reservation_id": "rsv-s2-008-01",
+        "granted_units": 8,
+        "spent_units": 2,
+        "currency": "trial_runs"
+      },
+      "evaluatorBinding": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "evaluator": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "calibration": {
+        "status": "MEASURED",
+        "not_measured_reason": null,
+        "evaluator_independence": {
+          "independent_evaluators": 1,
+          "blind_to_producer": true,
+          "separate_processes": true
+        }
+      },
+      "card": {
+        "alternative_explanations": [
+          {
+            "claim_id": null,
+            "description": "the filter changed which spans were labelled rather than which were bound"
+          }
+        ],
+        "assumptions": [
+          "the holdout partition is exchangeable with the dev partition",
+          "the evaluator is blind to the filter under test"
+        ],
+        "card_id": "hyc-s2-008-01",
+        "card_type": "HYPOTHESIS",
+        "confounders": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "description": "cohort difficulty drifts between the dev partition and the holdout partition",
+            "status": "IDENTIFIED"
+          }
+        ],
+        "contractVersion": "1.0.0",
+        "counterevidence": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "relation": "bounds"
+          }
+        ],
+        "created_at": "2026-01-01T00:00:00.000Z",
+        "created_by": "s2-008-fixture-author",
+        "falsifiers": [
+          {
+            "description": "the holdout agreement interval lies inside the preregistered noise band",
+            "observable": "holdout agreement interval against the frozen baseline 0.75 with a 0.02 band"
+          }
+        ],
+        "mediators": [],
+        "nodes": [
+          {
+            "claim_id": "clm-s2-008-01",
+            "domain": "coherence-triage",
+            "revision": 1,
+            "role": "source"
+          },
+          {
+            "claim_id": "clm-s2-008-02",
+            "domain": "span-extraction",
+            "revision": 1,
+            "role": "target"
+          }
+        ],
+        "novelty": {
+          "assessment": "NOT_ASSESSED",
+          "corpus": null,
+          "search_horizon": null,
+          "similar_prior_refs": []
+        },
+        "originating_domains": [
+          "span-extraction",
+          "coherence-triage"
+        ],
+        "proposed_relation": {
+          "causal_assertion": null,
+          "object": "span binding agreement on the holdout partition",
+          "predicate": "is associated with",
+          "relation_strength": "CORRELATION_EVIDENCE",
+          "subject": "deterministic coherence triage filter"
+        },
+        "scope": {
+          "domain_limits": [
+            "the eight hand-authored fixture cases only; no production span stream was measured",
+            "association only; no causal effect is claimed or measurable on this corpus"
+          ],
+          "geography": null,
+          "period": null,
+          "population": null,
+          "units": "span"
+        },
+        "stale": {
+          "invalidation_event_ids": [],
+          "is_stale": false,
+          "stale_claim_ids": []
+        },
+        "status": "FRESH",
+        "temporal_ordering": {
+          "established": false,
+          "event_times": [],
+          "evidence_claim_ids": []
+        },
+        "test_design": "One seeded percentile-bootstrap interval per enumerated trial over the eight fixture cases, compared against the frozen baseline 0.75 with a preregistered noise band of 0.02, Holm-Bonferroni over the three declared comparisons. Observational corpus; inference_mode ASSOCIATIONAL.",
+        "type_promotion": null,
+        "uncertainty": {
+          "author_confidence": null,
+          "evidence_support": 0,
+          "expert_trust": null,
+          "measured_calibration": null
+        }
+      },
+      "provenance": {
+        "raw_run_id": "s2-008-run-b-0-p318681",
+        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "nonce": "n-b-6a6b09c0720c4e01",
+        "executor_id": "exec-s2-008-b-0-p318681"
+      },
+      "budget": {
+        "units": 1,
+        "settle_key": "6f32f4ec1e8d8a1e4324c17e373ddd5c476cd249cfc11a29a2a8f1ab0d2282f8",
+        "replayed": false
+      },
+      "elapsed_ms": 0,
+      "latency_ms": 0,
+      "latency_source": "executor_reported",
+      "infra": null,
+      "reconciliation_id": null,
+      "detail": "",
+      "verdict": "ALLOW",
+      "verdict_reasons": []
+    },
+    {
+      "index": 2,
+      "trial": "trl-s2-008-03",
+      "seeds": [
+        101,
+        202,
+        303,
+        404,
+        505
+      ],
+      "metric": "case_agreement_rate",
+      "numerator": 5,
+      "denominator": 8,
+      "case_record_rate": 1,
+      "status": "RESOLVED",
+      "outcome": "UNRESOLVED",
+      "reason_codes": [],
+      "observed": 0.625,
+      "interval": {
+        "lower": 0.2557372163157952,
+        "upper": 0.8899171402998891,
+        "method": "wilson_score",
+        "confidence": 0.9833333333333333
+      },
+      "noise_band": 0.02,
+      "decision": {
+        "decision": "UNRESOLVED",
+        "reason": "interval_straddles_null_outside_noise_band",
+        "insideNoiseBand": false,
+        "intervalClearsNoise": false,
+        "correction": null
+      },
+      "bindings": {
+        "seed": {
+          "seeds": [
+            101,
+            202,
+            303,
+            404,
+            505
+          ],
+          "source": "PREREGISTERED"
+        },
+        "holdout": {
+          "partition": "HOLDOUT",
+          "read_at": "2026-01-01T01:00:00.000Z",
+          "decision_at": "2026-01-01T01:00:00.000Z",
+          "opened_before_decision_point": false,
+          "opens": 1,
+          "max_opens": 1,
+          "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+          "access_record_id": "rec-df6574c60001",
+          "case_id": "s2-008-case-01"
+        },
+        "budget": {
+          "reservation_id": "rsv-s2-008-01",
+          "granted_units": 8,
+          "spent_units": 3,
+          "units": 1,
+          "settle_key": "09aba34bc46e47032971ac476c71c2a511bcd4b46728e2ed0ef911bf84c5721c",
+          "replayed": false
+        },
+        "evaluator": {
+          "evaluator_id": "evl-s2-008-runner",
+          "independent": true,
+          "blind_to_producer": true
+        }
+      },
+      "seedBinding": {
+        "seeds": [
+          101,
+          202,
+          303,
+          404,
+          505
+        ],
+        "source": "PREREGISTERED"
+      },
+      "holdoutBinding": {
+        "partition": "HOLDOUT",
+        "read_at": "2026-01-01T01:00:00.000Z",
+        "decision_at": "2026-01-01T01:00:00.000Z",
+        "opened_before_decision_point": false,
+        "opens": 1,
+        "max_opens": 1,
+        "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+        "access_record_id": "rec-df6574c60001",
+        "case_id": "s2-008-case-01"
+      },
+      "budgetBinding": {
+        "reservation_id": "rsv-s2-008-01",
+        "granted_units": 8,
+        "spent_units": 3,
+        "currency": "trial_runs"
+      },
+      "evaluatorBinding": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "evaluator": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "calibration": {
+        "status": "MEASURED",
+        "not_measured_reason": null,
+        "evaluator_independence": {
+          "independent_evaluators": 1,
+          "blind_to_producer": true,
+          "separate_processes": true
+        }
+      },
+      "card": {
+        "alternative_explanations": [
+          {
+            "claim_id": null,
+            "description": "the filter changed which spans were labelled rather than which were bound"
+          }
+        ],
+        "assumptions": [
+          "the holdout partition is exchangeable with the dev partition",
+          "the evaluator is blind to the filter under test"
+        ],
+        "card_id": "hyc-s2-008-01",
+        "card_type": "HYPOTHESIS",
+        "confounders": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "description": "cohort difficulty drifts between the dev partition and the holdout partition",
+            "status": "IDENTIFIED"
+          }
+        ],
+        "contractVersion": "1.0.0",
+        "counterevidence": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "relation": "bounds"
+          }
+        ],
+        "created_at": "2026-01-01T00:00:00.000Z",
+        "created_by": "s2-008-fixture-author",
+        "falsifiers": [
+          {
+            "description": "the holdout agreement interval lies inside the preregistered noise band",
+            "observable": "holdout agreement interval against the frozen baseline 0.75 with a 0.02 band"
+          }
+        ],
+        "mediators": [],
+        "nodes": [
+          {
+            "claim_id": "clm-s2-008-01",
+            "domain": "coherence-triage",
+            "revision": 1,
+            "role": "source"
+          },
+          {
+            "claim_id": "clm-s2-008-02",
+            "domain": "span-extraction",
+            "revision": 1,
+            "role": "target"
+          }
+        ],
+        "novelty": {
+          "assessment": "NOT_ASSESSED",
+          "corpus": null,
+          "search_horizon": null,
+          "similar_prior_refs": []
+        },
+        "originating_domains": [
+          "span-extraction",
+          "coherence-triage"
+        ],
+        "proposed_relation": {
+          "causal_assertion": null,
+          "object": "span binding agreement on the holdout partition",
+          "predicate": "is associated with",
+          "relation_strength": "CORRELATION_EVIDENCE",
+          "subject": "deterministic coherence triage filter"
+        },
+        "scope": {
+          "domain_limits": [
+            "the eight hand-authored fixture cases only; no production span stream was measured",
+            "association only; no causal effect is claimed or measurable on this corpus"
+          ],
+          "geography": null,
+          "period": null,
+          "population": null,
+          "units": "span"
+        },
+        "stale": {
+          "invalidation_event_ids": [],
+          "is_stale": false,
+          "stale_claim_ids": []
+        },
+        "status": "FRESH",
+        "temporal_ordering": {
+          "established": false,
+          "event_times": [],
+          "evidence_claim_ids": []
+        },
+        "test_design": "One seeded percentile-bootstrap interval per enumerated trial over the eight fixture cases, compared against the frozen baseline 0.75 with a preregistered noise band of 0.02, Holm-Bonferroni over the three declared comparisons. Observational corpus; inference_mode ASSOCIATIONAL.",
+        "type_promotion": null,
+        "uncertainty": {
+          "author_confidence": null,
+          "evidence_support": 0,
+          "expert_trust": null,
+          "measured_calibration": null
+        }
+      },
+      "provenance": {
+        "raw_run_id": "s2-008-run-b-0-p318681",
+        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "nonce": "n-b-6a6b09c0720c4e01",
+        "executor_id": "exec-s2-008-b-0-p318681"
+      },
+      "budget": {
+        "units": 1,
+        "settle_key": "09aba34bc46e47032971ac476c71c2a511bcd4b46728e2ed0ef911bf84c5721c",
+        "replayed": false
+      },
+      "elapsed_ms": 0,
+      "latency_ms": 0,
+      "latency_source": "executor_reported",
+      "infra": null,
+      "reconciliation_id": null,
+      "detail": "",
+      "verdict": "ALLOW",
+      "verdict_reasons": []
+    },
+    {
+      "index": 3,
+      "trial": "trl-s2-008-04",
+      "seeds": [
+        101,
+        202,
+        303,
+        404,
+        505
+      ],
+      "metric": "case_agreement_rate",
+      "numerator": null,
+      "denominator": null,
+      "case_record_rate": null,
+      "status": "INFRA_ERROR",
+      "outcome": "INFRA",
+      "reason_codes": [
+        "MEASUREMENT_ABSENT"
+      ],
+      "observed": null,
+      "interval": null,
+      "noise_band": 0.02,
+      "decision": null,
+      "bindings": {
+        "seed": {
+          "seeds": [
+            101,
+            202,
+            303,
+            404,
+            505
+          ],
+          "source": "PREREGISTERED"
+        },
+        "holdout": {
+          "partition": "HOLDOUT",
+          "read_at": "2026-01-01T01:00:00.000Z",
+          "decision_at": "2026-01-01T01:00:00.000Z",
+          "opened_before_decision_point": false,
+          "opens": 1,
+          "max_opens": 1,
+          "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+          "access_record_id": "rec-df6574c60001",
+          "case_id": "s2-008-case-01"
+        },
+        "budget": {
+          "reservation_id": "rsv-s2-008-01",
+          "granted_units": 8,
+          "spent_units": 4,
+          "units": 1,
+          "settle_key": "b8000fabfc1c4209351d9e5f5069f31f4edd976fc325b64efedb3e409121f4da",
+          "replayed": false
+        },
+        "evaluator": {
+          "evaluator_id": "evl-s2-008-runner",
+          "independent": true,
+          "blind_to_producer": true
+        }
+      },
+      "seedBinding": {
+        "seeds": [
+          101,
+          202,
+          303,
+          404,
+          505
+        ],
+        "source": "PREREGISTERED"
+      },
+      "holdoutBinding": {
+        "partition": "HOLDOUT",
+        "read_at": "2026-01-01T01:00:00.000Z",
+        "decision_at": "2026-01-01T01:00:00.000Z",
+        "opened_before_decision_point": false,
+        "opens": 1,
+        "max_opens": 1,
+        "labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+        "access_record_id": "rec-df6574c60001",
+        "case_id": "s2-008-case-01"
+      },
+      "budgetBinding": {
+        "reservation_id": "rsv-s2-008-01",
+        "granted_units": 8,
+        "spent_units": 4,
+        "currency": "trial_runs"
+      },
+      "evaluatorBinding": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "evaluator": {
+        "evaluator_id": "evl-s2-008-runner",
+        "independent": true,
+        "blind_to_producer": true
+      },
+      "calibration": {
+        "status": "MEASURED",
+        "not_measured_reason": null,
+        "evaluator_independence": {
+          "independent_evaluators": 1,
+          "blind_to_producer": true,
+          "separate_processes": true
+        }
+      },
+      "card": {
+        "alternative_explanations": [
+          {
+            "claim_id": null,
+            "description": "the filter changed which spans were labelled rather than which were bound"
+          }
+        ],
+        "assumptions": [
+          "the holdout partition is exchangeable with the dev partition",
+          "the evaluator is blind to the filter under test"
+        ],
+        "card_id": "hyc-s2-008-01",
+        "card_type": "HYPOTHESIS",
+        "confounders": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "description": "cohort difficulty drifts between the dev partition and the holdout partition",
+            "status": "IDENTIFIED"
+          }
+        ],
+        "contractVersion": "1.0.0",
+        "counterevidence": [
+          {
+            "claim_id": "clm-s2-008-02",
+            "relation": "bounds"
+          }
+        ],
+        "created_at": "2026-01-01T00:00:00.000Z",
+        "created_by": "s2-008-fixture-author",
+        "falsifiers": [
+          {
+            "description": "the holdout agreement interval lies inside the preregistered noise band",
+            "observable": "holdout agreement interval against the frozen baseline 0.75 with a 0.02 band"
+          }
+        ],
+        "mediators": [],
+        "nodes": [
+          {
+            "claim_id": "clm-s2-008-01",
+            "domain": "coherence-triage",
+            "revision": 1,
+            "role": "source"
+          },
+          {
+            "claim_id": "clm-s2-008-02",
+            "domain": "span-extraction",
+            "revision": 1,
+            "role": "target"
+          }
+        ],
+        "novelty": {
+          "assessment": "NOT_ASSESSED",
+          "corpus": null,
+          "search_horizon": null,
+          "similar_prior_refs": []
+        },
+        "originating_domains": [
+          "span-extraction",
+          "coherence-triage"
+        ],
+        "proposed_relation": {
+          "causal_assertion": null,
+          "object": "span binding agreement on the holdout partition",
+          "predicate": "is associated with",
+          "relation_strength": "CORRELATION_EVIDENCE",
+          "subject": "deterministic coherence triage filter"
+        },
+        "scope": {
+          "domain_limits": [
+            "the eight hand-authored fixture cases only; no production span stream was measured",
+            "association only; no causal effect is claimed or measurable on this corpus"
+          ],
+          "geography": null,
+          "period": null,
+          "population": null,
+          "units": "span"
+        },
+        "stale": {
+          "invalidation_event_ids": [],
+          "is_stale": false,
+          "stale_claim_ids": []
+        },
+        "status": "FRESH",
+        "temporal_ordering": {
+          "established": false,
+          "event_times": [],
+          "evidence_claim_ids": []
+        },
+        "test_design": "One seeded percentile-bootstrap interval per enumerated trial over the eight fixture cases, compared against the frozen baseline 0.75 with a preregistered noise band of 0.02, Holm-Bonferroni over the three declared comparisons. Observational corpus; inference_mode ASSOCIATIONAL.",
+        "type_promotion": null,
+        "uncertainty": {
+          "author_confidence": null,
+          "evidence_support": 0,
+          "expert_trust": null,
+          "measured_calibration": null
+        }
+      },
+      "provenance": {
+        "raw_run_id": "s2-008-run-b-0-p318681",
+        "commit_sha": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+        "tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
+        "nonce": "n-b-6a6b09c0720c4e01",
+        "executor_id": "exec-s2-008-b-0-p318681"
+      },
+      "budget": {
+        "units": 1,
+        "settle_key": "b8000fabfc1c4209351d9e5f5069f31f4edd976fc325b64efedb3e409121f4da",
+        "replayed": false
+      },
+      "elapsed_ms": 0,
+      "latency_ms": 0,
+      "latency_source": "executor_reported",
+      "infra": {
+        "code": "MEASUREMENT_ABSENT",
+        "message": "the measurer produced no sample; an infra result is a row of the ledger, never a zero"
+      },
+      "reconciliation_id": null,
+      "detail": "",
+      "verdict": "VIOLATION",
+      "verdict_reasons": [
+        "TRIAL_NOT_RESOLVED:INFRA_ERROR"
+      ]
+    }
+  ],
+  "metrics": {
+    "metric": "case_agreement_rate",
+    "numerator": 18,
+    "denominator": 24,
+    "outcomeCounts": {
+      "UNRESOLVED": 3,
+      "INFRA": 1
+    },
+    "notMeasured": 1,
+    "basis": "POOLED_TRIAL_COUNTS"
+  },
+  "latency": {
+    "samples": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "interval": {
+      "pointEstimate": 0,
+      "lower": 0,
+      "upper": 0,
+      "method": "percentile_bootstrap",
+      "resamples": 2000,
+      "confidence": 0.9833333333333333,
+      "seed": 20260801,
+      "samples": 4
+    },
+    "decides": false,
+    "parameters": {
+      "seed": 20260801,
+      "resamples": 2000,
+      "p": 0.95,
+      "confidence": 0.9833333333333333,
+      "preregistered": true
+    }
+  },
+  "codes": [
+    "MEASUREMENT_ABSENT"
+  ],
+  "counters": {
+    "holdoutPeek": 0,
+    "seedSubstitution": 0,
+    "hypothesisRewrite": 0,
+    "budgetOpacity": 0,
+    "causalUpgrade": 0,
+    "missingEvaluator": 0
+  },
+  "counter_sources": {
+    "holdoutPeek": "refusals[].code and trials[].verdict_reasons",
+    "seedSubstitution": "refusals[].code (fatal in this engine: a substitution or a rewrite throws and returns no record)",
+    "hypothesisRewrite": "refusals[].code (fatal in this engine: a substitution or a rewrite throws and returns no record)",
+    "budgetOpacity": "refusals[].code and trials[].verdict_reasons",
+    "causalUpgrade": "refusals[].code and trials[].verdict_reasons",
+    "missingEvaluator": "refusals[].code and trials[].verdict_reasons of trials with status RESOLVED"
+  },
+  "reconciliations": [],
+  "refusals": [],
+  "run_counters": {
+    "executed": 4,
+    "resolved": 3,
+    "infra": 1,
+    "unresolved": 0,
+    "skipped": 0,
+    "reconciliations": 0,
+    "budget_exceeded": 0
+  },
+  "ledger": {
+    "chain_verified": true,
+    "snapshot_digest": "sha256:97942dd150519171643af4a8927cf7160c8db7ec5241c24233a0020e8f0f1431",
+    "record_kinds": [
+      "ACCESS",
+      "PREREGISTRATION_RECORDED",
+      "BUDGET_RESERVATION",
+      "BUDGET_SPEND",
+      "TRIAL_RESULT",
+      "BUDGET_SPEND",
+      "TRIAL_RESULT",
+      "BUDGET_SPEND",
+      "TRIAL_RESULT",
+      "BUDGET_SPEND",
+      "TRIAL_RESULT"
+    ],
+    "record_count": 11
+  },
+  "table_findings": [],
+  "table_finding_count": 0,
+  "derived_rows": [
+    {
+      "index": 0,
+      "trial": "trl-s2-008-01",
+      "table_says": "UNRESOLVED",
+      "rule_derived": "UNRESOLVED",
+      "agrees": true,
+      "observed": 0.875,
+      "interval": {
+        "lower": 0.45362450010939603,
+        "upper": 0.9833385697376568,
+        "method": "wilson_score",
+        "confidence": 0.9833333333333333
+      },
+      "decision_reason": "interval_straddles_null_outside_noise_band",
+      "status": "RESOLVED",
+      "verdict": "ALLOW"
+    },
+    {
+      "index": 1,
+      "trial": "trl-s2-008-02",
+      "table_says": "UNRESOLVED",
+      "rule_derived": "UNRESOLVED",
+      "agrees": true,
+      "observed": 0.75,
+      "interval": {
+        "lower": 0.3470789962265127,
+        "upper": 0.9442297170048558,
+        "method": "wilson_score",
+        "confidence": 0.9833333333333333
+      },
+      "decision_reason": "interval_straddles_null_outside_noise_band",
+      "status": "RESOLVED",
+      "verdict": "ALLOW"
+    },
+    {
+      "index": 2,
+      "trial": "trl-s2-008-03",
+      "table_says": "UNRESOLVED",
+      "rule_derived": "UNRESOLVED",
+      "agrees": true,
+      "observed": 0.625,
+      "interval": {
+        "lower": 0.2557372163157952,
+        "upper": 0.8899171402998891,
+        "method": "wilson_score",
+        "confidence": 0.9833333333333333
+      },
+      "decision_reason": "interval_straddles_null_outside_noise_band",
+      "status": "RESOLVED",
+      "verdict": "ALLOW"
+    },
+    {
+      "index": 3,
+      "trial": "trl-s2-008-04",
+      "table_says": "INFRA",
+      "rule_derived": "INFRA",
+      "agrees": true,
+      "observed": null,
+      "interval": null,
+      "decision_reason": null,
+      "status": "INFRA_ERROR",
+      "verdict": "VIOLATION"
+    }
+  ],
+  "decision_digest": "84817268ca71124271059df4f5b79329ea4da5c0c51c1e21d42efb72f1965646",
+  "artefact_digest": "a2b16520787f0c2f0a2c1869522a345dc73b0b9a6677f1e1815b295762bdd91a"
+}

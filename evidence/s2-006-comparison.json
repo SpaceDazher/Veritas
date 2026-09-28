@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "ticket": "S2-006",
   "role": "fail-closed comparator over two pre-sealed process-separated prediction sets (spec §9); the candidate is never re-run after unseal",
-  "testedImplementationCommit": "03e47c880a8054cadd72bf972a052dc5e055518b",
+  "testedImplementationCommit": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
   "corpus": {
     "manifestId": "anmf-s2006-fixture-corpus",
     "manifestSha256": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
@@ -13,14 +13,14 @@
   "runParameters": {
     "run_a": {
       "executor": "exec-s2-006-a",
-      "pid": 65958,
+      "pid": 141443,
       "clock": "2026-01-15T08:00:00.000Z",
       "nonce": "n-a-7c1e4d90a2b8f3e6",
       "output_root": "results/s2-006/run-a"
     },
     "run_b": {
       "executor": "exec-s2-006-b",
-      "pid": 65966,
+      "pid": 141455,
       "clock": "2026-03-21T23:59:59.999Z",
       "nonce": "n-b-3f9a62d1c5e80b74",
       "output_root": "results/s2-006/run-b"
@@ -31,8 +31,8 @@
     "run_b": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac"
   },
   "runManifestDigests": {
-    "run_a": "6bd36d1d4ebb7c8894c426ba7f1937db40c2c6b82e7b68a034c3d739f092bf68",
-    "run_b": "824db17fd7a03ec3dd423dc07b55d3c84b0f1243757788d3ad00b6ef2041d41c"
+    "run_a": "369b0ec493651bb4b832ea235a6bc8bd6239994d7aead01807ec460fd2da41f7",
+    "run_b": "43e7f31f15b69d74d8459159c85925ce154693c395f09a11522d0ec145676db5"
   },
   "hardCounters": {
     "run_a": {
@@ -63,8 +63,8 @@
         "runB": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac"
       },
       "runManifestDigests": {
-        "runA": "6bd36d1d4ebb7c8894c426ba7f1937db40c2c6b82e7b68a034c3d739f092bf68",
-        "runB": "824db17fd7a03ec3dd423dc07b55d3c84b0f1243757788d3ad00b6ef2041d41c"
+        "runA": "369b0ec493651bb4b832ea235a6bc8bd6239994d7aead01807ec460fd2da41f7",
+        "runB": "43e7f31f15b69d74d8459159c85925ce154693c395f09a11522d0ec145676db5"
       },
       "consensusGold": {
         "case-s2006-01": "SUPPORTED",
