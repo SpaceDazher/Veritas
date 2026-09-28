@@ -2,7 +2,6 @@
  "kind": "PREREGISTRATION",
  "rule": "s2-008-prereg-v1",
  "preregistration_id": "xpr-s2-008c-01",
- "expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35",
  "card_id": "hyc-s2-008c-01",
  "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
  "recorded_at": "2026-09-28T00:00:00.000Z",
@@ -167,22 +166,15 @@
   "on_null": "RECORD_AND_CONTINUE",
   "on_infra": "RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO"
  },
- "bootstrap_process": {
-  "where": "a second isolated launch, after the decision point, never predicting anything",
-  "why_separate": "a bootstrap needs the agreement vector, which is a function of the label; the predictor must never see a label, so the two cannot be one process",
-  "multiplicity": "every resample is carried as its full per-case multiplicity vector, so a case drawn three times counts three times and the resample mean converges on the measured rate",
-  "guard": "a trial whose resample mean does not sit at its own measured rate is refused, not published"
- },
  "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
  "budget_reservation": {
   "reservation_id": "rsv-s2-008c-01",
   "currency": "isolated_executor_launches",
-  "granted_units": 12,
+  "granted_units": 6,
   "spent_units": 0,
   "expires_at": "2026-09-28T23:59:59.000Z",
   "trial_timeout_ms": 120000,
-  "unit_definition": "one podman launch of a digest-pinned executor image; 9 preregistered prediction launches (3 arms x 3 frozen seeds) plus 1 preregistered bootstrap launch, charged one unit each as they happen; monetary spend is zero and no external service is contacted",
-  "enumerated_work": "3 declared trials x 3 frozen seeds + 1 bootstrap launch = 10 preregistered launches, ceiling 12"
+  "unit_definition": "one podman launch of the digest-pinned executor image; monetary spend is zero and no external service is contacted"
  },
  "noise_rule": {
   "band": 0.06969570950743816,
@@ -336,5 +328,5 @@
   "name": "case_agreement_rate",
   "subject_is_pooled_aggregate": true
  },
- "preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58"
+ "preregistration_digest": "f060405fd736ad6b11c307dd418200e00b6d6aa6e8e752bcb749828a9cdf9747"
 }

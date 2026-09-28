@@ -1,0 +1,2105 @@
+{
+ "adapter": {
+  "NOT_A_MODEL_CALL": "the executor is a deterministic installed program, not a model-calling agent; no model and no paid service is involved anywhere in this campaign",
+  "adapter_kind": "real",
+  "blind_input_digest": "2c334912e940a47883e330059e60058e4ebdb58634479ae3649a9b7d0b6cbd61",
+  "kind": "real installed executor inside the S2-002 A-MVP-04 digest-pinned isolation profile",
+  "launches": 9,
+  "pin": {
+   "architecture": "amd64",
+   "digest": "sha256:03e0ec1aeed6b1d64d576fb0e14ed0b565947232014149412c5c296a497b9218",
+   "imageId": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221"
+  },
+  "pin_context_digest": "270852bc98767811a4c8a072a9a81d70ad74a0abf480958d25cec4791fe3b533",
+  "provider": "generic_cli",
+  "real_adapter_provenance": {
+   "detail": "podman launched the content-pinned image sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221 (base docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2) with the four allowlist axes enforced; the container's own pid and node version came back in its stdout",
+   "status": "REAL_ADAPTER_AVAILABLE"
+  }
+ },
+ "artefact_digest": "018fe440a4355a8808ff40e4770102e01331aa5dc2b473c6234981a1ef004429",
+ "base": {
+  "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+  "commit_sha": "2e684230a938cd00a54c30d1bcad0db49d432afc",
+  "track_tracked": true,
+  "tracked_files_of_this_track": 73,
+  "tree_sha": "4a256aae9eb5ee964bea4e115d34bdc155fd5861",
+  "worktree_dirty": true
+ },
+ "calibration": {
+  "evaluator_independence": {
+   "blind_to_producer": true,
+   "independent_evaluators": 1,
+   "separate_processes": true
+  },
+  "not_measured_reason": null,
+  "status": "MEASURED"
+ },
+ "campaign": "the real Veritas history, three preregistered message-feature arms",
+ "campaign_decision": {
+  "correction": {
+   "alpha": 0.05,
+   "atBoundary": false,
+   "blocking_p": null,
+   "blocking_rank": null,
+   "blocking_threshold": null,
+   "comparisons": 3,
+   "declared": 3,
+   "declared_members": [
+    {
+     "id": "trl-s2-008c-01"
+    },
+    {
+     "id": "trl-s2-008c-02"
+    },
+    {
+     "id": "trl-s2-008c-03"
+    }
+   ],
+   "effective_family_size": 3,
+   "family_widened": false,
+   "inherited_p_bound": 3,
+   "max_p_bound": 0.016667,
+   "method": "holm_bonferroni",
+   "never_rejects": false,
+   "pUpper": 0.016667,
+   "rejected": true,
+   "rejection_floor": 0.016667,
+   "subject": "trl-s2-008c-01",
+   "subject_in_declared_family": true,
+   "subject_role": "POOLED_AGGREGATE_OF_DECLARED_FAMILY",
+   "threshold": 0.05
+  },
+  "decision": "NEGATIVE",
+  "estimate": 0.531746,
+  "insideNoiseBand": false,
+  "interval": {
+   "confidence": 0.9833333333333333,
+   "lower": 0.126984,
+   "upper": 0.642857
+  },
+  "intervalClearsNoise": true,
+  "method": "holm_bonferroni",
+  "noiseBand": 0.06969570950743816,
+  "nullValue": 0.8803191489361702,
+  "reason": "significant_effect_in_the_other_direction"
+ },
+ "campaign_verdict": "FAIL",
+ "codes": [],
+ "commit_sha": "2e684230a938cd00a54c30d1bcad0db49d432afc",
+ "counters": {
+  "launches": 9,
+  "launches_producing_a_measurement": 6,
+  "reconciliations": 0,
+  "trials_infra": 0,
+  "trials_resolved": 3,
+  "trials_skipped": 0,
+  "trials_unresolved": 0
+ },
+ "evaluator": {
+  "blind_to_producer": true,
+  "evaluator_id": "evl-s2-008-campaign-evaluator",
+  "independent": true
+ },
+ "holdout": {
+  "access_record_id": "rec-d09c6115000d",
+  "decision_at": "2026-09-28T00:00:00.000Z",
+  "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+  "max_opens": 1,
+  "opened_before_decision_point": false,
+  "opens": 1,
+  "partition": "HOLDOUT",
+  "read_at": "2026-09-28T00:00:00.000Z"
+ },
+ "kind": "s2-008-campaign-run/1-ABORTED",
+ "label": "a",
+ "latency": {
+  "decides": false,
+  "interval": null,
+  "parameters": {
+   "confidence": 0.9833333333333333,
+   "p": 0.9833333333333333,
+   "preregistered": true,
+   "resamples": 2000,
+   "seed": 20260926
+  },
+  "samples": []
+ },
+ "metrics": {
+  "basis": "POOLED_TRIAL_COUNTS",
+  "denominator": 378,
+  "metric": "case_agreement_rate",
+  "notMeasured": 0,
+  "numerator": 201,
+  "outcomeCounts": {
+   "NEGATIVE": 3
+  }
+ },
+ "ordering": {
+  "access_row_index": 12,
+  "access_rows": 1,
+  "first_trial_row_index": 3,
+  "ordering_holds": true,
+  "preregistration_row_index": 0,
+  "proved_by": "REGISTRY_JOURNAL_NOT_A_CLOCK",
+  "rule": "every predictor answered before any label was revealed, and the holdout was opened exactly once"
+ },
+ "preregistration": {
+  "budget": {
+   "currency": "isolated_executor_launches",
+   "expires_at": "2026-09-28T23:59:59.000Z",
+   "granted_units": 6,
+   "reservation_id": "rsv-s2-008c-01",
+   "spent_units": 9,
+   "unit_definition": "one podman launch of the digest-pinned executor image; monetary spend is zero and no external service is contacted"
+  },
+  "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
+  "card_id": "hyc-s2-008c-01",
+  "decision_rule": {
+   "alpha": 0.05,
+   "comparisons": [
+    "trl-s2-008c-01",
+    "trl-s2-008c-02",
+    "trl-s2-008c-03"
+   ],
+   "confidence": 0.9833333333333333,
+   "direction": "increase",
+   "method": "holm_bonferroni",
+   "null_value": 0.8803191489361702
+  },
+  "digest": "f060405fd736ad6b11c307dd418200e00b6d6aa6e8e752bcb749828a9cdf9747",
+  "expected_table_digest": null,
+  "frozen_table": {
+   "band": 0.06969570950743816,
+   "baseline": 0.8803191489361702,
+   "kind": "s2-008-campaign-table/1",
+   "metric": "case_agreement_rate",
+   "n_holdout": 126,
+   "note": "A real campaign cannot freeze an expected OUTCOME: the data are not authored, so any such expectation would be the hypothesis rewritten to fit the result. What is frozen here is the rule, the family and the precision the design supports, and the four outcome classes the engine may emit. The gate below is that the run agrees with THIS document, not with a predicted answer.",
+   "permitted_outcomes": [
+    "POSITIVE",
+    "NEGATIVE",
+    "NULL",
+    "INFRA",
+    "UNRESOLVED"
+   ],
+   "rule": {
+    "alpha": 0.05,
+    "can_only_answer": "ANY_OUTCOME",
+    "confidence": 0.9833333333333333,
+    "confidence_derivation": "1 - alpha / family_size",
+    "family_size": 3,
+    "method": "holm_bonferroni",
+    "never_rejects": false,
+    "rejection_floor": 0.016666666666666666
+   },
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ]
+  },
+  "inference_mode": "ASSOCIATIONAL",
+  "noise_rule": {
+   "band": 0.06969570950743816,
+   "band_derivation": {
+    "computed_before": "the holdout partition was opened",
+    "half_width": 0.06969570950743816,
+    "n_holdout": 126,
+    "rule": "noise_band = the Wilson-scaled half-width of the preregistered interval at the preregistered confidence for the preregistered holdout n, evaluated at the DEV-partition baseline",
+    "why": "a difference below the width this design can resolve is not an effect this campaign is able to see; calling it one would be noise dressed as a finding",
+    "z": 2.3939798012415405
+   },
+   "bootstrap_samples": 2000,
+   "bootstrap_seed": 20260926,
+   "confidence": 0.9833333333333333,
+   "inference_mode": "ASSOCIATIONAL",
+   "method": "percentile_bootstrap_over_poisson_binomial_draw_counts",
+   "negative_rule": "UPPER_MINUS_BASELINE_LT_BEGATIVE_BAND",
+   "noise_band": 0.06969570950743816,
+   "null_rule": "INTERVAL_INSIDE_BAND_AROUND_BASELINE",
+   "percentile": 0.9833333333333333,
+   "positive_rule": "LOWER_MINUS_BASELINE_GT_BAND",
+   "unit": "ratio"
+  },
+  "seed_count": 3,
+  "seeds": [
+   20260926,
+   20260927,
+   20260928
+  ],
+  "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
+  "stopping_rule": {
+   "early_stop": false,
+   "kind": "FIXED_TRIALS",
+   "max_trials": 3,
+   "on_infra": "RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO",
+   "on_negative": "RECORD_AND_CONTINUE",
+   "on_null": "RECORD_AND_CONTINUE"
+  },
+  "trial_count": 3
+ },
+ "provenance": {
+  "clock": "2026-09-28T00:00:00.000Z",
+  "commit": "2e684230a938cd00a54c30d1bcad0db49d432afc",
+  "executor_id": "exec-s2-008-campaign-a",
+  "label": "a",
+  "nonce": "n-a-e38111c3f56b3c4a",
+  "pid": 525669,
+  "run_id": "s2-008-campaign-a-525669",
+  "started_at": "2026-09-28T00:00:00.000Z",
+  "tree": "4a256aae9eb5ee964bea4e115d34bdc155fd5861",
+  "version": "s2-008-runner-v1"
+ },
+ "raw_run_id": "s2-008-campaign-a-525669",
+ "reconciliations": [],
+ "registry": {
+  "chain_verified": {
+   "brokenAt": null,
+   "headBound": true,
+   "headDigest": "sha256:08d43b1dd6b60db633bdfad4eb1be34375303f03fbb290af898cb3bbb4e2e564",
+   "length": 16,
+   "markers": {
+    "brokenAt": null,
+    "length": 16,
+    "ok": true,
+    "uncommittedFrom": null
+   },
+   "ok": true,
+   "recordCount": 16,
+   "uncommittedFrom": null
+  },
+  "head_digest": "sha256:08d43b1dd6b60db633bdfad4eb1be34375303f03fbb290af898cb3bbb4e2e564",
+  "root_is_scratch": true,
+  "rows": [
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "PREREGISTRATION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "BUDGET_RESERVATION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "BUDGET_SPEND",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL_EXECUTION",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "ACCESS",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL",
+    "trial": null
+   },
+   {
+    "at": "2026-09-28T00:00:00.000Z",
+    "kind": "TRIAL",
+    "trial": null
+   }
+  ],
+  "snapshot_digest": "sha256:38f461444f01deca4d65b33b1fa8793ddfd253668c33f75f01a4d89425a3dc11"
+ },
+ "rule_feasibility": {
+  "can_only_answer": "ANY_OUTCOME",
+  "feasible": true,
+  "max_p_bound": 0.016667,
+  "never_rejects": false,
+  "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject",
+  "rejection_floor": 0.016667
+ },
+ "run": {
+  "engine": {
+   "retriable": false,
+   "sequential": true,
+   "trial_count": 3,
+   "trial_timeout_ms": 120000,
+   "trial_timeout_source": "budget_reservation.trial_timeout_ms (preregistered, not chosen at run time)",
+   "units_per_trial": 1
+  },
+  "finished_at": "2026-09-28T00:00:00.000Z",
+  "label": "a",
+  "started_at": "2026-09-28T00:00:00.000Z",
+  "status": "RUN_COMPLETED",
+  "version": "s2-008-campaign-run/1"
+ },
+ "seed_disclosure": {
+  "count": 3,
+  "disclosed": true,
+  "name": "report_every_seed",
+  "seeds": [
+   20260926,
+   20260927,
+   20260928
+  ],
+  "selection": null
+ },
+ "ticket": "S2-008",
+ "tree_sha": "4a256aae9eb5ee964bea4e115d34bdc155fd5861",
+ "trials": [
+  {
+   "analytic_wilson": {
+    "confidence": 0.9833333333333333,
+    "lower": 0.19352251867182876,
+    "method": "wilson_score",
+    "pointEstimate": 0.2777777777777778,
+    "successes": 35,
+    "trials": 126,
+    "upper": 0.381369180759208
+   },
+   "arm_id": "arm-scope-present",
+   "bindings": {
+    "budget": {
+     "currency": "isolated_executor_launches",
+     "expires_at": "2026-09-28T23:59:59.000Z",
+     "granted_units": 6,
+     "reservation_id": "rsv-s2-008c-01",
+     "spent_units": 9,
+     "within_reservation": false
+    },
+    "evaluator": {
+     "blind_to_producer": true,
+     "evaluator_id": "evl-s2-008-campaign-evaluator",
+     "independent": true
+    },
+    "holdout": {
+     "access_record_id": "rec-d09c6115000d",
+     "decision_at": "2026-09-28T00:00:00.000Z",
+     "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+     "max_opens": 1,
+     "opened_before_decision_point": false,
+     "opens": 1,
+     "partition": "HOLDOUT",
+     "read_at": "2026-09-28T00:00:00.000Z"
+    },
+    "seed": {
+     "preregistered_seeds": [
+      20260926,
+      20260927,
+      20260928
+     ],
+     "seeds": [
+      20260926,
+      20260927,
+      20260928
+     ],
+     "source": "PREREGISTERED"
+    }
+   },
+   "budgetBinding": {
+    "currency": "isolated_executor_launches",
+    "expires_at": "2026-09-28T23:59:59.000Z",
+    "granted_units": 6,
+    "reservation_id": "rsv-s2-008c-01",
+    "spent_units": 9,
+    "within_reservation": false
+   },
+   "calibration": {
+    "evaluator_independence": {
+     "blind_to_producer": true,
+     "independent_evaluators": 1,
+     "separate_processes": true
+    },
+    "not_measured_reason": null,
+    "status": "MEASURED"
+   },
+   "decision": {
+    "correction": {
+     "alpha": 0.05,
+     "atBoundary": false,
+     "blocking_p": null,
+     "blocking_rank": null,
+     "blocking_threshold": null,
+     "comparisons": 3,
+     "declared": 3,
+     "declared_members": [
+      {
+       "id": "trl-s2-008c-01"
+      },
+      {
+       "id": "trl-s2-008c-02"
+      },
+      {
+       "id": "trl-s2-008c-03"
+      }
+     ],
+     "effective_family_size": 3,
+     "family_widened": false,
+     "inherited_p_bound": 3,
+     "max_p_bound": 0.016667,
+     "method": "holm_bonferroni",
+     "never_rejects": false,
+     "pUpper": 0.016667,
+     "rejected": true,
+     "rejection_floor": 0.016667,
+     "subject": "trl-s2-008c-01",
+     "subject_in_declared_family": true,
+     "subject_role": "DECLARED_COMPARISON",
+     "threshold": 0.05
+    },
+    "decision": "NEGATIVE",
+    "insideNoiseBand": false,
+    "intervalClearsNoise": true,
+    "reason": "significant_effect_in_the_other_direction"
+   },
+   "denominator": 126,
+   "evaluator": {
+    "blind_to_producer": true,
+    "evaluator_id": "evl-s2-008-campaign-evaluator",
+    "independent": true
+   },
+   "evaluatorBinding": {
+    "blind_to_producer": true,
+    "evaluator_id": "evl-s2-008-campaign-evaluator",
+    "independent": true
+   },
+   "holdoutBinding": {
+    "access_record_id": "rec-d09c6115000d",
+    "decision_at": "2026-09-28T00:00:00.000Z",
+    "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+    "max_opens": 1,
+    "opened_before_decision_point": false,
+    "opens": 1,
+    "partition": "HOLDOUT",
+    "read_at": "2026-09-28T00:00:00.000Z"
+   },
+   "index": 0,
+   "interval": {
+    "lower": 0.12698412698412698,
+    "method": "HULL_OF_ALL_SEED_INTERVALS",
+    "seeds_reported": 2,
+    "seeds_used": 2,
+    "selected": null,
+    "upper": 0.2222222222222222
+   },
+   "launches": [
+    {
+     "arm_id": "arm-scope-present",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-scope-present seed=20260926 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-scope-present-20260926",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-scope-present",
+      "20260926",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": "cce1ea826e65ec72fbd339af002cae1c01a58f288e6f10503f2dd3df75995faf",
+     "payload_chunks": 5,
+     "payload_error": null,
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": "v22.23.3",
+      "host_pid": 525669,
+      "issues": [],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": true,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260926,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    },
+    {
+     "arm_id": "arm-scope-present",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-scope-present seed=20260927 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-scope-present-20260927",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-scope-present",
+      "20260927",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": "a50f38983ee320b17b7126810fde5e17761608d4f0621b7fe4697418e0d2acb5",
+     "payload_chunks": 5,
+     "payload_error": null,
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": "v22.23.3",
+      "host_pid": 525669,
+      "issues": [],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": true,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260927,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    },
+    {
+     "arm_id": "arm-scope-present",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-scope-present seed=20260928 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-scope-present-20260928",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-scope-present",
+      "20260928",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": null,
+     "payload_chunks": 4,
+     "payload_error": "4 chunks for a declared 5",
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": null,
+      "host_pid": 525669,
+      "issues": [
+       "no_payload"
+      ],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": false,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260928,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:56-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    }
+   ],
+   "metric": "case_agreement_rate",
+   "numerator": 35,
+   "observed": 0.2777777777777778,
+   "outcome": "NEGATIVE",
+   "per_seed": [
+    {
+     "agreeing": 35,
+     "banner": "ADAPTER_OK arm=arm-scope-present seed=20260926 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_pid": 1,
+     "denominator": 126,
+     "interval": {
+      "confidence": 0.9833333333333333,
+      "lower": 0.12698412698412698,
+      "method": "PERCENTILE_BOOTSTRAP_OVER_EXACT_RESAMPLE_BITMASKS",
+      "n": 126,
+      "resample_max": 0.24603174603174602,
+      "resample_mean": 0.17646031746032123,
+      "resample_min": 0.10317460317460317,
+      "samples": 2000,
+      "upper": 0.2222222222222222
+     },
+     "measured": 0.2777777777777778,
+     "output_digest": "cce1ea826e65ec72fbd339af002cae1c01a58f288e6f10503f2dd3df75995faf",
+     "resample_matrix_sha256": "8b3d36ee0c69bf2f65f48d7deec5e534884919bc4432840466feeaa9248bef96",
+     "seed": 20260926
+    },
+    {
+     "agreeing": 35,
+     "banner": "ADAPTER_OK arm=arm-scope-present seed=20260927 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_pid": 1,
+     "denominator": 126,
+     "interval": {
+      "confidence": 0.9833333333333333,
+      "lower": 0.12698412698412698,
+      "method": "PERCENTILE_BOOTSTRAP_OVER_EXACT_RESAMPLE_BITMASKS",
+      "n": 126,
+      "resample_max": 0.24603174603174602,
+      "resample_mean": 0.17586507936508303,
+      "resample_min": 0.0873015873015873,
+      "samples": 2000,
+      "upper": 0.2222222222222222
+     },
+     "measured": 0.2777777777777778,
+     "output_digest": "a50f38983ee320b17b7126810fde5e17761608d4f0621b7fe4697418e0d2acb5",
+     "resample_matrix_sha256": "f016d2ad742e681e0f5f801533976cc422b5e2005f9432e2410e0d5e18652940",
+     "seed": 20260927
+    }
+   ],
+   "reason_codes": [],
+   "seedBinding": {
+    "preregistered_seeds": [
+     20260926,
+     20260927,
+     20260928
+    ],
+    "seeds": [
+     20260926,
+     20260927,
+     20260928
+    ],
+    "source": "PREREGISTERED"
+   },
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ],
+   "status": "RESOLVED",
+   "trial": "trl-s2-008c-01",
+   "verdict": "VIOLATION",
+   "verdict_reasons": [
+    "BUDGET_BINDING_UNSATISFIED:spend_exceeds_reservation:9>6"
+   ]
+  },
+  {
+   "analytic_wilson": {
+    "confidence": 0.9833333333333333,
+    "lower": 0.8331888409458362,
+    "method": "wilson_score",
+    "pointEstimate": 0.9126984126984127,
+    "successes": 115,
+    "trials": 126,
+    "upper": 0.9562980029679525
+   },
+   "arm_id": "arm-type-feat-fix",
+   "bindings": {
+    "budget": {
+     "currency": "isolated_executor_launches",
+     "expires_at": "2026-09-28T23:59:59.000Z",
+     "granted_units": 6,
+     "reservation_id": "rsv-s2-008c-01",
+     "spent_units": 9,
+     "within_reservation": false
+    },
+    "evaluator": {
+     "blind_to_producer": true,
+     "evaluator_id": "evl-s2-008-campaign-evaluator",
+     "independent": true
+    },
+    "holdout": {
+     "access_record_id": "rec-d09c6115000d",
+     "decision_at": "2026-09-28T00:00:00.000Z",
+     "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+     "max_opens": 1,
+     "opened_before_decision_point": false,
+     "opens": 1,
+     "partition": "HOLDOUT",
+     "read_at": "2026-09-28T00:00:00.000Z"
+    },
+    "seed": {
+     "preregistered_seeds": [
+      20260926,
+      20260927,
+      20260928
+     ],
+     "seeds": [
+      20260926,
+      20260927,
+      20260928
+     ],
+     "source": "PREREGISTERED"
+    }
+   },
+   "budgetBinding": {
+    "currency": "isolated_executor_launches",
+    "expires_at": "2026-09-28T23:59:59.000Z",
+    "granted_units": 6,
+    "reservation_id": "rsv-s2-008c-01",
+    "spent_units": 9,
+    "within_reservation": false
+   },
+   "calibration": {
+    "evaluator_independence": {
+     "blind_to_producer": true,
+     "independent_evaluators": 1,
+     "separate_processes": true
+    },
+    "not_measured_reason": null,
+    "status": "MEASURED"
+   },
+   "decision": {
+    "correction": {
+     "alpha": 0.05,
+     "atBoundary": false,
+     "blocking_p": null,
+     "blocking_rank": null,
+     "blocking_threshold": null,
+     "comparisons": 3,
+     "declared": 3,
+     "declared_members": [
+      {
+       "id": "trl-s2-008c-01"
+      },
+      {
+       "id": "trl-s2-008c-02"
+      },
+      {
+       "id": "trl-s2-008c-03"
+      }
+     ],
+     "effective_family_size": 3,
+     "family_widened": false,
+     "inherited_p_bound": 3,
+     "max_p_bound": 0.016667,
+     "method": "holm_bonferroni",
+     "never_rejects": false,
+     "pUpper": 0.016667,
+     "rejected": true,
+     "rejection_floor": 0.016667,
+     "subject": "trl-s2-008c-02",
+     "subject_in_declared_family": true,
+     "subject_role": "DECLARED_COMPARISON",
+     "threshold": 0.05
+    },
+    "decision": "NEGATIVE",
+    "insideNoiseBand": false,
+    "intervalClearsNoise": true,
+    "reason": "significant_effect_in_the_other_direction"
+   },
+   "denominator": 126,
+   "evaluator": {
+    "blind_to_producer": true,
+    "evaluator_id": "evl-s2-008-campaign-evaluator",
+    "independent": true
+   },
+   "evaluatorBinding": {
+    "blind_to_producer": true,
+    "evaluator_id": "evl-s2-008-campaign-evaluator",
+    "independent": true
+   },
+   "holdoutBinding": {
+    "access_record_id": "rec-d09c6115000d",
+    "decision_at": "2026-09-28T00:00:00.000Z",
+    "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+    "max_opens": 1,
+    "opened_before_decision_point": false,
+    "opens": 1,
+    "partition": "HOLDOUT",
+    "read_at": "2026-09-28T00:00:00.000Z"
+   },
+   "index": 1,
+   "interval": {
+    "lower": 0.5079365079365079,
+    "method": "HULL_OF_ALL_SEED_INTERVALS",
+    "seeds_reported": 2,
+    "seeds_used": 2,
+    "selected": null,
+    "upper": 0.6428571428571429
+   },
+   "launches": [
+    {
+     "arm_id": "arm-type-feat-fix",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260926 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-type-feat-fix-20260926",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-type-feat-fix",
+      "20260926",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": "2b3ae3c4255a475cccce8ea3bd70f987932c77fe12fe8c97cff7c037a7ff6667",
+     "payload_chunks": 5,
+     "payload_error": null,
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": "v22.23.3",
+      "host_pid": 525669,
+      "issues": [],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": true,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260926,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    },
+    {
+     "arm_id": "arm-type-feat-fix",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260927 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-type-feat-fix-20260927",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-type-feat-fix",
+      "20260927",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": "0fac22009f3ec07b3b99bb4d3974be7bb339b2642a28f6feaf20e130d5b3e5d9",
+     "payload_chunks": 5,
+     "payload_error": null,
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": "v22.23.3",
+      "host_pid": 525669,
+      "issues": [],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": true,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260927,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    },
+    {
+     "arm_id": "arm-type-feat-fix",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260928 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-type-feat-fix-20260928",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-type-feat-fix",
+      "20260928",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": null,
+     "payload_chunks": 5,
+     "payload_error": "no ADAPTER_JSON_END line: the payload was cut short",
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": null,
+      "host_pid": 525669,
+      "issues": [
+       "no_payload"
+      ],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": false,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260928,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:57-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    }
+   ],
+   "metric": "case_agreement_rate",
+   "numerator": 115,
+   "observed": 0.9126984126984127,
+   "outcome": "NEGATIVE",
+   "per_seed": [
+    {
+     "agreeing": 115,
+     "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260926 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_pid": 1,
+     "denominator": 126,
+     "interval": {
+      "confidence": 0.9833333333333333,
+      "lower": 0.5079365079365079,
+      "method": "PERCENTILE_BOOTSTRAP_OVER_EXACT_RESAMPLE_BITMASKS",
+      "n": 126,
+      "resample_max": 0.6825396825396826,
+      "resample_mean": 0.5778769841269781,
+      "resample_min": 0.47619047619047616,
+      "samples": 2000,
+      "upper": 0.6428571428571429
+     },
+     "measured": 0.9126984126984127,
+     "output_digest": "2b3ae3c4255a475cccce8ea3bd70f987932c77fe12fe8c97cff7c037a7ff6667",
+     "resample_matrix_sha256": "8b3d36ee0c69bf2f65f48d7deec5e534884919bc4432840466feeaa9248bef96",
+     "seed": 20260926
+    },
+    {
+     "agreeing": 115,
+     "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260927 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_pid": 1,
+     "denominator": 126,
+     "interval": {
+      "confidence": 0.9833333333333333,
+      "lower": 0.5079365079365079,
+      "method": "PERCENTILE_BOOTSTRAP_OVER_EXACT_RESAMPLE_BITMASKS",
+      "n": 126,
+      "resample_max": 0.6666666666666666,
+      "resample_mean": 0.5783968253968192,
+      "resample_min": 0.49206349206349204,
+      "samples": 2000,
+      "upper": 0.6428571428571429
+     },
+     "measured": 0.9126984126984127,
+     "output_digest": "0fac22009f3ec07b3b99bb4d3974be7bb339b2642a28f6feaf20e130d5b3e5d9",
+     "resample_matrix_sha256": "f016d2ad742e681e0f5f801533976cc422b5e2005f9432e2410e0d5e18652940",
+     "seed": 20260927
+    }
+   ],
+   "reason_codes": [],
+   "seedBinding": {
+    "preregistered_seeds": [
+     20260926,
+     20260927,
+     20260928
+    ],
+    "seeds": [
+     20260926,
+     20260927,
+     20260928
+    ],
+    "source": "PREREGISTERED"
+   },
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ],
+   "status": "RESOLVED",
+   "trial": "trl-s2-008c-02",
+   "verdict": "VIOLATION",
+   "verdict_reasons": [
+    "BUDGET_BINDING_UNSATISFIED:spend_exceeds_reservation:9>6"
+   ]
+  },
+  {
+   "analytic_wilson": {
+    "confidence": 0.9833333333333333,
+    "lower": 0.306440082215999,
+    "method": "wilson_score",
+    "pointEstimate": 0.40476190476190477,
+    "successes": 51,
+    "trials": 126,
+    "upper": 0.5113706461115882
+   },
+   "arm_id": "arm-type-chore",
+   "bindings": {
+    "budget": {
+     "currency": "isolated_executor_launches",
+     "expires_at": "2026-09-28T23:59:59.000Z",
+     "granted_units": 6,
+     "reservation_id": "rsv-s2-008c-01",
+     "spent_units": 9,
+     "within_reservation": false
+    },
+    "evaluator": {
+     "blind_to_producer": true,
+     "evaluator_id": "evl-s2-008-campaign-evaluator",
+     "independent": true
+    },
+    "holdout": {
+     "access_record_id": "rec-d09c6115000d",
+     "decision_at": "2026-09-28T00:00:00.000Z",
+     "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+     "max_opens": 1,
+     "opened_before_decision_point": false,
+     "opens": 1,
+     "partition": "HOLDOUT",
+     "read_at": "2026-09-28T00:00:00.000Z"
+    },
+    "seed": {
+     "preregistered_seeds": [
+      20260926,
+      20260927,
+      20260928
+     ],
+     "seeds": [
+      20260926,
+      20260927,
+      20260928
+     ],
+     "source": "PREREGISTERED"
+    }
+   },
+   "budgetBinding": {
+    "currency": "isolated_executor_launches",
+    "expires_at": "2026-09-28T23:59:59.000Z",
+    "granted_units": 6,
+    "reservation_id": "rsv-s2-008c-01",
+    "spent_units": 9,
+    "within_reservation": false
+   },
+   "calibration": {
+    "evaluator_independence": {
+     "blind_to_producer": true,
+     "independent_evaluators": 1,
+     "separate_processes": true
+    },
+    "not_measured_reason": null,
+    "status": "MEASURED"
+   },
+   "decision": {
+    "correction": {
+     "alpha": 0.05,
+     "atBoundary": false,
+     "blocking_p": null,
+     "blocking_rank": null,
+     "blocking_threshold": null,
+     "comparisons": 3,
+     "declared": 3,
+     "declared_members": [
+      {
+       "id": "trl-s2-008c-01"
+      },
+      {
+       "id": "trl-s2-008c-02"
+      },
+      {
+       "id": "trl-s2-008c-03"
+      }
+     ],
+     "effective_family_size": 3,
+     "family_widened": false,
+     "inherited_p_bound": 3,
+     "max_p_bound": 0.016667,
+     "method": "holm_bonferroni",
+     "never_rejects": false,
+     "pUpper": 0.016667,
+     "rejected": true,
+     "rejection_floor": 0.016667,
+     "subject": "trl-s2-008c-03",
+     "subject_in_declared_family": true,
+     "subject_role": "DECLARED_COMPARISON",
+     "threshold": 0.05
+    },
+    "decision": "NEGATIVE",
+    "insideNoiseBand": false,
+    "intervalClearsNoise": true,
+    "reason": "significant_effect_in_the_other_direction"
+   },
+   "denominator": 126,
+   "evaluator": {
+    "blind_to_producer": true,
+    "evaluator_id": "evl-s2-008-campaign-evaluator",
+    "independent": true
+   },
+   "evaluatorBinding": {
+    "blind_to_producer": true,
+    "evaluator_id": "evl-s2-008-campaign-evaluator",
+    "independent": true
+   },
+   "holdoutBinding": {
+    "access_record_id": "rec-d09c6115000d",
+    "decision_at": "2026-09-28T00:00:00.000Z",
+    "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+    "max_opens": 1,
+    "opened_before_decision_point": false,
+    "opens": 1,
+    "partition": "HOLDOUT",
+    "read_at": "2026-09-28T00:00:00.000Z"
+   },
+   "index": 2,
+   "interval": {
+    "lower": 0.19047619047619047,
+    "method": "HULL_OF_ALL_SEED_INTERVALS",
+    "seeds_reported": 2,
+    "seeds_used": 2,
+    "selected": null,
+    "upper": 0.30952380952380953
+   },
+   "launches": [
+    {
+     "arm_id": "arm-type-chore",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-type-chore seed=20260926 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-type-chore-20260926",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-type-chore",
+      "20260926",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": "85d4e7a4ecc544fb18b3e428660cc000a63128d84e97f7cfacc434049e09233a",
+     "payload_chunks": 5,
+     "payload_error": null,
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": "v22.23.3",
+      "host_pid": 525669,
+      "issues": [],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": true,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260926,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    },
+    {
+     "arm_id": "arm-type-chore",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-type-chore seed=20260927 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-type-chore-20260927",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-type-chore",
+      "20260927",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": null,
+     "payload_chunks": 4,
+     "payload_error": "4 chunks for a declared 5",
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": null,
+      "host_pid": 525669,
+      "issues": [
+       "no_payload"
+      ],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": false,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260927,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    },
+    {
+     "arm_id": "arm-type-chore",
+     "axes": {
+      "environment": {
+       "allowlist": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV"
+       ],
+       "inherited": false,
+       "pairs": [
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "PI_HOME=/tmp/pi",
+        "NODE_ENV=production"
+       ],
+       "secretHandles": []
+      },
+      "filesystem": {
+       "denyLinkEscape": true,
+       "denyTraversal": true,
+       "mounts": [],
+       "rootFsReadOnly": true,
+       "writableTmpfs": [
+        "/tmp"
+       ]
+      },
+      "network": {
+       "allowlist": [],
+       "egressSocket": null,
+       "flag": "--network=none",
+       "policy": "deny_all"
+      },
+      "process": {
+       "maxProcesses": 32,
+       "memoryMb": 256,
+       "memorySwapMb": 256,
+       "nanoCpus": 500000000,
+       "timeoutMs": 120000
+      }
+     },
+     "banner": "ADAPTER_OK arm=arm-type-chore seed=20260928 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_argv": [
+      "run",
+      "--rm",
+      "--pull=never",
+      "--network=none",
+      "--read-only",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+      "--pids-limit",
+      "32",
+      "--memory",
+      "256m",
+      "--memory-swap",
+      "256m",
+      "--cpus",
+      "0.5",
+      "--env",
+      "HOME=/tmp",
+      "--env",
+      "TMPDIR=/tmp",
+      "--env",
+      "PI_HOME=/tmp/pi",
+      "--env",
+      "NODE_ENV=production",
+      "--cap-drop",
+      "all",
+      "--security-opt",
+      "no-new-privileges",
+      "--ipc=none",
+      "--user",
+      "65534:65534",
+      "--log-driver=none",
+      "--name",
+      "s2-008-campaign-arm-type-chore-20260928",
+      "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+      "/usr/local/bin/node",
+      "/opt/campaign/arm.mjs",
+      "/opt/campaign/holdout.blind.json",
+      "/tmp/campaign-out.json",
+      "arm-type-chore",
+      "20260928",
+      "2000"
+     ],
+     "exit_code": 0,
+     "image": "sha256:d9510dc2833ce99781bea75a023cd4dac9f25b0c5c59fc162bea2f3e890f3221",
+     "image_break_requested": false,
+     "output_digest": "cf8b6bd198132cd1d80dceb6ea8a235657eebc23fe9f3af144c3485ec04662e5",
+     "payload_chunks": 5,
+     "payload_error": null,
+     "podman": {
+      "argv_prefix": [
+       "--root",
+       "/tmp/podman-root",
+       "--runroot",
+       "/tmp/podman-runroot",
+       "--runtime",
+       "/usr/bin/crun"
+      ],
+      "executable": "podman"
+     },
+     "real_start": {
+      "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one",
+      "container_pid": 1,
+      "container_runtime_version": "v22.23.3",
+      "host_pid": 525669,
+      "issues": [],
+      "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+      "proven": true,
+      "separate_process": true
+     },
+     "samples": 2000,
+     "seed": 20260928,
+     "signal": null,
+     "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-09-28T03:39:58-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+     "timed_out": false
+    }
+   ],
+   "metric": "case_agreement_rate",
+   "numerator": 51,
+   "observed": 0.40476190476190477,
+   "outcome": "NEGATIVE",
+   "per_seed": [
+    {
+     "agreeing": 51,
+     "banner": "ADAPTER_OK arm=arm-type-chore seed=20260926 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_pid": 1,
+     "denominator": 126,
+     "interval": {
+      "confidence": 0.9833333333333333,
+      "lower": 0.1984126984126984,
+      "method": "PERCENTILE_BOOTSTRAP_OVER_EXACT_RESAMPLE_BITMASKS",
+      "n": 126,
+      "resample_max": 0.3333333333333333,
+      "resample_mean": 0.25607539682539576,
+      "resample_min": 0.18253968253968253,
+      "samples": 2000,
+      "upper": 0.30952380952380953
+     },
+     "measured": 0.40476190476190477,
+     "output_digest": "85d4e7a4ecc544fb18b3e428660cc000a63128d84e97f7cfacc434049e09233a",
+     "resample_matrix_sha256": "8b3d36ee0c69bf2f65f48d7deec5e534884919bc4432840466feeaa9248bef96",
+     "seed": 20260926
+    },
+    {
+     "agreeing": 51,
+     "banner": "ADAPTER_OK arm=arm-type-chore seed=20260928 samples=2000 n=126 draw_total=252000 pid=1 node=v22.23.3",
+     "container_pid": 1,
+     "denominator": 126,
+     "interval": {
+      "confidence": 0.9833333333333333,
+      "lower": 0.19047619047619047,
+      "method": "PERCENTILE_BOOTSTRAP_OVER_EXACT_RESAMPLE_BITMASKS",
+      "n": 126,
+      "resample_max": 0.3333333333333333,
+      "resample_mean": 0.2559484126984116,
+      "resample_min": 0.15873015873015872,
+      "samples": 2000,
+      "upper": 0.30952380952380953
+     },
+     "measured": 0.40476190476190477,
+     "output_digest": "cf8b6bd198132cd1d80dceb6ea8a235657eebc23fe9f3af144c3485ec04662e5",
+     "resample_matrix_sha256": "1601a5d45094e10cb088278adfe4523a4449ed16fd70f6a7af66593733a46223",
+     "seed": 20260928
+    }
+   ],
+   "reason_codes": [],
+   "seedBinding": {
+    "preregistered_seeds": [
+     20260926,
+     20260927,
+     20260928
+    ],
+    "seeds": [
+     20260926,
+     20260927,
+     20260928
+    ],
+    "source": "PREREGISTERED"
+   },
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ],
+   "status": "RESOLVED",
+   "trial": "trl-s2-008c-03",
+   "verdict": "VIOLATION",
+   "verdict_reasons": [
+    "BUDGET_BINDING_UNSATISFIED:spend_exceeds_reservation:9>6"
+   ]
+  }
+ ],
+ "version": "s2-008-campaign-run/1",
+ "aborted": {
+  "verdict": "ABORTED_NOT_A_RESULT",
+  "defect_1": "the measurer encoded each bootstrap resample as a MEMBERSHIP bitmask, which collapses multiplicity: a case drawn three times contributes once, so the resample distribution is not a bootstrap of the data and its mean cannot equal the observed rate. Measured: observed 115/126 = 0.9127 against a resample mean of 0.5779, a ratio of 0.633 = 1 - e^-1, which is the expected fraction of DISTINCT cases drawn in 126 draws with replacement. Every interval this run produced is therefore a description of a distribution the adapter never drew.",
+  "defect_2": "the budget reservation declared 6 units of one isolated executor launch each, and the run made 9 launches without charging any of them, so the ledger carried a budget that was neither enforced nor transparent",
+  "why_this_is_not_a_result": "the only numbers this run produced are arithmetically impossible for the stated procedure; there is no effect size here to be outcome-driven, and the supersession that follows cannot have been chosen to fit one",
+  "supersedes_to": "evidence/s2-008-campaign-run-a.json (the corrected run)"
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "kind": "SUPERSESSION",
+ "supersession_id": "spr-s2-008c-01",
+ "superseded": {
+  "file": "preregistration-superseded.json",
+  "preregistration_digest": "f060405fd736ad6b11c307dd418200e00b6d6aa6e8e752bcb749828a9cdf9747",
+  "recovered_from_commit": "2e684230a938cd00a54c30d1bcad0db49d432afc"
+ },
+ "replaced_by": {
+  "file": "preregistration.json",
+  "preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58",
+  "expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35"
+ },
+ "reason": "two apparatus defects, no effect: the resampler collapsed bootstrap multiplicity (a 115/126 rate returned centred at 0.578), and 9 launches ran against an uncharged 6-unit budget. The rule, band, seeds and baseline are unchanged.",
+ "account": "Two defects in the MEASUREMENT APPARATUS, found by running the first campaign, and neither of them an effect: (1) the resampler encoded each bootstrap resample as a membership bitmask, which collapses multiplicity, so a case drawn three times contributed once. Measured on the aborted run: an observed rate of 115/126 = 0.9127 came back with a resample mean of 0.5779, a ratio of 0.633 = 1 - e^-1, which is the expected fraction of DISTINCT cases drawn in 126 draws with replacement. Every interval that run produced described a distribution the adapter never drew, so the run carried no effect size to be outcome-driven; (2) the budget reserved 6 units of one isolated executor launch each and the run made 9 launches while charging none of them, so the ledger carried a budget that was neither enforced nor transparent. The correction moves the resampling into a second, post-reveal launch (it needs the agreement vector, and the predictor must never see a label), carries every resample with its full multiplicity, refuses a trial whose resample mean does not sit at its own measured rate, charges every launch against the reservation as it happens, and raises the ceiling to 12 to cover the work the preregistration itself enumerates. WHAT DID NOT CHANGE, and had to not: the question, the card, the metric, the dev-measured baseline, the noise band, the seed set and its HULL rule, the family size, alpha, the derived confidence, the direction, the trial list and the one-shot holdout access. The band is the design-time precision floor and was not moved to make an arm clear it.",
+ "mechanism": {
+  "refused": true,
+  "code": "MALFORMED_RESULT",
+  "detail": "SUPERSESSION_TABLE_DIGEST_ABSENT",
+  "consequence": "the superseded document sealed no expected_table_digest, so the track mechanism cannot carry this supersession; it is carried by the chained source ledger entry and by this record, and the omission is a defect of the first freeze"
+ },
+ "supersession_digest": "37050753a4bdbcfd5d5615acb88d0f91a8f85a1e72450761c027d69b898469f6"
+}

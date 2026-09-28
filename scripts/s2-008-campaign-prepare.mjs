@@ -45,6 +45,9 @@ import {
   isResearchContractValid,
   researchContractErrors,
   SOURCE_LEDGER_KIND,
+  createSupersession,
+  assertSupersession,
+  SUPERSESSION_KIND,
 } from '../src/lib/research/index.mjs';
 import { ruleFeasibility } from '../src/lib/research/comparator.mjs';
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
@@ -53,6 +56,23 @@ export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
 
 // --- the design, frozen as constants in the source so a reader sees the rule ---
+// The commit that froze the FIRST preregistration, before any arm had been run.
+// The superseded document is recovered from it, so the supersession preserves
+// the old bytes exactly rather than a re-typed copy of them.
+export const FREEZE_COMMIT = '2e684230a938cd00a54c30d1bcad0db49d432afc';
+
+// The contract bounds a supersession reason at 240 characters, so the reason is
+// a statement and the full account lives in the report and in the ledger entry.
+export const SUPERSESSION_REASON = 'two apparatus defects, no effect: the resampler collapsed bootstrap multiplicity (a 115/126 rate returned centred at 0.578), and 9 launches ran against an uncharged 6-unit budget. The rule, band, seeds and baseline are unchanged.';
+
+export const SUPERSESSION_ACCOUNT = [
+  'Two defects in the MEASUREMENT APPARATUS, found by running the first campaign, and neither of them an effect:',
+  '(1) the resampler encoded each bootstrap resample as a membership bitmask, which collapses multiplicity, so a case drawn three times contributed once. Measured on the aborted run: an observed rate of 115/126 = 0.9127 came back with a resample mean of 0.5779, a ratio of 0.633 = 1 - e^-1, which is the expected fraction of DISTINCT cases drawn in 126 draws with replacement. Every interval that run produced described a distribution the adapter never drew, so the run carried no effect size to be outcome-driven;',
+  '(2) the budget reserved 6 units of one isolated executor launch each and the run made 9 launches while charging none of them, so the ledger carried a budget that was neither enforced nor transparent.',
+  'The correction moves the resampling into a second, post-reveal launch (it needs the agreement vector, and the predictor must never see a label), carries every resample with its full multiplicity, refuses a trial whose resample mean does not sit at its own measured rate, charges every launch against the reservation as it happens, and raises the ceiling to 12 to cover the work the preregistration itself enumerates.',
+  'WHAT DID NOT CHANGE, and had to not: the question, the card, the metric, the dev-measured baseline, the noise band, the seed set and its HULL rule, the family size, alpha, the derived confidence, the direction, the trial list and the one-shot holdout access. The band is the design-time precision floor and was not moved to make an arm clear it.',
+].join(' ');
+
 export const SOURCE = Object.freeze({
   project: 'Veritas',
   kind: 'real repository history, read from the local checkout with git',
@@ -306,6 +326,8 @@ export function preregistrationOf({ rows, dev, holdout, baseline, band, card }) 
     kind: 'PREREGISTRATION',
     rule: 's2-008-prereg-v1',
     preregistration_id: 'xpr-s2-008c-01',
+    // Sealed here; the superseded document omitted it, which is defect 3.
+    expected_table_digest: null,
     card_id: card.card_id,
     card_digest: canonicalDigest(card),
     recorded_at: '2026-09-28T00:00:00.000Z',
@@ -363,7 +385,19 @@ export function preregistrationOf({ rows, dev, holdout, baseline, band, card }) 
       on_null: 'RECORD_AND_CONTINUE',
       on_infra: 'RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO',
     },
-    // Sequential selection, stated because the rule is FIXED_TRIALS: there is
+    // How the interval is produced, frozen BEFORE the corrected run. The
+  // predictor is blind and answers first; the evaluator opens the holdout once
+  // at the decision point; the seeded bootstrap runs afterwards, in its own
+  // launch, on the agreement vectors. An earlier design resampled inside the
+  // blind process and returned a membership bitmask, which collapses
+  // multiplicity; the run it produced is preserved as ABORTED.
+  bootstrap_process: {
+    where: 'a second isolated launch, after the decision point, never predicting anything',
+    why_separate: 'a bootstrap needs the agreement vector, which is a function of the label; the predictor must never see a label, so the two cannot be one process',
+    multiplicity: 'every resample is carried as its full per-case multiplicity vector, so a case drawn three times counts three times and the resample mean converges on the measured rate',
+    guard: 'a trial whose resample mean does not sit at its own measured rate is refused, not published',
+  },
+  // Sequential selection, stated because the rule is FIXED_TRIALS: there is
     // no interim analysis, no peek and no alpha spending. A trial is decided
     // when it completes; the family is corrected once at the end.
     sequential_rule: 'NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY',
@@ -371,12 +405,19 @@ export function preregistrationOf({ rows, dev, holdout, baseline, band, card }) 
       reservation_id: 'rsv-s2-008c-01',
       // A NAMED unit, not an abstraction: one unit is one container launch of
       // the real installed executor. The figure is the ceiling, not the spend.
+      //
+      // It was 6 in the superseded document and the first run made 9 launches
+      // without charging any of them. The ceiling now covers the work the
+      // preregistration itself enumerates — 3 arms x 3 seeds of prediction plus
+      // one bootstrap launch — with headroom, and every launch is charged
+      // against this reservation as it happens.
       currency: 'isolated_executor_launches',
-      granted_units: 6,
+      granted_units: 12,
       spent_units: 0,
       expires_at: RESERVATION_EXPIRES,
       trial_timeout_ms: PER_TRIAL_TIMEOUT_MS,
-      unit_definition: 'one podman launch of the digest-pinned executor image; monetary spend is zero and no external service is contacted',
+      unit_definition: 'one podman launch of a digest-pinned executor image; 9 preregistered prediction launches (3 arms x 3 frozen seeds) plus 1 preregistered bootstrap launch, charged one unit each as they happen; monetary spend is zero and no external service is contacted',
+      enumerated_work: '3 declared trials x 3 frozen seeds + 1 bootstrap launch = 10 preregistered launches, ceiling 12',
     },
     noise_rule: {
       band: band.band,
@@ -469,7 +510,7 @@ export function preregistrationOf({ rows, dev, holdout, baseline, band, card }) 
  *  expected outcome: a real campaign's outcome is not knowable before the run,
  *  and a table that declared one would be a hypothesis written to match the
  *  result. What it freezes is the RULE and the precision the design supports. */
-export function frozenTableOf(prereg) {
+export function frozenTableOf(prereg, supersedes = null) {
   const feasibility = ruleFeasibility({ alpha: ALPHA, confidence: CONFIDENCE, familySize: FAMILY_SIZE });
   return {
     kind: 's2-008-campaign-table/1',
@@ -491,6 +532,18 @@ export function frozenTableOf(prereg) {
     n_dev: prereg.frozen_baseline.denominator,
     n_holdout: prereg.holdout_access.case_count,
     seeds: [...SEEDS],
+    // WHICH frozen document is in force, and what it replaced. The anchor the
+    // source ledger chains on is a digest of (cases, table), so a supersession
+    // that changed neither would be refused as recording no change — which is
+    // the ledger working. Naming the superseded digest here is what makes the
+    // supersession a fact the chain can carry.
+    supersession: supersedes === null ? null : {
+      superseded_preregistration_digest: supersedes.preregistration_digest,
+      recovered_from_commit: FREEZE_COMMIT,
+      reason: SUPERSESSION_REASON,
+      account: SUPERSESSION_ACCOUNT,
+    },
+    budget_ceiling: prereg.budget_reservation.granted_units,
   };
 }
 
@@ -501,7 +554,7 @@ function writeJson(file, value) {
   fs.writeFileSync(file, `${JSON.stringify(value, null, 1)}\n`);
 }
 
-function manifestOf({ devCases, holdoutCases, prereg, anchor }) {
+function manifestOf({ devCases, holdoutCases, prereg, anchor, superseded, supersession, ledger }) {
   return {
     kind: 's2-008-campaign-corpus/1',
     description: 'The REAL Veritas history as an S2-008 corpus. Every case is a real commit: the label comes from `git show --name-only` and the subject from `git log`. No case is authored.',
@@ -531,8 +584,21 @@ function manifestOf({ devCases, holdoutCases, prereg, anchor }) {
       status: 'IN_FORCE',
       sealed_before_first_trial: true,
     },
+    superseded_preregistration: {
+      file: 'preregistration-superseded.json',
+      preregistration_digest: superseded.preregistration_digest,
+      status: 'SUPERSEDED',
+      superseded_by: 'preregistration.json',
+      recovered_from_commit: FREEZE_COMMIT,
+    },
+    supersession: {
+      file: 'preregistration-supersession.json',
+      supersession_id: supersession.supersession_id,
+      supersession_digest: supersession.supersession_digest,
+      reason: SUPERSESSION_REASON,
+    },
     frozen_table: { file: 'frozen-table.json', digest: canonicalDigest(frozenTableOf(prereg)) },
-    source_ledger: { file: 'source-ledger.json', entry_count: 1, last_anchor_digest: anchor },
+    source_ledger: { file: 'source-ledger.json', entry_count: ledger.length, last_anchor_digest: anchor },
   };
 }
 
@@ -564,6 +630,11 @@ export function selftest() {
 }
 
 export function prepare({ write = true } = {}) {
+  // The superseded document is read out of the freeze COMMIT, before anything is
+  // built: the working tree is about to hold the new one, and a supersession
+  // that quoted the new bytes would preserve nothing.
+  const supersededRaw = JSON.parse(git('show', `${FREEZE_COMMIT}:corpus/s2-008-campaign/preregistration.json`));
+  const supersededRef = { preregistration_digest: preregistrationDigest(supersededRaw) };
   const rows = realRows();
   const { dev, holdout } = splitRows(rows);
   const baseline = frozenBaselineOf(dev);
@@ -576,6 +647,11 @@ export function prepare({ write = true } = {}) {
   }
 
   const prereg = preregistrationOf({ rows, dev, holdout, baseline, band, card });
+  // The in-force document seals its OWN frozen table. The superseded one did
+  // not, which is why the track's supersession mechanism refuses to carry this
+  // supersession (SUPERSESSION_TABLE_DIGEST_ABSENT) — a finding, not a
+  // formality, and the reason this document differs from the one it replaces.
+  const tableDigest = canonicalDigest(frozenTableOf(prereg, supersededRef));
 
   // 2. The rule must be able to decide. A rule that can never reject makes the
   //    campaign undecidable by construction, and that is checked from the
@@ -595,35 +671,88 @@ export function prepare({ write = true } = {}) {
   assertPreregistration(sealed);
 
   const digest = preregistrationDigest(sealed);
-  const frozenPrereg = { ...sealed, preregistration_digest: digest };
-  const anchor = sourceAnchorDigest({ cases_digest: canonicalDigest({ dev: dev.length, holdout: holdout.length }), expected_table_digest: canonicalDigest(frozenTableOf(frozenPrereg)) });
+  const frozenPrereg = { ...sealed, expected_table_digest: tableDigest, preregistration_digest: digest };
+  const anchor = sourceAnchorDigest({ cases_digest: canonicalDigest({ dev: dev.length, holdout: holdout.length }), expected_table_digest: canonicalDigest(frozenTableOf(frozenPrereg, supersededRef)) });
+  void SUPERSESSION_KIND;
+  // The first freeze's own ledger entry, read out of the freeze commit so the
+  // chain starts where it started rather than where this script begins.
+  const previousLedger = JSON.parse(git('show', `${FREEZE_COMMIT}:corpus/s2-008-campaign/source-ledger.json`));
+  const previous = Array.isArray(previousLedger.entries) && previousLedger.entries.length > 0
+    ? previousLedger.entries[previousLedger.entries.length - 1]
+    : null;
   const ledger = [createSourceLedgerEntry({
-    index: 0,
-    previous: null,
+    index: previous === null ? 0 : 1,
+    previous: previous === null ? null : (previous.anchor_digest ?? null),
     cases_digest: canonicalDigest({ dev: dev.length, holdout: holdout.length }),
-    expected_table_digest: canonicalDigest(frozenTableOf(frozenPrereg)),
-    reason: 'the first and only freeze of this campaign: the real history, the dev-measured baseline, the design-time band and the rule, sealed before the adapter was ever launched',
+    expected_table_digest: canonicalDigest(frozenTableOf(frozenPrereg, supersededRef)),
+    reason: 'the freeze of this campaign, and its supersession: the real history, the dev-measured baseline, the design-time band, the rule, the two-process bootstrap and the charged budget, all sealed before the corrected adapter was ever launched',
+    previous,
   })];
-  assertSourceLedger(ledger, { cases_digest: canonicalDigest({ dev: dev.length, holdout: holdout.length }), expected_table_digest: canonicalDigest(frozenTableOf(frozenPrereg)) });
+  // The chain is asserted WHOLE, from the first freeze to this one: a new entry
+  // checked on its own would prove nothing about what it follows.
+  const fullLedger = [...(Array.isArray(previousLedger.entries) ? previousLedger.entries : []), ...ledger];
+  assertSourceLedger(fullLedger, { cases_digest: canonicalDigest({ dev: dev.length, holdout: holdout.length }), expected_table_digest: canonicalDigest(frozenTableOf(frozenPrereg, supersededRef)) });
+
+  // --- 5. the SUPERSESSION, and the document it replaces --------------------
+  const supersededDigest = supersededRef.preregistration_digest;
+  // The track's own supersession mechanism is TRIED first and its refusal is
+  // recorded. `createSupersession` requires BOTH documents to seal the frozen
+  // table, and the superseded one does not — a real freeze that seals no table
+  // digest cannot be superseded by the mechanism built for the purpose. The
+  // refusal is the evidence; the supersession is carried by the chained source
+  // ledger entry and by this record instead, and neither is invented now.
+  let supersessionRefusal = null;
+  try {
+    const built = createSupersession({ superseded: supersededRaw, replacedBy: frozenPrereg, reason: SUPERSESSION_REASON });
+    assertSupersession(built, supersededRaw);
+    supersessionRefusal = { refused: false, supersession: built };
+  } catch (error) {
+    supersessionRefusal = {
+      refused: true,
+      code: String(error?.code ?? 'UNKNOWN'),
+      detail: String(error?.message ?? error).slice(0, 300),
+      consequence: 'the superseded document sealed no expected_table_digest, so the track mechanism cannot carry this supersession; it is carried by the chained source ledger entry and by this record, and the omission is a defect of the first freeze',
+    };
+  }
+  const supersession = {
+    kind: SUPERSESSION_KIND,
+    supersession_id: 'spr-s2-008c-01',
+    superseded: { file: 'preregistration-superseded.json', preregistration_digest: supersededDigest, recovered_from_commit: FREEZE_COMMIT },
+    replaced_by: { file: 'preregistration.json', preregistration_digest: digest, expected_table_digest: tableDigest },
+    reason: SUPERSESSION_REASON,
+    account: SUPERSESSION_ACCOUNT,
+    mechanism: supersessionRefusal,
+    supersession_digest: canonicalDigest({
+      superseded: supersededDigest, replaced_by: digest, table: tableDigest, reason: SUPERSESSION_REASON,
+    }),
+  };
+  const superseded = {
+    file: 'preregistration-superseded.json',
+    preregistration_digest: supersededDigest,
+    recovered_from_commit: FREEZE_COMMIT,
+    reason: SUPERSESSION_REASON,
+  };
 
   const devOut = buildCases(dev, 'PRIMARY');
   const holdoutOut = buildCases(holdout, 'HOLDOUT');
-  const manifest = manifestOf({ devCases: devOut, holdoutCases: holdoutOut, prereg: frozenPrereg, anchor });
+  const manifest = manifestOf({ devCases: devOut, holdoutCases: holdoutOut, prereg: frozenPrereg, anchor, superseded, supersession, ledger: fullLedger });
   // The blind copy: what the adapter is allowed to see. No label, ever.
   const blind = holdout.map((row) => ({ case_id: row.case_id, subject: row.subject, committed_at: row.committed_at }));
 
   const files = {
     'preregistration.json': frozenPrereg,
-    'frozen-table.json': frozenTableOf(frozenPrereg),
+    'frozen-table.json': frozenTableOf(frozenPrereg, supersededRef),
     'manifest.json': manifest,
     // `{entries: [...]}`, the shape `dataset.mjs#assertLedgerBinding` reads.
     // The bare array the first attempt wrote was not loadable, and the freeze
     // was therefore incomplete rather than merely untidy. It is completed here,
     // and no arm had been run when it was fixed.
-    'source-ledger.json': { kind: SOURCE_LEDGER_KIND, entries: ledger },
+    'source-ledger.json': { kind: SOURCE_LEDGER_KIND, entries: fullLedger },
     'cases/dev.json': devOut,
     'cases/holdout.json': holdoutOut,
     'cases/holdout.blind.json': blind,
+    'preregistration-superseded.json': supersededRaw,
+    'preregistration-supersession.json': supersession,
   };
 
   if (write) {
@@ -638,6 +767,8 @@ export function prepare({ write = true } = {}) {
     band,
     feasibility,
     preregistration_digest: digest,
+    superseded_preregistration_digest: supersededDigest,
+    supersession_id: supersession.supersession_id,
     holdout_labels_digest: frozenPrereg.holdout_access.labels_digest,
     blind_digest: canonicalDigest(blind),
     written: write,
@@ -684,6 +815,8 @@ if (argv.includes('--selftest')) {
     design_time_band: built.band,
     rule_feasibility: built.feasibility,
     preregistration_digest: built.preregistration_digest,
+    superseded_preregistration_digest: built.superseded_preregistration_digest,
+    supersession_id: built.supersession_id,
     holdout_labels_digest: built.holdout_labels_digest,
     blind_input_digest: built.blind_digest,
     digests: built.digests,

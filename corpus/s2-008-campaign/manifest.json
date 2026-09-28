@@ -523,17 +523,30 @@
  },
  "preregistration": {
   "file": "preregistration.json",
-  "preregistration_digest": "f060405fd736ad6b11c307dd418200e00b6d6aa6e8e752bcb749828a9cdf9747",
+  "preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58",
   "status": "IN_FORCE",
   "sealed_before_first_trial": true
  },
+ "superseded_preregistration": {
+  "file": "preregistration-superseded.json",
+  "preregistration_digest": "f060405fd736ad6b11c307dd418200e00b6d6aa6e8e752bcb749828a9cdf9747",
+  "status": "SUPERSEDED",
+  "superseded_by": "preregistration.json",
+  "recovered_from_commit": "2e684230a938cd00a54c30d1bcad0db49d432afc"
+ },
+ "supersession": {
+  "file": "preregistration-supersession.json",
+  "supersession_id": "spr-s2-008c-01",
+  "supersession_digest": "37050753a4bdbcfd5d5615acb88d0f91a8f85a1e72450761c027d69b898469f6",
+  "reason": "two apparatus defects, no effect: the resampler collapsed bootstrap multiplicity (a 115/126 rate returned centred at 0.578), and 9 launches ran against an uncharged 6-unit budget. The rule, band, seeds and baseline are unchanged."
+ },
  "frozen_table": {
   "file": "frozen-table.json",
-  "digest": "c22fb97fce2f5615ed0af50a17a1849880ebda256e84c698be5d4b359aa909ab"
+  "digest": "5b7ead6f23853e23742ff20ef6bf404088e323a576eec93410cf462865380080"
  },
  "source_ledger": {
   "file": "source-ledger.json",
-  "entry_count": 1,
-  "last_anchor_digest": "49a6d758e3e5c9cf26eabb0023815a38edb626562ea56e79c81b3835098b07c7"
+  "entry_count": 2,
+  "last_anchor_digest": "52710b17f4223c5b1c5c31ee61825a52a6086da9c3b12299d2774d0512f9f4ae"
  }
 }
