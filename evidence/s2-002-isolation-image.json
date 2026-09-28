@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "record": "s2-002-isolation-image",
+  "subject": "A-MVP-04",
+  "subjectId": "a-mvp-04-isolation-image",
+  "aMvpClause": "изоляция — образ",
+  "status": "PASS",
+  "reason": null,
+  "base": {
+    "registry_digest": "sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+    "reference": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+    "pull_exit": 0,
+    "observed_digest": "sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+    "architecture": "amd64",
+    "digest_matches_pin": true
+  },
+  "executor": {
+    "package": "@earendil-works/pi-coding-agent",
+    "entrypoint": "/opt/veritas-executor/dist/bundle/cli.js"
+  },
+  "provenance": {
+    "source_path": "/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent",
+    "package": "@earendil-works/pi-coding-agent",
+    "installed_version_from_package_json": "0.87.1",
+    "expected_version": "0.87.1",
+    "version_matches": true,
+    "executor_tree_sha256": "sha256:201209e7c5e783e847f6cb2d259530772210164b79053bac8e1ea8001abf5965",
+    "executor_tree_files": 14014,
+    "directories_copied": [
+      "dist",
+      "node_modules",
+      "package.json"
+    ],
+    "symlinks": "skipped, not followed; a resolved link could otherwise change the digest with bytes the build copies but the digest never read",
+    "committed_to_repository": false
+  },
+  "build": {
+    "performed": true,
+    "build_exit": 0,
+    "inspect_exit": 0,
+    "observed": {
+      "Id": "f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+      "Digest": "sha256:4936a523d8082389bb1c0343078ff7a4ec9f057426ae3becc6f6618175460429",
+      "Architecture": "amd64",
+      "layers": 6
+    },
+    "context_staged_from": "/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent"
+  },
+  "pin": {
+    "executor_image_id": "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+    "executor_image_digest": "sha256:4936a523d8082389bb1c0343078ff7a4ec9f057426ae3becc6f6618175460429",
+    "executor_tree_sha256_pinned": "sha256:201209e7c5e783e847f6cb2d259530772210164b79053bac8e1ea8001abf5965",
+    "executor_tree_sha256_observed": "sha256:201209e7c5e783e847f6cb2d259530772210164b79053bac8e1ea8001abf5965",
+    "executor_tree_matches": true,
+    "executor_tree_files_pinned": 14014,
+    "executor_tree_files_observed": 14014,
+    "id_matches": true,
+    "digest_matches": true,
+    "architecture": "amd64",
+    "digest_pinned": true,
+    "codes": {
+      "NOT_DIGEST_PINNED": "ISOLATION_IMAGE_NOT_DIGEST_PINNED",
+      "DIGEST_MISMATCH": "ISOLATION_IMAGE_DIGEST_MISMATCH",
+      "NOT_BUILT": "ISOLATION_IMAGE_NOT_BUILT"
+    }
+  },
+  "reproducibility": {
+    "recipe": "podman build --timestamp 0 -f src/lib/isolation/Containerfile.executor <staged context>",
+    "why_timestamp_zero": "buildah stamps layers with the wall clock by default, so two builds of identical content get different digests; with the timestamp zeroed the derived digest is a function of (base digest + executor tree bytes) alone",
+    "measured": "two independent builds of the same Containerfile and the same staged tree produced the identical Id and the identical Digest",
+    "portablePin": "base.registry_digest",
+    "localPin": "executor.derived_digest",
+    "note": "the executor tree is not committed; it is digested where it is installed, and a host whose installation differs produces a different executor_tree_sha256 and is refused rather than measured against this pin"
+  },
+  "commands": [
+    {
+      "step": "image:pull-base",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "pull",
+        "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutSha256": "0043d56d67594c6b6b63b991b438d092c03ebd2c384b3757795ff4cfff21614b",
+      "stderrSha256": "0ecfc0d28120b92d77d114579d58c253d27706220f43e6881561a3592272945f"
+    },
+    {
+      "step": "image:inspect-base",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "inspect",
+        "--format",
+        "{{.Digest}}|{{.Architecture}}",
+        "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutSha256": "63a2d8220037e511d5dfd8e29743ae45033aa79c1674ffb50e4544ac8a79a9e4",
+      "stderrSha256": "8a144098ef6499a6f566847bc3e3e5b1e9308a75e21e4dbcffd3e78aad35732e"
+    },
+    {
+      "step": "image:build-executor",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "build",
+        "--timestamp",
+        "0",
+        "--pull=never",
+        "-f",
+        "/home/daniil/Veritas/src/lib/isolation/Containerfile.executor",
+        "-t",
+        "localhost/veritas-executor:isolated",
+        "/tmp/veritas-isolation-build-bQEX8g"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutSha256": "0d0779f965769c4c06c39ea239f7c0c7fe58b521f5f01ae3f6dc3536daecd40a",
+      "stderrSha256": "01bcd73a92c08102b7fce72b08fd0b9620adc7c1aca3e193934f70efd9dd5eb3"
+    },
+    {
+      "step": "image:inspect-executor",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "inspect",
+        "--format",
+        "{{.Id}}|{{.Digest}}|{{.Architecture}}|{{len .RootFS.Layers}}",
+        "localhost/veritas-executor:isolated"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutSha256": "e8e1d2b9a35e528a0da0d1e1683559bd8f3d334c46f0662b9387d662bb1b2d13",
+      "stderrSha256": "622d5b7331ea5bea5f730ceb4e6089ffd5fb1103759d5579dbaad7c5c2e7f3cb"
+    }
+  ],
+  "limits": [
+    "the derived digest is reproducible only for the executor tree this record names; an executor upgrade moves the pin and that move must be an explicit, reviewed change",
+    "no RUN instruction exists in the Containerfile, so the image is proven to contain a working executor by the live run, not by a cached build step"
+  ]
+}

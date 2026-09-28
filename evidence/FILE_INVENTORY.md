@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 920.
+Generated from `git ls-files`; count: 936.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -441,6 +441,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-002-comparison.json`
 - `evidence/s2-002-dependency-binding.json`
 - `evidence/s2-002-gvisor-sandbox.json`
+- `evidence/s2-002-isolation-image.json`
+- `evidence/s2-002-isolation-live.json`
 - `evidence/s2-002-podman-sandbox.json`
 - `evidence/s2-002-run-a.json`
 - `evidence/s2-002-run-b.json`
@@ -532,6 +534,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `pilots/scenario-b/task-brief.json`
 - `postcss.config.mjs`
 - `README.md`
+- `results/s2-002/isolation/live/raw-run.log.json`
 - `results/s2-002/run-a/observations.json`
 - `results/s2-002/run-a/summary.json`
 - `results/s2-002/run-b/observations.json`
@@ -669,6 +672,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/generate-verifier-types.mjs`
 - `scripts/git-client.mjs`
 - `scripts/policy-probes.mjs`
+- `scripts/s2-002-isolation-image.mjs`
+- `scripts/s2-002-isolation-run.mjs`
 - `scripts/s2-002-run.mjs`
 - `scripts/s2-003-db-replay.mjs`
 - `scripts/s2-003-run.mjs`
@@ -708,6 +713,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/verify-postgres-smoke.mjs`
 - `scripts/verify-s2-002-cancellation-v2.mjs`
 - `scripts/verify-s2-002-dependencies.mjs`
+- `scripts/verify-s2-002-isolation-falsification.sh`
+- `scripts/verify-s2-002-isolation.mjs`
 - `scripts/verify-s2-002.mjs`
 - `scripts/verify-s2-003-dependencies.mjs`
 - `scripts/verify-s2-003.mjs`
@@ -794,6 +801,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/ingestion/postgres-store.mjs`
 - `src/lib/ingestion/store.mjs`
 - `src/lib/ingestion/time-model.mjs`
+- `src/lib/isolation/Containerfile.executor`
+- `src/lib/isolation/egress.mjs`
+- `src/lib/isolation/image.mjs`
+- `src/lib/isolation/launch.mjs`
+- `src/lib/isolation/profile.mjs`
+- `src/lib/isolation/README.md`
+- `src/lib/isolation/secrets.mjs`
 - `src/lib/sloqual/comparator.mjs`
 - `src/lib/sloqual/contract.mjs`
 - `src/lib/sloqual/index.mjs`
@@ -873,6 +887,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/security-hardening.test.mjs`
 - `tests/ingestion/time-model.test.mjs`
 - `tests/ingestion/transactional-audit.test.mjs`
+- `tests/isolation/live-evidence.test.mjs`
+- `tests/isolation/profile-axes.test.mjs`
 - `tests/sloqual/comparator.test.mjs`
 - `tests/sloqual/contract.test.mjs`
 - `tests/sloqual/harness.test.mjs`
