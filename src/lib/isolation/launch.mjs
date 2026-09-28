@@ -111,6 +111,20 @@ export function buildInvocation(profile, request) {
       throw new Error(`${LAUNCH_ERRORS.ARGV_INVALID}:handle-not-declared:${handle}`);
     }
   }
+  // The credential, if this run delivers one. A DECLARED handle is required: a
+  // credential with no descriptor would put a value on this host with nothing on
+  // record to say what it was, which is the leak A-MVP-04 was built to prevent.
+  const credential = request.credential ?? null;
+  if (credential !== null) {
+    assertSecretHandleId(credential.handle);
+    if (!declared.has(credential.handle)) {
+      throw new Error(`${LAUNCH_ERRORS.ARGV_INVALID}:credential-handle-not-declared:${credential.handle}`);
+    }
+    if (typeof credential.envFilePath !== 'string' || credential.envFilePath.length === 0) {
+      throw new Error(`${LAUNCH_ERRORS.ARGV_INVALID}:credential-env-file-path-required`);
+    }
+  }
+  const credentialEnvFilePath = credential === null ? null : credential.envFilePath;
 
   const f = profile.filesystem;
   const p = profile.process;
@@ -145,6 +159,11 @@ export function buildInvocation(profile, request) {
     '--log-driver=none',
     // --- secret handles: names only, no values, no paths ---
     ...handles.flatMap((handle) => ['--secret', handle]),
+    // --- the credential bridge: a PATH, never a NAME=VALUE pair. `--env NAME=value`
+    // would put the value in the argv of podman on this host, where a process list
+    // can read it; `--env-file` passes a path to a 0600 file the caller unlinks in a
+    // finally. Neither the value nor the env NAME the executor reads is in the argv.
+    ...(credentialEnvFilePath ? ['--env-file', credentialEnvFilePath] : []),
     // --- the allowlist's only exit, when the profile asked for one ---
     ...(egressSocketPath ? ['--mount', `type=bind,src=${egressSocketPath},dst=/run/egress.sock`] : []),
     ...(request.name ? ['--name', request.name] : []),
