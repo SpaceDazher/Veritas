@@ -1060,8 +1060,9 @@ export function gateStatusFromExit(exitCode) {
  *     the replay's A3 is the measurement. This says WHICH GATE OWNS a
  *     property; both gates ran, and `crossRecordAgreement` already refused a
  *     harness A3 that claims a measurement it did not make; and
- *   * the #45 scope statement: the campaign behind issue #45 is NOT_RUN, so this
- *     deterministic track does not decide the ticket's own scope.
+ *   * the #12 scope statement: the campaign behind issue #12 is NOT_RUN — it was
+ *     #45, which is now CLOSED (PARTIAL) with that remainder transferred to #12 —
+ *     so this deterministic track does not decide the ticket's own scope.
  *
  * They are RETURNED, not thrown away, and `verify` puts them in the summary's
  * `scopeNotes` and the printed output. What they no longer do is vote: they used
@@ -1078,7 +1079,7 @@ export function ticketScopeNotes(crossRecord) {
   if (crossRecord?.verdict === 'NOT_COMPARABLE_DISCLOSED') {
     notes.push(`the harness's A3 is table-derived, not a measurement (${crossRecord.note}); the authoritative A3 is the replay's`);
   }
-  notes.push('the campaign behind #45 is NOT_RUN, so this deterministic track does not decide the ticket\'s own scope');
+  notes.push('the campaign behind #12 is NOT_RUN, so this deterministic track does not decide the ticket\'s own scope; #45 carried that scope and is now CLOSED (PARTIAL) with its remainder in #12');
   return notes;
 }
 
@@ -1535,7 +1536,7 @@ export function verify(args = {}) {
   //         TRACK DOES NOT DECIDE, never about a check it owns: which gate OWNS
   //         a property (the harness's A3 is table-derived, so the replay's A3 is
   //         the authoritative one) and the SCOPE of the ticket (the campaign
-  //         behind #45 is NOT_RUN, so this deterministic track does not decide
+  //         behind #12 is NOT_RUN, so this deterministic track does not decide
   //         the ticket's own verdict). Recorded in the summary and in the
   //         printed output, and they decide NOTHING.
   //
@@ -1636,7 +1637,7 @@ export function verify(args = {}) {
     },
     // F2/F3/G4: each ticket-level statement has ONE home. The provability
     // preconditions are unmet and are defects (so they are in `defects` above and
-    // here); the #45 campaign statement is a scope note and is in `scopeNotes`.
+    // here); the #12 campaign statement is a scope note and is in `scopeNotes`.
     // This list therefore names only unmet preconditions this file treats as
     // defects, and is empty on a run whose whole track is tracked, committed and
     // unmodified.
@@ -1644,7 +1645,7 @@ export function verify(args = {}) {
     engineering_status: 'BLOCKED_DEPENDENCY',
     assurance_status: 'NOT_MEASURED',
     real_adapter_status: 'NOT_RUN_REAL_ADAPTER',
-    a_mvp_status: 'NOT_RUN (A-MVP-01..07, behind #45)',
+    a_mvp_status: 'NOT_RUN (A-MVP-01..07, behind #12)',
     note: 'engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from this gate and never are: a green deterministic track does not convert the ticket\'s own scope into done.',
     observedAtIso,
     startedAtIso,

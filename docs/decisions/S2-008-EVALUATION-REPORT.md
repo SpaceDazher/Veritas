@@ -17,7 +17,7 @@ red-to-green step: green but not sound — the aggregator trusted its children�
 themselves** · §0.6 acceptance
 table A1..A5 · §0.7 the six negative probes · §0.8 the `A === B` rule and the frozen
 table · §0.9 the two process-separated runs · §0.10 the honest campaign outcome ·
-§0.11 the limits · §0.12 what remains blocked behind #45 · §0.13 VERDICT.
+§0.11 the limits · §0.12 what remains blocked behind #12 · §0.13 VERDICT.
 
 ### 0.1 What was asked
 
@@ -28,7 +28,8 @@ negative probes, a frozen expected-value table, two process-separated runs, a
 cross-process replay, and evidence that survives a repeat on the same base. Read
 literally, a cycle also means a campaign on a real project, with real spend, and the
 task quality of a live executor; that part stays behind
-[#45](https://github.com/SpaceDazher/Veritas/issues/45) and is **not** attempted here
+[#12](https://github.com/SpaceDazher/Veritas/issues/12) — inherited from #45, which is now
+CLOSED (PARTIAL) — and is **not** attempted here
 (§0.12).
 
 The owner recorded the first delivery as **red** and asked for a repair under four
@@ -264,7 +265,7 @@ control that did not run, the cross-process replay, the harness that could not r
 every property. **Two were statements about the track, not about a check**: that the
 harness's `A3` is table-derived rather than a measurement (so the replay's `A3` is
 the authoritative one), and that the campaign behind
-[#45](https://github.com/SpaceDazher/Veritas/issues/45) is `NOT_RUN`, so this
+[#12](https://github.com/SpaceDazher/Veritas/issues/12) is `NOT_RUN`, so this
 deterministic track does not decide the ticket's own scope. The status line then read
 `notRun.length > 0`, and the two informational notes are present on **every** run —
 so `PASS` was unreachable by construction, and a gate whose verdict is a constant is
@@ -318,7 +319,7 @@ is a statement about the *gates*, and `gates.harness.properties` is still
 `[A1 HELD, A2 HELD, A3 HELD, A4 HELD, A5 HELD]` with `overall "PASS"` and `verdict
 "FAIL"`. The ticket's own scope is untouched: `engineering_status
 "BLOCKED_DEPENDENCY"`, `assurance_status "NOT_MEASURED"`, `real_adapter_status
-"NOT_RUN_REAL_ADAPTER"`, `a_mvp_status "NOT_RUN (A-MVP-01..07, behind #45)"`.
+"NOT_RUN_REAL_ADAPTER"`, `a_mvp_status "NOT_RUN (A-MVP-01..07, behind #12)"`.
 
 **Three pins hold the split in place**, in
 `tests/research/gate-semantics.test.mjs`, against the real exported helpers of the
@@ -729,7 +730,7 @@ was not written to produce this answer, and a hand-edited declaration is refused
    this harness improves any real metric. The track's own calibration record is carried
    as `NOT_MEASURED` with `not_measured_reason: "outcome_not_defined"`.
 
-### 0.12 What remains blocked behind #45
+### 0.12 What remains blocked behind #12
 
 * **The ticket's own acceptance — a campaign on a real project — is `NOT_RUN` and
   stays so.** This track measured eight hand-authored fixture cases; no production span
@@ -738,7 +739,7 @@ was not written to produce this answer, and a hand-edited declaration is refused
 * The four status fields are separate and none of them is derived from this gate:
   `engineeringStatus = BLOCKED_DEPENDENCY`, `assuranceStatus = NOT_MEASURED`,
   `realAdapterStatus = NOT_RUN_REAL_ADAPTER`,
-  `aMvpStatus = NOT_RUN (A-MVP-01..07, behind #45)`. The aggregator says it in its own
+  `aMvpStatus = NOT_RUN (A-MVP-01..07, behind #12)`. The aggregator says it in its own
   record: *"engineeringStatus, assuranceStatus and the A-MVP rows are NOT derived from
   this gate and never are: a green deterministic track does not convert the ticket's
   own scope into done."*
@@ -778,7 +779,7 @@ The committed aggregator record was the artifact of those runs, and it is the re
 **§0.5b** replaced: `evidence/s2-008-summary.json` then read `status NOT_RUN`,
 `exitCode 3`, `blockingGates []`, `defects []`, with both `NOT_RUN` disclosures — the
 table-derived harness A3, and the campaign behind
-[#45](https://github.com/SpaceDazher/Veritas/issues/45). It now reads `status PASS`,
+[#12](https://github.com/SpaceDazher/Veritas/issues/12). It now reads `status PASS`,
 `exitCode 0`, `blockingGates []`, `defects []`, and the same two disclosures in
 `scopeNotes`, which are recorded and printed and cannot decide a verdict.
 
@@ -822,14 +823,14 @@ in §0.8 and §0.11 item 3 rather than argued away.
 
 ---
 
-## Verdict: TRACK_REJECTED_AS_ACCEPTED — the machinery is real, three of five criteria hold, two do not, and the ticket stays `BLOCKED_DEPENDENCY` behind #45
+## Verdict: TRACK_REJECTED_AS_ACCEPTED — the machinery is real, three of five criteria hold, two do not, and the ticket stays `BLOCKED_DEPENDENCY` behind #12
 
 > **Repair update (2026-09-27, §0.13).** The headline above and the status table
 > under it are the **pre-repair snapshot at `813f5be`**, and they are left as they
 > were measured. The repair moved three facts: the two blocking gates are gone
 > (`blockingGates []`, `defects []`), all five acceptance properties hold, and the
 > aggregator's status is **`NOT_RUN` with `exitCode 3`** — the two `NOT_RUN`
-> disclosures are the table-derived harness A3 and **the campaign behind #45**, both
+> disclosures are the table-derived harness A3 and **the campaign behind #12**, both
 > of which were already in this summary. The current verdict, the current command
 > log and the limits are in **§0**; the table below is history. Nothing below §0 is
 > quoted as a current result.
@@ -841,7 +842,7 @@ in §0.8 and §0.11 item 3 rather than argued away.
 > **dependency gate is now PASS** — so it is four of five criteria, and
 > `blockingGates` is `replay`, `harness`. **A3 still FAILS** (`findingsA=3
 > findingsB=3`), `trackStatus` is still `FAIL`, and the ticket is still
-> `BLOCKED_DEPENDENCY` behind #45. Read §20 for the current numbers; do not read
+> `BLOCKED_DEPENDENCY` behind #12. Read §20 for the current numbers; do not read
 > the table below as the state of the branch.
 
 > **Supersession.** An earlier version of this file (written against the pre-repair
@@ -857,7 +858,7 @@ in §0.8 and §0.11 item 3 rather than argued away.
 
 `trackStatus = FAIL (not accepted)`, `engineeringStatus = BLOCKED_DEPENDENCY`,
 `assuranceStatus = NOT_MEASURED`, `realAdapterStatus = NOT_RUN_REAL_ADAPTER`,
-`aMvpStatus = NOT_RUN (A-MVP-01..07, behind #45)`.
+`aMvpStatus = NOT_RUN (A-MVP-01..07, behind #12)`.
 
 **One sentence:** the S2-008 deterministic track is a complete, honest, offline
 harness whose six negative probes and six controls genuinely run and genuinely flip,
@@ -883,7 +884,7 @@ untracked-tree fact** that only `git add` can fix.
 * It is **not** an acceptance of the ticket. `engineeringStatus` stays
   `BLOCKED_DEPENDENCY`; the ticket's own scope — a campaign on a real project, real
   spend, a live executor's task quality, `A-MVP-01..07` — is behind
-  [#45](https://github.com/SpaceDazher/Veritas/issues/45) and none of it is attempted
+  [#12](https://github.com/SpaceDazher/Veritas/issues/12) and none of it is attempted
   here.
 * It is **not** a causal claim, an effect size, a calibration or a campaign outcome.
   The transport is deterministic and offline; §14 states the boundary in full.
@@ -1032,11 +1033,11 @@ quotes.
 **After the repair of 2026-09-27 (current; see §0.6 for the measurements):**
 
 ```text
-trackStatus        = NOT_RUN          (no blocking gate, no defect; two disclosures remain, one of them #45)
+trackStatus        = NOT_RUN          (no blocking gate, no defect; two disclosures remain, one of them #12)
 engineeringStatus  = BLOCKED_DEPENDENCY   (this ticket, not this track)
 assuranceStatus    = NOT_MEASURED
 realAdapterStatus  = NOT_RUN_REAL_ADAPTER
-aMvpStatus         = NOT_RUN (A-MVP-01..07, behind #45)
+aMvpStatus         = NOT_RUN (A-MVP-01..07, behind #12)
 aggregator         = NOT_RUN, exit 3  (evidence/s2-008-summary.json; gates all PASS, blockingGates [])
 campaignVerdict    = FAIL (recorded, not a gate term)   campaignDecision = UNRESOLVED, decisionStatus = NOT_MEASURED
 notInferred        = [real_adapter_execution, human_review, empirical_semantic_accuracy,
@@ -1055,7 +1056,7 @@ verdictReasons     = ["dependency gate BLOCKED_DEPENDENCY (exit 1): index.mjs-ab
 engineeringStatus  = BLOCKED_DEPENDENCY   (this ticket, not this track)
 assuranceStatus    = NOT_MEASURED
 realAdapterStatus  = NOT_RUN_REAL_ADAPTER
-aMvpStatus         = NOT_RUN (A-MVP-01..07, behind #45)
+aMvpStatus         = NOT_RUN (A-MVP-01..07, behind #12)
 aggregator         = FAIL, exit 1     (evidence/s2-008-summary.json)
 verdictReasons     = ["dependency gate BLOCKED_DEPENDENCY (exit 1): index.mjs-absent-at-commit",
                       "replay gate FAIL (exit 1): A3 findingsA=3 findingsB=3; A5 track_tracked=false",
@@ -1642,7 +1643,7 @@ Other limits, none cosmetic:
 
 ---
 
-## 15. What remains blocked behind #45
+## 15. What remains blocked behind #12
 
 Unchanged by this track, and not substituted by it:
 
@@ -1761,7 +1762,7 @@ unnecessary (§12.3) and the manifest reseal is still pending.
 
 **A1 CLOSED · A2 CLOSED · A3 FAILED · A4 CLOSED · A5 FAILED on one untracked-tree fact.**
 `trackStatus = FAIL`; the ticket's own `engineeringStatus` stays `BLOCKED_DEPENDENCY`
-behind #45, and this report does not change that, does not substitute for it, and makes
+behind #12, and this report does not change that, does not substitute for it, and makes
 no causal claim from the deterministic transport.
 
 The work is worth keeping and is unusually honest: a gate that exits 3 when it could not
@@ -1955,7 +1956,7 @@ presents a forged one. The repair says so in the evidence
   wrote an `exitCode` member. The replay now writes it into the bytes it writes
   (`'exitCode' in record === true`), the rule checks it in both directions, and a
   missing one is itself a freshness issue. The ticket-level preconditions (the
-  track is untracked; the campaign behind #45 is `NOT_RUN`) are now **status
+  track is untracked; the campaign behind #12 is `NOT_RUN`) are now **status
   terms**: each is a named `NOT_RUN` entry and the status is never `PASS` while
   they hold. No green summary contradicts its own defects any more.
 * **EV-1 (a run record was not bound to the child that wrote it).** `readEvidence`
@@ -2099,7 +2100,7 @@ of the harness. `trackStatus` is still `FAIL`, `engineeringStatus` is still
 `BLOCKED_DEPENDENCY`, `assuranceStatus` is still `NOT_MEASURED`,
 `realAdapterStatus` is still `NOT_RUN_REAL_ADAPTER`, and `A-MVP-01..07` are still
 `NOT_RUN`: **the ticket is not accepted by this track.** Its own acceptance is
-the real-executor campaign in #45, and this pass did not touch it.
+the real-executor campaign in #12 (inherited from #45), and this pass did not touch it.
 
 Two of the harness's five properties are reported `HELD` and its own `verdict`
 is still `FAIL`, because the verdict is delegated to `resolveCampaignVerdict`
