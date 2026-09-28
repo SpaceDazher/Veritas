@@ -1,0 +1,688 @@
+{
+  "schemaVersion": 1,
+  "record": "s2-002-isolation-live",
+  "subject": "A-MVP-04",
+  "subjectId": "a-mvp-04-isolation-live",
+  "aMvpClause": "изоляция — образ, allowlist, secret handles",
+  "aMvpStatus": "NOT_CLAIMED",
+  "aMvpClauseMeasured": true,
+  "aMvpClauseUpgradeRequires": "a human review of this record; the script measures, it does not score",
+  "status": "PASS",
+  "reason": null,
+  "startedAt": "2026-09-28T07:06:16.918Z",
+  "finishedAt": "2026-09-28T07:06:48.518Z",
+  "component": {
+    "package": "@earendil-works/pi-coding-agent",
+    "expectedVersion": "0.87.1",
+    "observedVersion": "0.87.1",
+    "versionSource": "the executor printed it from inside the container; no version is read from package.json by this record"
+  },
+  "tier": "LOCAL_RESTRICTED",
+  "profileId": "sbx-isolation-executor-local-restricted-v1",
+  "executableTiers": [
+    "LOCAL_RESTRICTED",
+    "UNTRUSTED_CODE"
+  ],
+  "nonExecutableTiers": [
+    "NO_EXEC",
+    "HOST_UNISOLATED"
+  ],
+  "host": {
+    "podmanVersion": "podman version 4.9.3",
+    "podmanVersionFromInfo": "4.9.3",
+    "ociruntimePath": "/usr/bin/crun",
+    "rootless": true,
+    "cgroupManager": "cgroupfs",
+    "cgroupVersion": "v2",
+    "cgroupControllers": "[cpuset cpu io memory pids]",
+    "crunVersion": "crun version 1.14.1",
+    "launcher": {
+      "executable": "podman",
+      "argvPrefix": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun"
+      ],
+      "boundary": "WSL2_ROOTLESS_PODMAN_DIRECT"
+    },
+    "isolationCanBeRaised": true
+  },
+  "image": {
+    "baseImage": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+    "baseDigest": "sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+    "basePullExit": 0,
+    "baseInspectExit": 0,
+    "baseObservedDigest": "sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+    "executorImageId": "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+    "executorImageDigest": "sha256:4936a523d8082389bb1c0343078ff7a4ec9f057426ae3becc6f6618175460429",
+    "executorObserved": {
+      "Id": "f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+      "Digest": "sha256:4936a523d8082389bb1c0343078ff7a4ec9f057426ae3becc6f6618175460429",
+      "Architecture": "amd64"
+    },
+    "executorInspectExit": 0,
+    "pinKind": {
+      "base": "registry-digest: portable; every host pulls this exact digest",
+      "executor": "derived-image-digest: pins the bytes produced on THIS host from this base plus the executor tree; a rebuild elsewhere can differ"
+    },
+    "pinVerified": true,
+    "pinIssues": [],
+    "digestPinned": true,
+    "executorPackage": "@earendil-works/pi-coding-agent",
+    "executorEntrypoint": "/opt/veritas-executor/dist/bundle/cli.js",
+    "executorExpectedVersion": "0.87.1"
+  },
+  "axes": {
+    "network": {
+      "declared": "deny_all",
+      "on": [
+        "route table inside the container is empty (VERITAS_ROUTE_ROWS=0)"
+      ],
+      "off": [
+        "any destination at all",
+        "DNS resolution",
+        "the allowlist forwarder, because the profile did not ask for allowlist"
+      ],
+      "enforced_by": "the kernel: --network=none",
+      "measured": {
+        "control": "NO_ROUTE_INSIDE_CONTAINER",
+        "what": "a direct connect() to the model API host from inside the container, with the same image and the same profile network flag",
+        "why_it_matters": "the KERNEL's half of the network axis: the container has no route, so the allowlist forwarder is the only exit rather than one of two. Its exit code is 7 BY DESIGN — the probe exits 7 on a connect error and 0 on a success, so 7 is the refusal and 0 would be the failure",
+        "observed": "ERR=EAI_AGAIN",
+        "exitCode": 7,
+        "expected_exit_on_refusal": 7,
+        "passed": true
+      }
+    },
+    "filesystem": {
+      "declared": "read-only root, writable tmpfs on /tmp",
+      "on": [
+        "/tmp is writable (VERITAS_TMP_FS_WRITABLE=true)"
+      ],
+      "off": [
+        "everything outside the declared tmpfs; a write to /etc returned EROFS"
+      ],
+      "enforced_by": "the kernel: --read-only plus --tmpfs"
+    },
+    "environment": {
+      "declared": "exactly HOME, TMPDIR, PI_HOME, NODE_ENV, VERITAS_SECRET_MOUNT; host environment not inherited",
+      "on": [
+        "the container's own env is [\"HOME\",\"HOSTNAME\",\"NODE_ENV\",\"NODE_VERSION\",\"PATH\",\"PI_HOME\",\"PWD\",\"TMPDIR\",\"VERITAS_SECRET_MOUNT\",\"YARN_VERSION\",\"container\"]"
+      ],
+      "off": [
+        "every other variable of this operator's session"
+      ],
+      "injectedFromProfile": [
+        "HOME",
+        "TMPDIR",
+        "PI_HOME",
+        "NODE_ENV",
+        "VERITAS_SECRET_MOUNT"
+      ],
+      "declaredButNotObserved": [],
+      "imageDefaultsObserved": [
+        "HOSTNAME",
+        "NODE_VERSION",
+        "PATH",
+        "PWD",
+        "YARN_VERSION",
+        "container"
+      ],
+      "imageDefaultsNote": "these come from the base image and the container runtime, not from the operator session; the control that rules out inheritance is HOST_ENVIRONMENT_NOT_INHERITED, which plants a variable in the launcher environment and observes its absence",
+      "enforced_by": "the launcher: the child env is built from the profile and there is no process.env read on that path",
+      "measured": {
+        "control": "HOST_ENVIRONMENT_NOT_INHERITED",
+        "what": "the launcher is started with the operator's real environment plus one planted variable; neither the variable nor the operator HOME may reach the container",
+        "why_it_matters": "both the planted variable and the operator HOME are things this session certainly has; if either arrived, the environment axis would be inheriting rather than building. A run where nothing interesting happens to be set would look identical to a correct one without this control",
+        "planted_variable": "VERITAS_PLANTER_PROBE",
+        "planted_value_observed_inside_container": "absent",
+        "variable_present_in_container_env": false,
+        "operator_home": "/home/daniil",
+        "operator_home_observed_inside_container": "/tmp",
+        "profile_home": "/tmp",
+        "home_came_from_profile": true,
+        "container_env": [
+          "HOME",
+          "HOSTNAME",
+          "NODE_ENV",
+          "NODE_VERSION",
+          "PATH",
+          "PI_HOME",
+          "PWD",
+          "TMPDIR",
+          "VERITAS_SECRET_MOUNT",
+          "YARN_VERSION",
+          "container"
+        ],
+        "passed": true
+      }
+    },
+    "process": {
+      "declared": "max_processes=32, memory=256m, cpus=0.5",
+      "on": [
+        "the flags are in the launch argv; the record quotes the argv"
+      ],
+      "off": [
+        "nothing — these are ceilings, and nothing raises them"
+      ],
+      "enforced_by": "the kernel via cgroup v2 and the pids controller",
+      "not_independently_measured": "a pids-limit breach was not provoked in this run; the flag is recorded from the argv that the kernel received, not from an observed refusal"
+    },
+    "image": {
+      "declared": "digest-pinned base docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2 and derived sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+      "on": [
+        "the executor answered a version query from inside the container"
+      ],
+      "off": [
+        "any tag: assertDigestPinned refuses a reference without @sha256:"
+      ],
+      "enforced_by": "podman pull by digest, plus assertImageMatchesPin over podman inspect"
+    },
+    "secrets": {
+      "declared": "descriptor sec-veritas-executor-credential, readable only at /run/secrets/sec-veritas-executor-credential",
+      "on": [
+        "the container read its credential and reported its LENGTH, not its value"
+      ],
+      "off": [
+        "the environment",
+        "the argv",
+        "the launch argv",
+        "the record"
+      ],
+      "enforced_by": "podman's secret store: `podman secret create <handle> <path>` then `podman run --secret <handle>`"
+    }
+  },
+  "secretHandle": {
+    "handle": "sec-veritas-executor-credential",
+    "form": "podman-secret-store-name-only",
+    "mountPathInsideContainer": "/run/secrets/sec-veritas-executor-credential",
+    "valuePublished": false,
+    "valueOrigin": "synthetic canary literal in scripts/s2-002-isolation-run.mjs; no dotenv, no environment variable and no credential store is read"
+  },
+  "leakDetection": {
+    "surfacesSearched": [
+      "argv",
+      "env",
+      "stdout",
+      "stderr",
+      "container_argv",
+      "podman_secret_ls",
+      "record"
+    ],
+    "leakDetected": false,
+    "leaks": [],
+    "fingerprint": "7be3e436423490f5",
+    "detectorFiresOnPlantedValue": true,
+    "detectorSelfCheckPassed": true,
+    "valuePublished": false,
+    "note": "the delivered value is a synthetic canary literal in this script; no dotenv, no environment variable and no credential store is read anywhere in this file",
+    "finalRecordScan": {
+      "ok": true,
+      "leaks": []
+    }
+  },
+  "negativeControls": [
+    {
+      "control": "WILDCARD_ALLOWLIST_REFUSED",
+      "what": "a '*' is refused on every axis, at any depth, and 'unrestricted' is refused as a policy",
+      "why_it_matters": "'*' is the value HOST_UNISOLATED carries, and the contract permits it there; a launch is a different act from a record, so nothing carrying one may reach the launcher",
+      "shapes": {
+        "network_entry_host": {
+          "refused": true,
+          "code": "ISOLATION_WILDCARD_ALLOWLIST_NOT_PERMITTED",
+          "at": "profile.network.allowlist[0].host"
+        },
+        "environment_allowlist": {
+          "refused": true,
+          "code": "ISOLATION_WILDCARD_ALLOWLIST_NOT_PERMITTED",
+          "at": "profile.environment.allowlist[0]"
+        },
+        "filesystem_roots": {
+          "refused": true,
+          "code": "ISOLATION_WILDCARD_ALLOWLIST_NOT_PERMITTED",
+          "at": "profile.filesystem.roots[0]"
+        },
+        "network_policy_unrestricted": {
+          "refused": true,
+          "code": "ISOLATION_WILDCARD_ALLOWLIST_NOT_PERMITTED",
+          "at": "profile.network.policy=unrestricted"
+        }
+      },
+      "passed": true
+    },
+    {
+      "control": "NON_EXECUTABLE_TIER_REFUSED",
+      "what": "NO_EXEC and HOST_UNISOLATED are both refused by assertExecutableProfile before any process exists",
+      "why_it_matters": "HOST_UNISOLATED is the tier the S2-007R record uses when a model-calling agent cannot run in isolation; accepting it here would be the silent substitution the handoff forbids",
+      "results": {
+        "NO_EXEC": {
+          "refused": true,
+          "code": "ISOLATION_TIER_NOT_EXECUTABLE"
+        },
+        "HOST_UNISOLATED": {
+          "refused": true,
+          "code": "ISOLATION_TIER_NOT_EXECUTABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "control": "ALLOWLIST_ESCAPE_REFUSED",
+      "what": "CONNECT to a host off the allowlist, and to a port off the allowlist, are both refused; the allowlisted pair is admitted",
+      "why_it_matters": "an allowlist that refuses everything would pass a refusal test alone; the admitted pair is the inversion that shows the control filters rather than blocks",
+      "off_allowlist_host": {
+        "destination": "evil.example.com:443",
+        "refused": true,
+        "raw": "HTTP/1.1 403 Forbidden\r\nX-Veritas-Refusal: EGRESS_NOT_ALLOWLISTED\r\nContent-Type: application/json\r\nContent-Length: 131\r\nConnection: close\r\n\r\n{\"refused\":\"EGRESS_NOT_ALLOWLISTED\",\"detail\":{\"host\":\"evil.example.com\",\"port\":443,\"method\":\"CONNECT\"},\"at\":\"evil.example.com:443\"}"
+      },
+      "off_allowlist_port": {
+        "destination": "open.bigmodel.cn:22",
+        "refused": true,
+        "raw": "HTTP/1.1 403 Forbidden\r\nX-Veritas-Refusal: EGRESS_NOT_ALLOWLISTED\r\nContent-Type: application/json\r\nContent-Length: 129\r\nConnection: close\r\n\r\n{\"refused\":\"EGRESS_NOT_ALLOWLISTED\",\"detail\":{\"host\":\"open.bigmodel.cn\",\"port\":22,\"method\":\"CONNECT\"},\"at\":\"open.bigmodel.cn:22\"}"
+      },
+      "on_allowlist": {
+        "destination": "open.bigmodel.cn:443",
+        "admitted": true,
+        "raw": "HTTP/1.1 200 Connection Established\r\n\r\n"
+      },
+      "passed": true
+    },
+    {
+      "control": "DENY_BY_DEFAULT_RESOLUTION",
+      "what": "under deny_all every destination is refused; under allowlist only the named pair resolves",
+      "why_it_matters": "the forwarder test proves the forwarder filters; this proves the POLICY refuses the same destination before any process exists, so a caller cannot ask for the wrong thing even if the forwarder were absent",
+      "deny_all": {
+        "destination": "open.bigmodel.cn:443",
+        "allowed": false,
+        "reason": "DENY_ALL"
+      },
+      "allowlist_denied": {
+        "destination": "evil.example.com:443",
+        "allowed": false,
+        "code": "ISOLATION_DESTINATION_NOT_ALLOWLISTED"
+      },
+      "allowlist_allowed": {
+        "destination": "open.bigmodel.cn:443",
+        "allowed": true,
+        "reason": "ON_ALLOWLIST"
+      },
+      "passed": true
+    },
+    {
+      "control": "NO_ROUTE_INSIDE_CONTAINER",
+      "what": "a direct connect() to the model API host from inside the container, with the same image and the same profile network flag",
+      "why_it_matters": "the KERNEL's half of the network axis: the container has no route, so the allowlist forwarder is the only exit rather than one of two. Its exit code is 7 BY DESIGN — the probe exits 7 on a connect error and 0 on a success, so 7 is the refusal and 0 would be the failure",
+      "observed": "ERR=EAI_AGAIN",
+      "exitCode": 7,
+      "expected_exit_on_refusal": 7,
+      "passed": true
+    },
+    {
+      "control": "HOST_ENVIRONMENT_NOT_INHERITED",
+      "what": "the launcher is started with the operator's real environment plus one planted variable; neither the variable nor the operator HOME may reach the container",
+      "why_it_matters": "both the planted variable and the operator HOME are things this session certainly has; if either arrived, the environment axis would be inheriting rather than building. A run where nothing interesting happens to be set would look identical to a correct one without this control",
+      "planted_variable": "VERITAS_PLANTER_PROBE",
+      "planted_value_observed_inside_container": "absent",
+      "variable_present_in_container_env": false,
+      "operator_home": "/home/daniil",
+      "operator_home_observed_inside_container": "/tmp",
+      "profile_home": "/tmp",
+      "home_came_from_profile": true,
+      "container_env": [
+        "HOME",
+        "HOSTNAME",
+        "NODE_ENV",
+        "NODE_VERSION",
+        "PATH",
+        "PI_HOME",
+        "PWD",
+        "TMPDIR",
+        "VERITAS_SECRET_MOUNT",
+        "YARN_VERSION",
+        "container"
+      ],
+      "passed": true
+    }
+  ],
+  "realRun": {
+    "axis_probe": {
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "VERITAS_ROUTE_ROWS=0\nVERITAS_ENV=[\"HOME\",\"HOSTNAME\",\"NODE_ENV\",\"NODE_VERSION\",\"PATH\",\"PI_HOME\",\"PWD\",\"TMPDIR\",\"VERITAS_SECRET_MOUNT\",\"YARN_VERSION\",\"container\"]\nVERITAS_ARGV=[\"/opt/veritas-executor/dist/bundle/cli.js\",\"--version\"]\nVERITAS_SECRET_PATH=/run/secrets/sec-veritas-executor-credential\nVERITAS_SECRET_PRESENT=true\nVERITAS_SECRET_LEN=56\nVERITAS_HOST_FS_WRITABLE=EROFS\nVERITAS_TMP_FS_WRITABLE=true\nVERITAS_UID=65534:65534\nVERITAS_PLANTER_ENV=absent\nVERITAS_HOME_VALUE=/tmp\n",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "executor_version": {
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "0.87.1"
+    },
+    "exitCode": 0,
+    "signal": null,
+    "probeStdout": "VERITAS_ROUTE_ROWS=0\nVERITAS_ENV=[\"HOME\",\"HOSTNAME\",\"NODE_ENV\",\"NODE_VERSION\",\"PATH\",\"PI_HOME\",\"PWD\",\"TMPDIR\",\"VERITAS_SECRET_MOUNT\",\"YARN_VERSION\",\"container\"]\nVERITAS_ARGV=[\"/opt/veritas-executor/dist/bundle/cli.js\",\"--version\"]\nVERITAS_SECRET_PATH=/run/secrets/sec-veritas-executor-credential\nVERITAS_SECRET_PRESENT=true\nVERITAS_SECRET_LEN=56\nVERITAS_HOST_FS_WRITABLE=EROFS\nVERITAS_TMP_FS_WRITABLE=true\nVERITAS_UID=65534:65534\nVERITAS_PLANTER_ENV=absent\nVERITAS_HOME_VALUE=/tmp\n",
+    "probeStderrDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "executorVersionDirect": "0.87.1",
+    "realStartProven": true,
+    "governedError": null,
+    "axisProbe": {
+      "VERITAS_ROUTE_ROWS": "0",
+      "VERITAS_ENV": "[\"HOME\",\"HOSTNAME\",\"NODE_ENV\",\"NODE_VERSION\",\"PATH\",\"PI_HOME\",\"PWD\",\"TMPDIR\",\"VERITAS_SECRET_MOUNT\",\"YARN_VERSION\",\"container\"]",
+      "VERITAS_ARGV": "[\"/opt/veritas-executor/dist/bundle/cli.js\",\"--version\"]",
+      "VERITAS_SECRET_PATH": "/run/secrets/sec-veritas-executor-credential",
+      "VERITAS_SECRET_PRESENT": "true",
+      "VERITAS_SECRET_LEN": "56",
+      "VERITAS_HOST_FS_WRITABLE": "EROFS",
+      "VERITAS_TMP_FS_WRITABLE": "true",
+      "VERITAS_UID": "65534:65534",
+      "VERITAS_PLANTER_ENV": "absent",
+      "VERITAS_HOME_VALUE": "/tmp"
+    }
+  },
+  "rawLog": {
+    "path": "results/s2-002/isolation/live",
+    "note": "every command, its argv and its exit code, plus the untruncated streams of each launch",
+    "file": "results/s2-002/isolation/live/raw-run.log.json",
+    "sha256": "919bdbc45f7d18de4a17c7712b3fa6f5ee092cd66b463e4002f5f840d589a9ea",
+    "bytes": 8897
+  },
+  "commands": [
+    {
+      "step": "host:version",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "--version"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 21,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "host:info:runtime",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.OCIRuntime.Name}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 14,
+      "stderrSha256": "c3d034400310bbd6e2154a002036716893975e1461c3a66940373b4240bfbd1f"
+    },
+    {
+      "step": "host:info:version",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Version.Version}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 6,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:info:rootless",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.Security.Rootless}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 5,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:info:cgroup-manager",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.CgroupManager}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 9,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:info:cgroup-controllers",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.CgroupControllers}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 28,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:cgroup-version-from-proc",
+      "argv": [
+        "awk",
+        "$3==\"cgroup2\"{print \"v2\"}",
+        "/proc/mounts"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 3,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "host:crun-version",
+      "argv": [
+        "/usr/bin/crun",
+        "--version"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 175,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "image:pull-base",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "pull",
+        "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 65,
+      "stderrSha256": "ead23d39e694ac6c2427469caf895b343ae7417d7fe31cebaf70062794527637"
+    },
+    {
+      "step": "image:inspect-base",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "inspect",
+        "--format",
+        "{{.Digest}}|{{.Architecture}}|{{.Created}}",
+        "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 118,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "image:inspect-executor",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "inspect",
+        "--format",
+        "{{.Id}}|{{.Digest}}|{{.Architecture}}",
+        "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 143,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "store:secret ls",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "ls"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 56,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "store:secret create",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "create",
+        "sec-veritas-executor-credential",
+        "/tmp/.sec-veritas-executor-credential.403749.0.spool"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 26,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "run:executor-version-direct",
+      "argv": [
+        "podman",
+        "run",
+        "--rm",
+        "--pull=never",
+        "--network=none",
+        "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+        "node",
+        "/opt/veritas-executor/dist/bundle/cli.js",
+        "--version"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 7,
+      "stderrSha256": "be05a099b25dfa83dedaa21e4229cb0bfcd034ae9d79f9090200bfffd2550d15"
+    },
+    {
+      "step": "negative:no-route-to-api-host",
+      "argv": [
+        "podman",
+        "run",
+        "--rm",
+        "--network=none",
+        "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+        "node",
+        "-e",
+        "connect(443,\"open.bigmodel.cn\")"
+      ],
+      "exitCode": 7,
+      "signal": null,
+      "stdoutBytes": 13,
+      "stderrSha256": "116afd4df5dcc7e00ab07829818b23cee8b7f741a352e0ba5c8ca69e07f3d537"
+    },
+    {
+      "step": "secret:ls",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "ls"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 199,
+      "stderrSha256": "d00c78d2d7ad615cfdd36befb293be046f3ca92c106bd9f5ad6ba74ae4ec34bf"
+    },
+    {
+      "step": "store:secret rm",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "rm",
+        "sec-veritas-executor-credential"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 26,
+      "stderrSha256": "d00c78d2d7ad615cfdd36befb293be046f3ca92c106bd9f5ad6ba74ae4ec34bf"
+    }
+  ],
+  "limits": [
+    "the base image digest is portable; the derived image digest pins only the bytes built on this host",
+    "no model call is made: this record is about isolation, and a paid call would not evidence a network flag",
+    "the pids and memory ceilings are recorded from the argv the kernel received, not from a provoked breach",
+    "the credential delivered to the container is synthetic; the descriptor mechanism is what is measured, not a real key"
+  ]
+}

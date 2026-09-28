@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "subject": "A-MVP-04",
+  "startedAt": "2026-09-28T07:06:16.918Z",
+  "finishedAt": "2026-09-28T07:06:48.518Z",
+  "commands": [
+    {
+      "step": "host:version",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "--version"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 21,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "host:info:runtime",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.OCIRuntime.Name}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 14,
+      "stderrSha256": "c3d034400310bbd6e2154a002036716893975e1461c3a66940373b4240bfbd1f"
+    },
+    {
+      "step": "host:info:version",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Version.Version}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 6,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:info:rootless",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.Security.Rootless}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 5,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:info:cgroup-manager",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.CgroupManager}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 9,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:info:cgroup-controllers",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "info",
+        "--format",
+        "{{.Host.CgroupControllers}}"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 28,
+      "stderrSha256": "65e43e1a63556f46b00046176e4008e639b81c2852c935abc0ea93988bb8c9f9"
+    },
+    {
+      "step": "host:cgroup-version-from-proc",
+      "argv": [
+        "awk",
+        "$3==\"cgroup2\"{print \"v2\"}",
+        "/proc/mounts"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 3,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "host:crun-version",
+      "argv": [
+        "/usr/bin/crun",
+        "--version"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 175,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "image:pull-base",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "pull",
+        "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 65,
+      "stderrSha256": "ead23d39e694ac6c2427469caf895b343ae7417d7fe31cebaf70062794527637"
+    },
+    {
+      "step": "image:inspect-base",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "inspect",
+        "--format",
+        "{{.Digest}}|{{.Architecture}}|{{.Created}}",
+        "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 118,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "image:inspect-executor",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "inspect",
+        "--format",
+        "{{.Id}}|{{.Digest}}|{{.Architecture}}",
+        "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 143,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "store:secret ls",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "ls"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 56,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "store:secret create",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "create",
+        "sec-veritas-executor-credential",
+        "/tmp/.sec-veritas-executor-credential.403749.0.spool"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 26,
+      "stderrSha256": "612537f5525795c5acf4af6c24cfcec068a987e55c3197434ffef50def901eb7"
+    },
+    {
+      "step": "run:executor-version-direct",
+      "argv": [
+        "podman",
+        "run",
+        "--rm",
+        "--pull=never",
+        "--network=none",
+        "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+        "node",
+        "/opt/veritas-executor/dist/bundle/cli.js",
+        "--version"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 7,
+      "stderrSha256": "be05a099b25dfa83dedaa21e4229cb0bfcd034ae9d79f9090200bfffd2550d15"
+    },
+    {
+      "step": "negative:no-route-to-api-host",
+      "argv": [
+        "podman",
+        "run",
+        "--rm",
+        "--network=none",
+        "sha256:f21d3d7988e439f4b1b2ad577955dfee141112144e86ce1adae5fdb3d8f0d1de",
+        "node",
+        "-e",
+        "connect(443,\"open.bigmodel.cn\")"
+      ],
+      "exitCode": 7,
+      "signal": null,
+      "stdoutBytes": 13,
+      "stderrSha256": "116afd4df5dcc7e00ab07829818b23cee8b7f741a352e0ba5c8ca69e07f3d537"
+    },
+    {
+      "step": "secret:ls",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "ls"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 199,
+      "stderrSha256": "d00c78d2d7ad615cfdd36befb293be046f3ca92c106bd9f5ad6ba74ae4ec34bf"
+    },
+    {
+      "step": "store:secret rm",
+      "argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "secret",
+        "rm",
+        "sec-veritas-executor-credential"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdoutBytes": 26,
+      "stderrSha256": "d00c78d2d7ad615cfdd36befb293be046f3ca92c106bd9f5ad6ba74ae4ec34bf"
+    }
+  ],
+  "streams": {
+    "axisProbeStdout": "VERITAS_ROUTE_ROWS=0\nVERITAS_ENV=[\"HOME\",\"HOSTNAME\",\"NODE_ENV\",\"NODE_VERSION\",\"PATH\",\"PI_HOME\",\"PWD\",\"TMPDIR\",\"VERITAS_SECRET_MOUNT\",\"YARN_VERSION\",\"container\"]\nVERITAS_ARGV=[\"/opt/veritas-executor/dist/bundle/cli.js\",\"--version\"]\nVERITAS_SECRET_PATH=/run/secrets/sec-veritas-executor-credential\nVERITAS_SECRET_PRESENT=true\nVERITAS_SECRET_LEN=56\nVERITAS_HOST_FS_WRITABLE=EROFS\nVERITAS_TMP_FS_WRITABLE=true\nVERITAS_UID=65534:65534\nVERITAS_PLANTER_ENV=absent\nVERITAS_HOME_VALUE=/tmp\n",
+    "axisProbeStderr": "",
+    "executorVersionStdout": "0.87.1",
+    "forwarderDecisions": [
+      {
+        "decision": "REFUSED",
+        "code": "EGRESS_NOT_ALLOWLISTED",
+        "host": "evil.example.com",
+        "port": 443,
+        "method": "CONNECT"
+      },
+      {
+        "decision": "REFUSED",
+        "code": "EGRESS_NOT_ALLOWLISTED",
+        "host": "open.bigmodel.cn",
+        "port": 22,
+        "method": "CONNECT"
+      },
+      {
+        "decision": "ADMITTED",
+        "host": "open.bigmodel.cn",
+        "port": 443,
+        "method": "CONNECT"
+      }
+    ]
+  }
+}
