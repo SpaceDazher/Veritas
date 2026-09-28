@@ -1,0 +1,242 @@
+// S2-008 #12 — the OWNER'S SIGNATURE on preregistration v2.
+//
+//   node scripts/s2-008-campaign-approve.mjs --principal <id> --label "<text>" [--out <path>]
+//
+// WHY THIS IS A SCRIPT AND NOT A FIELD IN THE DRAFT
+// A signature you can type into a JSON file is not a signature. The draft ships
+// with `approval.status: null` on purpose, and this script is the only thing that
+// can turn it into an approved document — and it REFUSES to issue one unless the
+// document it is signing still says the thing the owner is approving. That is the
+// difference this repository has now paid for twice in this track: a record that
+// asserts itself, and an A-MVP gate that trusted the record it was judging.
+//
+// THREE THINGS HAPPEN HERE, IN THIS ORDER, and the order is the point:
+//
+//   1. THE SCIENCE IS CHECKED AGAINST v1 BEFORE ANY SIGNATURE. A supersession may
+//      change the predictor, the currency and the spend. It may NOT change the
+//      rule, the metric, the frozen baseline, the noise band, the seeds, the
+//      multiplicity rule, the stopping rule, the holdout access or the hypothesis
+//      card. Any movement in those is `SCOPE_DRIFT` and nothing is issued — so a
+//      "signature" can never be a quiet rewrite of the experiment. The comparison
+//      is by value, member by member, and it prints the first field that moved.
+//
+//   2. THE DOCUMENT IS FROZEN WITH A DIGEST OVER EVERYTHING EXCEPT THE APPROVAL
+//      BLOCK. `preregistration_digest` is a hash of the scientific body. Editing
+//      any field after signing changes the recomputed digest, and the arm — which
+//      recomputes it from the bytes it was handed — refuses. The approval cannot
+//      travel away from the document it approves.
+//
+//   3. THE APPROVAL RECORDS WHO, AND IT IS NOT A SECRET. A principal id and a
+//      label, like scripts/s2-007r-authorization.mjs records the owner of the
+//      HOST_UNISOLATED permit. `issued_at` is the wall clock, which decides nothing
+//      here: it is a fact about when the permit was written, and the digest over
+//      the body deliberately excludes it so a re-run does not change the document.
+//
+// The issued document is NOT yet in force. It becomes in force when
+// `scripts/s2-008-campaign-prepare.mjs --seal-v2` records its digest in the corpus
+// manifest and carries a SUPERSESSION from v1, exactly as the previous
+// supersession did. Until then the arm's own `PREREG_NOT_APPROVED` check is not
+// even reached, because a run is pointed at the draft.
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
+
+export const APPROVE_ERRORS = Object.freeze({
+  ARGS: 'APPROVAL_ARGUMENTS_INCOMPLETE',
+  DRAFT_ABSENT: 'APPROVAL_DRAFT_ABSENT',
+  DRAFT_ALREADY_APPROVED: 'APPROVAL_DRAFT_ALREADY_APPROVED',
+  DRAFT_CORRUPT: 'APPROVAL_DRAFT_UNREADABLE',
+  BASE_ABSENT: 'APPROVAL_BASE_PREREGISTRATION_ABSENT',
+  SCOPE_DRIFT: 'APPROVAL_SCOPE_DRIFT',
+  ALREADY_SIGNED: 'APPROVAL_ALREADY_SIGNED',
+});
+
+/** The members a supersession may not touch. Value-compared, in this order. */
+export const FROZEN_MEMBERS = Object.freeze([
+  'card',
+  'metric',
+  'frozen_baseline',
+  'noise_rule',
+  'multiplicity_rule',
+  'seed_rule',
+  'seeds_digest',
+  'seed_count',
+  'stopping_rule',
+  'sequential_rule',
+  'holdout_access',
+  'inference_mode',
+  'trial_list',
+  'expected_table_digest',
+  'bootstrap_process',
+]);
+
+/** The members that MAY move, and are named so the record says what it bought. */
+export const MOVABLE_MEMBERS = Object.freeze(['arms', 'budget_reservation', 'executor', 'description', 'title', 'rule', 'preregistration_id']);
+
+/** The body a digest is taken over: everything except the approval and the digest itself. */
+export function scientificBody(document) {
+  const { approval, preregistration_digest, status, ...body } = document ?? {};
+  return body;
+}
+
+/** The digest of the scientific body. Recomputed by the verifier, not trusted. */
+export function preregistrationDigest(document) {
+  return canonicalDigest(scientificBody(document));
+}
+
+/**
+ * The comparison that decides whether this document may be signed at all.
+ * Returns the first member that moved, with the two values, or null when the
+ * science is byte-for-byte the frozen one.
+ */
+export function scopeDrift(base, candidate, members = FROZEN_MEMBERS) {
+  for (const member of members) {
+    const a = canonicalDigest(base?.[member] ?? null);
+    const b = canonicalDigest(candidate?.[member] ?? null);
+    if (a !== b) {
+      return { member, base_digest: a, candidate_digest: b, base_present: member in (base ?? {}), candidate_present: member in (candidate ?? {}) };
+    }
+  }
+  return null;
+}
+
+export function parseArgs(argv) {
+  const out = { principal: null, label: null, out: null };
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    const take = () => {
+      const value = argv[i + 1];
+      if (value === undefined || value.startsWith('--')) throw new Error(`${APPROVE_ERRORS.ARGS}:${token}`);
+      i += 1;
+      return value;
+    };
+    if (token === '--principal') out.principal = take();
+    else if (token === '--label') out.label = take();
+    else if (token === '--out') out.out = take();
+    else if (token === '--help' || token === '-h') out.help = true;
+    else throw new Error(`${APPROVE_ERRORS.ARGS}:unknown-argument:${token}`);
+  }
+  return out;
+}
+
+/**
+ * Issue the signed document. Refuses on a moved scientific member, on a draft
+ * that already claims approval, and on anything it cannot read.
+ */
+export function approve({ draft, base, principal, label, issuedAt = null }) {
+  if (typeof principal !== 'string' || principal.length === 0) throw new Error(`${APPROVE_ERRORS.ARGS}:--principal`);
+  if (typeof label !== 'string' || label.length === 0) throw new Error(`${APPROVE_ERRORS.ARGS}:--label`);
+  if (!isPlainObject(draft)) throw new Error(`${APPROVE_ERRORS.DRAFT_CORRUPT}`);
+  if (!isPlainObject(base)) throw new Error(`${APPROVE_ERRORS.BASE_ABSENT}`);
+  if (draft.approval?.status !== null && draft.approval?.status !== undefined) {
+    // Signing a document that already claims to be signed is how a second,
+    // different signature gets to coexist with the first one.
+    throw new Error(`${APPROVE_ERRORS.ALREADY_SIGNED}:${String(draft.approval?.status)}`);
+  }
+  const drift = scopeDrift(base, draft);
+  if (drift !== null) {
+    throw new Error(`${APPROVE_ERRORS.SCOPE_DRIFT}:${drift.member}:${drift.base_digest.slice(0, 16)}!=${drift.candidate_digest.slice(0, 16)}`);
+  }
+  const body = {
+    ...scientificBody(draft),
+    status: 'APPROVED',
+    approval: {
+      status: 'APPROVED',
+      authority: 'HUMAN_OWNER',
+      principal_id: principal,
+      label,
+      // The wall clock decides nothing and is outside the digest, so re-running
+      // this script does not produce a different document.
+      issued_at: issuedAt,
+      signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+      in_force: false,
+      becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v2 records this digest in the corpus manifest and carries a SUPERSESSION from xpr-s2-008c-01',
+    },
+  };
+  return Object.freeze({ ...body, preregistration_digest: preregistrationDigest(body) });
+}
+
+function isPlainObject(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+const CORPUS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../corpus/s2-008-campaign');
+const DRAFT = path.join(CORPUS_DIR, 'preregistration.v2.draft.json');
+// The IN-FORCE v1, not preregistration-superseded.json: that file is the document the
+// PREVIOUS supersession replaced, and its digest differs. v2 supersedes what is in force.
+const BASE = path.join(CORPUS_DIR, 'preregistration.json');
+const OUT = path.join(CORPUS_DIR, 'preregistration.v2.approved.json');
+
+const USAGE = `s2-008-campaign-approve — the owner's signature on preregistration v2
+
+  --principal <id>     the owner's principal id, recorded like every permit here
+  --label "<text>"     who is signing, in words
+  --out <path>         where to write the signed document
+
+Refuses to issue anything if a frozen scientific member moved against
+xpr-s2-008c-01: the card, the metric, the frozen baseline, the noise band, the
+seeds, the multiplicity rule, the stopping rule, the holdout access, the inference
+mode, the trial list and the frozen table digest. A supersession may change the
+predictor, the currency and the spend; it may not change the experiment.
+
+Issuing does not put the document in force. That is --seal-v2's job, and until it
+runs the campaign runs v1.
+`;
+
+function main() {
+  const argv = process.argv.slice(2);
+  const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+  if (!isMain) return null;
+  let args;
+  try {
+    args = parseArgs(argv);
+  } catch (error) {
+    process.stderr.write(`${String(error.message)}\n\n${USAGE}`);
+    process.exitCode = 2;
+    return null;
+  }
+  if (args.help || argv.length === 0) {
+    process.stdout.write(USAGE);
+    process.exitCode = args.help ? 0 : 2;
+    return null;
+  }
+  try {
+    if (!existsSync(DRAFT)) throw new Error(`${APPROVE_ERRORS.DRAFT_ABSENT}:${DRAFT}`);
+    if (!existsSync(BASE)) throw new Error(`${APPROVE_ERRORS.BASE_ABSENT}:${BASE}`);
+    const draft = JSON.parse(readFileSync(DRAFT, 'utf8'));
+    const base = JSON.parse(readFileSync(BASE, 'utf8'));
+    const signed = approve({
+      draft,
+      base,
+      principal: args.principal,
+      label: args.label,
+      issuedAt: new Date().toISOString(),
+    });
+    const out = args.out ?? OUT;
+    writeFileSync(out, `${JSON.stringify(signed, null, 2)}\n`, 'utf8');
+    process.stdout.write(`${JSON.stringify({
+      written: out,
+      preregistration_id: signed.preregistration_id,
+      status: signed.status,
+      preregistration_digest: signed.preregistration_digest,
+      approved_by: `${signed.approval.principal_id} (${signed.approval.authority})`,
+      in_force: signed.approval.in_force,
+      next: 'node scripts/s2-008-campaign-prepare.mjs --seal-v2',
+    }, null, 2)}\n`);
+    process.exitCode = 0;
+    return signed;
+  } catch (error) {
+    process.stderr.write(`${JSON.stringify({
+      status: 'REFUSED',
+      ok: false,
+      code: String(error?.message ?? 'APPROVAL_FAILED').split(':')[0],
+      detail: String(error?.message ?? error).slice(0, 400),
+    }, null, 2)}\n`);
+    process.exitCode = 3;
+    return null;
+  }
+}
+
+main();

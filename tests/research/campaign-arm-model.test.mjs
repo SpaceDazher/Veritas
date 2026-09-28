@@ -22,6 +22,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
+import { preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs';
 import {
   APPROVED,
   ARM_ERRORS,
@@ -41,22 +42,39 @@ const ENV_NAME = 'ZAI_API_KEY';
 const ARM_ID = 'arm-model-zai-glm53flash';
 const SCRIPT = path.resolve(import.meta.dirname, '../../scripts/s2-008-campaign-arm-model.mjs');
 
-function withDir(fn) {
+/** async because the arm's `main` is async, and the cases await it. */
+async function withDir(fn) {
   const dir = mkdtempSync(path.join(tmpdir(), 'veritas-arm-'));
   try {
-    return fn(dir);
+    return await fn(dir);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 }
 
+/**
+ * A preregistration that would actually be in force: approved AND sealed, with a
+ * digest the arm's own recomputation matches. The previous fixture carried
+ * `approval.status` alone, which stopped being enough when the arm began
+ * recomputing the signed digest — a fixture that cannot pass the real gate proves
+ * nothing about the arm.
+ */
 function prereg(overrides = {}) {
-  return {
+  const body = {
     budget_reservation: { currency: 'tokens', granted_units: 100_000_000, trial_timeout_ms: 120000 },
     executor: { provider: 'zai-coding-cn', model: 'glm-5.3-flash', credential_env_name: ENV_NAME },
-    approval: { status: APPROVED, required_from: 'the repository owner' },
+    status: 'APPROVED',
+    approval: {
+      status: APPROVED,
+      authority: 'HUMAN_OWNER',
+      principal_id: 'prn-fixture',
+      label: 'fixture',
+      signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+      in_force: true,
+    },
     ...overrides,
   };
+  return { ...body, preregistration_digest: preregistrationDigest(body) };
 }
 
 function blindInput(n = 4) {
@@ -122,14 +140,14 @@ test("pi usage is read from turn_end/agent_end, and a per-message report is NOT 
   );
 });
 
-test('a dry run exercises the whole path, calls no model, spends nothing, and says so', () => {
-  withDir((dir) => {
+test('a dry run exercises the whole path, calls no model, spends nothing, and says so', async () => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');
     writeFileSync(input, JSON.stringify(blindInput(5)));
     writeFileSync(pre, JSON.stringify(prereg()));
-    assert.equal(main([input, out, ARM_ID, pre, '20260926', '--dry-run'], {}), 0, 'a completed dry run must exit 0');
+    assert.equal(await main([input, out, ARM_ID, pre, '20260926', '--dry-run'], {}), 0, 'a completed dry run must exit 0');
     const record = JSON.parse(readFileSync(out, 'utf8'));
     assert.equal(record.kind, 's2-008-campaign-adapter-predict-model/1');
     assert.equal(record.outcome_class, 'DRY_RUN', 'a dry run must not be able to read as a measurement');
@@ -151,8 +169,8 @@ test('a dry run exercises the whole path, calls no model, spends nothing, and sa
   });
 });
 
-test('the blindness guard voids the run, exactly as the zero-spend arm does', () => {
-  withDir((dir) => {
+test('the blindness guard voids the run, exactly as the zero-spend arm does', async () => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');
@@ -166,8 +184,8 @@ test('the blindness guard voids the run, exactly as the zero-spend arm does', ()
   });
 });
 
-test('a reservation not denominated in tokens REFUSES the run rather than guessing a unit', () => {
-  withDir((dir) => {
+test('a reservation not denominated in tokens REFUSES the run rather than guessing a unit', async () => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');
@@ -181,8 +199,8 @@ test('a reservation not denominated in tokens REFUSES the run rather than guessi
   });
 });
 
-test('the budget is EXHAUSTED as an outcome: recorded, non-zero exit, and not a silent truncation', () => {
-  withDir((dir) => {
+test('the budget is EXHAUSTED as an outcome: recorded, non-zero exit, and not a silent truncation', async () => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');
@@ -206,7 +224,7 @@ test('the budget is EXHAUSTED as an outcome: recorded, non-zero exit, and not a 
   });
 });
 
-test('the credential is read from the env, never from an argv, and its absence refuses BEFORE a spawn', () => {
+test('the credential is read from the env, never from an argv, and its absence refuses BEFORE a spawn', async () => {
   assert.equal(readCredential(ENV_NAME, { [ENV_NAME]: CANARY }), true);
   assert.equal(readCredential(ENV_NAME, { [ENV_NAME]: 'short' }), false, 'a too-short value counted as a credential');
   assert.equal(readCredential(ENV_NAME, {}), false, 'an absent credential counted as present');
@@ -227,13 +245,13 @@ test('the credential is read from the env, never from an argv, and its absence r
   }
 
   // What the record publishes: the NAME, never the value.
-  withDir((dir) => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');
     writeFileSync(input, JSON.stringify(blindInput(1)));
     writeFileSync(pre, JSON.stringify(prereg()));
-    main([input, out, ARM_ID, pre, '1', '--dry-run'], { [ENV_NAME]: CANARY });
+    await main([input, out, ARM_ID, pre, '1', '--dry-run'], { [ENV_NAME]: CANARY });
     const raw = readFileSync(out, 'utf8');
     assert.equal(raw.includes(CANARY), false, 'the credential value is in the record');
     const record = JSON.parse(raw);
@@ -263,13 +281,13 @@ test('the five situations get five outcome classes, and none of them is a pass',
   assert.equal(all.size, 5, 'two of the five situations collapse into one class');
 });
 
-test('an UNAPPROVED preregistration is refused before the budget is even read', () => {
+test('an UNAPPROVED preregistration is refused before the budget is even read', async () => {
   // v2 exists on disk as a draft with approval.status null. A run that could pick
   // a draft up would turn "the owner has not signed this" into "the run happened
   // anyway" — so the check comes FIRST, ahead of the budget, because an
   // unapproved document has no budget worth reading.
   for (const approval of [undefined, {}, { status: null }, { status: 'AWAITING_OWNER_APPROVAL' }, { status: 'DRAFT' }]) {
-    withDir((dir) => {
+    await withDir(async (dir) => {
       const input = path.join(dir, 'in.json');
       const out = path.join(dir, 'out.json');
       const pre = path.join(dir, 'prereg.json');
@@ -283,7 +301,7 @@ test('an UNAPPROVED preregistration is refused before the budget is even read', 
   }
   // And the approved shape is accepted, so the check is not simply refusing
   // everything — otherwise it would be untested and untrustworthy.
-  withDir((dir) => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');
@@ -315,8 +333,8 @@ test('the shipped v2 DRAFT is refused as written, on the real document', () => {
   }
 });
 
-test('an unknown arm id is refused, so a mis-typed id cannot spend anything', () => {
-  withDir((dir) => {
+test('an unknown arm id is refused, so a mis-typed id cannot spend anything', async () => {
+  await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
     const out = path.join(dir, 'out.json');
     const pre = path.join(dir, 'prereg.json');

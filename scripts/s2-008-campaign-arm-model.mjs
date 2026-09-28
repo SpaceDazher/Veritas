@@ -47,6 +47,8 @@ export const APPROVED = 'APPROVED';
 
 export const ARM_ERRORS = Object.freeze({
   PREREG_NOT_APPROVED: 'PREREGISTRATION_NOT_APPROVED',
+  PREREG_DIGEST_MISMATCH: 'PREREGISTRATION_DIGEST_MISMATCH',
+  PREREG_NOT_IN_FORCE: 'PREREGISTRATION_NOT_IN_FORCE',
   USAGE: 'arm-model-usage',
   BLIND_INPUT_EMPTY: 'BLIND_INPUT_EMPTY',
   BLIND_INPUT_CARRIES_LABEL: 'BLIND_INPUT_CARRIES_LABEL',
@@ -175,7 +177,7 @@ export function classifyOutcome({ dryRun, stopped, measured }) {
   return measured ? 'MEASURED' : 'NOT_RUN';
 }
 
-export function main(argv, env = process.env) {
+export async function main(argv, env = process.env) {
   const flags = new Set(argv.filter((a) => a.startsWith('--')));
   const positional = argv.filter((a) => !a.startsWith('--'));
   if (positional.length < 5) {
@@ -215,6 +217,27 @@ export function main(argv, env = process.env) {
   if (prereg.approval?.status !== APPROVED) {
     process.stderr.write(`${ARM_ERRORS.PREREG_NOT_APPROVED}:${String(prereg.preregistration_id ?? 'unknown')}:${String(prereg.approval?.status ?? 'none')}\n`);
     return 7;
+  }
+
+  // THE APPROVAL MUST TRAVEL WITH THE DOCUMENT. `approval.status` alone is a
+  // string anyone can type, and the digest is the only thing that says WHICH
+  // document was signed. So the arm recomputes the digest over the scientific
+  // body — every member except approval, status and the digest itself — and
+  // refuses a mismatch. Edit the rule, the band, the baseline or a seed after the
+  // signature and the recomputed digest no longer matches, so an approved run
+  // cannot be a run of a different experiment.
+  const { canonicalDigest } = await import('../src/lib/verifier/canonical-json.mjs');
+  const { approval: _approval, preregistration_digest: _declared, status: _status, ...body } = prereg;
+  const recomputed = canonicalDigest(body);
+  if (recomputed !== String(prereg.preregistration_digest ?? '')) {
+    process.stderr.write(`${ARM_ERRORS.PREREG_DIGEST_MISMATCH}:signed=${String(prereg.preregistration_digest ?? '').slice(0, 16)}:recomputed=${recomputed.slice(0, 16)}\n`);
+    return 8;
+  }
+  if (prereg.approval?.signed_digest_over !== undefined && prereg.approval.in_force !== true) {
+    // A signature that has not been sealed into the corpus manifest by
+    // `--seal-v2` is a signature of a document that is not yet the one in force.
+    process.stderr.write(`${ARM_ERRORS.PREREG_NOT_IN_FORCE}:${String(prereg.preregistration_id ?? 'unknown')}\n`);
+    return 9;
   }
 
   const reservation = prereg.budget_reservation ?? {};
@@ -318,5 +341,13 @@ export function main(argv, env = process.env) {
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 if (isMain) {
-  process.exitCode = main(process.argv.slice(2), process.env);
+  // The EXIT CODE IS THE EXIT CODE `main` returned. An earlier version of this line
+  // did `process.exitCode = signed === null ? 1 : 0`, which threw away every numeric
+  // refusal code: the arm printed PREREGISTRATION_NOT_APPROVED or _DIGEST_MISMATCH and
+  // still exited 0. A guard that refuses in its output and reports success in its status
+  // is the silent-zero class this whole track exists to remove, and it was reintroduced
+  // here by a refactor. A test now runs the arm as a process and reads the status.
+  main(process.argv.slice(2), process.env).then((code) => {
+    process.exitCode = typeof code === 'number' ? code : 1;
+  });
 }
