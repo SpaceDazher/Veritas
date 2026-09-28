@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "69cf2ec32a51512b744b96d8d3567daa175a9b77",
-  "sourceTree": "8bb5a2b0a3bc7769fc86a1079d023ef6296647c1",
-  "trackedFileCount": 936,
-  "manifestFileCount": 931,
-  "payloadManifestSha256": "82f1796b331f64c0e10fe8faba6f98e2cfdfb22e8cda08e32d48ff61e9740b7d",
-  "fileManifestSha256": "d36bb0d366642a7b669fce472b5ece849c4fd254efbcf02b3734c3bb8b148940",
+  "sourceCommit": "81fad7cbe38c7180480d96063f12a56045c7adb6",
+  "sourceTree": "888d987d3143d195036bf94eb0f883e617969fae",
+  "trackedFileCount": 939,
+  "manifestFileCount": 934,
+  "payloadManifestSha256": "5380dd87960136ba4adaecf43a7c6c052529543f4e839370f53defa820da678d",
+  "fileManifestSha256": "d9003edc49f429ba10d6eb1839e7c19cf97d8e6456002bf52b1f58fbbb7c7c74",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2108,8 +2108,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "34df500f448d1941707173f81a5363cac1e9998ced2e84a0b358fb02483ddf17",
-      "bytes": 41906
+      "sha256": "8b2afeb2cfd64faa363ac9106542610df8b315bc99a7660edd3dc4b3e74c03a3",
+      "bytes": 42048
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3637,6 +3637,11 @@
       "bytes": 1129
     },
     {
+      "path": "scripts/veritas-credential-provision.mjs",
+      "sha256": "d7d16c726430dccf284c268959856561009d1ddaa86ea76b7db31e09e690919d",
+      "bytes": 7537
+    },
+    {
       "path": "src/app/api/agent-board/[...path]/route.ts",
       "sha256": "3284f459a11e8c6c7b555ed54581134b7622d7947515e266e7070bc312c00ad0",
       "bytes": 1069
@@ -3998,8 +4003,8 @@
     },
     {
       "path": "src/lib/isolation/launch.mjs",
-      "sha256": "ce24dc26365e3e471cdc5ea7f18bcee8f2e10770050e551011199174175f9922",
-      "bytes": 10913
+      "sha256": "73393dead0c054e3cc5f5da7c338699911a41470bbacf29d20fc6e6d12ca7712",
+      "bytes": 12134
     },
     {
       "path": "src/lib/isolation/profile.mjs",
@@ -4013,8 +4018,8 @@
     },
     {
       "path": "src/lib/isolation/secrets.mjs",
-      "sha256": "5a73ac52d5caba0d7006bb6ee422ad3c249bf69b3e26b1eba6b96f47f7bc4425",
-      "bytes": 8736
+      "sha256": "26267e7b0d1a836f9a19ec8975789a5bcafeb1b16b461863c1daae7b7d652831",
+      "bytes": 13529
     },
     {
       "path": "src/lib/sloqual/comparator.mjs",
@@ -4410,6 +4415,16 @@
       "path": "tests/ingestion/transactional-audit.test.mjs",
       "sha256": "e4f1589df9a8b1884aeea0946bf61ce7ae3c68a5a45acd962e9f0c70ab575cc7",
       "bytes": 4360
+    },
+    {
+      "path": "tests/isolation/credential-bridge.test.mjs",
+      "sha256": "338f742b7c23518fa72ff46d06291e6a7cf25fc226fcb1021f25d62c90301228",
+      "bytes": 10550
+    },
+    {
+      "path": "tests/isolation/credential-provision.test.mjs",
+      "sha256": "82b602b53db8c6418dd2d201e52ed62dc5e4188320ea816866b6560c9cab113e",
+      "bytes": 7449
     },
     {
       "path": "tests/isolation/live-evidence.test.mjs",
