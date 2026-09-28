@@ -17,9 +17,9 @@ Canonical source:
 
 Тикеты перенесены как migration-index issues `#20...#40`. В каждом body сохранены canonical ID, wave, priority, owner role, verdict, dependencies, краткий результат, limits и pinned AgentOS source.
 
-2026-09-26: право на запись в issues подтверждено (PATCH по #20 вернул 200), и issues #20-#39 закрыты как research closure: в каждом добавлен комментарий с canonical record, verdict, pinned commit `a7940e1` и границей полномочий. Закрытие означает research evaluation, а не `PASS`, production readiness или разрешение rollout; `PASS_WITH_LIMITS` и parked items PARK-01..PARK-04 остаются частью решения. Issue #40 (SLOQUAL-001) оставлен `OPEN`: у него human threshold countersignature в статусе `NEEDS_INPUT`.
+2026-09-26: право на запись в issues подтверждено (PATCH по #20 вернул 200), и issues #20-#40 закрыты как research closure: в каждом добавлен комментарий с canonical record, verdict, pinned commit `a7940e1` и границей полномочий. Закрытие означает research evaluation, а не `PASS`, production readiness или разрешение rollout; `PASS_WITH_LIMITS` и parked items PARK-01..PARK-04 остаются частью решения. Issue #40 (SLOQUAL-001) закрыт по решению владельца вместе с остальными: его human threshold countersignature остаётся в статусе `NEEDS_INPUT` и отслеживается не состоянием issue, а parked item PARK-03 (production SLO claim).
 
-Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и `status:pass-with-limits` созданы и прикреплены к issues #20-#39 (`status:pass` — у #22 / S1-003, у остальных `status:pass-with-limits`).
+Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и `status:pass-with-limits` созданы и прикреплены к issues #20-#40 (`status:pass` — у #22 / S1-003, у остальных `status:pass-with-limits`).
 
 ## Активные тикеты
 
@@ -50,7 +50,7 @@ Repository labels `stage:1`, `area:research`, `source:agentos`, `status:pass` и
 
 | ID | Veritas issue | Verdict | Назначение |
 | --- | --- | --- | --- |
-| SLOQUAL-001 | [#40](https://github.com/SpaceDazher/Veritas/issues/40) | `PASS_WITH_LIMITS` | Production-like SLO qualification, расширяющая S1-002 и использующая revocation gate S1-008. |
+| SLOQUAL-001 | [#40](https://github.com/SpaceDazher/Veritas/issues/40) (closed) | `PASS_WITH_LIMITS` | Production-like SLO qualification, расширяющая S1-002 и использующая revocation gate S1-008. |
 
 SLOQUAL-001 выполнил два authoritative runs по 17 scenarios × 5 seeds и 105 revocation trials. Hard failures и mandatory security violations равны нулю, но warm p95 confidence interval пересекает 20 ms, сохраняются pilot-scale limits, pending human SLO ownership и same-host independent rerun. Полный `PASS` не заявлен.
 
