@@ -15,8 +15,8 @@
   "database_engine": "PostgreSQL",
   "server_version": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
   "pids": {
-    "contended": 251048,
-    "crash": 251245
+    "contended": 395760,
+    "crash": 395929
   },
   "status": "RECORDED",
   "calls": [
@@ -773,14 +773,14 @@
       "audit": 32,
       "outbox": 1,
       "outbox_acked": 1,
-      "operations": 32,
+      "operations": 33,
       "spend_rows": 1
     },
-    "digest": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-    "rawDigest": "d39118d29ebc793bf54e9b6f36b8c61373b471f000ffa5754a0024b7b5c4a1a1"
+    "digest": "056d118f70e5be07c90347f8c9712238540afc9b51c94f63a6d29b8bdfe6f38e",
+    "rawDigest": "42a95d05233bf174770de3b9ec9183cf679f6a813f87d1eaaece5cb37ace9550"
   },
   "contended": {
-    "barrierDir": "/tmp/s2-007-db-replay-Lk0kKR/barrier",
+    "barrierDir": "/tmp/s2-007-db-replay-kNdCj7/barrier",
     "label": "b",
     "contestedClaim": {
       "outcome": "ACCEPT",
@@ -798,11 +798,11 @@
     },
     "sharedIdempotency": {
       "idempotency_key": "7a2911f6a7c474db3d00db03596c922093094fc9ea90c7d62c21486be9d1c39d",
-      "outcome": "ACCEPT",
+      "outcome": "REFUSE",
       "replayed": false,
-      "code": null,
+      "code": "IDEMPOTENCY_CONFLICT",
       "typed": true,
-      "revision": 1
+      "revision": null
     },
     "sharedIdempotencySettled": {
       "letter": "b",
@@ -832,7 +832,7 @@
     "exitCode": null,
     "signal": "SIGKILL",
     "diedAsDesigned": true,
-    "pid": 251245,
+    "pid": 395929,
     "executorId": "exec-s2-007-db-b"
   }
 }

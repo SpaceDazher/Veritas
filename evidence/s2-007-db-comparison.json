@@ -32,7 +32,8 @@
           "0005_verifier_store.sql",
           "0006_verifier_acl.sql",
           "0007_verifier_store_hardening.sql",
-          "0008_agent_board.sql"
+          "0008_agent_board.sql",
+          "0009_agent_board_hardening.sql"
         ]
       },
       {
@@ -45,7 +46,8 @@
           "0005_verifier_store.sql",
           "0006_verifier_acl.sql",
           "0007_verifier_store_hardening.sql",
-          "0008_agent_board.sql"
+          "0008_agent_board.sql",
+          "0009_agent_board_hardening.sql"
         ]
       },
       {
@@ -58,7 +60,8 @@
           "0005_verifier_store.sql",
           "0006_verifier_acl.sql",
           "0007_verifier_store_hardening.sql",
-          "0008_agent_board.sql"
+          "0008_agent_board.sql",
+          "0009_agent_board_hardening.sql"
         ]
       }
     ],
@@ -94,9 +97,13 @@
       {
         "name": "0008_agent_board.sql",
         "sha256": "3c021cec4b5b5b9f877d85cdd77065e5fa1d4e8bfc4ff65cde242997cfd4c7d7"
+      },
+      {
+        "name": "0009_agent_board_hardening.sql",
+        "sha256": "ff56b0fd0a1230b2f24d52c9831570986549648edf59f7070e57849be696143d"
       }
     ],
-    "count": 8
+    "count": 9
   },
   "boundary": {
     "entryPoint": "src/lib/agentboard/commands.mjs#execute",
@@ -140,12 +147,12 @@
   "comparison": {
     "ok": true,
     "canonical_digests": {
-      "run_a": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb",
-      "run_b": "9ee2415986d20ce09b4249fe1a0cfafe6281fdfc8ba28fb9ff5f84044048dfeb"
+      "run_a": "056d118f70e5be07c90347f8c9712238540afc9b51c94f63a6d29b8bdfe6f38e",
+      "run_b": "056d118f70e5be07c90347f8c9712238540afc9b51c94f63a6d29b8bdfe6f38e"
     },
     "raw_digests": {
-      "run_a": "403bd4b433bf60cef4ceae1a5a6006742cffe3703ecabadb8f4e32d3e4a45a97",
-      "run_b": "d39118d29ebc793bf54e9b6f36b8c61373b471f000ffa5754a0024b7b5c4a1a1"
+      "run_a": "f682ef544aea7bcb105d1cd63851ac343f16f1209b3f69ee00b09180f2635d0f",
+      "run_b": "42a95d05233bf174770de3b9ec9183cf679f6a813f87d1eaaece5cb37ace9550"
     },
     "raw_digest_note": "the raw digests differ by construction: the database clock wrote different instants into the two schemas. The canonical comparison uses the documented projection (see the executor header).",
     "crash_phase_digests": {
@@ -264,8 +271,8 @@
       "b": "SIGKILL"
     },
     "pids": {
-      "a": 251126,
-      "b": 251245
+      "a": 395904,
+      "b": 395929
     },
     "effects_issued": {
       "a": 1,
@@ -300,10 +307,10 @@
     "ok": true
   },
   "freshness": {
-    "started_at": "2026-09-26T21:34:39.054Z",
-    "finished_at": "2026-09-26T21:34:50.107Z",
-    "duration_ms": 11053,
-    "observed_at": "2026-09-26T21:34:50.107Z",
+    "started_at": "2026-09-28T06:57:18.201Z",
+    "finished_at": "2026-09-28T06:57:29.270Z",
+    "duration_ms": 11069,
+    "observed_at": "2026-09-28T06:57:29.270Z",
     "run_ids": [
       "s2-007-db-run-a",
       "s2-007-db-run-b"
@@ -318,8 +325,8 @@
     }
   },
   "git": {
-    "commit_sha": "8d73f973881062285123f24584f354bc891e8a52",
-    "tree_sha": "b25bb67b06ea5e04c1ac400046846cb0b074f62e",
+    "commit_sha": "a63ec7537c60fbd7d476472ffcebe8ec07c95242",
+    "tree_sha": "a2e819f24fd61dc9f6ee03fde6bd9c2d5d28c820",
     "dirty": true,
     "note": "the record describes this TREE; an aggregator re-reads HEAD^{tree} and refuses a record that no longer matches"
   },

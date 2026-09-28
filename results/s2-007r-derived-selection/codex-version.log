@@ -1,0 +1,20 @@
+{
+  "provider": "codex",
+  "binary_path": "/home/daniil/.local/bin/codex",
+  "argv": [
+    "--version"
+  ],
+  "exit_code": 0,
+  "signal": null,
+  "stdout": "codex-cli 0.157.1\n",
+  "stderr": "",
+  "scope": {
+    "crossing_kind": "version_handshake",
+    "argv": [
+      "--version"
+    ],
+    "is_a_governed_task_run": false,
+    "spends_a_model_invocation": false,
+    "statement": "this spawns a really installed CLI and records the version it printed; it is a process crossing, NOT a governed task execution, and it says nothing about run quality"
+  }
+}
