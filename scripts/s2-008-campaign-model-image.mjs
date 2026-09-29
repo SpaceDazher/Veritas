@@ -28,6 +28,11 @@ export function buildModelImage() {
     const target = path.join(context, 'opt/veritas');
     for (const name of [
       'scripts/s2-008-campaign-arm-model.mjs',
+      // The bridge the model reaches the network THROUGH. It is in the image rather
+      // than bind-mounted because the profile mounts exactly one socket and no
+      // repository path, and because a program that can change between build and
+      // run is not a program a digest can commit to.
+      'scripts/s2-008-egress-bridge.mjs',
       'src/lib/verifier/canonical-json.mjs',
       'corpus/s2-008-campaign/cases/holdout.blind.json',
       'corpus/s2-008-campaign/preregistration.v3.in-force.json',

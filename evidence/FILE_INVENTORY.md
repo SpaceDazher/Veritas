@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1118.
+Generated from `git ls-files`; count: 1120.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -827,6 +827,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-probes.mjs`
 - `scripts/s2-008-campaign-run.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
+- `scripts/s2-008-egress-bridge.mjs`
 - `scripts/s2-008-harness.mjs`
 - `scripts/s2-008-replay.mjs`
 - `scripts/s2-008-run.mjs`
@@ -1046,6 +1047,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/ingestion/transactional-audit.test.mjs`
 - `tests/isolation/credential-bridge.test.mjs`
 - `tests/isolation/credential-provision.test.mjs`
+- `tests/isolation/egress-bridge.test.mjs`
 - `tests/isolation/egress-forwarder.test.mjs`
 - `tests/isolation/live-evidence.test.mjs`
 - `tests/isolation/profile-axes.test.mjs`
