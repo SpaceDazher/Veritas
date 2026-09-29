@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "97d1313cf137573187216d7f010c1d815528d9ab",
-  "sourceTree": "118cf8c74ac5fd9c42ecb9306c386abf1cbc8e3d",
-  "trackedFileCount": 1121,
-  "manifestFileCount": 1116,
-  "payloadManifestSha256": "7217d9e395cfd4030482f8c94eb1ba3ad7fe6472c12a9d35bc0ef62637e6cbab",
-  "fileManifestSha256": "82478c6bd436b670217f13d06c9b9bf35ceb6200826d962637983273de9702f8",
+  "sourceCommit": "550606b6fe539b48beaba9bc3f75a5753d8e9f24",
+  "sourceTree": "ba6ea4ac646f110284468fa31534063005e73cc4",
+  "trackedFileCount": 1123,
+  "manifestFileCount": 1118,
+  "payloadManifestSha256": "57a7cea411613e47939122838106984b90c3bf0274fce26025dbe7cafb1078e4",
+  "fileManifestSha256": "e6833993069c99918893b1d4c8c8fc7d8e2c6932e47b516204a8f67d2b387b30",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2398,8 +2398,8 @@
     },
     {
       "path": "docs/DEVELOPMENT.md",
-      "sha256": "6404cc3edb7e96be46a2405bd778ef1799ee2d2b3fa74b400bc90dddd5a2bcfb",
-      "bytes": 11072
+      "sha256": "c6b6b2c23889b3f9b1f06b1f2ebb9ecebed8f61a5ff05055d1f1d329e7357450",
+      "bytes": 11911
     },
     {
       "path": "docs/ingestion/S2-003-CONNECTOR-CONTRACT.md",
@@ -2553,8 +2553,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "0f54f58dd7575c0f10915c1b115464daea70f356b7fd3b74459d82e050251777",
-      "bytes": 50268
+      "sha256": "28e4898cb8c8d3990c0d9c8029f77e8ec6e7aa673f55d0739aaf1ca93a6ee385",
+      "bytes": 50369
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -2945,6 +2945,11 @@
       "path": "evidence/s2-008-campaign/model-image-pin-v3.json",
       "sha256": "1b2eb151884f77353436f00d528727da432cacafc0a218427c0baefe55b5c67c",
       "bytes": 1752
+    },
+    {
+      "path": "evidence/s2-008-campaign/model-image-pin-v4.json",
+      "sha256": "4b26412667030e225b8f7eb03351183992ed671a28c3cc4ff16d1fd737648060",
+      "bytes": 3449
     },
     {
       "path": "evidence/s2-008-campaign/probes.json",
@@ -4068,8 +4073,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-arm-model.mjs",
-      "sha256": "9fdc399edf1e9786fd33fc44f6b84b82daef3d15982ec874c08a9a3a92899433",
-      "bytes": 16271
+      "sha256": "c9ce6cfa7c4e6a68ffa4d72627c454176131b1dbfc8ce8b5c134af16ef6182ed",
+      "bytes": 22692
     },
     {
       "path": "scripts/s2-008-campaign-arm.mjs",
@@ -4088,8 +4093,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-model-image.mjs",
-      "sha256": "604efe84207f8bafcb1562d079d6b71b4753d912d469b459522aabd38f455fc1",
-      "bytes": 5893
+      "sha256": "389a21fedb7599c13bc653375cbe0c00e6ea2bf904789a4bee5ddf6b9f5328c3",
+      "bytes": 11699
     },
     {
       "path": "scripts/s2-008-campaign-prepare.mjs",
@@ -4143,8 +4148,8 @@
     },
     {
       "path": "scripts/setup-podman-tmp.sh",
-      "sha256": "ef4a3c121e46588f3a7b971262b0b65d041282e6bbf6992e931c4052bc360770",
-      "bytes": 524
+      "sha256": "d20a1d8e3a6510fda4c37625db95e49f1763b182b9c8dafb520f3c1387c717c0",
+      "bytes": 3911
     },
     {
       "path": "scripts/sloqual-freeze.mjs",
@@ -5235,6 +5240,11 @@
       "path": "tests/research/campaign-approval.test.mjs",
       "sha256": "dee7aa2dc6c6c6ae864af77c4f0ee129bf37f6fefe36527d24bb175ac930f009",
       "bytes": 11181
+    },
+    {
+      "path": "tests/research/campaign-arm-egress.test.mjs",
+      "sha256": "aa2667aec3fe6f8c6d2847964fea2f8b3b51ec985db5968d67e7efdc8cd18060",
+      "bytes": 10470
     },
     {
       "path": "tests/research/campaign-arm-model.test.mjs",
