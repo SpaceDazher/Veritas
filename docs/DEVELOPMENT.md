@@ -6,6 +6,12 @@
 - npm
 - PostgreSQL для Web, migrations и PostgreSQL store tests
 - Podman для `LOCAL_RESTRICTED` verification
+
+После перезагрузки WSL восстановите rootless Podman runtime командой
+`source scripts/setup-podman-tmp.sh`. Скрипт создаёт обёртку в `/tmp/bin`,
+выставляет `PATH`, `XDG_RUNTIME_DIR` и `TMPDIR`. Проверка:
+`podman info --format '{{.Host.OCIRuntime.Name}}'` должна вывести
+`/usr/bin/crun`. `/tmp` очищается при перезагрузке; образ нужно собрать заново.
 - gVisor systrap userspace kernel плюс Podman auto-userns для `UNTRUSTED_CODE`
 - Java 11+ и pinned `tla2tools` для AgentOS formal reproduction, если запускаются внешние Stage 1 gates
 
