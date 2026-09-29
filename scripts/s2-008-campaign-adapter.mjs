@@ -143,7 +143,44 @@ export function verifyImagePin() {
 
 /** ONE trial measurement by the real installed executor.
  *  @returns {{ok: boolean, observation: object, output: object|null, record: object}} */
-export function runTrial({ armId, seed, samples, timeoutMs, pin, breakImage = false }) {
+/**
+ * PERSIST THE PER-CASE PREDICTIONS. Before this, a run record carried the arm's
+ * aggregate count, its interval and a digest of the arm's output — and a digest
+ * pins WHICH output without letting anyone re-score it. For a regex arm the
+ * evaluator re-derives the predictions and checks the count, so a self-reported
+ * number is not load-bearing. For a MODEL arm there is nothing to re-derive: the
+ * only source of the predictions is the executor, so a count the executor reported
+ * about itself is exactly the "record asserts itself" shape this repository has now
+ * paid to remove three times. A third party must be able to take the predictions,
+ * the corpus labels, and get the number themselves.
+ *
+ * They go to a SIDECAR rather than into the governed run record: 126 rows x 3 seeds
+ * x 3 arms would bloat a record whose size other records pin. The binding runs the
+ * other way — the record names the sidecar's digest — so a tampered prediction
+ * file cannot be passed off as this run's.
+ */
+export function persistPredictions({ output, armId, seed, runLabel, sink }) {
+  const rows = Array.isArray(output?.predictions) ? output.predictions : null;
+  if (rows === null || typeof sink !== 'function' || runLabel === null || runLabel === undefined) return null;
+  const body = {
+    kind: 's2-008-campaign-predictions/1',
+    run: String(runLabel),
+    arm_id: armId,
+    // The arm's own accounting beside the rows it produced, so a reader can see how
+    // many answers were unusable without trusting the count.
+    unparsed: rows.filter((row) => String(row?.predicted ?? '') === 'UNPARSED').length,
+    model_calls: output?.executor?.model_calls ?? null,
+    spent_tokens: output?.budget?.spent_tokens ?? null,
+    usd_spent: output?.budget?.usd_spent ?? null,
+    outcome_class: output?.outcome_class ?? null,
+    rows: rows.map((row) => ({ case_id: String(row?.case_id ?? ''), predicted: String(row?.predicted ?? '') })),
+  };
+  const digest = canonicalDigest(body);
+  sink(digest, body);
+  return Object.freeze({ digest, rows: body.rows.length, unparsed: body.unparsed });
+}
+
+export function runTrial({ armId, seed, samples, timeoutMs, pin, breakImage = false, predictionsSink = null, runLabel = null }) {
   const image = breakImage
     // The INFRA probe: a digest that is syntactically a pin and is not on this
     // host. podman is told `--pull=never`, so the launch fails for real.
@@ -189,6 +226,7 @@ export function runTrial({ armId, seed, samples, timeoutMs, pin, breakImage = fa
   } catch (error) {
     payloadError = String(error?.message ?? error);
   }
+  const predictions = persistPredictions({ output, armId, seed, runLabel, sink: predictionsSink });
   return {
     ok: observation.exitCode === 0 && output !== null,
     observation,
@@ -210,6 +248,10 @@ export function runTrial({ armId, seed, samples, timeoutMs, pin, breakImage = fa
       payload_chunks: chunks.length,
       payload_error: payloadError,
       output_digest: output === null ? null : canonicalDigest(output),
+      // What a third party needs to re-score this seed without the executor. Null for an
+      // arm that recorded no per-case rows — a fact the record states rather than
+      // leaves to be inferred.
+      predictions: predictions === null ? null : { digest: predictions.digest, rows: predictions.rows, unparsed: predictions.unparsed },
       // A run that did not start is not a run. Two independent predicates,
       // because the A-MVP-04 one does not apply to this program:
       //

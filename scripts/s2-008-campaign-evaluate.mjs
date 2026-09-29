@@ -42,6 +42,77 @@ const ARM_RULES = Object.freeze({
   'arm-type-chore': (subject) => (/^chore(\([^)]*\))?!?:/.test(subject) ? 'MINOR' : 'MAJOR'),
 });
 
+/**
+ * The recorded predictions a run published, or an explanation of why there are
+ * none. The run record names the sidecar's digest, and the file is read through
+ * that name: a sidecar edited after the run fails here, which is the only reason
+ * a sidecar can be trusted at all.
+ */
+export function loadRecordedPredictions({ trial, entry, runLabel, readFile = (file) => fs.readFileSync(file, 'utf8'), root = REPO_ROOT }) {
+  const rows = [];
+  const perSeed = Array.isArray(trial?.per_seed) ? trial.per_seed : [];
+  let bound = 0;
+  for (const seedRow of perSeed) {
+    const ref = seedRow?.predictions ?? trial?.predictions ?? null;
+    if (ref === null || ref === undefined) continue;
+    const file = `evidence/s2-008-campaign/predictions-${String(runLabel)}.json`;
+    let body = null;
+    try {
+      body = JSON.parse(readFile(path.join(root, file), 'utf8'));
+    } catch {
+      return { available: false, reason: `sidecar absent or unreadable: ${file}` };
+    }
+    const slice = (body?.seeds ?? []).find((s) => s?.seed === seedRow.seed && s?.arm_id === entry.arm_id);
+    if (slice === undefined) return { available: false, reason: `sidecar has no rows for ${entry.arm_id}@${seedRow.seed}` };
+    if (canonicalDigest(slice) !== ref.digest) {
+      return { available: false, reason: `sidecar slice for ${entry.arm_id}@${seedRow.seed} does not match the digest the run recorded` };
+    }
+    rows.push(...(slice.rows ?? []));
+    bound += 1;
+  }
+  if (bound === 0) return { available: false, reason: 'the run recorded no per-case predictions for this arm' };
+  return { available: true, rows, seeds: bound };
+}
+
+/**
+ * The closed label set, restated here rather than imported from the arm: a scorer
+ * that borrows the predictor's vocabulary cannot notice the predictor using a value
+ * outside it. `UNPARSED` is IN the set and is never equal to a label, so an
+ * unusable answer counts as a disagreement — the arm's policy, restated and
+ * therefore checkable rather than assumed.
+ */
+export const CLOSED_PREDICTIONS = Object.freeze(['MAJOR', 'MINOR', 'UNPARSED']);
+
+/** Score recorded per-case predictions against the corpus labels, from scratch. */
+export function scoreRecordedPredictions({ rows, labels, expectedIds, closed = CLOSED_PREDICTIONS }) {
+  const problems = [];
+  if (!Array.isArray(rows) || rows.length === 0) return { ok: false, problems: ['predictions:absent'] };
+  const byId = new Map();
+  for (const row of rows) {
+    const id = String(row?.case_id ?? '');
+    const predicted = String(row?.predicted ?? '');
+    if (byId.has(id)) problems.push(`predictions:duplicate-case:${id}`);
+    if (!closed.includes(predicted)) problems.push(`predictions:outside-closed-set:${id}:${predicted}`);
+    byId.set(id, predicted);
+  }
+  const ids = [...byId.keys()].sort();
+  if (expectedIds !== null && expectedIds !== undefined) {
+    const want = [...expectedIds].sort();
+    if (ids.length !== want.length || ids.some((id, i) => id !== want[i])) {
+      problems.push(`predictions:case-set-differs-from-corpus:${ids.length}!=${want.length}`);
+    }
+  }
+  let agreeing = 0;
+  let unparsed = 0;
+  for (const [id, predicted] of byId) {
+    if (predicted === 'UNPARSED') unparsed += 1;
+    const label = labels.get(id);
+    if (label === undefined) { problems.push(`labels:no-such-case:${id}`); continue; }
+    if (predicted === label) agreeing += 1;
+  }
+  return { ok: problems.length === 0, problems, agreeing, unparsed, rows: rows.length };
+}
+
 /** The label rule, restated from the corpus's own frozen `label_rule` string
  *  and re-applied to the git trees. This is the part that must not be taken on
  *  trust: if the label can be moved, the whole campaign is measuring a choice. */
@@ -117,6 +188,10 @@ function parseArgs(argv) {
 const args = parseArgs(process.argv);
 const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-a.json'), 'utf8'));
 const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-b.json'), 'utf8'));
+/** Which run this evaluation scores, and therefore which sidecar it reads. Derived
+ *  from the run FILE rather than a constant, so a second evaluator over run B
+  cannot quietly score run A's predictions. */
+const RUN_LABEL = 'a';
 const prereg = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.json'), 'utf8'));
 const devCases = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'cases/dev.json'), 'utf8'));
 const holdoutCases = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'cases/holdout.json'), 'utf8'));
@@ -132,6 +207,7 @@ const devLabelMismatches = devRelabelled.filter((row) => row.corpus_label !== ro
 // per (arm, seed), and the label from the corpus. The run's `numerator` is not
 // read.
 const perTrial = [];
+const problems = [];
 // One independent derivation per DECLARED arm. The arm rules and the label rule
 // are restated at the top of this file; the run's own counts are read only to be
 // compared, never to compute anything.
@@ -141,8 +217,35 @@ for (const entry of prereg.trial_list) {
   // {case_id, predicted} and then compared against `row.label`, which was
   // therefore `undefined` on every row: the independent count came back 0 for
   // every arm and disagreed with the run for the wrong reason.
-  const predictions = holdoutCases.map((row) => ({ case_id: row.case_id, label: row.label, predicted: ARM_RULES[entry.arm_id](row.subject) }));
-  const agreeing = predictions.filter((row) => row.predicted === row.label).length;
+  // A recorded-prediction arm (the model) has NO rule to restate: the executor is the
+  // only source, so the evaluator scores the rows the run published and says so
+  // rather than quietly restating something it cannot know.
+  const recorded = loadRecordedPredictions({ trial, entry, runLabel: RUN_LABEL });
+  const labels = new Map(holdoutCases.map((row) => [row.case_id, row.label]));
+  let agreeing;
+  let predictionSource;
+  let unparsed = null;
+  if (recorded.available) {
+    const scored = scoreRecordedPredictions({
+      rows: recorded.rows,
+      labels,
+      expectedIds: holdoutCases.map((row) => row.case_id),
+    });
+    if (!scored.ok) {
+      problems.push(`trial ${entry.trial_id}: recorded predictions are not scoreable: ${scored.problems.join('; ')}`);
+    }
+    agreeing = scored.agreeing;
+    unparsed = scored.unparsed;
+    predictionSource = 'RECORDED_PREDICTIONS_SCORED_INDEPENDENTLY';
+  } else if (typeof ARM_RULES[entry.arm_id] === 'function') {
+    const predictions = holdoutCases.map((row) => ({ case_id: row.case_id, label: row.label, predicted: ARM_RULES[entry.arm_id](row.subject) }));
+    agreeing = predictions.filter((row) => row.predicted === row.label).length;
+    predictionSource = 'RESTATED_RULE';
+  } else {
+    problems.push(`trial ${entry.trial_id}: no restatable rule and no recorded predictions for arm ${entry.arm_id}`);
+    agreeing = 0;
+    predictionSource = 'NONE';
+  }
   const independent = wilsonIndependent(agreeing, holdoutCases.length, prereg.multiplicity_rule.confidence);
   const bootstrap = trial?.per_seed ?? [];
   const hull = {
@@ -163,6 +266,20 @@ for (const entry of prereg.trial_list) {
   perTrial.push({
     trial_id: entry.trial_id,
     arm_id: entry.arm_id,
+    // WHICH PATH produced the number above, published so a reader does not have to
+    // infer it. On RESTATED_RULE the evaluator recomputed the prediction, so the
+    // run's own count is only a comparison. On RECORDED_... the executor is the
+    // only source of the prediction: the labels, the count, the interval and the
+    // decision are all re-derived here, and the PREDICTION is the one link this
+    // evaluation cannot re-derive. That limit is stated rather than smoothed over,
+    // because a run that hides it is the "record asserts itself" shape again.
+    prediction_source: predictionSource,
+    prediction_independence: predictionSource === 'RECORDED_PREDICTIONS_SCORED_INDEPENDENTLY'
+      ? 'labels, count, interval and decision re-derived; the per-case PREDICTION is taken from the run and is NOT independently re-derivable'
+      : (predictionSource === 'RESTATED_RULE'
+        ? 'the prediction was recomputed from a rule restated in this file, so the run count is a comparison and not a source'
+        : 'no predictions and no restatable rule: nothing was scored'),
+    unparsed_predictions: unparsed,
     agreeing,
     denominator: holdoutCases.length,
     measured: agreeing / holdoutCases.length,
@@ -295,6 +412,8 @@ const record = {
   kind: 's2-008-campaign-evaluation/1',
   ticket: 'S2-008',
   subject: 'an independent re-derivation of the real campaign, from the primary evidence and not from the run record',
+  // The independence limit of this evaluation, in one place.
+  prediction_independence: 'per-arm: see prediction_source. A model arm has no restatable rule, so its predictions are scored from the run the record published; the labels, the count, the interval and the decision are still re-derived here.',
   method: [
     'the holdout and dev labels are RE-DERIVED from the git trees with the label rule restated here, and compared to the corpus',
     'the per-arm agreement counts are recomputed from the corpus labels and the arm rules restated here, and compared to the run record',

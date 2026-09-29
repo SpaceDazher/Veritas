@@ -2,6 +2,7 @@
  "kind": "s2-008-campaign-evaluation/1",
  "ticket": "S2-008",
  "subject": "an independent re-derivation of the real campaign, from the primary evidence and not from the run record",
+ "prediction_independence": "per-arm: see prediction_source. A model arm has no restatable rule, so its predictions are scored from the run the record published; the labels, the count, the interval and the decision are still re-derived here.",
  "method": [
   "the holdout and dev labels are RE-DERIVED from the git trees with the label rule restated here, and compared to the corpus",
   "the per-arm agreement counts are recomputed from the corpus labels and the arm rules restated here, and compared to the run record",
@@ -11,8 +12,8 @@
   "the repeat run is compared on base, decision digest, verdict projection and raw run id"
  ],
  "base": {
-  "commit_sha": "fdc4fef55ac827218e386c2602047f2d4eb3a25d",
-  "tree_sha": "ce6e2192491ebd0685bd364dff9f07caddca9e2c"
+  "commit_sha": "ce71796c7a8b5e8601b196a240b8344c4d55d4b0",
+  "tree_sha": "316ecc77e99817f5c7f0121ed04fec273e0a2518"
  },
  "preregistration_digest": "9379e329315edb8fc4b84d8e7c73ca24d5ea7303f5c9c85769630ace6b76f802",
  "frozen_constants": {
@@ -67,6 +68,9 @@
   {
    "trial_id": "trl-s2-008c-01",
    "arm_id": "arm-scope-present",
+   "prediction_source": "RESTATED_RULE",
+   "prediction_independence": "the prediction was recomputed from a rule restated in this file, so the run count is a comparison and not a source",
+   "unparsed_predictions": null,
    "agreeing": 35,
    "denominator": 126,
    "measured": 0.2777777777777778,
@@ -100,6 +104,9 @@
   {
    "trial_id": "trl-s2-008c-02",
    "arm_id": "arm-type-feat-fix",
+   "prediction_source": "RESTATED_RULE",
+   "prediction_independence": "the prediction was recomputed from a rule restated in this file, so the run count is a comparison and not a source",
+   "unparsed_predictions": null,
    "agreeing": 115,
    "denominator": 126,
    "measured": 0.9126984126984127,
@@ -128,6 +135,9 @@
   {
    "trial_id": "trl-s2-008c-03",
    "arm_id": "arm-type-chore",
+   "prediction_source": "RESTATED_RULE",
+   "prediction_independence": "the prediction was recomputed from a rule restated in this file, so the run count is a comparison and not a source",
+   "unparsed_predictions": null,
    "agreeing": 51,
    "denominator": 126,
    "measured": 0.40476190476190477,
