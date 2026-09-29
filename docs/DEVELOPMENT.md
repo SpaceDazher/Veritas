@@ -9,9 +9,18 @@
 
 После перезагрузки WSL восстановите rootless Podman runtime командой
 `source scripts/setup-podman-tmp.sh`. Скрипт создаёт обёртку в `/tmp/bin`,
-выставляет `PATH`, `XDG_RUNTIME_DIR` и `TMPDIR`. Проверка:
+выставляет `PATH`, `XDG_RUNTIME_DIR` и `TMPDIR`, затем проверяет наличие
+закреплённой базы по digest и подтягивает её, если её нет. Проверка:
 `podman info --format '{{.Host.OCIRuntime.Name}}'` должна вывести
-`/usr/bin/crun`. `/tmp` очищается при перезагрузке; образ нужно собрать заново.
+`/usr/bin/crun`.
+
+`/tmp` очищается при перезагрузке, а сборки идут с `--pull=never`, поэтому
+пустое хранилище само себя не восстановит: без базы любая сборка падает с
+`exit 125 image not known`. Скрипт делает это сам. `podman system reset -f`
+удаляет закреплённую базу — после него достаточно снова выполнить
+`source scripts/setup-podman-tmp.sh`. Присутствие образа проверяется
+`podman inspect <digest>`, а не `podman images`: сборка с `-t` забирает имя
+базового образа на себя, и проверка по имени сообщает о наличии отсутствие.
 - gVisor systrap userspace kernel плюс Podman auto-userns для `UNTRUSTED_CODE`
 - Java 11+ и pinned `tla2tools` для AgentOS formal reproduction, если запускаются внешние Stage 1 gates
 
