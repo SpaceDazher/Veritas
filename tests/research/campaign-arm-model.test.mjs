@@ -321,7 +321,7 @@ test('the shipped v2 DRAFT is refused as written, on the real document', () => {
   assert.equal(draft.approval?.runnable_now, false);
   assert.equal(draft.status, 'AWAITING_OWNER_APPROVAL');
   assert.equal(draft.budget_reservation.currency, 'tokens');
-  assert.equal(draft.budget_reservation.granted_units, 100000000);
+  assert.equal(draft.budget_reservation.granted_units, 5000000);
   // The supersession must name what it replaces and what it does NOT touch.
   assert.equal(draft.supersession.supersedes, 'xpr-s2-008c-01');
   assert.ok(draft.supersession.unchanged.includes('multiplicity_rule'),

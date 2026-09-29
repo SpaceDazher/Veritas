@@ -790,9 +790,19 @@ function buildCases(rows, partition) {
 }
 
 const argv = process.argv.slice(2);
-if (argv.includes('--selftest')) {
+if (argv.includes('--seal-v2')) {
+  throw new Error('V2_NOT_SEALABLE: its frozen trial list names three old arms while its declared arms name one model arm; use an explicitly approved v3');
+} else if (argv.includes('--seal-v3')) {
+  const { sealOnDisk } = await import('./s2-008-campaign-seal-v3.mjs');
+  console.log(JSON.stringify({ mode: 'seal-v3', ...sealOnDisk() }, null, 2));
+} else if (argv.includes('--selftest')) {
   selftest();
 } else if (argv.includes('--check')) {
+  const currentManifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
+  if (currentManifest.preregistration?.file === 'preregistration.v3.in-force.json') {
+    const { checkV3OnDisk } = await import('./s2-008-campaign-seal-v3.mjs');
+    console.log(JSON.stringify({ mode: 'check-v3', ...checkV3OnDisk() }, null, 2));
+  } else {
   const built = prepare({ write: false });
   const mismatches = [];
   for (const [name, digest] of Object.entries(built.digests)) {
@@ -803,7 +813,14 @@ if (argv.includes('--selftest')) {
   }
   console.log(JSON.stringify({ mode: 'check', preregistration_digest: built.preregistration_digest, mismatches, ok: mismatches.length === 0 }, null, 2));
   if (mismatches.length > 0) process.exitCode = 1;
+  }
 } else {
+  if (fs.existsSync(path.join(CORPUS_DIR, 'manifest.json'))) {
+    const active = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
+    if (active.preregistration?.file === 'preregistration.v3.in-force.json') {
+      throw new Error('V3_IN_FORCE_REFUSES_V1_REBUILD');
+    }
+  }
   const built = prepare({ write: true });
   console.log(JSON.stringify({
     mode: 'write',

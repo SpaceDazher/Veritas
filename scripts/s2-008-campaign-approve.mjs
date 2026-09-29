@@ -103,7 +103,7 @@ export function scopeDrift(base, candidate, members = FROZEN_MEMBERS) {
 }
 
 export function parseArgs(argv) {
-  const out = { principal: null, label: null, out: null };
+  const out = { principal: null, label: null, out: null, version: 'v2' };
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     const take = () => {
@@ -115,6 +115,7 @@ export function parseArgs(argv) {
     if (token === '--principal') out.principal = take();
     else if (token === '--label') out.label = take();
     else if (token === '--out') out.out = take();
+    else if (token === '--version') out.version = take();
     else if (token === '--help' || token === '-h') out.help = true;
     else throw new Error(`${APPROVE_ERRORS.ARGS}:unknown-argument:${token}`);
   }
@@ -158,6 +159,46 @@ export function approve({ draft, base, principal, label, issuedAt = null }) {
   return Object.freeze({ ...body, preregistration_digest: preregistrationDigest(body) });
 }
 
+export function approveV3({ draft, base, table, principal, label, issuedAt = null }) {
+  if (typeof principal !== 'string' || principal.length === 0) throw new Error(`${APPROVE_ERRORS.ARGS}:--principal`);
+  if (typeof label !== 'string' || label.length === 0) throw new Error(`${APPROVE_ERRORS.ARGS}:--label`);
+  if (!isPlainObject(draft) || !isPlainObject(base) || !isPlainObject(table)) throw new Error('V3_DOCUMENT_ABSENT');
+  if (draft.approval?.status !== null) throw new Error(`${APPROVE_ERRORS.ALREADY_SIGNED}:v3`);
+  if (draft.rule !== 's2-008-prereg-v3' || draft.preregistration_id !== 'xpr-s2-008c-03') throw new Error('V3_VERSION_MISMATCH');
+  const drift = scopeDrift(base, draft, FROZEN_MEMBERS.filter((member) => member !== 'trial_list' && member !== 'expected_table_digest'));
+  if (drift !== null) throw new Error(`${APPROVE_ERRORS.SCOPE_DRIFT}:${drift.member}`);
+  if (!Array.isArray(base.trial_list) || !Array.isArray(draft.trial_list) || draft.trial_list.length !== base.trial_list.length ||
+      draft.trial_list[0]?.arm_id !== 'arm-model-zai-glm53flash') throw new Error('V3_SCOPE_DRIFT:trial_list');
+  const expectedTrials = structuredClone(base.trial_list);
+  expectedTrials[0].arm_id = draft.trial_list[0].arm_id;
+  expectedTrials[0].predictor = draft.trial_list[0].predictor;
+  if (canonicalDigest(expectedTrials) !== canonicalDigest(draft.trial_list)) throw new Error('V3_SCOPE_DRIFT:trial_list');
+  if (!Array.isArray(draft.arms) || canonicalDigest(draft.arms.slice(1)) !== canonicalDigest(base.arms.slice(1)) ||
+      draft.arms[0]?.arm_id !== draft.trial_list[0].arm_id) throw new Error('V3_SCOPE_DRIFT:arms');
+  if (draft.expected_table_digest !== canonicalDigest(table) ||
+      table.trial_list_digest !== canonicalDigest(draft.trial_list) ||
+      table.budget_currency !== draft.budget_reservation.currency ||
+      table.budget_ceiling !== draft.budget_reservation.granted_units ||
+      table.supersession?.superseded_preregistration_digest !== base.preregistration_digest) {
+    throw new Error('V3_SCOPE_DRIFT:expected_table_digest');
+  }
+  const body = {
+    ...scientificBody(draft),
+    status: 'APPROVED',
+    approval: {
+      status: 'APPROVED',
+      authority: 'HUMAN_OWNER',
+      principal_id: principal,
+      label,
+      issued_at: issuedAt,
+      signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+      in_force: false,
+      becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v3 records this digest in the corpus manifest and carries a SUPERSESSION from xpr-s2-008c-01',
+    },
+  };
+  return Object.freeze({ ...body, preregistration_digest: preregistrationDigest(body) });
+}
+
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -168,9 +209,13 @@ const DRAFT = path.join(CORPUS_DIR, 'preregistration.v2.draft.json');
 // PREVIOUS supersession replaced, and its digest differs. v2 supersedes what is in force.
 const BASE = path.join(CORPUS_DIR, 'preregistration.json');
 const OUT = path.join(CORPUS_DIR, 'preregistration.v2.approved.json');
+const V3_DRAFT = path.join(CORPUS_DIR, 'preregistration.v3.draft.json');
+const V3_TABLE = path.join(CORPUS_DIR, 'frozen-table.v3.json');
+const V3_OUT = path.join(CORPUS_DIR, 'preregistration.v3.approved.json');
 
-const USAGE = `s2-008-campaign-approve — the owner's signature on preregistration v2
+const USAGE = `s2-008-campaign-approve — the owner's signature on preregistration v2 or v3
 
+  --version v2|v3     document to sign (default v2)
   --principal <id>     the owner's principal id, recorded like every permit here
   --label "<text>"     who is signing, in words
   --out <path>         where to write the signed document
@@ -203,18 +248,21 @@ function main() {
     return null;
   }
   try {
-    if (!existsSync(DRAFT)) throw new Error(`${APPROVE_ERRORS.DRAFT_ABSENT}:${DRAFT}`);
+    if (!['v2', 'v3'].includes(args.version)) throw new Error('APPROVAL_VERSION_UNKNOWN');
+    const draftPath = args.version === 'v3' ? V3_DRAFT : DRAFT;
+    if (!existsSync(draftPath)) throw new Error(`${APPROVE_ERRORS.DRAFT_ABSENT}:${draftPath}`);
     if (!existsSync(BASE)) throw new Error(`${APPROVE_ERRORS.BASE_ABSENT}:${BASE}`);
-    const draft = JSON.parse(readFileSync(DRAFT, 'utf8'));
+    const draft = JSON.parse(readFileSync(draftPath, 'utf8'));
     const base = JSON.parse(readFileSync(BASE, 'utf8'));
-    const signed = approve({
+    const signed = (args.version === 'v3' ? approveV3 : approve)({
       draft,
       base,
+      ...(args.version === 'v3' ? { table: JSON.parse(readFileSync(V3_TABLE, 'utf8')) } : {}),
       principal: args.principal,
       label: args.label,
       issuedAt: new Date().toISOString(),
     });
-    const out = args.out ?? OUT;
+    const out = args.out ?? (args.version === 'v3' ? V3_OUT : OUT);
     writeFileSync(out, `${JSON.stringify(signed, null, 2)}\n`, 'utf8');
     process.stdout.write(`${JSON.stringify({
       written: out,
@@ -223,7 +271,7 @@ function main() {
       preregistration_digest: signed.preregistration_digest,
       approved_by: `${signed.approval.principal_id} (${signed.approval.authority})`,
       in_force: signed.approval.in_force,
-      next: 'node scripts/s2-008-campaign-prepare.mjs --seal-v2',
+      next: `node scripts/s2-008-campaign-prepare.mjs --seal-${args.version}`,
     }, null, 2)}\n`);
     process.exitCode = 0;
     return signed;

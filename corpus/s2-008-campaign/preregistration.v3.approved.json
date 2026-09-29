@@ -1,14 +1,14 @@
 {
   "kind": "PREREGISTRATION",
-  "rule": "s2-008-prereg-v2",
-  "preregistration_id": "xpr-s2-008c-02",
-  "expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35",
+  "rule": "s2-008-prereg-v3",
+  "preregistration_id": "xpr-s2-008c-03",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
   "card_id": "hyc-s2-008c-01",
   "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
   "recorded_at": "2026-09-28T00:00:00.000Z",
   "inference_mode": "ASSOCIATIONAL",
   "title": "S2-008 acceptance campaign, paid leg: a model-calling executor under the same frozen rule",
-  "description": "The predictor is an installed, model-calling executor (pi, GLM 5.3 flash from z.ai) running inside the S2-002 A-MVP-04 digest-pinned LOCAL_RESTRICTED isolation profile. The rule, the noise band, the frozen baseline, the three seeds, the Holm-Bonferroni family and the one-shot holdout access are carried from v1 UNCHANGED, so a comparison against the zero-spend campaign compares predictors and not rules.",
+  "description": "One model predictor and two carried control predictors in the original three-comparison family. The model replaces trial 01; the metric, baseline, band, three seeds, stopping rule and one-shot holdout policy stay frozen.",
   "card": {
     "contractVersion": "1.0.0",
     "card_id": "hyc-s2-008c-01",
@@ -175,7 +175,7 @@
   },
   "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
   "budget_reservation": {
-    "reservation_id": "rsv-s2-008c-02",
+    "reservation_id": "rsv-s2-008c-03",
     "currency": "tokens",
     "granted_units": 5000000,
     "spent_units": 0,
@@ -244,10 +244,10 @@
     {
       "index": 0,
       "trial_id": "trl-s2-008c-01",
-      "arm_id": "arm-scope-present",
+      "arm_id": "arm-model-zai-glm53flash",
       "partition": "HOLDOUT",
       "stratum": "all_commits",
-      "predictor": "predict MAJOR iff the subject matches /^[a-z]+(\\([^)]*\\))?!?:/ (a conventional-commit subject carrying a scope)",
+      "predictor": "the installed executor classifies the commit subject as MAJOR or MINOR — one word, one call per case",
       "seeds": [
         20260926,
         20260927,
@@ -336,13 +336,22 @@
       "predictor": "the installed executor classifies the commit subject as MAJOR or MINOR — one word, one call per case",
       "arm_program": "scripts/s2-008-campaign-arm-model.mjs",
       "carried_from_v1": false
+    },
+    {
+      "trial_id": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "predictor": "predict MAJOR iff the subject type is feat or fix"
+    },
+    {
+      "trial_id": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "predictor": "predict MINOR iff the subject type is chore, else predict MAJOR"
     }
   ],
   "campaign_metric": {
     "name": "case_agreement_rate",
     "subject_is_pooled_aggregate": true
   },
-  "preregistration_digest": "UNSEALED_PENDING_APPROVAL",
   "executor": {
     "provider": "zai-coding-cn",
     "model": "glm-5.3-flash",
@@ -372,12 +381,16 @@
       "card"
     ]
   },
-  "status": "AWAITING_OWNER_APPROVAL",
+  "status": "APPROVED",
   "approval": {
-    "status": null,
-    "required_from": "the repository owner",
-    "why_it_is_null": "AUTONOMY_POLICY.md:11 — modifying a frozen goal, threshold, corpus or tool is BLOCKED until a new version exists and a human approves it PRE-RUN. This document is that new version, and it is not approved.",
-    "blocked_until": "the owner sets approval.status = APPROVED, and the prepare pipeline seals it into the corpus manifest",
-    "runnable_now": false
-  }
+    "status": "APPROVED",
+    "authority": "HUMAN_OWNER",
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "issued_at": "2026-09-29T05:17:57.334Z",
+    "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
+    "in_force": false,
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v3 records this digest in the corpus manifest and carries a SUPERSESSION from xpr-s2-008c-01"
+  },
+  "preregistration_digest": "39d0b37a1aa3585f1aead90820b0d0b858b726ef875561cfe3b4934e5d2c3103"
 }

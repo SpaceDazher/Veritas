@@ -342,7 +342,6 @@
     "name": "case_agreement_rate",
     "subject_is_pooled_aggregate": true
   },
-  "preregistration_digest": "UNSEALED_PENDING_APPROVAL",
   "executor": {
     "provider": "zai-coding-cn",
     "model": "glm-5.3-flash",
@@ -372,12 +371,16 @@
       "card"
     ]
   },
-  "status": "AWAITING_OWNER_APPROVAL",
+  "status": "APPROVED",
   "approval": {
-    "status": null,
-    "required_from": "the repository owner",
-    "why_it_is_null": "AUTONOMY_POLICY.md:11 — modifying a frozen goal, threshold, corpus or tool is BLOCKED until a new version exists and a human approves it PRE-RUN. This document is that new version, and it is not approved.",
-    "blocked_until": "the owner sets approval.status = APPROVED, and the prepare pipeline seals it into the corpus manifest",
-    "runnable_now": false
-  }
+    "status": "APPROVED",
+    "authority": "HUMAN_OWNER",
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "issued_at": "2026-09-29T05:05:49.867Z",
+    "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
+    "in_force": false,
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v2 records this digest in the corpus manifest and carries a SUPERSESSION from xpr-s2-008c-01"
+  },
+  "preregistration_digest": "0c5ab4beff4b4dba1903fb248ae24f01684aa7d0d9ada17994b3cd47c44f5345"
 }

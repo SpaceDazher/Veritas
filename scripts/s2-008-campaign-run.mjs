@@ -193,9 +193,19 @@ function projectJournalRows(rows) {
   });
 }
 
+export function assertRunnerPreregInForce(prereg, manifest) {
+  if (manifest?.preregistration?.status !== 'IN_FORCE' ||
+      manifest.preregistration.file !== 'preregistration.json' ||
+      manifest.preregistration.preregistration_digest !== preregistrationDigest(prereg)) {
+    throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
+  }
+}
+
 export async function runCampaign({ label = 'a', write = true, out = null, verifyPin = false } = {}) {
   const prereg = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.json'), 'utf8'));
   const frozenTable = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'frozen-table.json'), 'utf8'));
+  const manifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
+  assertRunnerPreregInForce(prereg, manifest);
 
   // --- 0. the frozen document is admissible and self-consistent -------------
   assertPreregistration(prereg);

@@ -715,6 +715,10 @@ export const PREREGISTRATION_RULE = 's2-008-prereg-v1';
  */
 export function preregistrationDigest(prereg) {
   if (!isPlainObject(prereg)) throw malformed('PREREGISTRATION_NOT_AN_OBJECT', `expected a preregistration object, got ${typeName(prereg)}`);
+  if (prereg.rule === 's2-008-prereg-v3') {
+    const { approval, status, preregistration_digest, ...body } = prereg;
+    return canonicalDigest(body);
+  }
   const projection = {};
   for (const field of DIGEST_FIELDS) {
     if (!Object.hasOwn(prereg, field) || prereg[field] === undefined) throw malformed('PREREGISTRATION_FIELD_MISSING', `digest-covered field absent: ${field}`);
@@ -818,7 +822,7 @@ export function assertPreregistration(prereg) {
   }
   const tableKey = firstPresentKey(prereg, ['expected_table_digest', 'table_digest']);
   if (tableKey !== null) requireDigest(prereg[tableKey], tableKey);
-  if (prereg.rule !== undefined && prereg.rule !== null && prereg.rule !== PREREGISTRATION_RULE) {
+  if (prereg.rule !== undefined && prereg.rule !== null && ![PREREGISTRATION_RULE, 's2-008-prereg-v3'].includes(prereg.rule)) {
     throw malformed('PREREGISTRATION_RULE_MISMATCH', `rule must be ${PREREGISTRATION_RULE}, got ${String(prereg.rule)}`);
   }
   for (const key of ['title', 'description', 'notes']) freeText(prereg[key], key);

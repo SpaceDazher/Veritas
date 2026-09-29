@@ -1,14 +1,14 @@
 {
   "kind": "PREREGISTRATION",
-  "rule": "s2-008-prereg-v2",
-  "preregistration_id": "xpr-s2-008c-02",
+  "rule": "s2-008-prereg-v1",
+  "preregistration_id": "xpr-s2-008c-01",
   "expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35",
   "card_id": "hyc-s2-008c-01",
   "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
   "recorded_at": "2026-09-28T00:00:00.000Z",
   "inference_mode": "ASSOCIATIONAL",
-  "title": "S2-008 acceptance campaign, paid leg: a model-calling executor under the same frozen rule",
-  "description": "The predictor is an installed, model-calling executor (pi, GLM 5.3 flash from z.ai) running inside the S2-002 A-MVP-04 digest-pinned LOCAL_RESTRICTED isolation profile. The rule, the noise band, the frozen baseline, the three seeds, the Holm-Bonferroni family and the one-shot holdout access are carried from v1 UNCHANGED, so a comparison against the zero-spend campaign compares predictors and not rules.",
+  "title": "Do commit-message features agree with a message-independent MAJOR label on the real Veritas history?",
+  "description": "Real project, real history, real predictor run by a digest-pinned installed executor. 3 preregistered arms, one family, frozen before the holdout was opened.",
   "card": {
     "contractVersion": "1.0.0",
     "card_id": "hyc-s2-008c-01",
@@ -175,29 +175,14 @@
   },
   "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
   "budget_reservation": {
-    "reservation_id": "rsv-s2-008c-02",
-    "currency": "tokens",
-    "granted_units": 5000000,
+    "reservation_id": "rsv-s2-008c-01",
+    "currency": "isolated_executor_launches",
+    "granted_units": 12,
     "spent_units": 0,
-    "unit_definition": "tokens, measured by the executor itself: pi --mode json reports usage.totalTokens on turn_end, and the arm reads that and nothing else. The mid-stream message_update events report zeros and are ignored, and a per-message report is not a run total, so the arm refuses rather than counting one. The model has no other spend channel: parallelism is 1 and the only egress destination the profile admits is open.bigmodel.cn:443.",
-    "expires_at": "2026-10-05T00:00:00.000Z",
-    "trial_timeout_ms": 180000,
-    "usd_reference": {
-      "measured": "pi --mode json turn_end.usage.cost.total — the provider's own report",
-      "per_call_observed": {
-        "tokens": 10233,
-        "usd": 0.00140476,
-        "note": "one trivial call; the system prompt alone is about 9058 input tokens"
-      },
-      "plan": {
-        "calls": 378,
-        "tokens_estimate": 3865734,
-        "usd_estimate": 0.530999
-      },
-      "why_it_is_here": "the repository has no cost model of its own — policy.mjs carries task/campaign/day limits with a currency field and adapters.mjs:907 forbids inventing one — so this is a MEASURED reference and not a budget. The ceiling above is denominated in tokens because tokens is the unit the owner set the cap in.",
-      "caveat": "The 5,000,000-token ceiling is about 29% above the measured 3,865,734-token plan. It is a binding control: stop before the next call when the recorded token total reaches the ceiling; report a budget stop rather than silently extending the campaign."
-    },
-    "enumerated_work": "3 declared trials x 3 frozen seeds = 9 model runs x 126 holdout cases = 1134 case calls"
+    "expires_at": "2026-09-28T23:59:59.000Z",
+    "trial_timeout_ms": 120000,
+    "unit_definition": "one podman launch of a digest-pinned executor image; 9 preregistered prediction launches (3 arms x 3 frozen seeds) plus 1 preregistered bootstrap launch, charged one unit each as they happen; monetary spend is zero and no external service is contacted",
+    "enumerated_work": "3 declared trials x 3 frozen seeds + 1 bootstrap launch = 10 preregistered launches, ceiling 12"
   },
   "noise_rule": {
     "band": 0.06969570950743816,
@@ -298,8 +283,9 @@
     "unseal_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f"
   },
   "recorded_before_first_trial": {
-    "first_trial": "NOT_STARTED",
-    "proof": "no trial has run under this document, and the arm refuses an unapproved preregistration"
+    "first_trial": "trl-s2-008c-01",
+    "order_proved_by": "REGISTRY_JOURNAL_NOT_A_CLOCK",
+    "proof": "the preregistration row is committed to the registry journal before the first TRIAL row, and the corpus manifest seals a preregistration_digest that the case files cannot be edited past"
   },
   "required_fields_present": [
     "hypothesis",
@@ -332,52 +318,23 @@
   "arms": [
     {
       "trial_id": "trl-s2-008c-01",
-      "arm_id": "arm-model-zai-glm53flash",
-      "predictor": "the installed executor classifies the commit subject as MAJOR or MINOR — one word, one call per case",
-      "arm_program": "scripts/s2-008-campaign-arm-model.mjs",
-      "carried_from_v1": false
+      "arm_id": "arm-scope-present",
+      "predictor": "predict MAJOR iff the subject matches /^[a-z]+(\\([^)]*\\))?!?:/ (a conventional-commit subject carrying a scope)"
+    },
+    {
+      "trial_id": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "predictor": "predict MAJOR iff the subject type is feat or fix"
+    },
+    {
+      "trial_id": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "predictor": "predict MINOR iff the subject type is chore, else predict MAJOR"
     }
   ],
   "campaign_metric": {
     "name": "case_agreement_rate",
     "subject_is_pooled_aggregate": true
   },
-  "preregistration_digest": "UNSEALED_PENDING_APPROVAL",
-  "executor": {
-    "provider": "zai-coding-cn",
-    "model": "glm-5.3-flash",
-    "package": "@earendil-works/pi-coding-agent",
-    "credential_env_name": "ZAI_API_KEY",
-    "credential_delivery": "podman --env-file — a path on the host argv; neither the value nor the variable name is in any argv",
-    "inside_isolation": "LOCAL_RESTRICTED, digest-pinned, egress allowlist open.bigmodel.cn:443 only",
-    "parallelism": 1,
-    "deterministic": false,
-    "determinism_note": "a model is not a function of its input. The arm records the digest of every raw answer so a repeat can be COMPARED against the committed one. No claim is made that the model is reproducible; the run statement is about the frozen inputs and the recorded outputs.",
-    "unparseable_policy": "an answer that is not exactly one of MAJOR/MINOR is UNPARSED and counts as a disagreement, never as a guess"
-  },
-  "supersession": {
-    "supersedes": "xpr-s2-008c-01",
-    "superseded_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58",
-    "reason": "the predictor, the currency and the spend change; the rule does not. v1 spent nothing and contacted nobody, so it could not have produced the ticket's own acceptance.",
-    "unchanged": [
-      "rule",
-      "metric",
-      "frozen_baseline",
-      "noise_rule",
-      "multiplicity_rule",
-      "seed_rule",
-      "seeds",
-      "stopping_rule",
-      "holdout_access",
-      "card"
-    ]
-  },
-  "status": "AWAITING_OWNER_APPROVAL",
-  "approval": {
-    "status": null,
-    "required_from": "the repository owner",
-    "why_it_is_null": "AUTONOMY_POLICY.md:11 — modifying a frozen goal, threshold, corpus or tool is BLOCKED until a new version exists and a human approves it PRE-RUN. This document is that new version, and it is not approved.",
-    "blocked_until": "the owner sets approval.status = APPROVED, and the prepare pipeline seals it into the corpus manifest",
-    "runnable_now": false
-  }
+  "preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58"
 }
