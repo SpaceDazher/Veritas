@@ -36,7 +36,7 @@
 // PARALLELISM IS 1, on purpose. AUTONOMY_POLICY records it as an MVP constraint
 // and it also keeps the spend bounded: one call in flight, one case at a time, so
 // exhausting the reservation stops the run between cases rather than inside it.
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -57,7 +57,28 @@ export const ARM_ERRORS = Object.freeze({
   PROVIDER_UNREACHABLE: 'MODEL_ENDPOINT_UNREACHABLE',
   NO_USAGE_REPORTED: 'MODEL_USAGE_NOT_REPORTED',
   BUDGET_EXHAUSTED: 'BUDGET_EXHAUSTED',
+  BRIDGE_NOT_READY: 'EGRESS_BRIDGE_NOT_READY',
 });
+
+/**
+ * Where the model reaches the network FROM, inside the container.
+ *
+ * The container runs with `--network=none` and exactly one bind mount: the unix
+ * socket the egress forwarder listens on, at `/run/egress.sock` (see
+ * `buildInvocation`). Nothing else crosses the boundary — no repository path, no
+ * host file. A TCP client cannot speak to a unix socket, so `pi` has no route to
+ * `open.bigmodel.cn:443` until something inside the container bridges loopback
+ * TCP to that socket. That something is `s2-008-egress-bridge.mjs`, baked into
+ * the image rather than mounted, because a program that can change between build
+ * and run is not a program a digest can commit to.
+ *
+ * The port is NOT a constant anywhere. The bridge is started on port 0 and the
+ * number it actually bound is read back from its `BRIDGE_READY` line; a fixed
+ * port in the code would be a guess about the host's state that the record then
+ * reports as a measurement.
+ */
+export const BRIDGE_SCRIPT_IN_IMAGE = '/opt/veritas/scripts/s2-008-egress-bridge.mjs';
+export const EGRESS_SOCKET_IN_IMAGE = '/run/egress.sock';
 
 /** The only answers that count. Anything else is UNPARSED, never guessed. */
 export const LABEL_SET = Object.freeze(['MAJOR', 'MINOR']);
@@ -124,6 +145,95 @@ export function readCredential(envName, env) {
   return typeof value === 'string' && value.length >= 8;
 }
 
+/**
+ * Start the in-container bridge and WAIT for it to report the port it bound.
+ *
+ * The order the campaign depends on is a launch-order fact, not a convention:
+ * the forwarder's socket must be listening, the container must be up with the
+ * socket mounted, the bridge must be up, the credential env-file must have been
+ * handed over, and only then may a model call happen. This function owns the one
+ * stage of that order that lives inside the container, and it fails closed: a
+ * bridge that never says `BRIDGE_READY` is a refusal to call the model, because
+ * calling it without a route either wastes the reservation on transport errors or
+ * — worse — succeeds by some path this arm did not measure.
+ */
+export function startEgressBridge({
+  script = BRIDGE_SCRIPT_IN_IMAGE,
+  socketPath = EGRESS_SOCKET_IN_IMAGE,
+  execPath = process.execPath,
+  timeoutMs = 15_000,
+  spawnImpl = spawn,
+} = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawnImpl(execPath, [script, '--port', '0', '--socket', socketPath], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let settled = false;
+    let stderr = '';
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn(value);
+    };
+    const timer = setTimeout(() => {
+      child.kill('SIGKILL');
+      finish(reject, new Error(`${ARM_ERRORS.BRIDGE_NOT_READY}:timeout:${timeoutMs}ms`));
+    }, timeoutMs);
+    child.stderr?.on('data', (chunk) => { stderr += String(chunk); });
+    child.on('error', (error) => finish(reject, new Error(`${ARM_ERRORS.BRIDGE_NOT_READY}:spawn:${String(error?.message ?? error).slice(0, 120)}`)));
+    child.on('exit', (code) => {
+      finish(reject, new Error(`${ARM_ERRORS.BRIDGE_NOT_READY}:exit=${String(code)}:${stderr.slice(-200)}`));
+    });
+    let buffered = '';
+    child.stdout?.on('data', (chunk) => {
+      buffered += String(chunk);
+      const lines = buffered.split('\n');
+      buffered = lines.pop() ?? '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('{')) continue;
+        let event;
+        try {
+          event = JSON.parse(trimmed);
+        } catch {
+          continue;
+        }
+        if (event.event !== 'BRIDGE_READY') continue;
+        // The port must be a NUMBER in the line, not a string that parses. A
+        // permissive Number() here would put "45123" into the published record as
+        // a string while the proxy used 45123, so the record and the route would
+        // disagree about their own types — and the record is what a reader checks.
+        const port = event.port;
+        if (typeof port !== 'number' || !Number.isInteger(port) || port <= 0 || port > 65535 || event.host !== '127.0.0.1') {
+          finish(reject, new Error(`${ARM_ERRORS.BRIDGE_NOT_READY}:bad-ready-line`));
+          return;
+        }
+        // The port is bound NOW. Cancelling the exit guard would let a bridge
+        // that dies a moment later be reported as a live route, so the child is
+        // handed to the caller instead: it lives until the arm exits.
+        child.removeAllListeners('exit');
+        clearTimeout(timer);
+        settled = true;
+        resolve(Object.freeze({ port, host: '127.0.0.1', child, stop: () => { try { child.kill('SIGTERM'); } catch { /* already gone */ } return true; } }));
+        return;
+      }
+    });
+  });
+}
+
+/** The proxy environment pi runs under. Built ONLY from the port just read. */
+export function proxyEnvironment(base, { port, host = '127.0.0.1' } = {}) {
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) {
+    throw new Error(`${ARM_ERRORS.BRIDGE_NOT_READY}:no-port-to-proxy`);
+  }
+  return Object.freeze({
+    ...(base ?? {}),
+    HTTPS_PROXY: `http://${host}:${port}`,
+    HTTP_PROXY: `http://${host}:${port}`,
+  });
+}
+
 /** One model call. Dry runs skip it and say so. */
 export function callModel(subject, { provider, model, envName, env, dryRun, timeoutMs }) {
   if (dryRun) {
@@ -177,7 +287,8 @@ export function classifyOutcome({ dryRun, stopped, measured }) {
   return measured ? 'MEASURED' : 'NOT_RUN';
 }
 
-export async function main(argv, env = process.env) {
+export async function main(argv, env = process.env, deps = {}) {
+  const startBridge = deps.startBridge ?? startEgressBridge;
   const flags = new Set(argv.filter((a) => a.startsWith('--')));
   const positional = argv.filter((a) => !a.startsWith('--'));
   if (positional.length < 5) {
@@ -263,6 +374,24 @@ export async function main(argv, env = process.env) {
   let usd = 0;
   let modelCalls = 0;
   let stop = null;
+  // THE THIRD STAGE OF THE LAUNCH ORDER, and the one that lives in here. The
+  // forwarder's socket is already listening and the container already has it
+  // mounted (that is `buildInvocation`'s job, on the host); what is left before a
+  // model call is the route. Under `--network=none` there is none until the bridge
+  // is up, so it is brought up and CONFIRMED here rather than assumed — a run
+  // that started calling without it would spend its reservation on transport
+  // errors and report them as UNPARSED predictions, which is the quiet-zero
+  // failure the whole outcome-class contract exists to prevent.
+  //
+  // A dry run starts nothing: there is no call to route, and a bridge listening
+  // during a dry run would be a live listener in a run whose record says it spent
+  // nothing and reached nothing.
+  let bridge = null;
+  let modelEnv = env;
+  if (!dryRun) {
+    bridge = await startBridge();
+    modelEnv = proxyEnvironment(env, bridge);
+  }
   for (const row of rows) {
     if (spent >= granted) {
       // A budget stop is an OUTCOME. It is not a retry, not a zero, and not a
@@ -272,7 +401,7 @@ export async function main(argv, env = process.env) {
     }
     let result;
     try {
-      result = callModel(String(row.subject ?? ''), { provider, model, envName, env, dryRun, timeoutMs });
+      result = callModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
       // A failed case is recorded as itself, not guessed and not skipped silently.
@@ -292,6 +421,7 @@ export async function main(argv, env = process.env) {
     });
   }
 
+  bridge?.stop();
   const out = {
     kind: 's2-008-campaign-adapter-predict-model/1',
     arm_id: armId,
@@ -315,6 +445,11 @@ export async function main(argv, env = process.env) {
       credential_env_name: envName,
       credential_present: readCredential(envName, env),
       credential_in_argv: false,
+      // What the call travelled over, and where the number came from. The port is
+      // reported as READ, never as configured, because there is no configured one.
+      egress_route: bridge === null
+        ? null
+        : { via: 'in-container loopback bridge', host: bridge.host, port: bridge.port, port_source: 'BRIDGE_READY' },
       model_calls: modelCalls,
       parallel_calls: 1,
     },
