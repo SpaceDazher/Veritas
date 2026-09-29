@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1100.
+Generated from `git ls-files`; count: 1117.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -436,12 +436,20 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/cases/holdout.blind.json`
 - `corpus/s2-008-campaign/cases/holdout.json`
 - `corpus/s2-008-campaign/frozen-table.json`
+- `corpus/s2-008-campaign/frozen-table.v3.json`
 - `corpus/s2-008-campaign/manifest.json`
 - `corpus/s2-008-campaign/preregistration-superseded.json`
 - `corpus/s2-008-campaign/preregistration-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v1-superseded.json`
+- `corpus/s2-008-campaign/preregistration-v3-supersession.json`
 - `corpus/s2-008-campaign/preregistration.json`
+- `corpus/s2-008-campaign/preregistration.v2.approved.json`
 - `corpus/s2-008-campaign/preregistration.v2.draft.json`
+- `corpus/s2-008-campaign/preregistration.v3.approved.json`
+- `corpus/s2-008-campaign/preregistration.v3.draft.json`
+- `corpus/s2-008-campaign/preregistration.v3.in-force.json`
 - `corpus/s2-008-campaign/source-ledger.json`
+- `corpus/s2-008-campaign/source-ledger.v3.json`
 - `docs/ARCHITECTURE.md`
 - `docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md`
 - `docs/claims/S2-004-EXPERT-LENS-POLICY.md`
@@ -585,10 +593,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
 - `evidence/s2-008-campaign/evaluation.json`
+- `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/run-a.json`
 - `evidence/s2-008-campaign/run-aborted-1.json`
 - `evidence/s2-008-campaign/run-b.json`
+- `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-comparison.json`
 - `evidence/s2-008-controls.json`
 - `evidence/s2-008-dependency-binding.json`
@@ -807,18 +817,22 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-007r-run.mjs`
 - `scripts/s2-008-build-corpus.mjs`
 - `scripts/s2-008-campaign-adapter.mjs`
+- `scripts/s2-008-campaign-approve.mjs`
 - `scripts/s2-008-campaign-arm-model.mjs`
 - `scripts/s2-008-campaign-arm.mjs`
 - `scripts/s2-008-campaign-bootstrap.mjs`
 - `scripts/s2-008-campaign-evaluate.mjs`
+- `scripts/s2-008-campaign-model-image.mjs`
 - `scripts/s2-008-campaign-prepare.mjs`
 - `scripts/s2-008-campaign-probes.mjs`
 - `scripts/s2-008-campaign-run.mjs`
+- `scripts/s2-008-campaign-seal-v3.mjs`
 - `scripts/s2-008-harness.mjs`
 - `scripts/s2-008-replay.mjs`
 - `scripts/s2-008-run.mjs`
 - `scripts/s2-008-security-probes.mjs`
 - `scripts/security-probes.mjs`
+- `scripts/setup-podman-tmp.sh`
 - `scripts/sloqual-freeze.mjs`
 - `scripts/sloqual-run.mjs`
 - `scripts/smoke.mjs`
@@ -1034,7 +1048,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/isolation/credential-provision.test.mjs`
 - `tests/isolation/live-evidence.test.mjs`
 - `tests/isolation/profile-axes.test.mjs`
+- `tests/research/campaign-approval.test.mjs`
 - `tests/research/campaign-arm-model.test.mjs`
+- `tests/research/campaign-currency-guard.test.mjs`
+- `tests/research/campaign-seal-v3.test.mjs`
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`

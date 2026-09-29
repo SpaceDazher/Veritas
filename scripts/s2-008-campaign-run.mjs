@@ -200,6 +200,109 @@ function projectJournalRows(rows) {
  *  that would make the ceiling look untouched. */
 export const MEASURABLE = 'isolated_executor_launches';
 
+/** Arms the adapter can actually run as the MODEL program. Empty until it can: the
+  * refusal is the honest state, and filling this list is the work that enables
+  * spending. A token charge is never taken on trust. */
+export const DISPATCHABLE_MODEL_ARMS = Object.freeze([]);
+
+/**
+ * What each currency is actually MEASURED by, named so no reader has to infer it.
+ * A launch is a process this runner can see starting. A token is a number the
+ * executor reports about that process — the runner can only carry it, never
+ * produce it, so a token charge is always a charge OF SOMETHING ELSE'S REPORT.
+ */
+export const MEASURED_BY = Object.freeze({
+  isolated_executor_launches: 'LAUNCH_COUNT',
+  tokens: 'EXECUTOR_REPORTED_TOKENS',
+});
+
+/**
+ * ONE step of the launch loop, as a decision: charge, or stop, or refuse.
+ *
+ * The loop that spends money is the loop that was mis-wired once already, so the
+ * arithmetic is extracted rather than left inline. A `spentUnits += 1` left in the
+ * body of a token-denominated loop is exactly the bypass this work removes, and
+ * inline it was invisible to the suite: reaching it needs a live corpus and a
+ * container. Here both branches are readable.
+ */
+export function chargingStep({ currency, spentUnits, grantedUnits, armOutput = null, armId = null, dispatchableArms = [] }) {
+  const plan = chargeFor({ currency, armOutput, armId, dispatchableArms });
+  if (plan.refusal) return { action: 'refuse', code: 'CHARGE_NOT_MEASURABLE', detail: plan.refusal, spent_units: Number(spentUnits) ?? 0 };
+  const spent = (Number(spentUnits) || 0) + plan.units;
+  return {
+    action: 'charge',
+    units: plan.units,
+    unit: plan.unit,
+    source: plan.source,
+    spent_units: spent,
+    // The stop is decided from the post-charge number, so a charge that exactly
+    // exhausts the ceiling ends the run rather than starting the next launch.
+    stop: ceilingReached(spent, grantedUnits),
+    granted_units: Number(grantedUnits),
+  };
+}
+
+/** Local, because this file had none: `chargeFor` has to tell a reported budget
+ *  object from a string that happens to have a `currency` member. Caught by the
+ *  suite as a ReferenceError, which is the cheapest kind of bug to find. */
+function isPlainObject(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Whether the reservation is spent. Pure, because the stop must be observable:
+ * the arm stops itself between CASES, and the run must not start the next LAUNCH
+ * once the money is gone. `>=` and not `>`, so a charge that exactly exhausts the
+ * ceiling stops rather than continuing to the next unit.
+ */
+export function ceilingReached(spent, granted) {
+  const a = Number(spent);
+  const b = Number(granted);
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b <= 0) return false;
+  return a >= b;
+}
+
+/**
+ * The charge for one launch, in the reservation's own currency — or a refusal.
+ *
+ * The rule that matters: a currency may only be charged in units this runner can
+ * name, and a token charge must be a number the ARM reported, taken from a named
+ * field. Nothing here estimates, converts, or rounds. A run that cannot produce a
+ * defensible number does not charge an invented one.
+ *
+ * Pure, so both branches are readable: an inline version was unreachable from a
+ * test because the only path to it satisfied an earlier guard first.
+ */
+export function chargeFor({ currency, armOutput = null, armId = null, dispatchableArms = [] }) {
+  const unit = MEASURED_BY[currency] ?? null;
+  if (unit === null) {
+    return { refusal: `RESERVATION_CURRENCY_NOT_MEASURABLE:${String(currency ?? '(none)')}` };
+  }
+  if (unit === 'LAUNCH_COUNT') {
+    return { units: 1, unit, currency, source: 'a container launch this runner observed' };
+  }
+  // A token charge is the arm's own report, and only for an arm this runner can
+  // actually dispatch to the model program — charging a program it never ran
+  // would be counting someone else's number.
+  if (!dispatchableArms.includes(armId)) {
+    return { refusal: `TOKEN_ARMED_NOT_DISPATCHABLE:${String(armId)}` };
+  }
+  const reported = armOutput?.budget;
+  if (!isPlainObject(reported) || String(reported.currency ?? '') !== currency) {
+    return { refusal: `ARM_BUDGET_NOT_IN_THIS_CURRENCY:${String(armId)}:${String(reported?.currency ?? 'none')}` };
+  }
+  const spent = reported.spent_tokens;
+  if (!Number.isInteger(spent) || spent < 0) {
+    return { refusal: `ARM_REPORTED_NO_TOKENS:${String(armId)}:${String(spent ?? 'absent')}` };
+  }
+  return {
+    units: spent,
+    unit,
+    currency,
+    source: `the executor's own ${reported.measured_by ?? 'usage.totalTokens'}, as carried in the arm record's budget.spent_tokens`,
+  };
+}
+
 /**
  * The currency decision, as a pure function so a test can reach BOTH branches.
  * Returning null means "carry on"; anything else is the refusal the caller
@@ -359,8 +462,41 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
   // currency stops the campaign here — before the first container, so a refusal
   // costs nothing and leaves no half-spent ledger behind.
   const MEASURABLE_CURRENCY = MEASURABLE;
+  // The arms this runner can dispatch to the MODEL program, and therefore the only
+  // arms whose token spend it can carry. Until the adapter dispatches the model
+  // arm, this is EMPTY on purpose: a token reservation then refuses every arm
+  // rather than charging a number this runner never produced.
+  const TOKEN_DISPATCHABLE_ARMS = DISPATCHABLE_MODEL_ARMS;
+  let budgetStop = null;
   const reservationCurrency = String(prereg.budget_reservation.currency ?? '');
   const refusal = currencyRefusal(reservationCurrency, { grantedUnits: prereg.budget_reservation.granted_units });
+  // A token reservation is only chargeable for arms this runner can dispatch to
+  // the model program. Decided HERE, before any launch, so an undispatchable arm
+  // costs nothing to find out.
+  const dispatchableArms = TOKEN_DISPATCHABLE_ARMS;
+  const armPlan = prereg.trial_list.map((entry) => ({
+    trial: entry.trial_id,
+    arm_id: entry.arm_id,
+    plan: chargeFor({ currency: reservationCurrency, armId: entry.arm_id, dispatchableArms }),
+  }));
+  const unplannable = armPlan.filter((row) => row.plan.refusal);
+  if (unplannable.length > 0) {
+    const detail = `${unplannable.map((row) => `${row.trial}:${row.arm_id}:${row.plan.refusal}`).join('; ')}. Nothing was launched: a reservation may only be charged in a unit this runner can name, and a token charge must be a number the arm itself reported.`;
+    appendRecord(registry, {
+      kind: 'BUDGET_REFUSAL',
+      record_kind: 'CHARGE_NOT_MEASURABLE',
+      run_id: runId,
+      reservation_id: reservationId,
+      declared_currency: reservationCurrency,
+      arms: unplannable.map((row) => ({ trial: row.trial, arm: row.arm_id, refusal: row.plan.refusal })),
+      spent_units: 0,
+      launches: 0,
+      detail,
+      at: DECISION_POINT,
+    });
+    process.stderr.write(`${detail}\n`);
+    return { status: 'BLOCKED', code: 'CHARGE_NOT_MEASURABLE', exitCode: 4, launches: 0, charged_units: 0, spent_units: 0, detail };
+  }
   if (refusal !== null) {
     appendRecord(registry, {
       kind: 'BUDGET_REFUSAL',
@@ -395,15 +531,53 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
         armId: entry.arm_id, seed, samples: prereg.noise_rule.bootstrap_samples,
         timeoutMs, pin: pin.pin,
       });
-      spentUnits += 1;
+      // The charge is decided AFTER the launch, because a token charge can only be
+      // read out of what the arm reported. A refusal here is a STOP, not a fallback
+      // to one unit: an unmeasurable launch is charged nothing and ends the run,
+      // because a ledger that keeps going after it stopped accounting is exactly
+      // how the v1 attempt went uncharged.
+      const step = chargingStep({
+        currency: reservationCurrency,
+        spentUnits,
+        grantedUnits: prereg.budget_reservation.granted_units,
+        armOutput: result.output,
+        armId: entry.arm_id,
+        dispatchableArms: TOKEN_DISPATCHABLE_ARMS,
+      });
+      if (step.action === 'refuse') {
+        appendRecord(registry, {
+          kind: 'BUDGET_REFUSAL',
+          record_kind: 'CHARGE_NOT_MEASURABLE',
+          run_id: runId,
+          reservation_id: reservationId,
+          declared_currency: reservationCurrency,
+          trial: entry.trial_id,
+          arm: entry.arm_id,
+          seed,
+          spent_units: step.spent_units,
+          launches: executions.length,
+          detail: step.detail,
+          at: DECISION_POINT,
+        });
+        process.stderr.write(`${step.detail}\n`);
+        return { status: 'BLOCKED', code: step.code, exitCode: 4, launches: executions.length, charged_units: step.spent_units, spent_units: step.spent_units, detail: step.detail };
+      }
+      spentUnits = step.spent_units;
       const charge = recordSpend(registry, {
         reservationId,
         key: `launch:${reservationId}:${preregDigest}:${entry.trial_id}:${String(seed)}`,
-        args: { reservation_id: reservationId, units: 1, unit: MEASURABLE_CURRENCY, currency: prereg.budget_reservation.currency, trial: entry.trial_id, seed, at: DECISION_POINT },
+        args: { reservation_id: reservationId, units: step.units, unit: step.unit, currency: reservationCurrency, source: step.source, trial: entry.trial_id, seed, at: DECISION_POINT },
       });
       // `replayed: false` is the ledger saying it CHARGED, and reporting that
       // as `outcome: false` reads like a failure. It is named here.
-      charges.push({ trial: entry.trial_id, seed, units: 1, unit: MEASURABLE_CURRENCY, replayed: charge?.replayed === true, settled: charge?.replayed !== true });
+      charges.push({ trial: entry.trial_id, seed, units: step.units, unit: step.unit, source: step.source, replayed: charge?.replayed === true, settled: charge?.replayed !== true });
+      // The ceiling is enforced HERE as well as inside the arm: the arm stops
+      // between cases, and a run must not start the next launch once the money
+      // is gone. The arm's own stop is recorded, not re-derived.
+      if (step.stop) {
+        budgetStop = { reason: 'BUDGET_EXHAUSTED', spent_units: spentUnits, granted_units: Number(prereg.budget_reservation.granted_units), after: { trial: entry.trial_id, seed } };
+        break;
+      }
       const row = {
         kind: 'TRIAL_EXECUTION',
         record_kind: 'TRIAL_EXECUTED',

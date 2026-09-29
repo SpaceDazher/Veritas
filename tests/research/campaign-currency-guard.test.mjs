@@ -21,6 +21,10 @@ import {
   assertRunnerPreregInForce,
   currencyRefusal,
   entryReportFor,
+  chargeFor,
+  chargingStep,
+  ceilingReached,
+  DISPATCHABLE_MODEL_ARMS,
 } from '../../scripts/s2-008-campaign-run.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
@@ -138,4 +142,139 @@ test('BOTH branches of the entry report are directly observable', () => {
   const normal = entryReportFor({ status: 'MEASURED', raw_run_id: 'r' });
   assert.equal(normal.report, null, 'a normal run was printed as a refusal');
   assert.equal(normal.exitCode, 0);
+});
+
+// --- the token charge itself, which is the piece that was missing -----------
+
+test('a launch charge is ONE unit, named as a launch', () => {
+  const charge = chargeFor({ currency: MEASURABLE_CURRENCY, armId: 'arm-type-chore' });
+  assert.equal(charge.units, 1);
+  assert.equal(charge.unit, 'LAUNCH_COUNT');
+  assert.equal(charge.refusal, undefined);
+});
+
+test('a token charge is the ARM\'S OWN number, and only for a dispatchable arm', () => {
+  const MODEL = 'arm-model-zai-glm53flash';
+  const reported = { budget: { currency: 'tokens', spent_tokens: 10233, measured_by: "pi --mode json turn_end.usage.totalTokens" } };
+
+  // Not dispatchable: this runner does not run the model program, so it cannot be
+  // counting that program's tokens.
+  assert.equal(
+    chargeFor({ currency: 'tokens', armId: MODEL, armOutput: reported }).refusal,
+    `TOKEN_ARMED_NOT_DISPATCHABLE:${MODEL}`,
+  );
+
+  const charge = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: reported, dispatchableArms: [MODEL] });
+  assert.equal(charge.units, 10233, 'the token charge is not the number the arm reported');
+  assert.equal(charge.unit, 'EXECUTOR_REPORTED_TOKENS');
+  assert.match(charge.source, /executor's own/, 'the source does not say whose number this is');
+  assert.match(charge.source, /usage\.totalTokens/, 'the source does not name the field');
+});
+
+test('a token charge REFUSES rather than estimating: wrong currency, no number, or a partial one', () => {
+  const MODEL = 'arm-model-zai-glm53flash';
+  const arms = [MODEL];
+  const cases = [
+    [{ armOutput: { budget: { currency: 'isolated_executor_launches', spent_tokens: 10 } } }, 'ARM_BUDGET_NOT_IN_THIS_CURRENCY'],
+    [{ armOutput: { budget: { currency: 'tokens' } } }, 'ARM_REPORTED_NO_TOKENS'],
+    [{ armOutput: { budget: { currency: 'tokens', spent_tokens: 0.5 } } }, 'ARM_REPORTED_NO_TOKENS'],
+    [{ armOutput: { budget: { currency: 'tokens', spent_tokens: -1 } } }, 'ARM_REPORTED_NO_TOKENS'],
+    [{ armOutput: { budget: { currency: 'tokens', spent_tokens: 'many' } } }, 'ARM_REPORTED_NO_TOKENS'],
+    [{ armOutput: null }, 'ARM_BUDGET_NOT_IN_THIS_CURRENCY'],
+    [{ armOutput: {} }, 'ARM_BUDGET_NOT_IN_THIS_CURRENCY'],
+  ];
+  for (const [extra, expected] of cases) {
+    const charge = chargeFor({ currency: 'tokens', armId: MODEL, dispatchableArms: arms, ...extra });
+    assert.match(String(charge.refusal ?? ''), new RegExp(expected),
+      `case ${JSON.stringify(extra)} produced ${JSON.stringify(charge)} instead of a ${expected} refusal`);
+  }
+  // An unknown currency is refused too: absence is not zero, and zero is not a permission.
+  assert.match(chargeFor({ currency: 'dollars', armId: MODEL }).refusal, /RESERVATION_CURRENCY_NOT_MEASURABLE/);
+  assert.match(chargeFor({ currency: undefined, armId: MODEL }).refusal, /RESERVATION_CURRENCY_NOT_MEASURABLE/);
+});
+
+test('the shipped dispatchable set is EMPTY, so nothing can spend tokens today', () => {
+  // The honest state, asserted so it cannot be quietly filled: the model arm is
+  // not dispatched by the adapter yet, and until it is, every token reservation is
+  // refused at the arm plan. Filling this list is the work that enables spending.
+  assert.deepEqual([...DISPATCHABLE_MODEL_ARMS], []);
+  const MODEL = 'arm-model-zai-glm53flash';
+  const charge = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens', spent_tokens: 10233 } } });
+  assert.equal(charge.refusal, `TOKEN_ARMED_NOT_DISPATCHABLE:${MODEL}`);
+});
+
+test('the ceiling stops on >=, so an exactly exhausted reservation does not continue', () => {
+  assert.equal(ceilingReached(4_999_999, 5_000_000), false, 'one unit short of the ceiling already stopped the run');
+  assert.equal(ceilingReached(5_000_000, 5_000_000), true, 'a reservation spent exactly did not stop');
+  assert.equal(ceilingReached(5_000_001, 5_000_000), true);
+  assert.equal(ceilingReached(0, 5_000_000), false);
+  // A missing or nonsensical ceiling does not stop the run by accident.
+  assert.equal(ceilingReached(10, undefined), false);
+  assert.equal(ceilingReached(10, 0), false);
+  assert.equal(ceilingReached(Number.NaN, 5_000_000), false);
+});
+
+test('the charging STEP is one decision: charge, or stop, or refuse', () => {
+  // The loop that spends money is the loop that was mis-wired once, so its
+  // arithmetic is pinned directly rather than reached through a live corpus.
+  const MODEL = 'arm-model-zai-glm53flash';
+  const reported = { budget: { currency: 'tokens', spent_tokens: 10_233, measured_by: "pi --mode json turn_end.usage.totalTokens" } };
+
+  // Charge, and add to what was already spent — not a fixed 1.
+  const step = chargingStep({
+    currency: 'tokens', spentUnits: 4_000_000, grantedUnits: 5_000_000,
+    armOutput: reported, armId: MODEL, dispatchableArms: [MODEL],
+  });
+  assert.equal(step.action, 'charge');
+  assert.equal(step.units, 10_233, 'the step charged a fixed unit instead of the number the arm reported');
+  assert.equal(step.spent_units, 4_010_233, 'the step did not add to the prior spend');
+  assert.equal(step.stop, false);
+
+  // The same step stops when the charge lands exactly on the ceiling.
+  const last = chargingStep({
+    currency: 'tokens', spentUnits: 4_989_767, grantedUnits: 5_000_000,
+    armOutput: reported, armId: MODEL, dispatchableArms: [MODEL],
+  });
+  assert.equal(last.action, 'charge');
+  assert.equal(last.spent_units, 5_000_000);
+  assert.equal(last.stop, true, 'a reservation spent exactly did not stop the run');
+
+  // And an unmeasurable charge REFUSES, charging nothing and not pretending.
+  const refused = chargingStep({
+    currency: 'tokens', spentUnits: 12, grantedUnits: 5_000_000,
+    armOutput: { budget: { currency: 'tokens' } }, armId: MODEL, dispatchableArms: [MODEL],
+  });
+  assert.equal(refused.action, 'refuse');
+  assert.equal(refused.spent_units, 12, 'a refusal moved the spend');
+  assert.match(refused.detail, /ARM_REPORTED_NO_TOKENS/);
+
+  // The launch path is the same decision with a different unit, and the shipped
+  // dispatchable set keeps the model arm out of it.
+  const launch = chargingStep({ currency: MEASURABLE_CURRENCY, spentUnits: 3, grantedUnits: 12, armId: 'arm-type-chore' });
+  assert.equal(launch.units, 1);
+  assert.equal(launch.spent_units, 4);
+  const modelUndispatchable = chargingStep({
+    currency: 'tokens', spentUnits: 0, grantedUnits: 5_000_000, armOutput: reported, armId: MODEL,
+  });
+  assert.equal(modelUndispatchable.action, 'refuse', 'the model arm was charged without being dispatchable');
+});
+
+test('the running total in the loop is only ever assigned from the step, never a literal', () => {
+  // The last unpinned line, and the most dangerous one: `spentUnits = 1` or
+  // `spentUnits += 1` inside the loop is the bypass this work exists to remove,
+  // and the loop body is only reachable with a live corpus and a container. The
+  // invariant is about the TEXT of the loop, and unlike an index comparison it
+  // cannot be satisfied by a comment: changing the assignment to a literal
+  // increment fails it.
+  const source = readFileSync(RUNNER, 'utf8');
+  const loopStart = source.indexOf('for (const entry of prereg.trial_list) {');
+  assert.ok(loopStart > 0, 'the launch loop is gone from the runner');
+  const loopEnd = source.indexOf('\n  }\n', source.indexOf('budgetStop = {', loopStart));
+  const body = source.slice(loopStart, loopEnd > loopStart ? loopEnd : loopStart + 6000);
+  for (const literal of ['spentUnits += 1', 'spentUnits = 1', 'spentUnits++', 'spentUnits = plan.units', 'spentUnits += plan.units']) {
+    assert.equal(body.includes(literal), false,
+      `the launch loop contains \`${literal}\`: the running spend may only be assigned from the charging step's decision`);
+  }
+  assert.match(body, /spentUnits = step\.spent_units;/,
+    'the launch loop does not take its running total from the charging step');
 });
