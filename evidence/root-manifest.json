@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "710b042c689158fc60945dd2e14b02a4367b381a",
-  "sourceTree": "4223e3e2e6785fc80d36681d3d602242e3d752df",
+  "sourceCommit": "e61ecab735bc5974265793d9ff365e592d025c38",
+  "sourceTree": "81649032e438ccdb99b3c7461bb3209169124ac4",
   "trackedFileCount": 1117,
   "manifestFileCount": 1112,
-  "payloadManifestSha256": "221f35c65d932143bec0e59069d4025d9c9f0a60f9dd17b9f4994fcefe2f8b63",
-  "fileManifestSha256": "88cf7f3523a953079ce19f9419875e2cb3e2bb219fee637939f37c3047724d82",
+  "payloadManifestSha256": "e0c473d6e265c7d3f9942fc75c2359d6f05b4de08fd1c6f15c9ef831740448ed",
+  "fileManifestSha256": "dfbef984b3f106aa1ffb8f38994a49c1bd142ee6b6048300b730e2dfb551b14f",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2553,8 +2553,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "608eeb97cc98d480af75714a50c344bcbf5ee33d026bb474969fb2d330aea130",
-      "bytes": 49218
+      "sha256": "ec6a112904809859377b359e556703839522e96d28ada1a6bffd2773ba2e5754",
+      "bytes": 50082
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -4103,8 +4103,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-run.mjs",
-      "sha256": "744c7aff6c3de447494637352a98e36e4ce8d94ab459bd3519a921f53656272e",
-      "bytes": 43794
+      "sha256": "c3c462e85f0c1e19039df50fea83ab3cabb7fbad4a1c79062d500d4947a02d3f",
+      "bytes": 52200
     },
     {
       "path": "scripts/s2-008-campaign-seal-v3.mjs",
@@ -5228,8 +5228,8 @@
     },
     {
       "path": "tests/research/campaign-currency-guard.test.mjs",
-      "sha256": "0e1eb5eb8a77107bab4ff47cede8051389533befd3537d94768535d1f143666f",
-      "bytes": 8206
+      "sha256": "df2ec45e6b557385596787e61f5c759fff4d080d15ece8b653f678f2c774aa5a",
+      "bytes": 16164
     },
     {
       "path": "tests/research/campaign-seal-v3.test.mjs",
