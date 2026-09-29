@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "a9e372406796d5108aa899ed4718d382316f2b6d",
-  "sourceTree": "2591a97ab8482865c5e529af41e2197897ae6272",
-  "trackedFileCount": 1120,
-  "manifestFileCount": 1115,
-  "payloadManifestSha256": "ce67bf091a0f0966137fb5141ef7da3f0a3f6160db09d9094c3482fabd064b06",
-  "fileManifestSha256": "d9637351384a454846c9fced9dda7a950e725fb7e165e031641d693181bd23bd",
+  "sourceCommit": "2eaac18080f7be33f878f94220e96567412205ea",
+  "sourceTree": "0bf91280f6dfde63847d7f50a349a2efb407b8a8",
+  "trackedFileCount": 1121,
+  "manifestFileCount": 1116,
+  "payloadManifestSha256": "c9075a378d3b0219d5afb4b43b92ec7a2e1a6662c77d75334715fe4553276264",
+  "fileManifestSha256": "840c1019bcc6d49b9cc45144d222d5fa117f86ea5020d5392e4b477c09236421",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2938,8 +2938,8 @@
     },
     {
       "path": "evidence/s2-008-campaign/evaluation.json",
-      "sha256": "d79660c7e934fc424dcaa6dd5730ad0cfd744ed757ab5d3fdb10aac2522dbcde",
-      "bytes": 7810
+      "sha256": "7e1b256eaffbb6cde4d7e58e20b14e788c5cf94edad97108df13749d36fe019d",
+      "bytes": 8720
     },
     {
       "path": "evidence/s2-008-campaign/model-image-pin-v3.json",
@@ -4058,8 +4058,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-adapter.mjs",
-      "sha256": "414a732d4ce131e176038a567aa0f8f5cec736ffaad726bc510a647e7d9f8d46",
-      "bytes": 21625
+      "sha256": "2f9218191efb47a6c56bd962426d2d55acbbe299d5e1adc9e13279c4e4a9a9e6",
+      "bytes": 24216
     },
     {
       "path": "scripts/s2-008-campaign-approve.mjs",
@@ -4083,8 +4083,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-evaluate.mjs",
-      "sha256": "4e82f9bb708322eb2210c160df32844843535ba20c79f8c0b5500cdfcaf09c56",
-      "bytes": 22767
+      "sha256": "6ac6507b625f30c2ff856ae7367b6bec604ee8300c38f9c655e9f9edd1670246",
+      "bytes": 29124
     },
     {
       "path": "scripts/s2-008-campaign-model-image.mjs",
@@ -5265,6 +5265,11 @@
       "path": "tests/research/dataset.test.mjs",
       "sha256": "a7935d7ca084bcdb33d5fe4895558e14eb3f006e5cabf7b8f7d4727e0eb8cb1b",
       "bytes": 19017
+    },
+    {
+      "path": "tests/research/evaluation-recorded-predictions.test.mjs",
+      "sha256": "f556f75aff444ffec9583ba7203c412154086036d03ad3b4dbafd23f0d88d2d7",
+      "bytes": 7963
     },
     {
       "path": "tests/research/fixtures/fixture-corrupted-variants.mjs",
