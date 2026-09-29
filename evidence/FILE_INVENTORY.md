@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1123.
+Generated from `git ls-files`; count: 1125.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -448,6 +448,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration.v3.approved.json`
 - `corpus/s2-008-campaign/preregistration.v3.draft.json`
 - `corpus/s2-008-campaign/preregistration.v3.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v4.draft.json`
 - `corpus/s2-008-campaign/source-ledger.json`
 - `corpus/s2-008-campaign/source-ledger.v3.json`
 - `docs/ARCHITECTURE.md`
@@ -828,6 +829,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-probes.mjs`
 - `scripts/s2-008-campaign-run.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
+- `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-egress-bridge.mjs`
 - `scripts/s2-008-harness.mjs`
 - `scripts/s2-008-replay.mjs`
