@@ -168,3 +168,19 @@ test('the env file is kept ONLY when the run asked for it, and it is 0600', () =
     assert.equal(existsSync(record.env_file), false);
   });
 });
+
+test('the default Podman launcher passes executable and argv in spawnSync order', () => {
+  withDir((dir) => {
+    const executable = path.join(dir, 'podman');
+    writeFileSync(executable, '#!/bin/sh\nif [ "$1" = "secret" ]; then exit 0; fi\nexit 2\n', { mode: 0o755 });
+    const previousPath = process.env.PATH;
+    process.env.PATH = dir + ':' + previousPath;
+    try {
+      const record = provision({ handle: HANDLE, envName: ENV_NAME }, { value: VALUE, spoolDir: dir });
+      assert.equal(record.store.created, true);
+      assert.equal(record.value_in_argv, false);
+    } finally {
+      process.env.PATH = previousPath;
+    }
+  });
+});
