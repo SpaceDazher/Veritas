@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "095f4913c5f05b4917a74e0d84e163f46b95a683",
-  "sourceTree": "0c255690d9283e76682cf70a4f1a997ffec3f10d",
-  "trackedFileCount": 1118,
-  "manifestFileCount": 1113,
-  "payloadManifestSha256": "84af2a990d4ac68b9cfa3a6cb6ab5ec5711f56c10c1ce84ac451d249ec32d146",
-  "fileManifestSha256": "c560015cf3883b9e93cb9d932a3f0aa7ba1389ab7733edcde13881f3dcdab15c",
+  "sourceCommit": "a9e372406796d5108aa899ed4718d382316f2b6d",
+  "sourceTree": "2591a97ab8482865c5e529af41e2197897ae6272",
+  "trackedFileCount": 1120,
+  "manifestFileCount": 1115,
+  "payloadManifestSha256": "ce67bf091a0f0966137fb5141ef7da3f0a3f6160db09d9094c3482fabd064b06",
+  "fileManifestSha256": "d9637351384a454846c9fced9dda7a950e725fb7e165e031641d693181bd23bd",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2553,8 +2553,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "e87c231eab790df03bac0e7186dea70597f7e06d88c8f33344140a3797665445",
-      "bytes": 50128
+      "sha256": "87ba55f7d19d496aac23552d91a44b968e7beaf0186f3de6adc9b6244768d2bc",
+      "bytes": 50208
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -4088,8 +4088,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-model-image.mjs",
-      "sha256": "9af98586b63448546bea51469bbfc6540834813d871d324278447b3956a3391b",
-      "bytes": 5550
+      "sha256": "604efe84207f8bafcb1562d079d6b71b4753d912d469b459522aabd38f455fc1",
+      "bytes": 5893
     },
     {
       "path": "scripts/s2-008-campaign-prepare.mjs",
@@ -4110,6 +4110,11 @@
       "path": "scripts/s2-008-campaign-seal-v3.mjs",
       "sha256": "1544982bbdec8804f81b102edda026c486385c9fd05d2c3231b9abf36bee80be",
       "bytes": 7300
+    },
+    {
+      "path": "scripts/s2-008-egress-bridge.mjs",
+      "sha256": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "bytes": 7585
     },
     {
       "path": "scripts/s2-008-harness.mjs",
@@ -5205,6 +5210,11 @@
       "path": "tests/isolation/credential-provision.test.mjs",
       "sha256": "6612d61cbed9eb3ea3f71fff398a0f94b6a1f7ea79d7f3c2a7bc7c339bdd89d6",
       "bytes": 8096
+    },
+    {
+      "path": "tests/isolation/egress-bridge.test.mjs",
+      "sha256": "b9e15c824fc9128815a31b2d07c9984faef18c6afa4a9903c1c36c0b32116891",
+      "bytes": 9219
     },
     {
       "path": "tests/isolation/egress-forwarder.test.mjs",
