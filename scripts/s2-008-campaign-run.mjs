@@ -193,6 +193,53 @@ function projectJournalRows(rows) {
   });
 }
 
+/** What this runner can OBSERVE happening, and therefore charge. A launch is a
+ *  process; a token is a number the executor reports about that process. This
+ *  runner can only see the first, and a reservation in any other currency stops
+ *  the campaign before the first container rather than being charged in a unit
+ *  that would make the ceiling look untouched. */
+export const MEASURABLE = 'isolated_executor_launches';
+
+/**
+ * The currency decision, as a pure function so a test can reach BOTH branches.
+ * Returning null means "carry on"; anything else is the refusal the caller
+ * records, prints and exits on. It was inline before, and the only way to observe
+ * a refusal was to satisfy an earlier guard — so a mutation of the exit code, or
+ * of the entry point's handling of the refusal, was invisible to the suite.
+ */
+export function currencyRefusal(reservationCurrency, { grantedUnits = null } = {}) {
+  if (reservationCurrency === MEASURABLE) return null;
+  return Object.freeze({
+    status: 'BLOCKED',
+    code: 'BUDGET_UNMEASURABLE',
+    exitCode: 4,
+    launches: 0,
+    charged_units: 0,
+    spent_units: 0,
+    granted_units: grantedUnits,
+    declared_currency: String(reservationCurrency ?? ''),
+    measurable_currency: MEASURABLE,
+    detail: `this runner charges ${MEASURABLE} and the reservation is denominated in ${String(reservationCurrency ?? '(none)')}; a launch is not a token, so nothing was launched and nothing was charged. A token-denominated campaign needs a runner that charges the executor's own usage.totalTokens.`,
+  });
+}
+
+/** What the entry point prints and what status it leaves, for any run record. */
+export function entryReportFor(record) {
+  if (record?.status === 'BLOCKED') {
+    return {
+      exitCode: Number.isInteger(record.exitCode) ? record.exitCode : 4,
+      report: {
+        status: record.status,
+        code: record.code,
+        launches: record.launches ?? 0,
+        charged_units: record.charged_units ?? 0,
+        detail: record.detail,
+      },
+    };
+  }
+  return { exitCode: 0, report: null };
+}
+
 export function assertRunnerPreregInForce(prereg, manifest) {
   if (manifest?.preregistration?.status !== 'IN_FORCE' ||
       manifest.preregistration.file !== 'preregistration.json' ||
@@ -297,6 +344,41 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
   const timeoutMs = prereg.budget_reservation.trial_timeout_ms;
   const deps = engineDeps();
 
+  // --- 2b. WHAT THIS RUNNER CAN MEASURE, checked BEFORE anything is launched ---
+  //
+  // This runner charges CONTAINER LAUNCHES: one unit per launch, because a
+  // launch is the thing it can observe happening. A token-denominated campaign
+  // is a different measurement, and the two are not interchangeable: the v1
+  // attempt charged nothing at all, and a later variant would have charged ONE
+  // TOKEN per launch against a 5,000,000-token ceiling — nine launches would read
+  // as 9 tokens spent, which is a ceiling that looks untouched while the whole
+  // amount went out. A budget that cannot be measured must REFUSE the run, not
+  // acquire a unit size that flatters it.
+  //
+  // So: this runner declares what it can measure, and a reservation in any other
+  // currency stops the campaign here — before the first container, so a refusal
+  // costs nothing and leaves no half-spent ledger behind.
+  const MEASURABLE_CURRENCY = MEASURABLE;
+  const reservationCurrency = String(prereg.budget_reservation.currency ?? '');
+  const refusal = currencyRefusal(reservationCurrency, { grantedUnits: prereg.budget_reservation.granted_units });
+  if (refusal !== null) {
+    appendRecord(registry, {
+      kind: 'BUDGET_REFUSAL',
+      record_kind: refusal.code,
+      run_id: runId,
+      reservation_id: reservationId,
+      declared_currency: refusal.declared_currency,
+      measurable_currency: refusal.measurable_currency,
+      granted_units: refusal.granted_units,
+      spent_units: 0,
+      launches: 0,
+      detail: refusal.detail,
+      at: DECISION_POINT,
+    });
+    process.stderr.write(`${refusal.detail}\n`);
+    return refusal;
+  }
+
   // --- 3. PHASE A: every arm at every seed, by the REAL adapter, BLIND ----
   // Every launch is CHARGED against the reservation as it happens. A budget
   // that is only compared at the end is a number in a document, and the first
@@ -317,11 +399,11 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
       const charge = recordSpend(registry, {
         reservationId,
         key: `launch:${reservationId}:${preregDigest}:${entry.trial_id}:${String(seed)}`,
-        args: { reservation_id: reservationId, units: 1, currency: prereg.budget_reservation.currency, trial: entry.trial_id, seed, at: DECISION_POINT },
+        args: { reservation_id: reservationId, units: 1, unit: MEASURABLE_CURRENCY, currency: prereg.budget_reservation.currency, trial: entry.trial_id, seed, at: DECISION_POINT },
       });
       // `replayed: false` is the ledger saying it CHARGED, and reporting that
       // as `outcome: false` reads like a failure. It is named here.
-      charges.push({ trial: entry.trial_id, seed, units: 1, replayed: charge?.replayed === true, settled: charge?.replayed !== true });
+      charges.push({ trial: entry.trial_id, seed, units: 1, unit: MEASURABLE_CURRENCY, replayed: charge?.replayed === true, settled: charge?.replayed !== true });
       const row = {
         kind: 'TRIAL_EXECUTION',
         record_kind: 'TRIAL_EXECUTED',
@@ -401,7 +483,7 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
       key: `launch:${reservationId}:${preregDigest}:bootstrap`,
       args: { reservation_id: reservationId, units: 1, currency: prereg.budget_reservation.currency, trial: 'BOOTSTRAP', at: DECISION_POINT },
     });
-    charges.push({ trial: 'BOOTSTRAP', seed: null, units: 1, launch_succeeded: result.ok, settled: true, note: 'a launch that fails is still charged: the unit is the launch, not the answer' });
+    charges.push({ trial: 'BOOTSTRAP', seed: null, units: 1, unit: MEASURABLE_CURRENCY, launch_succeeded: result.ok, settled: true, note: 'a launch that fails is still charged: the unit is the launch, not the answer' });
     appendRecord(registry, {
       kind: 'TRIAL_EXECUTION', record_kind: 'BOOTSTRAP_EXECUTED', trial: 'BOOTSTRAP',
       raw_run_id: runId, nonce: provenance.nonce, at: DECISION_POINT,
@@ -756,6 +838,15 @@ if (!isEntry) {
     write: args.write === true,
     out: typeof args.out === 'string' ? args.out : null,
   });
+  // A refusal is a RESULT, and the entry point has to say so with a non-zero
+  // status and nothing but the refusal. Without this the print below would
+  // dereference fields a refused run never produced, and the operator would read
+  // a TypeError instead of the reason the campaign did not start.
+  const entry = entryReportFor(record);
+  if (entry.report !== null) {
+    console.log(JSON.stringify(entry.report, null, 2));
+    process.exitCode = entry.exitCode;
+  } else {
   console.log(JSON.stringify({
     raw_run_id: record.raw_run_id,
     commit_sha: record.commit_sha,
@@ -775,4 +866,5 @@ if (!isEntry) {
     counters: record.counters,
     chain_verified: record.registry.chain_verified,
   }, null, 2));
+  }
 }
