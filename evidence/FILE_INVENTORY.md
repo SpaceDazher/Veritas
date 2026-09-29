@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1120.
+Generated from `git ls-files`; count: 1121.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -1058,6 +1058,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`
+- `tests/research/evaluation-recorded-predictions.test.mjs`
 - `tests/research/fixtures/fixture-corrupted-variants.mjs`
 - `tests/research/fixtures/fixture-digest.mjs`
 - `tests/research/fixtures/fixture-expected-values.mjs`
