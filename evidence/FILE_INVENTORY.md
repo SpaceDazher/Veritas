@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1170.
+Generated from `git ls-files`; count: 1193.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -447,7 +447,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration-v4-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v5-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v5-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v6-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v6-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v7-supersession.json`
 - `corpus/s2-008-campaign/preregistration.json`
 - `corpus/s2-008-campaign/preregistration.v2.approved.json`
 - `corpus/s2-008-campaign/preregistration.v2.draft.json`
@@ -463,6 +465,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration.v6.approved.json`
 - `corpus/s2-008-campaign/preregistration.v6.draft.json`
 - `corpus/s2-008-campaign/preregistration.v6.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v7.approved.json`
+- `corpus/s2-008-campaign/preregistration.v7.draft.json`
+- `corpus/s2-008-campaign/preregistration.v7.in-force.json`
 - `corpus/s2-008-campaign/source-ledger.json`
 - `corpus/s2-008-campaign/source-ledger.v3.json`
 - `docs/ARCHITECTURE.md`
@@ -503,6 +508,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/product/PILOT_PROFILE.md`
 - `docs/product/PRODUCT_CONTRACT.md`
 - `docs/S2-008-CAMPAIGN-V6.md`
+- `docs/S2-008-CAMPAIGN-V7.md`
 - `docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md`
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
 - `docs/security/S2-002-PROCESS-CANCELLATION.md`
@@ -608,6 +614,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-real-run-gate.json`
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
+- `evidence/s2-008-campaign/dry-run-v7.json`
 - `evidence/s2-008-campaign/evaluation.json`
 - `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/model-image-pin-v4.json`
@@ -615,11 +622,22 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v5.json`
 - `evidence/s2-008-campaign/model-image-pin-v6-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v6.json`
+- `evidence/s2-008-campaign/model-image-pin-v7-preseal.json`
+- `evidence/s2-008-campaign/model-image-pin-v7.json`
+- `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/probes-v6.json`
 - `evidence/s2-008-campaign/probes.json`
+- `evidence/s2-008-campaign/provider-auth-resolution-cn-v6.json`
+- `evidence/s2-008-campaign/reconciliation-v6-a.json`
 - `evidence/s2-008-campaign/run-a.json`
 - `evidence/s2-008-campaign/run-aborted-1.json`
 - `evidence/s2-008-campaign/run-b.json`
+- `evidence/s2-008-campaign/run-v6-a.json`
+- `evidence/s2-008-campaign/runtime-policy-v7-final.json`
+- `evidence/s2-008-campaign/runtime-policy-v7-preseal.json`
+- `evidence/s2-008-campaign/security-probes-v6.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
+- `evidence/s2-008-campaign/zero-network-auth-v6.json`
 - `evidence/s2-008-comparison.json`
 - `evidence/s2-008-controls.json`
 - `evidence/s2-008-dependency-binding.json`
@@ -842,6 +860,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-arm-model.mjs`
 - `scripts/s2-008-campaign-arm.mjs`
 - `scripts/s2-008-campaign-bootstrap.mjs`
+- `scripts/s2-008-campaign-credential-env.mjs`
 - `scripts/s2-008-campaign-egress-forwarder.mjs`
 - `scripts/s2-008-campaign-evaluate.mjs`
 - `scripts/s2-008-campaign-model-image.mjs`
@@ -852,12 +871,15 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-seal-v4.mjs`
 - `scripts/s2-008-campaign-seal-v5.mjs`
 - `scripts/s2-008-campaign-seal-v6.mjs`
+- `scripts/s2-008-campaign-seal-v7.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-campaign-v5-approval.mjs`
 - `scripts/s2-008-campaign-v5-draft.mjs`
 - `scripts/s2-008-campaign-v6-approval.mjs`
 - `scripts/s2-008-campaign-v6-draft.mjs`
 - `scripts/s2-008-campaign-v6-timeout.mjs`
+- `scripts/s2-008-campaign-v7-approval.mjs`
+- `scripts/s2-008-campaign-v7-draft.mjs`
 - `scripts/s2-008-egress-bridge.mjs`
 - `scripts/s2-008-harness.mjs`
 - `scripts/s2-008-replay.mjs`
@@ -1101,6 +1123,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-v5-approval.test.mjs`
 - `tests/research/campaign-v6-probe-evidence.test.mjs`
 - `tests/research/campaign-v6-timeout.test.mjs`
+- `tests/research/campaign-v7-credential.test.mjs`
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`
