@@ -66,3 +66,20 @@ No signed body or model image source was changed during this repair.
 The earlier standalone paid route probe was NOT_RUN: automatic approval review
 rejected the extra request outside authorized A/B. Route acceptance must come
 from the authorized A/B campaign itself. Human A-MVP-05 review remains pending.
+
+## Actual A outcome
+
+The authorized A attempt on base c6529cf stopped at seed 20260926 with INFRA,
+exit 10, zero confirmed usage and unreconciled_spend true. B was NOT_RUN.
+Actual provider tokens/cost remain unknown; zero confirmed counters are not
+zero spend. The original report and predictions sidecar are retained unchanged.
+
+The runner originally dropped the own-arm stop/diagnostics after hashing its
+output. Host adapter fix 1e7b900 retains arm_report in future launch evidence,
+with RED-to-GREEN tests and full npm test exit 0 (1875 tests, no failed/cancelled).
+Image-covered sources and the signed v7 body were unchanged by that fix.
+
+The independent evaluation command refused with exit 1 because B is absent,
+before holdout access. Seven campaign probes and the security record bind to
+the same original A commit/tree. See S2-008-CAMPAIGN-V7-REPORT.md and
+evidence/s2-008-campaign/operational-block-v7.json for the acceptance gap.
