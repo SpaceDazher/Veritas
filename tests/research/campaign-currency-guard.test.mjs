@@ -193,14 +193,14 @@ test('a token charge REFUSES rather than estimating: wrong currency, no number, 
   assert.match(chargeFor({ currency: undefined, armId: MODEL }).refusal, /RESERVATION_CURRENCY_NOT_MEASURABLE/);
 });
 
-test('the shipped dispatchable set is EMPTY, so nothing can spend tokens today', () => {
-  // The honest state, asserted so it cannot be quietly filled: the model arm is
-  // not dispatched by the adapter yet, and until it is, every token reservation is
-  // refused at the arm plan. Filling this list is the work that enables spending.
-  assert.deepEqual([...DISPATCHABLE_MODEL_ARMS], []);
+test('the shipped dispatchable set names only the model arm with proven own-report accounting', () => {
   const MODEL = 'arm-model-zai-glm53flash';
-  const charge = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens', spent_tokens: 10233 } } });
-  assert.equal(charge.refusal, `TOKEN_ARMED_NOT_DISPATCHABLE:${MODEL}`);
+  assert.deepEqual([...DISPATCHABLE_MODEL_ARMS], [MODEL]);
+  const output = { budget: { currency: 'tokens', spent_tokens: 10233, unreconciled_spend: false } };
+  const charge = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: output, dispatchableArms: DISPATCHABLE_MODEL_ARMS });
+  assert.equal(charge.units, output.budget.spent_tokens);
+  assert.equal(charge.unit, 'EXECUTOR_REPORTED_TOKENS');
+  assert.equal(chargeFor({ currency: 'tokens', armId: MODEL, armOutput: output }).refusal, `TOKEN_ARMED_NOT_DISPATCHABLE:${MODEL}`);
 });
 
 test('the ceiling stops on >=, so an exactly exhausted reservation does not continue', () => {

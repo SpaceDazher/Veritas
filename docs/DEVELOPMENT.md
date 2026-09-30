@@ -10,7 +10,8 @@
 После перезагрузки WSL восстановите rootless Podman runtime командой
 `source scripts/setup-podman-tmp.sh`. Скрипт создаёт обёртку в `/tmp/bin`,
 выставляет `PATH`, `XDG_RUNTIME_DIR` и `TMPDIR`, затем проверяет наличие
-закреплённой базы по digest и подтягивает её, если её нет. Проверка:
+закреплённых образов Node и PostgreSQL по digest и подтягивает их, если их нет.
+PostgreSQL pin используется обязательным concurrency suite в `npm test`. Проверка:
 `podman info --format '{{.Host.OCIRuntime.Name}}'` должна вывести
 `/usr/bin/crun`.
 

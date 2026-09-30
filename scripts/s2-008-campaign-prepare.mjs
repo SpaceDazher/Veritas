@@ -795,11 +795,23 @@ if (argv.includes('--seal-v2')) {
 } else if (argv.includes('--seal-v3')) {
   const { sealOnDisk } = await import('./s2-008-campaign-seal-v3.mjs');
   console.log(JSON.stringify({ mode: 'seal-v3', ...sealOnDisk() }, null, 2));
+} else if (argv.includes('--seal-v4')) {
+  const { sealOnDisk } = await import('./s2-008-campaign-seal-v4.mjs');
+  console.log(JSON.stringify({ mode: 'seal-v4', ...sealOnDisk() }, null, 2));
+} else if (argv.includes('--seal-v5')) {
+  const { sealV5OnDisk } = await import('./s2-008-campaign-seal-v5.mjs');
+  console.log(JSON.stringify({ mode: 'seal-v5', ...sealV5OnDisk() }, null, 2));
 } else if (argv.includes('--selftest')) {
   selftest();
 } else if (argv.includes('--check')) {
   const currentManifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
-  if (currentManifest.preregistration?.file === 'preregistration.v3.in-force.json') {
+  if (currentManifest.preregistration?.file === 'preregistration.v5.in-force.json') {
+    const { checkV5OnDisk } = await import('./s2-008-campaign-seal-v5.mjs');
+    console.log(JSON.stringify({ mode: 'check-v5', ...checkV5OnDisk() }, null, 2));
+  } else if (currentManifest.preregistration?.file === 'preregistration.v4.in-force.json') {
+    const { checkV4OnDisk } = await import('./s2-008-campaign-seal-v4.mjs');
+    console.log(JSON.stringify({ mode: 'check-v4', ...checkV4OnDisk() }, null, 2));
+  } else if (currentManifest.preregistration?.file === 'preregistration.v3.in-force.json') {
     const { checkV3OnDisk } = await import('./s2-008-campaign-seal-v3.mjs');
     console.log(JSON.stringify({ mode: 'check-v3', ...checkV3OnDisk() }, null, 2));
   } else {

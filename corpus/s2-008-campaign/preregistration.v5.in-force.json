@@ -1,7 +1,7 @@
 {
   "kind": "PREREGISTRATION",
-  "rule": "s2-008-prereg-v4",
-  "preregistration_id": "xpr-s2-008c-04",
+  "rule": "s2-008-prereg-v5",
+  "preregistration_id": "xpr-s2-008c-05",
   "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
   "card_id": "hyc-s2-008c-01",
   "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
@@ -197,7 +197,9 @@
       "why_it_is_here": "the repository has no cost model of its own — policy.mjs carries task/campaign/day limits with a currency field and adapters.mjs:907 forbids inventing one — so this is a MEASURED reference and not a budget. The ceiling above is denominated in tokens because tokens is the unit the owner set the cap in.",
       "caveat": "The 5,000,000-token ceiling is about 29% above the measured 3,865,734-token plan. It is a binding control: stop before the next call when the recorded token total reaches the ceiling; report a budget stop rather than silently extending the campaign."
     },
-    "enumerated_work": "1 model trial x 3 frozen seeds = 3 model runs x 126 holdout cases = 378 case calls; 2 regex control trials make no model calls"
+    "enumerated_work": "1 model trial x 3 frozen seeds = 3 model runs x 126 holdout cases = 378 case calls; 2 regex control trials make no model calls",
+    "ceiling_scope": "PER_RUN_A_OR_B",
+    "aggregate_spend_disclosure": "A and B each have an independent 5,000,000-token ceiling; report their total spend separately"
   },
   "noise_rule": {
     "band": 0.06969570950743816,
@@ -299,7 +301,7 @@
   },
   "recorded_before_first_trial": {
     "first_trial": "NOT_STARTED",
-    "proof": "no trial has run under this document, and the arm refuses an unapproved preregistration"
+    "proof": "no paid trial has run under v5 and v4 paid launches are blocked"
   },
   "required_fields_present": [
     "hypothesis",
@@ -364,7 +366,7 @@
     "determinism_note": "a model is not a function of its input. The arm records the digest of every raw answer so a repeat can be COMPARED against the committed one. No claim is made that the model is reproducible; the run statement is about the frozen inputs and the recorded outputs.",
     "unparseable_policy": "an answer that is not exactly one of MAJOR/MINOR is UNPARSED and counts as a disagreement, never as a guess",
     "model_image": {
-      "content_commitment": "d3ff8228d8c1f17091e59c0af2171c10f2444dbb5dd6940dfe9666063c40433f",
+      "content_commitment": "b40206b970c4190f5387c15b4bea66f4f5e9dbff143e45d8533952123427b150",
       "covers": [
         "arm",
         "blind",
@@ -377,17 +379,18 @@
       "excludes": [
         "prereg"
       ],
-      "field_why": "this is a commitment to the CONTENT the run executes (arm, bridge, canonical-json, corpus, base, pi, recipe), not to the built image digest",
+      "field_why": "content commitment covers the cap-aware arm, bridge, corpus, base, pi and recipe; the signed document is excluded to avoid a digest cycle",
       "cycle_why": "the signed body is COPYed into this image, so a body carrying the image digest would contain a digest of itself; the direction is preregistration -> image only",
-      "built_image_pin": "evidence/s2-008-campaign/model-image-pin-v4.json",
+      "built_image_pin": "evidence/s2-008-campaign/model-image-pin-v5.json",
       "built_image_pin_reason": "the built image includes this signed document, so its digest is recorded in evidence and re-verified per launch; the signed body contains only the acyclic content commitment"
     }
   },
   "supersession": {
-    "supersedes": "xpr-s2-008c-03",
-    "superseded_digest": "39d0b37a1aa3585f1aead90820b0d0b858b726ef875561cfe3b4934e5d2c3103",
-    "reason": "the model image gained the egress bridge, so its content commitment changed. The question, card, metric, baseline, band, seeds, family, stopping, holdout access, trial list and ceiling are unchanged.",
+    "supersedes": "xpr-s2-008c-04",
+    "superseded_digest": "2ca9dd659ecaa80a978164529bd4674571d42becb5dfdb915f6d124272f1d5c4",
+    "reason": "v5 replaces the model image with a shared remaining-token cap across seeds; the scientific rule and the 5,000,000-token ceiling per run are unchanged",
     "unchanged": [
+      "card",
       "metric",
       "frozen_baseline",
       "noise_rule",
@@ -398,23 +401,22 @@
       "stopping_rule",
       "sequential_rule",
       "holdout_access",
-      "card",
+      "inference_mode",
       "trial_list",
       "expected_table_digest",
-      "bootstrap_process",
-      "inference_mode"
+      "bootstrap_process"
     ]
   },
-  "status": "DRAFT",
+  "status": "APPROVED",
   "approval": {
-    "status": null,
+    "status": "APPROVED",
     "authority": "HUMAN_OWNER",
-    "principal_id": null,
-    "label": null,
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
     "issued_at": null,
     "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
-    "in_force": false,
-    "becomes_in_force_when": "the owner signs this draft and scripts/s2-008-campaign-prepare.mjs seals the resulting digest into the corpus manifest"
+    "in_force": true,
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v5 records this digest and supersession in the corpus manifest"
   },
-  "preregistration_digest": "2ca9dd659ecaa80a978164529bd4674571d42becb5dfdb915f6d124272f1d5c4"
+  "preregistration_digest": "b482cc7ea0325b405e18f33777ba93d387a0a494a01ace65db7a8b8457da6df9"
 }

@@ -70,10 +70,7 @@ const draft = {
       // launch. It is deliberately NOT in the signed body, and this says so where
       // a reader of the signature will look for it.
       built_image_pin: 'evidence/s2-008-campaign/model-image-pin-v4.json',
-      built_image_id: pin.first.imageId,
-      built_image_digest: pin.first.digest,
-      built_image_id_is_signed: false,
-      built_image_pin_reason: 'a pin whose value the signature covers cannot be re-cut without invalidating the signature; the built image is therefore pinned in evidence and re-verified per launch instead',
+      built_image_pin_reason: 'the built image includes this signed document, so its digest is recorded in evidence and re-verified per launch; the signed body contains only the acyclic content commitment',
     },
   },
   supersession: {
@@ -86,7 +83,12 @@ const draft = {
     first_trial: 'NOT_STARTED',
     proof: 'no trial has run under this document, and the arm refuses an unapproved preregistration',
   },
-  // Unchanged on purpose: budget_reservation, including granted_units 5000000.
+  // The ceiling is unchanged. The explanatory enumeration corrects v3's
+  // mistaken claim that all three trial arms call the model: only trial 01 does.
+  budget_reservation: {
+    ...base.budget_reservation,
+    enumerated_work: '1 model trial x 3 frozen seeds = 3 model runs x 126 holdout cases = 378 case calls; 2 regex control trials make no model calls',
+  },
   status: 'DRAFT',
   approval: {
     status: null,

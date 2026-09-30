@@ -21,12 +21,15 @@
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { readCorpus } from '../src/lib/research/dataset.mjs';
 import { openRegistry, readJournal } from '../src/lib/research/registry.mjs';
+import { preregistrationDigest } from '../src/lib/research/preregistration.mjs';
+import { buildBootstrapImage, runBootstrap } from './s2-008-campaign-adapter.mjs';
 
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -41,6 +44,57 @@ const ARM_RULES = Object.freeze({
   'arm-type-feat-fix': (subject) => (/^(feat|fix)(\([^)]*\))?!?:/.test(subject) ? 'MAJOR' : 'MINOR'),
   'arm-type-chore': (subject) => (/^chore(\([^)]*\))?!?:/.test(subject) ? 'MINOR' : 'MAJOR'),
 });
+
+/**
+ * V4 sidecars are immutable one-file-per-(trial,seed) records. The run gives
+ * only a digest and path; this reader binds both to the declared trial and
+ * scores each frozen seed separately against the holdout labels.
+ */
+export function loadV4TrialPredictions({
+  trial, entry, runLabel, seeds, holdoutCases,
+  readFile = (file) => fs.readFileSync(file, 'utf8'), root = REPO_ROOT, version = 'v4',
+}) {
+  const refuse = (reason) => ({ available: false, reason });
+  if (!Array.isArray(seeds) || !Array.isArray(holdoutCases) || !Array.isArray(trial?.seeds) ||
+      trial.trial_id !== entry?.trial_id || trial.arm_id !== entry?.arm_id) {
+    return refuse('V4_TRIAL_SHAPE_MISMATCH');
+  }
+  const seen = trial.seeds.map((row) => row?.seed);
+  if (seen.length !== seeds.length || seen.some((seed, i) => seed !== seeds[i]) ||
+      new Set(seen).size !== seeds.length) return refuse('V4_SEED_SET_MISMATCH');
+  const expectedIds = holdoutCases.map((row) => row.case_id);
+  const labels = new Map(holdoutCases.map((row) => [row.case_id, row.label]));
+  const perSeed = [];
+  for (const seedRow of trial.seeds) {
+    const seed = seedRow.seed;
+    const ref = seedRow.predictions;
+    const expectedFile = `evidence/s2-008-campaign/predictions-${version}-${runLabel}-${entry.trial_id}-${seed}.json`;
+    if (!ref || ref.file !== expectedFile) return refuse(`V4_SIDECAR_PATH_MISMATCH:${seed}`);
+    let body;
+    try { body = JSON.parse(readFile(path.join(root, expectedFile))); }
+    catch { return refuse(`V4_SIDECAR_MISSING:${seed}`); }
+    if (canonicalDigest(body) !== ref.digest) return refuse(`V4_SIDECAR_DIGEST_MISMATCH:${seed}`);
+    if (body?.kind !== 's2-008-campaign-predictions/1' ||
+        body.run !== runLabel || body.arm_id !== entry.arm_id || body.seed !== seed ||
+        !Array.isArray(body.rows) || body.rows.length !== ref.rows ||
+        body.unparsed !== ref.unparsed ||
+        (seedRow.outcome_class !== undefined && body.outcome_class !== seedRow.outcome_class)) {
+      return refuse(`V4_SIDECAR_BODY_MISMATCH:${seed}`);
+    }
+    const scored = scoreRecordedPredictions({ rows: body.rows, labels, expectedIds });
+    if (!scored.ok) return refuse(`V4_CASE_SET_MISMATCH:${seed}:${scored.problems.join(';')}`);
+    if (scored.unparsed !== body.unparsed) return refuse(`V4_UNPARSED_COUNT_MISMATCH:${seed}`);
+    const byId = new Map(body.rows.map((row) => [row.case_id, row.predicted]));
+    const agreement = holdoutCases.map((row) => byId.get(row.case_id) === row.label ? 1 : 0);
+    perSeed.push({
+      seed, agreeing: scored.agreeing, denominator: scored.rows, agreement,
+      observed: scored.agreeing / scored.rows, unparsed: scored.unparsed,
+      prediction_digest: ref.digest, outcome_class: body.outcome_class,
+      model_calls: body.model_calls, spent_tokens: body.spent_tokens, usd_spent: body.usd_spent,
+    });
+  }
+  return { available: true, per_seed: perSeed };
+}
 
 /**
  * The recorded predictions a run published, or an explanation of why there are
@@ -172,6 +226,266 @@ function decisionIndependent({ observed, lower, upper, noiseBand, alpha, confide
   return { decision: 'UNRESOLVED', reason: 'not_significant_after_multiplicity_correction', pUpper, floor, margin_to_floor: margin, epsilon: DECISION_EPSILON, can_never_reject: pUpper > floor };
 }
 
+
+function activeCampaignVersion(manifest) {
+  const match = /^preregistration\.(v[45])\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
+  return match?.[1] ?? null;
+}
+
+/** Refuse before the holdout is opened if either blind phase is incomplete. */
+export function preflightV4Runs({ runA, runB, prereg, manifest }) {
+  const refuse = (reason) => ({ ok: false, reason });
+  const version = activeCampaignVersion(manifest);
+  if (version === null ||
+      manifest.preregistration.status !== 'IN_FORCE' ||
+      manifest.preregistration.preregistration_digest !== preregistrationDigest(prereg) ||
+      prereg.preregistration_digest !== preregistrationDigest(prereg) ||
+      prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true) {
+    return refuse('V4_PREREGISTRATION_NOT_IN_FORCE');
+  }
+  for (const [label, run] of [['a', runA], ['b', runB]]) {
+    if (run?.kind !== `s2-008-campaign-${version}-predictions/1` || run.label !== label ||
+        run.status !== 'MEASURED' || run.dry_run !== false) return refuse(`V4_RUN_NOT_MEASURED:${label}`);
+    if (run.preregistration_digest !== prereg.preregistration_digest ||
+        run.model_image_pin?.content_commitment !== prereg.executor?.model_image?.content_commitment) {
+      return refuse(`V4_RUN_PREREGISTRATION_MISMATCH:${label}`);
+    }
+    if (typeof run.raw_run_id !== 'string' || !run.raw_run_id ||
+        typeof run.nonce !== 'string' || !run.nonce ||
+        typeof run.base?.commit_sha !== 'string' || !run.base.commit_sha ||
+        typeof run.base?.tree_sha !== 'string' || !run.base.tree_sha) return refuse(`V4_RUN_PROVENANCE_ABSENT:${label}`);
+    if (run.base.worktree_dirty !== false) return refuse(`V4_RUN_DIRTY_BASE:${label}`);
+    if (!Array.isArray(run.trials) || run.trials.length !== prereg.trial_list.length ||
+        !Array.isArray(run.charges) || run.charges.length !== prereg.trial_list.length * prereg.seed_rule.seeds.length) {
+      return refuse(`V4_RUN_INCOMPLETE:${label}`);
+    }
+    let charged = 0;
+    for (let i = 0; i < prereg.trial_list.length; i += 1) {
+      const declared = prereg.trial_list[i];
+      const trial = run.trials[i];
+      if (trial?.trial_id !== declared.trial_id || trial.arm_id !== declared.arm_id ||
+          !Array.isArray(trial.seeds) || trial.seeds.length !== prereg.seed_rule.seeds.length) return refuse(`V4_RUN_INCOMPLETE:${label}`);
+      for (let j = 0; j < prereg.seed_rule.seeds.length; j += 1) {
+        const seed = prereg.seed_rule.seeds[j];
+        const row = trial.seeds[j];
+        const charge = run.charges.find((item) => item.trial === declared.trial_id && item.seed === seed);
+        if (row?.seed !== seed || !row.predictions?.digest || !row.predictions?.file ||
+            !charge || charge.arm_id !== declared.arm_id || !Number.isInteger(charge.units) || charge.units < 0) {
+          return refuse(`V4_RUN_INCOMPLETE:${label}`);
+        }
+        if (declared.arm_id === 'arm-model-zai-glm53flash') {
+          if (row.outcome_class !== 'MEASURED' || charge.units <= 0) return refuse(`V4_RUN_NOT_MEASURED:${label}`);
+        } else if (charge.units !== 0) return refuse(`V4_CONTROL_CHARGED_TOKENS:${label}`);
+        charged += charge.units;
+      }
+    }
+    if (run.reservation?.currency !== 'tokens' ||
+        run.reservation.granted_units !== prereg.budget_reservation.granted_units ||
+        run.spent_units !== charged || charged > run.reservation.granted_units ||
+        run.launches !== run.charges.length) return refuse(`V4_BUDGET_MISMATCH:${label}`);
+  }
+  if (runA.raw_run_id === runB.raw_run_id || runA.nonce === runB.nonce) return refuse('V4_RUN_PROVENANCE_NOT_DISTINCT');
+  if (runA.base.commit_sha !== runB.base.commit_sha || runA.base.tree_sha !== runB.base.tree_sha) return refuse('V4_RUN_BASE_MOVED');
+  return { ok: true, base: runA.base, distinct_run_ids: true, distinct_nonces: true };
+}
+
+/** The signed point estimate is seed-invariant; a moved rate is a refusal. */
+export function scoreV4Trial({ entry, per_seed, bootstrapRows, prereg }) {
+  const refuse = (reason) => ({ ok: false, reason });
+  const seeds = prereg.seed_rule.seeds;
+  if (!Array.isArray(per_seed) || !Array.isArray(bootstrapRows) ||
+      per_seed.length !== seeds.length || bootstrapRows.length !== seeds.length) return refuse('V4_BOOTSTRAP_INCOMPLETE');
+  const first = per_seed[0];
+  if (prereg.seed_rule.point_estimate !== 'OBSERVED_RATE_SEED_INVARIANT') return refuse('V4_POINT_ESTIMATE_RULE_UNSUPPORTED');
+  if (per_seed.some((row, i) => row.seed !== seeds[i] || row.denominator !== first.denominator ||
+      row.agreeing !== first.agreeing)) return refuse('V4_SEED_RATE_MOVED');
+  const rows = [];
+  for (const row of per_seed) {
+    const boot = bootstrapRows.find((item) => item.trial_id === entry.trial_id && item.seed === row.seed);
+    if (!boot || !Number.isFinite(boot.lower) || !Number.isFinite(boot.upper) ||
+        boot.lower < 0 || boot.upper > 1 || boot.lower > boot.upper ||
+        boot.observed_rate !== row.observed || boot.mean_matches_observed !== true) return refuse('V4_BOOTSTRAP_MISMATCH');
+    rows.push({ seed: row.seed, agreeing: row.agreeing, denominator: row.denominator,
+      observed: row.observed, unparsed: row.unparsed, interval: { lower: boot.lower, upper: boot.upper },
+      prediction_digest: row.prediction_digest });
+  }
+  const lower = Math.min(...rows.map((row) => row.interval.lower));
+  const upper = Math.max(...rows.map((row) => row.interval.upper));
+  const decision = decisionIndependent({
+    observed: first.observed, lower, upper, noiseBand: prereg.noise_rule.band,
+    alpha: prereg.multiplicity_rule.alpha, confidence: prereg.multiplicity_rule.confidence,
+    familySize: prereg.multiplicity_rule.family_size, direction: prereg.multiplicity_rule.direction,
+    nullValue: prereg.multiplicity_rule.null_value,
+  });
+  return { ok: true, trial_id: entry.trial_id, arm_id: entry.arm_id,
+    agreeing: first.agreeing, denominator: first.denominator, observed: first.observed,
+    interval: { lower, upper, method: 'HULL_OF_ALL_SEED_INTERVALS' },
+    per_seed: rows, outcome: decision.decision, decision };
+}
+
+const V4_PROBES = Object.freeze([
+  'P1_INFRA_IMAGE_ABSENT', 'P2_LOST_EVALUATOR', 'P3_NO_MEASUREMENT',
+  'P4_PREREGISTERED_TIMEOUT', 'P5_INTERRUPTED_THEN_RESTARTED',
+  'P6_EXPIRED_RESERVATION', 'P7_MISSING_OUTCOME_DETECTABLE',
+]);
+
+/** Compare the immutable table with the signed scientific constants. */
+export function verifyV4FrozenTable({ prereg, manifest, frozenTable }) {
+  const refuse = (reason) => ({ ok: false, reason });
+  if (frozenTable?.kind !== 's2-008-campaign-table/1' ||
+      manifest?.frozen_table?.file !== 'frozen-table.v3.json' ||
+      canonicalDigest(frozenTable) !== manifest.frozen_table.digest ||
+      canonicalDigest(frozenTable) !== prereg.expected_table_digest) return refuse('V4_FROZEN_TABLE_DIGEST_MISMATCH');
+  const rule = frozenTable.rule;
+  const expected = prereg.multiplicity_rule;
+  if (rule?.alpha !== expected.alpha || rule.method !== expected.method ||
+      rule.family_size !== expected.family_size || rule.confidence !== expected.confidence ||
+      rule.rejection_floor !== expected.alpha / expected.family_size ||
+      rule.confidence_derivation !== '1 - alpha / family_size' ||
+      rule.never_rejects !== ((1 - expected.confidence) - (expected.alpha / expected.family_size) >
+        (expected.alpha / expected.family_size) * 1e-12) ||
+      rule.can_only_answer !== 'ANY_OUTCOME' ||
+      frozenTable.metric !== prereg.metric?.name ||
+      frozenTable.baseline !== prereg.frozen_baseline.value ||
+      frozenTable.band !== prereg.noise_rule.band ||
+      frozenTable.n_holdout !== prereg.holdout_access.case_count ||
+      canonicalDigest(frozenTable.seeds) !== canonicalDigest(prereg.seed_rule.seeds) ||
+      frozenTable.budget_ceiling !== prereg.budget_reservation.granted_units ||
+      frozenTable.budget_currency !== prereg.budget_reservation.currency ||
+      frozenTable.trial_list_digest !== canonicalDigest(prereg.trial_list) ||
+      !Array.isArray(frozenTable.permitted_outcomes) ||
+      !['POSITIVE', 'NEGATIVE', 'NULL', 'INFRA', 'UNRESOLVED'].every((value) => frozenTable.permitted_outcomes.includes(value))) {
+    return refuse('V4_FROZEN_TABLE_RULE_MISMATCH');
+  }
+  return { ok: true, digest: canonicalDigest(frozenTable), verdict: 'AGREES', remarks: [] };
+}
+
+/** Score the sealed sidecars after the blind runs, using a separate bootstrap. */
+export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, holdoutCases, bootstrap,
+  readFile = (file) => fs.readFileSync(file, 'utf8'), root = REPO_ROOT }) {
+  const gate = preflightV4Runs({ runA, runB, prereg, manifest });
+  if (!gate.ok) return gate;
+  const table = verifyV4FrozenTable({ prereg, manifest, frozenTable });
+  if (!table.ok) return table;
+  if (!Array.isArray(holdoutCases) || holdoutCases.length !== prereg.holdout_access.case_count ||
+      new Set(holdoutCases.map((row) => row.case_id)).size !== holdoutCases.length ||
+      holdoutCases.some((row) => row.label !== relabel(row.case_id))) {
+    return { ok: false, reason: 'V4_HOLDOUT_LABEL_OR_CASE_MISMATCH' };
+  }
+  const version = activeCampaignVersion(manifest);
+  const scoredRuns = [];
+  for (const [label, run] of [['a', runA], ['b', runB]]) {
+    const loaded = [];
+    const vectors = [];
+    let sidecarCalls = 0;
+    let sidecarTokens = 0;
+    let sidecarUsd = 0;
+    for (let i = 0; i < prereg.trial_list.length; i += 1) {
+      const entry = prereg.trial_list[i];
+      const result = loadV4TrialPredictions({
+        trial: run.trials[i], entry, runLabel: label, seeds: prereg.seed_rule.seeds,
+        holdoutCases, readFile, root, version,
+      });
+      if (!result.available) return { ok: false, reason: result.reason, run: label, trial_id: entry.trial_id };
+      loaded.push({ entry, per_seed: result.per_seed });
+      for (const row of result.per_seed) {
+        const charge = run.charges.find((item) => item.trial === entry.trial_id && item.seed === row.seed);
+        const expectedCalls = entry.arm_id === 'arm-model-zai-glm53flash' ? holdoutCases.length : 0;
+        if (!Number.isInteger(row.model_calls) || row.model_calls !== expectedCalls ||
+            !Number.isInteger(row.spent_tokens) || row.spent_tokens !== charge?.units ||
+            !Number.isFinite(row.usd_spent) || row.usd_spent < 0 ||
+            (expectedCalls === 0 && row.usd_spent !== 0)) {
+          return { ok: false, reason: 'V4_SIDECAR_USAGE_MISMATCH', run: label, trial_id: entry.trial_id };
+        }
+        sidecarCalls += row.model_calls;
+        sidecarTokens += row.spent_tokens;
+        sidecarUsd += row.usd_spent;
+        vectors.push({ trial_id: `${entry.trial_id}@${row.seed}`,
+          arm_id: entry.arm_id, agreement: row.agreement });
+      }
+    }
+    if (sidecarCalls !== run.model_calls || sidecarTokens !== run.spent_units) {
+      return { ok: false, reason: 'V4_RUN_USAGE_MISMATCH', run: label };
+    }
+    let boot;
+    try {
+      boot = bootstrap({ label, vectors, seeds: prereg.seed_rule.seeds,
+        samples: prereg.multiplicity_rule.bootstrap_samples,
+        confidence: prereg.multiplicity_rule.confidence });
+    } catch (error) {
+      return { ok: false, reason: 'V4_BOOTSTRAP_LAUNCH_FAILED', run: label, detail: String(error?.message ?? error) };
+    }
+    const output = boot?.output;
+    if (!boot?.record?.real_start?.proven ||
+        output?.kind !== 's2-008-campaign-bootstrap-output/1' ||
+        output.samples !== prereg.multiplicity_rule.bootstrap_samples ||
+        output.confidence !== prereg.multiplicity_rule.confidence ||
+        !Array.isArray(output.results) || output.results.length !== vectors.length * prereg.seed_rule.seeds.length) {
+      return { ok: false, reason: 'V4_BOOTSTRAP_ISOLATION_OR_OUTPUT_MISMATCH', run: label };
+    }
+    const trials = [];
+    for (const { entry, per_seed } of loaded) {
+      const selected = per_seed.map((row) => {
+        const matches = output.results.filter((item) =>
+          item.trial_id === `${entry.trial_id}@${row.seed}` && item.seed === row.seed && item.arm_id === entry.arm_id);
+        if (matches.length !== 1) return null;
+        const item = matches[0];
+        if (item.samples !== prereg.multiplicity_rule.bootstrap_samples ||
+            item.confidence !== prereg.multiplicity_rule.confidence ||
+            item.n !== row.denominator || item.method !== 'PERCENTILE_BOOTSTRAP_WITH_MULTIPLICITY')
+          return null;
+        return { ...item, trial_id: entry.trial_id };
+      });
+      if (selected.includes(null)) return { ok: false, reason: 'V4_BOOTSTRAP_ROW_MISMATCH', run: label, trial_id: entry.trial_id };
+      const scored = scoreV4Trial({ entry, per_seed, bootstrapRows: selected, prereg });
+      if (!scored.ok) return { ...scored, run: label, trial_id: entry.trial_id };
+      trials.push(scored);
+    }
+    const numerator = trials.reduce((sum, row) => sum + row.agreeing, 0);
+    const denominator = trials.reduce((sum, row) => sum + row.denominator, 0);
+    const interval = {
+      lower: Math.min(...trials.map((row) => row.interval.lower)),
+      upper: Math.max(...trials.map((row) => row.interval.upper)),
+    };
+    const campaign = decisionIndependent({
+      observed: numerator / denominator, lower: interval.lower, upper: interval.upper,
+      noiseBand: prereg.noise_rule.band, alpha: prereg.multiplicity_rule.alpha,
+      confidence: prereg.multiplicity_rule.confidence,
+      familySize: prereg.multiplicity_rule.family_size,
+      direction: prereg.multiplicity_rule.direction,
+      nullValue: prereg.multiplicity_rule.null_value,
+    });
+    const projection = { trials: trials.map((row) => ({
+      trial_id: row.trial_id, agreeing: row.agreeing, denominator: row.denominator,
+      interval: row.interval, outcome: row.outcome,
+    })), campaign: campaign.decision };
+    scoredRuns.push({
+      label, raw_run_id: run.raw_run_id, nonce: run.nonce, base: run.base,
+      spent_units: run.spent_units, model_calls: run.model_calls, usd_spent: sidecarUsd,
+      bootstrap: { record: boot.record, output_digest: canonicalDigest(output) },
+      trials, pooled: { numerator, denominator, observed: numerator / denominator, interval, decision: campaign },
+      decision_digest: canonicalDigest(projection),
+    });
+  }
+  return {
+    ok: true, kind: `s2-008-campaign-${version}-evaluation/1`,
+    preregistration_digest: prereg.preregistration_digest,
+    holdout_cases: holdoutCases.length, table,
+    probes: { status: 'NOT_RUN', total: V4_PROBES.length,
+      items: V4_PROBES.map((probe) => ({ probe, status: 'NOT_RUN' })) },
+    verdict: 'PENDING_PROBES',
+    aggregate_spend: { currency: 'tokens', units: runA.spent_units + runB.spent_units,
+      usd_reported: scoredRuns.reduce((sum, row) => sum + row.usd_spent, 0) },
+    prediction_independence: 'Model predictions come from immutable run sidecars; labels, counts, bootstrap intervals and decisions are recomputed here.',
+    runs: scoredRuns,
+    reproducibility: {
+      same_base: true, distinct_raw_run_ids: true, distinct_nonces: true,
+      same_decision_digest: scoredRuns[0].decision_digest === scoredRuns[1].decision_digest,
+      note: 'A/B decision equality is disclosed, not a pass criterion.',
+    },
+  };
+}
+
 function parseArgs(argv) {
   const args = {};
   for (let index = 2; index < argv.length; index += 1) {
@@ -185,7 +499,86 @@ function parseArgs(argv) {
   return args;
 }
 
+function evaluateV4OnDisk({ out, requestedVersion }) {
+  const read = (relative) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, relative), 'utf8'));
+  const manifest = read('corpus/s2-008-campaign/manifest.json');
+  const version = activeCampaignVersion(manifest);
+  if (version === null || version !== requestedVersion) throw new Error('ACTIVE_CAMPAIGN_VERSION_MISMATCH');
+  const prereg = read(`corpus/s2-008-campaign/preregistration.${version}.in-force.json`);
+  const frozenTable = read('corpus/s2-008-campaign/frozen-table.v3.json');
+  const runA = read(`evidence/s2-008-campaign/run-${version}-a.json`);
+  const runB = read(`evidence/s2-008-campaign/run-${version}-b.json`);
+  const preflight = preflightV4Runs({ runA, runB, prereg, manifest });
+  if (!preflight.ok) throw new Error(preflight.reason);
+  if (fs.existsSync(out)) throw new Error('V4_EVALUATION_ALREADY_EXISTS');
+
+  // The case id is blind; the labels are opened only after both blind runs pass.
+  const blind = read('corpus/s2-008-campaign/cases/holdout.blind.json');
+  const accessRoot = path.join(REPO_ROOT, `evidence/s2-008-campaign/${version}-evaluation-access`);
+  let holdoutCases;
+  let accessRows;
+  let accessJournalDigest;
+  {
+    const ms = Date.parse(DECISION_POINT);
+    let nextId = 0;
+    const clock = { nowNs: () => ms * 1e6, nowMs: () => ms,
+      iso: () => DECISION_POINT, now: () => new Date(ms), nowIso: () => DECISION_POINT };
+    const registry = openRegistry({ root: accessRoot, clock, ids: { next: () => `v4-${++nextId}` } });
+    const opened = readCorpus(registry, {
+      partition: 'HOLDOUT', caseId: blind[0].case_id,
+      unsealDigest: prereg.holdout_access.unseal_digest, corpusDir: CORPUS_DIR,
+      decisionPoint: DECISION_POINT, maxOpens: prereg.holdout_access.max_opens,
+      actorKind: 'EVALUATOR', releasedActorKinds: prereg.holdout_access.released_actor_kinds,
+    });
+    const journal = readJournal(registry);
+    accessRows = journal.filter((row) => row.kind === 'ACCESS').length;
+    accessJournalDigest = canonicalDigest(journal);
+    if (blind.length !== prereg.holdout_access.case_count ||
+        new Set(blind.map((row) => row.case_id)).size !== blind.length ||
+        blind.some((row) => !Object.hasOwn(opened.labels, row.case_id))) {
+      throw new Error('V4_BLIND_CASE_SET_MISMATCH');
+    }
+    holdoutCases = blind.map((row) => ({ ...row, label: opened.labels[row.case_id] }));
+  }
+  if (accessRows !== 1) throw new Error('V4_HOLDOUT_ACCESS_NOT_ONE');
+  const bootstrap = ({ label, vectors, seeds, samples, confidence }) => {
+    const workspace = fs.mkdtempSync(path.join(os.tmpdir(), `s2-008-v4-bootstrap-${label}-`));
+    try {
+      const agreementFile = path.join(workspace, 'agreement.json');
+      fs.writeFileSync(agreementFile, JSON.stringify({ vectors, seeds, samples, confidence }));
+      const image = buildBootstrapImage({ agreementFile, samples, confidence });
+      const result = runBootstrap({
+        agreementFile, samples, confidence, timeoutMs: prereg.budget_reservation.trial_timeout_ms,
+        pin: image.pin,
+      });
+      return { output: result.output, record: { ...result.record, image_pin: image.pin,
+        context_digest: image.context_digest } };
+    } finally {
+      fs.rmSync(workspace, { recursive: true, force: true });
+    }
+  };
+  const evaluation = evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, holdoutCases, bootstrap });
+  if (!evaluation.ok) throw new Error(`${evaluation.reason}:${evaluation.run ?? ''}:${evaluation.trial_id ?? ''}`);
+  const record = { ...evaluation, holdout_one_shot: { access_rows: accessRows,
+    journal_digest: accessJournalDigest, registry: path.relative(REPO_ROOT, accessRoot) } };
+  fs.writeFileSync(out, `${JSON.stringify(record, null, 2)}
+`, { flag: 'wx', mode: 0o600 });
+  return { verdict: record.verdict, table_verdict: record.table.verdict,
+    probes: record.probes.status, out: path.relative(REPO_ROOT, out),
+    a: record.runs[0].pooled.decision.decision, b: record.runs[1].pooled.decision.decision,
+    same_decision_digest: record.reproducibility.same_decision_digest };
+}
+
 const args = parseArgs(process.argv);
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain && (args.v4 || args.v5)) {
+  try {
+    const requestedVersion = args.v5 ? 'v5' : 'v4';
+    const out = typeof args.out === 'string' ? path.resolve(args.out) : path.join(REPO_ROOT, `evidence/s2-008-campaign/evaluation-${requestedVersion}.json`);
+    console.log(JSON.stringify(evaluateV4OnDisk({ out, requestedVersion }), null, 2));
+  } catch (error) { console.error(String(error?.message ?? error)); process.exitCode = 1; }
+}
+if (isMain && !args.v4 && !args.v5) {
 const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-a.json'), 'utf8'));
 const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-b.json'), 'utf8'));
 /** Which run this evaluation scores, and therefore which sidecar it reads. Derived
@@ -500,3 +893,5 @@ console.log(JSON.stringify({
   out: path.relative(REPO_ROOT, out),
 }, null, 2));
 if (findings.length > 0) process.exitCode = 1;
+
+}

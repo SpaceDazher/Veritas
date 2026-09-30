@@ -163,7 +163,7 @@ test('the bridge is up and confirmed BEFORE the first model call, and its failur
     // this a real gate rather than a comment is what is NOT there afterwards — a
     // record full of UNPARSED transport failures would look like a model that
     // disagreed with every case, and would be scored as such.
-    const refused = await main([input, out, ARM_ID, preregPath, '20260926'], { [ENV_NAME]: 'x'.repeat(20) }, {
+    const refused = await main([input, out, ARM_ID, preregPath, '20260926', '--remaining-tokens', '5000000'], { [ENV_NAME]: 'x'.repeat(20) }, {
       startBridge: async () => { throw new Error(`${ARM_ERRORS.BRIDGE_NOT_READY}:exit=1:EACCES /run/egress.sock`); },
     }).then(() => 'resolved', (error) => error.message);
     assert.match(refused, /EGRESS_BRIDGE_NOT_READY/, 'a dead bridge did not stop the run');
@@ -171,7 +171,7 @@ test('the bridge is up and confirmed BEFORE the first model call, and its failur
 
     // A live bridge: the port the line reported reaches the record as an
     // observation, and the dry run stays out of it entirely.
-    const live = await main([input, out, ARM_ID, preregPath, '20260926'], { [ENV_NAME]: 'x'.repeat(20) }, {
+    const live = await main([input, out, ARM_ID, preregPath, '20260926', '--remaining-tokens', '5000000'], { [ENV_NAME]: 'x'.repeat(20) }, {
       startBridge: async () => ({ port: 45123, host: '127.0.0.1', stop: () => true }),
     });
     const record = JSON.parse(readFileSync(out, 'utf8'));

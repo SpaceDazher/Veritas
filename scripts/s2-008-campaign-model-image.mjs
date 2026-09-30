@@ -12,7 +12,22 @@ import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
-const TAG = 'localhost/veritas-s2-008-model:v4';
+export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
+  if (version !== 'v4' && version !== 'v5') throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (preseal && version !== 'v5') throw new Error('MODEL_PRESEAL_VERSION_INVALID');
+  const stagedVersion = preseal ? 'v4' : version;
+  return Object.freeze({
+    tag: `localhost/veritas-s2-008-model:${version}`,
+    stagedPrereg: `corpus/s2-008-campaign/preregistration.${stagedVersion}.in-force.json`,
+    pinFile: `evidence/s2-008-campaign/model-image-pin-${version}${preseal ? '-preseal' : ''}.json`,
+    schema: `s2-008-model-image-pin/${version.slice(1)}`,
+  });
+}
+const MODEL_PATHS = modelImagePaths(
+  process.argv.includes('--v5') ? 'v5' : 'v4',
+  { preseal: process.argv.includes('--preseal') },
+);
+const TAG = MODEL_PATHS.tag;
 const ENV = { PATH: '/tmp/bin:/usr/bin:/bin', XDG_RUNTIME_DIR: '/tmp/xdg-rt', TMPDIR: '/tmp', HOME: '/home/daniil' };
 
 /**
@@ -82,7 +97,7 @@ export function buildModelImage() {
       'scripts/s2-008-egress-bridge.mjs',
       'src/lib/verifier/canonical-json.mjs',
       'corpus/s2-008-campaign/cases/holdout.blind.json',
-      'corpus/s2-008-campaign/preregistration.v3.in-force.json',
+      MODEL_PATHS.stagedPrereg,
     ]) {
       const dest = path.join(target, name);
       fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -108,7 +123,7 @@ export function buildModelImage() {
       bridge: sha(path.join(ROOT, 'scripts/s2-008-egress-bridge.mjs')),
       canonical_json: sha(path.join(ROOT, 'src/lib/verifier/canonical-json.mjs')),
       blind: sha(path.join(ROOT, 'corpus/s2-008-campaign/cases/holdout.blind.json')),
-      prereg: sha(path.join(ROOT, 'corpus/s2-008-campaign/preregistration.v3.in-force.json')),
+      prereg: sha(path.join(ROOT, MODEL_PATHS.stagedPrereg)),
       pi_bundle: sha(path.join(PACKAGE, 'dist/bundle/cli.js')),
       pi_shrinkwrap: sha(path.join(PACKAGE, 'npm-shrinkwrap.json')),
       recipe: sha(file),
@@ -150,6 +165,22 @@ export function verifyModelPin() {
   };
 }
 
+export function assertRecordedModelPin(rebuilt, recorded) {
+  if (rebuilt?.identical !== true || rebuilt.context_digest_stable !== true ||
+      rebuilt.content_commitment_stable !== true ||
+      rebuilt.commitment_excludes_preregistration !== true ||
+      recorded?.schema !== MODEL_PATHS.schema ||
+      recorded.image_tag !== TAG || recorded.base_image !== BASE_IMAGE ||
+      recorded.identical !== true || recorded.context_digest_stable !== true ||
+      recorded.content_commitment_stable !== true ||
+      recorded.commitment_excludes_preregistration !== true ||
+      canonicalDigest({ first: rebuilt.first, second: rebuilt.second }) !==
+        canonicalDigest({ first: recorded.first, second: recorded.second })) {
+    throw new Error('MODEL_RECORDED_PIN_MISMATCH');
+  }
+  return rebuilt;
+}
+
 export function dryRunModelInImage(pin) {
   const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
     image: pin.imageId,
@@ -159,12 +190,12 @@ export function dryRunModelInImage(pin) {
       '/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json',
       '/tmp/model-out.json',
       'arm-model-zai-glm53flash',
-      '/opt/veritas/corpus/s2-008-campaign/preregistration.v3.in-force.json',
+      `/opt/veritas/${MODEL_PATHS.stagedPrereg}`,
       '20260926',
       '--dry-run',
     ],
     timeoutMs: 180000,
-    name: 's2-008-model-v3-dry-run',
+    name: `s2-008-model-${MODEL_PATHS.schema.split('/').at(-1)}-dry-run`,
   });
   const observation = executeIsolated(invocation, {
     env: { PATH: '/tmp/bin:/usr/bin:/bin', HOME: '/tmp', XDG_RUNTIME_DIR: '/tmp/xdg-rt', TMPDIR: '/tmp' },
@@ -185,9 +216,14 @@ export function dryRunModelInImage(pin) {
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
   const writePin = process.argv.includes('--write-pin');
-  const result = process.argv.includes('--verify-pin') || writePin
+  const result = writePin
     ? verifyModelPin()
-    : process.argv.includes('--dry-run') ? dryRunModelInImage(buildModelImage()) : buildModelImage();
+    : process.argv.includes('--verify-pin')
+      ? assertRecordedModelPin(
+        verifyModelPin(),
+        JSON.parse(fs.readFileSync(path.join(ROOT, MODEL_PATHS.pinFile), 'utf8')),
+      )
+      : process.argv.includes('--dry-run') ? dryRunModelInImage(buildModelImage()) : buildModelImage();
   if (writePin) {
     // The pin file is WRITTEN BY THE BUILD, never typed. A hand-written pin is
     // the one thing this whole module exists to make impossible, and the cheapest
@@ -202,9 +238,9 @@ if (isMain) {
       })}\n`);
       process.exitCode = 1;
     } else {
-      const target = path.join(ROOT, 'evidence/s2-008-campaign/model-image-pin-v4.json');
+      const target = path.join(ROOT, MODEL_PATHS.pinFile);
       fs.writeFileSync(target, `${JSON.stringify({
-        schema: 's2-008-model-image-pin/4',
+        schema: MODEL_PATHS.schema,
         image_tag: TAG,
         base_image: BASE_IMAGE,
         // What the SIGNED body may carry, and what it deliberately does not. Kept

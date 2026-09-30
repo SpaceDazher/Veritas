@@ -362,3 +362,45 @@ function runScript(argv) {
     };
   }
 }
+
+test('an unknown billable call stops before the next case and records unreconciled usage', async () => {
+  await withDir(async (dir) => {
+    const input = path.join(dir, 'in.json');
+    const out = path.join(dir, 'out.json');
+    const pre = path.join(dir, 'prereg.json');
+    writeFileSync(input, JSON.stringify(blindInput(3)));
+    writeFileSync(pre, JSON.stringify(prereg()));
+    let calls = 0;
+    const code = await main([input, out, ARM_ID, pre, '20260926', '--remaining-tokens', '100000000'], { [ENV_NAME]: CANARY }, {
+      startBridge: async () => ({ host: '127.0.0.1', port: 45123, stop: () => true }),
+      callModel: () => { calls += 1; throw new Error(ARM_ERRORS.NO_USAGE_REPORTED); },
+    });
+    assert.notEqual(code, 0);
+    assert.equal(calls, 1, 'an unknown-spend failure launched another call');
+    const record = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(record.budget.unreconciled_spend, true);
+    assert.equal(record.stop.reason, ARM_ERRORS.NO_USAGE_REPORTED);
+    assert.equal(record.predictions.length, 0);
+    assert.equal(record.outcome_class, 'INFRA');
+  });
+});
+
+test('a paid call returning a zero final total is not chargeable as zero', async () => {
+  await withDir(async (dir) => {
+    const input = path.join(dir, 'in.json');
+    const out = path.join(dir, 'out.json');
+    const pre = path.join(dir, 'prereg.json');
+    writeFileSync(input, JSON.stringify(blindInput(2)));
+    writeFileSync(pre, JSON.stringify(prereg()));
+    let calls = 0;
+    const code = await main([input, out, ARM_ID, pre, '20260926', '--remaining-tokens', '100000000'], { [ENV_NAME]: CANARY }, {
+      startBridge: async () => ({ host: '127.0.0.1', port: 45123, stop: () => true }),
+      callModel: () => { calls += 1; return { text: 'MAJOR', usage: { totalTokens: 0 }, model_called: true }; },
+    });
+    assert.notEqual(code, 0);
+    assert.equal(calls, 1);
+    const record = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(record.budget.unreconciled_spend, true);
+    assert.equal(record.predictions.length, 0);
+  });
+});

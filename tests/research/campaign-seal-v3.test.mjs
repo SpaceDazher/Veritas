@@ -13,7 +13,35 @@ const load = (name) => JSON.parse(readFileSync(path.join(dir, name), 'utf8'));
 const base = load('preregistration.json');
 const draft = load('preregistration.v3.draft.json');
 const table = load('frozen-table.v3.json');
-const manifest = { ...load('manifest.json'), preregistration: { file: 'preregistration.json', status: 'IN_FORCE', preregistration_digest: base.preregistration_digest } };
+// Reconstruct the v1 authority passed to pure v3 sealing tests. The on-disk
+// manifest now names v4, so using it as a v1 fixture would carry later history.
+const current = load('manifest.json');
+const originalSupersession = load('preregistration-supersession.json');
+const originalSuperseded = load('preregistration-superseded.json');
+const originalLedger = load('source-ledger.json');
+const manifest = {
+  ...current,
+  preregistration: { file: 'preregistration.json', status: 'IN_FORCE', preregistration_digest: base.preregistration_digest },
+  superseded_preregistration: {
+    file: 'preregistration-superseded.json',
+    preregistration_digest: originalSuperseded.preregistration_digest,
+    status: 'SUPERSEDED',
+    superseded_by: 'preregistration.json',
+  },
+  supersession: {
+    file: 'preregistration-supersession.json',
+    supersession_id: originalSupersession.supersession_id,
+    supersession_digest: originalSupersession.supersession_digest,
+    reason: originalSupersession.reason,
+  },
+  frozen_table: { file: 'frozen-table.json', digest: canonicalDigest(load('frozen-table.json')) },
+  source_ledger: {
+    file: 'source-ledger.json',
+    entry_count: originalLedger.entries.length,
+    last_anchor_digest: originalLedger.entries.at(-1).anchor_digest,
+  },
+};
+delete manifest.supersession_history;
 const ledger = load('source-ledger.json');
 const clone = (value) => structuredClone(value);
 

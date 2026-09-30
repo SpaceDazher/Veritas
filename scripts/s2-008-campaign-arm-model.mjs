@@ -57,6 +57,8 @@ export const ARM_ERRORS = Object.freeze({
   PROVIDER_UNREACHABLE: 'MODEL_ENDPOINT_UNREACHABLE',
   NO_USAGE_REPORTED: 'MODEL_USAGE_NOT_REPORTED',
   BUDGET_EXHAUSTED: 'BUDGET_EXHAUSTED',
+  SHARED_CAP_REQUIRED: 'SHARED_TOKEN_CAP_REQUIRED',
+  SHARED_CAP_INVALID: 'SHARED_TOKEN_CAP_INVALID',
   BRIDGE_NOT_READY: 'EGRESS_BRIDGE_NOT_READY',
 });
 
@@ -255,7 +257,7 @@ export function callModel(subject, { provider, model, envName, env, dryRun, time
     throw new Error(`${ARM_ERRORS.PROVIDER_UNREACHABLE}:${String(error?.message ?? error).slice(0, 160)}`);
   }
   const usage = extractUsage(stdout);
-  if (usage === null) throw new Error(`${ARM_ERRORS.NO_USAGE_REPORTED}`);
+  if (usage === null || !Number.isInteger(usage.totalTokens) || usage.totalTokens <= 0) throw new Error(`${ARM_ERRORS.NO_USAGE_REPORTED}`);
   let text = '';
   for (const line of stdout.split('\n')) {
     const trimmed = line.trim();
@@ -289,8 +291,16 @@ export function classifyOutcome({ dryRun, stopped, measured }) {
 
 export async function main(argv, env = process.env, deps = {}) {
   const startBridge = deps.startBridge ?? startEgressBridge;
+  const invokeModel = deps.callModel ?? callModel;
+  const capPositions = argv.flatMap((value, index) => value === '--remaining-tokens' ? [index] : []);
+  const capPosition = capPositions.length === 1 ? capPositions[0] : -1;
+  const capText = capPosition >= 0 ? argv[capPosition + 1] : undefined;
   const flags = new Set(argv.filter((a) => a.startsWith('--')));
-  const positional = argv.filter((a) => !a.startsWith('--'));
+  const positional = argv.filter((a, index) => !a.startsWith('--') && !(capPosition >= 0 && index === capPosition + 1));
+  if (capPositions.length > 1 || [...flags].some((flag) => flag !== '--dry-run' && flag !== '--remaining-tokens')) {
+    process.stderr.write(`${ARM_ERRORS.SHARED_CAP_INVALID}:flags\n`);
+    return 11;
+  }
   if (positional.length < 5) {
     process.stderr.write(`usage: arm-model <input.json> <out.json> <arm_id> <prereg.json> <seed> [--dry-run]\n`);
     return 2;
@@ -364,6 +374,22 @@ export async function main(argv, env = process.env, deps = {}) {
     process.stderr.write(`BUDGET_RESERVATION_NOT_IN_TOKENS:${currency}\n`);
     return 5;
   }
+  // The signed grant is a campaign ceiling. A later seed receives only what
+  // earlier seeds have not already spent, never a fresh grant of that amount.
+  // Missing/invalid paid caps refuse BEFORE bridge or pi can start.
+  let launchCap = granted;
+  if (capPosition < 0 && !dryRun) {
+    process.stderr.write(`${ARM_ERRORS.SHARED_CAP_REQUIRED}\n`);
+    return 11;
+  }
+  if (capPosition >= 0) {
+    if (typeof capText !== 'string' || !/^(0|[1-9]\d*)$/.test(capText) ||
+        !Number.isSafeInteger(Number(capText))) {
+      process.stderr.write(`${ARM_ERRORS.SHARED_CAP_INVALID}\n`);
+      return 11;
+    }
+    launchCap = Math.min(granted, Number(capText));
+  }
   const provider = String(prereg.executor?.provider ?? 'zai-coding-cn');
   const model = String(prereg.executor?.model ?? 'glm-5.3-flash');
   const envName = String(prereg.executor?.credential_env_name ?? 'ZAI_API_KEY');
@@ -373,6 +399,8 @@ export async function main(argv, env = process.env, deps = {}) {
   let spent = 0;
   let usd = 0;
   let modelCalls = 0;
+  let modelAttempts = 0;
+  let unreconciledSpend = false;
   let stop = null;
   // THE THIRD STAGE OF THE LAUNCH ORDER, and the one that lives in here. The
   // forwarder's socket is already listening and the container already has it
@@ -392,23 +420,41 @@ export async function main(argv, env = process.env, deps = {}) {
     bridge = await startBridge();
     modelEnv = proxyEnvironment(env, bridge);
   }
-  for (const row of rows) {
-    if (spent >= granted) {
+  for (const [index, row] of rows.entries()) {
+    if (spent >= launchCap) {
       // A budget stop is an OUTCOME. It is not a retry, not a zero, and not a
       // silent truncation: it is recorded with what had been spent.
-      stop = Object.freeze({ reason: ARM_ERRORS.BUDGET_EXHAUSTED, spent_tokens: spent, granted_tokens: granted, usd_spent: usd, stopped_before_case: String(row.case_id) });
+      stop = Object.freeze({ reason: ARM_ERRORS.BUDGET_EXHAUSTED, spent_tokens: spent, granted_tokens: launchCap, signed_grant_tokens: granted, usd_spent: usd, stopped_before_case: String(row.case_id), overrun_tokens: Math.max(0, spent - launchCap) });
       break;
     }
     let result;
+    if (!dryRun) modelAttempts += 1;
     try {
-      result = callModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs });
+      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
-      // A failed case is recorded as itself, not guessed and not skipped silently.
-      predictions.push({ case_id: row.case_id, predicted: UNPARSED, failure: code });
-      continue;
+      // A transport or usage failure may already have spent tokens. Stop now:
+      // treating it as an unparsed answer with zero usage would bypass the cap.
+      unreconciledSpend = code !== ARM_ERRORS.NO_CREDENTIAL;
+      stop = Object.freeze({
+        reason: code,
+        unreconciled_spend: unreconciledSpend,
+        spent_tokens_confirmed: spent,
+        stopped_before_case: String(row.case_id),
+      });
+      break;
     }
-    spent += Number(result.usage?.totalTokens ?? 0);
+    if (!dryRun && (!Number.isInteger(result?.usage?.totalTokens) || result.usage.totalTokens <= 0)) {
+      unreconciledSpend = true;
+      stop = Object.freeze({
+        reason: ARM_ERRORS.NO_USAGE_REPORTED,
+        unreconciled_spend: true,
+        spent_tokens_confirmed: spent,
+        stopped_before_case: String(row.case_id),
+      });
+      break;
+    }
+    spent += result.usage.totalTokens;
     usd += Number(result.usage?.cost?.total ?? 0);
     if (result.model_called) modelCalls += 1;
     predictions.push({
@@ -419,6 +465,15 @@ export async function main(argv, env = process.env, deps = {}) {
       // more people than the run is reproducible for.
       raw_sha256: createHash('sha256').update(String(result.text ?? '')).digest('hex'),
     });
+    if (spent >= launchCap) {
+      stop = Object.freeze({
+        reason: ARM_ERRORS.BUDGET_EXHAUSTED,
+        spent_tokens: spent, granted_tokens: launchCap, signed_grant_tokens: granted,
+        usd_spent: usd, stopped_before_case: rows[index + 1]?.case_id ?? null,
+        overrun_tokens: Math.max(0, spent - launchCap),
+      });
+      break;
+    }
   }
 
   bridge?.stop();
@@ -431,10 +486,12 @@ export async function main(argv, env = process.env, deps = {}) {
     budget: {
       currency,
       granted_tokens: granted,
+      launch_cap_tokens: launchCap,
       spent_tokens: spent,
       usd_spent: usd,
       measured_by: "pi --mode json turn_end.usage.totalTokens — the executor's own report; the streaming message_update zeros are ignored",
-      exhausted: stop !== null,
+      exhausted: stop?.reason === ARM_ERRORS.BUDGET_EXHAUSTED,
+      unreconciled_spend: unreconciledSpend,
     },
     stop,
     dry_run: Boolean(dryRun),
@@ -451,6 +508,7 @@ export async function main(argv, env = process.env, deps = {}) {
         ? null
         : { via: 'in-container loopback bridge', host: bridge.host, port: bridge.port, port_source: 'BRIDGE_READY' },
       model_calls: modelCalls,
+      model_attempts: modelAttempts,
       parallel_calls: 1,
     },
     container: {
@@ -471,7 +529,7 @@ export async function main(argv, env = process.env, deps = {}) {
   process.stdout.write(`ADAPTER_JSON_END ${payload.length}\n`);
   // A budget stop is a non-zero exit: the run did not complete, and a gate that
   // cannot tell that from a complete run is not a gate.
-  return stop === null ? 0 : 6;
+  return stop === null ? 0 : stop.reason === ARM_ERRORS.BUDGET_EXHAUSTED ? 6 : 10;
 }
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;

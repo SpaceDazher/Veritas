@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "2ca9dd659ecaa80a978164529bd4674571d42becb5dfdb915f6d124272f1d5c4",
+  "replaced_by_preregistration_digest": "b482cc7ea0325b405e18f33777ba93d387a0a494a01ace65db7a8b8457da6df9",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v5 replaces the model image with a shared remaining-token cap across seeds while preserving the frozen science and the per-run ceiling",
+  "supersession_id": "spr-63b25c08751b4b0a74453dcc",
+  "supersession_digest": "30a69bcc4b69782702dea41c0ca5aecaace6b85d33cf22bd70bc64880f6ee71b"
+}

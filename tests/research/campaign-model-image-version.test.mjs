@@ -1,0 +1,15 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { modelImagePaths } from '../../scripts/s2-008-campaign-model-image.mjs';
+
+test('v5 preseal uses v4 document only to establish the acyclic content commitment', () => {
+  const preseal = modelImagePaths('v5', { preseal: true });
+  const sealed = modelImagePaths('v5');
+  assert.equal(preseal.tag, sealed.tag);
+  assert.equal(preseal.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v4.in-force.json');
+  assert.equal(sealed.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v5.in-force.json');
+  assert.equal(preseal.pinFile, 'evidence/s2-008-campaign/model-image-pin-v5-preseal.json');
+  assert.equal(sealed.pinFile, 'evidence/s2-008-campaign/model-image-pin-v5.json');
+  assert.equal(preseal.schema, 's2-008-model-image-pin/5');
+  assert.throws(() => modelImagePaths('v4', { preseal: true }), /MODEL_PRESEAL_VERSION_INVALID/);
+});

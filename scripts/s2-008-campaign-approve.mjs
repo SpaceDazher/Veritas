@@ -199,6 +199,93 @@ export function approveV3({ draft, base, table, principal, label, issuedAt = nul
   return Object.freeze({ ...body, preregistration_digest: preregistrationDigest(body) });
 }
 
+
+
+export function assertV4Pin(draft, pin) {
+  if (pin?.schema !== 's2-008-model-image-pin/4' || pin.identical !== true ||
+      pin.context_digest_stable !== true || pin.content_commitment_stable !== true ||
+      pin.commitment_excludes_preregistration !== true ||
+      !isPlainObject(pin.first) || !isPlainObject(pin.second) ||
+      !isPlainObject(pin.first.sources) || !isPlainObject(pin.second.sources)) {
+    throw new Error('V4_PIN_NOT_USABLE');
+  }
+  const covers = Object.keys(pin.first.sources).filter((name) => name !== 'prereg').sort();
+  const commitment = canonicalDigest(Object.fromEntries(covers.map((name) => [name, pin.first.sources[name]])));
+  if (pin.first.content_commitment !== commitment ||
+      pin.second.content_commitment !== commitment ||
+      pin.first.source_digest !== canonicalDigest(pin.first.sources) ||
+      pin.second.source_digest !== canonicalDigest(pin.second.sources) ||
+      pin.first.source_digest !== pin.second.source_digest ||
+      pin.first.imageId !== pin.second.imageId || pin.first.digest !== pin.second.digest ||
+      canonicalDigest(pin.first.content_commitment_covers) !== canonicalDigest(covers) ||
+      canonicalDigest(pin.second.content_commitment_covers) !== canonicalDigest(covers) ||
+      canonicalDigest(pin.commitment?.covers) !== canonicalDigest(covers) ||
+      canonicalDigest(pin.commitment?.excludes) !== canonicalDigest(['prereg']) ||
+      pin.commitment?.field !== 'executor.model_image.content_commitment' ||
+      draft.executor?.model_image?.content_commitment !== commitment ||
+      canonicalDigest(draft.executor.model_image.covers) !== canonicalDigest(covers) ||
+      canonicalDigest(draft.executor.model_image.excludes) !== canonicalDigest(['prereg']) ||
+      draft.executor.model_image.built_image_pin !== 'evidence/s2-008-campaign/model-image-pin-v4.json') {
+    throw new Error('V4_PIN_MISMATCH');
+  }
+  return commitment;
+}
+
+export function approveV4({ draft, base, table, principal, label, issuedAt = null, pin }) {
+  if (typeof principal !== 'string' || principal.length === 0) throw new Error(`${APPROVE_ERRORS.ARGS}:--principal`);
+  if (typeof label !== 'string' || label.length === 0) throw new Error(`${APPROVE_ERRORS.ARGS}:--label`);
+  if (!isPlainObject(draft) || !isPlainObject(base) || !isPlainObject(table)) throw new Error('V4_DOCUMENT_ABSENT');
+  if (draft.approval?.status !== null) throw new Error(`${APPROVE_ERRORS.ALREADY_SIGNED}:v4`);
+  if (draft.rule !== 's2-008-prereg-v4' || draft.preregistration_id !== 'xpr-s2-008c-04' ||
+      base.rule !== 's2-008-prereg-v3' || base.preregistration_id !== 'xpr-s2-008c-03') throw new Error('V4_VERSION_MISMATCH');
+  if (base.preregistration_digest !== preregistrationDigest(base)) throw new Error('V4_BASE_MISMATCH');
+  assertV4Pin(draft, pin);
+  const drift = scopeDrift(base, draft);
+  if (drift !== null) throw new Error(`${APPROVE_ERRORS.SCOPE_DRIFT}:${drift.member}`);
+  if (draft.expected_table_digest !== canonicalDigest(table) ||
+      draft.expected_table_digest !== base.expected_table_digest) throw new Error('V4_TABLE_MISMATCH');
+  const expectedSupersessionKeys = ['supersedes', 'superseded_digest', 'reason', 'unchanged'];
+  if (!isPlainObject(draft.supersession) ||
+      canonicalDigest(Object.keys(draft.supersession).sort()) !== canonicalDigest(expectedSupersessionKeys.sort()) ||
+      canonicalDigest(Array.isArray(draft.supersession.unchanged) ? [...draft.supersession.unchanged].sort() : null) !== canonicalDigest([...FROZEN_MEMBERS].sort()) ||
+      typeof draft.supersession.reason !== 'string' || draft.supersession.reason.trim() !== draft.supersession.reason ||
+      draft.supersession.reason.length === 0 || draft.supersession.reason.length > 500 ||
+      /[\r\n]/.test(draft.supersession.reason)) throw new Error('V4_SUPERSESSION_SCOPE_MISMATCH');
+  if (draft.supersession.supersedes !== base.preregistration_id ||
+      draft.supersession.superseded_digest !== base.preregistration_digest) throw new Error('V4_BASE_MISMATCH:supersession');
+  const beforeExecutor = structuredClone(base.executor ?? {});
+  const afterExecutor = structuredClone(draft.executor ?? {});
+  delete beforeExecutor.model_image;
+  delete afterExecutor.model_image;
+  if (canonicalDigest(beforeExecutor) !== canonicalDigest(afterExecutor) ||
+      canonicalDigest(base.executor?.model_image ?? null) === canonicalDigest(draft.executor?.model_image ?? null)) {
+    throw new Error('V4_SCOPE_DRIFT:executor');
+  }
+  const beforeBudget = structuredClone(base.budget_reservation ?? {});
+  const afterBudget = structuredClone(draft.budget_reservation ?? {});
+  delete beforeBudget.enumerated_work;
+  delete afterBudget.enumerated_work;
+  if (canonicalDigest(beforeBudget) !== canonicalDigest(afterBudget)) throw new Error('V4_SCOPE_DRIFT:budget_reservation');
+  const allowed = new Set(['rule', 'preregistration_id', 'executor', 'budget_reservation', 'supersession', 'status', 'approval', 'preregistration_digest']);
+  for (const member of new Set([...Object.keys(base), ...Object.keys(draft)])) {
+    if (!allowed.has(member) && canonicalDigest(base[member] ?? null) !== canonicalDigest(draft[member] ?? null)) {
+      throw new Error(`V4_SCOPE_DRIFT:${member}`);
+    }
+  }
+  const body = {
+    ...scientificBody(draft),
+    status: 'APPROVED',
+    approval: {
+      status: 'APPROVED', authority: 'HUMAN_OWNER', principal_id: principal, label,
+      issued_at: issuedAt,
+      signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+      in_force: false,
+      becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v4 records this digest in the corpus manifest and carries a content-only SUPERSESSION from xpr-s2-008c-03',
+    },
+  };
+  return Object.freeze({ ...body, preregistration_digest: preregistrationDigest(body) });
+}
+
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -212,10 +299,14 @@ const OUT = path.join(CORPUS_DIR, 'preregistration.v2.approved.json');
 const V3_DRAFT = path.join(CORPUS_DIR, 'preregistration.v3.draft.json');
 const V3_TABLE = path.join(CORPUS_DIR, 'frozen-table.v3.json');
 const V3_OUT = path.join(CORPUS_DIR, 'preregistration.v3.approved.json');
+const V4_DRAFT = path.join(CORPUS_DIR, 'preregistration.v4.draft.json');
+const V4_OUT = path.join(CORPUS_DIR, 'preregistration.v4.approved.json');
+const V4_BASE = path.join(CORPUS_DIR, 'preregistration.v3.in-force.json');
+const V4_PIN = path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-image-pin-v4.json');
 
-const USAGE = `s2-008-campaign-approve — the owner's signature on preregistration v2 or v3
+const USAGE = `s2-008-campaign-approve — the owner's signature on preregistration v2, v3 or v4
 
-  --version v2|v3     document to sign (default v2)
+  --version v2|v3|v4     document to sign (default v2)
   --principal <id>     the owner's principal id, recorded like every permit here
   --label "<text>"     who is signing, in words
   --out <path>         where to write the signed document
@@ -248,21 +339,23 @@ function main() {
     return null;
   }
   try {
-    if (!['v2', 'v3'].includes(args.version)) throw new Error('APPROVAL_VERSION_UNKNOWN');
-    const draftPath = args.version === 'v3' ? V3_DRAFT : DRAFT;
+    if (!['v2', 'v3', 'v4'].includes(args.version)) throw new Error('APPROVAL_VERSION_UNKNOWN');
+    const draftPath = args.version === 'v4' ? V4_DRAFT : args.version === 'v3' ? V3_DRAFT : DRAFT;
     if (!existsSync(draftPath)) throw new Error(`${APPROVE_ERRORS.DRAFT_ABSENT}:${draftPath}`);
-    if (!existsSync(BASE)) throw new Error(`${APPROVE_ERRORS.BASE_ABSENT}:${BASE}`);
+    const basePath = args.version === 'v4' ? V4_BASE : BASE;
+    if (!existsSync(basePath)) throw new Error(`${APPROVE_ERRORS.BASE_ABSENT}:${basePath}`);
     const draft = JSON.parse(readFileSync(draftPath, 'utf8'));
-    const base = JSON.parse(readFileSync(BASE, 'utf8'));
-    const signed = (args.version === 'v3' ? approveV3 : approve)({
+    const base = JSON.parse(readFileSync(basePath, 'utf8'));
+    const signed = (args.version === 'v4' ? approveV4 : args.version === 'v3' ? approveV3 : approve)({
       draft,
       base,
-      ...(args.version === 'v3' ? { table: JSON.parse(readFileSync(V3_TABLE, 'utf8')) } : {}),
+      ...(args.version === 'v3' || args.version === 'v4' ? { table: JSON.parse(readFileSync(V3_TABLE, 'utf8')) } : {}),
+      ...(args.version === 'v4' ? { pin: JSON.parse(readFileSync(V4_PIN, 'utf8')) } : {}),
       principal: args.principal,
       label: args.label,
       issuedAt: new Date().toISOString(),
     });
-    const out = args.out ?? (args.version === 'v3' ? V3_OUT : OUT);
+    const out = args.out ?? (args.version === 'v4' ? V4_OUT : args.version === 'v3' ? V3_OUT : OUT);
     writeFileSync(out, `${JSON.stringify(signed, null, 2)}\n`, 'utf8');
     process.stdout.write(`${JSON.stringify({
       written: out,

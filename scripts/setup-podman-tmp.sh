@@ -41,7 +41,6 @@ veritas_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 if ! command -v node >/dev/null 2>&1; then
   printf 'podman: NOT_RUN — node не найден, пин базового образа не прочитан.\n' >&2
   printf 'podman: сборки упадут с exit 125 image not known, пока база не подтянута:\n' >&2
-  printf 'podman:   podman pull docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2\n' >&2
   return 0 2>/dev/null || exit 0
 fi
 base_image="$(VERITAS_ROOT="$veritas_root" node --input-type=module -e '
@@ -64,6 +63,20 @@ else
     printf 'podman: НЕ УДАЛОСЬ подтянуть %s\n' "$base_image" >&2
     printf 'podman: сборки упадут с exit 125 image not known. Это NOT_RUN, не успех.\n' >&2
   fi
+fi
+# The full npm test suite also starts a pinned PostgreSQL image. Keep its
+# digest in the test fixture module and restore it into this same /tmp store.
+postgres_image="$(VERITAS_ROOT="$veritas_root" node --input-type=module -e '
+  import { pathToFileURL } from "node:url";
+  const { PINNED_POSTGRES_IMAGE } = await import(pathToFileURL(process.env.VERITAS_ROOT + "/tests/agentboard/postgres-image.mjs").href);
+  process.stdout.write(PINNED_POSTGRES_IMAGE);
+')"
+if podman inspect --format '{{.Id}}' "$postgres_image" >/dev/null 2>&1; then
+  printf 'podman: закреплённый PostgreSQL для npm test уже в /tmp/podman-root.\n'
+elif podman pull "$postgres_image" >/dev/null 2>&1; then
+  printf 'podman: закреплённый PostgreSQL для npm test подтянут.\n'
+else
+  printf 'podman: NOT_RUN — PostgreSQL image не подтянут; concurrency suite даст exit 1.\n' >&2
 fi
 printf 'podman: после `podman system reset -f` закреплённая база удаляется —\n'
 printf 'podman: снова выполните source scripts/setup-podman-tmp.sh.\n'

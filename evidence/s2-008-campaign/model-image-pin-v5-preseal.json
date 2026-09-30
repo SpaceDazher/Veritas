@@ -1,6 +1,6 @@
 {
-  "schema": "s2-008-model-image-pin/4",
-  "image_tag": "localhost/veritas-s2-008-model:v4",
+  "schema": "s2-008-model-image-pin/5",
+  "image_tag": "localhost/veritas-s2-008-model:v5",
   "base_image": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
   "commitment": {
     "field": "executor.model_image.content_commitment",
@@ -20,11 +20,11 @@
     "why_excluded": "the signed body is COPYed into this image, so a commitment covering it would be a digest of a document containing that digest; the direction is preregistration -> image only"
   },
   "first": {
-    "imageId": "sha256:abcdc1b5538c7c694737963fca9acc7cc194f4c0590b79d8b5eaa5615c861fa8",
-    "digest": "sha256:0e01412106d59f08a9c2d75f779d8053d60aa052d4320204d8863121158ab031",
+    "imageId": "sha256:1aa3bc26294cfc9b8ea28efc9d330336d9b96f0240b492ffcb58552790b9a790",
+    "digest": "sha256:e17e23842970493ccc92ec22293f188bb09baaee8d97a78fbabe3606aa55993a",
     "architecture": "amd64",
-    "source_digest": "997b4758e369fb4f454367729c17ff62766e355afd8eab4667e1032d3a342e36",
-    "content_commitment": "d3ff8228d8c1f17091e59c0af2171c10f2444dbb5dd6940dfe9666063c40433f",
+    "source_digest": "a8eebade500bf5bac0861db709210a13175158f8fdb5cc9f46d4661f5bf3910e",
+    "content_commitment": "b40206b970c4190f5387c15b4bea66f4f5e9dbff143e45d8533952123427b150",
     "content_commitment_covers": [
       "arm",
       "blind",
@@ -35,7 +35,7 @@
       "recipe"
     ],
     "sources": {
-      "arm": "1898939786ec591bc0c2ba9f96b7b1afe92917039783b5d56045ff3a35f2cfef",
+      "arm": "f5b2f130006ff99025e306ea0dd62282628127106b30e8e1eefdd6fb99420e19",
       "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
       "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
       "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
@@ -46,11 +46,11 @@
     }
   },
   "second": {
-    "imageId": "sha256:abcdc1b5538c7c694737963fca9acc7cc194f4c0590b79d8b5eaa5615c861fa8",
-    "digest": "sha256:0e01412106d59f08a9c2d75f779d8053d60aa052d4320204d8863121158ab031",
+    "imageId": "sha256:1aa3bc26294cfc9b8ea28efc9d330336d9b96f0240b492ffcb58552790b9a790",
+    "digest": "sha256:e17e23842970493ccc92ec22293f188bb09baaee8d97a78fbabe3606aa55993a",
     "architecture": "amd64",
-    "source_digest": "997b4758e369fb4f454367729c17ff62766e355afd8eab4667e1032d3a342e36",
-    "content_commitment": "d3ff8228d8c1f17091e59c0af2171c10f2444dbb5dd6940dfe9666063c40433f",
+    "source_digest": "a8eebade500bf5bac0861db709210a13175158f8fdb5cc9f46d4661f5bf3910e",
+    "content_commitment": "b40206b970c4190f5387c15b4bea66f4f5e9dbff143e45d8533952123427b150",
     "content_commitment_covers": [
       "arm",
       "blind",
@@ -61,7 +61,7 @@
       "recipe"
     ],
     "sources": {
-      "arm": "1898939786ec591bc0c2ba9f96b7b1afe92917039783b5d56045ff3a35f2cfef",
+      "arm": "f5b2f130006ff99025e306ea0dd62282628127106b30e8e1eefdd6fb99420e19",
       "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
       "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
       "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",

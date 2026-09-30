@@ -405,16 +405,16 @@
       "inference_mode"
     ]
   },
-  "status": "DRAFT",
+  "status": "APPROVED",
   "approval": {
-    "status": null,
+    "status": "APPROVED",
     "authority": "HUMAN_OWNER",
-    "principal_id": null,
-    "label": null,
-    "issued_at": null,
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "issued_at": "2026-09-30T01:15:29.071Z",
     "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
     "in_force": false,
-    "becomes_in_force_when": "the owner signs this draft and scripts/s2-008-campaign-prepare.mjs seals the resulting digest into the corpus manifest"
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v4 records this digest in the corpus manifest and carries a content-only SUPERSESSION from xpr-s2-008c-03"
   },
   "preregistration_digest": "2ca9dd659ecaa80a978164529bd4674571d42becb5dfdb915f6d124272f1d5c4"
 }

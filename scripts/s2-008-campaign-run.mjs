@@ -32,6 +32,7 @@
 //   node scripts/s2-008-campaign-run.mjs --label b --out evidence/<file>.json
 
 import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -60,7 +61,7 @@ import {
   TRIAL_STATUSES, RESEARCH_OUTCOMES, TRIAL_VERDICTS, RESEARCH_PARTITIONS,
 } from '../src/lib/research/constants.mjs';
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
-import { buildImage, runTrial, buildBootstrapImage, runBootstrap, verifyImagePin } from './s2-008-campaign-adapter.mjs';
+import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin } from './s2-008-campaign-adapter.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -203,7 +204,7 @@ export const MEASURABLE = 'isolated_executor_launches';
 /** Arms the adapter can actually run as the MODEL program. Empty until it can: the
   * refusal is the honest state, and filling this list is the work that enables
   * spending. A token charge is never taken on trust. */
-export const DISPATCHABLE_MODEL_ARMS = Object.freeze([]);
+export const DISPATCHABLE_MODEL_ARMS = Object.freeze(['arm-model-zai-glm53flash']);
 
 /**
  * What each currency is actually MEASURED by, named so no reader has to infer it.
@@ -281,6 +282,11 @@ export function chargeFor({ currency, armOutput = null, armId = null, dispatchab
   if (unit === 'LAUNCH_COUNT') {
     return { units: 1, unit, currency, source: 'a container launch this runner observed' };
   }
+  // Regex controls make no model calls. Their token charge is exactly zero,
+  // independently of how many containers were launched.
+  if (armId === 'arm-type-feat-fix' || armId === 'arm-type-chore') {
+    return { units: 0, unit, currency, source: 'regex control: no model call' };
+  }
   // A token charge is the arm's own report, and only for an arm this runner can
   // actually dispatch to the model program — charging a program it never ran
   // would be counting someone else's number.
@@ -290,6 +296,9 @@ export function chargeFor({ currency, armOutput = null, armId = null, dispatchab
   const reported = armOutput?.budget;
   if (!isPlainObject(reported) || String(reported.currency ?? '') !== currency) {
     return { refusal: `ARM_BUDGET_NOT_IN_THIS_CURRENCY:${String(armId)}:${String(reported?.currency ?? 'none')}` };
+  }
+  if (reported.unreconciled_spend === true) {
+    return { refusal: `ARM_UNRECONCILED_SPEND:${String(armId)}` };
   }
   const spent = reported.spent_tokens;
   if (!Number.isInteger(spent) || spent < 0) {
@@ -301,6 +310,21 @@ export function chargeFor({ currency, armOutput = null, armId = null, dispatchab
     currency,
     source: `the executor's own ${reported.measured_by ?? 'usage.totalTokens'}, as carried in the arm record's budget.spent_tokens`,
   };
+}
+
+/** A pre-launch check cannot ask an arm for output it has not produced yet. */
+export function preflightCharge({ currency, armId, dispatchableArms = DISPATCHABLE_MODEL_ARMS } = {}) {
+  if (currency === 'tokens') {
+    if (armId === 'arm-type-feat-fix' || armId === 'arm-type-chore') {
+      return { units: 0, unit: 'EXECUTOR_REPORTED_TOKENS', source: 'regex control: no model call' };
+    }
+    if (dispatchableArms.includes(armId)) {
+      return { pending_report: true, unit: 'EXECUTOR_REPORTED_TOKENS' };
+    }
+    return { refusal: `TOKEN_ARMED_NOT_DISPATCHABLE:${String(armId)}` };
+  }
+  if (currency === MEASURABLE) return { units: 1, unit: 'LAUNCH_COUNT' };
+  return { refusal: `RESERVATION_CURRENCY_NOT_MEASURABLE:${String(currency ?? '(none)')}` };
 }
 
 /**
@@ -986,6 +1010,201 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
   return artefact;
 }
 
+
+/**
+ * V4 prediction phase. The model is called while every input is blind; labels
+ * are opened later by the independent evaluator. Each seed's exact rows are
+ * written to a separate immutable sidecar and bound by its digest.
+ */
+export async function runV4Campaign({
+  label = 'a', arm = null, seed = null, dryRun = false, write = true, out = null,
+  prereg = null,
+  manifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8')),
+  modelPin = null,
+  dispatchableArms = DISPATCHABLE_MODEL_ARMS,
+  runModel = runModelTrial, runRegex = runTrial, buildRegex = buildImage,
+} = {}) {
+  const safeLabel = String(label);
+  if (!/^[a-z0-9][a-z0-9-]{0,19}$/.test(safeLabel)) throw new Error('RUN_LABEL_INVALID');
+  const activeFile = manifest?.preregistration?.file;
+  if (activeFile !== 'preregistration.v4.in-force.json' &&
+      activeFile !== 'preregistration.v5.in-force.json') {
+    throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
+  }
+  prereg = prereg ?? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8'));
+  const version = prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  const campaignKind = `s2-008-campaign-v${version}-predictions/1`;
+  const base = resolveBase();
+  const runId = `s2-008c-v4-${safeLabel}-${randomUUID().replaceAll('-', '').slice(0, 20)}`;
+  const nonce = deriveProcessNonce({ label: safeLabel, runId, attempt: 0, pid: process.pid });
+  const expectedPreregFile = prereg.rule === 's2-008-prereg-v5'
+    ? 'preregistration.v5.in-force.json' : 'preregistration.v4.in-force.json';
+  if (manifest?.preregistration?.file !== expectedPreregFile ||
+      manifest.preregistration.status !== 'IN_FORCE' ||
+      manifest.preregistration.preregistration_digest !== preregistrationDigest(prereg) ||
+      prereg.preregistration_digest !== preregistrationDigest(prereg) ||
+      prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true) {
+    throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
+  }
+  // The v4 image was built before the shared remaining-cap protocol existed.
+  // Its arm would take a fresh 5m grant at every seed. Paid v4 is therefore
+  // refused before building or launching anything; only a sealed successor
+  // whose image contains the cap-aware arm may spend.
+  if (!dryRun && prereg.rule !== 's2-008-prereg-v5') {
+    return {
+      kind: campaignKind, status: 'BLOCKED',
+      code: 'MODEL_CAP_RESEAL_REQUIRED', reason: 'MODEL_CAP_RESEAL_REQUIRED: signed v4 image does not enforce a shared remaining-token cap',
+      spent_units: 0, launches: 0, charges: [], trials: [],
+      preregistration_digest: prereg.preregistration_digest,
+    };
+  }
+  const declaredPinPath = prereg.executor?.model_image?.built_image_pin;
+  if (declaredPinPath !== `evidence/s2-008-campaign/model-image-pin-v${prereg.rule === 's2-008-prereg-v5' ? '5' : '4'}.json`) {
+    throw new Error('MODEL_IMAGE_PIN_VERSION_MISMATCH');
+  }
+  const activeModelPin = modelPin ?? JSON.parse(fs.readFileSync(path.join(REPO_ROOT, declaredPinPath), 'utf8'));
+  if (activeModelPin?.schema !== `s2-008-model-image-pin/${version}` ||
+      activeModelPin.identical !== true ||
+      activeModelPin.context_digest_stable !== true ||
+      activeModelPin.content_commitment_stable !== true ||
+      activeModelPin.first?.content_commitment !== prereg.executor?.model_image?.content_commitment) {
+    return {
+      kind: campaignKind, status: 'BLOCKED', code: 'MODEL_IMAGE_PIN_INVALID',
+      reason: 'MODEL_IMAGE_PIN_INVALID: built image pin does not match the signed content commitment and version',
+      spent_units: 0, launches: 0, charges: [], trials: [],
+      preregistration_digest: prereg.preregistration_digest,
+    };
+  }
+  const entries = arm === null ? prereg.trial_list : prereg.trial_list.filter((entry) => entry.arm_id === arm);
+  if (entries.length === 0) throw new Error('CAMPAIGN_ARM_NOT_PREREGISTERED');
+  const seeds = seed === null ? prereg.seed_rule.seeds : prereg.seed_rule.seeds.filter((value) => value === Number(seed));
+  if (seeds.length === 0) throw new Error('CAMPAIGN_SEED_NOT_PREREGISTERED');
+  const currency = prereg.budget_reservation.currency;
+  const plan = entries.map((entry) => ({
+    arm_id: entry.arm_id,
+    charge: preflightCharge({ currency, armId: entry.arm_id, dispatchableArms }),
+  }));
+  const denied = plan.find((row) => row.charge.refusal);
+  if (denied) return {
+    kind: campaignKind, status: 'BLOCKED', code: 'CHARGE_NOT_MEASURABLE',
+    reason: denied.charge.refusal, spent_units: 0, launches: 0, charges: [], trials: [],
+    preregistration_digest: prereg.preregistration_digest,
+  };
+
+  const regexPin = entries.some((entry) => entry.arm_id !== 'arm-model-zai-glm53flash') ? buildRegex().pin : null;
+  const trials = [];
+  const charges = [];
+  let spentUnits = 0;
+  let launches = 0;
+  let unknownLaunchAttempts = 0;
+  let unreconciledSpend = false;
+  let status = dryRun ? 'DRY_RUN' : 'MEASURED';
+  let reason = null;
+  let code = null;
+  let modelCalls = 0;
+  const granted = prereg.budget_reservation.granted_units;
+  for (const entry of entries) {
+    const perSeed = [];
+    for (const currentSeed of seeds) {
+      if (spentUnits >= granted) {
+        status = 'BUDGET_STOPPED'; code = 'BUDGET_EXHAUSTED'; reason = 'recorded spend reached the preregistered ceiling';
+        break;
+      }
+      let sidecarFile = null;
+      const sink = write ? (digest, body) => {
+        const relative = `evidence/s2-008-campaign/predictions-v${version}-${safeLabel}-${entry.trial_id}-${currentSeed}.json`;
+        const absolute = path.join(REPO_ROOT, relative);
+        fs.writeFileSync(absolute, `${JSON.stringify(body, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
+        sidecarFile = relative;
+        if (canonicalDigest(body) !== digest) throw new Error('PREDICTIONS_SIDECAR_DIGEST_MISMATCH');
+      } : null;
+      let result;
+      try {
+        result = entry.arm_id === 'arm-model-zai-glm53flash'
+          ? await runModel({
+            armId: entry.arm_id, seed: currentSeed,
+            timeoutMs: prereg.budget_reservation.trial_timeout_ms,
+            dryRun, pin: activeModelPin, prereg,
+            remainingTokens: version === 5 ? granted - spentUnits : undefined,
+            predictionsSink: sink, runLabel: safeLabel,
+          })
+          : await runRegex({
+            armId: entry.arm_id, seed: currentSeed,
+            samples: prereg.noise_rule.bootstrap_samples,
+            timeoutMs: prereg.budget_reservation.trial_timeout_ms,
+            pin: regexPin, predictionsSink: sink, runLabel: safeLabel,
+          });
+      } catch {
+        // An exception may occur after a provider request. No usage report
+        // means the spend is unknown, so stop the campaign and publish it.
+        const model = entry.arm_id === 'arm-model-zai-glm53flash';
+        result = {
+          ok: false, launch_unknown: true,
+          output: {
+            outcome_class: 'INFRA',
+            budget: model ? { currency: 'tokens', spent_tokens: 0, unreconciled_spend: true } : null,
+            stop: { reason: model ? 'MODEL_EXECUTION_UNRECONCILED' : 'CONTROL_EXECUTION_FAILED' },
+          },
+          record: {
+            arm_id: entry.arm_id, seed: currentSeed,
+            payload_error: model ? 'MODEL_EXECUTION_UNRECONCILED' : 'CONTROL_EXECUTION_FAILED',
+            real_start: { proven: false },
+          },
+        };
+      }
+      if (result.launch_unknown) unknownLaunchAttempts += 1;
+      else launches += 1;
+      const step = chargingStep({
+        currency, spentUnits, grantedUnits: granted,
+        armOutput: result.output, armId: entry.arm_id, dispatchableArms,
+      });
+      if (step.action === 'refuse') {
+        status = 'BLOCKED'; code = step.code; reason = step.detail;
+        if (result.output?.budget?.unreconciled_spend === true) unreconciledSpend = true;
+        perSeed.push({ seed: currentSeed, outcome_class: result.output?.outcome_class ?? 'NOT_RUN', predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null, launch: result.record });
+        break;
+      }
+      spentUnits = step.spent_units;
+      charges.push({
+        trial: entry.trial_id, arm_id: entry.arm_id, seed: currentSeed,
+        units: step.units, unit: step.unit, source: step.source,
+        spent_units_after: spentUnits,
+      });
+      modelCalls += Number(result.output?.executor?.model_calls ?? 0);
+      perSeed.push({
+        seed: currentSeed, outcome_class: result.output?.outcome_class ?? 'NOT_RUN',
+        predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null,
+        launch: result.record,
+      });
+      if (result.output?.budget?.exhausted === true || step.stop) {
+        status = 'BUDGET_STOPPED'; code = 'BUDGET_EXHAUSTED'; reason = 'arm or runner reached the preregistered ceiling';
+        break;
+      }
+      if (!result.ok || result.output?.outcome_class === 'INFRA' || result.output?.outcome_class === 'NOT_RUN') {
+        status = 'BLOCKED'; code = 'ARM_DID_NOT_COMPLETE'; reason = String(result.output?.stop?.reason ?? result.record?.payload_error ?? 'arm returned no complete measurement');
+        break;
+      }
+    }
+    trials.push({ trial_id: entry.trial_id, arm_id: entry.arm_id, seeds: perSeed });
+    if (status === 'BLOCKED' || status === 'BUDGET_STOPPED') break;
+  }
+  const report = {
+    kind: campaignKind, status, code, reason,
+    label: safeLabel, dry_run: Boolean(dryRun),
+    raw_run_id: runId, nonce, base,
+    preregistration_digest: prereg.preregistration_digest,
+    model_image_pin: { imageId: activeModelPin.first.imageId, digest: activeModelPin.first.digest, content_commitment: activeModelPin.first.content_commitment },
+    reservation: { id: prereg.budget_reservation.reservation_id, currency, granted_units: granted },
+    spent_units: spentUnits, unreconciled_spend: unreconciledSpend,
+    model_calls: modelCalls, launches, unknown_launch_attempts: unknownLaunchAttempts, charges, trials,
+  };
+  if (write) {
+    const target = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);
+    fs.writeFileSync(target, `${JSON.stringify(report, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
+  }
+  return report;
+}
+
 function parseArgs(argv) {
   const args = {};
   for (let index = 2; index < argv.length; index += 1) {
@@ -1004,6 +1223,17 @@ const isEntry = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPa
 if (!isEntry) {
   // Imported as a library (the independent evaluator imports the interval
   // helper); running a campaign is a decision, not a side effect of an import.
+} else if (args.v4 || (args.arm && args.dryRun)) {
+  const record = await runV4Campaign({
+    label: String(args.label ?? 'a'),
+    arm: typeof args.arm === 'string' ? args.arm : null,
+    seed: typeof args.seed === 'string' ? Number(args.seed) : null,
+    dryRun: args.dryRun === true,
+    write: args.write === 'true' || (args.write !== 'false' && args.dryRun !== true),
+    out: typeof args.out === 'string' ? args.out : null,
+  });
+  console.log(JSON.stringify(record, null, 2));
+  if (record.status === 'BLOCKED' || record.status === 'BUDGET_STOPPED') process.exitCode = 4;
 } else if (args.verifyPin) {
   console.log(JSON.stringify(verifyImagePin(), null, 2));
 } else {

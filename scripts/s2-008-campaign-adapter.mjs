@@ -31,7 +31,7 @@
 //                                              [--out <file>] [--verify-pin]
 //                                              [--break-image]   # the INFRA probe
 
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -42,6 +42,8 @@ import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isol
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
 import { assertImageMatchesPin } from '../src/lib/isolation/image.mjs';
+import { ISOLATION_EGRESS_ALLOWLIST } from '../src/lib/isolation/profile.mjs';
+import { assertNoSecretLeak, spoolCredentialEnvFile } from '../src/lib/isolation/secrets.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -166,6 +168,7 @@ export function persistPredictions({ output, armId, seed, runLabel, sink }) {
     kind: 's2-008-campaign-predictions/1',
     run: String(runLabel),
     arm_id: armId,
+    seed,
     // The arm's own accounting beside the rows it produced, so a reader can see how
     // many answers were unusable without trusting the count.
     unparsed: rows.filter((row) => String(row?.predicted ?? '') === 'UNPARSED').length,
@@ -435,4 +438,312 @@ if (!isEntry) {
   if (!result.ok && !args.breakImage) process.exitCode = 1;
 } else {
   console.log(JSON.stringify({ usage: 'node scripts/s2-008-campaign-adapter.mjs --arm <id> --seed <n> | --verify-pin | --break-image', podman_host: PODMAN_HOST, profile_id: SANDBOX_ISOLATION_EXECUTOR.profile_id }, null, 2));
+}
+
+const MODEL_CREDENTIAL_HANDLE = 'sec-veritas-executor-credential';
+const MODEL_CREDENTIAL_ENV = 'ZAI_API_KEY';
+const FORWARDER_PROGRAM = path.join(REPO_ROOT, 'scripts/s2-008-campaign-egress-forwarder.mjs');
+
+export function modelCredentialValue({
+  env = process.env,
+  readAuth = () => fs.readFileSync(path.join(os.homedir(), '.pi/agent/auth.json'), 'utf8'),
+} = {}) {
+  const injected = env?.[MODEL_CREDENTIAL_ENV];
+  if (typeof injected === 'string' && injected.length >= 8) return injected;
+  let auth;
+  try { auth = JSON.parse(readAuth()); } catch { throw new Error('EXECUTOR_CREDENTIAL_ABSENT'); }
+  const value = auth?.['zai-coding-cn']?.key;
+  if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+  return value;
+}
+
+/** Inspect only metadata. A missing store entry refuses before a model call. */
+export function modelCredentialPresent(handle = MODEL_CREDENTIAL_HANDLE) {
+  const inspected = spawnSync('podman', [...PODMAN_HOST.argvPrefix, 'secret', 'inspect', handle], {
+    encoding: 'utf8', env: PODMAN_ENV, maxBuffer: 16 * 1024,
+  });
+  return inspected.status === 0;
+}
+
+/**
+ * Keep the allowlist socket in a separate process: executeIsolated uses
+ * spawnSync, so a forwarder in this event loop could not answer CONNECT.
+ */
+export function startCampaignForwarder({ spawnImpl = spawn, timeoutMs = 10_000 } = {}) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-campaign-egress-'));
+  // The container is uid 65534; it must traverse the host directory to the
+  // bind-mounted socket. The socket itself is chmod 0777 by the forwarder.
+  fs.chmodSync(dir, 0o755);
+  const socketPath = path.join(dir, 'egress.sock');
+  return new Promise((resolve, reject) => {
+    const child = spawnImpl(process.execPath, [FORWARDER_PROGRAM, socketPath], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { PATH: '/usr/bin:/bin', HOME: '/tmp', NODE_ENV: 'production' },
+    });
+    let ready = false;
+    let ended = false;
+    let buffered = '';
+    let timer;
+    const cleanupDir = () => { fs.rmSync(dir, { recursive: true, force: true }); };
+    const fail = (code) => {
+      if (ready) return;
+      clearTimeout(timer);
+      try { child.kill('SIGTERM'); } catch { /* not running */ }
+      cleanupDir();
+      reject(new Error(code));
+    };
+    child.once('error', () => fail('CAMPAIGN_FORWARDER_START_FAILED'));
+    child.on('exit', () => {
+      ended = true;
+      if (!ready) fail('CAMPAIGN_FORWARDER_EXITED_BEFORE_READY');
+    });
+    child.stderr?.resume(); // drain without recording anything a child might print
+    child.stdout?.on('data', (chunk) => {
+      buffered += String(chunk);
+      const lines = buffered.split('\n');
+      buffered = lines.pop() ?? '';
+      for (const line of lines) {
+        let event;
+        try { event = JSON.parse(line); } catch { continue; }
+        if (event?.event !== 'FORWARDER_READY') continue;
+        if (event.socket !== socketPath || !fs.existsSync(socketPath) || ended) {
+          fail('CAMPAIGN_FORWARDER_READY_INVALID');
+          return;
+        }
+        ready = true;
+        clearTimeout(timer);
+        resolve(Object.freeze({
+          socketPath,
+          get alive() { return !ended; },
+          async stop() {
+            if (!ended) {
+              child.kill('SIGTERM');
+              await new Promise((done) => {
+                const timeout = setTimeout(() => { child.kill('SIGKILL'); done(); }, 3_000);
+                child.once('exit', () => { clearTimeout(timeout); done(); });
+              });
+            }
+            cleanupDir();
+          },
+        }));
+        return;
+      }
+    });
+    timer = setTimeout(() => fail('CAMPAIGN_FORWARDER_READY_TIMEOUT'), timeoutMs);
+  });
+}
+
+/**
+ * Paid model launch boundary. The value exists only in this process and one
+ * 0600 env-file; Podman receives its path and the declared secret handle.
+ * The arm starts its bridge after the container begins and reads BRIDGE_READY
+ * before giving pi HTTPS_PROXY. This function keeps the host forwarder alive
+ * while the synchronous container launch runs.
+ */
+export async function executeModelWithCredential({
+  image, argv, timeoutMs, name = 's2-008-campaign-model',
+  handle = MODEL_CREDENTIAL_HANDLE,
+  credentialValue = undefined,
+  credentialPresent = modelCredentialPresent,
+  startForwarder = startCampaignForwarder,
+  execute = executeIsolated,
+} = {}) {
+  if (credentialPresent(handle) !== true) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+  const value = credentialValue === undefined ? modelCredentialValue() : credentialValue;
+  if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-credential-'));
+  let envFile = null;
+  let forwarder = null;
+  try {
+    // No container may start until this resolves with a listening socket.
+    forwarder = await startForwarder(path.join(dir, 'egress.sock'));
+    if (!forwarder || typeof forwarder.socketPath !== 'string') throw new Error('CAMPAIGN_FORWARDER_NOT_READY');
+    envFile = spoolCredentialEnvFile(handle, MODEL_CREDENTIAL_ENV, value, { spoolDir: dir });
+    const profile = {
+      ...SANDBOX_ISOLATION_EXECUTOR,
+      network: { policy: 'allowlist', allowlist: ISOLATION_EGRESS_ALLOWLIST },
+    };
+    const invocation = buildInvocation(profile, {
+      image, argv, timeoutMs, name,
+      secretHandles: [handle],
+      credential: { handle, envFilePath: envFile.path },
+      egressSocketPath: forwarder.socketPath,
+    });
+    let observation;
+    try {
+      observation = await execute(invocation, { env: PODMAN_ENV });
+    } catch {
+      // A podman exception can embed its stderr. That text is untrusted and
+      // could contain the credential, so the public error is a fixed code.
+      throw new Error('MODEL_EXECUTION_FAILED');
+    }
+    const record = {
+      image: invocation.image,
+      axes: invocation.axes,
+      container_argv: [...invocation.podmanArgv],
+      credential: { handle, env_name: MODEL_CREDENTIAL_ENV, delivered_by: '--env-file', expected_surfaces: ['env'] },
+      egress: { socket: '/run/egress.sock', allowlist: ISOLATION_EGRESS_ALLOWLIST },
+      exit_code: observation?.exitCode ?? null,
+    };
+    const leakScan = assertNoSecretLeak({
+      argv: invocation.argv,
+      env: { [MODEL_CREDENTIAL_ENV]: value },
+      stdout: observation?.stdout ?? '',
+      stderr: observation?.stderr ?? '',
+      arm: observation ?? {},
+      launch: invocation,
+      record,
+    }, {
+      value,
+      required: ['argv', 'env', 'stdout', 'stderr', 'arm', 'launch', 'record'],
+      expected: ['env'],
+    });
+    const planted = assertNoSecretLeak({ stdout: 'prefix ' + value + ' suffix' }, { value, required: ['stdout'] });
+    const detectorSelfCheckPassed = !planted.ok && planted.leaks.includes('stdout');
+    if (!leakScan.ok || !detectorSelfCheckPassed) throw new Error('SECRET_VALUE_DETECTED_IN_SURFACE');
+    if (forwarder.alive === false) throw new Error('CAMPAIGN_FORWARDER_DIED_DURING_RUN');
+    return { observation, invocation, record, leakScan, detectorSelfCheckPassed };
+  } finally {
+    envFile?.unlink();
+    await forwarder?.stop();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+const MODEL_ARM_ID = 'arm-model-zai-glm53flash';
+const MODEL_PROGRAM_IN_IMAGE = '/opt/veritas/scripts/s2-008-campaign-arm-model.mjs';
+const MODEL_INPUT_IN_IMAGE = '/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json';
+function modelPreregVersion(rule) {
+  if (rule === 's2-008-prereg-v4') return 4;
+  if (rule === 's2-008-prereg-v5') return 5;
+  throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
+}
+
+
+export function modelTrialArgv({ armId, seed, dryRun = false, remainingTokens = undefined, preregRule = 's2-008-prereg-v4' } = {}) {
+  if (armId !== MODEL_ARM_ID || !Number.isInteger(Number(seed))) throw new Error('MODEL_TRIAL_REQUEST_INVALID');
+  const version = modelPreregVersion(preregRule);
+  const preregPath = `/opt/veritas/corpus/s2-008-campaign/preregistration.v${version}.in-force.json`;
+  if (remainingTokens === undefined && !dryRun) throw new Error('SHARED_TOKEN_CAP_REQUIRED');
+  if (remainingTokens !== undefined && (!Number.isSafeInteger(remainingTokens) || remainingTokens < 0)) {
+    throw new Error('SHARED_TOKEN_CAP_INVALID');
+  }
+  return [
+    '/usr/local/bin/node', MODEL_PROGRAM_IN_IMAGE, MODEL_INPUT_IN_IMAGE,
+    '/tmp/model-out.json', armId, preregPath, String(seed),
+    ...(remainingTokens === undefined ? [] : ['--remaining-tokens', String(remainingTokens)]),
+    ...(dryRun ? ['--dry-run'] : []),
+  ];
+}
+
+/** Re-read the local image by content address for every model launch. */
+export function assertPinnedModelImage({
+  pin,
+  prereg,
+  inspect = (imageId) => {
+    const fields = podman(['inspect', '--format', '{{.Id}}|{{.Digest}}|{{.Architecture}}', imageId]).split('|');
+    return { Id: fields[0], Digest: fields[1], Architecture: fields[2] };
+  },
+} = {}) {
+  const version = modelPreregVersion(prereg?.rule);
+  const pinPath = `evidence/s2-008-campaign/model-image-pin-v${version}.json`;
+  if (prereg?.executor?.model_image?.built_image_pin !== pinPath ||
+      pin?.schema !== `s2-008-model-image-pin/${version}`) {
+    throw new Error('MODEL_IMAGE_PIN_VERSION_MISMATCH');
+  }
+  const built = pin?.first;
+  if (!pin?.identical || !pin?.context_digest_stable || !pin?.content_commitment_stable || !built) {
+    throw new Error('MODEL_IMAGE_PIN_NOT_REPRODUCED');
+  }
+  if (prereg?.executor?.model_image?.content_commitment !== built.content_commitment) {
+    throw new Error('MODEL_CONTENT_COMMITMENT_MISMATCH');
+  }
+  if (prereg?.approval?.status !== 'APPROVED' || prereg?.approval?.in_force !== true) {
+    throw new Error('MODEL_PREREGISTRATION_NOT_IN_FORCE');
+  }
+  const { approval: _approval, preregistration_digest: _declared, status: _status, ...body } = prereg;
+  if (canonicalDigest(body) !== prereg.preregistration_digest) {
+    throw new Error('MODEL_PREREGISTRATION_DIGEST_MISMATCH');
+  }
+  const signedBytes = sha256Of(path.join(CORPUS_DIR, `preregistration.v${version}.in-force.json`));
+  if (built.sources?.prereg !== signedBytes) throw new Error('MODEL_IMAGE_PREREGISTRATION_BYTES_MISMATCH');
+  return assertImageMatchesPin(inspect(built.imageId), {
+    imageId: built.imageId, digest: built.digest, architecture: built.architecture,
+  });
+}
+
+function parseModelPayload(stdout) {
+  const lines = String(stdout ?? '').split('\n');
+  const chunks = lines.filter((line) => line.startsWith('ADAPTER_JSON '));
+  const end = lines.find((line) => line.startsWith('ADAPTER_JSON_END '));
+  if (chunks.length === 0 || !end) return { output: null, error: 'MODEL_PAYLOAD_ABSENT', chunks: chunks.length };
+  try {
+    const parsed = chunks.map((line) => /^ADAPTER_JSON (\d+)\/(\d+) ([A-Za-z0-9+/=]+)$/.exec(line));
+    if (parsed.some((match) => !match)) throw new Error('MODEL_PAYLOAD_CHUNK_INVALID');
+    const total = Number(parsed[0][2]);
+    if (total !== parsed.length || parsed.some((match, index) => Number(match[1]) !== index + 1 || Number(match[2]) !== total)) {
+      throw new Error('MODEL_PAYLOAD_CHUNK_ORDER_INVALID');
+    }
+    const base64 = parsed.map((match) => match[3]).join('');
+    if (Number(end.split(' ')[1]) !== base64.length) throw new Error('MODEL_PAYLOAD_LENGTH_MISMATCH');
+    return { output: JSON.parse(Buffer.from(base64, 'base64').toString('utf8')), error: null, chunks: chunks.length };
+  } catch (error) {
+    return { output: null, error: String(error?.message ?? error), chunks: chunks.length };
+  }
+}
+
+/** Model branch, preserving the adapter's output and sidecar shape. */
+export async function runModelTrial({
+  armId, seed, timeoutMs, dryRun = false, pin, prereg, remainingTokens = undefined,
+  predictionsSink = null, runLabel = null,
+  inspect, executeDry = executeIsolated, executePaid = executeModelWithCredential,
+} = {}) {
+  const pinned = assertPinnedModelImage({ pin, prereg, inspect });
+  const argv = modelTrialArgv({ armId, seed, dryRun, remainingTokens, preregRule: prereg.rule });
+  let observation;
+  let invocation = null;
+  if (dryRun) {
+    invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
+      image: pinned.imageId, argv, timeoutMs, name: 's2-008-model-v4-dry-run',
+    });
+    observation = await executeDry(invocation, { env: PODMAN_ENV });
+  } else {
+    const paid = await executePaid({
+      image: pinned.imageId, argv, timeoutMs,
+      name: 's2-008-model-v4-' + String(seed),
+    });
+    observation = paid.observation;
+    invocation = paid.invocation;
+  }
+  const parsed = parseModelPayload(observation?.stdout);
+  const output = parsed.output;
+  const banner = String(observation?.stdout ?? '').split('\n').find((line) => line.startsWith('ADAPTER_OK')) ?? null;
+  const predictions = persistPredictions({ output, armId, seed, runLabel, sink: predictionsSink });
+  const pid = Number(/pid=(\d+)/.exec(banner ?? '')?.[1] ?? 0);
+  const realStart = {
+    proven: observation?.exitCode === 0 && banner !== null && output !== null && pid > 0 && output?.container?.pid === pid,
+    container_pid: pid || null,
+    host_pid: process.pid,
+    separate_process: pid > 0 && pid !== process.pid,
+    container_runtime_version: output?.container?.node_version ?? null,
+    pin_rechecked_by: 'assertPinnedModelImage',
+  };
+  return {
+    ok: realStart.proven,
+    observation,
+    output,
+    record: {
+      arm_id: armId, seed, image: pinned.imageId, image_digest: pinned.digest,
+      container_argv: invocation ? [...invocation.podmanArgv] : null,
+      axes: invocation?.axes ?? null,
+      exit_code: observation?.exitCode ?? null,
+      signal: observation?.signal ?? null,
+      timed_out: observation?.timedOut ?? false,
+      stderr_excerpt: String(observation?.stderr ?? '').slice(-400),
+      banner, payload_chunks: parsed.chunks, payload_error: parsed.error,
+      output_digest: output === null ? null : canonicalDigest(output),
+      predictions: predictions === null ? null : { digest: predictions.digest, rows: predictions.rows, unparsed: predictions.unparsed },
+      real_start: realStart,
+    },
+  };
 }
