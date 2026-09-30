@@ -52,6 +52,7 @@ test('v6 timeout policy signs a finite per-call limit and a formula-bound per-co
   assert.equal(policy.bridge_report_margin_ms, 300_000);
   assert.equal(policy.total_container_timeout_ms, 22_980_000);
   assert.equal(policy.total_container_timeout_scope, 'ONE_MODEL_CONTAINER_PER_SEED');
+  assert.deepEqual(policy.pi_argv_flags, ['--no-tools', '--no-extensions', '--no-skills']);
   assert.doesNotThrow(() => assertV6ModelTimeoutPolicy(policy));
 
   for (const altered of [

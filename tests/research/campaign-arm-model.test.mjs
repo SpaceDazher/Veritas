@@ -34,6 +34,7 @@ import {
   classifyOutcome,
   extractUsage,
   main,
+  modelCallArgv,
   parseLabel,
   readCredential,
 } from '../../scripts/s2-008-campaign-arm-model.mjs';
@@ -153,6 +154,18 @@ test('pi 0.99.1 usage comes only from final agent_end assistant messages and sum
   assert.equal(extractUsage(JSON.stringify({ type: 'agent_end', messages: [{ role: 'assistant', content: [] }] })), null,
     'a final assistant message with missing usage must fail closed');
   assert.equal(extractUsage('not json at all'), null);
+});
+
+test('pi receives no tool, extension, or skill capabilities for one-word predictions', () => {
+  assert.deepEqual(modelCallArgv({
+    provider: 'zai-coding-cn', model: 'glm-5.3-flash', prompt: 'classify this subject',
+  }), [
+    '--print', '--mode', 'json',
+    '--provider', 'zai-coding-cn',
+    '--model', 'glm-5.3-flash',
+    '--no-session', '--no-tools', '--no-extensions', '--no-skills',
+    'classify this subject',
+  ]);
 });
 
 test('assistant result parser reads text blocks and ignores thinking and tool-call blocks', () => {
