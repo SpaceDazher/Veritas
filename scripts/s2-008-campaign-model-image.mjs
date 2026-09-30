@@ -9,13 +9,14 @@ import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { BASE_IMAGE, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { PODMAN_HOST, buildInvocation, executeIsolated } from '../src/lib/isolation/launch.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
+import { modelContainerTimeoutFromPreregistration } from './s2-008-campaign-v6-timeout.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
 export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
-  if (version !== 'v4' && version !== 'v5') throw new Error('MODEL_IMAGE_VERSION_INVALID');
-  if (preseal && version !== 'v5') throw new Error('MODEL_PRESEAL_VERSION_INVALID');
-  const stagedVersion = preseal ? 'v4' : version;
+  if (!['v4', 'v5', 'v6'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (preseal && !['v5', 'v6'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
+  const stagedVersion = preseal ? (version === 'v6' ? 'v5' : 'v4') : version;
   return Object.freeze({
     tag: `localhost/veritas-s2-008-model:${version}`,
     stagedPrereg: `corpus/s2-008-campaign/preregistration.${stagedVersion}.in-force.json`,
@@ -24,7 +25,7 @@ export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
   });
 }
 const MODEL_PATHS = modelImagePaths(
-  process.argv.includes('--v5') ? 'v5' : 'v4',
+  process.argv.includes('--v6') ? 'v6' : process.argv.includes('--v5') ? 'v5' : 'v4',
   { preseal: process.argv.includes('--preseal') },
 );
 const TAG = MODEL_PATHS.tag;
@@ -84,6 +85,32 @@ function podman(args) {
 }
 function sha(file) { return createHash('sha256').update(fs.readFileSync(file)).digest('hex'); }
 
+/** Digest every staged pi runtime entry, including nested chunks and link targets. */
+export function digestRuntimeTree(root) {
+  const entries = [];
+  const visit = (directory, prefix = '') => {
+    for (const name of fs.readdirSync(directory).sort()) {
+      const absolute = path.join(directory, name);
+      const relative = prefix ? prefix + '/' + name : name;
+      const stat = fs.lstatSync(absolute);
+      const mode = stat.mode & 0o777;
+      if (stat.isSymbolicLink()) {
+        entries.push({ path: relative, type: 'symlink', mode, target: fs.readlinkSync(absolute) });
+      } else if (stat.isDirectory()) {
+        entries.push({ path: relative, type: 'directory', mode });
+        visit(absolute, relative);
+      } else if (stat.isFile()) {
+        entries.push({ path: relative, type: 'file', mode, sha256: sha(absolute) });
+      } else {
+        throw new Error('PI_RUNTIME_TREE_ENTRY_UNSUPPORTED:' + relative);
+      }
+    }
+  };
+  visit(root);
+  entries.sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+  return canonicalDigest(entries);
+}
+
 export function buildModelImage() {
   const context = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-image-'));
   try {
@@ -98,6 +125,8 @@ export function buildModelImage() {
       'src/lib/verifier/canonical-json.mjs',
       'corpus/s2-008-campaign/cases/holdout.blind.json',
       MODEL_PATHS.stagedPrereg,
+      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6'
+        ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
     ]) {
       const dest = path.join(target, name);
       fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -127,6 +156,10 @@ export function buildModelImage() {
       pi_bundle: sha(path.join(PACKAGE, 'dist/bundle/cli.js')),
       pi_shrinkwrap: sha(path.join(PACKAGE, 'npm-shrinkwrap.json')),
       recipe: sha(file),
+      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6' ? {
+        timeout_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-v6-timeout.mjs')),
+        pi_runtime_tree: digestRuntimeTree(path.join(context, 'opt/pi')),
+      } : {}),
     };
     // The two digests are computed from the SAME object, so they cannot drift
     // apart by being built at different moments from different state.
@@ -182,6 +215,11 @@ export function assertRecordedModelPin(rebuilt, recorded) {
 }
 
 export function dryRunModelInImage(pin) {
+  const stagedPrereg = JSON.parse(fs.readFileSync(path.join(ROOT, MODEL_PATHS.stagedPrereg), 'utf8'));
+  let timeoutMs = 180_000;
+  if (stagedPrereg.rule === 's2-008-prereg-v6') {
+    timeoutMs = modelContainerTimeoutFromPreregistration(stagedPrereg);
+  }
   const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
     image: pin.imageId,
     argv: [
@@ -194,7 +232,7 @@ export function dryRunModelInImage(pin) {
       '20260926',
       '--dry-run',
     ],
-    timeoutMs: 180000,
+    timeoutMs,
     name: `s2-008-model-${MODEL_PATHS.schema.split('/').at(-1)}-dry-run`,
   });
   const observation = executeIsolated(invocation, {

@@ -29,7 +29,7 @@ manifest.superseded_preregistration = {
   status: 'SUPERSEDED',
   superseded_by: 'preregistration.v3.in-force.json',
 };
-manifest.supersession = structuredClone(activeManifest.supersession_history[0]);
+manifest.supersession = structuredClone(activeManifest.supersession_history.find((row) => row.file === 'preregistration-v3-supersession.json'));
 delete manifest.supersession_history;
 const ledger = read('source-ledger.v3.json');
 const clone = (v) => structuredClone(v);

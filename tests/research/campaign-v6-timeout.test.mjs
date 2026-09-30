@@ -3,17 +3,20 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs';
 import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
-import { runV4Campaign } from '../../scripts/s2-008-campaign-run.mjs';
+import { campaignCliMode, runV4Campaign } from '../../scripts/s2-008-campaign-run.mjs';
 import {
   assertV6ModelTimeoutPolicy,
   createV6ModelTimeoutPolicy,
 } from '../../scripts/s2-008-campaign-v6-timeout.mjs';
 import {
   approveV6,
+  approvalIdentityFromArgv,
   createV6Draft,
 } from '../../scripts/s2-008-campaign-v6-approval.mjs';
 import { modelImagePaths } from '../../scripts/s2-008-campaign-model-image.mjs';
+import { assertV6PresealPin } from '../../scripts/s2-008-campaign-v6-approval.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
 const corpus = path.join(root, 'corpus/s2-008-campaign');
@@ -23,8 +26,34 @@ const table = JSON.parse(fs.readFileSync(path.join(corpus, 'frozen-table.v3.json
 const previousPin = JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v5.json')));
 const MODEL = 'arm-model-zai-glm53flash';
 
+test('v6 CLI selects the preregistered campaign runner and rejects conflicting version flags', () => {
+  assert.deepEqual(campaignCliMode({ v6: true, dryRun: true }), {
+    predictionRunner: true, requestedVersion: 6,
+  });
+  assert.deepEqual(campaignCliMode({ arm: MODEL, dryRun: true }), {
+    predictionRunner: true, requestedVersion: null,
+  });
+  assert.deepEqual(campaignCliMode({}), { predictionRunner: false, requestedVersion: null });
+  assert.throws(() => campaignCliMode({ v5: true, v6: true }), /CAMPAIGN_VERSION_FLAGS_CONFLICT/);
+});
+
+test('v6 approval CLI refuses to infer the approver from argv when identity flags are missing', () => {
+  const prefix = ['node', 'scripts/s2-008-campaign-v6-draft.mjs', '--approve'];
+  assert.throws(() => approvalIdentityFromArgv(prefix), /V6_APPROVAL_IDENTITY_MISSING/);
+  assert.throws(() => approvalIdentityFromArgv([...prefix, '--label', 'Daniil']), /V6_APPROVAL_IDENTITY_MISSING/);
+  assert.throws(() => approvalIdentityFromArgv([...prefix, '--principal', 'prn-owner']), /V6_APPROVAL_IDENTITY_MISSING/);
+  assert.deepEqual(approvalIdentityFromArgv([
+    ...prefix, '--principal', 'prn-owner', '--label', 'Daniil (repository owner)',
+  ]), { principal: 'prn-owner', label: 'Daniil (repository owner)' });
+});
+
 function pinV6() {
-  const sources = { ...previousPin.first.sources, arm: 'f'.repeat(64) };
+  const sources = {
+    ...previousPin.first.sources,
+    arm: 'f'.repeat(64),
+    pi_runtime_tree: 'e'.repeat(64),
+    timeout_policy: 'd'.repeat(64),
+  };
   const covers = Object.keys(sources).filter((key) => key !== 'prereg').sort();
   const commitment = canonicalDigest(Object.fromEntries(covers.map((key) => [key, sources[key]])));
   const first = {
@@ -44,6 +73,16 @@ function pinV6() {
 }
 
 const presealPin = pinV6();
+
+test('v6 preseal rejects a pin without the complete pi runtime tree source', () => {
+  const valid = assertV6PresealPin({ pin: presealPin, baseBytes, commitment: presealPin.first.content_commitment });
+  assert.equal(valid.ok, true);
+  const incomplete = structuredClone(presealPin);
+  delete incomplete.first.sources.pi_runtime_tree;
+  assert.throws(() => assertV6PresealPin({
+    pin: incomplete, baseBytes, commitment: incomplete.first.content_commitment,
+  }), /V6_PRESEAL_PIN_INVALID/);
+});
 
 test('v6 timeout policy signs a finite per-call limit and a formula-bound per-container limit', () => {
   const policy = createV6ModelTimeoutPolicy();
@@ -73,7 +112,7 @@ test('v6 approval preserves every frozen scientific member and binds only the v6
   assert.equal(draft.executor.model_launch_timeout.total_container_timeout_ms, 22_980_000);
   assert.equal(draft.budget_reservation.granted_units, 5_000_000);
   assert.equal(draft.budget_reservation.ceiling_scope, 'PER_RUN_A_OR_B');
-  assert.equal(draft.supersession.scope, 'executor timeout policy only; frozen scientific members and 5M per-run ceiling unchanged');
+  assert.equal(draft.supersession.scope, 'model execution and runtime binding; frozen scientific members and 5M per-run ceiling unchanged');
   const signed = approveV6({
     draft, base, baseBytes, table, pin: presealPin,
     principal: 'prn-s2007r-owner', label: 'Daniil (repository owner)',
@@ -141,4 +180,60 @@ test('v5 paid model dispatch is blocked because its outer timeout cannot cover t
 
   const paths = modelImagePaths('v6');
   assert.equal(paths.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v6.in-force.json');
+});
+
+
+test('v6 refuses dirty sources and missing, invalid, or expired reservation clocks before paid model launch', async () => {
+  const draft = createV6Draft({ base, baseBytes, pin: presealPin });
+  const signed = approveV6({
+    draft, base, baseBytes, table, pin: presealPin,
+    principal: 'prn-s2007r-owner', label: 'Daniil (repository owner)',
+  });
+  for (const variant of [
+    { expiry: '2026-09-29T00:00:00.000Z', now: Date.parse('2026-09-30T00:00:00.000Z'), code: 'BUDGET_RESERVATION_EXPIRED' },
+    { expiry: 'not-a-date', now: Date.parse('2026-09-30T00:00:00.000Z'), code: 'BUDGET_RESERVATION_EXPIRY_INVALID' },
+    { expiry: null, now: Date.parse('2026-09-30T00:00:00.000Z'), code: 'BUDGET_RESERVATION_EXPIRY_INVALID' },
+    { expiry: '2026-10-05T00:00:00.000Z', now: Number.NaN, code: 'BUDGET_RESERVATION_CLOCK_INVALID' },
+  ]) {
+    const prereg = structuredClone(signed);
+    if (variant.expiry === null) delete prereg.budget_reservation.expires_at;
+    else prereg.budget_reservation.expires_at = variant.expiry;
+    prereg.preregistration_digest = preregistrationDigest(prereg);
+    prereg.approval = { ...prereg.approval, in_force: true };
+    const manifest = { preregistration: {
+      file: 'preregistration.v6.in-force.json', status: 'IN_FORCE',
+      preregistration_digest: prereg.preregistration_digest,
+    } };
+    let launched = false;
+    const report = await runV4Campaign({
+      label: 'expired-v6', arm: MODEL, seed: prereg.seed_rule.seeds[0], dryRun: false, write: false,
+      prereg, manifest, modelPin: presealPin, dispatchableArms: [MODEL],
+      resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+      now: () => variant.now,
+      runModel: async () => { launched = true; throw new Error('must not launch'); },
+    });
+    assert.equal(report.status, 'BLOCKED');
+    assert.equal(report.code, variant.code);
+    assert.equal(report.launches, 0);
+    assert.equal(launched, false);
+  }
+  for (const dirty of [true, undefined]) {
+    let launched = false;
+    const dirtyPrereq = { ...signed, approval: { ...signed.approval, in_force: true } };
+    const report = await runV4Campaign({
+      label: 'dirty-v6', arm: MODEL, seed: dirtyPrereq.seed_rule.seeds[0], dryRun: false, write: false,
+      prereg: dirtyPrereq,
+      manifest: { preregistration: {
+        file: 'preregistration.v6.in-force.json', status: 'IN_FORCE',
+        preregistration_digest: dirtyPrereq.preregistration_digest,
+      } },
+      modelPin: presealPin, dispatchableArms: [MODEL],
+      resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), ...(dirty === undefined ? {} : { worktree_dirty: dirty }) }),
+      now: () => Date.parse('2026-09-30T00:00:00.000Z'),
+      runModel: async () => { launched = true; throw new Error('must not launch'); },
+    });
+    assert.equal(report.code, 'DIRTY_SOURCE_BASE');
+    assert.equal(report.launches, 0);
+    assert.equal(launched, false);
+  }
 });

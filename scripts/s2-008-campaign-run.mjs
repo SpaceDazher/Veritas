@@ -62,6 +62,7 @@ import {
 } from '../src/lib/research/constants.mjs';
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
 import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin } from './s2-008-campaign-adapter.mjs';
+import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -1021,24 +1022,23 @@ export async function runV4Campaign({
   prereg = null,
   manifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8')),
   modelPin = null,
-  dispatchableArms = DISPATCHABLE_MODEL_ARMS,
-  runModel = runModelTrial, runRegex = runTrial, buildRegex = buildImage,
+  dispatchableArms = DISPATCHABLE_MODEL_ARMS, expectedVersion = null,
+  runModel = runModelTrial, runRegex = runTrial, buildRegex = buildImage, resolveBaseFn = resolveBase, now = () => Date.now(),
 } = {}) {
   const safeLabel = String(label);
   if (!/^[a-z0-9][a-z0-9-]{0,19}$/.test(safeLabel)) throw new Error('RUN_LABEL_INVALID');
   const activeFile = manifest?.preregistration?.file;
-  if (activeFile !== 'preregistration.v4.in-force.json' &&
-      activeFile !== 'preregistration.v5.in-force.json') {
+  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json'].includes(activeFile)) {
     throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
   }
   prereg = prereg ?? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8'));
-  const version = prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  const version = prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  if (expectedVersion !== null && expectedVersion !== version) throw new Error('ACTIVE_CAMPAIGN_VERSION_MISMATCH');
   const campaignKind = `s2-008-campaign-v${version}-predictions/1`;
-  const base = resolveBase();
-  const runId = `s2-008c-v4-${safeLabel}-${randomUUID().replaceAll('-', '').slice(0, 20)}`;
+  const base = resolveBaseFn();
+  const runId = 's2-008c-v' + version + '-' + safeLabel + '-' + randomUUID().replaceAll('-', '').slice(0, 20);
   const nonce = deriveProcessNonce({ label: safeLabel, runId, attempt: 0, pid: process.pid });
-  const expectedPreregFile = prereg.rule === 's2-008-prereg-v5'
-    ? 'preregistration.v5.in-force.json' : 'preregistration.v4.in-force.json';
+  const expectedPreregFile = 'preregistration.v' + version + '.in-force.json';
   if (manifest?.preregistration?.file !== expectedPreregFile ||
       manifest.preregistration.status !== 'IN_FORCE' ||
       manifest.preregistration.preregistration_digest !== preregistrationDigest(prereg) ||
@@ -1050,16 +1050,30 @@ export async function runV4Campaign({
   // Its arm would take a fresh 5m grant at every seed. Paid v4 is therefore
   // refused before building or launching anything; only a sealed successor
   // whose image contains the cap-aware arm may spend.
-  if (!dryRun && prereg.rule !== 's2-008-prereg-v5') {
+  if (!dryRun && prereg.rule !== 's2-008-prereg-v6') {
+    const code = prereg.rule === 's2-008-prereg-v5'
+      ? 'MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED' : 'MODEL_CAP_RESEAL_REQUIRED';
     return {
-      kind: campaignKind, status: 'BLOCKED',
-      code: 'MODEL_CAP_RESEAL_REQUIRED', reason: 'MODEL_CAP_RESEAL_REQUIRED: signed v4 image does not enforce a shared remaining-token cap',
+      kind: campaignKind, status: 'BLOCKED', code,
+      reason: code + ': only the v6 signed image binds a finite total model-container timeout and authoritative model accounting',
       spent_units: 0, launches: 0, charges: [], trials: [],
       preregistration_digest: prereg.preregistration_digest,
     };
   }
+  if (!dryRun && base?.worktree_dirty !== false) {
+    return {
+      kind: campaignKind, status: 'BLOCKED', code: 'DIRTY_SOURCE_BASE',
+      reason: 'paid model launch refused because the source tree differs from the signed image and preregistration review state',
+      spent_units: 0, launches: 0, charges: [], trials: [],
+      preregistration_digest: prereg.preregistration_digest,
+    };
+  }
+  if (prereg.rule === 's2-008-prereg-v6') {
+    assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    if (prereg.holdout_access?.case_count !== 126) throw new Error('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH');
+  }
   const declaredPinPath = prereg.executor?.model_image?.built_image_pin;
-  if (declaredPinPath !== `evidence/s2-008-campaign/model-image-pin-v${prereg.rule === 's2-008-prereg-v5' ? '5' : '4'}.json`) {
+  if (declaredPinPath !== 'evidence/s2-008-campaign/model-image-pin-v' + version + '.json') {
     throw new Error('MODEL_IMAGE_PIN_VERSION_MISMATCH');
   }
   const activeModelPin = modelPin ?? JSON.parse(fs.readFileSync(path.join(REPO_ROOT, declaredPinPath), 'utf8'));
@@ -1106,6 +1120,26 @@ export async function runV4Campaign({
   for (const entry of entries) {
     const perSeed = [];
     for (const currentSeed of seeds) {
+      if (!dryRun && entry.arm_id === 'arm-model-zai-glm53flash' && version === 6) {
+        const expiresAt = Date.parse(prereg.budget_reservation?.expires_at ?? '');
+        if (!Number.isFinite(expiresAt)) {
+          status = 'BLOCKED'; code = 'BUDGET_RESERVATION_EXPIRY_INVALID';
+          reason = 'v6 token reservation expiry is absent or invalid; no model launch was authorized';
+          break;
+        }
+        let nowMs;
+        try { nowMs = Number(now()); } catch { nowMs = Number.NaN; }
+        if (!Number.isFinite(nowMs)) {
+          status = 'BLOCKED'; code = 'BUDGET_RESERVATION_CLOCK_INVALID';
+          reason = 'v6 token reservation authorization clock is invalid; no model launch was authorized';
+          break;
+        }
+        if (nowMs >= expiresAt) {
+          status = 'BLOCKED'; code = 'BUDGET_RESERVATION_EXPIRED';
+          reason = 'v6 token reservation expired before this model launch';
+          break;
+        }
+      }
       if (spentUnits >= granted) {
         status = 'BUDGET_STOPPED'; code = 'BUDGET_EXHAUSTED'; reason = 'recorded spend reached the preregistered ceiling';
         break;
@@ -1123,9 +1157,11 @@ export async function runV4Campaign({
         result = entry.arm_id === 'arm-model-zai-glm53flash'
           ? await runModel({
             armId: entry.arm_id, seed: currentSeed,
-            timeoutMs: prereg.budget_reservation.trial_timeout_ms,
+            timeoutMs: version === 6
+              ? prereg.executor.model_launch_timeout.total_container_timeout_ms
+              : prereg.budget_reservation.trial_timeout_ms,
             dryRun, pin: activeModelPin, prereg,
-            remainingTokens: version === 5 ? granted - spentUnits : undefined,
+            remainingTokens: version >= 5 ? granted - spentUnits : undefined,
             predictionsSink: sink, runLabel: safeLabel,
           })
           : await runRegex({
@@ -1218,14 +1254,26 @@ function parseArgs(argv) {
   return args;
 }
 
+export function campaignCliMode(args = {}) {
+  const versions = ['v4', 'v5', 'v6'].filter((name) => args[name] === true);
+  if (versions.length > 1) throw new Error('CAMPAIGN_VERSION_FLAGS_CONFLICT');
+  const requestedVersion = versions.length === 0 ? null : Number(versions[0].slice(1));
+  return Object.freeze({
+    predictionRunner: requestedVersion !== null || Boolean(args.arm && args.dryRun),
+    requestedVersion,
+  });
+}
+
 const args = parseArgs(process.argv);
+const cliMode = campaignCliMode(args);
 const isEntry = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (!isEntry) {
   // Imported as a library (the independent evaluator imports the interval
   // helper); running a campaign is a decision, not a side effect of an import.
-} else if (args.v4 || (args.arm && args.dryRun)) {
+} else if (cliMode.predictionRunner) {
   const record = await runV4Campaign({
     label: String(args.label ?? 'a'),
+    expectedVersion: cliMode.requestedVersion,
     arm: typeof args.arm === 'string' ? args.arm : null,
     seed: typeof args.seed === 'string' ? Number(args.seed) : null,
     dryRun: args.dryRun === true,

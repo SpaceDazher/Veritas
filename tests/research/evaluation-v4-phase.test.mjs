@@ -8,11 +8,26 @@ import { evaluateV4Campaign } from '../../scripts/s2-008-campaign-evaluate.mjs';
 
 const corpus = path.resolve(import.meta.dirname, '../../corpus/s2-008-campaign');
 const prereg = JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v4.in-force.json')));
-const manifestV5 = JSON.parse(fs.readFileSync(path.join(corpus, 'manifest.json')));
-const manifest = structuredClone(manifestV5);
-manifest.preregistration = { file: 'preregistration.v4.in-force.json',
-  status: 'IN_FORCE', preregistration_digest: prereg.preregistration_digest };
+const currentManifest = JSON.parse(fs.readFileSync(path.join(corpus, 'manifest.json')));
+const preregV3 = JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v3.in-force.json')));
 const preregV5 = JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v5.in-force.json')));
+const historicalManifest = (file, preregistration, supersededFile, supersededDigest) => {
+  const index = currentManifest.supersession_history.findIndex((row) => row.file === file);
+  if (index < 0) throw new Error(`missing supersession history: ${file}`);
+  const history = currentManifest.supersession_history.slice(0, index + 1);
+  return { ...structuredClone(currentManifest),
+    supersession_history: history, supersession: history.at(-1),
+    preregistration: { file: preregistration, status: 'IN_FORCE',
+      preregistration_digest: preregistration === 'preregistration.v4.in-force.json' ? prereg.preregistration_digest : preregV5.preregistration_digest },
+    superseded_preregistration: { file: supersededFile, status: 'SUPERSEDED',
+      preregistration_digest: supersededDigest },
+  };
+};
+const manifestV5 = historicalManifest('preregistration-v5-supersession.json',
+  'preregistration.v5.in-force.json', 'preregistration-v4-superseded.json',
+  JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v4.in-force.json'))).preregistration_digest);
+const manifest = historicalManifest('preregistration-v4-supersession.json',
+  'preregistration.v4.in-force.json', 'preregistration-v3-superseded.json', preregV3.preregistration_digest);
 const frozenTable = JSON.parse(fs.readFileSync(path.join(corpus, 'frozen-table.v3.json')));
 const holdoutCases = JSON.parse(fs.readFileSync(path.join(corpus, 'cases/holdout.json')));
 

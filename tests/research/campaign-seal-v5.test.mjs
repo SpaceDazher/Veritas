@@ -17,11 +17,13 @@ const input = () => ({
   manifest: (() => {
     const active = read('manifest.json');
     const base = read('preregistration.v4.in-force.json');
-    const previous = active.supersession_history.at(-2);
+    const historyIndex = active.supersession_history.findIndex((row) => row.file === 'preregistration-v4-supersession.json');
+    if (historyIndex < 0) throw new Error('v4 supersession history is absent');
+    const previous = active.supersession_history[historyIndex];
     return { ...active,
       preregistration: { file: 'preregistration.v4.in-force.json', status: 'IN_FORCE',
         preregistration_digest: base.preregistration_digest },
-      supersession_history: active.supersession_history.slice(0, -1),
+      supersession_history: active.supersession_history.slice(0, historyIndex + 1),
       supersession: previous,
     };
   })(),

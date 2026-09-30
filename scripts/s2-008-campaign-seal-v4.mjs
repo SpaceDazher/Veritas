@@ -116,11 +116,10 @@ export function checkV4OnDisk() {
     manifest.preregistration.preregistration_digest === preregistrationDigest(prereg) &&
     manifest.superseded_preregistration?.preregistration_digest === preregistrationDigest(base) &&
     manifest.supersession?.supersession_digest === supersession.supersession_digest;
-  const archivedV4 = manifest.superseded_preregistration?.file === 'preregistration-v4-superseded.json' &&
-    manifest.superseded_preregistration.preregistration_digest === preregistrationDigest(prereg) &&
-    manifest.supersession_history?.some((row) =>
-      row.file === 'preregistration-v4-supersession.json' &&
-      row.supersession_digest === supersession.supersession_digest);
+  const archivedV4 = manifest.supersession_history?.some((row) =>
+    row.file === 'preregistration-v4-supersession.json' &&
+    row.supersession_id === supersession.supersession_id &&
+    row.supersession_digest === supersession.supersession_digest);
   if ((!activeV4 && !archivedV4) ||
       manifest.source_ledger?.last_anchor_digest !== last.anchor_digest ||
       manifest.source_ledger.entry_count !== ledger.entries.length ||

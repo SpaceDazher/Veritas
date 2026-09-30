@@ -29,6 +29,9 @@ import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { readCorpus } from '../src/lib/research/dataset.mjs';
 import { openRegistry, readJournal } from '../src/lib/research/registry.mjs';
 import { preregistrationDigest } from '../src/lib/research/preregistration.mjs';
+import { RESEARCH_HARD_GATE_COUNTERS } from '../src/lib/research/constants.mjs';
+import { PROBE_FAMILIES, PROBE_NAMES } from '../src/lib/research/probes.mjs';
+import { NEGATIVE_CONTROLS, EXTRA_CONTROL_IDS } from '../src/lib/research/negative-controls.mjs';
 import { buildBootstrapImage, runBootstrap } from './s2-008-campaign-adapter.mjs';
 
 
@@ -227,9 +230,128 @@ function decisionIndependent({ observed, lower, upper, noiseBand, alpha, confide
 }
 
 
-function activeCampaignVersion(manifest) {
-  const match = /^preregistration\.(v[45])\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
+export function activeCampaignVersion(manifest) {
+  const match = /^preregistration\.(v[456])\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
   return match?.[1] ?? null;
+}
+
+const EXPECTED_CAMPAIGN_PROBES = Object.freeze([
+  'P1_INFRA_IMAGE_ABSENT',
+  'P2_LOST_EVALUATOR',
+  'P3_NO_MEASUREMENT',
+  'P4_PREREGISTERED_TIMEOUT',
+  'P5_INTERRUPTED_THEN_RESTARTED',
+  'P6_EXPIRED_RESERVATION',
+  'P7_MISSING_OUTCOME_DETECTABLE',
+]);
+const sameMembers = (actual, expected) => Array.isArray(actual) &&
+  actual.length === expected.length &&
+  canonicalDigest([...actual].sort()) === canonicalDigest([...expected].sort());
+const validBase = (value) => typeof value?.commit_sha === 'string' && value.commit_sha.length > 0 &&
+  typeof value?.tree_sha === 'string' && value.tree_sha.length > 0;
+
+export function validateV6ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB }) {
+  const notRun = (reason) => ({ ok: false, status: 'NOT_RUN', reason });
+  const fail = (reason) => ({ ok: false, status: 'FAIL', reason });
+  let digest;
+  try { digest = preregistrationDigest(prereg); } catch { return notRun('V6_PREREGISTRATION_MALFORMED'); }
+  if (prereg?.rule !== 's2-008-prereg-v6' || prereg.preregistration_digest !== digest) {
+    return notRun('V6_PREREGISTRATION_DIGEST_MISMATCH');
+  }
+  if (!campaignProbes || campaignProbes.kind !== 's2-008-campaign-probes/1' || campaignProbes.status !== 'PASS' || campaignProbes.ok !== true || campaignProbes.exitCode !== 0 ||
+      !Array.isArray(campaignProbes.probes) || campaignProbes.probes.length !== EXPECTED_CAMPAIGN_PROBES.length ||
+      campaignProbes.preregistration_digest !== digest || !validBase(runA?.base) || !validBase(runB?.base)) {
+    return notRun('V6_CAMPAIGN_PROBE_RECORD_MISSING_OR_MALFORMED');
+  }
+  const campaignIds = campaignProbes.probes.map((row) => row?.probe);
+  if (!sameMembers(campaignIds, EXPECTED_CAMPAIGN_PROBES) ||
+      campaignIds.length !== new Set(campaignIds).size ||
+      campaignProbes.commit_sha !== runA.base.commit_sha ||
+      campaignProbes.tree_sha !== runA.base.tree_sha ||
+      runA.base.commit_sha !== runB.base.commit_sha ||
+      runA.base.tree_sha !== runB.base.tree_sha) {
+    return notRun('V6_CAMPAIGN_PROBE_BINDING_MISMATCH');
+  }
+  if (campaignProbes.probes.some((row) => row.held !== true)) {
+    return fail('V6_CAMPAIGN_PROBE_NOT_HELD');
+  }
+  const outcomes = [...new Set(campaignProbes.probes.flatMap((row) =>
+    row.observed?.outcome === undefined ? [] : [row.observed.outcome]))].sort();
+  if (campaignProbes.summary?.total !== EXPECTED_CAMPAIGN_PROBES.length ||
+      campaignProbes.summary?.held !== EXPECTED_CAMPAIGN_PROBES.length ||
+      campaignProbes.summary?.broken !== 0 ||
+      canonicalDigest(campaignProbes.summary?.outcome_classes_exercised) !== canonicalDigest(outcomes)) {
+    return notRun('V6_CAMPAIGN_PROBE_SUMMARY_MISMATCH');
+  }
+  if (!securityControls || securityControls.base?.commit_sha !== runA.base.commit_sha ||
+      securityControls.base?.tree_sha !== runA.base.tree_sha) {
+    return notRun('V6_SECURITY_PROBE_BASE_MISMATCH');
+  }
+  const expectedSecurityProbes = PROBE_FAMILIES.flatMap((family) =>
+    PROBE_NAMES[family].map((probe) => ({ family, probe })));
+  const securityRows = securityControls.probes?.results;
+  if (!Array.isArray(securityRows) || securityRows.some((row) => row?.passed !== true) || !sameMembers(
+    securityRows.map((row) => row?.family + '\u0000' + row?.probe),
+    expectedSecurityProbes.map((row) => row.family + '\u0000' + row.probe),
+  ) || securityRows.length !== new Set(securityRows.map((row) => row?.family + '\u0000' + row?.probe)).size ||
+      securityControls.probes.notRun?.length !== 0 || securityControls.probes.broken?.length !== 0) {
+    return notRun('V6_SECURITY_PROBE_ROWS_MISSING_OR_MALFORMED');
+  }
+  const expectedControlIds = [
+    ...NEGATIVE_CONTROLS.map((row) => row.id),
+    ...EXTRA_CONTROL_IDS,
+  ];
+  const controlRows = securityControls.controls?.records;
+  const controlIds = Array.isArray(controlRows) ? controlRows.map((row) => row?.id) : [];
+  if (!Array.isArray(controlRows) || !sameMembers(controlIds, expectedControlIds) ||
+      controlIds.length !== new Set(controlIds).size ||
+      !Array.isArray(securityControls.controls.notRun) ||
+      securityControls.controls.notRun.length !== 0 ||
+      securityControls.controls.digest !== canonicalDigest({
+        controls: controlRows, notRun: securityControls.controls.notRun,
+      })) {
+    return notRun('V6_SECURITY_CONTROL_ROWS_MISSING_OR_MALFORMED');
+  }
+  const counters = securityControls.hardGates?.counters;
+  if (!counters || !sameMembers(securityControls.hardGates?.names, RESEARCH_HARD_GATE_COUNTERS) ||
+      Object.keys(counters).length !== RESEARCH_HARD_GATE_COUNTERS.length ||
+      RESEARCH_HARD_GATE_COUNTERS.some((name) => !Object.hasOwn(counters, name) ||
+        !Number.isInteger(counters[name]) || counters[name] < 0)) {
+    return notRun('V6_SECURITY_HARD_GATE_COUNTERS_MISSING_OR_MALFORMED');
+  }
+  const totals = securityControls.totals;
+  const passed = securityRows.filter((row) => row.status === 'pass').length;
+  const flipped = controlRows.filter((row) => row.flipped === true).length;
+  const summaryConsistent = totals?.families === PROBE_FAMILIES.length &&
+    totals?.probes === expectedSecurityProbes.length &&
+    totals?.probes_ran === securityRows.length &&
+    totals?.passed === passed &&
+    totals?.failed === securityRows.length - passed &&
+    totals?.not_run === securityControls.probes.notRun.length &&
+    totals?.broken === securityControls.probes.broken.length &&
+    totals?.controls_declared === NEGATIVE_CONTROLS.length &&
+    totals?.controls_extra_declared === EXTRA_CONTROL_IDS.length &&
+    totals?.controls_ran === controlRows.length &&
+    totals?.controls_flipped === flipped &&
+    Array.isArray(totals?.controls_unaccounted) && totals.controls_unaccounted.length === 0;
+  if (!summaryConsistent) return notRun('V6_SECURITY_PROBE_SUMMARY_MISMATCH');
+  if (securityRows.some((row) => row.status !== 'pass') ||
+      controlRows.some((row) => row.flipped !== true) ||
+      securityControls.controls.allFlipped !== true ||
+      securityControls.controls.gate?.ok !== true ||
+      securityControls.controls.gate?.failures?.length !== 0 ||
+      RESEARCH_HARD_GATE_COUNTERS.some((name) => counters[name] !== 0) ||
+      securityControls.hardGates.ok !== true ||
+      securityControls.hardGates.moved?.length !== 0 ||
+      securityControls.status !== 'PASS' || securityControls.ok !== true ||
+      securityControls.exitCode !== 0) {
+    return fail('V6_SECURITY_PROBE_GATE_FAILED');
+  }
+  return {
+    ok: true, status: 'PASS',
+    campaign_probe_digest: canonicalDigest(campaignProbes),
+    security_controls_digest: canonicalDigest(securityControls),
+  };
 }
 
 /** Refuse before the holdout is opened if either blind phase is incomplete. */
@@ -362,6 +484,7 @@ export function verifyV4FrozenTable({ prereg, manifest, frozenTable }) {
 
 /** Score the sealed sidecars after the blind runs, using a separate bootstrap. */
 export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, holdoutCases, bootstrap,
+  campaignProbes = null, securityControls = null,
   readFile = (file) => fs.readFileSync(file, 'utf8'), root = REPO_ROOT }) {
   const gate = preflightV4Runs({ runA, runB, prereg, manifest });
   if (!gate.ok) return gate;
@@ -373,6 +496,10 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
     return { ok: false, reason: 'V4_HOLDOUT_LABEL_OR_CASE_MISMATCH' };
   }
   const version = activeCampaignVersion(manifest);
+  const probeEvidence = version === 'v6'
+    ? validateV6ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
+    : null;
+  if (probeEvidence && !probeEvidence.ok) return probeEvidence;
   const scoredRuns = [];
   for (const [label, run] of [['a', runA], ['b', runB]]) {
     const loaded = [];
@@ -471,9 +598,16 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
     ok: true, kind: `s2-008-campaign-${version}-evaluation/1`,
     preregistration_digest: prereg.preregistration_digest,
     holdout_cases: holdoutCases.length, table,
-    probes: { status: 'NOT_RUN', total: V4_PROBES.length,
-      items: V4_PROBES.map((probe) => ({ probe, status: 'NOT_RUN' })) },
-    verdict: 'PENDING_PROBES',
+    probes: version === 'v6'
+      ? {
+          status: probeEvidence.status, total: EXPECTED_CAMPAIGN_PROBES.length,
+          items: campaignProbes.probes.map((row) => ({ probe: row.probe, status: 'PASS' })),
+          campaign_probe_digest: probeEvidence.campaign_probe_digest,
+          security_controls_digest: probeEvidence.security_controls_digest,
+        }
+      : { status: 'NOT_RUN', total: V4_PROBES.length,
+          items: V4_PROBES.map((probe) => ({ probe, status: 'NOT_RUN' })) },
+    verdict: version === 'v6' ? 'PENDING_HUMAN_REVIEW' : 'PENDING_PROBES',
     aggregate_spend: { currency: 'tokens', units: runA.spent_units + runB.spent_units,
       usd_reported: scoredRuns.reduce((sum, row) => sum + row.usd_spent, 0) },
     prediction_independence: 'Model predictions come from immutable run sidecars; labels, counts, bootstrap intervals and decisions are recomputed here.',
@@ -510,6 +644,18 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
   const runB = read(`evidence/s2-008-campaign/run-${version}-b.json`);
   const preflight = preflightV4Runs({ runA, runB, prereg, manifest });
   if (!preflight.ok) throw new Error(preflight.reason);
+  let campaignProbes = null;
+  let securityControls = null;
+  if (version === 'v6') {
+    try {
+      campaignProbes = read('evidence/s2-008-campaign/probes-v6.json');
+      securityControls = read('evidence/s2-008-campaign/security-probes-v6.json');
+    } catch {
+      throw new Error('V6_PROBE_EVIDENCE_NOT_RUN');
+    }
+    const evidence = validateV6ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB });
+    if (!evidence.ok) throw new Error('V6_PROBE_EVIDENCE_' + evidence.status + ':' + evidence.reason);
+  }
   if (fs.existsSync(out)) throw new Error('V4_EVALUATION_ALREADY_EXISTS');
 
   // The case id is blind; the labels are opened only after both blind runs pass.
@@ -557,7 +703,10 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
       fs.rmSync(workspace, { recursive: true, force: true });
     }
   };
-  const evaluation = evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, holdoutCases, bootstrap });
+  const evaluation = evaluateV4Campaign({
+    runA, runB, prereg, manifest, frozenTable, holdoutCases, bootstrap,
+    campaignProbes, securityControls,
+  });
   if (!evaluation.ok) throw new Error(`${evaluation.reason}:${evaluation.run ?? ''}:${evaluation.trial_id ?? ''}`);
   const record = { ...evaluation, holdout_one_shot: { access_rows: accessRows,
     journal_digest: accessJournalDigest, registry: path.relative(REPO_ROOT, accessRoot) } };
@@ -571,14 +720,14 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
 
 const args = parseArgs(process.argv);
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain && (args.v4 || args.v5)) {
+if (isMain && (args.v4 || args.v5 || args.v6)) {
   try {
-    const requestedVersion = args.v5 ? 'v5' : 'v4';
+    const requestedVersion = args.v6 ? 'v6' : args.v5 ? 'v5' : 'v4';
     const out = typeof args.out === 'string' ? path.resolve(args.out) : path.join(REPO_ROOT, `evidence/s2-008-campaign/evaluation-${requestedVersion}.json`);
     console.log(JSON.stringify(evaluateV4OnDisk({ out, requestedVersion }), null, 2));
   } catch (error) { console.error(String(error?.message ?? error)); process.exitCode = 1; }
 }
-if (isMain && !args.v4 && !args.v5) {
+if (isMain && !args.v4 && !args.v5 && !args.v6) {
 const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-a.json'), 'utf8'));
 const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-b.json'), 'utf8'));
 /** Which run this evaluation scores, and therefore which sidecar it reads. Derived

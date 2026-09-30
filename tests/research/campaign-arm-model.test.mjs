@@ -208,6 +208,7 @@ test('v6 signed call timeout overrides the control trial timeout', async () => {
           total_container_timeout_ms: 22_980_000,
           total_container_timeout_formula: 'holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms',
           total_container_timeout_scope: 'ONE_MODEL_CONTAINER_PER_SEED',
+          pi_argv_flags: ['--no-tools', '--no-extensions', '--no-skills'],
         },
       },
     });

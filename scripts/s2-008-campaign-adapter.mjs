@@ -38,6 +38,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
+import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
+import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -616,6 +618,7 @@ const MODEL_INPUT_IN_IMAGE = '/opt/veritas/corpus/s2-008-campaign/cases/holdout.
 function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v4') return 4;
   if (rule === 's2-008-prereg-v5') return 5;
+  if (rule === 's2-008-prereg-v6') return 6;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
 
@@ -657,6 +660,14 @@ export function assertPinnedModelImage({
   }
   if (prereg?.executor?.model_image?.content_commitment !== built.content_commitment) {
     throw new Error('MODEL_CONTENT_COMMITMENT_MISMATCH');
+  }
+  if (version === 6) {
+    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
+    assertV6PresealPin({
+      pin, baseBytes: preregBytes,
+      commitment: prereg.executor.model_image.content_commitment,
+    });
+    assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
   }
   if (prereg?.approval?.status !== 'APPROVED' || prereg?.approval?.in_force !== true) {
     throw new Error('MODEL_PREREGISTRATION_NOT_IN_FORCE');
@@ -704,13 +715,13 @@ export async function runModelTrial({
   let invocation = null;
   if (dryRun) {
     invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
-      image: pinned.imageId, argv, timeoutMs, name: 's2-008-model-v4-dry-run',
+      image: pinned.imageId, argv, timeoutMs, name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-dry-run',
     });
     observation = await executeDry(invocation, { env: PODMAN_ENV });
   } else {
     const paid = await executePaid({
       image: pinned.imageId, argv, timeoutMs,
-      name: 's2-008-model-v4-' + String(seed),
+      name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-' + String(seed),
     });
     observation = paid.observation;
     invocation = paid.invocation;

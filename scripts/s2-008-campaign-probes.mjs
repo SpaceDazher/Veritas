@@ -494,6 +494,63 @@ function parseArgs(argv) {
   return args;
 }
 
+export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
+  const rootPath = path.resolve(root);
+  if (requested === undefined || requested === null || requested === '') {
+    return path.join(rootPath, 'corpus/s2-008-campaign/preregistration.json');
+  }
+  if (typeof requested !== 'string') throw new Error('PROBE_PREREG_PATH_INVALID');
+  const candidate = path.isAbsolute(requested)
+    ? path.resolve(requested)
+    : path.resolve(rootPath, requested);
+  const relative = path.relative(rootPath, candidate);
+  const normalized = relative.split(path.sep).join('/');
+  if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative) ||
+      !/^corpus\/s2-008-campaign\/preregistration\.v[456]\.in-force\.json$/.test(normalized)) {
+    throw new Error('PROBE_PREREG_PATH_INVALID');
+  }
+  return candidate;
+}
+
+export function validateProbePreregistration({ prereg, manifest }) {
+  try {
+    const digest = preregistrationDigest(prereg);
+    const file = 'preregistration.v6.in-force.json';
+    if (prereg?.rule !== 's2-008-prereg-v6' ||
+        prereg.preregistration_digest !== digest ||
+        prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true ||
+        manifest?.preregistration?.file !== file ||
+        manifest.preregistration.status !== 'IN_FORCE' ||
+        manifest.preregistration.preregistration_digest !== digest) {
+      return { ok: false, reason: 'PROBE_PREREGISTRATION_NOT_ACTIVE_V6' };
+    }
+    return { ok: true, digest, file };
+  } catch {
+    return { ok: false, reason: 'PROBE_PREREGISTRATION_MALFORMED' };
+  }
+}
+
+export function childInvocationArgs(child, { preregPath = null, stateFile = null, resultOut = null } = {}) {
+  if (!['crash', 'restart'].includes(child)) throw new Error('PROBE_CHILD_INVALID');
+  const result = ['scripts/s2-008-campaign-probes.mjs', '--child', child];
+  if (child === 'restart') result.push('--state', stateFile, '--result-out', resultOut);
+  if (preregPath !== null) result.push('--prereg', preregPath);
+  return result;
+}
+
+function readProbePreregistration(requested) {
+  const selectedPath = resolveProbePreregistrationPath(requested);
+  const prereg = JSON.parse(fs.readFileSync(selectedPath, 'utf8'));
+  if (requested !== undefined) {
+    const manifest = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'corpus/s2-008-campaign/manifest.json'), 'utf8'));
+    const validation = validateProbePreregistration({ prereg, manifest });
+    if (!validation.ok) throw new Error(validation.reason);
+  } else {
+    assertPreregistration(prereg);
+  }
+  return { prereg, selectedPath };
+}
+
 const args = parseArgs(process.argv);
 const isEntry = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isEntry && args.child === 'restart') {
@@ -501,13 +558,12 @@ if (isEntry && args.child === 'restart') {
   // half left behind. The state arrives as a FILE, because the crashed process
   // was SIGKILLed and could not hand anything over any other way.
   const state = JSON.parse(fs.readFileSync(String(args.state), 'utf8'));
-  const prereg = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.json'), 'utf8'));
+  const { prereg } = readProbePreregistration(args.prereg);
   const result = probeRestart(prereg, state);
   fs.writeFileSync(String(args.resultOut), `${JSON.stringify(result)}\n`);
   process.exit(result.held ? 0 : 1);
 } else if (isEntry && args.child !== 'crash') {
-  const prereg = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.json'), 'utf8'));
-  assertPreregistration(prereg);
+  const { prereg, selectedPath } = readProbePreregistration(args.prereg);
   const feasibility = ruleFeasibility({
     alpha: prereg.multiplicity_rule.alpha,
     confidence: prereg.multiplicity_rule.confidence,
@@ -531,7 +587,8 @@ if (isEntry && args.child === 'restart') {
   fs.rmSync(stateFile, { force: true });
   fs.rmSync(resultFile, { force: true });
   const crashed = await new Promise((resolve) => {
-    const child = spawn(process.execPath, [path.join(REPO_ROOT, 'scripts/s2-008-campaign-probes.mjs'), '--child', 'crash'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    const childArgs = childInvocationArgs('crash', { preregPath: args.prereg ? selectedPath : null });
+    const child = spawn(process.execPath, [path.join(REPO_ROOT, childArgs[0]), ...childArgs.slice(1)], { stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';
     let err = '';
     child.stdout.on('data', (chunk) => { out += String(chunk); });
@@ -542,7 +599,10 @@ if (isEntry && args.child === 'restart') {
   });
   step('P5 restart child');
   const restarted = await new Promise((resolve) => {
-    const child = spawn(process.execPath, [path.join(REPO_ROOT, 'scripts/s2-008-campaign-probes.mjs'), '--child', 'restart', '--state', stateFile, '--result-out', resultFile], { stdio: ['ignore', 'pipe', 'pipe'] });
+    const childArgs = childInvocationArgs('restart', {
+      preregPath: args.prereg ? selectedPath : null, stateFile, resultOut: resultFile,
+    });
+    const child = spawn(process.execPath, [path.join(REPO_ROOT, childArgs[0]), ...childArgs.slice(1)], { stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';
     let err = '';
     child.stdout.on('data', (chunk) => { out += String(chunk); });
@@ -558,13 +618,17 @@ if (isEntry && args.child === 'restart') {
 
   const record = {
     kind: 's2-008-campaign-probes/1',
+    status: probes.every((probe) => probe.held === true) ? 'PASS' : 'FAIL',
+    ok: probes.every((probe) => probe.held === true),
+    exitCode: probes.every((probe) => probe.held === true) ? 0 : 1,
+    preregistration_file: path.relative(REPO_ROOT, selectedPath).split(path.sep).join('/'),
     ticket: 'S2-008',
     subject: 'the real campaign adapter and the frozen corpus',
     commit_sha: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim(),
     tree_sha: execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim(),
     preregistration_digest: preregistrationDigest(prereg),
     rule_feasibility: feasibility,
-    note: 'none of these is a campaign trial and none enters a decision. They are the evidence that an absent, broken or interrupted outcome is DETECTABLE rather than indistinguishable from a null.',
+    note: 'none of these is a campaign trial and none enters a decision. P1 checks generic missing-image launch classification and does not call the model or provider. The probes evidence that an absent, broken or interrupted outcome is DETECTABLE rather than indistinguishable from a null.',
     probes,
     summary: {
       total: probes.length,
@@ -573,8 +637,12 @@ if (isEntry && args.child === 'restart') {
       outcome_classes_exercised: [...new Set(probes.flatMap((probe) => (probe.observed?.outcome === undefined ? [] : [probe.observed.outcome])))].sort(),
     },
   };
-  const out = typeof args.out === 'string' ? args.out : path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes.json');
-  fs.writeFileSync(out, `${JSON.stringify(record, null, 1)}\n`);
+  const defaultOut = prereg.rule === 's2-008-prereg-v6'
+    ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v6.json')
+    : path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes.json');
+  const out = typeof args.out === 'string' ? args.out : defaultOut;
+  fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
+  fs.writeFileSync(out, JSON.stringify(record, null, 1) + String.fromCharCode(10));
   console.log(JSON.stringify({
     probes: probes.map((probe) => ({ probe: probe.probe, held: probe.held, observed: probe.observed })),
     summary: record.summary,
@@ -586,6 +654,6 @@ if (isEntry && args.child === 'restart') {
 // The crashing half of P5, run as its own process. It commits the rows, writes
 // its state durably, and then SIGKILLs itself with nothing flushed.
 if (isEntry && args.child === 'crash') {
-  const prereg = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.json'), 'utf8'));
+  const { prereg } = readProbePreregistration(args.prereg);
   probeInterrupted(prereg);
 }

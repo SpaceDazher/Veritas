@@ -127,16 +127,15 @@ test('v4 dry-run keeps the old no-cap argv while successor uses versioned names'
 
 
 test('paid successor refuses a v4 image pin before any build or model launch', async () => {
-  const { canonicalDigest } = await import('../../src/lib/verifier/canonical-json.mjs');
-  const document=JSON.parse(readFileSync(new URL('../../corpus/s2-008-campaign/preregistration.v4.in-force.json',import.meta.url)));
-  const next={...document,rule:'s2-008-prereg-v5',executor:{...document.executor,model_image:{...document.executor.model_image,built_image_pin:'evidence/s2-008-campaign/model-image-pin-v5.json'}}};
-  next.preregistration_digest=canonicalDigest((({approval,status,preregistration_digest,...body})=>body)(next));
-  const manifest={preregistration:{file:'preregistration.v5.in-force.json',status:'IN_FORCE',preregistration_digest:next.preregistration_digest}};
+  const next=JSON.parse(readFileSync(new URL('../../corpus/s2-008-campaign/preregistration.v6.in-force.json',import.meta.url)));
+  const manifest=JSON.parse(readFileSync(new URL('../../corpus/s2-008-campaign/manifest.json',import.meta.url)));
   let launched=false;
   const result=await runV4Campaign({label:'pin-gate',write:false,dryRun:false,prereg:next,manifest,
     modelPin:JSON.parse(readFileSync(new URL('../../evidence/s2-008-campaign/model-image-pin-v4.json',import.meta.url))),
     runModel:async()=>{launched=true;throw new Error('unexpected');},
     buildRegex:()=>{launched=true;throw new Error('unexpected');},
+    resolveBaseFn:()=>({commit_sha:'a'.repeat(40),tree_sha:'b'.repeat(40),worktree_dirty:false}),
+    now:()=>Date.parse('2026-09-30T00:00:00.000Z'),
   });
   assert.equal(result.status,'BLOCKED');
   assert.match(result.reason,/MODEL_IMAGE_PIN_INVALID/);

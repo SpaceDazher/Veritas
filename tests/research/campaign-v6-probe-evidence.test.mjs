@@ -4,7 +4,10 @@ import {
   activeCampaignVersion,
   validateV6ProbeEvidence,
 } from '../../scripts/s2-008-campaign-evaluate.mjs';
+import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { RESEARCH_HARD_GATE_COUNTERS } from '../../src/lib/research/constants.mjs';
+import { PROBE_FAMILIES, PROBE_NAMES } from '../../src/lib/research/probes.mjs';
+import { NEGATIVE_CONTROLS, EXTRA_CONTROL_IDS } from '../../src/lib/research/negative-controls.mjs';
 import {
   childInvocationArgs,
   resolveProbePreregistrationPath,
@@ -13,7 +16,12 @@ import {
 
 const commit = 'a'.repeat(40);
 const tree = 'b'.repeat(40);
-const preregistrationDigest = 'c'.repeat(64);
+const preregistrationBody = {
+  rule: 's2-008-prereg-v6',
+  preregistration_id: 'xpr-s2-008c-06',
+  supersession: { supersedes: 'xpr-s2-008c-05' },
+};
+const preregistrationDigest = canonicalDigest(preregistrationBody);
 const probeIds = [
   'P1_INFRA_IMAGE_ABSENT',
   'P2_LOST_EVALUATOR',
@@ -30,6 +38,9 @@ function campaignRecord() {
   const probes = probeIds.map((probe) => ({ probe, held: true, observed: { outcome: 'INFRA' } }));
   return {
     kind: 's2-008-campaign-probes/1',
+    status: 'PASS',
+    ok: true,
+    exitCode: 0,
     commit_sha: commit,
     tree_sha: tree,
     preregistration_digest: preregistrationDigest,
@@ -50,14 +61,25 @@ function securityRecord() {
       families: 6, probes: 6, probes_ran: 6, passed: 6, failed: 0, not_run: 0, broken: 0,
       controls_declared: 6, controls_extra_declared: 1, controls_ran: 7, controls_flipped: 7, controls_unaccounted: [],
     },
-    probes: { results: Array.from({ length: 6 }, (_, index) => ({ probe: 'probe-' + index, status: 'pass' })), notRun: [], broken: [] },
-    controls: {
-      allFlipped: true,
-      gate: { ok: true, failures: [] },
+    probes: {
+      results: PROBE_FAMILIES.flatMap((family) => PROBE_NAMES[family].map((probe) => ({ family, probe, status: 'pass', passed: true }))),
       notRun: [],
-      records: Array.from({ length: 7 }, (_, index) => ({ id: 'control-' + index, flipped: true })),
-      digest: 'd'.repeat(64),
+      broken: [],
     },
+    controls: (() => {
+      const records = [
+        ...NEGATIVE_CONTROLS.map(({ id }) => ({ id, flipped: true })),
+        ...EXTRA_CONTROL_IDS.map((id) => ({ id, flipped: true })),
+      ];
+      const notRun = [];
+      return {
+        allFlipped: true,
+        gate: { ok: true, failures: [] },
+        notRun,
+        records,
+        digest: canonicalDigest({ controls: records, notRun }),
+      };
+    })(),
   };
 }
 
@@ -69,7 +91,7 @@ test('v6 evaluator accepts only complete same-base campaign probes and fresh sec
   const result = validateV6ProbeEvidence({
     campaignProbes: campaignRecord(),
     securityControls: securityRecord(),
-    prereg: { preregistration_digest: preregistrationDigest },
+    prereg: { ...preregistrationBody, preregistration_digest: preregistrationDigest },
     runA, runB,
   });
   assert.equal(result.ok, true, result.reason);
@@ -82,7 +104,7 @@ test('v6 evaluator refuses missing, duplicate, foreign, or incomplete probe evid
   const input = {
     campaignProbes: campaignRecord(),
     securityControls: securityRecord(),
-    prereg: { preregistration_digest: preregistrationDigest },
+    prereg: { ...preregistrationBody, preregistration_digest: preregistrationDigest },
     runA, runB,
   };
   assert.equal(validateV6ProbeEvidence({ ...input, campaignProbes: null }).status, 'NOT_RUN');
@@ -102,6 +124,15 @@ test('v6 evaluator refuses missing, duplicate, foreign, or incomplete probe evid
   const wrongTree = securityRecord();
   wrongTree.base.tree_sha = 'f'.repeat(40);
   assert.equal(validateV6ProbeEvidence({ ...input, securityControls: wrongTree }).status, 'NOT_RUN');
+  const falseStatus = campaignRecord();
+  falseStatus.status = 'FAIL';
+  falseStatus.ok = false;
+  falseStatus.exitCode = 1;
+  assert.notEqual(validateV6ProbeEvidence({ ...input, campaignProbes: falseStatus }).status, 'PASS');
+
+  const falseProbeBit = securityRecord();
+  falseProbeBit.probes.results[0].passed = false;
+  assert.notEqual(validateV6ProbeEvidence({ ...input, securityControls: falseProbeBit }).status, 'PASS');
 });
 
 test('v6 evaluator reports a failed held-probe assertion and never converts it to PASS', () => {
@@ -110,7 +141,7 @@ test('v6 evaluator reports a failed held-probe assertion and never converts it t
   const result = validateV6ProbeEvidence({
     campaignProbes: probes,
     securityControls: securityRecord(),
-    prereg: { preregistration_digest: preregistrationDigest },
+    prereg: { ...preregistrationBody, preregistration_digest: preregistrationDigest },
     runA, runB,
   });
   assert.notEqual(result.status, 'PASS');
@@ -118,8 +149,7 @@ test('v6 evaluator reports a failed held-probe assertion and never converts it t
 
 test('campaign probe accepts only an in-force preregistration named by the corpus manifest', () => {
   const prereg = {
-    rule: 's2-008-prereg-v6',
-    preregistration_id: 'xpr-s2-008c-06',
+    ...preregistrationBody,
     preregistration_digest: preregistrationDigest,
     approval: { status: 'APPROVED', in_force: true },
   };

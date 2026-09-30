@@ -42,6 +42,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+
 /** The only value that lets a preregistration be run under. */
 export const APPROVED = 'APPROVED';
 
@@ -120,25 +121,68 @@ export function parseLabel(text) {
   return LABEL_SET.includes(trimmed.toUpperCase()) ? trimmed.toUpperCase() : UNPARSED;
 }
 
-/** pi's own final usage, from turn_end / agent_end. Streaming zeros are ignored. */
-export function extractUsage(stdout) {
-  let best = null;
+function finalAgentEnd(stdout) {
+  let final = null;
   for (const line of String(stdout ?? '').split('\n')) {
     const trimmed = line.trim();
     if (!trimmed.startsWith('{')) continue;
-    let event;
     try {
-      event = JSON.parse(trimmed);
-    } catch {
-      continue;
-    }
-    if (event.type !== 'turn_end' && event.type !== 'agent_end') continue;
-    const usage = event.usage;
-    if (!usage || typeof usage !== 'object') continue;
-    if (typeof usage.totalTokens !== 'number') continue;
-    if (best === null || usage.totalTokens > best.totalTokens) best = usage;
+      const event = JSON.parse(trimmed);
+      if (event?.type === 'agent_end') final = event;
+    } catch {}
   }
-  return best;
+  return final;
+}
+
+/** Sum billed assistant messages from pi's one authoritative final agent_end. */
+export function extractUsage(stdout) {
+  const messages = finalAgentEnd(stdout)?.messages;
+  if (!Array.isArray(messages)) return null;
+  const billed = messages.filter((message) => message?.role === 'assistant');
+  if (billed.length === 0) return null;
+  const seenIds = new Set();
+  const totals = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { total: 0 } };
+  for (const message of billed) {
+    if (typeof message.id === 'string') {
+      if (seenIds.has(message.id)) continue;
+      seenIds.add(message.id);
+    }
+    const usage = message.usage;
+    if (!usage || typeof usage !== 'object' ||
+        !Number.isSafeInteger(usage.totalTokens) || usage.totalTokens < 0 ||
+        !usage.cost || typeof usage.cost !== 'object' ||
+        !Number.isFinite(usage.cost.total) || usage.cost.total < 0) return null;
+    for (const field of ['input', 'output', 'cacheRead', 'cacheWrite']) {
+      const value = usage[field];
+      if (value !== undefined && (!Number.isSafeInteger(value) || value < 0)) return null;
+      totals[field] += value ?? 0;
+    }
+    totals.totalTokens += usage.totalTokens;
+    totals.cost.total += usage.cost.total;
+  }
+  if (!Number.isSafeInteger(totals.totalTokens) || !Number.isFinite(totals.cost.total)) return null;
+  return totals;
+}
+
+/** Only assistant text blocks can become a prediction; thinking and tool payloads are ignored. */
+export function assistantMessageText(message) {
+  if (message?.role !== 'assistant') return '';
+  if (typeof message.content === 'string') return message.content;
+  if (!Array.isArray(message.content)) return '';
+  return message.content
+    .filter((block) => block?.type === 'text' && typeof block.text === 'string')
+    .map((block) => block.text)
+    .join('\n');
+}
+
+export function modelCallArgv({ provider, model, prompt }) {
+  return [
+    '--print', '--mode', 'json',
+    '--provider', provider,
+    '--model', model,
+    '--no-session', '--no-tools', '--no-extensions', '--no-skills',
+    prompt,
+  ];
 }
 
 /** The credential: present or not, and NEVER printed. The NAME is publishable. */
@@ -246,30 +290,18 @@ export function callModel(subject, { provider, model, envName, env, dryRun, time
   }
   let stdout;
   try {
-    stdout = execFileSync('pi', [
-      '--print', '--mode', 'json',
-      '--provider', provider,
-      '--model', model,
-      '--no-session',
-      buildPrompt(subject),
-    ], { encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env });
+    stdout = execFileSync('pi', modelCallArgv({
+      provider, model, prompt: buildPrompt(subject),
+    }), { encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env });
   } catch (error) {
     throw new Error(`${ARM_ERRORS.PROVIDER_UNREACHABLE}:${String(error?.message ?? error).slice(0, 160)}`);
   }
   const usage = extractUsage(stdout);
   if (usage === null || !Number.isInteger(usage.totalTokens) || usage.totalTokens <= 0) throw new Error(`${ARM_ERRORS.NO_USAGE_REPORTED}`);
-  let text = '';
-  for (const line of stdout.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('{')) continue;
-    let event;
-    try {
-      event = JSON.parse(trimmed);
-    } catch {
-      continue;
-    }
-    if (event.type === 'message_end' && typeof event.message?.content === 'string') text = event.message.content;
-  }
+  const messages = finalAgentEnd(stdout)?.messages;
+  const assistantMessages = Array.isArray(messages)
+    ? messages.filter((message) => message?.role === 'assistant') : [];
+  const text = assistantMessageText(assistantMessages.at(-1));
   return { text, usage, model_called: true };
 }
 
@@ -393,7 +425,22 @@ export async function main(argv, env = process.env, deps = {}) {
   const provider = String(prereg.executor?.provider ?? 'zai-coding-cn');
   const model = String(prereg.executor?.model ?? 'glm-5.3-flash');
   const envName = String(prereg.executor?.credential_env_name ?? 'ZAI_API_KEY');
-  const timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
+  let timeoutPolicy = null;
+  let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
+  if (prereg.rule === 's2-008-prereg-v6') {
+    try {
+      const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
+      timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    } catch {
+      process.stderr.write('V6_MODEL_TIMEOUT_POLICY_INVALID\n');
+      return 12;
+    }
+    if (rows.length !== timeoutPolicy.holdout_case_count) {
+      process.stderr.write('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH\n');
+      return 12;
+    }
+    timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
+  }
 
   const predictions = [];
   let spent = 0;
@@ -489,7 +536,7 @@ export async function main(argv, env = process.env, deps = {}) {
       launch_cap_tokens: launchCap,
       spent_tokens: spent,
       usd_spent: usd,
-      measured_by: "pi --mode json turn_end.usage.totalTokens — the executor's own report; the streaming message_update zeros are ignored",
+      measured_by: "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
       exhausted: stop?.reason === ARM_ERRORS.BUDGET_EXHAUSTED,
       unreconciled_spend: unreconciledSpend,
     },
@@ -510,6 +557,7 @@ export async function main(argv, env = process.env, deps = {}) {
       model_calls: modelCalls,
       model_attempts: modelAttempts,
       parallel_calls: 1,
+      model_launch_timeout: timeoutPolicy,
     },
     container: {
       node_version: process.version,
