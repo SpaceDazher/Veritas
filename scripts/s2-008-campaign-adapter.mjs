@@ -761,6 +761,8 @@ export async function runModelTrial({
       stderr_excerpt: String(observation?.stderr ?? '').slice(-400),
       banner, payload_chunks: parsed.chunks, payload_error: parsed.error,
       output_digest: output === null ? null : canonicalDigest(output),
+      // Keep the own-arm budget and stop reason; a digest cannot recover an INFRA report.
+      arm_report: output,
       predictions: predictions === null ? null : { digest: predictions.digest, rows: predictions.rows, unparsed: predictions.unparsed },
       real_start: realStart,
     },

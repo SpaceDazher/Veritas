@@ -75,6 +75,7 @@ test('model branch runs the model image and carries its own token report and sid
   assert.equal(called, 1);
   assert.equal(result.ok, true);
   assert.equal(result.output.budget.spent_tokens, 0);
+  assert.deepEqual(result.record.arm_report, output);
   assert.equal(sidecars.length, 1);
   assert.equal(result.record.predictions.digest, sidecars[0][0]);
   assert.equal(result.record.predictions.rows, 1);
@@ -205,4 +206,31 @@ test('v5 runner refuses paid dispatch until the signed total timeout policy is r
   assert.equal(report.launches, 0);
   assert.match(report.reason, /MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED/);
   assert.deepEqual(report.trials, []);
+});
+
+test('model INFRA retains the own-arm stop and unknown-spend report in durable launch evidence', async () => {
+  const output = {
+    arm_id: MODEL, outcome_class: 'INFRA', dry_run: false,
+    budget: { currency: 'tokens', spent_tokens: 0, unreconciled_spend: true },
+    executor: { model_calls: 0, model_attempts: 1 },
+    stop: { reason: 'MODEL_USAGE_NOT_REPORTED', unreconciled_spend: true, stopped_before_case: 'x' },
+    predictions: [], container: { pid: 123, node_version: 'v22.0.0' },
+  };
+  const payload = Buffer.from(JSON.stringify(output)).toString('base64');
+  const result = await runModelTrial({
+    armId: MODEL, seed: 20260926, timeoutMs: 180000, dryRun: true,
+    pin, prereg, runLabel: 'infra-retention', predictionsSink: () => {},
+    inspect: () => ({ Id: digest.imageId, Digest: digest.digest, Architecture: digest.architecture }),
+    executeDry: () => ({
+      exitCode: 10, signal: null, timedOut: false,
+      stdout: 'ADAPTER_OK arm=' + MODEL + ' seed=20260926 n=1 predictions=0 tokens=0 usd=0 dry_run=false pid=123 node=v22.0.0\n'
+        + 'ADAPTER_JSON 1/1 ' + payload + '\nADAPTER_JSON_END ' + payload.length + '\n',
+      stderr: '',
+    }),
+  });
+  assert.equal(result.ok, false);
+  const retained = JSON.parse(JSON.stringify(result.record)).arm_report;
+  assert.deepEqual(retained, output);
+  assert.equal(retained.stop.reason, 'MODEL_USAGE_NOT_REPORTED');
+  assert.equal(retained.budget.unreconciled_spend, true);
 });
