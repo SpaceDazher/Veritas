@@ -23,5 +23,5 @@ test('v6 preseal stages the active v5 document and publishes a versioned v6 pin'
   assert.equal(preseal.pinFile, 'evidence/s2-008-campaign/model-image-pin-v6-preseal.json');
   assert.equal(sealed.pinFile, 'evidence/s2-008-campaign/model-image-pin-v6.json');
   assert.equal(preseal.schema, 's2-008-model-image-pin/6');
-  assert.throws(() => modelImagePaths('v5', { preseal: true }), /MODEL_PRESEAL_VERSION_INVALID/);
+  assert.equal(modelImagePaths('v5', { preseal: true }).stagedPrereg, 'corpus/s2-008-campaign/preregistration.v4.in-force.json');
 });
