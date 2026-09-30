@@ -13,3 +13,15 @@ test('v5 preseal uses v4 document only to establish the acyclic content commitme
   assert.equal(preseal.schema, 's2-008-model-image-pin/5');
   assert.throws(() => modelImagePaths('v4', { preseal: true }), /MODEL_PRESEAL_VERSION_INVALID/);
 });
+
+test('v6 preseal stages the active v5 document and publishes a versioned v6 pin', () => {
+  const preseal = modelImagePaths('v6', { preseal: true });
+  const sealed = modelImagePaths('v6');
+  assert.equal(preseal.tag, sealed.tag);
+  assert.equal(preseal.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v5.in-force.json');
+  assert.equal(sealed.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v6.in-force.json');
+  assert.equal(preseal.pinFile, 'evidence/s2-008-campaign/model-image-pin-v6-preseal.json');
+  assert.equal(sealed.pinFile, 'evidence/s2-008-campaign/model-image-pin-v6.json');
+  assert.equal(preseal.schema, 's2-008-model-image-pin/6');
+  assert.throws(() => modelImagePaths('v5', { preseal: true }), /MODEL_PRESEAL_VERSION_INVALID/);
+});

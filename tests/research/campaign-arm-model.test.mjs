@@ -28,6 +28,7 @@ import {
   ARM_ERRORS,
   LABEL_SET,
   UNPARSED,
+  assistantMessageText,
   buildPrompt,
   callModel,
   classifyOutcome,
@@ -111,35 +112,105 @@ test('the label set is closed: an answer must BE a label, not contain one', () =
   assert.ok(!/label/i.test(prompt), 'the prompt itself must not use the word the data seals');
 });
 
-test("pi usage is read from turn_end/agent_end, and a per-message report is NOT a run total", () => {
+test('pi 0.99.1 usage comes only from final agent_end assistant messages and sums every billed turn once', () => {
+  const firstAssistant = {
+    role: 'assistant',
+    content: [{ type: 'text', text: 'working' }],
+    usage: { input: 100, output: 10, totalTokens: 110, cost: { total: 0.001 } },
+  };
+  const secondAssistant = {
+    role: 'assistant',
+    content: [{ type: 'text', text: 'MINOR' }],
+    usage: { input: 120, output: 20, totalTokens: 140, cost: { total: 0.002 } },
+  };
   const stdout = [
     JSON.stringify({ type: 'session', id: 'x' }),
-    // A mid-stream update: zeros. Counting these would report a spent budget of
-    // 0 and the reservation would govern nothing.
-    JSON.stringify({ type: 'message_update', usage: { input: 0, output: 0, totalTokens: 0, cost: { total: 0 } } }),
-    JSON.stringify({ type: 'message_end', message: { role: 'assistant', content: 'MINOR' }, usage: { input: 9058, output: 23, totalTokens: 10233, cost: { total: 0.00140476 } } }),
-    JSON.stringify({ type: 'turn_end', usage: { input: 9058, output: 23, totalTokens: 10233, cost: { total: 0.00140476 } } }),
+    JSON.stringify({ type: 'message_update', message: firstAssistant }),
+    JSON.stringify({ type: 'message_end', message: firstAssistant }),
+    JSON.stringify({ type: 'turn_end', message: firstAssistant, toolResults: [] }),
+    JSON.stringify({ type: 'message_end', message: secondAssistant }),
+    JSON.stringify({
+      type: 'agent_end',
+      messages: [
+        { role: 'user', content: [{ type: 'text', text: 'prompt' }] },
+        firstAssistant,
+        { role: 'toolResult', content: [{ type: 'text', text: 'tool output' }] },
+        secondAssistant,
+      ],
+    }),
   ].join('\n');
   const usage = extractUsage(stdout);
-  assert.equal(usage.totalTokens, 10233, 'the real total was not read');
-  assert.equal(usage.cost.total, 0.00140476);
+  assert.equal(usage.totalTokens, 250, 'all billed assistant turns must be counted exactly once');
+  assert.equal(usage.input, 220);
+  assert.equal(usage.output, 30);
+  assert.equal(usage.cost.total, 0.003);
 
-  const zeros = JSON.stringify({ type: 'turn_end', usage: { totalTokens: 0 } });
-  assert.equal(extractUsage(`${zeros}\n${zeros}\n`)?.totalTokens, 0, 'a zero-only report must not look like a measurement');
+  const partial = [
+    JSON.stringify({ type: 'message_end', message: { ...secondAssistant, usage: { totalTokens: 999_999 } } }),
+    JSON.stringify({ type: 'turn_end', message: secondAssistant, toolResults: [] }),
+  ].join('\n');
+  assert.equal(extractUsage(partial), null, 'a missing final agent_end must not be treated as a measured run');
+  assert.equal(extractUsage(JSON.stringify({ type: 'agent_end', messages: [{ role: 'assistant', content: [] }] })), null,
+    'a final assistant message with missing usage must fail closed');
   assert.equal(extractUsage('not json at all'), null);
+});
 
-  // A per-MESSAGE report is not the run's total. Taking it would make a turn of
-  // several messages under-count in the direction that makes the budget govern
-  // LESS, so the arm refuses instead.
-  const messageOnly = JSON.stringify({ type: 'message_end', message: { content: 'MINOR' }, usage: { totalTokens: 999_999, cost: { total: 9.99 } } });
-  assert.equal(extractUsage(messageOnly), null, 'a per-message usage was taken for the run total');
+test('assistant result parser reads text blocks and ignores thinking and tool-call blocks', () => {
+  const message = {
+    role: 'assistant',
+    content: [
+      { type: 'thinking', thinking: 'MAJOR' },
+      { type: 'toolCall', id: 't1', name: 'bash', arguments: { command: 'echo MAJOR' } },
+      { type: 'text', text: 'MINOR' },
+    ],
+  };
+  assert.equal(assistantMessageText(message), 'MINOR');
+  assert.equal(parseLabel(assistantMessageText(message)), 'MINOR');
+  assert.equal(assistantMessageText({ role: 'assistant', content: [{ type: 'thinking', thinking: 'MINOR' }] }), '');
+  assert.equal(assistantMessageText({ role: 'toolResult', content: [{ type: 'text', text: 'MAJOR' }] }), '');
   assert.equal(
-    extractUsage(`${messageOnly}\n${JSON.stringify({ type: 'message_end', message: { content: 'MINOR' }, usage: { totalTokens: 888_888 } })}`),
-    null,
-    'two per-message reports were added up into a run total',
+    parseLabel(assistantMessageText({ role: 'assistant', content: [
+      { type: 'text', text: 'MAJOR' }, { type: 'text', text: 'MINOR' },
+    ] })),
+    UNPARSED,
+    'separate text blocks must not be concatenated into a valid label',
   );
 });
 
+test('v6 signed call timeout overrides the control trial timeout', async () => {
+  await withDir(async (dir) => {
+    const input = path.join(dir, 'in.json');
+    const out = path.join(dir, 'out.json');
+    const pre = path.join(dir, 'prereg.json');
+    const document = prereg({
+      rule: 's2-008-prereg-v6',
+      preregistration_id: 'xpr-s2-008c-06',
+      budget_reservation: { currency: 'tokens', granted_units: 100_000_000, trial_timeout_ms: 90_000 },
+      executor: {
+        provider: 'zai-coding-cn', model: 'glm-5.3-flash', credential_env_name: ENV_NAME,
+        model_launch_timeout: {
+          per_model_call_timeout_ms: 180_000,
+          holdout_case_count: 126,
+          bridge_report_margin_ms: 300_000,
+          total_container_timeout_ms: 22_980_000,
+          total_container_timeout_formula: 'holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms',
+          total_container_timeout_scope: 'ONE_MODEL_CONTAINER_PER_SEED',
+        },
+      },
+    });
+    writeFileSync(input, JSON.stringify(blindInput(126)));
+    writeFileSync(pre, JSON.stringify(document));
+    const observed = [];
+    const code = await main([input, out, ARM_ID, pre, '20260926', '--dry-run'], {}, {
+      callModel: (_subject, options) => {
+        observed.push(options.timeoutMs);
+        return { text: 'MINOR', usage: { totalTokens: 0, cost: { total: 0 } }, model_called: false };
+      },
+    });
+    assert.equal(code, 0);
+    assert.deepEqual(observed, Array(126).fill(180_000));
+  });
+});
 test('a dry run exercises the whole path, calls no model, spends nothing, and says so', async () => {
   await withDir(async (dir) => {
     const input = path.join(dir, 'in.json');
