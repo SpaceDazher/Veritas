@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v5.in-force.json",
-    "preregistration_digest": "b482cc7ea0325b405e18f33777ba93d387a0a494a01ace65db7a8b8457da6df9",
+    "file": "preregistration.v6.in-force.json",
+    "preregistration_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v4-superseded.json",
-    "preregistration_digest": "2ca9dd659ecaa80a978164529bd4674571d42becb5dfdb915f6d124272f1d5c4",
+    "file": "preregistration-v5-superseded.json",
+    "preregistration_digest": "b482cc7ea0325b405e18f33777ba93d387a0a494a01ace65db7a8b8457da6df9",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v5.in-force.json"
+    "superseded_by": "preregistration.v6.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v5-supersession.json",
-    "supersession_id": "spr-63b25c08751b4b0a74453dcc",
-    "supersession_digest": "30a69bcc4b69782702dea41c0ca5aecaace6b85d33cf22bd70bc64880f6ee71b",
-    "reason": "v5 replaces the model image with a shared remaining-token cap across seeds while preserving the frozen science and the per-run ceiling"
+    "file": "preregistration-v6-supersession.json",
+    "supersession_id": "spr-038fe4892c4261aa1d5006e9",
+    "supersession_digest": "ba081fe23d682940a5d9f457998321b430f4d82cd8ec809e9faf11053b1b5741",
+    "reason": "v6 updates model execution and runtime binding while preserving the frozen scientific members and 5,000,000-token ceiling per A/B run"
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -566,6 +566,12 @@
       "supersession_id": "spr-63b25c08751b4b0a74453dcc",
       "supersession_digest": "30a69bcc4b69782702dea41c0ca5aecaace6b85d33cf22bd70bc64880f6ee71b",
       "reason": "v5 replaces the model image with a shared remaining-token cap across seeds while preserving the frozen science and the per-run ceiling"
+    },
+    {
+      "file": "preregistration-v6-supersession.json",
+      "supersession_id": "spr-038fe4892c4261aa1d5006e9",
+      "supersession_digest": "ba081fe23d682940a5d9f457998321b430f4d82cd8ec809e9faf11053b1b5741",
+      "reason": "v6 updates model execution and runtime binding while preserving the frozen scientific members and 5,000,000-token ceiling per A/B run"
     }
   ]
 }
