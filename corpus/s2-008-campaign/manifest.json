@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v6.in-force.json",
-    "preregistration_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
+    "file": "preregistration.v7.in-force.json",
+    "preregistration_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v5-superseded.json",
-    "preregistration_digest": "b482cc7ea0325b405e18f33777ba93d387a0a494a01ace65db7a8b8457da6df9",
+    "file": "preregistration-v6-superseded.json",
+    "preregistration_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v6.in-force.json"
+    "superseded_by": "preregistration.v7.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v6-supersession.json",
-    "supersession_id": "spr-038fe4892c4261aa1d5006e9",
-    "supersession_digest": "ba081fe23d682940a5d9f457998321b430f4d82cd8ec809e9faf11053b1b5741",
-    "reason": "v6 updates model execution and runtime binding while preserving the frozen scientific members and 5,000,000-token ceiling per A/B run"
+    "file": "preregistration-v7-supersession.json",
+    "supersession_id": "spr-e1528d2ad7894ced0439c598",
+    "supersession_digest": "a1618ec9764dc5164856abf8d182f799a2b35aa2e76b619e52c8251a03cdbd64",
+    "reason": "v7 corrects provider credential routing and disables retry, cache-warming, and compaction paths while preserving frozen science and the 5,000,000-token ceiling per A/B run"
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -572,6 +572,12 @@
       "supersession_id": "spr-038fe4892c4261aa1d5006e9",
       "supersession_digest": "ba081fe23d682940a5d9f457998321b430f4d82cd8ec809e9faf11053b1b5741",
       "reason": "v6 updates model execution and runtime binding while preserving the frozen scientific members and 5,000,000-token ceiling per A/B run"
+    },
+    {
+      "file": "preregistration-v7-supersession.json",
+      "supersession_id": "spr-e1528d2ad7894ced0439c598",
+      "supersession_digest": "a1618ec9764dc5164856abf8d182f799a2b35aa2e76b619e52c8251a03cdbd64",
+      "reason": "v7 corrects provider credential routing and disables retry, cache-warming, and compaction paths while preserving frozen science and the 5,000,000-token ceiling per A/B run"
     }
   ]
 }
