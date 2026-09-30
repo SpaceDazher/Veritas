@@ -1,6 +1,10 @@
 # S2-008 campaign v6 execution
 
-V6 is an operational supersession of signed v5. Frozen scientific members and
+V6 is a historical operational supersession of signed v5. Its first A seed
+stopped with INFRA because pi requires ZAI_CODING_CN_API_KEY while v6 supplied
+ZAI_API_KEY. The original failure is immutable; a separate deny-all replay and
+pinned-runtime auth guard reconcile its model spend as zero. V7 corrects delivery.
+Frozen scientific members and
 the frozen v3 table remain unchanged. Daniil authorized preparation and signature.
 
 ## Signed execution policy
@@ -36,8 +40,9 @@ Run the actual-image dry-run first:
 node scripts/s2-008-campaign-run.mjs --v6 --arm arm-model-zai-glm53flash --dry-run
 
 It must report three DRY_RUN outcomes, zero model calls and zero tokens.
-A separate single blind connectivity call checks the real credential/proxy route;
-its spend is recorded separately and included in the disclosed aggregate.
+A proposed separate paid connectivity call was NOT_RUN: automatic approval
+review rejected the additional external holdout payload. The authorized A/B
+campaign itself must provide the real credential/proxy-route evidence.
 
 Run A and B from the same clean commit/tree. Temporarily stage A's generated
 evidence outside the repository while B starts, then restore its exact bytes.
