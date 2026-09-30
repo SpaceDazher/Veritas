@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1193.
+Generated from `git ls-files`; count: 1200.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -508,6 +508,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/product/PILOT_PROFILE.md`
 - `docs/product/PRODUCT_CONTRACT.md`
 - `docs/S2-008-CAMPAIGN-V6.md`
+- `docs/S2-008-CAMPAIGN-V7-REPORT.md`
 - `docs/S2-008-CAMPAIGN-V7.md`
 - `docs/scenarios/SCENARIO_A_CODEX_PI_HARNESS.md`
 - `docs/scenarios/SCENARIO_B_CROSS_DOMAIN_RESEARCH.md`
@@ -624,8 +625,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v6.json`
 - `evidence/s2-008-campaign/model-image-pin-v7-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v7.json`
+- `evidence/s2-008-campaign/offline-call-diagnostic-v7.json`
+- `evidence/s2-008-campaign/operational-block-v7.json`
 - `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/predictions-v7-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/probes-v6.json`
+- `evidence/s2-008-campaign/probes-v7.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/provider-auth-resolution-cn-v6.json`
 - `evidence/s2-008-campaign/reconciliation-v6-a.json`
@@ -633,9 +638,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/run-aborted-1.json`
 - `evidence/s2-008-campaign/run-b.json`
 - `evidence/s2-008-campaign/run-v6-a.json`
+- `evidence/s2-008-campaign/run-v7-a.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-final.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-preseal.json`
 - `evidence/s2-008-campaign/security-probes-v6.json`
+- `evidence/s2-008-campaign/security-probes-v7.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/zero-network-auth-v6.json`
 - `evidence/s2-008-comparison.json`
