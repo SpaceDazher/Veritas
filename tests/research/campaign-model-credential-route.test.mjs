@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { connect } from 'node:net';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 
 import {
@@ -121,4 +123,55 @@ test('a launcher failure is sanitized so an exception cannot print the credentia
     assert.match(String(error.message), /MODEL_EXECUTION_FAILED/);
     return true;
   });
+});
+
+test('signed v7 runtime key name is the sole 0600 env-file binding', async () => {
+  let envFilePath = null;
+  const result = await executeModelWithCredential({
+    image: 'sha256:' + 'a'.repeat(64),
+    argv: ['/usr/local/bin/node', '/opt/veritas/scripts/s2-008-campaign-arm-model.mjs'],
+    timeoutMs: 1000,
+    envName: 'ZAI_CODING_CN_API_KEY',
+    credentialValue: KEY,
+    credentialPresent: () => true,
+    startForwarder: async (socketPath) => ({ socketPath, stop: async () => {} }),
+    execute: (invocation) => {
+      const argv = invocation.podmanArgv;
+      const envIndex = argv.indexOf('--env-file');
+      envFilePath = argv[envIndex + 1];
+      assert.equal(statSync(envFilePath).mode & 0o777, 0o600);
+      assert.equal(readFileSync(envFilePath, 'utf8'), 'ZAI_CODING_CN_API_KEY=' + KEY + '\n');
+      assert.equal(readFileSync(envFilePath, 'utf8').split('\n').filter(Boolean).length, 1);
+      assert.equal(argv.some((arg) => arg.includes(KEY)), false);
+      assert.equal(argv.includes('--api-key'), false);
+      return { exitCode: 0, signal: null, timedOut: false, stdout: 'ADAPTER_OK', stderr: '', image: invocation.image, axes: invocation.axes };
+    },
+  });
+  assert.equal(result.record.credential.env_name, 'ZAI_CODING_CN_API_KEY');
+  assert.equal(JSON.stringify(result).includes(KEY), false);
+  assert.equal(existsSync(envFilePath), false);
+});
+
+test('installed pi 0.99.1 resolves zai-coding-cn from the signed v7 key name offline', async (t) => {
+  const modulePath = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai/dist/env-api-keys.js';
+  if (!existsSync(modulePath)) {
+    t.skip('the configured pi runtime is not installed on this host');
+    return;
+  }
+  const { getEnvApiKey } = await import(pathToFileURL(modulePath).href);
+  const sentinel = 'offline-contract-sentinel-key';
+  assert.equal(getEnvApiKey('zai-coding-cn', { ZAI_CODING_CN_API_KEY: sentinel }), sentinel);
+  assert.equal(getEnvApiKey('zai-coding-cn', { ZAI_API_KEY: sentinel }), undefined);
+});
+
+test('unknown signed credential env names refuse before secret lookup or process launch', async () => {
+  let touched = false;
+  await assert.rejects(() => executeModelWithCredential({
+    image: 'sha256:' + 'a'.repeat(64), argv: ['/usr/local/bin/node'], timeoutMs: 1000,
+    envName: 'PATH', credentialValue: KEY,
+    credentialPresent: () => { touched = true; return true; },
+    startForwarder: async () => { touched = true; throw new Error('unexpected'); },
+    execute: () => { touched = true; throw new Error('unexpected'); },
+  }), /MODEL_CREDENTIAL_ENV_NAME_INVALID/);
+  assert.equal(touched, false);
 });

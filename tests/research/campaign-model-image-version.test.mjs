@@ -25,3 +25,14 @@ test('v6 preseal stages the active v5 document and publishes a versioned v6 pin'
   assert.equal(preseal.schema, 's2-008-model-image-pin/6');
   assert.equal(modelImagePaths('v5', { preseal: true }).stagedPrereg, 'corpus/s2-008-campaign/preregistration.v4.in-force.json');
 });
+
+test('v7 preseal starts from signed v6 and uses a distinct versioned pin', () => {
+  const preseal = modelImagePaths('v7', { preseal: true });
+  const sealed = modelImagePaths('v7');
+  assert.equal(preseal.tag, sealed.tag);
+  assert.equal(preseal.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v6.in-force.json');
+  assert.equal(sealed.stagedPrereg, 'corpus/s2-008-campaign/preregistration.v7.in-force.json');
+  assert.equal(preseal.pinFile, 'evidence/s2-008-campaign/model-image-pin-v7-preseal.json');
+  assert.equal(sealed.pinFile, 'evidence/s2-008-campaign/model-image-pin-v7.json');
+  assert.equal(preseal.schema, 's2-008-model-image-pin/7');
+});
