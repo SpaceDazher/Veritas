@@ -46,7 +46,6 @@
 // otherwise a disposable container is started from the PINNED image with
 // `--pull=never` and removed again in the file-level `after` hook.
 
-import { PINNED_POSTGRES_IMAGE } from './postgres-image.mjs';
 import { after, before, describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
@@ -106,7 +105,7 @@ const ns = (id) => `${id}-${RUN}`;
 
 // The image is pinned by digest (spec §5): a floating tag would make this test
 // depend on whatever the registry served today.
-const PINNED_POSTGRES = PINNED_POSTGRES_IMAGE;
+const PINNED_POSTGRES = 'docker.io/library/postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73';
 const CONTAINER = 's2007-concurrency-pg';
 
 const CLOSED_CODES = new Set(ERROR_CODES);

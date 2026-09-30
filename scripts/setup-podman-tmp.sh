@@ -65,11 +65,14 @@ else
   fi
 fi
 # The full npm test suite also starts a pinned PostgreSQL image. Keep its
-# digest in the test fixture module and restore it into this same /tmp store.
+# digest in the frozen concurrency test and restore it into this same /tmp
+# store. Read that literal without modifying the frozen test (G7 pins its bytes).
 postgres_image="$(VERITAS_ROOT="$veritas_root" node --input-type=module -e '
-  import { pathToFileURL } from "node:url";
-  const { PINNED_POSTGRES_IMAGE } = await import(pathToFileURL(process.env.VERITAS_ROOT + "/tests/agentboard/postgres-image.mjs").href);
-  process.stdout.write(PINNED_POSTGRES_IMAGE);
+  import fs from "node:fs";
+  const source = fs.readFileSync(process.env.VERITAS_ROOT + "/tests/agentboard/concurrency.test.mjs", "utf8");
+  const match = source.match(/const PINNED_POSTGRES = .(docker\.io\/library\/postgres@sha256:[0-9a-f]{64}).;/);
+  if (!match) process.exit(2);
+  process.stdout.write(match[1]);
 ')"
 if podman inspect --format '{{.Id}}' "$postgres_image" >/dev/null 2>&1; then
   printf 'podman: закреплённый PostgreSQL для npm test уже в /tmp/podman-root.\n'
