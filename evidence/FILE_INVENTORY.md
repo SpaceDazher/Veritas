@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1125.
+Generated from `git ls-files`; count: 1154.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -441,14 +441,23 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration-superseded.json`
 - `corpus/s2-008-campaign/preregistration-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v1-superseded.json`
+- `corpus/s2-008-campaign/preregistration-v3-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v3-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v4-superseded.json`
+- `corpus/s2-008-campaign/preregistration-v4-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v5-supersession.json`
 - `corpus/s2-008-campaign/preregistration.json`
 - `corpus/s2-008-campaign/preregistration.v2.approved.json`
 - `corpus/s2-008-campaign/preregistration.v2.draft.json`
 - `corpus/s2-008-campaign/preregistration.v3.approved.json`
 - `corpus/s2-008-campaign/preregistration.v3.draft.json`
 - `corpus/s2-008-campaign/preregistration.v3.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v4.approved.json`
 - `corpus/s2-008-campaign/preregistration.v4.draft.json`
+- `corpus/s2-008-campaign/preregistration.v4.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v5.approved.json`
+- `corpus/s2-008-campaign/preregistration.v5.draft.json`
+- `corpus/s2-008-campaign/preregistration.v5.in-force.json`
 - `corpus/s2-008-campaign/source-ledger.json`
 - `corpus/s2-008-campaign/source-ledger.v3.json`
 - `docs/ARCHITECTURE.md`
@@ -596,6 +605,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/evaluation.json`
 - `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/model-image-pin-v4.json`
+- `evidence/s2-008-campaign/model-image-pin-v5-preseal.json`
+- `evidence/s2-008-campaign/model-image-pin-v5.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/run-a.json`
 - `evidence/s2-008-campaign/run-aborted-1.json`
@@ -823,13 +834,18 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-arm-model.mjs`
 - `scripts/s2-008-campaign-arm.mjs`
 - `scripts/s2-008-campaign-bootstrap.mjs`
+- `scripts/s2-008-campaign-egress-forwarder.mjs`
 - `scripts/s2-008-campaign-evaluate.mjs`
 - `scripts/s2-008-campaign-model-image.mjs`
 - `scripts/s2-008-campaign-prepare.mjs`
 - `scripts/s2-008-campaign-probes.mjs`
 - `scripts/s2-008-campaign-run.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
+- `scripts/s2-008-campaign-seal-v4.mjs`
+- `scripts/s2-008-campaign-seal-v5.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
+- `scripts/s2-008-campaign-v5-approval.mjs`
+- `scripts/s2-008-campaign-v5-draft.mjs`
 - `scripts/s2-008-egress-bridge.mjs`
 - `scripts/s2-008-harness.mjs`
 - `scripts/s2-008-replay.mjs`
@@ -954,6 +970,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `src/lib/research/causality.mjs`
 - `src/lib/research/comparator.mjs`
 - `src/lib/research/constants.mjs`
+- `src/lib/research/content-supersession.mjs`
 - `src/lib/research/contracts.mjs`
 - `src/lib/research/dataset.mjs`
 - `src/lib/research/executor.mjs`
@@ -1058,11 +1075,23 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-arm-egress.test.mjs`
 - `tests/research/campaign-arm-model.test.mjs`
 - `tests/research/campaign-currency-guard.test.mjs`
+- `tests/research/campaign-model-credential-route.test.mjs`
+- `tests/research/campaign-model-dispatch.test.mjs`
+- `tests/research/campaign-model-image-version.test.mjs`
+- `tests/research/campaign-model-pin-record.test.mjs`
 - `tests/research/campaign-seal-v3.test.mjs`
+- `tests/research/campaign-seal-v4.test.mjs`
+- `tests/research/campaign-seal-v5.test.mjs`
+- `tests/research/campaign-shared-cap.test.mjs`
+- `tests/research/campaign-v4-draft.test.mjs`
+- `tests/research/campaign-v5-approval.test.mjs`
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`
 - `tests/research/evaluation-recorded-predictions.test.mjs`
+- `tests/research/evaluation-v4-phase.test.mjs`
+- `tests/research/evaluation-v4-scoring.test.mjs`
+- `tests/research/evaluation-v4-sidecars.test.mjs`
 - `tests/research/fixtures/fixture-corrupted-variants.mjs`
 - `tests/research/fixtures/fixture-digest.mjs`
 - `tests/research/fixtures/fixture-expected-values.mjs`
