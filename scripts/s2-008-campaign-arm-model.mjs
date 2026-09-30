@@ -39,6 +39,7 @@
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -281,7 +282,7 @@ export function proxyEnvironment(base, { port, host = '127.0.0.1' } = {}) {
 }
 
 /** One model call. Dry runs skip it and say so. */
-export function callModel(subject, { provider, model, envName, env, dryRun, timeoutMs }) {
+export function callModel(subject, { provider, model, envName, env, dryRun, timeoutMs, piSettings = null, execFile = execFileSync }) {
   if (dryRun) {
     return { text: 'MINOR', usage: { totalTokens: 0, cost: { total: 0 } }, model_called: false };
   }
@@ -289,12 +290,35 @@ export function callModel(subject, { provider, model, envName, env, dryRun, time
     throw new Error(`${ARM_ERRORS.NO_CREDENTIAL}:${envName}`);
   }
   let stdout;
+  let runtimeEnv = env;
+  let settingsDir = null;
+  if (piSettings !== null) {
+    try {
+      if (piSettings.config_dir_env !== 'PI_CODING_AGENT_DIR' ||
+          piSettings.retry?.enabled !== false || piSettings.retry?.maxRetries !== 0 ||
+          piSettings.retry?.provider?.maxRetries !== 0 || piSettings.cacheWarming !== 'off' ||
+          piSettings.compaction?.enabled !== false ||
+          Object.keys(piSettings).sort().join(',') !== 'cacheWarming,compaction,config_dir_env,retry' ||
+          Object.keys(piSettings.retry).sort().join(',') !== 'enabled,maxRetries,provider' ||
+          Object.keys(piSettings.retry.provider).join(',') !== 'maxRetries' ||
+          Object.keys(piSettings.compaction).join(',') !== 'enabled') throw new Error('V7_PI_SETTINGS_POLICY_INVALID');
+      const { config_dir_env: _configDirEnv, ...settings } = piSettings;
+      settingsDir = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-pi-settings-'));
+      fs.writeFileSync(path.join(settingsDir, 'settings.json'), JSON.stringify(settings) + '\n', { mode: 0o600, flag: 'wx' });
+      runtimeEnv = { ...env, PI_CODING_AGENT_DIR: settingsDir };
+    } catch {
+      if (settingsDir) fs.rmSync(settingsDir, { recursive: true, force: true });
+      throw new Error('V7_PI_SETTINGS_MATERIALIZATION_FAILED');
+    }
+  }
   try {
-    stdout = execFileSync('pi', modelCallArgv({
+    stdout = execFile('pi', modelCallArgv({
       provider, model, prompt: buildPrompt(subject),
-    }), { encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env });
+    }), { encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env: runtimeEnv });
   } catch (error) {
     throw new Error(`${ARM_ERRORS.PROVIDER_UNREACHABLE}:${String(error?.message ?? error).slice(0, 160)}`);
+  } finally {
+    if (settingsDir) fs.rmSync(settingsDir, { recursive: true, force: true });
   }
   const usage = extractUsage(stdout);
   if (usage === null || !Number.isInteger(usage.totalTokens) || usage.totalTokens <= 0) throw new Error(`${ARM_ERRORS.NO_USAGE_REPORTED}`);
@@ -426,8 +450,10 @@ export async function main(argv, env = process.env, deps = {}) {
   const model = String(prereg.executor?.model ?? 'glm-5.3-flash');
   const envName = String(prereg.executor?.credential_env_name ?? 'ZAI_API_KEY');
   let timeoutPolicy = null;
+  let piSettings = null;
+  let piSettingsDigest = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (prereg.rule === 's2-008-prereg-v6') {
+  if (prereg.rule === 's2-008-prereg-v6' || prereg.rule === 's2-008-prereg-v7') {
     try {
       const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
       timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -440,6 +466,17 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
+    if (prereg.rule === 's2-008-prereg-v7') {
+      try {
+        const { assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
+        piSettings = assertV7ExecutorPolicy(prereg.executor).settings;
+        const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
+        piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
+      } catch {
+        process.stderr.write('V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
+        return 13;
+      }
+    }
   }
 
   const predictions = [];
@@ -477,7 +514,7 @@ export async function main(argv, env = process.env, deps = {}) {
     let result;
     if (!dryRun) modelAttempts += 1;
     try {
-      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs });
+      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
       // A transport or usage failure may already have spent tokens. Stop now:
@@ -547,6 +584,7 @@ export async function main(argv, env = process.env, deps = {}) {
       provider,
       model,
       credential_env_name: envName,
+      pi_settings_sha256: piSettingsDigest,
       credential_present: readCredential(envName, env),
       credential_in_argv: false,
       // What the call travelled over, and where the number came from. The port is

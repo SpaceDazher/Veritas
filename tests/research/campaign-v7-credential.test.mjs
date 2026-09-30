@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs';
-import { campaignCliMode, runV4Campaign } from '../../scripts/s2-008-campaign-run.mjs';
+import { campaignCliMode, productionPaidRunRefusal, runV4Campaign } from '../../scripts/s2-008-campaign-run.mjs';
 import { modelImagePaths } from '../../scripts/s2-008-campaign-model-image.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
@@ -17,6 +18,16 @@ const ledger = JSON.parse(fs.readFileSync(path.join(corpus, 'source-ledger.v3.js
 const activeManifest = JSON.parse(fs.readFileSync(path.join(corpus, 'manifest.json')));
 const pinV6 = JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v6.json')));
 const model = 'arm-model-zai-glm53flash';
+
+const manifestV6 = structuredClone(activeManifest);
+if (manifestV6.supersession_history?.at(-1)?.file === 'preregistration-v7-supersession.json') {
+  manifestV6.supersession_history.pop();
+  manifestV6.supersession = manifestV6.supersession_history.at(-1);
+}
+manifestV6.preregistration = {
+  file: 'preregistration.v6.in-force.json', status: 'IN_FORCE',
+  preregistration_digest: base.preregistration_digest,
+};
 
 function makePinV7() {
   const sources = {
@@ -74,6 +85,10 @@ test('v7 approval binds only provider credential routing while retaining frozen 
   wrongEnv.executor.credential_env_name = 'ZAI_API_KEY';
   wrongEnv.preregistration_digest = preregistrationDigest(wrongEnv);
   assert.throws(() => approveV7({ draft: wrongEnv, base, baseBytes, table, pin, principal: 'prn-owner', label: 'Daniil' }), /V7_SCOPE_MISMATCH|CREDENTIAL_ENV/);
+  const retryMutation = structuredClone(draft);
+  retryMutation.executor.pi_settings.retry.provider.maxRetries = 3;
+  retryMutation.preregistration_digest = preregistrationDigest(retryMutation);
+  assert.throws(() => approveV7({ draft: retryMutation, base, baseBytes, table, pin, principal: 'prn-owner', label: 'Daniil' }), /V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID/);
   const changedScience = structuredClone(draft);
   changedScience.trial_list[0].arm_id = 'arm-type-chore';
   changedScience.preregistration_digest = preregistrationDigest(changedScience);
@@ -83,10 +98,10 @@ test('v7 approval binds only provider credential routing while retaining frozen 
 test('v7 seal preserves v6 history and commits an immutable supersession', async () => {
   const { pin, draft, signed } = await makeV7();
   const { sealV7, assertV7ManifestBinding } = await import('../../scripts/s2-008-campaign-seal-v7.mjs');
-  const result = sealV7({ signed, draft, base, baseBytes, table, pin, manifest: activeManifest, ledger });
+  const result = sealV7({ signed, draft, base, baseBytes, table, pin, manifest: manifestV6, ledger });
   assert.equal(result.prereg.approval.in_force, true);
   assert.equal(result.manifest.preregistration.file, 'preregistration.v7.in-force.json');
-  assert.equal(result.manifest.supersession_history.length, activeManifest.supersession_history.length + 1);
+  assert.equal(result.manifest.supersession_history.length, manifestV6.supersession_history.length + 1);
   assert.equal(result.manifest.supersession_history.at(-1).file, 'preregistration-v7-supersession.json');
   assert.equal(result.manifest.superseded_preregistration.file, 'preregistration-v6-superseded.json');
   assert.equal(result.ledger.entries.length, ledger.entries.length);
@@ -108,7 +123,7 @@ test('v7 CLI/image routes select v7 while v6 paid runs refuse before launch', as
   const reportV6 = await runV4Campaign({
     label: 'legacy-v6', arm: model, write: false, dryRun: false,
     prereg: JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v6.in-force.json'))),
-    manifest: activeManifest, modelPin: pinV6, dispatchableArms: [model],
+    manifest: manifestV6, modelPin: pinV6, dispatchableArms: [model],
     resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
     now: () => Date.parse('2026-09-30T00:00:00.000Z'),
     runModel: async () => { v6Calls += 1; throw new Error('must not launch'); },
@@ -147,4 +162,37 @@ test('v7 paid routing keeps signed timeout and per-run cap and dispatches only u
   assert.equal(seen[0].timeoutMs, 22_980_000);
   assert.equal(seen[0].remainingTokens, 5_000_000);
   assert.equal(seen[0].prereg.executor.credential_env_name, 'ZAI_CODING_CN_API_KEY');
+});
+
+test('paid production CLI requires durable A/B evidence and refuses collisions before launch', async () => {
+  assert.equal(productionPaidRunRefusal({ dryRun: false, label: 'a', write: 'false' }).code, 'PAID_RUN_EVIDENCE_REQUIRED');
+  assert.equal(productionPaidRunRefusal({ dryRun: false, label: 'c', write: true }).code, 'PAID_RUN_LABEL_INVALID');
+  assert.equal(productionPaidRunRefusal({ dryRun: true, label: 'c', write: 'false' }), null);
+
+  const { pin, prereg } = await makeV7();
+  const manifest = { preregistration: { file: 'preregistration.v7.in-force.json', status: 'IN_FORCE', preregistration_digest: prereg.preregistration_digest } };
+  const baseFn = () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false });
+  const defaultPaidWriteDisabled = await runV4Campaign({
+    label: 'a', write: false, prereg, manifest, modelPin: pin, dispatchableArms: [model], resolveBaseFn: baseFn,
+  });
+  assert.equal(defaultPaidWriteDisabled.code, 'PAID_RUN_EVIDENCE_REQUIRED');
+  assert.equal(defaultPaidWriteDisabled.launches, 0);
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-v7-evidence-collision-'));
+  const out = path.join(dir, 'existing-run.json');
+  fs.writeFileSync(out, '{}');
+  let launches = 0;
+  try {
+    const collision = await runV4Campaign({
+      label: 'a', write: true, out, prereg, manifest, modelPin: pin, dispatchableArms: [model], resolveBaseFn: baseFn,
+      runModel: async () => { launches += 1; throw new Error('must not launch'); },
+    });
+    assert.equal(collision.code, 'CAMPAIGN_EVIDENCE_TARGET_EXISTS');
+    assert.equal(collision.spent_units, 0);
+    assert.equal(collision.launches, 0);
+    assert.deepEqual(collision.charges, []);
+    assert.equal(launches, 0);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

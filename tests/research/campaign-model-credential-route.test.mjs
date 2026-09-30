@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { connect } from 'node:net';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { callModel } from '../../scripts/s2-008-campaign-arm-model.mjs';
+import { V7_PI_SETTINGS, assertV7ExecutorPolicy } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 
 import {
@@ -174,4 +176,43 @@ test('unknown signed credential env names refuse before secret lookup or process
     execute: () => { touched = true; throw new Error('unexpected'); },
   }), /MODEL_CREDENTIAL_ENV_NAME_INVALID/);
   assert.equal(touched, false);
+});
+
+test('signed v7 pi settings disable request retries/cache warming/compaction in a private config directory', () => {
+  const settings = { ...V7_PI_SETTINGS };
+  const envName = 'ZAI_CODING_CN_API_KEY';
+  let configDir = null;
+  let calls = 0;
+  const result = callModel('subject', {
+    provider: 'zai-coding-cn', model: 'glm-5.3-flash', envName,
+    env: { [envName]: KEY, HTTPS_PROXY: 'http://127.0.0.1:43123' },
+    dryRun: false, timeoutMs: 180000, piSettings: settings,
+    execFile: (command, argv, options) => {
+      calls += 1;
+      assert.equal(command, 'pi');
+      assert.ok(argv.includes('--no-tools'));
+      assert.ok(argv.includes('--no-extensions'));
+      assert.ok(argv.includes('--no-skills'));
+      configDir = options.env.PI_CODING_AGENT_DIR;
+      const settingsPath = path.join(configDir, 'settings.json');
+      assert.equal(statSync(settingsPath).mode & 0o777, 0o600);
+      assert.deepEqual(JSON.parse(readFileSync(settingsPath, 'utf8')), {
+        retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0 } },
+        cacheWarming: 'off', compaction: { enabled: false },
+      });
+      return JSON.stringify({ type: 'agent_end', messages: [{ role: 'assistant', id: 'billed-1',
+        usage: { input: 3, output: 1, totalTokens: 4, cost: { total: 0.0001 } },
+        content: [{ type: 'text', text: 'MINOR' }] }] });
+    },
+  });
+  assert.equal(calls, 1);
+  assert.equal(result.text, 'MINOR');
+  assert.equal(result.usage.totalTokens, 4);
+  assert.equal(existsSync(configDir), false);
+
+  const invalid = structuredClone(settings);
+  invalid.retry.enabled = true;
+  assert.throws(() => assertV7ExecutorPolicy({
+    provider: 'zai-coding-cn', credential_env_name: envName, pi_settings: invalid,
+  }), /V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID/);
 });

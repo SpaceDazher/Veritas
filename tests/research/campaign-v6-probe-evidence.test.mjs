@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import {
   activeCampaignVersion,
   validateV6ProbeEvidence,
+  validateV7ProbeEvidence,
 } from '../../scripts/s2-008-campaign-evaluate.mjs';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { V7_CREDENTIAL_ENV_NAME, V7_PI_SETTINGS } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { RESEARCH_HARD_GATE_COUNTERS } from '../../src/lib/research/constants.mjs';
 import { PROBE_FAMILIES, PROBE_NAMES } from '../../src/lib/research/probes.mjs';
 import { NEGATIVE_CONTROLS, EXTRA_CONTROL_IDS } from '../../src/lib/research/negative-controls.mjs';
@@ -174,4 +176,56 @@ test('explicit v6 preregistration path is canonical and reaches both crash and r
     'scripts/s2-008-campaign-probes.mjs', '--child', 'restart',
     '--state', '/tmp/state.json', '--result-out', '/tmp/result.json', '--prereg', selected,
   ]);
+});
+
+test('v7 evaluator binds its own preregistration and requires the same complete campaign/security probe contract', () => {
+  const body = {
+    rule: 's2-008-prereg-v7',
+    preregistration_id: 'xpr-s2-008c-07',
+    supersession: { supersedes: 'xpr-s2-008c-06' },
+  };
+  const digest = canonicalDigest(body);
+  const campaign = campaignRecord();
+  campaign.preregistration_digest = digest;
+  const input = {
+    campaignProbes: campaign,
+    securityControls: securityRecord(),
+    prereg: { ...body, preregistration_digest: digest },
+    runA, runB,
+  };
+  const result = validateV7ProbeEvidence(input);
+  assert.equal(result.status, 'PASS');
+  assert.equal(result.campaign_probe_digest.length, 64);
+  const duplicate = structuredClone(campaign);
+  duplicate.probes[1].probe = duplicate.probes[0].probe;
+  assert.equal(validateV7ProbeEvidence({ ...input, campaignProbes: duplicate }).status, 'NOT_RUN');
+  const foreign = structuredClone(campaign);
+  foreign.preregistration_digest = preregistrationDigest;
+  assert.equal(validateV7ProbeEvidence({ ...input, campaignProbes: foreign }).status, 'NOT_RUN');
+});
+
+test('v7 campaign probe paths and active preregistration binding reach both restart children', () => {
+  const root = '/tmp/veritas-probe-root';
+  const selected = resolveProbePreregistrationPath('corpus/s2-008-campaign/preregistration.v7.in-force.json', root);
+  assert.equal(selected, root + '/corpus/s2-008-campaign/preregistration.v7.in-force.json');
+  assert.deepEqual(childInvocationArgs('crash', { preregPath: selected }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'crash', '--prereg', selected,
+  ]);
+  assert.deepEqual(childInvocationArgs('restart', { preregPath: selected, stateFile: '/tmp/state.json', resultOut: '/tmp/result.json' }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'restart',
+    '--state', '/tmp/state.json', '--result-out', '/tmp/result.json', '--prereg', selected,
+  ]);
+  const body = {
+    rule: 's2-008-prereg-v7', preregistration_id: 'xpr-s2-008c-07',
+    executor: { provider: 'zai-coding-cn', credential_env_name: V7_CREDENTIAL_ENV_NAME, pi_settings: structuredClone(V7_PI_SETTINGS) },
+  };
+  const digest = canonicalDigest(body);
+  const prereg = { ...body, preregistration_digest: digest, approval: { status: 'APPROVED', in_force: true } };
+  const manifest = { preregistration: { file: 'preregistration.v7.in-force.json', status: 'IN_FORCE', preregistration_digest: digest } };
+  assert.equal(validateProbePreregistration({ prereg, manifest }).ok, true);
+  const retryMutation = structuredClone(prereg);
+  retryMutation.executor.pi_settings.retry.maxRetries = 2;
+  const { approval: _approval, preregistration_digest: _digest, ...mutatedBody } = retryMutation;
+  retryMutation.preregistration_digest = canonicalDigest(mutatedBody);
+  assert.notEqual(validateProbePreregistration({ prereg: retryMutation, manifest }).ok, true);
 });

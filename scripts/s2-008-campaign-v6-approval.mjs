@@ -27,22 +27,21 @@ export function approvalIdentityFromArgv(argv) {
 }
 
 
-export function assertV6PresealPin({ pin, baseBytes, commitment = null }) {
+export function assertVersionedPresealPin({ pin, baseBytes, commitment = null, version, requiredSources = [] }) {
   const first = pin?.first;
   const second = pin?.second;
-  if (pin?.schema !== 's2-008-model-image-pin/6' ||
+  const error = `V${version}_PRESEAL_PIN_INVALID`;
+  if (!Number.isInteger(version) || version < 4 || version > 99 ||
+      pin?.schema !== `s2-008-model-image-pin/${version}` ||
       pin.identical !== true || pin.context_digest_stable !== true ||
       pin.content_commitment_stable !== true || pin.commitment_excludes_preregistration !== true ||
       !first?.sources || !second?.sources ||
       first.sources.prereg !== digestBytes(baseBytes) ||
-      !HEX64.test(first.sources.pi_runtime_tree ?? '') ||
-      !HEX64.test(first.sources.timeout_policy ?? '')) {
-    throw new Error('V6_PRESEAL_PIN_INVALID');
+      requiredSources.some((name) => !HEX64.test(first.sources[name] ?? ''))) {
+    throw new Error(error);
   }
   const sourceNames = Object.keys(first.sources).sort();
-  if (sourceNames.some((name) => !HEX64.test(first.sources[name] ?? ''))) {
-    throw new Error('V6_PRESEAL_PIN_INVALID');
-  }
+  if (sourceNames.some((name) => !HEX64.test(first.sources[name] ?? ''))) throw new Error(error);
   const covers = sourceNames.filter((name) => name !== 'prereg');
   const expected = canonicalDigest(Object.fromEntries(covers.map((name) => [name, first.sources[name]])));
   const sameSources = canonicalDigest(first.sources) === canonicalDigest(second.sources);
@@ -54,10 +53,12 @@ export function assertV6PresealPin({ pin, baseBytes, commitment = null }) {
       canonicalDigest(first.content_commitment_covers) !== canonicalDigest(covers) ||
       canonicalDigest(pin.commitment?.covers) !== canonicalDigest(covers) ||
       canonicalDigest(pin.commitment?.excludes) !== canonicalDigest(['prereg']) ||
-      (commitment !== null && commitment !== expected)) {
-    throw new Error('V6_PRESEAL_PIN_INVALID');
-  }
+      (commitment !== null && commitment !== expected)) throw new Error(error);
   return { ok: true, commitment: expected, covers };
+}
+
+export function assertV6PresealPin(args) {
+  return assertVersionedPresealPin({ ...args, version: 6, requiredSources: ['pi_runtime_tree', 'timeout_policy'] });
 }
 
 export function createV6Draft({ base, baseBytes, pin }) {

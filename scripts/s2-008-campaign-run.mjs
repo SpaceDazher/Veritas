@@ -63,6 +63,7 @@ import {
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
 import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin } from './s2-008-campaign-adapter.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
+import { assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -1028,11 +1029,11 @@ export async function runV4Campaign({
   const safeLabel = String(label);
   if (!/^[a-z0-9][a-z0-9-]{0,19}$/.test(safeLabel)) throw new Error('RUN_LABEL_INVALID');
   const activeFile = manifest?.preregistration?.file;
-  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json'].includes(activeFile)) {
+  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json'].includes(activeFile)) {
     throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
   }
   prereg = prereg ?? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8'));
-  const version = prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  const version = prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
   if (expectedVersion !== null && expectedVersion !== version) throw new Error('ACTIVE_CAMPAIGN_VERSION_MISMATCH');
   const campaignKind = `s2-008-campaign-v${version}-predictions/1`;
   const base = resolveBaseFn();
@@ -1050,15 +1051,22 @@ export async function runV4Campaign({
   // Its arm would take a fresh 5m grant at every seed. Paid v4 is therefore
   // refused before building or launching anything; only a sealed successor
   // whose image contains the cap-aware arm may spend.
-  if (!dryRun && prereg.rule !== 's2-008-prereg-v6') {
-    const code = prereg.rule === 's2-008-prereg-v5'
-      ? 'MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED' : 'MODEL_CAP_RESEAL_REQUIRED';
+  if (!dryRun && prereg.rule !== 's2-008-prereg-v7') {
+    const code = version === 6 ? 'MODEL_CREDENTIAL_ENV_RESEAL_REQUIRED'
+      : version === 5 ? 'MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED' : 'MODEL_CAP_RESEAL_REQUIRED';
     return {
       kind: campaignKind, status: 'BLOCKED', code,
-      reason: code + ': only the v6 signed image binds a finite total model-container timeout and authoritative model accounting',
+      reason: code + ': only the v7 signed image binds the provider-specific credential name and finite retry policy',
       spent_units: 0, launches: 0, charges: [], trials: [],
       preregistration_digest: prereg.preregistration_digest,
     };
+  }
+  const productionPaidBackend = runModel === runModelTrial;
+  if (!dryRun && productionPaidBackend && !['a', 'b'].includes(safeLabel)) {
+    return { kind: campaignKind, status: 'BLOCKED', code: 'PAID_RUN_LABEL_INVALID', reason: 'production paid runs require the preregistered A or B label', spent_units: 0, launches: 0, charges: [], trials: [], preregistration_digest: prereg.preregistration_digest };
+  }
+  if (!dryRun && productionPaidBackend && !write) {
+    return { kind: campaignKind, status: 'BLOCKED', code: 'PAID_RUN_EVIDENCE_REQUIRED', reason: 'production paid runs require durable report and prediction sidecars', spent_units: 0, launches: 0, charges: [], trials: [], preregistration_digest: prereg.preregistration_digest };
   }
   if (!dryRun && base?.worktree_dirty !== false) {
     return {
@@ -1068,10 +1076,11 @@ export async function runV4Campaign({
       preregistration_digest: prereg.preregistration_digest,
     };
   }
-  if (prereg.rule === 's2-008-prereg-v6') {
+  if (prereg.rule === 's2-008-prereg-v6' || prereg.rule === 's2-008-prereg-v7') {
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     if (prereg.holdout_access?.case_count !== 126) throw new Error('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH');
   }
+  if (!dryRun && prereg.rule === 's2-008-prereg-v7') assertV7ExecutorPolicy(prereg.executor);
   const declaredPinPath = prereg.executor?.model_image?.built_image_pin;
   if (declaredPinPath !== 'evidence/s2-008-campaign/model-image-pin-v' + version + '.json') {
     throw new Error('MODEL_IMAGE_PIN_VERSION_MISMATCH');
@@ -1093,6 +1102,18 @@ export async function runV4Campaign({
   if (entries.length === 0) throw new Error('CAMPAIGN_ARM_NOT_PREREGISTERED');
   const seeds = seed === null ? prereg.seed_rule.seeds : prereg.seed_rule.seeds.filter((value) => value === Number(seed));
   if (seeds.length === 0) throw new Error('CAMPAIGN_SEED_NOT_PREREGISTERED');
+  if (write) {
+    const reportTarget = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);
+    const planned = [reportTarget, ...entries.flatMap((entry) => seeds.map((currentSeed) =>
+      path.join(REPO_ROOT, 'evidence/s2-008-campaign', `predictions-v${version}-${safeLabel}-${entry.trial_id}-${currentSeed}.json`)))];
+    const collision = planned.find((target) => fs.existsSync(target));
+    if (collision) return {
+      kind: campaignKind, status: 'BLOCKED', code: 'CAMPAIGN_EVIDENCE_TARGET_EXISTS',
+      reason: 'planned campaign report or prediction sidecar already exists; refusing before any arm launch',
+      evidence_target: path.relative(REPO_ROOT, collision), spent_units: 0, launches: 0, charges: [], trials: [],
+      preregistration_digest: prereg.preregistration_digest,
+    };
+  }
   const currency = prereg.budget_reservation.currency;
   const plan = entries.map((entry) => ({
     arm_id: entry.arm_id,
@@ -1120,7 +1141,7 @@ export async function runV4Campaign({
   for (const entry of entries) {
     const perSeed = [];
     for (const currentSeed of seeds) {
-      if (!dryRun && entry.arm_id === 'arm-model-zai-glm53flash' && version === 6) {
+      if (!dryRun && entry.arm_id === 'arm-model-zai-glm53flash' && version >= 6) {
         const expiresAt = Date.parse(prereg.budget_reservation?.expires_at ?? '');
         if (!Number.isFinite(expiresAt)) {
           status = 'BLOCKED'; code = 'BUDGET_RESERVATION_EXPIRY_INVALID';
@@ -1157,7 +1178,7 @@ export async function runV4Campaign({
         result = entry.arm_id === 'arm-model-zai-glm53flash'
           ? await runModel({
             armId: entry.arm_id, seed: currentSeed,
-            timeoutMs: version === 6
+            timeoutMs: version >= 6
               ? prereg.executor.model_launch_timeout.total_container_timeout_ms
               : prereg.budget_reservation.trial_timeout_ms,
             dryRun, pin: activeModelPin, prereg,
@@ -1246,6 +1267,12 @@ function parseArgs(argv) {
   for (let index = 2; index < argv.length; index += 1) {
     const token = argv[index];
     if (!token.startsWith('--')) continue;
+    const equal = token.indexOf('=');
+    if (equal >= 0) {
+      const key = token.slice(2, equal).replace(/[-_](\w)/g, (_m, c) => c.toUpperCase());
+      args[key] = token.slice(equal + 1);
+      continue;
+    }
     const key = token.slice(2).replace(/[-_](\w)/g, (_m, c) => c.toUpperCase());
     const next = argv[index + 1];
     if (next === undefined || next.startsWith('--')) args[key] = true;
@@ -1254,8 +1281,15 @@ function parseArgs(argv) {
   return args;
 }
 
+export function productionPaidRunRefusal({ dryRun = false, label = 'a', write = true } = {}) {
+  if (dryRun) return null;
+  if (write === false || write === 'false') return { code: 'PAID_RUN_EVIDENCE_REQUIRED', reason: 'production paid runs require durable report and prediction sidecars' };
+  if (!['a', 'b'].includes(String(label))) return { code: 'PAID_RUN_LABEL_INVALID', reason: 'production paid runs require the preregistered A or B label' };
+  return null;
+}
+
 export function campaignCliMode(args = {}) {
-  const versions = ['v4', 'v5', 'v6'].filter((name) => args[name] === true);
+  const versions = ['v4', 'v5', 'v6', 'v7'].filter((name) => args[name] === true);
   if (versions.length > 1) throw new Error('CAMPAIGN_VERSION_FLAGS_CONFLICT');
   const requestedVersion = versions.length === 0 ? null : Number(versions[0].slice(1));
   return Object.freeze({
@@ -1271,8 +1305,14 @@ if (!isEntry) {
   // Imported as a library (the independent evaluator imports the interval
   // helper); running a campaign is a decision, not a side effect of an import.
 } else if (cliMode.predictionRunner) {
+  const label = String(args.label ?? 'a');
+  const refusal = productionPaidRunRefusal({ dryRun: args.dryRun === true, label, write: args.write });
+  if (refusal) {
+    console.log(JSON.stringify({ status: 'BLOCKED', ...refusal, spent_units: 0, launches: 0, charges: [], trials: [] }, null, 2));
+    process.exitCode = 4;
+  } else {
   const record = await runV4Campaign({
-    label: String(args.label ?? 'a'),
+    label,
     expectedVersion: cliMode.requestedVersion,
     arm: typeof args.arm === 'string' ? args.arm : null,
     seed: typeof args.seed === 'string' ? Number(args.seed) : null,
@@ -1282,6 +1322,7 @@ if (!isEntry) {
   });
   console.log(JSON.stringify(record, null, 2));
   if (record.status === 'BLOCKED' || record.status === 'BUDGET_STOPPED') process.exitCode = 4;
+  }
 } else if (args.verifyPin) {
   console.log(JSON.stringify(verifyImagePin(), null, 2));
 } else {

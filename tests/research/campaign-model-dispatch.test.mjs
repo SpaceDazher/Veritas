@@ -11,9 +11,9 @@ const pin = JSON.parse(readFileSync(path.join(ROOT, 'evidence/s2-008-campaign/mo
 const prereg = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/preregistration.v4.in-force.json'), 'utf8'));
 const MODEL = 'arm-model-zai-glm53flash';
 const digest = pin.first;
-const pinV6 = JSON.parse(readFileSync(path.join(ROOT, 'evidence/s2-008-campaign/model-image-pin-v6.json'), 'utf8'));
-const preregV6 = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/preregistration.v6.in-force.json'), 'utf8'));
-const manifestV6 = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/manifest.json'), 'utf8'));
+const pinV7 = JSON.parse(readFileSync(path.join(ROOT, 'evidence/s2-008-campaign/model-image-pin-v7.json'), 'utf8'));
+const preregV7 = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/preregistration.v7.in-force.json'), 'utf8'));
+const manifestV7 = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/manifest.json'), 'utf8'));
 
 test('model argv names the model arm, blind input, and signed v4 in-force document', () => {
   const argv = modelTrialArgv({ armId: MODEL, seed: 20260926, dryRun: true });
@@ -94,7 +94,7 @@ test('token accounting is proved from the arm report for the enabled model arm',
 });
 
 
-test('v6 runner charges the model report, zero for regex controls, and keeps every seed separate', async () => {
+test('v7 runner charges the model report, zero for regex controls, and keeps every seed separate', async () => {
   const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
   const calls = [];
   const remainingCaps = [];
@@ -106,15 +106,15 @@ test('v6 runner charges the model report, zero for regex controls, and keeps eve
       executor: { model_calls: tokens === 0 ? 0 : 1 },
       predictions: [{ case_id: 'x', predicted: 'MINOR' }],
     },
-    record: { image: pinV6.first.imageId, image_digest: pinV6.first.digest, exit_code: 0, output_digest: 'sample', predictions: { digest: 'sidecar', rows: 1, unparsed: 0 } },
+    record: { image: pinV7.first.imageId, image_digest: pinV7.first.digest, exit_code: 0, output_digest: 'sample', predictions: { digest: 'sidecar', rows: 1, unparsed: 0 } },
   });
-  const successor = preregV6;
-  const successorPin = pinV6;
+  const successor = preregV7;
+  const successorPin = pinV7;
   const report = await runV4Campaign({
     label: 'test-dispatch',
     write: false,
     prereg: successor,
-    manifest: manifestV6,
+    manifest: manifestV7,
     modelPin: successorPin,
     dispatchableArms: [MODEL],
     resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
@@ -124,7 +124,7 @@ test('v6 runner charges the model report, zero for regex controls, and keeps eve
     buildRegex: () => ({ pin: { imageId: 'sha256:' + 'b'.repeat(64) } }),
   });
   assert.equal(calls.length, 9);
-  assert.match(report.raw_run_id, /^s2-008c-v6-test-dispatch-/);
+  assert.match(report.raw_run_id, /^s2-008c-v7-test-dispatch-/);
   assert.equal(typeof report.nonce, 'string');
   assert.match(report.base.commit_sha, /^[0-9a-f]{40}$/);
   assert.match(report.base.tree_sha, /^[0-9a-f]{40}$/);
@@ -133,18 +133,18 @@ test('v6 runner charges the model report, zero for regex controls, and keeps eve
   assert.deepEqual(report.charges.map((row) => row.units), [10233, 10233, 10233, 0, 0, 0, 0, 0, 0]);
   assert.ok(report.charges.every((row) => row.unit === 'EXECUTOR_REPORTED_TOKENS'));
   assert.equal(report.trials[0].seeds.length, 3);
-  assert.deepEqual(report.trials[0].seeds.map((row) => row.seed), preregV6.seed_rule.seeds);
+  assert.deepEqual(report.trials[0].seeds.map((row) => row.seed), preregV7.seed_rule.seeds);
   assert.equal(report.trials[0].seeds[0].predictions.digest, 'sidecar');
 });
 
-test('v6 runner refuses unknown or unreconciled model spend without starting another seed', async () => {
+test('v7 runner refuses unknown or unreconciled model spend without starting another seed', async () => {
   const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
   let calls = 0;
-  const successor = preregV6;
-  const successorPin = pinV6;
+  const successor = preregV7;
+  const successorPin = pinV7;
   const report = await runV4Campaign({
     label: 'test-refuse', write: false, prereg: successor,
-    manifest: manifestV6,
+    manifest: manifestV7,
     modelPin: successorPin, dispatchableArms: [MODEL],
     resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
     now: () => Date.parse('2026-09-30T00:00:00.000Z'),
@@ -159,12 +159,12 @@ test('v6 runner refuses unknown or unreconciled model spend without starting ano
 });
 
 
-test('v6 runner preserves an unknown-spend model exception and stops before another seed', async () => {
+test('v7 runner preserves an unknown-spend model exception and stops before another seed', async () => {
   const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
   let attempts = 0;
   const report = await runV4Campaign({
     label: 'exception-probe', arm: MODEL, write: false,
-    prereg: preregV6, manifest: manifestV6, modelPin: pinV6,
+    prereg: preregV7, manifest: manifestV7, modelPin: pinV7,
     dispatchableArms: [MODEL],
     resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
     now: () => Date.parse('2026-09-30T00:00:00.000Z'),

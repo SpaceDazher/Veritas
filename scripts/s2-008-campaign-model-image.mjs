@@ -14,9 +14,9 @@ import { modelContainerTimeoutFromPreregistration } from './s2-008-campaign-v6-t
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
 export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
-  if (!['v4', 'v5', 'v6'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
-  if (preseal && !['v5', 'v6'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
-  const stagedVersion = preseal ? (version === 'v6' ? 'v5' : 'v4') : version;
+  if (!['v4', 'v5', 'v6', 'v7'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (preseal && !['v5', 'v6', 'v7'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
+  const stagedVersion = preseal ? `v${Number(version.slice(1)) - 1}` : version;
   return Object.freeze({
     tag: `localhost/veritas-s2-008-model:${version}`,
     stagedPrereg: `corpus/s2-008-campaign/preregistration.${stagedVersion}.in-force.json`,
@@ -25,7 +25,7 @@ export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
   });
 }
 const MODEL_PATHS = modelImagePaths(
-  process.argv.includes('--v6') ? 'v6' : process.argv.includes('--v5') ? 'v5' : 'v4',
+  process.argv.includes('--v7') ? 'v7' : process.argv.includes('--v6') ? 'v6' : process.argv.includes('--v5') ? 'v5' : 'v4',
   { preseal: process.argv.includes('--preseal') },
 );
 const TAG = MODEL_PATHS.tag;
@@ -125,8 +125,10 @@ export function buildModelImage() {
       'src/lib/verifier/canonical-json.mjs',
       'corpus/s2-008-campaign/cases/holdout.blind.json',
       MODEL_PATHS.stagedPrereg,
-      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6'
+      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6' || MODEL_PATHS.schema === 's2-008-model-image-pin/7'
         ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
+      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/7'
+        ? ['scripts/s2-008-campaign-credential-env.mjs'] : []),
     ]) {
       const dest = path.join(target, name);
       fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -158,6 +160,11 @@ export function buildModelImage() {
       recipe: sha(file),
       ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6' ? {
         timeout_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-v6-timeout.mjs')),
+        pi_runtime_tree: digestRuntimeTree(path.join(context, 'opt/pi')),
+      } : {}),
+      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/7' ? {
+        timeout_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-v6-timeout.mjs')),
+        credential_env_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-credential-env.mjs')),
         pi_runtime_tree: digestRuntimeTree(path.join(context, 'opt/pi')),
       } : {}),
     };
@@ -217,7 +224,7 @@ export function assertRecordedModelPin(rebuilt, recorded) {
 export function dryRunModelInImage(pin) {
   const stagedPrereg = JSON.parse(fs.readFileSync(path.join(ROOT, MODEL_PATHS.stagedPrereg), 'utf8'));
   let timeoutMs = 180_000;
-  if (stagedPrereg.rule === 's2-008-prereg-v6') {
+  if (['s2-008-prereg-v6', 's2-008-prereg-v7'].includes(stagedPrereg.rule)) {
     timeoutMs = modelContainerTimeoutFromPreregistration(stagedPrereg);
   }
   const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {

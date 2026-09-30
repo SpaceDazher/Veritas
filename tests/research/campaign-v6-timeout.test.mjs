@@ -24,6 +24,9 @@ const baseBytes = fs.readFileSync(path.join(corpus, 'preregistration.v5.in-force
 const base = JSON.parse(baseBytes);
 const table = JSON.parse(fs.readFileSync(path.join(corpus, 'frozen-table.v3.json')));
 const previousPin = JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v5.json')));
+const preregV7 = JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v7.in-force.json')));
+const pinV7 = JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v7.json')));
+const activeManifest = JSON.parse(fs.readFileSync(path.join(corpus, 'manifest.json')));
 const MODEL = 'arm-model-zai-glm53flash';
 
 test('v6 CLI selects the preregistered campaign runner and rejects conflicting version flags', () => {
@@ -183,31 +186,27 @@ test('v5 paid model dispatch is blocked because its outer timeout cannot cover t
 });
 
 
-test('v6 refuses dirty sources and missing, invalid, or expired reservation clocks before paid model launch', async () => {
-  const draft = createV6Draft({ base, baseBytes, pin: presealPin });
-  const signed = approveV6({
-    draft, base, baseBytes, table, pin: presealPin,
-    principal: 'prn-s2007r-owner', label: 'Daniil (repository owner)',
-  });
+test('v7 refuses dirty sources and missing, invalid, or expired reservation clocks before paid model launch', async () => {
   for (const variant of [
     { expiry: '2026-09-29T00:00:00.000Z', now: Date.parse('2026-09-30T00:00:00.000Z'), code: 'BUDGET_RESERVATION_EXPIRED' },
     { expiry: 'not-a-date', now: Date.parse('2026-09-30T00:00:00.000Z'), code: 'BUDGET_RESERVATION_EXPIRY_INVALID' },
     { expiry: null, now: Date.parse('2026-09-30T00:00:00.000Z'), code: 'BUDGET_RESERVATION_EXPIRY_INVALID' },
     { expiry: '2026-10-05T00:00:00.000Z', now: Number.NaN, code: 'BUDGET_RESERVATION_CLOCK_INVALID' },
   ]) {
-    const prereg = structuredClone(signed);
+    const prereg = structuredClone(preregV7);
     if (variant.expiry === null) delete prereg.budget_reservation.expires_at;
     else prereg.budget_reservation.expires_at = variant.expiry;
     prereg.preregistration_digest = preregistrationDigest(prereg);
     prereg.approval = { ...prereg.approval, in_force: true };
-    const manifest = { preregistration: {
-      file: 'preregistration.v6.in-force.json', status: 'IN_FORCE',
+    const manifest = structuredClone(activeManifest);
+    manifest.preregistration = {
+      file: 'preregistration.v7.in-force.json', status: 'IN_FORCE',
       preregistration_digest: prereg.preregistration_digest,
-    } };
+    };
     let launched = false;
     const report = await runV4Campaign({
-      label: 'expired-v6', arm: MODEL, seed: prereg.seed_rule.seeds[0], dryRun: false, write: false,
-      prereg, manifest, modelPin: presealPin, dispatchableArms: [MODEL],
+      label: 'expired-v7', arm: MODEL, seed: prereg.seed_rule.seeds[0], dryRun: false, write: false,
+      prereg, manifest, modelPin: pinV7, dispatchableArms: [MODEL],
       resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
       now: () => variant.now,
       runModel: async () => { launched = true; throw new Error('must not launch'); },
@@ -219,15 +218,12 @@ test('v6 refuses dirty sources and missing, invalid, or expired reservation cloc
   }
   for (const dirty of [true, undefined]) {
     let launched = false;
-    const dirtyPrereq = { ...signed, approval: { ...signed.approval, in_force: true } };
+    const dirtyPrereq = structuredClone(preregV7);
     const report = await runV4Campaign({
-      label: 'dirty-v6', arm: MODEL, seed: dirtyPrereq.seed_rule.seeds[0], dryRun: false, write: false,
+      label: 'dirty-v7', arm: MODEL, seed: dirtyPrereq.seed_rule.seeds[0], dryRun: false, write: false,
       prereg: dirtyPrereq,
-      manifest: { preregistration: {
-        file: 'preregistration.v6.in-force.json', status: 'IN_FORCE',
-        preregistration_digest: dirtyPrereq.preregistration_digest,
-      } },
-      modelPin: presealPin, dispatchableArms: [MODEL],
+      manifest: activeManifest,
+      modelPin: pinV7, dispatchableArms: [MODEL],
       resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), ...(dirty === undefined ? {} : { worktree_dirty: dirty }) }),
       now: () => Date.parse('2026-09-30T00:00:00.000Z'),
       runModel: async () => { launched = true; throw new Error('must not launch'); },

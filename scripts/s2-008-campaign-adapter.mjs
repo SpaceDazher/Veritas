@@ -40,6 +40,8 @@ import { fileURLToPath } from 'node:url';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
+import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
+import { assertV7ExecutorPolicy, credentialEnvNameForPreregistration, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -544,12 +546,14 @@ export function startCampaignForwarder({ spawnImpl = spawn, timeoutMs = 10_000 }
  */
 export async function executeModelWithCredential({
   image, argv, timeoutMs, name = 's2-008-campaign-model',
+  envName = MODEL_CREDENTIAL_ENV,
   handle = MODEL_CREDENTIAL_HANDLE,
   credentialValue = undefined,
   credentialPresent = modelCredentialPresent,
   startForwarder = startCampaignForwarder,
   execute = executeIsolated,
 } = {}) {
+  if (envName !== MODEL_CREDENTIAL_ENV && envName !== V7_CREDENTIAL_ENV_NAME) throw new Error('MODEL_CREDENTIAL_ENV_NAME_INVALID');
   if (credentialPresent(handle) !== true) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
   const value = credentialValue === undefined ? modelCredentialValue() : credentialValue;
   if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
@@ -560,7 +564,7 @@ export async function executeModelWithCredential({
     // No container may start until this resolves with a listening socket.
     forwarder = await startForwarder(path.join(dir, 'egress.sock'));
     if (!forwarder || typeof forwarder.socketPath !== 'string') throw new Error('CAMPAIGN_FORWARDER_NOT_READY');
-    envFile = spoolCredentialEnvFile(handle, MODEL_CREDENTIAL_ENV, value, { spoolDir: dir });
+    envFile = spoolCredentialEnvFile(handle, envName, value, { spoolDir: dir });
     const profile = {
       ...SANDBOX_ISOLATION_EXECUTOR,
       network: { policy: 'allowlist', allowlist: ISOLATION_EGRESS_ALLOWLIST },
@@ -583,13 +587,13 @@ export async function executeModelWithCredential({
       image: invocation.image,
       axes: invocation.axes,
       container_argv: [...invocation.podmanArgv],
-      credential: { handle, env_name: MODEL_CREDENTIAL_ENV, delivered_by: '--env-file', expected_surfaces: ['env'] },
+      credential: { handle, env_name: envName, delivered_by: '--env-file', expected_surfaces: ['env'] },
       egress: { socket: '/run/egress.sock', allowlist: ISOLATION_EGRESS_ALLOWLIST },
       exit_code: observation?.exitCode ?? null,
     };
     const leakScan = assertNoSecretLeak({
       argv: invocation.argv,
-      env: { [MODEL_CREDENTIAL_ENV]: value },
+      env: { [envName]: value },
       stdout: observation?.stdout ?? '',
       stderr: observation?.stderr ?? '',
       arm: observation ?? {},
@@ -619,6 +623,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v4') return 4;
   if (rule === 's2-008-prereg-v5') return 5;
   if (rule === 's2-008-prereg-v6') return 6;
+  if (rule === 's2-008-prereg-v7') return 7;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
 
@@ -663,11 +668,13 @@ export function assertPinnedModelImage({
   }
   if (version === 6) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
-    assertV6PresealPin({
-      pin, baseBytes: preregBytes,
-      commitment: prereg.executor.model_image.content_commitment,
-    });
+    assertV6PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+  } else if (version === 7) {
+    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v7.in-force.json'));
+    assertV7PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    assertV7ExecutorPolicy(prereg.executor);
   }
   if (prereg?.approval?.status !== 'APPROVED' || prereg?.approval?.in_force !== true) {
     throw new Error('MODEL_PREREGISTRATION_NOT_IN_FORCE');
@@ -722,6 +729,7 @@ export async function runModelTrial({
     const paid = await executePaid({
       image: pinned.imageId, argv, timeoutMs,
       name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-' + String(seed),
+      envName: credentialEnvNameForPreregistration(prereg),
     });
     observation = paid.observation;
     invocation = paid.invocation;

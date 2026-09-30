@@ -51,6 +51,7 @@ import {
   RESEARCH_ID_PREFIXES,
 } from '../src/lib/research/constants.mjs';
 import { buildImage, runTrial } from './s2-008-campaign-adapter.mjs';
+import { assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -486,6 +487,12 @@ function parseArgs(argv) {
   for (let index = 2; index < argv.length; index += 1) {
     const token = argv[index];
     if (!token.startsWith('--')) continue;
+    const equal = token.indexOf('=');
+    if (equal >= 0) {
+      const key = token.slice(2, equal).replace(/[-_](\w)/g, (_m, c) => c.toUpperCase());
+      args[key] = token.slice(equal + 1);
+      continue;
+    }
     const key = token.slice(2).replace(/[-_](\w)/g, (_m, c) => c.toUpperCase());
     const next = argv[index + 1];
     if (next === undefined || next.startsWith('--')) args[key] = true;
@@ -506,7 +513,7 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
   const relative = path.relative(rootPath, candidate);
   const normalized = relative.split(path.sep).join('/');
   if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative) ||
-      !/^corpus\/s2-008-campaign\/preregistration\.v[456]\.in-force\.json$/.test(normalized)) {
+      !/^corpus\/s2-008-campaign\/preregistration\.v[4567]\.in-force\.json$/.test(normalized)) {
     throw new Error('PROBE_PREREG_PATH_INVALID');
   }
   return candidate;
@@ -515,14 +522,15 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
 export function validateProbePreregistration({ prereg, manifest }) {
   try {
     const digest = preregistrationDigest(prereg);
-    const file = 'preregistration.v6.in-force.json';
-    if (prereg?.rule !== 's2-008-prereg-v6' ||
-        prereg.preregistration_digest !== digest ||
+    const version = prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
+    const file = version === null ? null : `preregistration.v${version}.in-force.json`;
+    if (version === 7) assertV7ExecutorPolicy(prereg.executor);
+    if (version === null || prereg.preregistration_digest !== digest ||
         prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true ||
         manifest?.preregistration?.file !== file ||
         manifest.preregistration.status !== 'IN_FORCE' ||
         manifest.preregistration.preregistration_digest !== digest) {
-      return { ok: false, reason: 'PROBE_PREREGISTRATION_NOT_ACTIVE_V6' };
+      return { ok: false, reason: version === null ? 'PROBE_PREREGISTRATION_VERSION_UNSUPPORTED' : `PROBE_PREREGISTRATION_NOT_ACTIVE_V${version}` };
     }
     return { ok: true, digest, file };
   } catch {
@@ -637,9 +645,11 @@ if (isEntry && args.child === 'restart') {
       outcome_classes_exercised: [...new Set(probes.flatMap((probe) => (probe.observed?.outcome === undefined ? [] : [probe.observed.outcome])))].sort(),
     },
   };
-  const defaultOut = prereg.rule === 's2-008-prereg-v6'
-    ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v6.json')
-    : path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes.json');
+  const defaultOut = prereg.rule === 's2-008-prereg-v7'
+    ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v7.json')
+    : prereg.rule === 's2-008-prereg-v6'
+      ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v6.json')
+      : path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes.json');
   const out = typeof args.out === 'string' ? args.out : defaultOut;
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
   fs.writeFileSync(out, JSON.stringify(record, null, 1) + String.fromCharCode(10));
