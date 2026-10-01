@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { modelTrialArgv, assertPinnedModelImage, runModelTrial } from '../../scripts/s2-008-campaign-adapter.mjs';
-import { chargeFor, preflightCharge, DISPATCHABLE_MODEL_ARMS } from '../../scripts/s2-008-campaign-run.mjs';
+import { chargeFor, chargingStep, preflightCharge, DISPATCHABLE_MODEL_ARMS } from '../../scripts/s2-008-campaign-run.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const pin = JSON.parse(readFileSync(path.join(ROOT, 'evidence/s2-008-campaign/model-image-pin-v4.json'), 'utf8'));
@@ -90,8 +90,13 @@ test('token accounting is proved from the arm report for the enabled model arm',
   const charged = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: own, dispatchableArms: [MODEL] });
   assert.equal(charged.units, 10233);
   assert.equal(charged.unit, 'EXECUTOR_REPORTED_TOKENS');
-  const partial = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens', unreconciled_spend: true, spent_tokens: 6735 } }, dispatchableArms: [MODEL] });
-  assert.match(partial.refusal, /ARM_UNRECONCILED_SPEND/);
+  const partial = chargingStep({
+    currency: 'tokens', spentUnits: 0, grantedUnits: 5000000,
+    armId: MODEL, dispatchableArms: [MODEL],
+    armOutput: { budget: { currency: 'tokens', unreconciled_spend: true, spent_tokens: 6735 } },
+  });
+  assert.equal(partial.action, 'refuse');
+  assert.match(partial.detail, /ARM_UNRECONCILED_SPEND/);
   assert.equal(partial.units, 6735);
   assert.equal(partial.lower_bound, true);
   assert.match(chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens' } }, dispatchableArms: [MODEL] }).refusal, /ARM_REPORTED_NO_TOKENS/);
@@ -340,4 +345,31 @@ test('invalid usage and call counters stay unknown in blocked host reports', asy
     assert.equal(report.model_calls_is_lower_bound, false);
     assert.equal(report.unknown_model_attempts, null);
   }
+});
+
+
+test('positive unknown model attempts stop before another seed even when budget is marked reconciled', async () => {
+  const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
+  let attempts = 0;
+  const output = {
+    outcome_class: 'MEASURED',
+    budget: { currency: 'tokens', spent_tokens: 6735, unreconciled_spend: false },
+    executor: { model_calls: 11, model_attempts: 12 },
+  };
+  const report = await runV4Campaign({
+    label: 'attempt-mismatch', arm: MODEL, write: false,
+    prereg: preregV7, manifest: manifestV7, modelPin: pinV7,
+    dispatchableArms: [MODEL],
+    resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+    now: () => Date.parse('2026-09-30T00:00:00.000Z'),
+    runModel: async () => { attempts += 1; return { ok: true, output, record: { arm_report: output } }; },
+  });
+  assert.equal(attempts, 1);
+  assert.equal(report.status, 'BLOCKED');
+  assert.match(report.reason, /ARM_UNRECONCILED_MODEL_ATTEMPTS:1/);
+  assert.equal(report.spent_units, 6735);
+  assert.equal(report.spent_units_is_lower_bound, true);
+  assert.equal(report.model_calls, 11);
+  assert.equal(report.model_calls_is_lower_bound, true);
+  assert.equal(report.unknown_model_attempts, 1);
 });
