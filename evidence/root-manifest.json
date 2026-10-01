@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "50ab175f8c0c87255052f871b999950eb8f80230",
-  "sourceTree": "c89dc2fdab825fb594e8143a54f8e432a3a33d83",
-  "trackedFileCount": 1202,
-  "manifestFileCount": 1197,
-  "payloadManifestSha256": "7336d7352e4db9287654e961be6c66cfca0171f69b4a9277ea1098e23b1bbc85",
-  "fileManifestSha256": "72e05e12674c2194d397ef815a29f0cfaf7e2cbfb642691f47c6fe792b52d79f",
+  "sourceCommit": "1ae91fd3102df85350aa91cc4a631c19bbcdf4bb",
+  "sourceTree": "39e017d6302d6e2a8f8111f5190e3c4e8cbb352e",
+  "trackedFileCount": 1207,
+  "manifestFileCount": 1202,
+  "payloadManifestSha256": "f9d0637f0d6435e656c2f14994de86c9d96fdc964bfb35c1503ca67b0a3cde69",
+  "fileManifestSha256": "e0eb49bb2021830f3fca191fc58ad1a527ef974439897b3a6f6616e613495deb",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2357,6 +2357,11 @@
       "bytes": 1872
     },
     {
+      "path": "docs/A-MVP-05-LOCAL-REVIEW.md",
+      "sha256": "96c88fe983275af6d8678dcafd86fd0e14082ba4bcf4a11e37cfdb8964d060a1",
+      "bytes": 2628
+    },
+    {
       "path": "docs/ARCHITECTURE.md",
       "sha256": "9ce0df70feb97458f05fb50d431ee6833879f2d83148a212d145e4a3be6fbfca",
       "bytes": 15139
@@ -2673,8 +2678,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "fb5aad81d13829f8f7bfb976242114fbf44bf42e06fdaa6bb1ccd35d4a544c06",
-      "bytes": 54505
+      "sha256": "47772ed6f76934e1e84bfa5e6c140b87006ecc6bfa38ea72c390d7986e974dfa",
+      "bytes": 54693
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -4062,6 +4067,16 @@
       "bytes": 8007
     },
     {
+      "path": "scripts/a-mvp05-review.mjs",
+      "sha256": "d37357b8c0aeade40d94fa3d1eb0dca2aab8449ad7fefde0d6ed0aa9690c23c0",
+      "bytes": 17501
+    },
+    {
+      "path": "scripts/a-mvp05-runtime.mjs",
+      "sha256": "ff4881c8087f9ba3ea2fe8e9c370f2587e86ec81c0efcf2a28c868b44d08ba35",
+      "bytes": 26090
+    },
+    {
       "path": "scripts/acceptance-gate.mjs",
       "sha256": "720fdf197bec02852f03002cba2e5c3326fdbc4045234d1235299529217c00be",
       "bytes": 1907
@@ -5275,6 +5290,16 @@
       "path": "tasks/SLOQUAL-001_SLO_QUALIFICATION.md",
       "sha256": "ffad42346ef8b0e906d994e3507f6e580e670d6834c7b48ceae45c588c9da4ab",
       "bytes": 5743
+    },
+    {
+      "path": "tests/agentboard/a-mvp05-review.test.mjs",
+      "sha256": "5b3e45e09c4b36deec293437cb253e6998e2d20aac3fd371057f398d16e73b2b",
+      "bytes": 11103
+    },
+    {
+      "path": "tests/agentboard/a-mvp05-runtime.test.mjs",
+      "sha256": "141ec65eb0d677afc69bc73f3706638eed35f770dde971a63d7b3ff71b4ec9f9",
+      "bytes": 3907
     },
     {
       "path": "tests/agentboard/concurrency.test.mjs",
