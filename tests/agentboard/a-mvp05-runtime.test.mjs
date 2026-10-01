@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
-import { snapshotA05Artifacts, replayA05Journal } from '../../scripts/a-mvp05-runtime.mjs';
+import { snapshotA05Artifacts, replayA05Journal, buildA05Task } from '../../scripts/a-mvp05-runtime.mjs';
 
 test('artifact snapshot measures bytes and refuses traversal, symlinks and duplicates', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'a05-artifact-'));
@@ -47,4 +47,17 @@ test('journal replay refuses changed document bindings even if state matches', (
     brief_digest: 'sha256:' + '0'.repeat(64), policy_digest: 'sha256:' + row.policy_digest,
     manifest_digest: 'sha256:' + row.manifest_digest };
   assert.throws(() => replayA05Journal(task, [row]), /JOURNAL/);
+});
+
+test('local task is valid against frozen board contract before any store mutation', () => {
+  const ticket = {
+    taskId:'abt-a05-schema', workspaceId:'ws-a05-schema', principalId:'prn-a05-human', producerId:'prn-a05-worker',
+    imageId:'sha256:'+'d'.repeat(64), baseline:[], runner_sha256:'e'.repeat(64),
+    brief:{title:'Local change',runner:'Actual local Node wrapper',acceptance:'Existing tests pass'},
+  };
+  const registration = {declared_capabilities:['task.read','artifact.write'],declared_tools:['tool:fs.read']};
+  const task = buildA05Task(ticket, registration, new Date().toISOString());
+  assert.equal(task.workspace_ref.root_ref,'project');
+  assert.equal(task.cost_limits.currency,'USD');
+  assert.equal(task.acl.visibility,'personal');
 });
