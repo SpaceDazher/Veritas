@@ -72,6 +72,19 @@ test('v9 has unique image pins and stages the signed v8 preregistration', () => 
   assert.deepEqual(argv.slice(-2), ['--remaining-tokens', '5000000']);
 });
 
+test('v9 image staging copies and hashes the inherited policy sources', async () => {
+  const { modelImagePolicyInputs } = await import('../../scripts/s2-008-campaign-model-image.mjs');
+  assert.equal(typeof modelImagePolicyInputs, 'function', 'image build must expose its versioned policy staging contract');
+  assert.deepEqual(modelImagePolicyInputs('s2-008-model-image-pin/8'), {
+    stageFiles: ['scripts/s2-008-campaign-v6-timeout.mjs', 'scripts/s2-008-campaign-credential-env.mjs'],
+    sourceNames: ['credential_env_policy', 'pi_runtime_tree', 'timeout_policy'],
+  });
+  assert.deepEqual(modelImagePolicyInputs('s2-008-model-image-pin/9'), {
+    stageFiles: ['scripts/s2-008-campaign-v6-timeout.mjs', 'scripts/s2-008-campaign-credential-env.mjs'],
+    sourceNames: ['credential_env_policy', 'pi_runtime_tree', 'timeout_policy'],
+  });
+});
+
 test('v9 guard validates the complete owner reconciliation and binds the preserved v8 A bytes', async () => {
   const { assertV8AReconciliation } = await import('../../scripts/s2-008-campaign-v9-approval.mjs');
   const accepted = assertV8AReconciliation({ reconciliation, priorRunBytes });
