@@ -305,3 +305,26 @@ test('a review decision is refused unless the canonical task is still IN_REVIEW'
     assert.equal(decisions, 0);
   });
 });
+
+test('browser same-origin GET works without Origin but POST still requires it', async () => {
+  await withServer({ credential: credential(), workflow: workflow() }, async ({ server }) => {
+    const read = await request(server, '/api/state', { token: TOKEN });
+    assert.equal(read.status, 200);
+    const write = await request(server, '/api/start', { method: 'POST', token: TOKEN, body: {} });
+    assert.equal(write.status, 403);
+  });
+});
+
+test('malformed request target is refused and the server remains available', async () => {
+  await withServer({ credential: credential(), workflow: workflow() }, async ({ server }) => {
+    const code = await new Promise((resolve, reject) => {
+      const req = httpRequest({
+        hostname: '127.0.0.1', port: server.address().port, path: 'http://[',
+      }, (res) => { res.resume(); res.on('end', () => resolve(res.statusCode)); });
+      req.setTimeout(2000, () => req.destroy(new Error('request timeout')));
+      req.on('error', reject); req.end();
+    });
+    assert.equal(code, 400);
+    assert.equal((await request(server, '/')).status, 200);
+  });
+});
