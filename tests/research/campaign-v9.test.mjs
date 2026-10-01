@@ -54,7 +54,7 @@ function createDraft(overrides = {}) {
 }
 let awaitableApproval;
 
- test('v9 has unique image pins and stages the signed v8 preregistration', () => {
+test('v9 has unique image pins and stages the signed v8 preregistration', () => {
   assert.deepEqual(modelImagePaths('v9', { preseal: true }), {
     tag: 'localhost/veritas-s2-008-model:v9',
     stagedPrereg: 'corpus/s2-008-campaign/preregistration.v8.in-force.json',
@@ -116,4 +116,80 @@ test('v9 draft carries v8 science and cap with a digest-bound fresh-run reconcil
 
   assert.throws(() => createDraft({ reconciliation: null }), /RECONCILIATION_MISSING/);
   assert.throws(() => createDraft({ base: JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v7.in-force.json')) }), /V9_BASE_NOT_IN_FORCE/);
+});
+
+test('a call reports provider correlation and the sidecar verifies per-case usage totals', async () => {
+  const { callModel } = await import('../../scripts/s2-008-campaign-arm-model.mjs');
+  const { persistPredictions } = await import('../../scripts/s2-008-campaign-adapter.mjs');
+  const stdout = `${JSON.stringify({
+    type: 'agent_end',
+    sessionId: 'session-observed',
+    messages: [{
+      role: 'assistant',
+      responseId: 'gen-observed-001',
+      content: [{ type: 'text', text: 'MINOR' }],
+      usage: { input: 432, output: 4, cacheRead: 142, cacheWrite: 0, totalTokens: 578, cost: { total: 0 } },
+    }],
+  })}\n`;
+  const result = callModel('safe synthetic input', {
+    provider: 'openrouter', model: 'stealth/space-bunny-alpha',
+    envName: 'OPENROUTER_API_KEY', env: { OPENROUTER_API_KEY: 'test-only' },
+    dryRun: false, timeoutMs: 1000, execFile: () => stdout,
+  });
+  assert.deepEqual(result.accounting, {
+    generation_id: 'gen-observed-001', session_id: 'session-observed',
+    correlation_status: 'CORRELATED', correlation_issue: null,
+    input: 432, output: 4, cacheRead: 142, cacheWrite: 0,
+    prompt_tokens: 574, prompt_token_basis: 'input+cacheRead+cacheWrite',
+    totalTokens: 578, reported_cost_usd: 0,
+  });
+
+  const output = {
+    predictions: [{ case_id: 'case-1', predicted: 'MINOR' }],
+    accounting: [{ case_id: 'case-1', ...result.accounting }],
+    executor: { model_calls: 1 },
+    budget: { spent_tokens: 578, usd_spent: 0 },
+    outcome_class: 'MEASURED',
+  };
+  let sidecar;
+  const saved = persistPredictions({
+    output, armId: 'arm-model-test', seed: 20260926, runLabel: 'v9-a',
+    sink: (_digest, body) => { sidecar = body; },
+  });
+  assert.equal(saved.rows, 1);
+  assert.equal(sidecar.accounting.calls, 1);
+  assert.equal(sidecar.accounting.tokens, 578);
+  assert.equal(sidecar.accounting.reported_cost_usd, 0);
+  assert.equal(sidecar.accounting.rows[0].generation_id, 'gen-observed-001');
+  assert.equal(sidecar.accounting.rows[0].prompt_tokens, 574);
+
+  assert.throws(() => persistPredictions({
+    output: { ...output, budget: { ...output.budget, spent_tokens: 579 } },
+    armId: 'arm-model-test', seed: 20260926, runLabel: 'v9-a', sink: () => {},
+  }), /ACCOUNTING_TOKEN_SUM/);
+  assert.throws(() => persistPredictions({
+    output: { ...output, executor: { model_calls: 2 } },
+    armId: 'arm-model-test', seed: 20260926, runLabel: 'v9-a', sink: () => {},
+  }), /ACCOUNTING_CALL_COUNT/);
+});
+
+test('v9 refuses correlation without erasing observed usage or guessing an ID', async () => {
+  const { callModel } = await import('../../scripts/s2-008-campaign-arm-model.mjs');
+  const stdout = `${JSON.stringify({
+    type: 'agent_end',
+    messages: [{
+      role: 'assistant',
+      content: [{ type: 'text', text: 'MINOR' }],
+      usage: { input: 20, output: 1, cacheRead: 0, cacheWrite: 0, totalTokens: 21, cost: { total: 0 } },
+    }],
+  })}\n`;
+  const result = callModel('safe synthetic input', {
+    provider: 'openrouter', model: 'stealth/space-bunny-alpha',
+    envName: 'OPENROUTER_API_KEY', env: { OPENROUTER_API_KEY: 'test-only' },
+    dryRun: false, timeoutMs: 1000, execFile: () => stdout,
+  });
+  assert.equal(result.usage.totalTokens, 21);
+  assert.equal(result.accounting.generation_id, null);
+  assert.equal(result.accounting.correlation_status, 'UNAVAILABLE');
+  assert.equal(result.accounting.correlation_issue, 'GENERATION_ID_MISSING');
 });
