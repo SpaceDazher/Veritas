@@ -322,11 +322,32 @@ export function callModel(subject, { provider, model, envName, env, dryRun, time
   }
   const usage = extractUsage(stdout);
   if (usage === null || !Number.isInteger(usage.totalTokens) || usage.totalTokens <= 0) throw new Error(`${ARM_ERRORS.NO_USAGE_REPORTED}`);
-  const messages = finalAgentEnd(stdout)?.messages;
+  const final = finalAgentEnd(stdout);
+  const messages = final?.messages;
   const assistantMessages = Array.isArray(messages)
     ? messages.filter((message) => message?.role === 'assistant') : [];
   const text = assistantMessageText(assistantMessages.at(-1));
-  return { text, usage, model_called: true };
+  const responseIds = assistantMessages.map((message) => message?.responseId).filter((value) => typeof value === 'string' && value.trim() !== '');
+  const singleResponseId = assistantMessages.length === 1 && responseIds.length === 1 ? responseIds[0] : null;
+  const finalMessage = assistantMessages.at(-1);
+  const sessionId = final?.session_id ?? final?.sessionId ?? finalMessage?.session_id ?? finalMessage?.sessionId ?? null;
+  const promptTokens = usage.input + usage.cacheRead + usage.cacheWrite;
+  const usageComponentsConsistent = usage.totalTokens === promptTokens + usage.output;
+  const correlationIssue = assistantMessages.length !== 1 ? 'MULTIPLE_BILLED_MESSAGES' : singleResponseId === null ? 'GENERATION_ID_MISSING' : null;
+  const accounting = {
+    generation_id: singleResponseId,
+    ...(typeof sessionId === 'string' && sessionId.trim() !== '' ? { session_id: sessionId } : {}),
+    correlation_status: correlationIssue === null ? 'CORRELATED' : 'UNAVAILABLE',
+    correlation_issue: correlationIssue,
+    input: usage.input, output: usage.output, cacheRead: usage.cacheRead, cacheWrite: usage.cacheWrite,
+    prompt_tokens: promptTokens,
+    prompt_token_basis: 'input+cacheRead+cacheWrite',
+    totalTokens: usage.totalTokens, reported_cost_usd: usage.cost.total,
+    usage_components_consistent: usageComponentsConsistent,
+    usage_component_issue: usageComponentsConsistent ? null : 'TOKEN_COMPONENT_MISMATCH',
+    ...(assistantMessages.length !== 1 ? { observed_generation_ids: responseIds } : {}),
+  };
+  return { text, usage, model_called: true, accounting };
 }
 
 /**
@@ -348,6 +369,7 @@ export function classifyOutcome({ dryRun, stopped, measured }) {
 export async function main(argv, env = process.env, deps = {}) {
   const startBridge = deps.startBridge ?? startEgressBridge;
   const invokeModel = deps.callModel ?? callModel;
+  const writeStdout = deps.writeStdout ?? ((text) => process.stdout.write(text));
   const capPositions = argv.flatMap((value, index) => value === '--remaining-tokens' ? [index] : []);
   const capPosition = capPositions.length === 1 ? capPositions[0] : -1;
   const capText = capPosition >= 0 ? argv[capPosition + 1] : undefined;
@@ -453,7 +475,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let piSettings = null;
   let piSettingsDigest = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9'].includes(prereg.rule)) {
     try {
       const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
       timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -466,10 +488,10 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (['s2-008-prereg-v7','s2-008-prereg-v8'].includes(prereg.rule)) {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9'].includes(prereg.rule)) {
       try {
         const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        piSettings = (prereg.rule === 's2-008-prereg-v8' ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
+        piSettings = (['s2-008-prereg-v8','s2-008-prereg-v9'].includes(prereg.rule) ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {
@@ -480,6 +502,9 @@ export async function main(argv, env = process.env, deps = {}) {
   }
 
   const predictions = [];
+  const accounting = [];
+  const requireGenerationId = prereg.rule === 's2-008-prereg-v9';
+  const generationIdsSeen = new Set();
   let spent = 0;
   let usd = 0;
   let modelCalls = 0;
@@ -541,6 +566,49 @@ export async function main(argv, env = process.env, deps = {}) {
     spent += result.usage.totalTokens;
     usd += Number(result.usage?.cost?.total ?? 0);
     if (result.model_called) modelCalls += 1;
+    if (result.model_called && result.accounting) {
+      const accountRow = { case_id: String(row.case_id), ...result.accounting };
+      let correlationIssue = accountRow.correlation_issue;
+      if (requireGenerationId && accountRow.correlation_status === 'CORRELATED' && generationIdsSeen.has(accountRow.generation_id)) {
+        correlationIssue = 'DUPLICATE_GENERATION_ID';
+        accountRow.correlation_status = 'UNAVAILABLE';
+        accountRow.correlation_issue = correlationIssue;
+      }
+      accounting.push(accountRow);
+      if (requireGenerationId && accountRow.usage_components_consistent !== true) {
+        const issue = accountRow.usage_component_issue ?? 'TOKEN_COMPONENT_STATUS_MISSING';
+        stop = Object.freeze({ reason: 'MODEL_CALL_ACCOUNTING_COMPONENTS_UNAVAILABLE', accounting_issue: issue,
+          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+        break;
+      }
+      if (requireGenerationId && (accountRow.correlation_status !== 'CORRELATED' || typeof accountRow.generation_id !== 'string' || accountRow.generation_id.trim() === '')) {
+        stop = Object.freeze({ reason: 'MODEL_CALL_CORRELATION_UNAVAILABLE', correlation_issue: correlationIssue ?? 'GENERATION_ID_MISSING',
+          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+        break;
+      }
+      if (typeof accountRow.generation_id === 'string' && accountRow.generation_id !== '') generationIdsSeen.add(accountRow.generation_id);
+    } else if (result.model_called) {
+      const accountRow = { case_id: String(row.case_id), generation_id: null, correlation_status: 'UNAVAILABLE',
+        correlation_issue: 'ACCOUNTING_MISSING', input: result.usage.input ?? 0, output: result.usage.output ?? 0,
+        cacheRead: result.usage.cacheRead ?? 0, cacheWrite: result.usage.cacheWrite ?? 0,
+        prompt_tokens: (result.usage.input ?? 0) + (result.usage.cacheRead ?? 0) + (result.usage.cacheWrite ?? 0),
+        prompt_token_basis: 'input+cacheRead+cacheWrite', totalTokens: result.usage.totalTokens,
+        reported_cost_usd: Number(result.usage?.cost?.total ?? 0) };
+      accountRow.usage_components_consistent = accountRow.totalTokens === accountRow.prompt_tokens + accountRow.output;
+      accountRow.usage_component_issue = accountRow.usage_components_consistent ? null : 'TOKEN_COMPONENT_MISMATCH';
+      accounting.push(accountRow);
+      if (requireGenerationId && accountRow.usage_components_consistent !== true) {
+        const issue = accountRow.usage_component_issue ?? 'TOKEN_COMPONENT_STATUS_MISSING';
+        stop = Object.freeze({ reason: 'MODEL_CALL_ACCOUNTING_COMPONENTS_UNAVAILABLE', accounting_issue: issue,
+          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+        break;
+      }
+      if (requireGenerationId) {
+        stop = Object.freeze({ reason: 'MODEL_CALL_CORRELATION_UNAVAILABLE', correlation_issue: 'ACCOUNTING_MISSING',
+          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+        break;
+      }
+    }
     predictions.push({
       case_id: row.case_id,
       predicted: parseLabel(result.text),
@@ -563,6 +631,8 @@ export async function main(argv, env = process.env, deps = {}) {
   bridge?.stop();
   const out = {
     kind: 's2-008-campaign-adapter-predict-model/1',
+    accounting_schema: 's2-008-model-accounting/1',
+    accounting,
     arm_id: armId,
     seed,
     n_cases: rows.length,
@@ -596,6 +666,7 @@ export async function main(argv, env = process.env, deps = {}) {
       model_attempts: modelAttempts,
       parallel_calls: 1,
       model_launch_timeout: timeoutPolicy,
+      accounting_policy: requireGenerationId ? 'GENERATION_ID_REQUIRED' : 'GENERATION_ID_OPTIONAL',
     },
     container: {
       node_version: process.version,
@@ -606,13 +677,13 @@ export async function main(argv, env = process.env, deps = {}) {
     },
   };
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2));
-  process.stdout.write(`ADAPTER_OK arm=${armId} seed=${seed} n=${rows.length} predictions=${predictions.length} tokens=${spent} usd=${usd.toFixed(6)} dry_run=${dryRun} pid=${process.pid} node=${process.version}\n`);
+  writeStdout(`ADAPTER_OK arm=${armId} seed=${seed} n=${rows.length} predictions=${predictions.length} tokens=${spent} usd=${usd.toFixed(6)} dry_run=${dryRun} pid=${process.pid} node=${process.version}\n`);
   const payload = Buffer.from(JSON.stringify(out), 'utf8').toString('base64');
   const chunks = Math.ceil(payload.length / CHUNK) || 1;
   for (let index = 0; index < chunks; index += 1) {
-    process.stdout.write(`ADAPTER_JSON ${index + 1}/${chunks} ${payload.slice(index * CHUNK, (index + 1) * CHUNK)}\n`);
+    writeStdout(`ADAPTER_JSON ${index + 1}/${chunks} ${payload.slice(index * CHUNK, (index + 1) * CHUNK)}\n`);
   }
-  process.stdout.write(`ADAPTER_JSON_END ${payload.length}\n`);
+  writeStdout(`ADAPTER_JSON_END ${payload.length}\n`);
   // A budget stop is a non-zero exit: the run did not complete, and a gate that
   // cannot tell that from a complete run is not a gate.
   return stop === null ? 0 : stop.reason === ARM_ERRORS.BUDGET_EXHAUSTED ? 6 : 10;

@@ -142,12 +142,14 @@ test('a call reports provider correlation and the sidecar verifies per-case usag
     input: 432, output: 4, cacheRead: 142, cacheWrite: 0,
     prompt_tokens: 574, prompt_token_basis: 'input+cacheRead+cacheWrite',
     totalTokens: 578, reported_cost_usd: 0,
+    usage_components_consistent: true, usage_component_issue: null,
   });
 
   const output = {
+    accounting_schema: 's2-008-model-accounting/1',
     predictions: [{ case_id: 'case-1', predicted: 'MINOR' }],
     accounting: [{ case_id: 'case-1', ...result.accounting }],
-    executor: { model_calls: 1 },
+    executor: { model_calls: 1, accounting_policy: 'GENERATION_ID_REQUIRED' },
     budget: { spent_tokens: 578, usd_spent: 0 },
     outcome_class: 'MEASURED',
   };
@@ -192,4 +194,131 @@ test('v9 refuses correlation without erasing observed usage or guessing an ID', 
   assert.equal(result.accounting.generation_id, null);
   assert.equal(result.accounting.correlation_status, 'UNAVAILABLE');
   assert.equal(result.accounting.correlation_issue, 'GENERATION_ID_MISSING');
+});
+
+test('an uncorrelated paid attempt retains its measured usage through arm and sidecar', async () => {
+  const { main, callModel } = await import('../../scripts/s2-008-campaign-arm-model.mjs');
+  const { persistPredictions } = await import('../../scripts/s2-008-campaign-adapter.mjs');
+  if (awaitableApproval === undefined) awaitableApproval = await import('../../scripts/s2-008-campaign-v9-approval.mjs');
+  const prereg = createDraft();
+  prereg.status = 'APPROVED';
+  prereg.approval = { status: 'APPROVED' };
+  prereg.preregistration_digest = preregistrationDigest(prereg);
+  const timeout = prereg.executor.model_launch_timeout;
+  const inputs = Array.from({ length: timeout.holdout_case_count }, (_, index) => ({
+    case_id: `synthetic-${index}`, subject: 'safe synthetic subject',
+  }));
+  const dir = fs.mkdtempSync('/tmp/s2-008-v9-arm-test-');
+  try {
+    const inputPath = `${dir}/input.json`;
+    const outputPath = `${dir}/output.json`;
+    const preregPath = `${dir}/prereg.json`;
+    fs.writeFileSync(inputPath, JSON.stringify(inputs));
+    fs.writeFileSync(outputPath, '');
+    fs.writeFileSync(preregPath, JSON.stringify(prereg));
+    const stdout = `${JSON.stringify({
+      type: 'agent_end',
+      sessionId: 'synthetic-session',
+      messages: [{
+        role: 'assistant',
+        content: [{ type: 'text', text: 'MINOR' }],
+        usage: { input: 432, output: 4, cacheRead: 142, cacheWrite: 0, totalTokens: 578, cost: { total: 0 } },
+      }],
+    })}\n`;
+    const exitCode = await main([
+      inputPath, outputPath, 'arm-model-zai-glm53flash', preregPath, '20260926',
+      '--remaining-tokens', '5000000',
+    ], { OPENROUTER_API_KEY: 'synthetic-test-token' }, {
+      startBridge: async () => ({ host: '127.0.0.1', port: 43001, stop() {} }),
+      writeStdout: () => {},
+      callModel: (subject, options) => callModel(subject, {
+        ...options, execFile: () => stdout,
+      }),
+    });
+    assert.equal(exitCode, 10);
+    const output = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+    assert.equal(output.outcome_class, 'INFRA');
+    assert.equal(output.predictions.length, 0);
+    assert.equal(output.executor.model_calls, 1);
+    assert.equal(output.budget.spent_tokens, 578);
+    assert.equal(output.accounting.length, 1);
+    assert.equal(output.accounting[0].correlation_status, 'UNAVAILABLE');
+
+    let sidecar;
+    const saved = persistPredictions({
+      output, armId: 'arm-model-zai-glm53flash', seed: 20260926, runLabel: 'v9-a',
+      sink: (_digest, body) => { sidecar = body; },
+    });
+    assert.equal(saved.rows, 0);
+    assert.equal(sidecar.model_calls, 1);
+    assert.equal(sidecar.spent_tokens, 578);
+    assert.equal(sidecar.accounting.calls, 1);
+    assert.equal(sidecar.accounting.tokens, 578);
+    assert.equal(sidecar.accounting.rows[0].correlation_issue, 'GENERATION_ID_MISSING');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the v9 evaluator requires complete unique generation accounting for measured model sidecars', async () => {
+  const { loadV4TrialPredictions } = await import('../../scripts/s2-008-campaign-evaluate.mjs');
+  const entry = base.trial_list.find((item) => item.arm_id === 'arm-model-zai-glm53flash');
+  const seed = 20260926;
+  const holdoutCases = [{ case_id: 'case-1', label: 'MINOR' }];
+  const make = (accountingRow) => {
+    const body = {
+      kind: 's2-008-campaign-predictions/1', run: 'a', arm_id: entry.arm_id, seed,
+      unparsed: 0, model_calls: 1, spent_tokens: 578, usd_spent: 0,
+      outcome_class: 'MEASURED', rows: [{ case_id: 'case-1', predicted: 'MINOR' }],
+      accounting: {
+        schema: 's2-008-model-accounting/1', policy: 'GENERATION_ID_REQUIRED',
+        calls: 1, tokens: 578, prompt_tokens: 574, reported_cost_usd: 0,
+        rows: [accountingRow],
+      },
+    };
+    const file = `evidence/s2-008-campaign/predictions-v9-a-${entry.trial_id}-${seed}.json`;
+    const trial = {
+      trial_id: entry.trial_id, arm_id: entry.arm_id,
+      seeds: [{ seed, predictions: { file, digest: canonicalDigest(body), rows: 1, unparsed: 0 } }],
+    };
+    return { body, trial, readFile: () => JSON.stringify(body) };
+  };
+  const valid = make({
+    case_id: 'case-1', generation_id: 'gen-correlated-001', correlation_status: 'CORRELATED',
+    input: 432, output: 4, cacheRead: 142, cacheWrite: 0, prompt_tokens: 574,
+    prompt_token_basis: 'input+cacheRead+cacheWrite', totalTokens: 578, reported_cost_usd: 0,
+    usage_components_consistent: true, usage_component_issue: null,
+  });
+  const accepted = loadV4TrialPredictions({
+    trial: valid.trial, entry, runLabel: 'a', seeds: [seed], holdoutCases,
+    readFile: valid.readFile, root: '/tmp', version: 'v9',
+  });
+  assert.equal(accepted.available, true);
+  assert.deepEqual(accepted.provider_generation_ids, ['gen-correlated-001']);
+
+  const inconsistent = make({
+    case_id: 'case-1', generation_id: 'gen-correlated-002', correlation_status: 'CORRELATED',
+    input: 432, output: 3, cacheRead: 142, cacheWrite: 0, prompt_tokens: 574,
+    prompt_token_basis: 'input+cacheRead+cacheWrite', totalTokens: 578, reported_cost_usd: 0,
+    usage_components_consistent: false, usage_component_issue: 'TOKEN_COMPONENT_MISMATCH',
+  });
+  const inconsistencyRefused = loadV4TrialPredictions({
+    trial: inconsistent.trial, entry, runLabel: 'a', seeds: [seed], holdoutCases,
+    readFile: inconsistent.readFile, root: '/tmp', version: 'v9',
+  });
+  assert.equal(inconsistencyRefused.available, false);
+  assert.match(inconsistencyRefused.reason, /V9_ACCOUNTING_CASE_SET_MISMATCH/);
+
+  const missingId = make({
+    case_id: 'case-1', generation_id: null, correlation_status: 'CORRELATED',
+    input: 432, output: 4, cacheRead: 142, cacheWrite: 0, prompt_tokens: 574,
+    prompt_token_basis: 'input+cacheRead+cacheWrite', totalTokens: 578, reported_cost_usd: 0,
+    usage_components_consistent: true, usage_component_issue: null,
+  });
+  const refused = loadV4TrialPredictions({
+    trial: missingId.trial, entry, runLabel: 'a', seeds: [seed], holdoutCases,
+    readFile: missingId.readFile, root: '/tmp', version: 'v9',
+  });
+  assert.equal(refused.available, false);
+  assert.match(refused.reason, /V9_ACCOUNTING_GENERATION_ID_INVALID/);
 });

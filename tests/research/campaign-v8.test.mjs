@@ -12,7 +12,7 @@ const baseBytes=fs.readFileSync('corpus/s2-008-campaign/preregistration.v7.in-fo
 const base=JSON.parse(baseBytes);
 const table=JSON.parse(fs.readFileSync('corpus/s2-008-campaign/frozen-table.v3.json'));
 function baseManifest() {
- const m=JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json'));
+ const m=JSON.parse(fs.readFileSync('tests/research/fixtures/manifest-v8.json'));
  m.preregistration={...m.preregistration,file:'preregistration.v7.in-force.json',status:'IN_FORCE',preregistration_digest:base.preregistration_digest};
  return m;
 }

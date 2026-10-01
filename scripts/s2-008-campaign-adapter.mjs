@@ -41,6 +41,7 @@ import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
 import { assertV8PresealPin } from './s2-008-campaign-v8-approval.mjs';
+import { assertV9PresealPin, assertV8AReconciliation, readV9ReconciliationInputs } from './s2-008-campaign-v9-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
@@ -168,6 +169,70 @@ export function verifyImagePin() {
 export function persistPredictions({ output, armId, seed, runLabel, sink }) {
   const rows = Array.isArray(output?.predictions) ? output.predictions : null;
   if (rows === null || typeof sink !== 'function' || runLabel === null || runLabel === undefined) return null;
+  const accountingRows = Array.isArray(output?.accounting) ? output.accounting : null;
+  let accounting = null;
+  if (output?.accounting_schema === 's2-008-model-accounting/1') {
+    if (accountingRows === null) throw new Error('ACCOUNTING_ROWS_MISSING');
+    const modelCalls = output?.executor?.model_calls;
+    if (!Number.isSafeInteger(modelCalls) || accountingRows.length !== modelCalls) throw new Error('ACCOUNTING_CALL_COUNT');
+    let tokens = 0;
+    let reportedCostUsd = 0;
+    let promptTokens = 0;
+    const generationIds = new Set();
+    for (const row of accountingRows) {
+      if (typeof row?.case_id !== 'string' || !row.case_id ||
+          !Number.isSafeInteger(row.totalTokens) || row.totalTokens < 0 ||
+          !Number.isFinite(row.reported_cost_usd) || row.reported_cost_usd < 0 ||
+          !Number.isSafeInteger(row.prompt_tokens) || row.prompt_tokens < 0 ||
+          row.prompt_token_basis !== 'input+cacheRead+cacheWrite' ||
+          !['CORRELATED', 'UNAVAILABLE'].includes(row.correlation_status)) throw new Error('ACCOUNTING_ROW_INVALID');
+      if (output?.executor?.accounting_policy === 'GENERATION_ID_REQUIRED' &&
+          (typeof row.usage_components_consistent !== 'boolean' ||
+           row.usage_components_consistent !== (row.totalTokens === row.prompt_tokens + row.output) ||
+           (row.usage_components_consistent && row.usage_component_issue !== null) ||
+           (!row.usage_components_consistent && row.usage_component_issue !== 'TOKEN_COMPONENT_MISMATCH'))) {
+        throw new Error('ACCOUNTING_TOKEN_COMPONENTS_INVALID');
+      }
+      if (row.correlation_status === 'CORRELATED') {
+        if (typeof row.generation_id !== 'string' || !row.generation_id.trim() || generationIds.has(row.generation_id)) {
+          throw new Error('ACCOUNTING_GENERATION_ID_INVALID');
+        }
+        generationIds.add(row.generation_id);
+      } else if (typeof row.correlation_issue !== 'string' || !row.correlation_issue) {
+        throw new Error('ACCOUNTING_CORRELATION_ISSUE_MISSING');
+      }
+      tokens += row.totalTokens;
+      reportedCostUsd += row.reported_cost_usd;
+      promptTokens += row.prompt_tokens;
+    }
+    if (tokens !== output?.budget?.spent_tokens) throw new Error('ACCOUNTING_TOKEN_SUM');
+    if (reportedCostUsd !== Number(output?.budget?.usd_spent ?? 0)) throw new Error('ACCOUNTING_COST_SUM');
+    if (output?.executor?.accounting_policy === 'GENERATION_ID_REQUIRED' && output?.outcome_class === 'MEASURED' &&
+        accountingRows.some((row) => row.correlation_status !== 'CORRELATED')) throw new Error('ACCOUNTING_REQUIRED_CORRELATION_MISSING');
+    accounting = {
+      schema: output.accounting_schema,
+      policy: output?.executor?.accounting_policy ?? 'GENERATION_ID_OPTIONAL',
+      calls: accountingRows.length,
+      tokens,
+      prompt_tokens: promptTokens,
+      reported_cost_usd: reportedCostUsd,
+      rows: accountingRows.map((row) => ({
+        case_id: row.case_id,
+        generation_id: row.generation_id ?? null,
+        ...(row.session_id ? { session_id: row.session_id } : {}),
+        correlation_status: row.correlation_status,
+        ...(row.correlation_issue ? { correlation_issue: row.correlation_issue } : {}),
+        ...(Array.isArray(row.observed_generation_ids) ? { observed_generation_ids: row.observed_generation_ids } : {}),
+        input: row.input, output: row.output, cacheRead: row.cacheRead, cacheWrite: row.cacheWrite,
+        prompt_tokens: row.prompt_tokens, prompt_token_basis: row.prompt_token_basis,
+        totalTokens: row.totalTokens, reported_cost_usd: row.reported_cost_usd,
+        ...(typeof row.usage_components_consistent === 'boolean' ? { usage_components_consistent: row.usage_components_consistent } : {}),
+        ...(row.usage_component_issue ? { usage_component_issue: row.usage_component_issue } : {}),
+      })),
+    };
+  } else if (output?.executor?.accounting_policy === 'GENERATION_ID_REQUIRED') {
+    throw new Error('ACCOUNTING_SCHEMA_MISSING');
+  }
   const body = {
     kind: 's2-008-campaign-predictions/1',
     run: String(runLabel),
@@ -180,11 +245,12 @@ export function persistPredictions({ output, armId, seed, runLabel, sink }) {
     spent_tokens: output?.budget?.spent_tokens ?? null,
     usd_spent: output?.budget?.usd_spent ?? null,
     outcome_class: output?.outcome_class ?? null,
+    ...(accounting === null ? {} : { accounting }),
     rows: rows.map((row) => ({ case_id: String(row?.case_id ?? ''), predicted: String(row?.predicted ?? '') })),
   };
   const digest = canonicalDigest(body);
   sink(digest, body);
-  return Object.freeze({ digest, rows: body.rows.length, unparsed: body.unparsed });
+  return Object.freeze({ digest, rows: body.rows.length, unparsed: body.unparsed, accounting_calls: accounting?.calls ?? null, accounting_tokens: accounting?.tokens ?? null });
 }
 
 export function runTrial({ armId, seed, samples, timeoutMs, pin, breakImage = false, predictionsSink = null, runLabel = null }) {
@@ -640,6 +706,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v6') return 6;
   if (rule === 's2-008-prereg-v7') return 7;
   if (rule === 's2-008-prereg-v8') return 8;
+  if (rule === 's2-008-prereg-v9') return 9;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
 
@@ -686,11 +753,15 @@ export function assertPinnedModelImage({
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
     assertV6PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
-  } else if (version === 7 || version === 8) {
+  } else if (version === 7 || version === 8 || version === 9) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v' + version + '.in-force.json'));
-    (version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    (version === 9 ? assertV9PresealPin : version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
-    (version === 8 ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor);
+    (version === 7 ? assertV7ExecutorPolicy : assertV8ExecutorPolicy)(prereg.executor);
+    if (version === 9) {
+      const reconciliationBinding = assertV8AReconciliation(readV9ReconciliationInputs());
+      if (prereg.restart_reconciliation?.canonical_digest !== reconciliationBinding.canonicalDigest) throw new Error('MODEL_RECONCILIATION_BINDING_MISMATCH');
+    }
   }
   if (prereg?.approval?.status !== 'APPROVED' || prereg?.approval?.in_force !== true) {
     throw new Error('MODEL_PREREGISTRATION_NOT_IN_FORCE');

@@ -70,7 +70,7 @@ export function credentialEnvNamesForProvider(provider) {
 }
 
 export function credentialEnvNameForPreregistration(prereg) {
-  if (prereg?.rule === 's2-008-prereg-v8') return assertV8ExecutorPolicy(prereg.executor).envName;
+  if (['s2-008-prereg-v8','s2-008-prereg-v9'].includes(prereg?.rule)) return assertV8ExecutorPolicy(prereg.executor).envName;
   if (prereg?.rule === 's2-008-prereg-v7') return assertV7ExecutorPolicy(prereg.executor).envName;
   if (['s2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6'].includes(prereg?.rule)) return 'ZAI_API_KEY';
   throw new Error('MODEL_CREDENTIAL_ENV_POLICY_UNSUPPORTED');

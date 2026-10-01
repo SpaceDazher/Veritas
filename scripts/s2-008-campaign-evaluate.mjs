@@ -68,6 +68,7 @@ export function loadV4TrialPredictions({
   const expectedIds = holdoutCases.map((row) => row.case_id);
   const labels = new Map(holdoutCases.map((row) => [row.case_id, row.label]));
   const perSeed = [];
+  const providerGenerationIds = [];
   for (const seedRow of trial.seeds) {
     const seed = seedRow.seed;
     const ref = seedRow.predictions;
@@ -84,6 +85,66 @@ export function loadV4TrialPredictions({
         (seedRow.outcome_class !== undefined && body.outcome_class !== seedRow.outcome_class)) {
       return refuse(`V4_SIDECAR_BODY_MISMATCH:${seed}`);
     }
+    if (version === 'v9' && entry.arm_id === 'arm-model-zai-glm53flash') {
+      const accounting = body.accounting;
+      if (accounting?.schema !== 's2-008-model-accounting/1' ||
+          accounting?.policy !== 'GENERATION_ID_REQUIRED' ||
+          !Array.isArray(accounting.rows) || !Number.isSafeInteger(accounting.calls) ||
+          accounting.calls !== body.model_calls || accounting.rows.length !== body.model_calls ||
+          !Number.isSafeInteger(accounting.tokens) || accounting.tokens !== body.spent_tokens ||
+          !Number.isSafeInteger(accounting.prompt_tokens) ||
+          !Number.isFinite(accounting.reported_cost_usd) || accounting.reported_cost_usd < 0 ||
+          accounting.reported_cost_usd !== body.usd_spent) {
+        return refuse(`V9_ACCOUNTING_TOTALS_INVALID:${seed}`);
+      }
+      let tokens = 0;
+      let promptTokens = 0;
+      let reportedCostUsd = 0;
+      const accountingCases = new Set();
+      const generationIds = new Set();
+      for (const row of accounting.rows) {
+        if (typeof row?.case_id !== 'string' || !expectedIds.includes(row.case_id) || accountingCases.has(row.case_id) ||
+            !['CORRELATED', 'UNAVAILABLE'].includes(row.correlation_status) ||
+            !Number.isSafeInteger(row.input) || row.input < 0 ||
+            !Number.isSafeInteger(row.output) || row.output < 0 ||
+            !Number.isSafeInteger(row.cacheRead) || row.cacheRead < 0 ||
+            !Number.isSafeInteger(row.cacheWrite) || row.cacheWrite < 0 ||
+            !Number.isSafeInteger(row.prompt_tokens) || row.prompt_tokens < 0 ||
+            row.prompt_tokens !== row.input + row.cacheRead + row.cacheWrite ||
+            row.prompt_token_basis !== 'input+cacheRead+cacheWrite' ||
+            !Number.isSafeInteger(row.totalTokens) || row.totalTokens < 0 ||
+            typeof row.usage_components_consistent !== 'boolean' ||
+            row.usage_components_consistent !== (row.totalTokens === row.prompt_tokens + row.output) ||
+            (row.usage_components_consistent && row.usage_component_issue !== null && row.usage_component_issue !== undefined) ||
+            (!row.usage_components_consistent && row.usage_component_issue !== 'TOKEN_COMPONENT_MISMATCH') ||
+            !Number.isFinite(row.reported_cost_usd) || row.reported_cost_usd < 0) {
+          return refuse(`V9_ACCOUNTING_ROW_INVALID:${seed}`);
+        }
+        accountingCases.add(row.case_id);
+        if (row.correlation_status === 'CORRELATED') {
+          if (typeof row.generation_id !== 'string' || !row.generation_id.trim() || generationIds.has(row.generation_id)) {
+            return refuse(`V9_ACCOUNTING_GENERATION_ID_INVALID:${seed}`);
+          }
+          generationIds.add(row.generation_id);
+          providerGenerationIds.push(row.generation_id);
+        } else if (typeof row.correlation_issue !== 'string' || !row.correlation_issue) {
+          return refuse(`V9_ACCOUNTING_CORRELATION_ISSUE_MISSING:${seed}`);
+        }
+        tokens += row.totalTokens;
+        promptTokens += row.prompt_tokens;
+        reportedCostUsd += row.reported_cost_usd;
+      }
+      if (tokens !== accounting.tokens || promptTokens !== accounting.prompt_tokens ||
+          reportedCostUsd !== accounting.reported_cost_usd) {
+        return refuse(`V9_ACCOUNTING_ROW_SUM_MISMATCH:${seed}`);
+      }
+      if (body.outcome_class === 'MEASURED' &&
+          (accounting.rows.length !== expectedIds.length ||
+           expectedIds.some((caseId) => !accountingCases.has(caseId)) ||
+           accounting.rows.some((row) => row.correlation_status !== 'CORRELATED' || row.usage_components_consistent !== true))) {
+        return refuse(`V9_ACCOUNTING_CASE_SET_MISMATCH:${seed}`);
+      }
+    }
     const scored = scoreRecordedPredictions({ rows: body.rows, labels, expectedIds });
     if (!scored.ok) return refuse(`V4_CASE_SET_MISMATCH:${seed}:${scored.problems.join(';')}`);
     if (scored.unparsed !== body.unparsed) return refuse(`V4_UNPARSED_COUNT_MISMATCH:${seed}`);
@@ -96,7 +157,7 @@ export function loadV4TrialPredictions({
       model_calls: body.model_calls, spent_tokens: body.spent_tokens, usd_spent: body.usd_spent,
     });
   }
-  return { available: true, per_seed: perSeed };
+  return { available: true, per_seed: perSeed, provider_generation_ids: providerGenerationIds };
 }
 
 /**
@@ -231,7 +292,7 @@ function decisionIndependent({ observed, lower, upper, noiseBand, alpha, confide
 
 
 export function activeCampaignVersion(manifest) {
-  const match = /^preregistration\.(v[45678])\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
+  const match = /^preregistration\.(v[456789])\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
   return match?.[1] ?? null;
 }
 
@@ -362,6 +423,10 @@ export function validateV6ProbeEvidence(args) {
 
 export function validateV8ProbeEvidence(args) {
   return validateVersionedProbeEvidence({ ...args, version: 8 });
+}
+
+export function validateV9ProbeEvidence(args) {
+  return validateVersionedProbeEvidence({ ...args, version: 9 });
 }
 
 export function validateV7ProbeEvidence(args) {
@@ -512,11 +577,13 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
   const version = activeCampaignVersion(manifest);
   const probeEvidence = version === 'v6'
     ? validateV6ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
+    : version === 'v9' ? validateV9ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
     : version === 'v8' ? validateV8ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
     : version === 'v7' ? validateV7ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
       : null;
   if (probeEvidence && !probeEvidence.ok) return probeEvidence;
   const scoredRuns = [];
+  const v9ProviderGenerationIds = new Set();
   for (const [label, run] of [['a', runA], ['b', runB]]) {
     const loaded = [];
     const vectors = [];
@@ -530,6 +597,14 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
         holdoutCases, readFile, root, version,
       });
       if (!result.available) return { ok: false, reason: result.reason, run: label, trial_id: entry.trial_id };
+      if (version === 'v9') {
+        for (const generationId of result.provider_generation_ids ?? []) {
+          if (v9ProviderGenerationIds.has(generationId)) {
+            return { ok: false, reason: 'V9_GENERATION_ID_DUPLICATE', run: label, trial_id: entry.trial_id };
+          }
+          v9ProviderGenerationIds.add(generationId);
+        }
+      }
       loaded.push({ entry, per_seed: result.per_seed });
       for (const row of result.per_seed) {
         const charge = run.charges.find((item) => item.trial === entry.trial_id && item.seed === row.seed);
@@ -614,7 +689,7 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
     ok: true, kind: `s2-008-campaign-${version}-evaluation/1`,
     preregistration_digest: prereg.preregistration_digest,
     holdout_cases: holdoutCases.length, table,
-    probes: ['v6','v7','v8'].includes(version)
+    probes: ['v6','v7','v8','v9'].includes(version)
       ? {
           status: probeEvidence.status, total: EXPECTED_CAMPAIGN_PROBES.length,
           items: campaignProbes.probes.map((row) => ({ probe: row.probe, status: 'PASS' })),
@@ -623,7 +698,7 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
         }
       : { status: 'NOT_RUN', total: V4_PROBES.length,
           items: V4_PROBES.map((probe) => ({ probe, status: 'NOT_RUN' })) },
-    verdict: ['v6','v7','v8'].includes(version) ? 'PENDING_HUMAN_REVIEW' : 'PENDING_PROBES',
+    verdict: ['v6','v7','v8','v9'].includes(version) ? 'PENDING_HUMAN_REVIEW' : 'PENDING_PROBES',
     aggregate_spend: { currency: 'tokens', units: runA.spent_units + runB.spent_units,
       usd_reported: scoredRuns.reduce((sum, row) => sum + row.usd_spent, 0) },
     prediction_independence: 'Model predictions come from immutable run sidecars; labels, counts, bootstrap intervals and decisions are recomputed here.',
@@ -662,7 +737,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
   if (!preflight.ok) throw new Error(preflight.reason);
   let campaignProbes = null;
   let securityControls = null;
-  if (['v6','v7','v8'].includes(version)) {
+  if (['v6','v7','v8','v9'].includes(version)) {
     const label = version.toUpperCase();
     try {
       campaignProbes = read(`evidence/s2-008-campaign/probes-${version}.json`);
@@ -670,7 +745,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
     } catch {
       throw new Error(`${label}_PROBE_EVIDENCE_NOT_RUN`);
     }
-    const validate = version === 'v8' ? validateV8ProbeEvidence : version === 'v6' ? validateV6ProbeEvidence : validateV7ProbeEvidence;
+    const validate = version === 'v9' ? validateV9ProbeEvidence : version === 'v8' ? validateV8ProbeEvidence : version === 'v6' ? validateV6ProbeEvidence : validateV7ProbeEvidence;
     const evidence = validate({ campaignProbes, securityControls, prereg, runA, runB });
     if (!evidence.ok) throw new Error(`${label}_PROBE_EVIDENCE_${evidence.status}:${evidence.reason}`);
   }
@@ -738,14 +813,14 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
 
 const args = parseArgs(process.argv);
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain && (args.v4 || args.v5 || args.v6 || args.v7 || args.v8)) {
+if (isMain && (args.v4 || args.v5 || args.v6 || args.v7 || args.v8 || args.v9)) {
   try {
-    const requestedVersion = args.v8 ? 'v8' : args.v7 ? 'v7' : args.v6 ? 'v6' : args.v5 ? 'v5' : 'v4';
+    const requestedVersion = args.v9 ? 'v9' : args.v8 ? 'v8' : args.v7 ? 'v7' : args.v6 ? 'v6' : args.v5 ? 'v5' : 'v4';
     const out = typeof args.out === 'string' ? path.resolve(args.out) : path.join(REPO_ROOT, `evidence/s2-008-campaign/evaluation-${requestedVersion}.json`);
     console.log(JSON.stringify(evaluateV4OnDisk({ out, requestedVersion }), null, 2));
   } catch (error) { console.error(String(error?.message ?? error)); process.exitCode = 1; }
 }
-if (isMain && !args.v4 && !args.v5 && !args.v6 && !args.v7 && !args.v8) {
+if (isMain && !args.v4 && !args.v5 && !args.v6 && !args.v7 && !args.v8 && !args.v9) {
 const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-a.json'), 'utf8'));
 const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-b.json'), 'utf8'));
 /** Which run this evaluation scores, and therefore which sidecar it reads. Derived
