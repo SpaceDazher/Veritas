@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "1ae91fd3102df85350aa91cc4a631c19bbcdf4bb",
-  "sourceTree": "39e017d6302d6e2a8f8111f5190e3c4e8cbb352e",
-  "trackedFileCount": 1207,
-  "manifestFileCount": 1202,
-  "payloadManifestSha256": "f9d0637f0d6435e656c2f14994de86c9d96fdc964bfb35c1503ca67b0a3cde69",
-  "fileManifestSha256": "e0eb49bb2021830f3fca191fc58ad1a527ef974439897b3a6f6616e613495deb",
+  "sourceCommit": "6bc9defee2f176a85f4b5a28b4ff5d947f2dc94e",
+  "sourceTree": "e0e09d106931437909f9eac6aa3766037f0392e9",
+  "trackedFileCount": 1209,
+  "manifestFileCount": 1204,
+  "payloadManifestSha256": "f2b246b2ae8c8f3453d07b25e3d3f8b24831be4a427deb1169277955eb30ea73",
+  "fileManifestSha256": "382d28e61aeeda303bc21d0db06dd9b6c16d7c18f0f54cce57d6deb6f6389761",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2397,6 +2397,11 @@
       "bytes": 7157
     },
     {
+      "path": "docs/decisions/2026-10-01-a-mvp05-human-review.md",
+      "sha256": "0627609f43ee34e8cf3792ac58723dffeea04dd1bbcfe64e27bfd340e9d4c6f4",
+      "bytes": 1615
+    },
+    {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
       "sha256": "fd48bbfc30673e51c880f8f105ad9300a39be9e94d9244237af771f506452b34",
       "bytes": 3980
@@ -2612,6 +2617,11 @@
       "bytes": 365
     },
     {
+      "path": "evidence/a-mvp05-human-review-2026-10-01.json",
+      "sha256": "72d0b5eb28810668961fc204a386e205266b9f6dd6f5095218348396086cb0cf",
+      "bytes": 21644
+    },
+    {
       "path": "evidence/contract-tests.json",
       "sha256": "9b8e60757c96bc42f57401e7173a527772967d3f104a68992738369de728dcbd",
       "bytes": 542
@@ -2678,8 +2688,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "47772ed6f76934e1e84bfa5e6c140b87006ecc6bfa38ea72c390d7986e974dfa",
-      "bytes": 54693
+      "sha256": "59c845df977b97ef976dba65aa7d3cea72886bce39b6ada734d78aa8e3314322",
+      "bytes": 54797
     },
     {
       "path": "evidence/frozen-manifest.json",
