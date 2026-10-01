@@ -90,7 +90,10 @@ test('token accounting is proved from the arm report for the enabled model arm',
   const charged = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: own, dispatchableArms: [MODEL] });
   assert.equal(charged.units, 10233);
   assert.equal(charged.unit, 'EXECUTOR_REPORTED_TOKENS');
-  assert.match(chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens', unreconciled_spend: true, spent_tokens: 0 } }, dispatchableArms: [MODEL] }).refusal, /ARM_UNRECONCILED_SPEND/);
+  const partial = chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens', unreconciled_spend: true, spent_tokens: 6735 } }, dispatchableArms: [MODEL] });
+  assert.match(partial.refusal, /ARM_UNRECONCILED_SPEND/);
+  assert.equal(partial.units, 6735);
+  assert.equal(partial.lower_bound, true);
   assert.match(chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'tokens' } }, dispatchableArms: [MODEL] }).refusal, /ARM_REPORTED_NO_TOKENS/);
   assert.match(chargeFor({ currency: 'tokens', armId: MODEL, armOutput: { budget: { currency: 'dollars', spent_tokens: 1 } }, dispatchableArms: [MODEL] }).refusal, /ARM_BUDGET_NOT_IN_THIS_CURRENCY/);
 });
@@ -177,7 +180,9 @@ test('v7 runner preserves an unknown-spend model exception and stops before anot
   assert.equal(attempts, 1);
   assert.equal(report.status, 'BLOCKED');
   assert.equal(report.unreconciled_spend, true);
-  assert.equal(report.spent_units, 0);
+  assert.equal(report.spent_units, null);
+  assert.equal(report.model_calls, null);
+  assert.equal(report.unknown_model_attempts, null);
   assert.equal(report.launches, 0);
   assert.equal(report.unknown_launch_attempts, 1);
   assert.match(report.reason, /ARM_UNRECONCILED_SPEND/);
@@ -234,4 +239,105 @@ test('model INFRA retains the own-arm stop and unknown-spend report in durable l
   assert.deepEqual(retained, output);
   assert.equal(retained.stop.reason, 'MODEL_USAGE_NOT_REPORTED');
   assert.equal(retained.budget.unreconciled_spend, true);
+});
+
+
+test('v9 host runner retains confirmed partial tokens and calls as lower bounds', async () => {
+  const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
+  let attempts = 0;
+  const output = {
+    arm_id: MODEL, outcome_class: 'INFRA', dry_run: false,
+    budget: {
+      currency: 'tokens', spent_tokens: 6735, usd_spent: 0,
+      measured_by: 'pi final assistant usage', unreconciled_spend: true,
+    },
+    executor: { model_calls: 11, model_attempts: 12 },
+    stop: {
+      reason: 'MODEL_ENDPOINT_UNREACHABLE', unreconciled_spend: true,
+      spent_tokens_confirmed: 6735,
+    },
+    predictions: [],
+  };
+  const report = await runV4Campaign({
+    label: 'partial-spend', arm: MODEL, write: false,
+    prereg: preregV7, manifest: manifestV7, modelPin: pinV7,
+    dispatchableArms: [MODEL],
+    resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+    now: () => Date.parse('2026-09-30T00:00:00.000Z'),
+    runModel: async () => {
+      attempts += 1;
+      return { ok: false, output, record: { arm_report: output, exit_code: 10 } };
+    },
+    runRegex: () => { throw new Error('regex launched after unreconciled model spend'); },
+    buildRegex: () => { throw new Error('regex built after unreconciled model spend'); },
+  });
+  assert.equal(attempts, 1);
+  assert.equal(report.status, 'BLOCKED');
+  assert.match(report.reason, /ARM_UNRECONCILED_SPEND/);
+  assert.equal(report.unreconciled_spend, true);
+  assert.equal(report.spent_units, 6735);
+  assert.equal(report.spent_units_is_lower_bound, true);
+  assert.equal(report.model_calls, 11);
+  assert.equal(report.model_calls_is_lower_bound, true);
+  assert.equal(report.unknown_model_attempts, 1);
+  assert.equal(report.launches, 1);
+  assert.equal(report.unknown_launch_attempts, 0);
+  assert.equal(report.charges.length, 1);
+  assert.equal(report.charges[0].units, 6735);
+  assert.equal(report.charges[0].lower_bound, true);
+});
+
+test('an injected MEASURED success cannot bypass the unreconciled-spend launch stop', async () => {
+  const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
+  let attempts = 0;
+  const output = {
+    outcome_class: 'MEASURED',
+    budget: { currency: 'tokens', spent_tokens: 50, unreconciled_spend: true },
+    executor: { model_calls: 2, model_attempts: 3 },
+  };
+  const report = await runV4Campaign({
+    label: 'unreconciled-ok', arm: MODEL, write: false,
+    prereg: preregV7, manifest: manifestV7, modelPin: pinV7,
+    dispatchableArms: [MODEL],
+    resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+    now: () => Date.parse('2026-09-30T00:00:00.000Z'),
+    runModel: async () => { attempts += 1; return { ok: true, output, record: { arm_report: output } }; },
+  });
+  assert.equal(attempts, 1);
+  assert.equal(report.status, 'BLOCKED');
+  assert.equal(report.spent_units, 50);
+  assert.equal(report.spent_units_is_lower_bound, true);
+  assert.equal(report.model_calls, 2);
+  assert.equal(report.model_calls_is_lower_bound, true);
+  assert.equal(report.unknown_model_attempts, 1);
+});
+
+test('invalid usage and call counters stay unknown in blocked host reports', async () => {
+  const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
+  for (const [label, output] of [
+    ['invalid-counts', {
+      outcome_class: 'INFRA',
+      budget: { currency: 'tokens', spent_tokens: '6735', unreconciled_spend: true },
+      executor: { model_calls: '11', model_attempts: 12 },
+    }],
+    ['missing-counts', {
+      outcome_class: 'INFRA',
+      budget: { currency: 'tokens', unreconciled_spend: true },
+    }],
+  ]) {
+    const report = await runV4Campaign({
+      label, arm: MODEL, write: false,
+      prereg: preregV7, manifest: manifestV7, modelPin: pinV7,
+      dispatchableArms: [MODEL],
+      resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+      now: () => Date.parse('2026-09-30T00:00:00.000Z'),
+      runModel: async () => ({ ok: false, output, record: { arm_report: output } }),
+    });
+    assert.equal(report.status, 'BLOCKED');
+    assert.equal(report.spent_units, null);
+    assert.equal(report.spent_units_is_lower_bound, false);
+    assert.equal(report.model_calls, null);
+    assert.equal(report.model_calls_is_lower_bound, false);
+    assert.equal(report.unknown_model_attempts, null);
+  }
 });
