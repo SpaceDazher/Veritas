@@ -517,7 +517,7 @@ test('a client cost.total of 0 stays 0 in the observation and null in the signed
     const reference = draft.budget_reservation.usd_reference;
     assert.equal(reference.confirmed_usd, null, 'a confirmed USD figure of null is required; 0 would read as free');
     assert.equal(reference.confirmed_usd_status, 'NOT_VERIFIED');
-    assert.equal(reference.measured_total_tokens_per_call, 11_139, 'the draft must carry the measured figure, not a typed one');
+    assert.equal(reference.measurement.totalTokens, 11_139, 'the draft must carry the measured figure, not a typed one');
     assert.equal(reference.projection.status, 'PROJECTION_NOT_MEASUREMENT',
       'a tools-ON host measurement must not be recorded as a container measurement');
   }

@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
+  "replaced_by_preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v8 replaces the executor with OpenRouter stealth/space-bunny-alpha while preserving frozen science and the 5,000,000-token ceiling per A/B run",
+  "supersession_id": "spr-a9453e449d1ce1ad1864b7f2",
+  "supersession_digest": "f3a23d8b737bf32fdf20767a497ae884aa98d7f1f02f7d45109779c58608aa02"
+}

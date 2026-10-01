@@ -14,6 +14,7 @@ const digest = pin.first;
 const pinV7 = JSON.parse(readFileSync(path.join(ROOT, 'evidence/s2-008-campaign/model-image-pin-v7.json'), 'utf8'));
 const preregV7 = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/preregistration.v7.in-force.json'), 'utf8'));
 const manifestV7 = JSON.parse(readFileSync(path.join(ROOT, 'corpus/s2-008-campaign/manifest.json'), 'utf8'));
+manifestV7.preregistration = {file:'preregistration.v7.in-force.json',status:'IN_FORCE',preregistration_digest:preregV7.preregistration_digest};
 
 test('model argv names the model arm, blind input, and signed v4 in-force document', () => {
   const argv = modelTrialArgv({ armId: MODEL, seed: 20260926, dryRun: true });

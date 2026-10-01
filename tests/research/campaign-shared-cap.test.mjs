@@ -129,6 +129,7 @@ test('v4 dry-run keeps the old no-cap argv while successor uses versioned names'
 test('paid successor refuses a v4 image pin before any build or model launch', async () => {
   const next=JSON.parse(readFileSync(new URL('../../corpus/s2-008-campaign/preregistration.v7.in-force.json',import.meta.url)));
   const manifest=JSON.parse(readFileSync(new URL('../../corpus/s2-008-campaign/manifest.json',import.meta.url)));
+  manifest.preregistration={file:'preregistration.v7.in-force.json',status:'IN_FORCE',preregistration_digest:next.preregistration_digest};
   let launched=false;
   const result=await runV4Campaign({label:'pin-gate',write:false,dryRun:false,prereg:next,manifest,
     modelPin:JSON.parse(readFileSync(new URL('../../evidence/s2-008-campaign/model-image-pin-v4.json',import.meta.url))),

@@ -51,7 +51,7 @@ import {
   RESEARCH_ID_PREFIXES,
 } from '../src/lib/research/constants.mjs';
 import { buildImage, runTrial } from './s2-008-campaign-adapter.mjs';
-import { assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { assertV7ExecutorPolicy, assertV8ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -513,7 +513,7 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
   const relative = path.relative(rootPath, candidate);
   const normalized = relative.split(path.sep).join('/');
   if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative) ||
-      !/^corpus\/s2-008-campaign\/preregistration\.v[4567]\.in-force\.json$/.test(normalized)) {
+      !/^corpus\/s2-008-campaign\/preregistration\.v[45678]\.in-force\.json$/.test(normalized)) {
     throw new Error('PROBE_PREREG_PATH_INVALID');
   }
   return candidate;
@@ -522,9 +522,10 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
 export function validateProbePreregistration({ prereg, manifest }) {
   try {
     const digest = preregistrationDigest(prereg);
-    const version = prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
+    const version = prereg?.rule === 's2-008-prereg-v8' ? 8 : prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
     const file = version === null ? null : `preregistration.v${version}.in-force.json`;
     if (version === 7) assertV7ExecutorPolicy(prereg.executor);
+    if (version === 8) assertV8ExecutorPolicy(prereg.executor);
     if (version === null || prereg.preregistration_digest !== digest ||
         prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true ||
         manifest?.preregistration?.file !== file ||
@@ -645,7 +646,9 @@ if (isEntry && args.child === 'restart') {
       outcome_classes_exercised: [...new Set(probes.flatMap((probe) => (probe.observed?.outcome === undefined ? [] : [probe.observed.outcome])))].sort(),
     },
   };
-  const defaultOut = prereg.rule === 's2-008-prereg-v7'
+  const defaultOut = prereg.rule === 's2-008-prereg-v8'
+    ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v8.json')
+    : prereg.rule === 's2-008-prereg-v7'
     ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v7.json')
     : prereg.rule === 's2-008-prereg-v6'
       ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v6.json')

@@ -306,7 +306,7 @@ const V4_PIN = path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-im
 
 const USAGE = `s2-008-campaign-approve — the owner's signature on preregistration v2, v3 or v4
 
-  --version v2|v3|v4     document to sign (default v2)
+  --version v2|v3|v4|v8  document to sign (default v2)
   --principal <id>     the owner's principal id, recorded like every permit here
   --label "<text>"     who is signing, in words
   --out <path>         where to write the signed document
@@ -321,7 +321,7 @@ Issuing does not put the document in force. That is --seal-v2's job, and until i
 runs the campaign runs v1.
 `;
 
-function main() {
+async function main() {
   const argv = process.argv.slice(2);
   const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
   if (!isMain) return null;
@@ -339,6 +339,23 @@ function main() {
     return null;
   }
   try {
+    if (args.version === 'v8') {
+      const { approveV8, readV8MeasurementOnDisk } = await import('./s2-008-campaign-v8-approval.mjs');
+      const baseBytes = readFileSync(path.join(CORPUS_DIR, 'preregistration.v7.in-force.json'));
+      const signed = approveV8({
+        draft: JSON.parse(readFileSync(path.join(CORPUS_DIR, 'preregistration.v8.draft.json'), 'utf8')),
+        base: JSON.parse(baseBytes), baseBytes,
+        table: JSON.parse(readFileSync(V3_TABLE, 'utf8')),
+        pin: JSON.parse(readFileSync(path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-image-pin-v8-preseal.json'), 'utf8')),
+        measurement: readV8MeasurementOnDisk(),
+        principal: args.principal, label: args.label, issuedAt: new Date().toISOString(),
+      });
+      const out = args.out ?? path.join(CORPUS_DIR, 'preregistration.v8.approved.json');
+      writeFileSync(out, JSON.stringify(signed, null, 2) + String.fromCharCode(10), { flag: 'wx', mode: 0o644 });
+      process.stdout.write(JSON.stringify({written:out,preregistration_id:signed.preregistration_id,
+        preregistration_digest:signed.preregistration_digest,approved_by:signed.approval.principal_id,in_force:false}) + String.fromCharCode(10));
+      return signed;
+    }
     if (!['v2', 'v3', 'v4'].includes(args.version)) throw new Error('APPROVAL_VERSION_UNKNOWN');
     const draftPath = args.version === 'v4' ? V4_DRAFT : args.version === 'v3' ? V3_DRAFT : DRAFT;
     if (!existsSync(draftPath)) throw new Error(`${APPROVE_ERRORS.DRAFT_ABSENT}:${draftPath}`);

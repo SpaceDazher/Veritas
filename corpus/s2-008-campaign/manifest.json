@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v7.in-force.json",
-    "preregistration_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
+    "file": "preregistration.v8.in-force.json",
+    "preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v6-superseded.json",
-    "preregistration_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
+    "file": "preregistration-v7-superseded.json",
+    "preregistration_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v7.in-force.json"
+    "superseded_by": "preregistration.v8.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v7-supersession.json",
-    "supersession_id": "spr-e1528d2ad7894ced0439c598",
-    "supersession_digest": "a1618ec9764dc5164856abf8d182f799a2b35aa2e76b619e52c8251a03cdbd64",
-    "reason": "v7 corrects provider credential routing and disables retry, cache-warming, and compaction paths while preserving frozen science and the 5,000,000-token ceiling per A/B run"
+    "file": "preregistration-v8-supersession.json",
+    "supersession_id": "spr-a9453e449d1ce1ad1864b7f2",
+    "supersession_digest": "f3a23d8b737bf32fdf20767a497ae884aa98d7f1f02f7d45109779c58608aa02",
+    "reason": "v8 replaces the executor with OpenRouter stealth/space-bunny-alpha while preserving frozen science and the 5,000,000-token ceiling per A/B run"
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -578,6 +578,12 @@
       "supersession_id": "spr-e1528d2ad7894ced0439c598",
       "supersession_digest": "a1618ec9764dc5164856abf8d182f799a2b35aa2e76b619e52c8251a03cdbd64",
       "reason": "v7 corrects provider credential routing and disables retry, cache-warming, and compaction paths while preserving frozen science and the 5,000,000-token ceiling per A/B run"
+    },
+    {
+      "file": "preregistration-v8-supersession.json",
+      "supersession_id": "spr-a9453e449d1ce1ad1864b7f2",
+      "supersession_digest": "f3a23d8b737bf32fdf20767a497ae884aa98d7f1f02f7d45109779c58608aa02",
+      "reason": "v8 replaces the executor with OpenRouter stealth/space-bunny-alpha while preserving frozen science and the 5,000,000-token ceiling per A/B run"
     }
   ]
 }

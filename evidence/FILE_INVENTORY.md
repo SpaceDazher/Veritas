@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1209.
+Generated from `git ls-files`; count: 1221.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -449,7 +449,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration-v5-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v6-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v6-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v7-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v7-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v8-supersession.json`
 - `corpus/s2-008-campaign/preregistration.json`
 - `corpus/s2-008-campaign/preregistration.v2.approved.json`
 - `corpus/s2-008-campaign/preregistration.v2.draft.json`
@@ -468,7 +470,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration.v7.approved.json`
 - `corpus/s2-008-campaign/preregistration.v7.draft.json`
 - `corpus/s2-008-campaign/preregistration.v7.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v8.approved.json`
 - `corpus/s2-008-campaign/preregistration.v8.draft.json`
+- `corpus/s2-008-campaign/preregistration.v8.in-force.json`
 - `corpus/s2-008-campaign/source-ledger.json`
 - `corpus/s2-008-campaign/source-ledger.v3.json`
 - `docs/A-MVP-05-LOCAL-REVIEW.md`
@@ -480,6 +484,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md`
 - `docs/decisions/2026-09-27-s2-007r-partial-disposition.md`
 - `docs/decisions/2026-10-01-a-mvp05-human-review.md`
+- `docs/decisions/2026-10-01-s2-008-v8-openrouter.md`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -629,7 +634,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v6.json`
 - `evidence/s2-008-campaign/model-image-pin-v7-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v7.json`
+- `evidence/s2-008-campaign/model-image-pin-v8-preseal.json`
+- `evidence/s2-008-campaign/model-image-pin-v8.json`
 - `evidence/s2-008-campaign/offline-call-diagnostic-v7.json`
+- `evidence/s2-008-campaign/openrouter-measurement-v8.json`
 - `evidence/s2-008-campaign/operational-block-v7.json`
 - `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v7-a-trl-s2-008c-01-20260926.json`
@@ -637,6 +645,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/probes-v7.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/provider-auth-resolution-cn-v6.json`
+- `evidence/s2-008-campaign/readiness-v8.json`
 - `evidence/s2-008-campaign/reconciliation-v6-a.json`
 - `evidence/s2-008-campaign/run-a.json`
 - `evidence/s2-008-campaign/run-aborted-1.json`
@@ -885,6 +894,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-seal-v5.mjs`
 - `scripts/s2-008-campaign-seal-v6.mjs`
 - `scripts/s2-008-campaign-seal-v7.mjs`
+- `scripts/s2-008-campaign-seal-v8.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-campaign-v5-approval.mjs`
 - `scripts/s2-008-campaign-v5-draft.mjs`
@@ -893,6 +903,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-v6-timeout.mjs`
 - `scripts/s2-008-campaign-v7-approval.mjs`
 - `scripts/s2-008-campaign-v7-draft.mjs`
+- `scripts/s2-008-campaign-v8-approval.mjs`
 - `scripts/s2-008-campaign-v8-draft.mjs`
 - `scripts/s2-008-egress-bridge.mjs`
 - `scripts/s2-008-harness.mjs`
@@ -1140,6 +1151,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-v6-probe-evidence.test.mjs`
 - `tests/research/campaign-v6-timeout.test.mjs`
 - `tests/research/campaign-v7-credential.test.mjs`
+- `tests/research/campaign-v8.test.mjs`
 - `tests/research/comparator-probes.test.mjs`
 - `tests/research/comparator.test.mjs`
 - `tests/research/dataset.test.mjs`

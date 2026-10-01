@@ -447,13 +447,13 @@
       "bootstrap_process"
     ]
   },
-  "status": "DRAFT",
+  "status": "APPROVED",
   "approval": {
-    "status": null,
+    "status": "APPROVED",
     "authority": "HUMAN_OWNER",
-    "principal_id": null,
-    "label": null,
-    "issued_at": null,
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "issued_at": "2026-10-01T08:25:08.763Z",
     "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
     "in_force": false,
     "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v8 records this digest and supersession in the corpus manifest"

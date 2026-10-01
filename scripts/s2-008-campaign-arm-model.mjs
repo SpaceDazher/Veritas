@@ -453,7 +453,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let piSettings = null;
   let piSettingsDigest = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (prereg.rule === 's2-008-prereg-v6' || prereg.rule === 's2-008-prereg-v7') {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8'].includes(prereg.rule)) {
     try {
       const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
       timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -466,10 +466,10 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (prereg.rule === 's2-008-prereg-v7') {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8'].includes(prereg.rule)) {
       try {
-        const { assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        piSettings = assertV7ExecutorPolicy(prereg.executor).settings;
+        const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
+        piSettings = (prereg.rule === 's2-008-prereg-v8' ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {

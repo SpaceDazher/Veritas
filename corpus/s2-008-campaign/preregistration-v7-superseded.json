@@ -1,7 +1,7 @@
 {
   "kind": "PREREGISTRATION",
-  "rule": "s2-008-prereg-v8",
-  "preregistration_id": "xpr-s2-008c-08",
+  "rule": "s2-008-prereg-v7",
+  "preregistration_id": "xpr-s2-008c-07",
   "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
   "card_id": "hyc-s2-008c-01",
   "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
@@ -175,7 +175,7 @@
   },
   "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
   "budget_reservation": {
-    "reservation_id": "rsv-s2-008c-08",
+    "reservation_id": "rsv-s2-008c-03",
     "currency": "tokens",
     "granted_units": 5000000,
     "spent_units": 0,
@@ -183,28 +183,20 @@
     "expires_at": "2026-10-05T00:00:00.000Z",
     "trial_timeout_ms": 180000,
     "usd_reference": {
-      "confirmed_usd": null,
-      "confirmed_usd_status": "NOT_VERIFIED",
-      "why_null": "Client cost.total=0 is not an independently verified provider price.",
-      "measurement": {
-        "input": 10941,
-        "output": 3,
-        "cacheRead": 195,
-        "totalTokens": 11139,
-        "traceSha256": "0946e3ffbc079bfda2e7de12a46dae82bc4175426728961322317ef507dd49df"
+      "measured": "pi 0.99.1 final agent_end.messages[*].usage.cost.total, summed for billed assistant messages; pi runtime reported estimate, provider invoice not independently verified",
+      "per_call_observed": {
+        "tokens": 10233,
+        "usd": 0.00140476,
+        "note": "historical pre-v6 invocation; one trivial call, with system prompt about 9058 input tokens; not a v7 cost projection"
       },
-      "measurement_basis": "one host-side call with tools ON; campaign runs with tools OFF",
-      "projection": {
+      "plan": {
         "calls": 378,
-        "cases_per_seed": 126,
-        "seeds": 3,
-        "tokens_per_call": 11139,
-        "tokens_estimate": 4210542,
-        "status": "PROJECTION_NOT_MEASUREMENT",
-        "caveat": "Container configuration is not measured by this host trace. Actual usage is charged during execution; the ceiling is unchanged."
+        "tokens_estimate": 3865734,
+        "usd_estimate": 0.530999,
+        "note": "historical pre-v6 estimate for 378 model case calls; v7 actual usage is measured during each run"
       },
-      "ceiling_scope": "PER_RUN_A_OR_B",
-      "aggregate_spend": "Report A+B separately; historical unresolved v7 spend stays UNKNOWN"
+      "why_it_is_here": "the repository has no cost model of its own — policy.mjs carries task/campaign/day limits with a currency field and adapters.mjs:907 forbids inventing one — so this is a MEASURED reference and not a budget. The ceiling above is denominated in tokens because tokens is the unit the owner set the cap in.",
+      "caveat": "The 5,000,000-token ceiling is binding independently for each A and B run, and aggregate A+B spend is reported separately. The retained 3,865,734-token / $0.530999 plan and $0.00140476 one-call observation were measured before v7 disabled tools, extensions, skills, retries, cache warming, and compaction; they are historical references, not a v7 cost projection. Stop before the next call when actual recorded token usage reaches the signed per-run ceiling."
     },
     "enumerated_work": "1 model trial x 3 frozen seeds = 3 model runs x 126 holdout cases = 378 case calls; 2 regex control trials make no model calls",
     "ceiling_scope": "PER_RUN_A_OR_B",
@@ -310,7 +302,7 @@
   },
   "recorded_before_first_trial": {
     "first_trial": "NOT_STARTED",
-    "proof": "No v8 trial has started. The interrupted v7 attempt remains recorded with unknown spend and is not retried."
+    "proof": "v6 stopped before provider authentication with zero provider requests; v4, v5 and v6 paid launches are refused"
   },
   "required_fields_present": [
     "hypothesis",
@@ -364,18 +356,18 @@
     "subject_is_pooled_aggregate": true
   },
   "executor": {
-    "provider": "openrouter",
-    "model": "stealth/space-bunny-alpha",
+    "provider": "zai-coding-cn",
+    "model": "glm-5.3-flash",
     "package": "@earendil-works/pi-coding-agent",
-    "credential_env_name": "OPENROUTER_API_KEY",
+    "credential_env_name": "ZAI_CODING_CN_API_KEY",
     "credential_delivery": "podman --env-file — a path on the host argv; neither the value nor the variable name is in any argv",
-    "inside_isolation": "LOCAL_RESTRICTED, digest-pinned, egress allowlist openrouter.ai:443 only",
+    "inside_isolation": "LOCAL_RESTRICTED, digest-pinned, egress allowlist open.bigmodel.cn:443 only",
     "parallelism": 1,
     "deterministic": false,
     "determinism_note": "a model is not a function of its input. The arm records the digest of every raw answer so a repeat can be COMPARED against the committed one. No claim is made that the model is reproducible; the run statement is about the frozen inputs and the recorded outputs.",
     "unparseable_policy": "an answer that is not exactly one of MAJOR/MINOR is UNPARSED and counts as a disagreement, never as a guess",
     "model_image": {
-      "content_commitment": "acf1e6933947a95fb22c561035dad82a05cb60ffee4eae83ffb2f8bd4557b7da",
+      "content_commitment": "8f9916e9ce1de9f29cddefd279ae940ed37c6d9198a7c31f093ed0d51433bf90",
       "covers": [
         "arm",
         "blind",
@@ -393,8 +385,8 @@
       ],
       "field_why": "the runtime tree digest covers every staged pi file, nested bundle chunk, mode and symbolic link target; model calls have disabled tools, extensions and skills and usage comes from final assistant messages",
       "cycle_why": "the signed body is COPYed into this image, so a body carrying the image digest would contain a digest of itself; the direction is preregistration -> image only",
-      "built_image_pin": "evidence/s2-008-campaign/model-image-pin-v8.json",
-      "built_image_pin_reason": "v8 built image binds this signed OpenRouter document; its acyclic content commitment excludes only the preregistration"
+      "built_image_pin": "evidence/s2-008-campaign/model-image-pin-v7.json",
+      "built_image_pin_reason": "v7 pin binds the full staged pi runtime tree, timeout policy, credential and retry policy, arm, bridge, corpus, base and recipe; the signed document is excluded to avoid a digest cycle"
     },
     "model_launch_timeout": {
       "per_model_call_timeout_ms": 180000,
@@ -425,10 +417,10 @@
     }
   },
   "supersession": {
-    "supersedes": "xpr-s2-008c-07",
-    "superseded_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
-    "scope": "executor provider/model, egress and content binding; frozen science and 5M ceiling per A/B unchanged",
-    "reason": "v8 replaces the executor with OpenRouter stealth/space-bunny-alpha and restricts egress to openrouter.ai:443",
+    "supersedes": "xpr-s2-008c-06",
+    "superseded_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
+    "scope": "provider credential routing and runtime retry controls; frozen scientific members, 180000 ms per-call timeout, 22980000 ms container timeout, and 5M per-run ceiling unchanged",
+    "reason": "v7 binds the provider-specific credential name, disables retries, cache warming, compaction, tools, extensions and skills, and commits the complete pi runtime tree while preserving the frozen scientific members and 5,000,000-token ceiling per A/B run",
     "unchanged": [
       "card",
       "metric",
@@ -447,16 +439,16 @@
       "bootstrap_process"
     ]
   },
-  "status": "DRAFT",
+  "status": "APPROVED",
   "approval": {
-    "status": null,
+    "status": "APPROVED",
     "authority": "HUMAN_OWNER",
-    "principal_id": null,
-    "label": null,
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
     "issued_at": null,
     "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
-    "in_force": false,
-    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v8 records this digest and supersession in the corpus manifest"
+    "in_force": true,
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v7 records this digest and supersession in the corpus manifest"
   },
-  "preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917"
+  "preregistration_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e"
 }

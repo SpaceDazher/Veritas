@@ -216,3 +216,37 @@ test('signed v7 pi settings disable request retries/cache warming/compaction in 
     provider: 'zai-coding-cn', credential_env_name: envName, pi_settings: invalid,
   }), /V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID/);
 });
+
+test('OpenRouter launch binds its signed provider to the forwarder and private env-file', async () => {
+ let envFile;
+ await executeModelWithCredential({
+  image:'sha256:'+'a'.repeat(64),argv:['/usr/local/bin/node'],timeoutMs:1000,
+  provider:'openrouter',envName:'OPENROUTER_API_KEY',credentialValue:KEY,credentialPresent:()=>true,
+  startForwarder:async(socketPath,options)=>{
+   assert.equal(options.provider,'openrouter');
+   return {socketPath,stop:async()=>{}};
+  },
+  execute:invocation=>{
+   envFile=invocation.podmanArgv[invocation.podmanArgv.indexOf('--env-file')+1];
+   assert.equal(statSync(envFile).mode&0o777,0o600);
+   assert.equal(readFileSync(envFile,'utf8'),'OPENROUTER_API_KEY='+KEY+'\n');
+   assert.equal(invocation.podmanArgv.some(x=>x.includes(KEY)),false);
+   return {exitCode:0,stdout:'OK',stderr:'',image:invocation.image,axes:invocation.axes};
+  }
+ });
+ assert.equal(existsSync(envFile),false);
+});
+test('real OpenRouter forwarder refuses the former provider without contacting it', async () => {
+ const f=await startCampaignForwarder({provider:'openrouter'});
+ try {
+  const answer=await new Promise((resolve,reject)=>{
+   const socket=connect(f.socketPath);
+   const timer=setTimeout(()=>{socket.destroy();reject(new Error('forwarder timeout'));},3000);
+   socket.on('connect',()=>socket.write('CONNECT open.bigmodel.cn:443 HTTP/1.1\r\nHost: open.bigmodel.cn:443\r\n\r\n'));
+   socket.on('data',chunk=>{clearTimeout(timer);socket.destroy();resolve(String(chunk));});
+   socket.on('error',error=>{clearTimeout(timer);reject(error);});
+  });
+  assert.match(answer,/EGRESS_NOT_ALLOWLISTED/);
+  assert.deepEqual(f.allowlist,[{host:'openrouter.ai',ports:[443]}]);
+ } finally {await f.stop();}
+});

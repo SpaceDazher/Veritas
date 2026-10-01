@@ -46,7 +46,7 @@ export function assertV8ExecutorPolicy(executor) {
       canonicalDigest(executor?.pi_settings ?? null) !== canonicalDigest(V7_PI_SETTINGS)) {
     throw new Error('V8_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID');
   }
-  return Object.freeze({ envName: V8_CREDENTIAL_ENV_NAME, provider: V8_EXECUTOR_POLICY.provider });
+  return Object.freeze({ envName: V8_CREDENTIAL_ENV_NAME, provider: V8_EXECUTOR_POLICY.provider, settings: V7_PI_SETTINGS });
 }
 
 /**

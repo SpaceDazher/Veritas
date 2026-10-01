@@ -63,7 +63,7 @@ import {
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
 import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin } from './s2-008-campaign-adapter.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
-import { assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { assertV8ExecutorPolicy, assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -1029,11 +1029,11 @@ export async function runV4Campaign({
   const safeLabel = String(label);
   if (!/^[a-z0-9][a-z0-9-]{0,19}$/.test(safeLabel)) throw new Error('RUN_LABEL_INVALID');
   const activeFile = manifest?.preregistration?.file;
-  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json'].includes(activeFile)) {
+  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json', 'preregistration.v8.in-force.json'].includes(activeFile)) {
     throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
   }
   prereg = prereg ?? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8'));
-  const version = prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  const version = prereg.rule === 's2-008-prereg-v8' ? 8 : prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
   if (expectedVersion !== null && expectedVersion !== version) throw new Error('ACTIVE_CAMPAIGN_VERSION_MISMATCH');
   const campaignKind = `s2-008-campaign-v${version}-predictions/1`;
   const base = resolveBaseFn();
@@ -1051,7 +1051,7 @@ export async function runV4Campaign({
   // Its arm would take a fresh 5m grant at every seed. Paid v4 is therefore
   // refused before building or launching anything; only a sealed successor
   // whose image contains the cap-aware arm may spend.
-  if (!dryRun && prereg.rule !== 's2-008-prereg-v7') {
+  if (!dryRun && !['s2-008-prereg-v7','s2-008-prereg-v8'].includes(prereg.rule)) {
     const code = version === 6 ? 'MODEL_CREDENTIAL_ENV_RESEAL_REQUIRED'
       : version === 5 ? 'MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED' : 'MODEL_CAP_RESEAL_REQUIRED';
     return {
@@ -1076,10 +1076,11 @@ export async function runV4Campaign({
       preregistration_digest: prereg.preregistration_digest,
     };
   }
-  if (prereg.rule === 's2-008-prereg-v6' || prereg.rule === 's2-008-prereg-v7') {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8'].includes(prereg.rule)) {
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     if (prereg.holdout_access?.case_count !== 126) throw new Error('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH');
   }
+  if (prereg.rule === 's2-008-prereg-v8') assertV8ExecutorPolicy(prereg.executor);
   if (!dryRun && prereg.rule === 's2-008-prereg-v7') assertV7ExecutorPolicy(prereg.executor);
   const declaredPinPath = prereg.executor?.model_image?.built_image_pin;
   if (declaredPinPath !== 'evidence/s2-008-campaign/model-image-pin-v' + version + '.json') {
@@ -1289,7 +1290,7 @@ export function productionPaidRunRefusal({ dryRun = false, label = 'a', write = 
 }
 
 export function campaignCliMode(args = {}) {
-  const versions = ['v4', 'v5', 'v6', 'v7'].filter((name) => args[name] === true);
+  const versions = ['v4', 'v5', 'v6', 'v7', 'v8'].filter((name) => args[name] === true);
   if (versions.length > 1) throw new Error('CAMPAIGN_VERSION_FLAGS_CONFLICT');
   const requestedVersion = versions.length === 0 ? null : Number(versions[0].slice(1));
   return Object.freeze({

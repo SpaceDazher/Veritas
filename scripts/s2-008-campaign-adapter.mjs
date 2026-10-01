@@ -40,8 +40,9 @@ import { fileURLToPath } from 'node:url';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
+import { assertV8PresealPin } from './s2-008-campaign-v8-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
-import { assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
+import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -476,14 +477,15 @@ export function modelCredentialPresent(handle = MODEL_CREDENTIAL_HANDLE) {
  * Keep the allowlist socket in a separate process: executeIsolated uses
  * spawnSync, so a forwarder in this event loop could not answer CONNECT.
  */
-export function startCampaignForwarder({ spawnImpl = spawn, timeoutMs = 10_000 } = {}) {
+export function startCampaignForwarder({ provider = 'zai-coding-cn', spawnImpl = spawn, timeoutMs = 10_000 } = {}) {
+  const allowlist = egressAllowlistForProvider(provider);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-campaign-egress-'));
   // The container is uid 65534; it must traverse the host directory to the
   // bind-mounted socket. The socket itself is chmod 0777 by the forwarder.
   fs.chmodSync(dir, 0o755);
   const socketPath = path.join(dir, 'egress.sock');
   return new Promise((resolve, reject) => {
-    const child = spawnImpl(process.execPath, [FORWARDER_PROGRAM, socketPath], {
+    const child = spawnImpl(process.execPath, [FORWARDER_PROGRAM, socketPath, provider], {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { PATH: '/usr/bin:/bin', HOME: '/tmp', NODE_ENV: 'production' },
     });
@@ -513,14 +515,14 @@ export function startCampaignForwarder({ spawnImpl = spawn, timeoutMs = 10_000 }
         let event;
         try { event = JSON.parse(line); } catch { continue; }
         if (event?.event !== 'FORWARDER_READY') continue;
-        if (event.socket !== socketPath || !fs.existsSync(socketPath) || ended) {
+        if (event.socket !== socketPath || event.provider !== provider || JSON.stringify(event.allowlist) !== JSON.stringify(allowlist) || !fs.existsSync(socketPath) || ended) {
           fail('CAMPAIGN_FORWARDER_READY_INVALID');
           return;
         }
         ready = true;
         clearTimeout(timer);
         resolve(Object.freeze({
-          socketPath,
+          socketPath, allowlist,
           get alive() { return !ended; },
           async stop() {
             if (!ended) {
@@ -554,7 +556,7 @@ export async function executeModelWithCredential({
   handle = MODEL_CREDENTIAL_HANDLE,
   credentialValue = undefined,
   credentialPresent = modelCredentialPresent,
-  startForwarder = startCampaignForwarder,
+  startForwarder = (_socketPath, options) => startCampaignForwarder(options),
   execute = executeIsolated,
 } = {}) {
   // The env name is not a free parameter: it is one this PROVIDER was signed
@@ -575,7 +577,7 @@ export async function executeModelWithCredential({
   let forwarder = null;
   try {
     // No container may start until this resolves with a listening socket.
-    forwarder = await startForwarder(path.join(dir, 'egress.sock'));
+    forwarder = await startForwarder(path.join(dir, 'egress.sock'), { provider });
     if (!forwarder || typeof forwarder.socketPath !== 'string') throw new Error('CAMPAIGN_FORWARDER_NOT_READY');
     envFile = spoolCredentialEnvFile(handle, envName, value, { spoolDir: dir });
     const profile = {
@@ -637,6 +639,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v5') return 5;
   if (rule === 's2-008-prereg-v6') return 6;
   if (rule === 's2-008-prereg-v7') return 7;
+  if (rule === 's2-008-prereg-v8') return 8;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
 
@@ -683,11 +686,11 @@ export function assertPinnedModelImage({
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
     assertV6PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
-  } else if (version === 7) {
-    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v7.in-force.json'));
-    assertV7PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+  } else if (version === 7 || version === 8) {
+    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v' + version + '.in-force.json'));
+    (version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
-    assertV7ExecutorPolicy(prereg.executor);
+    (version === 8 ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor);
   }
   if (prereg?.approval?.status !== 'APPROVED' || prereg?.approval?.in_force !== true) {
     throw new Error('MODEL_PREREGISTRATION_NOT_IN_FORCE');
@@ -742,6 +745,7 @@ export async function runModelTrial({
     const paid = await executePaid({
       image: pinned.imageId, argv, timeoutMs,
       name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-' + String(seed),
+      provider: prereg.executor.provider,
       envName: credentialEnvNameForPreregistration(prereg),
     });
     observation = paid.observation;

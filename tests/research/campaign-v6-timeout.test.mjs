@@ -27,6 +27,7 @@ const previousPin = JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-
 const preregV7 = JSON.parse(fs.readFileSync(path.join(corpus, 'preregistration.v7.in-force.json')));
 const pinV7 = JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v7.json')));
 const activeManifest = JSON.parse(fs.readFileSync(path.join(corpus, 'manifest.json')));
+activeManifest.preregistration = {file:'preregistration.v7.in-force.json',status:'IN_FORCE',preregistration_digest:preregV7.preregistration_digest};
 const MODEL = 'arm-model-zai-glm53flash';
 
 test('v6 CLI selects the preregistered campaign runner and rejects conflicting version flags', () => {
