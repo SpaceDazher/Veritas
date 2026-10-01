@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "134b2477ea45df2ccf207c00fb0463b4c811c96b",
-  "sourceTree": "877620bb2b55fd55dcbe9839174b9bb6bcc14eb8",
-  "trackedFileCount": 1200,
-  "manifestFileCount": 1195,
-  "payloadManifestSha256": "80707a75b2b090f173900bfdeda872f4d76a2588b9353501d21fdab03d68dd50",
-  "fileManifestSha256": "3b3ef83a8a714e323d2c863ae83fdde6691b2b2d0869d87dd90f11a1d41b576b",
+  "sourceCommit": "50ab175f8c0c87255052f871b999950eb8f80230",
+  "sourceTree": "c89dc2fdab825fb594e8143a54f8e432a3a33d83",
+  "trackedFileCount": 1202,
+  "manifestFileCount": 1197,
+  "payloadManifestSha256": "7336d7352e4db9287654e961be6c66cfca0171f69b4a9277ea1098e23b1bbc85",
+  "fileManifestSha256": "72e05e12674c2194d397ef815a29f0cfaf7e2cbfb642691f47c6fe792b52d79f",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2342,6 +2342,11 @@
       "bytes": 19544
     },
     {
+      "path": "corpus/s2-008-campaign/preregistration.v8.draft.json",
+      "sha256": "117ccfe3dab033fefcb6f918fd0ebd54d8e2848bd64de08eae7675064303fb96",
+      "bytes": 19563
+    },
+    {
       "path": "corpus/s2-008-campaign/source-ledger.json",
       "sha256": "cf0783c0ea038caf940ad050efd1005d8e49b1e0e028a91fdeddb657e9e8511c",
       "bytes": 1210
@@ -2668,8 +2673,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "9dd82e1337f349dbfb5f4355bab4b7209ee7b63fb2d818defd40e3ad131b2f12",
-      "bytes": 54407
+      "sha256": "fb5aad81d13829f8f7bfb976242114fbf44bf42e06fdaa6bb1ccd35d4a544c06",
+      "bytes": 54505
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -4288,8 +4293,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-adapter.mjs",
-      "sha256": "32a0bbdc154572361640d89c981b636be2d7a7e03c2873f286b978cf6819ea17",
-      "bytes": 40038
+      "sha256": "52325dc332c8698627e9344c52fd6d609d9821909dafc3e87d43ac1985e174f4",
+      "bytes": 40818
     },
     {
       "path": "scripts/s2-008-campaign-approve.mjs",
@@ -4313,8 +4318,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-credential-env.mjs",
-      "sha256": "e9fd6ae4b3d2e17a69f97aad98d713d9ea7ee1144a6d26f622998f85170b24a8",
-      "bytes": 1462
+      "sha256": "23671637a23f0b3a9c46a8f10e3835e63022b301c27ef6188d64b93cd2bcf3d5",
+      "bytes": 3988
     },
     {
       "path": "scripts/s2-008-campaign-egress-forwarder.mjs",
@@ -4410,6 +4415,11 @@
       "path": "scripts/s2-008-campaign-v7-draft.mjs",
       "sha256": "f8296969546c0345d9397097dee120ba0c1d9143c889b30a1b374266f11daf8a",
       "bytes": 1962
+    },
+    {
+      "path": "scripts/s2-008-campaign-v8-draft.mjs",
+      "sha256": "ed8de6dcb75d22d99309707f514ef9eeb33bea5ebaab488f0515a775eef8a819",
+      "bytes": 8553
     },
     {
       "path": "scripts/s2-008-egress-bridge.mjs",
@@ -4993,8 +5003,8 @@
     },
     {
       "path": "src/lib/isolation/profile.mjs",
-      "sha256": "7f12169e05dc2f15b149cf6b68e4c50f95bb73a44dfa03ecd643e3bb404ce6ed",
-      "bytes": 14234
+      "sha256": "c07e9c87f5dadf24b01574febd73c249e335f75ce6b2242b087944de0753323d",
+      "bytes": 15609
     },
     {
       "path": "src/lib/isolation/README.md",
@@ -5548,8 +5558,8 @@
     },
     {
       "path": "tests/research/campaign-arm-model.test.mjs",
-      "sha256": "60a821ff7d017f16928f1519e71900a4f8f234b5c935637f22573e195aa74f9b",
-      "bytes": 24836
+      "sha256": "8edb63096c4485e7b1e8a209dbaefd3e3888c80027db5409c6d016ac4f1dacea",
+      "bytes": 26893
     },
     {
       "path": "tests/research/campaign-currency-guard.test.mjs",
