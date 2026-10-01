@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1202.
+Generated from `git ls-files`; count: 1207.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -471,6 +471,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration.v8.draft.json`
 - `corpus/s2-008-campaign/source-ledger.json`
 - `corpus/s2-008-campaign/source-ledger.v3.json`
+- `docs/A-MVP-05-LOCAL-REVIEW.md`
 - `docs/ARCHITECTURE.md`
 - `docs/claims/S2-004-CLAIM-GRAPH-CONTRACT.md`
 - `docs/claims/S2-004-EXPERT-LENS-POLICY.md`
@@ -817,6 +818,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `results/s2-007r/run-02.json`
 - `results/s2-007r/run-record.json`
 - `results/s2-007r/sql-observations-round3.json`
+- `scripts/a-mvp05-review.mjs`
+- `scripts/a-mvp05-runtime.mjs`
 - `scripts/acceptance-gate.mjs`
 - `scripts/apply-migrations.mjs`
 - `scripts/check-inventory.mjs`
@@ -1060,6 +1063,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tasks/S2-006M_MODEL_ASSISTED_PILOT.md`
 - `tasks/S2-008_RD_EXPERIMENT_CYCLE.md`
 - `tasks/SLOQUAL-001_SLO_QUALIFICATION.md`
+- `tests/agentboard/a-mvp05-review.test.mjs`
+- `tests/agentboard/a-mvp05-runtime.test.mjs`
 - `tests/agentboard/concurrency.test.mjs`
 - `tests/agentboard/contracts-drift.test.mjs`
 - `tests/agentboard/contracts.test.mjs`

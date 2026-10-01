@@ -12,16 +12,20 @@ const PAGE = [
   '<!doctype html>',
   '<html lang="ru">',
   '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
-  '<title>A-MVP-05 · локальная проверка</title></head>',
+  '<title>A-MVP-05 · локальная проверка</title><link rel="stylesheet" href="/style.css"></head>',
   '<body>',
   '<main>',
   '<h1>A-MVP-05 · локальная проверка</h1>',
   '<p>Фиксированное задание: добавить строку в README изолированного репозитория и запустить его тест.</p>',
   '<p>Исполнитель — детерминированный локальный Node wrapper в Podman; вызовов модели и API нет.</p>',
-  '<label for="token">Одноразовый ключ рецензента</label>',
+  '<label for="token">Ключ рецензента (действует 24 часа)</label>',
   '<input id="token" type="password" autocomplete="off" spellcheck="false">',
   '<button id="open">Открыть задание</button>',
-  '<pre id="status" aria-live="polite">Вставьте ключ, чтобы загрузить состояние.</pre>',
+  '<p id="status" aria-live="polite">Вставьте ключ, чтобы загрузить состояние.</p>',
+  '<p id="error" role="alert"></p>',
+  '<section><h2>Задание</h2><p>Добавить в README ровно строку <code>Review cycle: local wrapper, no provider calls.</code>. Код и три существующих теста должны остаться без изменений.</p></section>',
+  '<section id="result" hidden><h2>Изменение</h2><pre id="diff"></pre><h2>Результат тестов</h2><pre id="tests"></pre></section>',
+  '<details><summary>Доказательства и журнал</summary><pre id="evidence"></pre></details>',
   '<button id="start" disabled>Создать задачу и выполнить</button>',
   '<label for="reason">Причина решения</label>',
   '<textarea id="reason" maxlength="500"></textarea>',
@@ -32,6 +36,8 @@ const PAGE = [
   '</body>',
   '</html>',
 ].join('\n');
+
+const STYLE = 'body{font:17px/1.5 system-ui,sans-serif;color:#202a36;background:#f4f6f8;margin:0}main{max-width:900px;margin:32px auto;padding:28px;background:white;border-radius:12px}label{display:block;margin-top:18px}input,textarea{box-sizing:border-box;width:100%;padding:10px;font:inherit;border:1px solid #9ba8b5;border-radius:6px}textarea{min-height:80px}button{font:inherit;padding:10px 16px;margin:12px 8px 12px 0;border:1px solid #66788a;border-radius:6px;cursor:pointer}button:disabled{cursor:default;opacity:.5}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #1d67cc;outline-offset:2px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef2f6;padding:16px;font-size:14px}#error{color:#a51f2f}section,details{margin:22px 0}h1{font-size:28px}h2{font-size:21px}';
 
 const APP = [
   "'use strict';",
@@ -52,23 +58,30 @@ const APP = [
   '  if (!response.ok) throw new Error(value.message || value.code || "request failed");',
   '  return value;',
   '}',
-  'function show(value) { statusBox.textContent = JSON.stringify(value, null, 2); currentState = value.state || null; viewed = value;',
+  'const errorBox = document.getElementById("error");',
+  'function show(value) { currentState = value.state || null; viewed = value; errorBox.textContent = "";',
+  '  const labels = {PENDING:"Задание ещё не создано. Нажмите «Создать задачу и выполнить».", IN_REVIEW:"Изменение готово. Прочитайте diff и тесты, укажите причину решения.", DONE:"Вы приняли результат. Решение и журнал сохранены.", BLOCKED:"Вы запросили изменения. Решение и журнал сохранены."};',
+  '  statusBox.textContent = labels[currentState] || ("Состояние: " + currentState);',
+  '  document.getElementById("result").hidden = !value.diff;',
+  '  document.getElementById("diff").textContent = value.diff || "";',
+  '  document.getElementById("tests").textContent = value.testLog || "";',
+  '  document.getElementById("evidence").textContent = JSON.stringify(value, null, 2);',
   '  startButton.disabled = currentState !== "PENDING";',
   '  approveButton.disabled = currentState !== "IN_REVIEW";',
   '  changesButton.disabled = currentState !== "IN_REVIEW";',
   '}',
   'document.getElementById("open").addEventListener("click", async () => {',
   '  bearer = tokenInput.value.trim(); tokenInput.value = "";',
-  '  try { show(await call("/api/state", "GET")); } catch (error) { bearer = ""; statusBox.textContent = String(error.message); }',
+  '  try { show(await call("/api/state", "GET")); } catch (error) { bearer = ""; startButton.disabled = true; approveButton.disabled = true; changesButton.disabled = true; errorBox.textContent = String(error.message); }',
   '});',
   'startButton.addEventListener("click", async () => {',
-  '  startButton.disabled = true;',
-  '  try { show(await call("/api/start", "POST", {})); } catch (error) { statusBox.textContent = String(error.message); }',
+  '  startButton.disabled = true; statusBox.textContent = "Выполняется локальная задача…";',
+  '  try { show(await call("/api/start", "POST", {})); } catch (error) { if (viewed) show(viewed); errorBox.textContent = String(error.message); }',
   '});',
   'async function decide(decision) {',
   '  approveButton.disabled = true; changesButton.disabled = true;',
   '  try { show(await call("/api/decision", "POST", { decision, reason: reasonInput.value.trim(), observed_manifest_digest: viewed.artifactManifestDigest, expected_revision: viewed.revision })); }',
-  '  catch (error) { statusBox.textContent = String(error.message); }',
+  '  catch (error) { if (viewed) show(viewed); errorBox.textContent = String(error.message); }',
   '}',
   'approveButton.addEventListener("click", () => decide("approve"));',
   'changesButton.addEventListener("click", () => decide("request_changes"));',
@@ -220,6 +233,11 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
         return;
       }
 
+      if (request.method === 'GET' && path.pathname === '/style.css') {
+        respondText(200, 'text/css; charset=utf-8', STYLE);
+        return;
+      }
+
       const routes = new Set(['/api/state', '/api/start', '/api/decision']);
       if (!routes.has(path.pathname)) {
         jsonResponse(response, 404, { code: 'NOT_FOUND' });
@@ -271,6 +289,10 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
       }
 
       if (request.method !== 'POST') {
+        jsonResponse(response, 405, { code: 'METHOD_NOT_ALLOWED' });
+        return;
+      }
+      if (path.pathname === '/api/state') {
         jsonResponse(response, 405, { code: 'METHOD_NOT_ALLOWED' });
         return;
       }

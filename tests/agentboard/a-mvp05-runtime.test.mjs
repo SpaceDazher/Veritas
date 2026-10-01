@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
-import { snapshotA05Artifacts, replayA05Journal, buildA05Task } from '../../scripts/a-mvp05-runtime.mjs';
+import { snapshotA05Artifacts, replayA05Journal, buildA05Task, createA05Workflow } from '../../scripts/a-mvp05-runtime.mjs';
 
 test('artifact snapshot measures bytes and refuses traversal, symlinks and duplicates', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'a05-artifact-'));
@@ -60,4 +60,11 @@ test('local task is valid against frozen board contract before any store mutatio
   assert.equal(task.workspace_ref.root_ref,'project');
   assert.equal(task.cost_limits.currency,'USD');
   assert.equal(task.acl.visibility,'personal');
+});
+
+test('separate workflow instances do not reuse durable audit IDs or a fixed epoch', () => {
+  const a = createA05Workflow({ pool: {}, ticket: {} }).store;
+  const b = createA05Workflow({ pool: {}, ticket: {} }).store;
+  assert.notEqual(a.newId('audit'), b.newId('audit'));
+  assert.ok(Math.abs(Date.now() - new Date(a.clock()).getTime()) < 2000);
 });

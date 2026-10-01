@@ -9,6 +9,7 @@ import { createServer } from 'node:net';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { PostgresAgentBoardStore } from '../src/lib/agentboard/store.mjs';
+import { assertBoardContract } from '../src/lib/agentboard/contracts.mjs';
 import { execute } from '../src/lib/agentboard/commands.mjs';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -174,7 +175,7 @@ function prepareTicket(label, principalId) {
     brief: { title: 'Add a review-cycle note to the isolated README', addition: ADDITION,
       acceptance: 'Only README changes; its added line matches the brief; all three existing sum tests pass.',
       runner: 'deterministic Node wrapper in Podman, not an LLM adapter',
-      timeout_ms: 120000, currency: 'TOKENS', cap: 1, planned_model_calls: 0, planned_tokens: 0 },
+      timeout_ms: 120000, currency: 'USD', cap: 0.01, cost_scope: 'Provider fees only; local electricity and opportunity cost NOT_MEASURED', planned_model_calls: 0, planned_tokens: 0 },
   };
   save(ticketFile, ticket, true); return ticket;
 }
@@ -187,9 +188,29 @@ function principal(ticket, who) {
       : ['board.task.read','board.task.transition','board.execution.start','board.result.collect','board.evidence.submit'],
   };
 }
+export function buildA05Task(ticket, registration, at) {
+  const task = {
+    contractVersion: '1.0.0', task_id: ticket.taskId, workspace_id: ticket.workspaceId,
+    title: ticket.brief.title, goal: 'Observe one human-created and human-reviewed bounded local change.',
+    description: ticket.brief.runner, acceptance_criteria: [ticket.brief.acceptance],
+    state: 'BACKLOG', revision: 1, priority: 'HIGH', dependencies: [],
+    required_capabilities: registration.declared_capabilities, allowed_tools: registration.declared_tools,
+    workspace_ref: { workspace_id: ticket.workspaceId, root_ref: 'project',
+      isolation_profile_id: PROFILE, sandbox_profile_digest: wire({ profile: PROFILE, image: ticket.imageId }), read_only_paths: [] },
+    time_limits: { timeout_ms: 120000, max_runtime_ms: 120000, deadline: null },
+    cost_limits: { currency: 'USD', max_task_cost: 0.01, max_campaign_cost: 0.01, max_day_cost: 0.01 },
+    acl: { visibility: 'personal', allowed_principal_ids: [ticket.principalId, ticket.producerId] },
+    brief_digest: wire(ticket.brief), policy_digest: wire({ isolation: PROFILE, network: 'none', capabilities: registration.declared_capabilities }),
+    manifest_digest: wire({ baseline: ticket.baseline, runner: ticket.runner_sha256, image: ticket.imageId }),
+    assigned_adapter_id: null, active_lease_id: null, fencing_token: null, attempts: 0,
+    artifacts: [], evidence_refs: [], block_reason: null, created_at: at, updated_at: at, history_digest: wire([]),
+  };
+  return assertBoardContract('board-task', task);
+}
+
 export function createA05Workflow({ pool, ticket }) {
-  const store = new PostgresAgentBoardStore({ pool });
   const clock = { now: () => new Date() };
+  const store = new PostgresAgentBoardStore({ pool, clock, ids: () => randomBytes(16).toString('hex') });
   let inFlight = null;
   async function command(name, args, who, step, transport) {
     const value = await execute({
@@ -249,27 +270,12 @@ export function createA05Workflow({ pool, ticket }) {
         real_adapter_provenance: { status: 'NOT_RUN_REAL_ADAPTER', detail: 'Actual deterministic Node process under Podman; no installed model agent or model-quality claim.' },
         registered_at: at,
       };
-      const task = {
-        contractVersion: '1.0.0', task_id: ticket.taskId, workspace_id: ticket.workspaceId,
-        title: ticket.brief.title, goal: 'Observe one human-created and human-reviewed bounded local change.',
-        description: ticket.brief.runner, acceptance_criteria: [ticket.brief.acceptance],
-        state: 'BACKLOG', revision: 1, priority: 'HIGH', dependencies: [],
-        required_capabilities: registration.declared_capabilities, allowed_tools: registration.declared_tools,
-        workspace_ref: { workspace_id: ticket.workspaceId, root_ref: ticket.project,
-          isolation_profile_id: PROFILE, sandbox_profile_digest: wire({ profile: PROFILE, image: ticket.imageId }), read_only_paths: [] },
-        time_limits: { timeout_ms: 120000, max_runtime_ms: 120000, deadline: null },
-        cost_limits: { currency: 'TOKENS', max_task_cost: 1, max_campaign_cost: 1, max_day_cost: 1 },
-        acl: { visibility: 'private', allowed_principal_ids: [ticket.principalId, ticket.producerId] },
-        brief_digest: wire(ticket.brief), policy_digest: wire({ isolation: PROFILE, network: 'none', capabilities: registration.declared_capabilities }),
-        manifest_digest: wire({ baseline: ticket.baseline, runner: ticket.runner_sha256, image: ticket.imageId }),
-        assigned_adapter_id: null, active_lease_id: null, fencing_token: null, attempts: 0,
-        artifacts: [], evidence_refs: [], block_reason: null, created_at: at, updated_at: at, history_digest: wire([]),
-      };
+      const task = buildA05Task(ticket, registration, at);
       await command('adapters.register', { registration }, 'human', 'register');
       await command('tasks.create', { task }, 'human', 'create');
       await command('budget.grant', { grant: {
         grant_id: 'grt-' + ticket.taskId.slice(4), workspace_id: ticket.workspaceId, task_id: ticket.taskId,
-        currency: 'TOKENS', task_limit: 1, campaign_limit: 1, day_limit: 1, timeout_ms: 120000,
+        currency: 'USD', task_limit: 0.01, campaign_limit: 0.01, day_limit: 0.01, timeout_ms: 120000,
         granted_by: ticket.principalId, expires_at: null, revoked_at: null,
       } }, 'human', 'grant');
       const bound = await findTask();
@@ -318,7 +324,7 @@ export function createA05Workflow({ pool, ticket }) {
         workspace_id: ticket.workspaceId, lease_id: run.lease_id, fencing_token: run.fencing_token, sequence: 1,
         outcome: 'SUCCEEDED', checkpoints: [],
         artifact_hashes: [{ artifact_id: 'art-' + ticket.taskId.slice(4), digest: wire(artifact), media_type: 'application/json' }],
-        measurements: { duration_ms: observed.duration_ms, spend: 0, currency: 'TOKENS',
+        measurements: { duration_ms: observed.duration_ms, spend: 0, currency: 'USD',
           model_id: 'NO_MODEL_LOCAL_NODE', tool_calls: 3 },
         error: null, reconciliation_required: false, completed_at: new Date().toISOString(),
       } }, 'worker', 'collect');
@@ -344,7 +350,7 @@ export function createA05Workflow({ pool, ticket }) {
     save(path.join(ticket.dir,'decision-receipt.json'), { ...result, audit,
       authority: 'server-resolved scoped local bearer credential; explicit user HTTP action',
       reviewer_principal_id: ticket.principalId, producer_principal_id: ticket.producerId,
-      fixture_test_only: ticket.label === 'preflight' }, true);
+      fixture_test_only: ticket.label.startsWith('preflight') }, true);
     return result;
   }
   return { status, start, decide, store };
@@ -354,7 +360,7 @@ async function main() {
   if (!['--init','--serve','--preflight','--inspect'].includes(mode) || process.argv.length !== 3) fail('USAGE_A05');
   const { pool } = await setupDatabase();
   try {
-    const ticket = prepareTicket(mode === '--preflight' ? 'preflight' : 'live',
+    const ticket = prepareTicket(mode === '--preflight' ? 'preflight-v2' : 'live',
       mode === '--preflight' ? 'prn-a05-test-reviewer' : 'prn-a05-daniil-reviewer');
     const workflow = createA05Workflow({ pool, ticket });
     if (mode === '--init') {
