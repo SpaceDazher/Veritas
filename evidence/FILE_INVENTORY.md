@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1207.
+Generated from `git ls-files`; count: 1209.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -479,6 +479,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/2026-09-26-s2-007-windows-acceptance.md`
 - `docs/decisions/2026-09-26-s2-007r-host-unisolated-tier.md`
 - `docs/decisions/2026-09-27-s2-007r-partial-disposition.md`
+- `docs/decisions/2026-10-01-a-mvp05-human-review.md`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -522,6 +523,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/stages/S2-008.md`
 - `docs/stages/stage-1.md`
 - `eslint.config.mjs`
+- `evidence/a-mvp05-human-review-2026-10-01.json`
 - `evidence/clean-checkout.json`
 - `evidence/closure-record.json`
 - `evidence/commit-record.json`

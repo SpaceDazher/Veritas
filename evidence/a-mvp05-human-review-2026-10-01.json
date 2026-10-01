@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "caseId": "A-MVP-05",
+  "verdict": "PASS",
+  "scope": "human-created and human-reviewed bounded local deterministic wrapper cycle",
+  "limitations": [
+    "No model quality claim",
+    "No paid campaign acceptance claim"
+  ],
+  "verifiedAt": "2026-10-01T06:47:06.962956+00:00",
+  "verifiedImplementationCommit": "e48fdcae2eaf4a97979c9601e903d73dd15c8f3c",
+  "taskId": "abt-a05-20dd67b39b51",
+  "reviewerPrincipalId": "prn-a05-daniil-reviewer",
+  "producerPrincipalId": "prn-a05-producer-20dd67b39b51",
+  "humanConfirmation": "все сделано",
+  "state": "DONE",
+  "revision": 6,
+  "decisionReason": "artifact sha256:fe0789777738331f4bf65cad9b8fa622455a8423ec6c0aa1efc775b971a66de5; проверено",
+  "reviewedAt": "2026-10-01T06:44:42.716Z",
+  "artifactManifestDigest": "fe0789777738331f4bf65cad9b8fa622455a8423ec6c0aa1efc775b971a66de5",
+  "artifactManifest": {
+    "kind": "a-mvp05-artifacts/1",
+    "files": [
+      {
+        "name": "README.md",
+        "bytes": 121,
+        "sha256": "67cc62b1ef2fb42ae50903354c30ff00df94f24e660a0d9f43d78a0b17f8ca13"
+      },
+      {
+        "name": "diff.patch",
+        "bytes": 239,
+        "sha256": "57308f465dcfee1c24e8487799230a7e4c8489db57c4e32dd7088c113e08b850"
+      },
+      {
+        "name": "run.json",
+        "bytes": 112,
+        "sha256": "30de18be0fda3139a552cc1521cab061ff6e32405ceaf40520f0b2521d3b797a"
+      },
+      {
+        "name": "sum.mjs",
+        "bytes": 58,
+        "sha256": "b4b3044dea1a66462020e8f89446dc8b8bb70843aff81a3bcf0fd3f6e426ca74"
+      },
+      {
+        "name": "sum.test.mjs",
+        "bytes": 312,
+        "sha256": "99b86e853ba4e833978f52d2bbfc05b4b4c6a00a8ac1915a057a4d3b396d8f7a"
+      },
+      {
+        "name": "tests.log",
+        "bytes": 497,
+        "sha256": "7e6adb7cee81fc037d8c45712c7bc01161d766f99b0479abb733fff956206dc1"
+      }
+    ],
+    "runtime": {
+      "node": "v22.23.3",
+      "pid": 1,
+      "test_exit": 0,
+      "test_error": null,
+      "model_calls": 0,
+      "tokens": 0,
+      "podman_pid": 298309,
+      "duration_ms": 2392,
+      "image_id": "88f8ba583a884279252779bbe221bf1ff2c61cf236cc973f8ca97676ae6d07f0",
+      "image_ref": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+      "runner_sha256": "bb84961918e8c16ca73a4217da2fc67cc51aab0ba85eb0197b16d7100ca7c1b8",
+      "isolation_profile": "sbx-podman-local-restricted-v1",
+      "network": "none",
+      "podman_argv": [
+        "--root",
+        "/tmp/podman-root",
+        "--runroot",
+        "/tmp/podman-runroot",
+        "--runtime",
+        "/usr/bin/crun",
+        "run",
+        "--rm",
+        "--pull=never",
+        "--network=none",
+        "--read-only",
+        "--cap-drop=all",
+        "--security-opt=no-new-privileges",
+        "--pids-limit=32",
+        "--memory=256m",
+        "--memory-swap=256m",
+        "--cpus=1",
+        "--userns=keep-id",
+        "--user=1000:1000",
+        "--tmpfs=/tmp:rw,nosuid,nodev,size=8m,mode=1777",
+        "--workdir=/workspace",
+        "--volume",
+        "/home/daniil/.local/state/veritas/a-mvp05/live/project:/workspace:rw",
+        "--volume",
+        "/home/daniil/.local/state/veritas/a-mvp05/live/runner.mjs:/runner.mjs:ro",
+        "88f8ba583a884279252779bbe221bf1ff2c61cf236cc973f8ca97676ae6d07f0",
+        "node",
+        "/runner.mjs"
+      ]
+    }
+  },
+  "artifactDiff": "diff --git a/README.md b/README.md\nindex 435897d..0dd6d75 100644\n--- a/README.md\n+++ b/README.md\n@@ -1,3 +1,5 @@\n # A-MVP-05 isolated repository\n \n Existing sum tests protect the fixture.\n+\n+Review cycle: local wrapper, no provider calls.\n",
+  "testLog": "TAP version 13\n# Subtest: empty input has zero sum\nok 1 - empty input has zero sum\n  ---\n  duration_ms: 0.582277\n  type: 'test'\n  ...\n# Subtest: mixed signs cancel correctly\nok 2 - mixed signs cancel correctly\n  ---\n  duration_ms: 0.102926\n  type: 'test'\n  ...\n# Subtest: fractional values sum correctly\nok 3 - fractional values sum correctly\n  ---\n  duration_ms: 0.083666\n  type: 'test'\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 48.106721\n",
+  "journal": {
+    "ok": true,
+    "state": "DONE",
+    "revision": 6,
+    "transitions": 5,
+    "history_digest": "sha256:3146f5f41f9246ddddf6f746a5b6e6c61aff427ac2b217e1fd7818d51fce00be",
+    "rows": [
+      {
+        "transition_id": "trn-94ce1ece249ab97f89c7b6131c6dc0f5",
+        "task_id": "abt-a05-20dd67b39b51",
+        "workspace_id": "ws-a05-20dd67b39b51",
+        "from_state": "BACKLOG",
+        "to_state": "READY",
+        "revision": 2,
+        "actor": "prn-a05-daniil-reviewer",
+        "actor_kind": "human_owner",
+        "idempotency_key": "2ad3df4d67a47d7cdb0f4c463c29702b6af0ffb997fb9a997a554eb4cdfa38f9",
+        "reason": "Authenticated user created the displayed fixed local task and resource limit.",
+        "lease_id": null,
+        "fencing_token": null,
+        "brief_digest": "9817b39c627cbb712a28bfe223c7da3575ef0fa2bd7c9a1a1ae89468af06a276",
+        "policy_digest": "4de9ad83a2a035a2ae96fcdfd9a1d232c8e2a1f43f8583b31282779c62cc5a8d",
+        "manifest_digest": "e5542b152f2d700ca0d191d7c95c53f41db1686e207380b608bfca54efa71d6d",
+        "payload": {
+          "kind": "state_transition",
+          "expected_revision": 1
+        },
+        "payload_digest": "d278b9fa9e1ba0cf136daab88d3fd96cca22baafbe7ed024fb9810f64e2c5f60",
+        "occurred_at": "2026-10-01T06:43:17.027Z"
+      },
+      {
+        "transition_id": "trn-73b75d73731e08049ae5d91625313e03",
+        "task_id": "abt-a05-20dd67b39b51",
+        "workspace_id": "ws-a05-20dd67b39b51",
+        "from_state": "READY",
+        "to_state": "CLAIMED",
+        "revision": 3,
+        "actor": "prn-a05-producer-20dd67b39b51",
+        "actor_kind": "scheduler",
+        "idempotency_key": "1f21a29a0cb9e5a40ebacceafed18747983906f221952d756dcc21aa8efae2c6",
+        "reason": "lease lse-282ec77cff13ae7901f2868c078bf649 granted to adr-a05-20dd67b39b51 until 2026-10-01T06:45:17.195Z",
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "fencing_token": "2",
+        "brief_digest": "9817b39c627cbb712a28bfe223c7da3575ef0fa2bd7c9a1a1ae89468af06a276",
+        "policy_digest": "4de9ad83a2a035a2ae96fcdfd9a1d232c8e2a1f43f8583b31282779c62cc5a8d",
+        "manifest_digest": "e5542b152f2d700ca0d191d7c95c53f41db1686e207380b608bfca54efa71d6d",
+        "payload": {
+          "kind": "state_transition",
+          "ttl_ms": 120000,
+          "adapter_id": "adr-a05-20dd67b39b51"
+        },
+        "payload_digest": "a6b78a3b1eb66607cd17afcf63a083858b7ec6fe9bc828a59b2b1b65e665a65e",
+        "occurred_at": "2026-10-01T06:43:17.195Z"
+      },
+      {
+        "transition_id": "trn-1b89c39c143ee5a14acce5d0b614cd58",
+        "task_id": "abt-a05-20dd67b39b51",
+        "workspace_id": "ws-a05-20dd67b39b51",
+        "from_state": "CLAIMED",
+        "to_state": "RUNNING",
+        "revision": 4,
+        "actor": "prn-a05-producer-20dd67b39b51",
+        "actor_kind": "scheduler",
+        "idempotency_key": "14dced5e5ffefe26e78007d89afaea619182d31519b14281ab527c0367d7c3bb",
+        "reason": "execution request recorded; run is DISPATCH_PENDING until the outbox is acknowledged",
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "fencing_token": "2",
+        "brief_digest": "9817b39c627cbb712a28bfe223c7da3575ef0fa2bd7c9a1a1ae89468af06a276",
+        "policy_digest": "4de9ad83a2a035a2ae96fcdfd9a1d232c8e2a1f43f8583b31282779c62cc5a8d",
+        "manifest_digest": "e5542b152f2d700ca0d191d7c95c53f41db1686e207380b608bfca54efa71d6d",
+        "payload": {
+          "kind": "state_transition",
+          "expected_revision": 3
+        },
+        "payload_digest": "2c7fee309d8690e5e88f5946bc9ddebb99650e5f8b809267e18be1afbc6f39b7",
+        "occurred_at": "2026-10-01T06:43:17.306Z"
+      },
+      {
+        "transition_id": "trn-6a16d6ae3313f20522c686438d5e23ee",
+        "task_id": "abt-a05-20dd67b39b51",
+        "workspace_id": "ws-a05-20dd67b39b51",
+        "from_state": "RUNNING",
+        "to_state": "IN_REVIEW",
+        "revision": 5,
+        "actor": "prn-a05-producer-20dd67b39b51",
+        "actor_kind": "adapter",
+        "idempotency_key": "8964fd7ed47935a3fcd38d0aa1fc9e3b7e55a3e9afb52a54381812728a1e5308",
+        "reason": "run run-cc943fb1a32a3962ce50773a0b0afcc1 collected as SUCCEEDED",
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "fencing_token": "2",
+        "brief_digest": "9817b39c627cbb712a28bfe223c7da3575ef0fa2bd7c9a1a1ae89468af06a276",
+        "policy_digest": "4de9ad83a2a035a2ae96fcdfd9a1d232c8e2a1f43f8583b31282779c62cc5a8d",
+        "manifest_digest": "e5542b152f2d700ca0d191d7c95c53f41db1686e207380b608bfca54efa71d6d",
+        "payload": {
+          "kind": "state_transition",
+          "adapter_id": "adr-a05-20dd67b39b51",
+          "lease_released": true
+        },
+        "payload_digest": "08a8b5bc07dfeab7490c9026f1941de37a9bf2ec229afb5477c0df89a9e94333",
+        "occurred_at": "2026-10-01T06:43:19.845Z"
+      },
+      {
+        "transition_id": "trn-b46313a90f472a797ad2edca1f32b0ae",
+        "task_id": "abt-a05-20dd67b39b51",
+        "workspace_id": "ws-a05-20dd67b39b51",
+        "from_state": "IN_REVIEW",
+        "to_state": "DONE",
+        "revision": 6,
+        "actor": "prn-a05-daniil-reviewer",
+        "actor_kind": "human_owner",
+        "idempotency_key": "d148fcb7a1cfd1b1968867762fe044738c8a8eaf8a66471d90131ee1ec7f406b",
+        "reason": "artifact sha256:fe0789777738331f4bf65cad9b8fa622455a8423ec6c0aa1efc775b971a66de5; проверено",
+        "lease_id": null,
+        "fencing_token": null,
+        "brief_digest": "9817b39c627cbb712a28bfe223c7da3575ef0fa2bd7c9a1a1ae89468af06a276",
+        "policy_digest": "4de9ad83a2a035a2ae96fcdfd9a1d232c8e2a1f43f8583b31282779c62cc5a8d",
+        "manifest_digest": "e5542b152f2d700ca0d191d7c95c53f41db1686e207380b608bfca54efa71d6d",
+        "payload": {
+          "kind": "state_transition",
+          "expected_revision": 5
+        },
+        "payload_digest": "4d3ccf2a592c1ce48fc3668ebc710e45b41ef7726dbd6494e40e24fd03029839",
+        "occurred_at": "2026-10-01T06:44:42.716Z"
+      }
+    ]
+  },
+  "audit": [
+    {
+      "audit_id": "aud-1b2bb9cb6e9c750bfdbd01a59d2bc9a3",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-daniil-reviewer",
+      "operation": "board.task.create",
+      "idempotency_key": "45c19b60ec1fa216abfa9014b0d4b31dacb326a4c9aa0185edfe0797aa4dc105",
+      "outcome": "COMMITTED",
+      "detail": {
+        "task": {
+          "acceptance_criteria": [
+            "Only README changes; its added line matches the brief; all three existing sum tests pass."
+          ]
+        },
+        "args_digest": "ab0fa295c229891ced08f105709abae049cbe4f5c30778eb55d47e28ecc86e51",
+        "cost_limits": {
+          "currency": "USD",
+          "max_day_cost": 0.01,
+          "max_task_cost": 0.01,
+          "max_campaign_cost": 0.01
+        },
+        "time_limits": {
+          "deadline": null,
+          "timeout_ms": 120000,
+          "max_runtime_ms": 120000
+        },
+        "brief_digest": "sha256:9817b39c627cbb712a28bfe223c7da3575ef0fa2bd7c9a1a1ae89468af06a276",
+        "policy_digest": "sha256:4de9ad83a2a035a2ae96fcdfd9a1d232c8e2a1f43f8583b31282779c62cc5a8d",
+        "workspace_ref": {
+          "root_ref": "project",
+          "workspace_id": "ws-a05-20dd67b39b51",
+          "read_only_paths": [],
+          "isolation_profile_id": "sbx-podman-local-restricted-v1",
+          "sandbox_profile_digest": "sha256:c55439c438ae544661a6298237450dcc5c2939b9b6d315706514e9e217e3804e"
+        },
+        "manifest_digest": "sha256:e5542b152f2d700ca0d191d7c95c53f41db1686e207380b608bfca54efa71d6d",
+        "state_at_create": "BACKLOG",
+        "history_digest_at_create": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "occurred_at": "2026-10-01T06:43:16.829Z"
+    },
+    {
+      "audit_id": "aud-b093ee8a80e65fdbb52ba404a8ad53af",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-daniil-reviewer",
+      "operation": "board.budget.grant",
+      "idempotency_key": "d350be20faa8ece898c785e8022512cf8db042b0f7d3ff29bc24aa0000b46a67",
+      "outcome": "COMMITTED",
+      "detail": {
+        "currency": "USD",
+        "grant_id": "grt-a05-20dd67b39b51",
+        "day_limit": 0.01,
+        "granted_by": "prn-a05-daniil-reviewer",
+        "task_limit": 0.01,
+        "args_digest": "439ff987179906be1675d26f9fcf482d17e814bee5adc1f73aa1ba2b24f87478",
+        "campaign_limit": 0.01
+      },
+      "occurred_at": "2026-10-01T06:43:16.952Z"
+    },
+    {
+      "audit_id": "aud-46ee45e9b9fd0576201f32ad11004afe",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-daniil-reviewer",
+      "operation": "board.task.transition",
+      "idempotency_key": "2ad3df4d67a47d7cdb0f4c463c29702b6af0ffb997fb9a997a554eb4cdfa38f9",
+      "outcome": "COMMITTED",
+      "detail": {
+        "lease_id": null,
+        "revision": 2,
+        "to_state": "READY",
+        "from_state": "BACKLOG",
+        "args_digest": "c5edc2701db8d988ec90354fe0d0cdff27ee9e30d702c2a1e8311b19c5caf916",
+        "fencing_token": null,
+        "transition_id": "trn-94ce1ece249ab97f89c7b6131c6dc0f5",
+        "history_digest": "sha256:719afd953bbc8f8222e0a5c8e1349e8d58f125e2059f5b65354db4b77b4a8ac5"
+      },
+      "occurred_at": "2026-10-01T06:43:17.027Z"
+    },
+    {
+      "audit_id": "aud-075a5b9dbd963864240c1287ccb325b3",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "board.task.claim",
+      "idempotency_key": "1f21a29a0cb9e5a40ebacceafed18747983906f221952d756dcc21aa8efae2c6",
+      "outcome": "COMMITTED",
+      "detail": {
+        "ttl_ms": 120000,
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "revision": 3,
+        "adapter_id": "adr-a05-20dd67b39b51",
+        "args_digest": "d889a3fbd98782dc33e958b4fff097ca65d666a0461f185a2b87e9afc64f9bbe",
+        "fencing_token": 2,
+        "transition_id": "trn-73b75d73731e08049ae5d91625313e03",
+        "history_digest": "sha256:36f29b94c7eae64ad3664781d468b0da02567a0059c37e59e0c102a37c5b5769"
+      },
+      "occurred_at": "2026-10-01T06:43:17.195Z"
+    },
+    {
+      "audit_id": "aud-1edf9d3836e20122c56350a9b1166ac9",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "execution.start",
+      "idempotency_key": "06e436ba2e28b5077713d9e75bcacffe0463f7cef8f25afb4c97d043b64a45ce",
+      "outcome": "COMMITTED",
+      "detail": {
+        "run_id": "run-cc943fb1a32a3962ce50773a0b0afcc1",
+        "grant_id": "grt-a05-20dd67b39b51",
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "outbox_id": "obx-ad396dd2dabdbaf092b2d98d1c9ff46e",
+        "adapter_id": "adr-a05-20dd67b39b51",
+        "outbox_key": "c82cfb18c8f187189424f5f605507ab7ba8edf46310dda1968ac920b271c27c4",
+        "request_id": "xer-765c5cf4ecb89cd9",
+        "args_digest": "c63b3f8166b55be21f1baecb325150f1418c4dc2531a329c1197cef310ccf96f",
+        "fencing_token": 2,
+        "request_digest": "sha256:a1a5c25c293c1a21d8f1402a619a39dbe64b8ed01af73c0115a6a31866009566",
+        "run_idempotency_key": "06e436ba2e28b5077713d9e75bcacffe0463f7cef8f25afb4c97d043b64a45ce"
+      },
+      "occurred_at": "2026-10-01T06:43:17.251Z"
+    },
+    {
+      "audit_id": "aud-ddddc3bc7212f5f30a9663689c7fd6b8",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "board.task.transition",
+      "idempotency_key": "14dced5e5ffefe26e78007d89afaea619182d31519b14281ab527c0367d7c3bb",
+      "outcome": "COMMITTED",
+      "detail": {
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "revision": 4,
+        "to_state": "RUNNING",
+        "from_state": "CLAIMED",
+        "args_digest": "a197c260621860313e3d5097b0207caf124e0c2d6d563cb1205abdb2f299b211",
+        "fencing_token": 2,
+        "transition_id": "trn-1b89c39c143ee5a14acce5d0b614cd58",
+        "history_digest": "sha256:e898bda96dff13ab3b31643d6d79bf1815631a3b81850c19d43cd21341b06f7e"
+      },
+      "occurred_at": "2026-10-01T06:43:17.306Z"
+    },
+    {
+      "audit_id": "aud-fb1df5ac2a89ab2a67d174e862ad73b9",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "outbox.dispatch",
+      "idempotency_key": "cefb80cbcc5d2edffbe056ee3d1ee9383eed3178582810f58cd0a54e0320133d",
+      "outcome": "COMMITTED",
+      "detail": {
+        "run_id": "run-cc943fb1a32a3962ce50773a0b0afcc1",
+        "attempts": 1,
+        "to_state": "SENT",
+        "outbox_id": "obx-ad396dd2dabdbaf092b2d98d1c9ff46e",
+        "event_type": "board.execution.request",
+        "from_state": "PENDING",
+        "last_error": null,
+        "args_digest": "cefb80cbcc5d2edffbe056ee3d1ee9383eed3178582810f58cd0a54e0320133d"
+      },
+      "occurred_at": "2026-10-01T06:43:17.363Z"
+    },
+    {
+      "audit_id": "aud-37ce32dec286c549d1ecf7c70ee82e36",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "outbox.ack",
+      "idempotency_key": "9563bc906baa0429a9984ea1312d3c3dec4b5be7cc6e6f3ecc57c7138c1ee04b",
+      "outcome": "COMMITTED",
+      "detail": {
+        "run_id": "run-cc943fb1a32a3962ce50773a0b0afcc1",
+        "attempts": 1,
+        "to_state": "ACKED",
+        "outbox_id": "obx-ad396dd2dabdbaf092b2d98d1c9ff46e",
+        "event_type": "board.execution.request",
+        "from_state": "SENT",
+        "last_error": null,
+        "args_digest": "9563bc906baa0429a9984ea1312d3c3dec4b5be7cc6e6f3ecc57c7138c1ee04b"
+      },
+      "occurred_at": "2026-10-01T06:43:19.775Z"
+    },
+    {
+      "audit_id": "aud-d42fc8542a787e76921bea833e4d9ad9",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "board.execution.collect_result",
+      "idempotency_key": "320eb649b28dcb7260df6ee11c1a641955b1ecd1555f49a57277ed67fdfffded",
+      "outcome": "COMMITTED",
+      "detail": {
+        "spend": 0,
+        "run_id": "run-cc943fb1a32a3962ce50773a0b0afcc1",
+        "outcome": "SUCCEEDED",
+        "currency": "USD",
+        "artifacts": [
+          "art-a05-20dd67b39b51"
+        ],
+        "run_state": "COLLECTED",
+        "args_digest": "479622f5a906cc6cf2484179006222ecfd70ff46375feaeebc72d04540ba9014",
+        "result_digest": "048c8acf65799f61afccfaa0aa1133e7ee18e0476bf0ebf2dd13b7920bbc6c0d",
+        "reconciliation_required": false
+      },
+      "occurred_at": "2026-10-01T06:43:19.817Z"
+    },
+    {
+      "audit_id": "aud-e07f16bbe27f6f6a03b077e330849a24",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-producer-20dd67b39b51",
+      "operation": "board.lease.release",
+      "idempotency_key": "8964fd7ed47935a3fcd38d0aa1fc9e3b7e55a3e9afb52a54381812728a1e5308",
+      "outcome": "COMMITTED",
+      "detail": {
+        "lease_id": "lse-282ec77cff13ae7901f2868c078bf649",
+        "revision": 5,
+        "to_state": "IN_REVIEW",
+        "from_state": "RUNNING",
+        "args_digest": "8964fd7ed47935a3fcd38d0aa1fc9e3b7e55a3e9afb52a54381812728a1e5308",
+        "fencing_token": 2,
+        "transition_id": "trn-6a16d6ae3313f20522c686438d5e23ee",
+        "history_digest": "sha256:c13de60efbed5233d68852659134b6d2bb34c4a8d7f2e7e567507fca24ed31d8"
+      },
+      "occurred_at": "2026-10-01T06:43:19.845Z"
+    },
+    {
+      "audit_id": "aud-f2067975421b80d6c0eea1b077885922",
+      "workspace_id": "ws-a05-20dd67b39b51",
+      "task_id": "abt-a05-20dd67b39b51",
+      "actor": "prn-a05-daniil-reviewer",
+      "operation": "board.task.transition",
+      "idempotency_key": "d148fcb7a1cfd1b1968867762fe044738c8a8eaf8a66471d90131ee1ec7f406b",
+      "outcome": "COMMITTED",
+      "detail": {
+        "lease_id": null,
+        "revision": 6,
+        "to_state": "DONE",
+        "from_state": "IN_REVIEW",
+        "args_digest": "52708cccecd99b5876f2411111f9c4f2a8b86892fb5589a769c9581f7f579c1b",
+        "fencing_token": null,
+        "transition_id": "trn-b46313a90f472a797ad2edca1f32b0ae",
+        "history_digest": "sha256:3146f5f41f9246ddddf6f746a5b6e6c61aff427ac2b217e1fd7818d51fce00be"
+      },
+      "occurred_at": "2026-10-01T06:44:42.716Z"
+    }
+  ],
+  "receiptSha256": "8c62ef012f0a5655a86ba7116b911972585b7f3342e374bd6eee852df971e0aa",
+  "independentVerification": {
+    "implementation": "Python hashlib plus independent state-chain and byte checks",
+    "payloadDigestsMatch": true,
+    "historyDigestMatches": true,
+    "artifactFilesMatch": true,
+    "reviewerCreatedTask": true,
+    "reviewerIsNotProducer": true,
+    "reviewedVersionMatchesCurrent": true,
+    "fixtureTestOnly": false
+  },
+  "selfVerification": {
+    "approaches": [
+      "human provenance and timestamps",
+      "independent artifact bytes and test results",
+      "independent journal payload and history replay"
+    ],
+    "scoresOutOf20": {
+      "requirementCoverage": 19,
+      "functionalCorrectness": 19,
+      "regressionRisk": 20,
+      "verificationEvidence": 19,
+      "securityAndOperationalRisk": 18
+    }
+  }
+}
