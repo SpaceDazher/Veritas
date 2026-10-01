@@ -489,3 +489,36 @@ test('a paid call returning a zero final total is not chargeable as zero', async
     assert.equal(record.predictions.length, 0);
   });
 });
+
+// The provider this draft moves the executor to reports `cost.total = 0`.
+// That is what the client reports, not a price, and the two must never be
+// confused: the raw 0 is kept as an observation, and the confirmed USD figure
+// carried into a signed document is null.
+//
+// This exists because the failure is silent in the worst direction. A draft that
+// recorded the raw 0 would look like a free provider and would be signed; a
+// parser "fix" that coerced the 0 into something else would hide the fact that
+// the price is simply unknown.
+test('a client cost.total of 0 stays 0 in the observation and null in the signed figure', () => {
+  const assistant = {
+    role: 'assistant',
+    content: [{ type: 'text', text: 'MINOR' }],
+    usage: { input: 10_941, output: 3, cacheRead: 195, cacheWrite: 0, totalTokens: 11_139, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } },
+  };
+  const stdout = JSON.stringify({ type: 'agent_end', messages: [{ role: 'user', content: [] }, assistant] });
+  const usage = extractUsage(stdout);
+  assert.equal(usage.totalTokens, 11_139, 'the measured tokens were not read');
+  assert.equal(usage.cost.total, 0, 'the raw client cost must be preserved as observed, not normalised away');
+
+  // And the treatment the draft is obliged to give it.
+  const draftPath = path.resolve(import.meta.dirname, '../../corpus/s2-008-campaign/preregistration.v8.draft.json');
+  if (existsSync(draftPath)) {
+    const draft = JSON.parse(readFileSync(draftPath, 'utf8'));
+    const reference = draft.budget_reservation.usd_reference;
+    assert.equal(reference.confirmed_usd, null, 'a confirmed USD figure of null is required; 0 would read as free');
+    assert.equal(reference.confirmed_usd_status, 'NOT_VERIFIED');
+    assert.equal(reference.measured_total_tokens_per_call, 11_139, 'the draft must carry the measured figure, not a typed one');
+    assert.equal(reference.projection.status, 'PROJECTION_NOT_MEASUREMENT',
+      'a tools-ON host measurement must not be recorded as a container measurement');
+  }
+});

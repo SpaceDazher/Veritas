@@ -41,13 +41,12 @@ import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
-import { assertV7ExecutorPolicy, credentialEnvNameForPreregistration, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
+import { assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
 import { assertImageMatchesPin } from '../src/lib/isolation/image.mjs';
-import { ISOLATION_EGRESS_ALLOWLIST } from '../src/lib/isolation/profile.mjs';
-import { assertNoSecretLeak, spoolCredentialEnvFile } from '../src/lib/isolation/secrets.mjs';
+import { ISOLATION_EGRESS_ALLOWLIST, egressAllowlistForProvider } from '../src/lib/isolation/profile.mjs';import { assertNoSecretLeak, spoolCredentialEnvFile } from '../src/lib/isolation/secrets.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -449,14 +448,18 @@ const MODEL_CREDENTIAL_ENV = 'ZAI_API_KEY';
 const FORWARDER_PROGRAM = path.join(REPO_ROOT, 'scripts/s2-008-campaign-egress-forwarder.mjs');
 
 export function modelCredentialValue({
+  provider = 'zai-coding-cn',
   env = process.env,
   readAuth = () => fs.readFileSync(path.join(os.homedir(), '.pi/agent/auth.json'), 'utf8'),
 } = {}) {
-  const injected = env?.[MODEL_CREDENTIAL_ENV];
-  if (typeof injected === 'string' && injected.length >= 8) return injected;
+  const names = credentialEnvNamesForProvider(provider);
+  for (const envName of names) {
+    const injected = env?.[envName];
+    if (typeof injected === 'string' && injected.length >= 8) return injected;
+  }
   let auth;
   try { auth = JSON.parse(readAuth()); } catch { throw new Error('EXECUTOR_CREDENTIAL_ABSENT'); }
-  const value = auth?.['zai-coding-cn']?.key;
+  const value = auth?.[provider]?.key;
   if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
   return value;
 }
@@ -546,16 +549,26 @@ export function startCampaignForwarder({ spawnImpl = spawn, timeoutMs = 10_000 }
  */
 export async function executeModelWithCredential({
   image, argv, timeoutMs, name = 's2-008-campaign-model',
-  envName = MODEL_CREDENTIAL_ENV,
+  provider = 'zai-coding-cn',
+  envName = undefined,
   handle = MODEL_CREDENTIAL_HANDLE,
   credentialValue = undefined,
   credentialPresent = modelCredentialPresent,
   startForwarder = startCampaignForwarder,
   execute = executeIsolated,
 } = {}) {
-  if (envName !== MODEL_CREDENTIAL_ENV && envName !== V7_CREDENTIAL_ENV_NAME) throw new Error('MODEL_CREDENTIAL_ENV_NAME_INVALID');
+  // The env name is not a free parameter: it is one this PROVIDER was signed
+  // with, and the egress allowlist below is built from that same provider. A
+  // caller passing a name from another provider would be delivering one
+  // destination's key while the container may reach another's host, so the
+  // pairing is re-derived here rather than trusted from the caller.
+  const allowedNames = credentialEnvNamesForProvider(provider);
+  const effectiveEnvName = envName ?? allowedNames[0];
+  if (!allowedNames.includes(effectiveEnvName)) throw new Error(`MODEL_CREDENTIAL_ENV_NAME_INVALID:${String(provider)}:${String(effectiveEnvName)}`);
+  envName = effectiveEnvName;
+  const egressAllowlist = egressAllowlistForProvider(provider);
   if (credentialPresent(handle) !== true) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
-  const value = credentialValue === undefined ? modelCredentialValue() : credentialValue;
+  const value = credentialValue === undefined ? modelCredentialValue({ provider }) : credentialValue;
   if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-credential-'));
   let envFile = null;
@@ -567,7 +580,7 @@ export async function executeModelWithCredential({
     envFile = spoolCredentialEnvFile(handle, envName, value, { spoolDir: dir });
     const profile = {
       ...SANDBOX_ISOLATION_EXECUTOR,
-      network: { policy: 'allowlist', allowlist: ISOLATION_EGRESS_ALLOWLIST },
+      network: { policy: 'allowlist', allowlist: egressAllowlist },
     };
     const invocation = buildInvocation(profile, {
       image, argv, timeoutMs, name,
@@ -588,7 +601,7 @@ export async function executeModelWithCredential({
       axes: invocation.axes,
       container_argv: [...invocation.podmanArgv],
       credential: { handle, env_name: envName, delivered_by: '--env-file', expected_surfaces: ['env'] },
-      egress: { socket: '/run/egress.sock', allowlist: ISOLATION_EGRESS_ALLOWLIST },
+      egress: { socket: '/run/egress.sock', allowlist: egressAllowlist },
       exit_code: observation?.exitCode ?? null,
     };
     const leakScan = assertNoSecretLeak({

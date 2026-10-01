@@ -130,6 +130,36 @@ export const ISOLATION_EGRESS_ALLOWLIST = Object.freeze([
   Object.freeze({ host: 'open.bigmodel.cn', ports: Object.freeze([443]) }),
 ]);
 
+/**
+ * THE MODEL EGRESS SET IS CHOSEN BY THE SIGNED DOCUMENT, NOT BY THIS FILE.
+ *
+ * The constant above is the set the host was configured for when the executor was
+ * pointed at z.ai, and it is deliberately left alone: existing runs keep the
+ * surface they were measured with. But a model run may only reach the host its
+ * OWN signed document names, and a second host in one shared constant would mean
+ * every run could reach both — which is a wider isolation surface than either
+ * document was signed for, arrived at by a convenience rather than a decision.
+ *
+ * So the sets are keyed by provider and resolved through one function that
+ * refuses an unknown provider. Adding a provider is an edit here AND a new signed
+ * document; neither alone is enough, because the document is what names the
+ * provider and this is what turns the name into a network flag.
+ */
+export const MODEL_EGRESS_TARGETS = Object.freeze({
+  'zai-coding-cn': ISOLATION_EGRESS_ALLOWLIST,
+  openrouter: Object.freeze([
+    Object.freeze({ host: 'openrouter.ai', ports: Object.freeze([443]) }),
+  ]),
+});
+
+export function egressAllowlistForProvider(provider) {
+  const targets = MODEL_EGRESS_TARGETS[provider];
+  if (targets === undefined) {
+    throw new Error(`${PROFILE_ERRORS.PROFILE_MALFORMED}:unknown-egress-provider:${String(provider)}`);
+  }
+  return Object.freeze([...targets]);
+}
+
 const HOSTNAME = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
 const ENV_NAME = /^[A-Z][A-Z0-9_]{0,63}$/;
 const SECRET_HANDLE = /^sec-[a-z0-9][a-z0-9-]{0,62}$/;
