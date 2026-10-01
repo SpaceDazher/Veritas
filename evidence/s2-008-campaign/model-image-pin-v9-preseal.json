@@ -1,0 +1,93 @@
+{
+  "schema": "s2-008-model-image-pin/9",
+  "image_tag": "localhost/veritas-s2-008-model:v9",
+  "base_image": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+  "commitment": {
+    "field": "executor.model_image.content_commitment",
+    "algorithm": "sha256 over canonical JSON of the covered sources",
+    "covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "excludes": [
+      "prereg"
+    ],
+    "why_excluded": "the signed body is COPYed into this image, so a commitment covering it would be a digest of a document containing that digest; the direction is preregistration -> image only"
+  },
+  "first": {
+    "imageId": "sha256:e41d5335ff565fd16f4712a3a2869c90507fc41848c42a82e4c8bfbeedc8ccf1",
+    "digest": "sha256:d2f759c13bb3183487a60657d225ef6ed6ad70bec060e66df356bd420fa46062",
+    "architecture": "amd64",
+    "source_digest": "219d7a395a9e54f5fa19b7f41f6305bf298fb840b6c309a25eb314c10b96f2f1",
+    "content_commitment": "5d95d45905714d178e613a04f424ddbdd61ef52acbc0a02632c48560960fc31c",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "31721ce7e802921128350be9daf741e1323d4a96f1efc5c89c57c272ec300682",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "3870263aff3a109d02430c40bd82e28306132a20e8a12d9caf0e08a72af20901",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "036c4af893d78da7df2d8b1464db904e8e2c4ad73a4d6c572f1161699fdaedf5",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "credential_env_policy": "a9d8401043df2c2462ee083bcae5b80e24c937d3094ccb870bb7e969ec4bd47e",
+      "pi_runtime_tree": "7da15eecf19218f2e9a3215e149c6d025f62078dbcd27cc3656500e8d96219f7"
+    }
+  },
+  "second": {
+    "imageId": "sha256:e41d5335ff565fd16f4712a3a2869c90507fc41848c42a82e4c8bfbeedc8ccf1",
+    "digest": "sha256:d2f759c13bb3183487a60657d225ef6ed6ad70bec060e66df356bd420fa46062",
+    "architecture": "amd64",
+    "source_digest": "219d7a395a9e54f5fa19b7f41f6305bf298fb840b6c309a25eb314c10b96f2f1",
+    "content_commitment": "5d95d45905714d178e613a04f424ddbdd61ef52acbc0a02632c48560960fc31c",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "31721ce7e802921128350be9daf741e1323d4a96f1efc5c89c57c272ec300682",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "3870263aff3a109d02430c40bd82e28306132a20e8a12d9caf0e08a72af20901",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "036c4af893d78da7df2d8b1464db904e8e2c4ad73a4d6c572f1161699fdaedf5",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "credential_env_policy": "a9d8401043df2c2462ee083bcae5b80e24c937d3094ccb870bb7e969ec4bd47e",
+      "pi_runtime_tree": "7da15eecf19218f2e9a3215e149c6d025f62078dbcd27cc3656500e8d96219f7"
+    }
+  },
+  "identical": true,
+  "context_digest_stable": true,
+  "content_commitment_stable": true,
+  "commitment_excludes_preregistration": true
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "s2-008-v9-readiness/1",
+  "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+  "builds_identical": true,
+  "content_commitment_stable": true,
+  "content_commitment": "5d95d45905714d178e613a04f424ddbdd61ef52acbc0a02632c48560960fc31c",
+  "image": "sha256:9b69ff6fff437bc1c46d250dab5ad306e6325b25b709d5033001f51c9905d285",
+  "digest": "sha256:d5db030db4031e87c432253dea7c48d09e50d52f1538faf07e6b0f84e7301b63",
+  "dry_run": {
+    "status": "DRY_RUN",
+    "tokens": 0,
+    "model_calls": 0,
+    "launches": 9
+  },
+  "paid_v9_status": "NOT_STARTED",
+  "previous_v8_A_reconciliation": "OWNER_CONFIRMED_COMPLETE_PROVIDER_LOG",
+  "historical_v7_spend": "UNKNOWN, separate"
+}
