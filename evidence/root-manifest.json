@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "c65e1c655c73be7a3bb9ec026bada9441e2a3641",
-  "sourceTree": "2e4a98442c5e4e52377cdad94b0745fd626ac3d8",
-  "trackedFileCount": 1222,
-  "manifestFileCount": 1217,
-  "payloadManifestSha256": "65f9c5bd6d7056d9f2f19ab36d696041cf7fe48f37e8baef32fe0221e803e8c6",
-  "fileManifestSha256": "1ad48049c7170c4f362a425de8265e6847cb404a87441d4cc65dd33afbcf08f1",
+  "sourceCommit": "9b89145665d7b44a27c7ab25282572961cafe54f",
+  "sourceTree": "b7172788fe4fc310e3d08933b4434f14b55dc4e1",
+  "trackedFileCount": 1230,
+  "manifestFileCount": 1225,
+  "payloadManifestSha256": "bbbb1c1db6f19209d7d11a64b717dfb05bc5f81faa8b53cf2caf4ce359f97309",
+  "fileManifestSha256": "9c7294f64ecb7e86c006976098c1bb6c844b3db4b88744f3ec715980fbda50a5",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2423,8 +2423,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-s2-008-v8-openrouter.md",
-      "sha256": "486b456e9c9a8e9aade709e2c3ea39676e96c0be56b22a9ebd5190233b240f61",
-      "bytes": 1454
+      "sha256": "f343e4ebc5e1a22cfa9ef493c4ff607e2208c2b85eccd1b4b7f33d8735727df6",
+      "bytes": 3160
     },
     {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
@@ -2713,8 +2713,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "ab34478127c23945992920a8c3fbc9fc31a278864ca3d3693c3e2c5f59aded69",
-      "bytes": 55492
+      "sha256": "81e010f8616a043dc6facb2149eda34ab5a0cc4dfc39e30c55711e7f3bd1dc0f",
+      "bytes": 55935
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3102,9 +3102,19 @@
       "bytes": 14472
     },
     {
+      "path": "evidence/s2-008-campaign/evaluation-v8-not-run.json",
+      "sha256": "bc251799acb98abfa9250c09073a743a8a4e718c750a069685c30756867604f0",
+      "bytes": 426
+    },
+    {
       "path": "evidence/s2-008-campaign/evaluation.json",
       "sha256": "7e1b256eaffbb6cde4d7e58e20b14e788c5cf94edad97108df13749d36fe019d",
       "bytes": 8720
+    },
+    {
+      "path": "evidence/s2-008-campaign/final-status-v8.json",
+      "sha256": "a745ac8b41e25b9461e3033a0aab2d7353bb03d8858b9375e64f2a55245d316e",
+      "bytes": 1998
     },
     {
       "path": "evidence/s2-008-campaign/model-image-pin-v3.json",
@@ -3162,6 +3172,11 @@
       "bytes": 1292
     },
     {
+      "path": "evidence/s2-008-campaign/openrouter-activity-excerpt-v8.json",
+      "sha256": "10ebfda4960489ce69641a10725477d8b5a3fd8bb3987d95452a0de832b20ca7",
+      "bytes": 2577
+    },
+    {
       "path": "evidence/s2-008-campaign/openrouter-measurement-v8.json",
       "sha256": "2ba7c6a70c868f37b07197812d37347b134e9cdcfc95d66de8c292a7044414fa",
       "bytes": 531
@@ -3182,6 +3197,11 @@
       "bytes": 238
     },
     {
+      "path": "evidence/s2-008-campaign/predictions-v8-a-trl-s2-008c-01-20260926.json",
+      "sha256": "5a0762b9c32f5840f2d6e707b4bd303dce200a8ec26aa32cee6094e3c901d812",
+      "bytes": 238
+    },
+    {
       "path": "evidence/s2-008-campaign/probes-v6.json",
       "sha256": "6b391882976f54f4e70d7d03f297e699be0b74e827b630b2f4a21059c708c6ef",
       "bytes": 6360
@@ -3189,6 +3209,11 @@
     {
       "path": "evidence/s2-008-campaign/probes-v7.json",
       "sha256": "86c680e9d46cc0f41602646f381ca896ec71774f8ef1af18641dcf463e3d1a21",
+      "bytes": 6362
+    },
+    {
+      "path": "evidence/s2-008-campaign/probes-v8.json",
+      "sha256": "0dde4f5b65fe17a78c115ea22da391479505ece8ed5b4182bd8cf27a7f578277",
       "bytes": 6362
     },
     {
@@ -3237,6 +3262,11 @@
       "bytes": 6343
     },
     {
+      "path": "evidence/s2-008-campaign/run-v8-a.json",
+      "sha256": "57424275104d16799ac67ea554ee684f84ff62d89e52c083db3f773915a7df05",
+      "bytes": 9156
+    },
+    {
       "path": "evidence/s2-008-campaign/runtime-policy-v7-final.json",
       "sha256": "fbc17ef917318bba5bd2b2a51aedce7a1fb115e6c539ff9bd226f1911a2cf114",
       "bytes": 854
@@ -3257,6 +3287,16 @@
       "bytes": 40365
     },
     {
+      "path": "evidence/s2-008-campaign/security-probes-v8.json",
+      "sha256": "738df7bafccdf1536689d289cfc6a31d39a4251d292307e48d4a44050e161ffa",
+      "bytes": 40374
+    },
+    {
+      "path": "evidence/s2-008-campaign/transport-diagnosis-v8.json",
+      "sha256": "6655b9000b4793a2b623e3eb3e44fdaa67df274581891b84c19ed79b056491d2",
+      "bytes": 2180
+    },
+    {
       "path": "evidence/s2-008-campaign/v3-readiness-report.md",
       "sha256": "599650898024157005f4e8ec2f25e1e4f9a01291d314180e29ebf9fd5dda5959",
       "bytes": 3637
@@ -3273,53 +3313,53 @@
     },
     {
       "path": "evidence/s2-008-comparison.json",
-      "sha256": "6b6e51efca69afe519cc2871ef54f3a2046b1b224bf4b095b90cdc057813405c",
+      "sha256": "1d6654ebb2e22ff347ea83cedd685e5c826315d01f0c65eb6ce91cd27641d9a8",
       "bytes": 28695
     },
     {
       "path": "evidence/s2-008-controls.json",
-      "sha256": "73ac5eae3fd66be42813bbc98edb69411d39b5eca80fd485e70e7bfce1d90b13",
+      "sha256": "3193916a46f75dda45dec1f3a1efa559385df6bbf17a07c134bebec08e092c5f",
       "bytes": 7372
     },
     {
       "path": "evidence/s2-008-dependency-binding.json",
-      "sha256": "e176f956f2757355e9e6d6fc255de745309673d4e47d081d0532bf8afc4aab78",
-      "bytes": 33414
+      "sha256": "b7284f1d4c86dbf2879f3a7273f46633524bce4c5ed8ecb73453ed5ec1978721",
+      "bytes": 32608
     },
     {
       "path": "evidence/s2-008-harness.json",
-      "sha256": "ba80c0422d0cc77a9200190e75858051a37263f7eb25b1a6cbea06ab5ad108c5",
+      "sha256": "7deb025c7ca3cdb9d92b5abe701fc59e9b1fc089ab173df16bb3f35b34fdd8d2",
       "bytes": 71969
     },
     {
       "path": "evidence/s2-008-probes.json",
-      "sha256": "4ecf49d9702b5b379d2346e20370143d0a358c1991c6763e1f026f6393d5b7f3",
+      "sha256": "b5de7576ca1e7566fc94375cdd1898a8130fb8e507c9a0e912acc5a9f587726d",
       "bytes": 26114
     },
     {
       "path": "evidence/s2-008-replay.json",
-      "sha256": "6335dbb2ccea6e56236a40c703000516953eb7953047e25d73838901a330d2ee",
+      "sha256": "583c4853088f1902b0882728cd70d60912d95bffccbc0420a653a30656a1fec4",
       "bytes": 36883
     },
     {
       "path": "evidence/s2-008-run-a.json",
-      "sha256": "ec1b12e92325ec7e9a807df63682d3b817c8058e7db5d11445f23d2562fd998e",
+      "sha256": "c004071e78b2536a0b22742e9020ca8bf3925fa084958c68006c74fe19d455d2",
       "bytes": 37937
     },
     {
       "path": "evidence/s2-008-run-b.json",
-      "sha256": "cc20f7637553bbeca88a7fcc112378b933637e734ae7d92fd25313241fd729c3",
+      "sha256": "133bdb98504512f2bb2e0967e7a20b751ad8cbea213c7be19e4967b057e20cf9",
       "bytes": 37937
     },
     {
       "path": "evidence/s2-008-security-probes.json",
-      "sha256": "aa1898bf3defe2872a67cdb1d1b6dcd16561506381a672dd44cb34c01d5e3834",
+      "sha256": "5ce6a2f014d679ecc7b784b74ab445c7138958731f9cbd8385e48027994fbaf4",
       "bytes": 40364
     },
     {
       "path": "evidence/s2-008-summary.json",
-      "sha256": "930c3210b4d76ba799753ead991623dc07ced5aee5ee5d525bf612706073c07c",
-      "bytes": 21008
+      "sha256": "91437f850181fb21711d9c3f80e56aec445fd772ff0eadc6736ab378bae979f6",
+      "bytes": 19904
     },
     {
       "path": "evidence/s2-008/corpus/cases/dev.json",
@@ -5073,8 +5113,8 @@
     },
     {
       "path": "src/lib/isolation/egress.mjs",
-      "sha256": "0d000c52487dfb99c2478425d46ccde279fb6e505a0e598edaa3dbf440548805",
-      "bytes": 7875
+      "sha256": "d5496fa006f59b92d2b1a3d7a7f585d0f3a52c2c38883d1f61ee98d7fc3bfcd2",
+      "bytes": 8134
     },
     {
       "path": "src/lib/isolation/image.mjs",
@@ -5628,8 +5668,8 @@
     },
     {
       "path": "tests/isolation/egress-forwarder.test.mjs",
-      "sha256": "e2a2ef0f5e14a571cc699b01392e3fb8b606d1ac7630d45bb9ce2f4f1909aaa4",
-      "bytes": 8626
+      "sha256": "a1124e44b384a0b6f6d72fdc3c6f53ba604d571ff7a50288d4d05f0a9182c78b",
+      "bytes": 10678
     },
     {
       "path": "tests/isolation/live-evidence.test.mjs",
