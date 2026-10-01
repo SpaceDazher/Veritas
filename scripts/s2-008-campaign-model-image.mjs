@@ -24,6 +24,22 @@ export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
     schema: `s2-008-model-image-pin/${version.slice(1)}`,
   });
 }
+
+/** Policy files copied into the container and source names committed by each image generation. */
+export function modelImagePolicyInputs(schema) {
+  const match = /^s2-008-model-image-pin\/(\d+)$/.exec(String(schema));
+  const version = match ? Number(match[1]) : NaN;
+  if (![4, 5, 6, 7, 8, 9].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  const stageFiles = [
+    ...(version >= 6 ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
+    ...(version >= 7 ? ['scripts/s2-008-campaign-credential-env.mjs'] : []),
+  ];
+  const sourceNames = [
+    ...(version >= 6 ? ['pi_runtime_tree', 'timeout_policy'] : []),
+    ...(version >= 7 ? ['credential_env_policy'] : []),
+  ].sort();
+  return Object.freeze({ stageFiles: Object.freeze(stageFiles), sourceNames: Object.freeze(sourceNames) });
+}
 const MODEL_PATHS = modelImagePaths(
   process.argv.includes('--v9') ? 'v9' : process.argv.includes('--v8') ? 'v8' : process.argv.includes('--v7') ? 'v7' : process.argv.includes('--v6') ? 'v6' : process.argv.includes('--v5') ? 'v5' : 'v4',
   { preseal: process.argv.includes('--preseal') },
@@ -112,6 +128,7 @@ export function digestRuntimeTree(root) {
 }
 
 export function buildModelImage() {
+  const policyInputs = modelImagePolicyInputs(MODEL_PATHS.schema);
   const context = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-image-'));
   try {
     const target = path.join(context, 'opt/veritas');
@@ -125,10 +142,7 @@ export function buildModelImage() {
       'src/lib/verifier/canonical-json.mjs',
       'corpus/s2-008-campaign/cases/holdout.blind.json',
       MODEL_PATHS.stagedPrereg,
-      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6' || ['s2-008-model-image-pin/7', 's2-008-model-image-pin/8'].includes(MODEL_PATHS.schema)
-        ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
-      ...(['s2-008-model-image-pin/7', 's2-008-model-image-pin/8'].includes(MODEL_PATHS.schema)
-        ? ['scripts/s2-008-campaign-credential-env.mjs'] : []),
+      ...policyInputs.stageFiles,
     ]) {
       const dest = path.join(target, name);
       fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -158,13 +172,13 @@ export function buildModelImage() {
       pi_bundle: sha(path.join(PACKAGE, 'dist/bundle/cli.js')),
       pi_shrinkwrap: sha(path.join(PACKAGE, 'npm-shrinkwrap.json')),
       recipe: sha(file),
-      ...(MODEL_PATHS.schema === 's2-008-model-image-pin/6' ? {
+      ...(policyInputs.sourceNames.includes('timeout_policy') ? {
         timeout_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-v6-timeout.mjs')),
-        pi_runtime_tree: digestRuntimeTree(path.join(context, 'opt/pi')),
       } : {}),
-      ...(['s2-008-model-image-pin/7', 's2-008-model-image-pin/8'].includes(MODEL_PATHS.schema) ? {
-        timeout_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-v6-timeout.mjs')),
+      ...(policyInputs.sourceNames.includes('credential_env_policy') ? {
         credential_env_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-credential-env.mjs')),
+      } : {}),
+      ...(policyInputs.sourceNames.includes('pi_runtime_tree') ? {
         pi_runtime_tree: digestRuntimeTree(path.join(context, 'opt/pi')),
       } : {}),
     };
