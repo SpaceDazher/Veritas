@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1229.
+Generated from `git ls-files`; count: 1230.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -639,6 +639,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v8-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v8.json`
 - `evidence/s2-008-campaign/offline-call-diagnostic-v7.json`
+- `evidence/s2-008-campaign/openrouter-activity-excerpt-v8.json`
 - `evidence/s2-008-campaign/openrouter-measurement-v8.json`
 - `evidence/s2-008-campaign/operational-block-v7.json`
 - `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
