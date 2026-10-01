@@ -1,0 +1,63 @@
+{
+  "kind": "s2-008-v8-final-status/1",
+  "status": "BLOCKED",
+  "checks": [
+    {
+      "command": "npm test",
+      "exit_code": 0,
+      "sha256": "de4ef465fa7452c005b674a8830ef852504313ac574430930e074e8359aa09ba",
+      "tests": 1901,
+      "pass": 1893,
+      "fail": 0,
+      "skipped": 8,
+      "cancelled": 0
+    },
+    {
+      "command": "npm run test:s2-002-isolation",
+      "exit_code": 0,
+      "sha256": "8fb078cede19c77463a449b579ecacd562e81a41e884e34832fbe645ccff2e40",
+      "tests": 125,
+      "pass": 125,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    {
+      "command": "npm run lint",
+      "exit_code": 0,
+      "sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9"
+    },
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592"
+    }
+  ],
+  "signature": "Daniil / prn-s2007r-owner; v8 sealed and checked",
+  "actual_A": {
+    "status": "BLOCKED",
+    "model_attempts": 1,
+    "confirmed_tokens": 0,
+    "actual_tokens": null,
+    "usd": null,
+    "reason": "MODEL_USAGE_NOT_REPORTED",
+    "retry": false
+  },
+  "B": {
+    "status": "NOT_RUN",
+    "reason": "Unknown spend from A is not reconciled."
+  },
+  "independent_evaluation": {
+    "status": "NOT_RUN",
+    "reason": "No complete A/B results."
+  },
+  "transport_repair": {
+    "binary_test": "RED to GREEN, byte-identical tunnel including pipelined payload",
+    "public_GET_after": 200,
+    "inference": false
+  },
+  "previous_v7_spend": "UNKNOWN, separate from v8",
+  "required_external_evidence": "OpenRouter request/usage log for 2026-10-01 08:44:20-08:44:24 UTC, stealth/space-bunny-alpha.",
+  "next_after_reconciliation": "Preserve v8 A; prepare a distinct signed successor and fresh clean A/B copies of repaired committed code. Do not reuse old copies or overwrite A.",
+  "paid_human_review": "NOT_RUN; earlier accepted A-MVP-05 applies only to the local wrapper cycle."
+}

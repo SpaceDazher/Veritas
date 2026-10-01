@@ -1,0 +1,178 @@
+{
+ "kind": "s2-008-campaign-probes/1",
+ "status": "PASS",
+ "ok": true,
+ "exitCode": 0,
+ "preregistration_file": "corpus/s2-008-campaign/preregistration.v8.in-force.json",
+ "ticket": "S2-008",
+ "subject": "the real campaign adapter and the frozen corpus",
+ "commit_sha": "09e1904cd89be9a9abbc6ebd97315fba15a50708",
+ "tree_sha": "3cebf377930f26a44201504c2c0dddce135e1b3b",
+ "preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
+ "rule_feasibility": {
+  "rejection_floor": 0.016667,
+  "max_p_bound": 0.016667,
+  "never_rejects": false,
+  "can_only_answer": "ANY_OUTCOME",
+  "feasible": true,
+  "note": "1 - c = 0.016667 <= alpha/m = 0.016667 with m=3; the rule can reject"
+ },
+ "note": "none of these is a campaign trial and none enters a decision. P1 checks generic missing-image launch classification and does not call the model or provider. The probes evidence that an absent, broken or interrupted outcome is DETECTABLE rather than indistinguishable from a null.",
+ "probes": [
+  {
+   "probe": "P1_INFRA_IMAGE_ABSENT",
+   "plants": "a real launch of sha256:0000000000000000000000000000000000000000000000000000000000000000 with --pull=never",
+   "real_failure": {
+    "exit_code": 125,
+    "real_start": {
+     "proven": false,
+     "note": "the INFRA probe names an image that is not on this host; no start is expected"
+    },
+    "stderr_excerpt": " using systemd, you may need to log in using a user session\"\ntime=\"2026-10-01T03:40:43-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly a"
+   },
+   "requires": "INFRA_ERROR / INFRA, never a zero, never a skip, no reconciliation (a definite failure is not an unknown effect)",
+   "observed": {
+    "status": "INFRA_ERROR",
+    "outcome": "INFRA",
+    "reason_codes": [
+     "ADAPTER_IMAGE_ABSENT"
+    ],
+    "measured": null,
+    "reconciliation": null
+   },
+   "held": true
+  },
+  {
+   "probe": "P2_LOST_EVALUATOR",
+   "plants": "a correctly measured trial with the evaluator record deleted",
+   "requires": "VIOLATION naming the missing evaluator; a case may not be closed on an absent evaluator",
+   "observed": {
+    "measured_status": "RESOLVED",
+    "measured_outcome": "NEGATIVE",
+    "verdict": "VIOLATION",
+    "reasons": [
+     "MISSING_EVALUATOR_BINDING",
+     "EVALUATOR_NOT_INDEPENDENT:BLOCKED_POLICY"
+    ]
+   },
+   "held": true
+  },
+  {
+   "probe": "P3_NO_MEASUREMENT",
+   "plants": "an observation carrying no measurement at all",
+   "requires": "UNRESOLVED plus a reconciliation row; a missing measurement is never 0 and never a skip",
+   "observed": {
+    "status": "UNRESOLVED",
+    "outcome": "UNRESOLVED",
+    "reason_codes": [
+     "MEASUREMENT_ABSENT"
+    ],
+    "measured": null,
+    "reconciliation": {
+     "reasonCode": "MEASUREMENT_ABSENT",
+     "detail": "the executor returned no measurement; a missing measurement is not a zero and not a skip"
+    }
+   },
+   "held": true
+  },
+  {
+   "probe": "P4_PREREGISTERED_TIMEOUT",
+   "plants": "an observation reporting elapsed_ms 180001 against the preregistered 180000",
+   "requires": "UNRESOLVED plus a reconciliation row: a trial that may or may not have completed is an undetermined effect, not a null",
+   "observed": {
+    "status": "UNRESOLVED",
+    "outcome": "UNRESOLVED",
+    "reason_codes": [
+     "TIMEOUT"
+    ],
+    "reconciliation": {
+     "reasonCode": "TIMEOUT",
+     "detail": "elapsed_ms 180001 exceeds the preregistered per-trial timeout 180000"
+    }
+   },
+   "held": true
+  },
+  {
+   "probe": "P7_MISSING_OUTCOME_DETECTABLE",
+   "plants": "a ledger with a TRIAL_STARTED row and no TRIAL_RESOLVED row for it",
+   "requires": "the gap is countable and named; the metric refuses a run with no measured trial instead of reporting 0, and a partially measured run reports the missing trial as not-measured rather than as a zero in its denominator",
+   "observed": {
+    "trials_started": 1,
+    "trials_with_an_outcome": 0,
+    "trials_missing_an_outcome": 1,
+    "missing_trial_ids": [
+     "trl-s2-008c-01"
+    ],
+    "metric_on_a_fully_missing_run": {
+     "error_class": "MalformedResult",
+     "code_in_message": "TRIALS_ABSENT",
+     "message": "TRIALS_ABSENT"
+    },
+    "metric_on_a_partly_missing_run": {
+     "numerator": 20,
+     "denominator": 126,
+     "notMeasured": 1,
+     "basis": "POOLED_TRIAL_COUNTS",
+     "outcomeCounts": {
+      "NEGATIVE": 1,
+      "UNRESOLVED": 1
+     }
+    }
+   },
+   "held": true
+  },
+  {
+   "probe": "P6_EXPIRED_RESERVATION",
+   "plants": "a settle presented against a reservation that expired at 2026-01-01T00:00:00.000Z, on a clock reading 2026-09-28T00:00:00.000Z",
+   "requires": "a typed refusal, and the spend does NOT advance: an expired reservation is a reconciliation, not a free charge",
+   "observed": {
+    "first_settle": {
+     "code": "RECONCILIATION_REQUIRED",
+     "name": "ReconciliationRequired",
+     "message": "BUDGET_RESERVATION_EXPIRED"
+    },
+    "second_settle": {
+     "refused": true,
+     "code": "RECONCILIATION_REQUIRED"
+    },
+    "spend_rows_written": 0,
+    "spend_advanced": false,
+    "chain_verified": true
+   },
+   "held": true
+  },
+  {
+   "probe": "P5_INTERRUPTED_THEN_RESTARTED",
+   "plants": "a real SIGKILL of a real run (child exit code null, signal SIGKILL), then a real restart in a second process (exit 0) against the same ledger with no purge",
+   "requires": "the restart sees phase-1 rows, does NOT re-run the interrupted trial, does NOT retry it, does NOT record a zero, and opens a RECONCILIATION row instead",
+   "observed": {
+    "rows_seen_by_restart": 4,
+    "crashed_run_id": "s2-008-probe-interrupted-p1",
+    "restart_run_id": "s2-008-probe-restart-p123113",
+    "interrupted_trial_status": "UNRESOLVED",
+    "interrupted_trial_outcome": "UNRESOLVED",
+    "interrupted_trial_measured": null,
+    "reconciliation_row": {
+     "kind": "RECONCILIATION",
+     "reason_code": "PROCESS_KILLED_MID_TRIAL",
+     "decider_kind": "human_owner"
+    },
+    "trials_executed_by_the_restart": 0,
+    "blind_retry": false,
+    "implicit_zero": false,
+    "chain_verified": true,
+    "head_digest": "sha256:927b87f23af63a7270bde60abfac13edf1c4837dc5368ae7e6c08e0c95aae5b2"
+   },
+   "held": true
+  }
+ ],
+ "summary": {
+  "total": 7,
+  "held": 7,
+  "broken": 0,
+  "outcome_classes_exercised": [
+   "INFRA",
+   "UNRESOLVED"
+  ]
+ }
+}

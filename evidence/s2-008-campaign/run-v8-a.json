@@ -1,0 +1,246 @@
+{
+  "kind": "s2-008-campaign-v8-predictions/1",
+  "status": "BLOCKED",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+  "label": "a",
+  "dry_run": false,
+  "raw_run_id": "s2-008c-v8-a-4badb93620ff4fafb267",
+  "nonce": "n-a-72f120d9cc3b4316",
+  "base": {
+    "commit_sha": "09e1904cd89be9a9abbc6ebd97315fba15a50708",
+    "tree_sha": "3cebf377930f26a44201504c2c0dddce135e1b3b",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 197,
+    "track_tracked": true
+  },
+  "preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
+  "model_image_pin": {
+    "imageId": "sha256:8ccb5d17b89f8d4e63b8c4f1325191a191d72bea6cb2af45fb657e3ddfe90006",
+    "digest": "sha256:d55ab8586706c6df39d3fe5089cd430b8ea9e7fbe4f496845a00374ccba98c14",
+    "content_commitment": "acf1e6933947a95fb22c561035dad82a05cb60ffee4eae83ffb2f8bd4557b7da"
+  },
+  "reservation": {
+    "id": "rsv-s2-008c-08",
+    "currency": "tokens",
+    "granted_units": 5000000
+  },
+  "spent_units": 0,
+  "unreconciled_spend": true,
+  "model_calls": 0,
+  "launches": 1,
+  "unknown_launch_attempts": 0,
+  "charges": [],
+  "trials": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "INFRA",
+          "predictions": {
+            "digest": "2ba0d98cd5c90e448d99a4db210e49404ea62c035e0ea7a8ba7cb95a1e1fb68e",
+            "rows": 0,
+            "unparsed": 0,
+            "file": "evidence/s2-008-campaign/predictions-v8-a-trl-s2-008c-01-20260926.json"
+          },
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260926,
+            "image": "sha256:8ccb5d17b89f8d4e63b8c4f1325191a191d72bea6cb2af45fb657e3ddfe90006",
+            "image_digest": "sha256:d55ab8586706c6df39d3fe5089cd430b8ea9e7fbe4f496845a00374ccba98c14",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--secret",
+              "sec-veritas-executor-credential",
+              "--env-file",
+              "/tmp/veritas-model-credential-QXK1w8/.sec-veritas-executor-credential.123714.0.env",
+              "--mount",
+              "type=bind,src=/tmp/veritas-campaign-egress-2VSmk7/egress.sock,dst=/run/egress.sock",
+              "--name",
+              "s2-008-model-v8-20260926",
+              "sha256:8ccb5d17b89f8d4e63b8c4f1325191a191d72bea6cb2af45fb657e3ddfe90006",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v8.in-force.json",
+              "20260926",
+              "--remaining-tokens",
+              "5000000"
+            ],
+            "axes": {
+              "network": {
+                "policy": "allowlist",
+                "flag": "--network=none",
+                "allowlist": [
+                  {
+                    "host": "openrouter.ai",
+                    "ports": [
+                      443
+                    ]
+                  }
+                ],
+                "egressSocket": "/tmp/veritas-campaign-egress-2VSmk7/egress.sock"
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [
+                  "/run/egress.sock"
+                ],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": [
+                  "sec-veritas-executor-credential"
+                ]
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 22980000
+              }
+            },
+            "exit_code": 10,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260926 n=126 predictions=0 tokens=0 usd=0.000000 dry_run=false pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "dce457d1dc827727f0f1e7a50c9e613e78331fbc71f0a9c16ed5df29bf4cfeaf",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260926,
+              "n_cases": 126,
+              "predictions": [],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 0,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": true
+              },
+              "stop": {
+                "reason": "MODEL_USAGE_NOT_REPORTED",
+                "unreconciled_spend": true,
+                "spent_tokens_confirmed": 0,
+                "stopped_before_case": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d"
+              },
+              "dry_run": false,
+              "outcome_class": "INFRA",
+              "executor": {
+                "provider": "openrouter",
+                "model": "stealth/space-bunny-alpha",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "credential_present": true,
+                "credential_in_argv": false,
+                "egress_route": {
+                  "via": "in-container loopback bridge",
+                  "host": "127.0.0.1",
+                  "port": 43229,
+                  "port_source": "BRIDGE_READY"
+                },
+                "model_calls": 0,
+                "model_attempts": 1,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "per_model_call_timeout_ms": 180000,
+                  "holdout_case_count": 126,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 22980000,
+                  "total_container_timeout_formula": "holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms",
+                  "total_container_timeout_scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                }
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260926"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": {
+              "digest": "2ba0d98cd5c90e448d99a4db210e49404ea62c035e0ea7a8ba7cb95a1e1fb68e",
+              "rows": 0,
+              "unparsed": 0
+            },
+            "real_start": {
+              "proven": false,
+              "container_pid": 1,
+              "host_pid": 123714,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -14,7 +14,7 @@
 // ones are proved refused.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connect } from 'node:net';
+import { connect, createServer } from 'node:net';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -169,4 +169,48 @@ test('the forwarder cannot be built into a pass-through', () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('CONNECT preserves binary bytes, including data arriving with the headers', async () => {
+ const bytes=Buffer.from([0,255,128,195,40,254,22,3,1]);
+ const sockets=new Set();
+ const echo=createServer(socket=>{
+  sockets.add(socket);socket.on('close',()=>sockets.delete(socket));
+  socket.on('data',chunk=>socket.write(chunk));
+ });
+ await new Promise(resolve=>echo.listen(0,'127.0.0.1',resolve));
+ const dir=mkdtempSync(path.join(tmpdir(),'veritas-egress-binary-'));
+ const socketPath=path.join(dir,'egress.sock');
+ const port=echo.address().port;
+ const f=createEgressForwarder({allowlist:[{host:'127.0.0.1',ports:[port]}],socketPath});
+ await f.listen();
+ try {
+  for(const coalesced of [false,true]){
+   const result=await new Promise((resolve,reject)=>{
+    const client=connect(socketPath);let header=Buffer.alloc(0),body=Buffer.alloc(0),ready=false;
+    const timer=setTimeout(()=>{client.destroy();reject(new Error('binary tunnel timeout'));},2000);
+    const finish=fn=>{clearTimeout(timer);client.destroy();fn();};
+    client.on('error',error=>finish(()=>reject(error)));
+    client.on('connect',()=>{
+     const head=Buffer.from('CONNECT 127.0.0.1:'+port+' HTTP/1.1\r\nHost: 127.0.0.1:'+port+'\r\n\r\n');
+     client.write(coalesced?Buffer.concat([head,bytes]):head);
+    });
+    client.on('data',chunk=>{
+     if(!ready){
+      header=Buffer.concat([header,chunk]);const end=header.indexOf('\r\n\r\n');
+      if(end<0)return;
+      if(!header.subarray(0,end).toString('ascii').includes('200')){finish(()=>reject(new Error('CONNECT refused')));return;}
+      ready=true;body=header.subarray(end+4);
+      if(!coalesced)client.write(bytes);
+     } else body=Buffer.concat([body,chunk]);
+     if(body.length>=bytes.length)finish(()=>resolve(body));
+    });
+   });
+   assert.deepEqual(result,bytes,'binary bytes changed; coalesced='+coalesced);
+  }
+ } finally {
+  for(const socket of sockets)socket.destroy();
+  await f.close();await new Promise(resolve=>echo.close(resolve));
+  rmSync(dir,{recursive:true,force:true});
+ }
 });

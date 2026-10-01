@@ -1,0 +1,10 @@
+{
+  "kind": "s2-008-v8-evaluation-not-run/1",
+  "status": "NOT_RUN",
+  "reason": "A stopped after one model attempt with MODEL_USAGE_NOT_REPORTED and unreconciled spend; no complete predictions. B was not started, so no independent A/B decision or aggregate measured spend exists.",
+  "confirmed_tokens_A": 0,
+  "actual_tokens_A": null,
+  "actual_tokens_B": null,
+  "confirmed_usd": null,
+  "historical_v7_spend": "UNKNOWN"
+}

@@ -107,10 +107,10 @@ export function createEgressForwarder({ allowlist, socketPath, log, preflight } 
   const admits = (host, port) => allowlist.some((entry) => entry.host === host && entry.ports.includes(port));
 
   const server = net.createServer((client) => {
-    client.setEncoding('utf8');
-    let head = '';
+    // Only HTTP headers are text. TLS and every subsequent payload stay bytes.
+    let head = Buffer.alloc(0);
     const onData = (chunk) => {
-      head += chunk;
+      head = Buffer.concat([head, chunk]);
       if (head.length > MAX_REQUEST_LINE) {
         client.off('data', onData);
         refuse(client, EGRESS_ERRORS.MALFORMED, { host: null, port: null }, log);
@@ -119,7 +119,7 @@ export function createEgressForwarder({ allowlist, socketPath, log, preflight } 
       const end = head.indexOf('\r\n\r\n');
       if (end === -1) return;
       client.off('data', onData);
-      const request = parseConnectRequest(head.slice(0, end));
+      const request = parseConnectRequest(head.subarray(0, end).toString('utf8'));
       if (!request) {
         refuse(client, EGRESS_ERRORS.MALFORMED, { host: null, port: null }, log);
         return;
@@ -138,13 +138,17 @@ export function createEgressForwarder({ allowlist, socketPath, log, preflight } 
         refuse(client, EGRESS_ERRORS.NOT_ALLOWLISTED, request, log);
         return;
       }
+      const remainder = head.subarray(end + 4);
+      client.pause();
       const upstream = net.connect(request.port, request.host, () => {
         log?.(decision);
         client.write('HTTP/1.1 200 Connection Established\r\n\r\n');
         client.removeAllListeners('end');
         client.removeAllListeners('close');
+        if (remainder.length > 0) upstream.write(remainder);
         upstream.pipe(client);
         client.pipe(upstream);
+        client.resume();
       });
       upstream.on('error', () => {
         log?.({ ...decision, decision: 'UPSTREAM_FAILED' });

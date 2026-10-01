@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1222.
+Generated from `git ls-files`; count: 1229.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -625,7 +625,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
 - `evidence/s2-008-campaign/dry-run-v7.json`
+- `evidence/s2-008-campaign/evaluation-v8-not-run.json`
 - `evidence/s2-008-campaign/evaluation.json`
+- `evidence/s2-008-campaign/final-status-v8.json`
 - `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/model-image-pin-v4.json`
 - `evidence/s2-008-campaign/model-image-pin-v5-preseal.json`
@@ -641,8 +643,10 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/operational-block-v7.json`
 - `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v7-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/predictions-v8-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/probes-v6.json`
 - `evidence/s2-008-campaign/probes-v7.json`
+- `evidence/s2-008-campaign/probes-v8.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/provider-auth-resolution-cn-v6.json`
 - `evidence/s2-008-campaign/readiness-v8.json`
@@ -652,10 +656,13 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/run-b.json`
 - `evidence/s2-008-campaign/run-v6-a.json`
 - `evidence/s2-008-campaign/run-v7-a.json`
+- `evidence/s2-008-campaign/run-v8-a.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-final.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-preseal.json`
 - `evidence/s2-008-campaign/security-probes-v6.json`
 - `evidence/s2-008-campaign/security-probes-v7.json`
+- `evidence/s2-008-campaign/security-probes-v8.json`
+- `evidence/s2-008-campaign/transport-diagnosis-v8.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/verification-v8.json`
 - `evidence/s2-008-campaign/zero-network-auth-v6.json`
