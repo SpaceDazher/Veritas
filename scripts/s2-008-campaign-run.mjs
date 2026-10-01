@@ -229,9 +229,28 @@ export const MEASURED_BY = Object.freeze({
  * inline it was invisible to the suite: reaching it needs a live corpus and a
  * container. Here both branches are readable.
  */
-export function chargingStep({ currency, spentUnits, grantedUnits, armOutput = null, armId = null, dispatchableArms = [] }) {
+export function chargingStep({ currency, spentUnits, grantedUnits, armOutput = null, armId = null, dispatchableArms = [], hasPriorSpendReport = false }) {
   const plan = chargeFor({ currency, armOutput, armId, dispatchableArms });
-  if (plan.refusal) return { action: 'refuse', code: 'CHARGE_NOT_MEASURABLE', detail: plan.refusal, spent_units: Number(spentUnits) ?? 0 };
+  const modelAccounting = armId === 'arm-model-zai-glm53flash' ? observedModelAccounting(armOutput) : null;
+  const attemptRefusal = modelAccounting?.unknown_model_attempts > 0
+    ? 'ARM_UNRECONCILED_MODEL_ATTEMPTS:' + modelAccounting.unknown_model_attempts
+    : null;
+  if (plan.refusal || attemptRefusal) {
+    const budget = armOutput?.budget;
+    const observed = currency === 'tokens' && isPlainObject(budget) && budget.currency === currency &&
+      Number.isSafeInteger(budget.spent_tokens) && budget.spent_tokens >= 0
+      ? budget.spent_tokens
+      : null;
+    const prior = Number.isSafeInteger(spentUnits) && spentUnits >= 0 ? spentUnits : null;
+    const priorIsKnown = hasPriorSpendReport && prior !== null;
+    const knownTotal = observed !== null ? (priorIsKnown ? prior : 0) + observed : priorIsKnown ? prior : null;
+    return {
+      action: 'refuse', code: 'CHARGE_NOT_MEASURABLE', detail: plan.refusal ?? attemptRefusal,
+      units: observed, unit: observed === null ? null : 'EXECUTOR_REPORTED_TOKENS',
+      source: observed === null ? null : 'arm-reported tokens retained as a lower bound after refusal',
+      lower_bound: knownTotal !== null, spent_units: knownTotal,
+    };
+  }
   const spent = (Number(spentUnits) || 0) + plan.units;
   return {
     action: 'charge',
@@ -251,6 +270,18 @@ export function chargingStep({ currency, spentUnits, grantedUnits, armOutput = n
  *  suite as a ReferenceError, which is the cheapest kind of bug to find. */
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function observedModelAccounting(output) {
+  const executor = output?.executor;
+  const calls = executor?.model_calls;
+  const attempts = executor?.model_attempts;
+  const callsValid = Number.isSafeInteger(calls) && calls >= 0;
+  const attemptsValid = Number.isSafeInteger(attempts) && attempts >= 0;
+  return {
+    model_calls: callsValid ? calls : null,
+    unknown_model_attempts: callsValid && attemptsValid && attempts >= calls ? attempts - calls : null,
+  };
 }
 
 /**
@@ -1143,6 +1174,9 @@ export async function runV4Campaign({
   const trials = [];
   const charges = [];
   let spentUnits = 0;
+  let hasKnownSpendReport = false;
+  let spentUnitsIsLowerBound = false;
+  let spendUncertain = false;
   let launches = 0;
   let unknownLaunchAttempts = 0;
   let unreconciledSpend = false;
@@ -1150,6 +1184,11 @@ export async function runV4Campaign({
   let reason = null;
   let code = null;
   let modelCalls = 0;
+  let hasModelCallsReport = false;
+  let modelCallsUnknown = false;
+  let modelCallsIsLowerBound = false;
+  let unknownModelAttempts = 0;
+  let unknownModelAttemptsUnknown = false;
   const granted = prereg.budget_reservation.granted_units;
   for (const entry of entries) {
     const perSeed = [];
@@ -1212,7 +1251,7 @@ export async function runV4Campaign({
           ok: false, launch_unknown: true,
           output: {
             outcome_class: 'INFRA',
-            budget: model ? { currency: 'tokens', spent_tokens: 0, unreconciled_spend: true } : null,
+            budget: model ? { currency: 'tokens', unreconciled_spend: true } : null,
             stop: { reason: model ? 'MODEL_EXECUTION_UNRECONCILED' : 'CONTROL_EXECUTION_FAILED' },
           },
           record: {
@@ -1224,23 +1263,54 @@ export async function runV4Campaign({
       }
       if (result.launch_unknown) unknownLaunchAttempts += 1;
       else launches += 1;
+      const isModelArm = entry.arm_id === 'arm-model-zai-glm53flash';
+      if (isModelArm) {
+        const accounting = observedModelAccounting(result.output);
+        if (accounting.model_calls === null) modelCallsUnknown = true;
+        else {
+          modelCalls += accounting.model_calls;
+          hasModelCallsReport = true;
+        }
+        if (accounting.unknown_model_attempts === null) unknownModelAttemptsUnknown = true;
+        else unknownModelAttempts += accounting.unknown_model_attempts;
+        if (result.launch_unknown || result.output?.budget?.unreconciled_spend === true ||
+            accounting.model_calls === null || accounting.unknown_model_attempts === null || accounting.unknown_model_attempts > 0) {
+          modelCallsIsLowerBound = true;
+        }
+      }
       const step = chargingStep({
         currency, spentUnits, grantedUnits: granted,
         armOutput: result.output, armId: entry.arm_id, dispatchableArms,
+        hasPriorSpendReport: hasKnownSpendReport,
       });
       if (step.action === 'refuse') {
         status = 'BLOCKED'; code = step.code; reason = step.detail;
-        if (result.output?.budget?.unreconciled_spend === true) unreconciledSpend = true;
+        unreconciledSpend = true;
+        spendUncertain = true;
+        if (step.units !== null) {
+          spentUnits = step.spent_units;
+          hasKnownSpendReport = true;
+          spentUnitsIsLowerBound = true;
+          charges.push({
+            trial: entry.trial_id, arm_id: entry.arm_id, seed: currentSeed,
+            units: step.units, unit: step.unit, source: step.source,
+            spent_units_after: spentUnits, lower_bound: true,
+            unreconciled_spend: true,
+          });
+        } else if (step.spent_units !== null) {
+          spentUnits = step.spent_units;
+          spentUnitsIsLowerBound = true;
+        }
         perSeed.push({ seed: currentSeed, outcome_class: result.output?.outcome_class ?? 'NOT_RUN', predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null, launch: result.record });
         break;
       }
       spentUnits = step.spent_units;
+      hasKnownSpendReport = true;
       charges.push({
         trial: entry.trial_id, arm_id: entry.arm_id, seed: currentSeed,
         units: step.units, unit: step.unit, source: step.source,
         spent_units_after: spentUnits,
       });
-      modelCalls += Number(result.output?.executor?.model_calls ?? 0);
       perSeed.push({
         seed: currentSeed, outcome_class: result.output?.outcome_class ?? 'NOT_RUN',
         predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null,
@@ -1265,8 +1335,13 @@ export async function runV4Campaign({
     preregistration_digest: prereg.preregistration_digest,
     model_image_pin: { imageId: activeModelPin.first.imageId, digest: activeModelPin.first.digest, content_commitment: activeModelPin.first.content_commitment },
     reservation: { id: prereg.budget_reservation.reservation_id, currency, granted_units: granted },
-    spent_units: spentUnits, unreconciled_spend: unreconciledSpend,
-    model_calls: modelCalls, launches, unknown_launch_attempts: unknownLaunchAttempts, charges, trials,
+    spent_units: spendUncertain && !hasKnownSpendReport ? null : spentUnits,
+    spent_units_is_lower_bound: spentUnitsIsLowerBound,
+    unreconciled_spend: unreconciledSpend,
+    model_calls: modelCallsUnknown && !hasModelCallsReport ? null : modelCalls,
+    model_calls_is_lower_bound: hasModelCallsReport && modelCallsIsLowerBound,
+    unknown_model_attempts: unknownModelAttemptsUnknown ? null : unknownModelAttempts,
+    launches, unknown_launch_attempts: unknownLaunchAttempts, charges, trials,
   };
   if (write) {
     const target = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);

@@ -243,6 +243,7 @@ test('the charging STEP is one decision: charge, or stop, or refuse', () => {
   const refused = chargingStep({
     currency: 'tokens', spentUnits: 12, grantedUnits: 5_000_000,
     armOutput: { budget: { currency: 'tokens' } }, armId: MODEL, dispatchableArms: [MODEL],
+    hasPriorSpendReport: true,
   });
   assert.equal(refused.action, 'refuse');
   assert.equal(refused.spent_units, 12, 'a refusal moved the spend');
