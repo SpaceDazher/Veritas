@@ -8,11 +8,11 @@
   "exitCode": 0,
   "reasons": [],
   "base": {
-    "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-    "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+    "commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+    "tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
     "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 70,
+    "tracked_files_of_this_track": 146,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },

@@ -9,11 +9,11 @@
   ],
   "evidence_eligible": true,
   "write_evidence": true,
-  "invocation_id": "6375c25ff20abe26a367b425ab093d9b",
-  "head_tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+  "invocation_id": "b95038153811324cb8a9b65c22ea5838",
+  "head_tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
   "invocation": {
-    "invocation_id": "6375c25ff20abe26a367b425ab093d9b",
-    "head_tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+    "invocation_id": "b95038153811324cb8a9b65c22ea5838",
+    "head_tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
     "source": "scripts/verify-s2-008.mjs generates one id per chain run and passes it with --invocation-id; a replay started by hand records null and says so",
     "purpose": "to tell this run's record from a copy of an earlier run's record — nothing else",
     "decides": false,
@@ -25,11 +25,11 @@
     "note": "the id is unique per aggregator run and carries no information about the campaign; the properties, the verdict and the exit code are computed exactly as they are without it"
   },
   "base": {
-    "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-    "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+    "commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+    "tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
     "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
     "worktree_dirty": true,
-    "tracked_files_of_this_track": 70,
+    "tracked_files_of_this_track": 146,
     "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
     "track_tracked": true
   },
@@ -49,7 +49,7 @@
         "evidence/s2-008/corpus",
         "--write"
       ],
-      "pid": 196044,
+      "pid": 105448,
       "exitCode": 0,
       "signal": null,
       "timedOut": false,
@@ -66,7 +66,7 @@
         "evidence/s2-008/corpus",
         "--write"
       ],
-      "pid": 196059,
+      "pid": 105462,
       "exitCode": 0,
       "signal": null,
       "timedOut": false,
@@ -78,20 +78,20 @@
     "a": {
       "path": "evidence/s2-008-run-a.json",
       "artefact_bound": true,
-      "digest": "684654947f5abb8c328f0b4c115d0f87a9c6d7b2fe2479cc80a621b2cc26df97",
+      "digest": "8c17c5827b2d924e2afb19d14e916f3def1d966f4d89258db76f94e29da4adf2",
       "readable": true,
-      "child_pid": 196044,
-      "record_pid": 196044,
+      "child_pid": 105448,
+      "record_pid": 105448,
       "pid_bound": true,
       "pid_binding_reason": null
     },
     "b": {
       "path": "evidence/s2-008-run-b.json",
       "artefact_bound": true,
-      "digest": "adfc9630bf8da6e1c7a8a283c8c794c80b19f48140ad94ddf70a36bc40054547",
+      "digest": "e087e347750560d87f29eed397fdd55b57199db1ee48207bdc7d21a76e461083",
       "readable": true,
-      "child_pid": 196059,
-      "record_pid": 196059,
+      "child_pid": 105462,
+      "record_pid": 105462,
       "pid_bound": true,
       "pid_binding_reason": null
     }
@@ -105,20 +105,20 @@
       "output_root"
     ],
     "raw_run_id": {
-      "a": "s2-008-run-a-0-p196044",
-      "b": "s2-008-run-b-0-p196059"
+      "a": "s2-008-run-a-0-p105448",
+      "b": "s2-008-run-b-0-p105462"
     },
     "nonce": {
-      "a": "n-a-0986d374ea32ed89",
-      "b": "n-b-56ff3b967e7befd9"
+      "a": "n-a-a319ea496bfa3e3c",
+      "b": "n-b-5ff65acf0e55162e"
     },
     "executor_id": {
-      "a": "exec-s2-008-a-0-p196044",
-      "b": "exec-s2-008-b-0-p196059"
+      "a": "exec-s2-008-a-0-p105448",
+      "b": "exec-s2-008-b-0-p105462"
     },
     "pid": {
-      "a": 196044,
-      "b": 196059
+      "a": 105448,
+      "b": 105462
     },
     "output_root": {
       "a": ".bb/s2-008/run/out-a-0",
@@ -238,7 +238,7 @@
                   "variant": "provenance_field",
                   "corrupted": {
                     "field": "trials[0].provenance.raw_run_id",
-                    "from": "s2-008-run-a-0-p196044",
+                    "from": "s2-008-run-a-0-p105448",
                     "to": "run-forged",
                     "variant": "provenance_field"
                   },
@@ -283,7 +283,7 @@
                   "variant": "provenance_field",
                   "corrupted": {
                     "field": "trials[0].provenance.raw_run_id",
-                    "from": "s2-008-run-b-0-p196059",
+                    "from": "s2-008-run-b-0-p105462",
                     "to": "run-forged",
                     "variant": "provenance_field"
                   },
@@ -462,7 +462,7 @@
         }
       },
       "notRun": [],
-      "digest": "ca84208aaafc22b036bc9fdc77201791bbf55c252521529799ac4bc5e35fe36f"
+      "digest": "de54810db2f82331f278ce353e95ba98a8248681b8fa575e7b5c7dcfaa37ae43"
     },
     "notRun": [],
     "error": null,
@@ -512,10 +512,10 @@
         "id": "base_binding",
         "status": "SATISFIED",
         "evidence": {
-          "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-          "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
-          "resolved_commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-          "resolved_tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14"
+          "commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+          "tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
+          "resolved_commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+          "resolved_tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199"
         },
         "missing": []
       },
@@ -726,10 +726,10 @@
     "runs": {
       "a": {
         "label": "runA",
-        "raw_run_id": "s2-008-run-a-0-p196044",
-        "nonce": "n-a-0986d374ea32ed89",
-        "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-        "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+        "raw_run_id": "s2-008-run-a-0-p105448",
+        "nonce": "n-a-a319ea496bfa3e3c",
+        "commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+        "tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -789,10 +789,10 @@
       },
       "b": {
         "label": "runB",
-        "raw_run_id": "s2-008-run-b-0-p196059",
-        "nonce": "n-b-56ff3b967e7befd9",
-        "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-        "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+        "raw_run_id": "s2-008-run-b-0-p105462",
+        "nonce": "n-b-5ff65acf0e55162e",
+        "commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+        "tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
         "digest": "d070dfdbe873c31256ffb52800afb9f845301afc546b116f4d1103df3d6c0d24",
         "trials": 4,
         "metric": {
@@ -965,13 +965,13 @@
   },
   "crash_restart": {
     "phase1": {
-      "pid": 196076,
+      "pid": 105476,
       "exitCode": null,
       "signal": "SIGKILL",
       "killed": true
     },
     "phase2": {
-      "pid": 196111,
+      "pid": 105497,
       "exitCode": 0,
       "document": {
         "ticket": "S2-008",
@@ -979,23 +979,23 @@
         "phase": 2,
         "label": "crash",
         "base": {
-          "commit_sha": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-          "tree_sha": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
+          "commit_sha": "a087548747011b26f3e952a4a85139b2fdd006ac",
+          "tree_sha": "0ee285fee60fa4252776cec0729af77d9b4eb199",
           "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
           "worktree_dirty": true,
-          "tracked_files_of_this_track": 70,
+          "tracked_files_of_this_track": 146,
           "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008/|evidence/s2-008-) — the TRACK sources, the corpus, the aggregator scripts and the s2-008 evidence records",
           "track_tracked": true
         },
         "provenance": {
           "version": "s2-008-runner-v1",
-          "commit": "eae1c8a4ad1b4979c6a3311937fc95b500225c56",
-          "tree": "be67eba29a0201d7b6b0c2cfe4f1277ecf0a8d14",
-          "run_id": "s2-008-run-crash-restart-p196111",
+          "commit": "a087548747011b26f3e952a4a85139b2fdd006ac",
+          "tree": "0ee285fee60fa4252776cec0729af77d9b4eb199",
+          "run_id": "s2-008-run-crash-restart-p105497",
           "label": "crash",
-          "executor_id": "exec-s2-008-crash-restart-p196111",
-          "pid": 196111,
-          "nonce": "n-crash-c85f624e7853c5de",
+          "executor_id": "exec-s2-008-crash-restart-p105497",
+          "pid": 105497,
+          "nonce": "n-crash-7cf5ebcf781d427f",
           "clock": "2026-01-01T01:00:00.000Z",
           "started_at": "2026-01-01T01:00:00.000Z"
         },
@@ -1013,9 +1013,9 @@
         "trials_executed_by_the_restart": 0,
         "reconciliation": {
           "record_kind": "RECONCILIATION",
-          "reconciliation_id": "rec-e0945a757b365b56",
-          "run_id": "s2-008-run-crash-restart-p196111",
-          "nonce": "n-crash-c85f624e7853c5de",
+          "reconciliation_id": "rec-65033852892b6f77",
+          "run_id": "s2-008-run-crash-restart-p105497",
+          "nonce": "n-crash-7cf5ebcf781d427f",
           "trial_index": 0,
           "trial": "trl-s2-008-01",
           "resolution": "EFFECT_UNDETERMINED",
@@ -1033,7 +1033,7 @@
           "created_at": "2026-01-01T01:00:00.000Z",
           "detail": "the process was killed between taking the preregistered reservation and executing the first trial; the effect of the interrupted trial is undetermined"
         },
-        "crashed_run_id": "s2-008-run-crash-crash-p196076",
+        "crashed_run_id": "s2-008-run-crash-crash-p105476",
         "blind_retry": false,
         "retry_attempted": false,
         "implicit_zero": false,
@@ -1134,7 +1134,7 @@
     {
       "letter": "a",
       "path": "evidence/s2-008-run-a.json",
-      "pid": 196044,
+      "pid": 105448,
       "exitCode": 0,
       "readable": true,
       "pid_bound": true,
@@ -1146,7 +1146,7 @@
     {
       "letter": "b",
       "path": "evidence/s2-008-run-b.json",
-      "pid": 196059,
+      "pid": 105462,
       "exitCode": 0,
       "readable": true,
       "pid_bound": true,
@@ -1162,8 +1162,8 @@
     "b": []
   },
   "freshness": {
-    "observed_at": "2026-09-28T10:34:41.402Z",
-    "finished_at": "2026-09-28T10:34:44.432Z",
+    "observed_at": "2026-10-01T08:36:10.307Z",
+    "finished_at": "2026-10-01T08:36:12.060Z",
     "source": "wall_clock",
     "decides": false,
     "excluded_from_repeatability": true
