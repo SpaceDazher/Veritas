@@ -1,0 +1,16 @@
+{
+  "kind": "s2-008-v9-paid-finish/1",
+  "label": "a",
+  "finished_at": "2026-10-01T13:44:32.307Z",
+  "exit_code": 4,
+  "report_present": true,
+  "report_sha256": "5958cdead994c3474a0496cf3bd41b2e9a4de31b02cf82075ff67339ac135b20",
+  "status": "BLOCKED",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+  "spent_units": 0,
+  "unreconciled_spend": true,
+  "model_calls": 0,
+  "launches": 1,
+  "raw_run_id": "s2-008c-v9-a-0c58e56c389b4622a70a"
+}

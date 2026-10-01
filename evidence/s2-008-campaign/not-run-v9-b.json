@@ -1,0 +1,11 @@
+{
+  "kind": "s2-008-campaign-v9-not-run/1",
+  "label": "b",
+  "status": "NOT_RUN",
+  "reason": "A stopped with unreconciled spend on the twelfth attempt; B was never invoked.",
+  "launches": 0,
+  "model_calls": 0,
+  "model_attempts": 0,
+  "actual_tokens": 0,
+  "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d"
+}

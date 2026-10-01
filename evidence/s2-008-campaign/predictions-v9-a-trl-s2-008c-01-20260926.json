@@ -1,0 +1,221 @@
+{
+  "kind": "s2-008-campaign-predictions/1",
+  "run": "a",
+  "arm_id": "arm-model-zai-glm53flash",
+  "seed": 20260926,
+  "unparsed": 0,
+  "model_calls": 11,
+  "spent_tokens": 6735,
+  "usd_spent": 0,
+  "outcome_class": "INFRA",
+  "accounting": {
+    "schema": "s2-008-model-accounting/1",
+    "policy": "GENERATION_ID_REQUIRED",
+    "calls": 11,
+    "tokens": 6735,
+    "prompt_tokens": 6257,
+    "reported_cost_usd": 0,
+    "rows": [
+      {
+        "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+        "generation_id": "gen-1790862063-wlaYeuztw4oOH74EfmSl",
+        "correlation_status": "CORRELATED",
+        "input": 446,
+        "output": 27,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 574,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 601,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+        "generation_id": "gen-1790862065-RMYHAFDC5TLKJLt7hkQ3",
+        "correlation_status": "CORRELATED",
+        "input": 444,
+        "output": 48,
+        "cacheRead": 130,
+        "cacheWrite": 0,
+        "prompt_tokens": 574,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 622,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+        "generation_id": "gen-1790862069-6Sutkk1nim7ETuaVi5ga",
+        "correlation_status": "CORRELATED",
+        "input": 436,
+        "output": 22,
+        "cacheRead": 140,
+        "cacheWrite": 0,
+        "prompt_tokens": 576,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 598,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+        "generation_id": "gen-1790862072-hubqJtvALHhLLMhk14XK",
+        "correlation_status": "CORRELATED",
+        "input": 427,
+        "output": 39,
+        "cacheRead": 138,
+        "cacheWrite": 0,
+        "prompt_tokens": 565,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 604,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+        "generation_id": "gen-1790862074-meQY1xEJZfN9zERZ69H6",
+        "correlation_status": "CORRELATED",
+        "input": 436,
+        "output": 3,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 564,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 567,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+        "generation_id": "gen-1790862076-pqdIzITcD3ryvF80XcRi",
+        "correlation_status": "CORRELATED",
+        "input": 576,
+        "output": 141,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 576,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 717,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+        "generation_id": "gen-1790862079-EGVRXM2tFY24tfzbfBzi",
+        "correlation_status": "CORRELATED",
+        "input": 437,
+        "output": 44,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 565,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 609,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+        "generation_id": "gen-1790862081-lF0vrjN4o9PVPp0YoswK",
+        "correlation_status": "CORRELATED",
+        "input": 424,
+        "output": 3,
+        "cacheRead": 140,
+        "cacheWrite": 0,
+        "prompt_tokens": 564,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 567,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+        "generation_id": "gen-1790862083-Nc00wWrkhQCs1nJFFLjZ",
+        "correlation_status": "CORRELATED",
+        "input": 442,
+        "output": 47,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 570,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 617,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+        "generation_id": "gen-1790862085-PVbccvrlUeWlnQvFoZAj",
+        "correlation_status": "CORRELATED",
+        "input": 437,
+        "output": 41,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 565,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 606,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+        "generation_id": "gen-1790862089-h4hwQzGbwj38vJxQLd6c",
+        "correlation_status": "CORRELATED",
+        "input": 422,
+        "output": 63,
+        "cacheRead": 142,
+        "cacheWrite": 0,
+        "prompt_tokens": 564,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 627,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+      "predicted": "MAJOR"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1247.
+Generated from `git ls-files`; count: 1260.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -490,6 +490,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/2026-09-27-s2-007r-partial-disposition.md`
 - `docs/decisions/2026-10-01-a-mvp05-human-review.md`
 - `docs/decisions/2026-10-01-s2-008-v8-openrouter.md`
+- `docs/decisions/2026-10-01-s2-008-v9-paid-stop.md`
 - `docs/decisions/2026-10-01-s2-008-v9-restart.md`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
@@ -633,8 +634,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/diagnostic-watch-20261001-01.json`
 - `evidence/s2-008-campaign/dry-run-v7.json`
 - `evidence/s2-008-campaign/evaluation-v8-not-run.json`
+- `evidence/s2-008-campaign/evaluation-v9-not-run.json`
+- `evidence/s2-008-campaign/evaluation-v9-preflight-refusal.json`
 - `evidence/s2-008-campaign/evaluation.json`
 - `evidence/s2-008-campaign/final-status-v8.json`
+- `evidence/s2-008-campaign/host-accounting-replay-v9.json`
+- `evidence/s2-008-campaign/host-fix-verification-v9.json`
 - `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/model-image-pin-v4.json`
 - `evidence/s2-008-campaign/model-image-pin-v5-preseal.json`
@@ -647,34 +652,42 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v8.json`
 - `evidence/s2-008-campaign/model-image-pin-v9-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v9.json`
+- `evidence/s2-008-campaign/not-run-v9-b.json`
 - `evidence/s2-008-campaign/offline-call-diagnostic-v7.json`
 - `evidence/s2-008-campaign/openrouter-activity-excerpt-v8.json`
 - `evidence/s2-008-campaign/openrouter-measurement-v8.json`
 - `evidence/s2-008-campaign/operational-block-v7.json`
+- `evidence/s2-008-campaign/paid-finish-v9-a.json`
+- `evidence/s2-008-campaign/paid-start-v9-a.json`
 - `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v7-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v8-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/predictions-v9-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/probes-v6.json`
 - `evidence/s2-008-campaign/probes-v7.json`
 - `evidence/s2-008-campaign/probes-v8.json`
+- `evidence/s2-008-campaign/probes-v9.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/provider-auth-resolution-cn-v6.json`
 - `evidence/s2-008-campaign/readiness-v8.json`
 - `evidence/s2-008-campaign/readiness-v9.json`
 - `evidence/s2-008-campaign/reconciliation-v6-a.json`
 - `evidence/s2-008-campaign/reconciliation-v8-a.json`
+- `evidence/s2-008-campaign/reconciliation-v9-a-partial.json`
 - `evidence/s2-008-campaign/run-a.json`
 - `evidence/s2-008-campaign/run-aborted-1.json`
 - `evidence/s2-008-campaign/run-b.json`
 - `evidence/s2-008-campaign/run-v6-a.json`
 - `evidence/s2-008-campaign/run-v7-a.json`
 - `evidence/s2-008-campaign/run-v8-a.json`
+- `evidence/s2-008-campaign/run-v9-a.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-final.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-preseal.json`
 - `evidence/s2-008-campaign/scope-mutations-v9.json`
 - `evidence/s2-008-campaign/security-probes-v6.json`
 - `evidence/s2-008-campaign/security-probes-v7.json`
 - `evidence/s2-008-campaign/security-probes-v8.json`
+- `evidence/s2-008-campaign/security-probes-v9.json`
 - `evidence/s2-008-campaign/transport-diagnosis-v8.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/verification-v8.json`

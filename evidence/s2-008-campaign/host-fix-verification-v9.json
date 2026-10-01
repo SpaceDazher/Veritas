@@ -1,0 +1,55 @@
+{
+  "kind": "s2-008-v9-host-fix-verification/1",
+  "source_commit": "77c3832a5a5725f18d5d0798c450be44ae91f656",
+  "host_source_sha256": "fe0fedc3c947d1b32da0976fe5c55d51f58ba7dc3111e3b187f3e773294c78eb",
+  "red_checkpoints": [
+    "4b1ce96",
+    "707d7bc"
+  ],
+  "green_checkpoint": "77c3832",
+  "source_scope": "Host runner only; signed arm/image/preregistration unchanged from paid A base62cab63.",
+  "logs": [
+    {
+      "name": "focused",
+      "path": "/tmp/veritas-v9-focused-final.log",
+      "sha256": "9d96a479c0d78cc3f6b7a222993d4e8447d4c8a06c6c0fcbea1b5f77761abe15"
+    },
+    {
+      "name": "lint",
+      "path": "/tmp/veritas-v9-lint-final.log",
+      "sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9"
+    },
+    {
+      "name": "typecheck",
+      "path": "/tmp/veritas-v9-typecheck-final.log",
+      "sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592"
+    },
+    {
+      "name": "npm-test",
+      "path": "/tmp/veritas-v9-npm-test-final.log",
+      "sha256": "9494ddf556db5f13698e80451d8589ba424e6332ad20a09b45ffdca5b0f3034c"
+    }
+  ],
+  "focused": {
+    "pass": 27,
+    "fail": 0
+  },
+  "full_suite": {
+    "command": "npm test",
+    "exit_code": 0,
+    "pass": 1905,
+    "fail": 0,
+    "cancelled": 0,
+    "skip": 8,
+    "skip_reason": "Optional DATABASE_URL-backed database tests; no cancellation."
+  },
+  "lint_exit": 0,
+  "typecheck_exit": 0,
+  "parent_independent_replay": {
+    "file": "evidence/s2-008-campaign/host-accounting-replay-v9.json",
+    "cases": 3,
+    "model_calls": 0
+  },
+  "paid_status": "INCOMPLETE",
+  "blocking_evidence": "Twelfth attempt usage/Generation ID and complete provider log unavailable."
+}

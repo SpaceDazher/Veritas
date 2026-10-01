@@ -1,0 +1,482 @@
+{
+  "kind": "s2-008-campaign-v9-predictions/1",
+  "status": "BLOCKED",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+  "label": "a",
+  "dry_run": false,
+  "raw_run_id": "s2-008c-v9-a-0c58e56c389b4622a70a",
+  "nonce": "n-a-f13baebbd29b25d1",
+  "base": {
+    "commit_sha": "62cab63a645af77eac01ef71a8aea55c23e335a7",
+    "tree_sha": "48b6c5d89cd4ec495587b90c67039e06ec79b3f6",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 221,
+    "track_tracked": true
+  },
+  "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+  "model_image_pin": {
+    "imageId": "sha256:9b69ff6fff437bc1c46d250dab5ad306e6325b25b709d5033001f51c9905d285",
+    "digest": "sha256:d5db030db4031e87c432253dea7c48d09e50d52f1538faf07e6b0f84e7301b63",
+    "content_commitment": "5d95d45905714d178e613a04f424ddbdd61ef52acbc0a02632c48560960fc31c"
+  },
+  "reservation": {
+    "id": "rsv-s2-008c-09",
+    "currency": "tokens",
+    "granted_units": 5000000
+  },
+  "spent_units": 0,
+  "unreconciled_spend": true,
+  "model_calls": 0,
+  "launches": 1,
+  "unknown_launch_attempts": 0,
+  "charges": [],
+  "trials": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "INFRA",
+          "predictions": {
+            "digest": "584f8aef8207e22051fe675c7fb74c0a39e463bd814432aeb968091f480b94cb",
+            "rows": 11,
+            "unparsed": 0,
+            "file": "evidence/s2-008-campaign/predictions-v9-a-trl-s2-008c-01-20260926.json"
+          },
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260926,
+            "image": "sha256:9b69ff6fff437bc1c46d250dab5ad306e6325b25b709d5033001f51c9905d285",
+            "image_digest": "sha256:d5db030db4031e87c432253dea7c48d09e50d52f1538faf07e6b0f84e7301b63",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--secret",
+              "sec-veritas-executor-credential",
+              "--env-file",
+              "/tmp/veritas-model-credential-Js5H8Y/.sec-veritas-executor-credential.150892.0.env",
+              "--mount",
+              "type=bind,src=/tmp/veritas-campaign-egress-yYJRGL/egress.sock,dst=/run/egress.sock",
+              "--name",
+              "s2-008-model-v9-20260926",
+              "sha256:9b69ff6fff437bc1c46d250dab5ad306e6325b25b709d5033001f51c9905d285",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v9.in-force.json",
+              "20260926",
+              "--remaining-tokens",
+              "5000000"
+            ],
+            "axes": {
+              "network": {
+                "policy": "allowlist",
+                "flag": "--network=none",
+                "allowlist": [
+                  {
+                    "host": "openrouter.ai",
+                    "ports": [
+                      443
+                    ]
+                  }
+                ],
+                "egressSocket": "/tmp/veritas-campaign-egress-yYJRGL/egress.sock"
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [
+                  "/run/egress.sock"
+                ],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": [
+                  "sec-veritas-executor-credential"
+                ]
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 22980000
+              }
+            },
+            "exit_code": 10,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260926 n=126 predictions=11 tokens=6735 usd=0.000000 dry_run=false pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "bfd942b37e3523606beb440ba8dcc5da08ae40d6265c7b48ecfd793f2dc9f4cf",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "accounting_schema": "s2-008-model-accounting/1",
+              "accounting": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "generation_id": "gen-1790862063-wlaYeuztw4oOH74EfmSl",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 446,
+                  "output": 27,
+                  "cacheRead": 128,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 574,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 601,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "generation_id": "gen-1790862065-RMYHAFDC5TLKJLt7hkQ3",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 444,
+                  "output": 48,
+                  "cacheRead": 130,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 574,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 622,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "generation_id": "gen-1790862069-6Sutkk1nim7ETuaVi5ga",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 436,
+                  "output": 22,
+                  "cacheRead": 140,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 576,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 598,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "generation_id": "gen-1790862072-hubqJtvALHhLLMhk14XK",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 427,
+                  "output": 39,
+                  "cacheRead": 138,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 565,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 604,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "generation_id": "gen-1790862074-meQY1xEJZfN9zERZ69H6",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 436,
+                  "output": 3,
+                  "cacheRead": 128,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 564,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 567,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "generation_id": "gen-1790862076-pqdIzITcD3ryvF80XcRi",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 576,
+                  "output": 141,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 576,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 717,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "generation_id": "gen-1790862079-EGVRXM2tFY24tfzbfBzi",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 437,
+                  "output": 44,
+                  "cacheRead": 128,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 565,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 609,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "generation_id": "gen-1790862081-lF0vrjN4o9PVPp0YoswK",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 424,
+                  "output": 3,
+                  "cacheRead": 140,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 564,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 567,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "generation_id": "gen-1790862083-Nc00wWrkhQCs1nJFFLjZ",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 442,
+                  "output": 47,
+                  "cacheRead": 128,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 570,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 617,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "generation_id": "gen-1790862085-PVbccvrlUeWlnQvFoZAj",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 437,
+                  "output": 41,
+                  "cacheRead": 128,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 565,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 606,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "generation_id": "gen-1790862089-h4hwQzGbwj38vJxQLd6c",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 422,
+                  "output": 63,
+                  "cacheRead": 142,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 564,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 627,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                }
+              ],
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260926,
+              "n_cases": 126,
+              "predictions": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                }
+              ],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 6735,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": true
+              },
+              "stop": {
+                "reason": "MODEL_ENDPOINT_UNREACHABLE",
+                "unreconciled_spend": true,
+                "spent_tokens_confirmed": 6735,
+                "stopped_before_case": "85f721b06317e335e560e5cf01f9235d970dfa73"
+              },
+              "dry_run": false,
+              "outcome_class": "INFRA",
+              "executor": {
+                "provider": "openrouter",
+                "model": "stealth/space-bunny-alpha",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "credential_present": true,
+                "credential_in_argv": false,
+                "egress_route": {
+                  "via": "in-container loopback bridge",
+                  "host": "127.0.0.1",
+                  "port": 42699,
+                  "port_source": "BRIDGE_READY"
+                },
+                "model_calls": 11,
+                "model_attempts": 12,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "per_model_call_timeout_ms": 180000,
+                  "holdout_case_count": 126,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 22980000,
+                  "total_container_timeout_formula": "holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms",
+                  "total_container_timeout_scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                },
+                "accounting_policy": "GENERATION_ID_REQUIRED"
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260926"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": {
+              "digest": "584f8aef8207e22051fe675c7fb74c0a39e463bd814432aeb968091f480b94cb",
+              "rows": 11,
+              "unparsed": 0
+            },
+            "real_start": {
+              "proven": false,
+              "container_pid": 1,
+              "host_pid": 150892,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

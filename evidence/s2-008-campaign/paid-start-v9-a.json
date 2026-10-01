@@ -1,0 +1,15 @@
+{
+  "kind": "s2-008-v9-paid-start/1",
+  "label": "a",
+  "status": "STARTED",
+  "started_at": "2026-10-01T13:41:01.013Z",
+  "base_commit": "62cab63a645af77eac01ef71a8aea55c23e335a7",
+  "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+  "provider": "openrouter",
+  "model": "stealth/space-bunny-alpha",
+  "credential_handle": "sec-veritas-executor-credential",
+  "credential_env_name": "OPENROUTER_API_KEY",
+  "credential_fingerprint": "63ba91bbeb808e17",
+  "cap_tokens": 5000000,
+  "automatic_retry": false
+}

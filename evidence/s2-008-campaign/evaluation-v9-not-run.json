@@ -1,0 +1,8 @@
+{
+  "kind": "s2-008-campaign-v9-evaluation-not-run/1",
+  "status": "NOT_RUN",
+  "decision": null,
+  "agrees": null,
+  "holdout_accessed_by_this_evaluation": false,
+  "reason": "A is INFRA/BLOCKED with unknown additional spend; B is NOT_RUN. There is no complete A/B case set to evaluate."
+}
