@@ -9,6 +9,7 @@ import { assertPreregistration, preregistrationDigest as sharedPreregistrationDi
 import { credentialEnvNameForPreregistration } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { modelImagePaths } from '../../scripts/s2-008-campaign-model-image.mjs';
 import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
+import { childInvocationArgs, resolveProbePreregistrationPath } from '../../scripts/s2-008-campaign-probes.mjs';
 import { activeCampaignVersion, evaluateV4Campaign, loadV4TrialPredictions, verifyV4FrozenTable } from '../../scripts/s2-008-campaign-evaluate.mjs';
 
 const evidence = 'evidence/s2-008-campaign';
@@ -79,6 +80,32 @@ test('v10 is a separate run/image version over the in-force v9 base', () => {
   });
   assert.equal(argv.includes('/opt/veritas/corpus/s2-008-campaign/preregistration.v10.in-force.json'), true);
   assert.equal(activeCampaignVersion({ preregistration: { file: 'preregistration.v10.in-force.json' } }), 'v10');
+});
+
+test('v10 probe path reaches both probe children through the public resolver', () => {
+  const root = '/tmp/veritas-probe-root';
+  const selected = resolveProbePreregistrationPath('corpus/s2-008-campaign/preregistration.v10.in-force.json', root);
+  assert.equal(selected, root + '/corpus/s2-008-campaign/preregistration.v10.in-force.json');
+  assert.deepEqual(childInvocationArgs('crash', { preregPath: selected }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'crash', '--prereg', selected,
+  ]);
+  assert.deepEqual(childInvocationArgs('restart', { preregPath: selected, stateFile: '/tmp/state.json', resultOut: '/tmp/result.json' }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'restart',
+    '--state', '/tmp/state.json', '--result-out', '/tmp/result.json', '--prereg', selected,
+  ]);
+});
+
+test('probe path resolver keeps legacy default and rejects unsupported or escaping paths', () => {
+  const root = '/tmp/veritas-probe-root';
+  assert.equal(resolveProbePreregistrationPath(undefined, root), root + '/corpus/s2-008-campaign/preregistration.json');
+  for (const requested of [
+    'corpus/s2-008-campaign/preregistration.v11.in-force.json',
+    'corpus/s2-008-campaign/preregistration.v100.in-force.json',
+    '/etc/passwd',
+    '../../etc/passwd',
+  ]) {
+    assert.throws(() => resolveProbePreregistrationPath(requested, root), /PROBE_PREREG_PATH_INVALID/);
+  }
 });
 
 test('v10 requires the complete v9 A reconciliation, sidecar and provider receipt', async () => {
