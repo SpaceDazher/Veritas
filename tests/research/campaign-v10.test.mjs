@@ -111,6 +111,9 @@ test('v10 requires the complete v9 A reconciliation, sidecar and provider receip
   const missingUsage = structuredClone(reconciliation);
   missingUsage.rows[0].input = null;
   assert.throws(() => assertV9AReconciliation({ ...inputs, reconciliation: missingUsage }), /V10_RECONCILIATION_ROW/);
+  const wrongLocalReceiptTime = structuredClone(reconciliation);
+  wrongLocalReceiptTime.rows[0].receipt.created_at = '2000-01-01T00:00:00.000Z';
+  assert.throws(() => assertV9AReconciliation({ ...inputs, reconciliation: wrongLocalReceiptTime }), /V10_RECONCILIATION_PROVIDER_EVENT/);
   const duplicateId = structuredClone(reconciliation);
   duplicateId.rows[1].generation_id = duplicateId.rows[0].generation_id;
   assert.throws(() => assertV9AReconciliation({ ...inputs, reconciliation: duplicateId }), /V10_RECONCILIATION_GENERATION_ID/);
