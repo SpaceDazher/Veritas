@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1312.
+Generated from `git ls-files`; count: 1340.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -498,8 +498,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/2026-10-01-s2-008-v9-paid-stop.md`
 - `docs/decisions/2026-10-01-s2-008-v9-reconciliation.md`
 - `docs/decisions/2026-10-01-s2-008-v9-restart.md`
+- `docs/decisions/2026-10-02-s2-008-paid-review-preparation.md`
+- `docs/decisions/2026-10-02-s2-008-v10-a-reconciliation.md`
 - `docs/decisions/2026-10-02-s2-008-v10-preflight.md`
 - `docs/decisions/2026-10-02-s2-008-v10-probe-route.md`
+- `docs/decisions/2026-10-02-s2-008-v10-stopped-a.md`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -640,6 +643,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-security-probes.json`
 - `evidence/s2-007r-summary.json`
 - `evidence/s2-008-campaign/diagnostic-watch-20261001-01.json`
+- `evidence/s2-008-campaign/dry-run-v10-clean-base.json`
 - `evidence/s2-008-campaign/dry-run-v10.json`
 - `evidence/s2-008-campaign/dry-run-v7.json`
 - `evidence/s2-008-campaign/evaluation-v8-not-run.json`
@@ -669,22 +673,41 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/openrouter-measurement-v8.json`
 - `evidence/s2-008-campaign/operational-block-v7.json`
 - `evidence/s2-008-campaign/paid-finish-v9-a.json`
+- `evidence/s2-008-campaign/paid-review-checks/focused-final.log`
+- `evidence/s2-008-campaign/paid-review-checks/generated-s2-006-comparison.json`
+- `evidence/s2-008-campaign/paid-review-checks/generated-s2-006-run-a.json`
+- `evidence/s2-008-campaign/paid-review-checks/generated-s2-006-run-b.json`
+- `evidence/s2-008-campaign/paid-review-checks/lint-final.log`
+- `evidence/s2-008-campaign/paid-review-checks/npm-test-final.log`
+- `evidence/s2-008-campaign/paid-review-checks/npm-test-sourced.log`
+- `evidence/s2-008-campaign/paid-review-checks/npm-test.log`
+- `evidence/s2-008-campaign/paid-review-checks/parent-focused-before-done.log`
+- `evidence/s2-008-campaign/paid-review-checks/red-done.log`
+- `evidence/s2-008-campaign/paid-review-checks/red-runtime.log`
+- `evidence/s2-008-campaign/paid-review-checks/red.log`
+- `evidence/s2-008-campaign/paid-review-checks/typecheck-final.log`
+- `evidence/s2-008-campaign/paid-review-preparation.json`
 - `evidence/s2-008-campaign/paid-start-v9-a.json`
+- `evidence/s2-008-campaign/predictions-v10-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v7-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v8-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v9-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/preflight-v10-route.json`
 - `evidence/s2-008-campaign/preflight-v10.json`
+- `evidence/s2-008-campaign/probes-v10.json`
 - `evidence/s2-008-campaign/probes-v6.json`
 - `evidence/s2-008-campaign/probes-v7.json`
 - `evidence/s2-008-campaign/probes-v8.json`
 - `evidence/s2-008-campaign/probes-v9.json`
 - `evidence/s2-008-campaign/probes.json`
 - `evidence/s2-008-campaign/provider-auth-resolution-cn-v6.json`
+- `evidence/s2-008-campaign/provider-receipt-v10-a-overlap.json`
 - `evidence/s2-008-campaign/provider-receipt-v9-a-attempt-12.json`
+- `evidence/s2-008-campaign/provider-receipts-v10-a-known.json`
 - `evidence/s2-008-campaign/readiness-v8.json`
 - `evidence/s2-008-campaign/readiness-v9.json`
+- `evidence/s2-008-campaign/reconciliation-v10-a.json`
 - `evidence/s2-008-campaign/reconciliation-v6-a.json`
 - `evidence/s2-008-campaign/reconciliation-v8-a.json`
 - `evidence/s2-008-campaign/reconciliation-v9-a-partial.json`
@@ -692,6 +715,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/run-a.json`
 - `evidence/s2-008-campaign/run-aborted-1.json`
 - `evidence/s2-008-campaign/run-b.json`
+- `evidence/s2-008-campaign/run-v10-a.json`
 - `evidence/s2-008-campaign/run-v6-a.json`
 - `evidence/s2-008-campaign/run-v7-a.json`
 - `evidence/s2-008-campaign/run-v8-a.json`
@@ -699,10 +723,12 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/runtime-policy-v7-final.json`
 - `evidence/s2-008-campaign/runtime-policy-v7-preseal.json`
 - `evidence/s2-008-campaign/scope-mutations-v9.json`
+- `evidence/s2-008-campaign/security-probes-v10.json`
 - `evidence/s2-008-campaign/security-probes-v6.json`
 - `evidence/s2-008-campaign/security-probes-v7.json`
 - `evidence/s2-008-campaign/security-probes-v8.json`
 - `evidence/s2-008-campaign/security-probes-v9.json`
+- `evidence/s2-008-campaign/stopped-v10-a.json`
 - `evidence/s2-008-campaign/transport-diagnosis-v8.json`
 - `evidence/s2-008-campaign/v10-checks/campaign-v10-focused-green.log`
 - `evidence/s2-008-campaign/v10-checks/lint.log`
@@ -995,6 +1021,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-v9-draft.mjs`
 - `scripts/s2-008-egress-bridge.mjs`
 - `scripts/s2-008-harness.mjs`
+- `scripts/s2-008-paid-review.mjs`
 - `scripts/s2-008-replay.mjs`
 - `scripts/s2-008-run.mjs`
 - `scripts/s2-008-security-probes.mjs`
@@ -1180,6 +1207,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/agentboard/policy.test.mjs`
 - `tests/agentboard/real-executor.test.mjs`
 - `tests/agentboard/recovery.test.mjs`
+- `tests/agentboard/s2-008-paid-review.test.mjs`
 - `tests/agentboard/summary-aggregator.test.mjs`
 - `tests/agentboard/transitions.test.mjs`
 - `tests/agentboard/unisolated-authorization.test.mjs`
