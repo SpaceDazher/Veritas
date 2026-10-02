@@ -1,0 +1,25 @@
+{
+  "kind": "s2-008-v9-provider-generation-receipt/1",
+  "queried_at": "2026-10-01T15:44:40.209Z",
+  "source": "https://openrouter.ai/api/v1/generation",
+  "generation_id": "gen-1790862092-qxgqw1Rrl8DGvxXX6i2A",
+  "http_status": 200,
+  "data": {
+    "id": "gen-1790862092-qxgqw1Rrl8DGvxXX6i2A",
+    "model": "stealth/space-bunny-alpha",
+    "created_at": "2026-10-01T13:41:32.379Z",
+    "generation_time": 180784,
+    "latency": 180783,
+    "native_tokens_prompt": 574,
+    "native_tokens_completion": 3,
+    "native_tokens_cached": 128,
+    "total_cost": 0,
+    "usage": 0,
+    "finish_reason": "stop",
+    "origin": "https://pi.dev/",
+    "provider_name": "Stealth",
+    "num_media_prompt": null,
+    "num_media_completion": 0,
+    "session_id": "01a0f7b2-e7a5-75d1-84ec-db2deaeacf98"
+  }
+}
