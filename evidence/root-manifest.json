@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "645c6b9279b56fb72fed4e0b38299b5d849043b4",
-  "sourceTree": "6dbd1abffae8ba88e0175df066e4163a74fa6ba9",
-  "trackedFileCount": 1286,
-  "manifestFileCount": 1281,
-  "payloadManifestSha256": "bc601f64e4376852fe0d491e395b13653897508ac262fabc96063ce655a5f183",
-  "fileManifestSha256": "0db9f91838679e280706ac32817bf3d6eb8577702d65a346711e6e9fc245dc30",
+  "sourceCommit": "9589862ece8dbe28432f6c6e5a4272d04a078de1",
+  "sourceTree": "d2a08f05764fce624c9c1bf86b673594002bd4ae",
+  "trackedFileCount": 1312,
+  "manifestFileCount": 1307,
+  "payloadManifestSha256": "a106ff6073fc81fb9efb242db848fe335d79666708a1172dfa3f3615458bd698",
+  "fileManifestSha256": "8465985dd4067c76e50f9141bf2517b81a886400d462a22f58fcd66c788af30a",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2497,6 +2497,11 @@
       "bytes": 2558
     },
     {
+      "path": "docs/decisions/2026-10-02-s2-008-v10-probe-route.md",
+      "sha256": "772ae606ae338bc70356ea303a9557af05221905895e6117dce991fe6b763d46",
+      "bytes": 1260
+    },
+    {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
       "sha256": "fd48bbfc30673e51c880f8f105ad9300a39be9e94d9244237af771f506452b34",
       "bytes": 3980
@@ -2783,8 +2788,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "0ac4208e681b769dd6d293b6b69cd677cf2fabaaebb06c0c5650f1984ded9af1",
-      "bytes": 58998
+      "sha256": "05c2b6d07e2444e826be992d79592f4b857cc9294159d65bbda1ae501f9094c9",
+      "bytes": 60819
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3342,6 +3347,11 @@
       "bytes": 6816
     },
     {
+      "path": "evidence/s2-008-campaign/preflight-v10-route.json",
+      "sha256": "19b19e010a80534921770e6ec743402a8b94c4fc4180816622b62307f1d70619",
+      "bytes": 7907
+    },
+    {
       "path": "evidence/s2-008-campaign/preflight-v10.json",
       "sha256": "44b2d5a0ddecb0a5a8b5c0aeaee12bd00e8a03d49df133759619420ad6a929b7",
       "bytes": 7680
@@ -3529,6 +3539,126 @@
     {
       "path": "evidence/s2-008-campaign/v10-checks/verify-s2-008.log",
       "sha256": "db89b23fc5dd632c0a90717d1b5889d24ce1901b44b9668802d85066093149e2",
+      "bytes": 2036
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-006-comparison.json",
+      "sha256": "d0167f163b1832d0f037cfce6c4cfc2d0207f4d85f2bfe2ec911f7e3725bf39e",
+      "bytes": 5605
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-006-run-a.json",
+      "sha256": "cd09ab24354b53772751946071077278f6d0fcfa82a950d2c94018e4e204150f",
+      "bytes": 12020
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-006-run-b.json",
+      "sha256": "8d504fb4c5506e809857d6162a0fb9896399937beacdf0886e798ad0cba59f54",
+      "bytes": 12020
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-comparison.json",
+      "sha256": "7e8c58c58e377c8db760afcc099716dae8fa621e8d10e70cf809a9926399a76e",
+      "bytes": 28695
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-controls.json",
+      "sha256": "33ed42bb6ff8cd5e6966ae7a29c36284a40f9e015142b079207894dd5f4d8666",
+      "bytes": 7372
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-dependency-binding.json",
+      "sha256": "35c709bb88937d55aa4db29bf4f9353bfae2c796c5add53d7cc0822b7b19c66e",
+      "bytes": 33318
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-harness.json",
+      "sha256": "fbc77c82c970569e874e196048f0540ec7631dae06963f8651ffe37ab2895a2f",
+      "bytes": 71969
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-probes.json",
+      "sha256": "42a6c28b99239c3c73e9c93499f18f780f702c6495dd34ef84d478478906ef44",
+      "bytes": 26114
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-replay.json",
+      "sha256": "219fdab287e9e6eae5642552752f2fd8e3de711bd8e718460ed1115f1a53cde6",
+      "bytes": 36883
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-run-a.json",
+      "sha256": "9768afcd23ffc92fac9acc6237d1863cbe507de8e91b8364a7553ba10d1f6db8",
+      "bytes": 37937
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-run-b.json",
+      "sha256": "9285cbeef33f3be271c5c704554e00de43649328dbbf0b065bc99b025aa47347",
+      "bytes": 37937
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-security-probes.json",
+      "sha256": "43a86aa703e7e42483c7f9aaa477bce06cb52175b467a72b8b0dbb025c291ef4",
+      "bytes": 40364
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-summary.json",
+      "sha256": "c9da02fdb8aef4373d78ea1756b54ea2bbe8598d3d1de9160d41bcb833e1a36c",
+      "bytes": 20346
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/lint.log",
+      "sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9",
+      "bytes": 46
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/npm-test.log",
+      "sha256": "77376860b2e60091817c7658e0130af3d32f5d4a3908f8caa602bc7abd2b5ea5",
+      "bytes": 531378
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/parent-focused.log",
+      "sha256": "fe44fcf8ad606bf9e6601f42aece13d970950706b3beb802fa772e81ca3cf755",
+      "bytes": 2664
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/probe-path-green.log",
+      "sha256": "46ed409bbc3d088dd61e336b7ca0784c37a0add58ee5bde0213bacaf4d20514e",
+      "bytes": 565
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/probe-path-red.log",
+      "sha256": "855678adee75f9d497a3c0acec0b5fc872dfa4ecda93cdf6f0016a0be968992b",
+      "bytes": 1199
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/targeted-probe-versions.log",
+      "sha256": "863972ef87e4f1f6a73e6cc2d4849192b24573311f511f0c2da1c4bc5eb1c648",
+      "bytes": 9190
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/test-research.log",
+      "sha256": "945d8c646dc5a0d2d174a2521fcf192c058e64a50ce9198a67bf49c7082a9a6a",
+      "bytes": 142862
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/test-s2-002-isolation.log",
+      "sha256": "3c3821a6e85877cebe72e3de1a9f4be1ca8cf813d6a7ee2bd431e358948c6891",
+      "bytes": 30102
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/test-s2-008.log",
+      "sha256": "d040031f5c5a123eef00d8a3bc8989c68ed022c1b884895717fe4941131c5bce",
+      "bytes": 142837
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/typecheck.log",
+      "sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592",
+      "bytes": 55
+    },
+    {
+      "path": "evidence/s2-008-campaign/v10-route-checks/verify-s2-008.log",
+      "sha256": "f3ab7a3f7c556fb224e04c6608187dee521d7b70528276ffcfbe77c6f7bc3bd7",
       "bytes": 2036
     },
     {
@@ -4693,8 +4823,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-probes.mjs",
-      "sha256": "818dccd452c2fd3f80d077d4ac4822785414568f52d4c6d79b5cd31932883211",
-      "bytes": 36923
+      "sha256": "d551d4331fd77112382e3e0144bcec49560d183e12c75ed15228d110baf89150",
+      "bytes": 36927
     },
     {
       "path": "scripts/s2-008-campaign-run.mjs",
@@ -6018,8 +6148,8 @@
     },
     {
       "path": "tests/research/campaign-v10.test.mjs",
-      "sha256": "c5812457006a26d20c7c9f761b3284dc93f7d024153fd01e619bf933c951a91c",
-      "bytes": 23186
+      "sha256": "56db80f61cb45c24ba3fbc79d0a6f55568871eba1dcdee7c215028faa62855cf",
+      "bytes": 24696
     },
     {
       "path": "tests/research/campaign-v4-draft.test.mjs",
