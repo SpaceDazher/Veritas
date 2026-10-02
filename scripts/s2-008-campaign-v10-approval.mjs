@@ -12,6 +12,12 @@ const V9_A_RUN_ID = 's2-008c-v9-a-0c58e56c389b4622a70a';
 const V9_A_RUN_SHA256 = '5958cdead994c3474a0496cf3bd41b2e9a4de31b02cf82075ff67339ac135b20';
 const V9_A_SIDECAR_SHA256 = '69910f08dbb5d60f1373b58400df8e62c49faf3799e8d0c435ffd2f3a830be63';
 const V9_PREREG_DIGEST = '6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d';
+const V9_A_STOPPED_PROVIDER_EVENT = Object.freeze({
+  generation_id: 'gen-1790862092-qxgqw1Rrl8DGvxXX6i2A',
+  case_id: '85f721b06317e335e560e5cf01f9235d970dfa73',
+  created_at: '2026-10-01T13:41:32.379Z',
+  generation_time: 180784,
+});
 const V9_SIDECAR_FILE = 'evidence/s2-008-campaign/predictions-v9-a-trl-s2-008c-01-20260926.json';
 const RECONCILIATION_PATH = new URL('../evidence/s2-008-campaign/reconciliation-v9-a.json', import.meta.url);
 const PROVIDER_RECEIPT_PATH = new URL('../evidence/s2-008-campaign/provider-receipt-v9-a-attempt-12.json', import.meta.url);
@@ -142,9 +148,21 @@ export function assertV9AReconciliation({
   const generationIds = new Set();
   const localRows = [];
   const providerOnlyRows = [];
+  const intervalStart = Date.parse(EXPECTED_INTERVAL.from);
+  const intervalEnd = Date.parse(EXPECTED_INTERVAL.to_exclusive);
+  let previousCreatedAt = -Infinity;
   let allTokens = 0;
   let allUsd = 0;
   for (const row of rows) {
+    const createdAt = typeof row?.created_at === 'string' ? Date.parse(row.created_at) : NaN;
+    if (!Number.isFinite(createdAt) || new Date(createdAt).toISOString() !== row.created_at ||
+        createdAt < intervalStart || createdAt >= intervalEnd || createdAt <= previousCreatedAt) {
+      throw new Error('V10_RECONCILIATION_PROVIDER_EVENT_INVALID');
+    }
+    previousCreatedAt = createdAt;
+    if (row.local_usage_observed === true && row.receipt?.created_at !== row.created_at) {
+      throw new Error('V10_RECONCILIATION_PROVIDER_EVENT_INVALID');
+    }
     if (typeof row?.generation_id !== 'string' ||
         !/^gen-[A-Za-z0-9-]+$/.test(row.generation_id) ||
         generationIds.has(row.generation_id)) {
@@ -256,6 +274,19 @@ export function assertV9AReconciliation({
 
   const providerOnly = providerOnlyRows[0];
   const externalData = receipt.data;
+  if (providerOnly !== rows.at(-1) ||
+      reconciliation.missing_prediction_case_id !== V9_A_STOPPED_PROVIDER_EVENT.case_id ||
+      providerOnly.generation_id !== V9_A_STOPPED_PROVIDER_EVENT.generation_id ||
+      providerOnly.case_id !== V9_A_STOPPED_PROVIDER_EVENT.case_id ||
+      providerOnly.created_at !== V9_A_STOPPED_PROVIDER_EVENT.created_at ||
+      receipt.generation_id !== V9_A_STOPPED_PROVIDER_EVENT.generation_id ||
+      receipt.data.id !== V9_A_STOPPED_PROVIDER_EVENT.generation_id ||
+      receipt.data.created_at !== V9_A_STOPPED_PROVIDER_EVENT.created_at ||
+      receipt.data.generation_time !== V9_A_STOPPED_PROVIDER_EVENT.generation_time ||
+      providerOnly.receipt?.data?.created_at !== V9_A_STOPPED_PROVIDER_EVENT.created_at ||
+      providerOnly.receipt?.data?.generation_time !== V9_A_STOPPED_PROVIDER_EVENT.generation_time) {
+    throw new Error('V10_RECONCILIATION_PROVIDER_EVENT_INVALID');
+  }
   if (!providerOnly.receipt ||
       providerOnly.generation_id !== receipt.generation_id ||
       providerOnly.receipt.generation_id !== receipt.generation_id ||
@@ -317,6 +348,7 @@ export function createV10Draft({
 }) {
   if (base?.rule !== 's2-008-prereg-v9' ||
       base.preregistration_id !== 'xpr-s2-008c-09' ||
+      base.preregistration_digest !== V9_PREREG_DIGEST ||
       base.approval?.in_force !== true ||
       base.preregistration_digest !== preregistrationDigest(base)) {
     throw new Error('V10_BASE_NOT_IN_FORCE');

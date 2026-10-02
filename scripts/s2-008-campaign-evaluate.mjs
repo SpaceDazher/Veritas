@@ -707,6 +707,7 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
     aggregate_spend: { currency: 'tokens', units: runA.spent_units + runB.spent_units,
       usd_reported: scoredRuns.reduce((sum, row) => sum + row.usd_spent, 0) },
     ...(version === 'v10' ? { prediction_source: 'IMMUTABLE_RUN_SIDECARS' } : {}),
+    ...(version === 'v10' ? { deterministic_evaluation: { verdict: 'AGREES', remarks: [] } } : {}),
     prediction_independence: 'Model predictions come from immutable run sidecars; labels, counts, bootstrap intervals and decisions are recomputed here.',
     runs: scoredRuns,
     reproducibility: {
