@@ -1,0 +1,217 @@
+{
+  "kind": "s2-008-v10-preflight/1",
+  "created_at": "2026-10-02T06:13:02.730Z",
+  "status": "READY_FOR_SEPARATE_PAID_A_B",
+  "checked_source_commit": "ce5bb31",
+  "signature": {
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+    "in_force": true,
+    "authority": "Owner-authorized delegated signing; paid human review remains pending"
+  },
+  "frozen_science": {
+    "members": [
+      {
+        "member": "card",
+        "digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82"
+      },
+      {
+        "member": "metric",
+        "digest": "3bfd324f59b10839e7b8fbd0905c064c624585eaa23953f408d144d417d49939"
+      },
+      {
+        "member": "frozen_baseline",
+        "digest": "6ee9ae1e569a7ed2abdddb1cbb9b1fa3b6c1611e3bfd2314079eb9d8b3505b89"
+      },
+      {
+        "member": "noise_rule",
+        "digest": "f09dd854337d88516ad42536daaf3c0092576373c11c9d8c63e8bb9b01d6c0c8"
+      },
+      {
+        "member": "multiplicity_rule",
+        "digest": "7e162d55685830560098aab17b5f47c722ed1a21174fdc407baa65c60a66145c"
+      },
+      {
+        "member": "seed_rule",
+        "digest": "9143869472c2ee4d9882862d51694ee94f5211f071698f262f8feca8e85b3ce9"
+      },
+      {
+        "member": "seeds_digest",
+        "digest": "68aa2a64940d7219861f73b52aaf518c8efa277af05a46eb8213250a2ddb7b30"
+      },
+      {
+        "member": "seed_count",
+        "digest": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
+      },
+      {
+        "member": "stopping_rule",
+        "digest": "db3ca5e7e53fa3e5c6c8de6a63fe0bf49f2fa24b3c42fedc883fcf3a901645bc"
+      },
+      {
+        "member": "sequential_rule",
+        "digest": "8f14f7d5b4d02e53ce31c604f60d17bb18bd0f4ebde61e6e6cfe220494c7c346"
+      },
+      {
+        "member": "holdout_access",
+        "digest": "7303a13bcebad5e821be505d8e75e44946dcf7438cdb9439bf6fe73e97e77750"
+      },
+      {
+        "member": "inference_mode",
+        "digest": "f712e48bdb5ead66f6fb85e4c1d88d76948022a20288bf62c04959d4ad429d0b"
+      },
+      {
+        "member": "trial_list",
+        "digest": "9137105f249f147f11210b357aebe5753e35916e4fc7653f64436f9414ea98d4"
+      },
+      {
+        "member": "expected_table_digest",
+        "digest": "87c7b3b77412ada526ac902cf37bffd6b737bbc54258ec49c8d96f1cbb86726a"
+      },
+      {
+        "member": "bootstrap_process",
+        "digest": "162a59a7d3f14871158ebd0ad36c1bf8ccd051994401cd8dd6040f943967421c"
+      }
+    ],
+    "scope_drift": null
+  },
+  "checks": [
+    {
+      "name": "focused-v10",
+      "command": "node --test tests/research/campaign-v10.test.mjs",
+      "exit_code": 0,
+      "summary": "9 passed, 0 failed, 0 skipped",
+      "log_file": "evidence/s2-008-campaign/v10-checks/campaign-v10-focused-green.log",
+      "log_sha256": "bda8e2937b3b8c9d332615ada7875f62907618dae50683f71409cc1c0efc4137"
+    },
+    {
+      "name": "npm-test",
+      "command": "npm test",
+      "exit_code": 0,
+      "summary": "1922 total; 1914 passed, 0 failed, 0 cancelled, 8 skipped; 6 PostgreSQL integration tests skipped because DATABASE_URL was not configured",
+      "log_file": "evidence/s2-008-campaign/v10-checks/npm-test.log",
+      "log_sha256": "081acfd9036bd9ab928b239495e02ad1be33644e4cc523121ca6f4582902504c"
+    },
+    {
+      "name": "test-research",
+      "command": "npm run test:research",
+      "exit_code": 0,
+      "summary": "424 passed; no skips",
+      "log_file": "evidence/s2-008-campaign/v10-checks/test-research.log",
+      "log_sha256": "4e39fdd11a8d79d245cbf332192ba4d581863286736b6e25a394107233b94747"
+    },
+    {
+      "name": "test-s2-008",
+      "command": "npm run test:s2-008",
+      "exit_code": 0,
+      "summary": "424 passed; no skips",
+      "log_file": "evidence/s2-008-campaign/v10-checks/test-s2-008.log",
+      "log_sha256": "0188b891c764cf1418004fb179932416e9fbc842c1fdce7c638adc514e82cb50"
+    },
+    {
+      "name": "test-s2-002-isolation",
+      "command": "npm run test:s2-002-isolation",
+      "exit_code": 0,
+      "summary": "125 passed; no skips",
+      "log_file": "evidence/s2-008-campaign/v10-checks/test-s2-002-isolation.log",
+      "log_sha256": "a4e3673bd3cbedaaa91e33756d35bc91b1d9caa61c635c3bbc261f56dc1fd5a7"
+    },
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "summary": "eslint completed",
+      "log_file": "evidence/s2-008-campaign/v10-checks/lint.log",
+      "log_sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9"
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "summary": "tsc --noEmit completed",
+      "log_file": "evidence/s2-008-campaign/v10-checks/typecheck.log",
+      "log_sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592"
+    },
+    {
+      "name": "verify-s2-008",
+      "command": "npm run verify:s2-008",
+      "exit_code": 0,
+      "summary": "verification completed and rewrote tracked S2-008 outputs, archived byte-for-byte before restore",
+      "log_file": "evidence/s2-008-campaign/v10-checks/verify-s2-008.log",
+      "log_sha256": "db89b23fc5dd632c0a90717d1b5889d24ce1901b44b9668802d85066093149e2"
+    }
+  ],
+  "full_suite_skip_detail": {
+    "count": 8,
+    "database_not_run_count": 6,
+    "database_reason": "NOT_RUN_DB: DATABASE_URL is not configured",
+    "other_skips": [
+      "VERITAS_S2_007R_REAL is not 1",
+      "an existing unnamed skip in the full suite"
+    ]
+  },
+  "parent_focused": {
+    "exit_code": 0,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "log_file": "evidence/s2-008-campaign/v10-checks/parent-focused-final.log",
+    "log_sha256": "a85ee8510cd0f00e0fc4cfd94b009cac95626e64d3aa5c5e6383f8ca875684e6"
+  },
+  "builds": {
+    "preseal_identical": true,
+    "final_identical": true,
+    "content_commitment": "cc670161cb4384481909c35f5b050e487c933bffa0bfaa189ab1b4ca13ee842b",
+    "commitment_matches_preseal": true,
+    "image_id": "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+    "image_digest": "sha256:2edcad361e8f0963ced19f055f4e848e9bb16d58144083d2dc7f234d9782e66e",
+    "recorded_pin_verification_exit_code": 0
+  },
+  "dry_run": {
+    "file": "evidence/s2-008-campaign/dry-run-v10.json",
+    "sha256": "8aa2f4858d4e62d5a8f9bb243cd19446e5efe7c63bd21a0a531384c0bd3f3509",
+    "status": "DRY_RUN",
+    "container_launches": 9,
+    "model_calls": 0,
+    "tokens": 0,
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "source_worktree_dirty": true
+  },
+  "prior_v9_spend": {
+    "campaign_tokens": 7312,
+    "provider_reported_usd": 0,
+    "scientific_outcome": "INFRA",
+    "predictions": 11,
+    "expected_model_calls": 378,
+    "original_report_retained": true
+  },
+  "ceiling": {
+    "currency": "tokens",
+    "units": 5000000,
+    "scope": "PER_RUN_A_OR_B",
+    "aggregate": "A+B reported separately; historical v9 A and the separate diagnostic remain distinct"
+  },
+  "paid_campaign": {
+    "a": "NOT_RUN",
+    "b": "NOT_RUN",
+    "independent_evaluation": "NOT_RUN",
+    "campaign_probes": "NOT_RUN_AT_FROZEN_BASE",
+    "human_review": "NOT_RUN"
+  },
+  "limitations": [
+    "Eight full-suite tests were skipped; see full_suite_skip_detail.",
+    "The inherited 11,139-token estimate is a host projection, not a container measurement.",
+    "Historical v7 spend remains UNKNOWN and outside this v9 reconciliation.",
+    "The synchronous launcher does not provide streaming durability across host power loss; unresolved attempts require reconciliation."
+  ]
+}

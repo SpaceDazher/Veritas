@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+  "replaced_by_preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v10 binds the completed v9 A spend reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run",
+  "supersession_id": "spr-f5fbb49684eaf403cdcbb1f9",
+  "supersession_digest": "7c3ea240b3ff3ab27d82cb4df0c0bb85ba125bca8a9b9f12d7f0d26ca5df4714"
+}

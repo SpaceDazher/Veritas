@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v9.in-force.json",
-    "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+    "file": "preregistration.v10.in-force.json",
+    "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v8-superseded.json",
-    "preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
+    "file": "preregistration-v9-superseded.json",
+    "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v9.in-force.json"
+    "superseded_by": "preregistration.v10.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v9-supersession.json",
-    "supersession_id": "spr-549689247379c2256057493c",
-    "supersession_digest": "bb12a18b6bceca88f2df2a2d163ac6c9577f0790247c05eb1d23fdc192e55f9c",
-    "reason": "v9 binds the completed v8 A owner reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run"
+    "file": "preregistration-v10-supersession.json",
+    "supersession_id": "spr-f5fbb49684eaf403cdcbb1f9",
+    "supersession_digest": "7c3ea240b3ff3ab27d82cb4df0c0bb85ba125bca8a9b9f12d7f0d26ca5df4714",
+    "reason": "v10 binds the completed v9 A spend reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run"
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -590,6 +590,12 @@
       "supersession_id": "spr-549689247379c2256057493c",
       "supersession_digest": "bb12a18b6bceca88f2df2a2d163ac6c9577f0790247c05eb1d23fdc192e55f9c",
       "reason": "v9 binds the completed v8 A owner reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run"
+    },
+    {
+      "file": "preregistration-v10-supersession.json",
+      "supersession_id": "spr-f5fbb49684eaf403cdcbb1f9",
+      "supersession_digest": "7c3ea240b3ff3ab27d82cb4df0c0bb85ba125bca8a9b9f12d7f0d26ca5df4714",
+      "reason": "v10 binds the completed v9 A spend reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run"
     }
   ]
 }
