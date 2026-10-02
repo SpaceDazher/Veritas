@@ -1,0 +1,14 @@
+{
+  "kind": "s2-008-v10-a-overlapping-generation/1",
+  "http_status": 200,
+  "id": "gen-1790924425-AX7ftss7HWmZpRnpRnSV",
+  "created_at": "2026-10-02T07:00:25.518Z",
+  "generation_time": 25234,
+  "model": "stealth/space-bunny-alpha",
+  "native_prompt": 525306,
+  "native_completion": 575,
+  "native_cached": 519296,
+  "cost_usd": 0,
+  "finish_reason": "tool_calls",
+  "cancelled": false
+}
