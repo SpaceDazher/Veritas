@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "9589862ece8dbe28432f6c6e5a4272d04a078de1",
-  "sourceTree": "d2a08f05764fce624c9c1bf86b673594002bd4ae",
-  "trackedFileCount": 1312,
-  "manifestFileCount": 1307,
-  "payloadManifestSha256": "a106ff6073fc81fb9efb242db848fe335d79666708a1172dfa3f3615458bd698",
-  "fileManifestSha256": "8465985dd4067c76e50f9141bf2517b81a886400d462a22f58fcd66c788af30a",
+  "sourceCommit": "a608eeb2c51fdecb948fbb7939b43f9bd742ef29",
+  "sourceTree": "393a1f856da242334dbfba8b17dfcf06f3c5eb4c",
+  "trackedFileCount": 1340,
+  "manifestFileCount": 1335,
+  "payloadManifestSha256": "8ecc09536d4c79c2bbd94e4ced5cc9531b8046ad6fbdae0c88bc7d736cc399d0",
+  "fileManifestSha256": "8ac8a4f4a8e7e610562af640e4079a4311086edfde0ea8bfe2968590cdaa7aad",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2492,6 +2492,16 @@
       "bytes": 3218
     },
     {
+      "path": "docs/decisions/2026-10-02-s2-008-paid-review-preparation.md",
+      "sha256": "f1fe70885936275fb7c3d8a15be27fabaeac086a5ab985693cfb2d173364a50a",
+      "bytes": 1708
+    },
+    {
+      "path": "docs/decisions/2026-10-02-s2-008-v10-a-reconciliation.md",
+      "sha256": "6e3fc0adbbe683e8daa8ff0a9f298595ce80ddcfe4dfee0b3d1c694856a5ad01",
+      "bytes": 1904
+    },
+    {
       "path": "docs/decisions/2026-10-02-s2-008-v10-preflight.md",
       "sha256": "bad7d913451e01c42ff3144a0e0dbae4642d6ddc42d695f0c336d82f1ae3393e",
       "bytes": 2558
@@ -2500,6 +2510,11 @@
       "path": "docs/decisions/2026-10-02-s2-008-v10-probe-route.md",
       "sha256": "772ae606ae338bc70356ea303a9557af05221905895e6117dce991fe6b763d46",
       "bytes": 1260
+    },
+    {
+      "path": "docs/decisions/2026-10-02-s2-008-v10-stopped-a.md",
+      "sha256": "22cffe261cf9e51ea8cdf18f760804117aa50be89aa627fd61475859efdafb5f",
+      "bytes": 1262
     },
     {
       "path": "docs/decisions/ADVERSARIAL_REVIEW.md",
@@ -2788,8 +2803,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "05c2b6d07e2444e826be992d79592f4b857cc9294159d65bbda1ae501f9094c9",
-      "bytes": 60819
+      "sha256": "dd2fceb4a1011fd6469849b16ae5e69eaf890f8519962951a4c7f6379cbe628b",
+      "bytes": 62535
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3177,6 +3192,11 @@
       "bytes": 723
     },
     {
+      "path": "evidence/s2-008-campaign/dry-run-v10-clean-base.json",
+      "sha256": "99c3119dbbba321194c9d862cb3569cf05beebb2082356f6cee1d90b9d87e2a9",
+      "bytes": 145848
+    },
+    {
       "path": "evidence/s2-008-campaign/dry-run-v10.json",
       "sha256": "8aa2f4858d4e62d5a8f9bb243cd19446e5efe7c63bd21a0a531384c0bd3f3509",
       "bytes": 145900
@@ -3322,9 +3342,84 @@
       "bytes": 493
     },
     {
+      "path": "evidence/s2-008-campaign/paid-review-checks/focused-final.log",
+      "sha256": "4e8269a4456e16a4971210d82a30bcdc4551cb0518c7392371103beb9c0ee733",
+      "bytes": 5025
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/generated-s2-006-comparison.json",
+      "sha256": "54ca4a8e4707c2e3d4160c47ea6440332b1da933d8c0cc67017f8a481cab904f",
+      "bytes": 5605
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/generated-s2-006-run-a.json",
+      "sha256": "b967c263e6ac6b174ea49554ee40853239d5958373c324e9ec9d25996b25ac38",
+      "bytes": 12020
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/generated-s2-006-run-b.json",
+      "sha256": "325fab541997085277113ca43487b021fc422a3d5460ccef586adc1977c80954",
+      "bytes": 12020
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/lint-final.log",
+      "sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9",
+      "bytes": 46
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/npm-test-final.log",
+      "sha256": "1a225ec442a9af9e27a27f9d28c2848986f9b0d88a576e74424f3f96e603e789",
+      "bytes": 534014
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/npm-test-sourced.log",
+      "sha256": "e18912ae03db1314bfcaaaef776bf02c7ad5c2d6c553fbd9584ec1ef53ada0e3",
+      "bytes": 533776
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/npm-test.log",
+      "sha256": "cc9d5c52d3da48da72a65c72301d25b2421eef80463b27565c4124dbab63c8f7",
+      "bytes": 540495
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/parent-focused-before-done.log",
+      "sha256": "96870b5bfa73743338fb7d3335fcfbb3a0209b296013dfb6efd3254b8f6e9c5b",
+      "bytes": 4812
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/red-done.log",
+      "sha256": "423c483ba551c9744e53c5112d440258667b37f7d7d2b5641ceac1f75924591b",
+      "bytes": 1223
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/red-runtime.log",
+      "sha256": "c2b192bceb16e2c8834ac19103f96c19fc44607d585484f7cd2232e7c4ce275b",
+      "bytes": 1388
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/red.log",
+      "sha256": "cd611e5cfee0490843eb48c7dec2fd6d472593769fc01cc0b4d7a40fd3915d3f",
+      "bytes": 7752
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-checks/typecheck-final.log",
+      "sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592",
+      "bytes": 55
+    },
+    {
+      "path": "evidence/s2-008-campaign/paid-review-preparation.json",
+      "sha256": "5927b51570b266aa92f2a6b2cc477753a65ea95da9d5fb9a4073121f35a0e339",
+      "bytes": 6583
+    },
+    {
       "path": "evidence/s2-008-campaign/paid-start-v9-a.json",
       "sha256": "3c9af4fb316f0763da0d9e20194fd7b5d99dfbd108ce9808c097f474ecccf8c3",
       "bytes": 553
+    },
+    {
+      "path": "evidence/s2-008-campaign/predictions-v10-a-trl-s2-008c-01-20260926.json",
+      "sha256": "f44adbf7a50540bc1cc0a28e328edf2ede64e135ba04badcd2687aa060ae167c",
+      "bytes": 14907
     },
     {
       "path": "evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json",
@@ -3357,6 +3452,11 @@
       "bytes": 7680
     },
     {
+      "path": "evidence/s2-008-campaign/probes-v10.json",
+      "sha256": "76109e6d10825a779a41be294b00fc69ce156a2a822653caa64e2e538ff8e592",
+      "bytes": 6363
+    },
+    {
       "path": "evidence/s2-008-campaign/probes-v6.json",
       "sha256": "6b391882976f54f4e70d7d03f297e699be0b74e827b630b2f4a21059c708c6ef",
       "bytes": 6360
@@ -3387,9 +3487,19 @@
       "bytes": 611
     },
     {
+      "path": "evidence/s2-008-campaign/provider-receipt-v10-a-overlap.json",
+      "sha256": "a7927ecb8053a4807e0143ec09050e97e808d6890a8cecfebce5eb916ea91f52",
+      "bytes": 389
+    },
+    {
       "path": "evidence/s2-008-campaign/provider-receipt-v9-a-attempt-12.json",
       "sha256": "bba7c1fad8d2d665a43a1e4909c9f8bd96b5c4bb5de7239c3a88d7ccfa892731",
       "bytes": 793
+    },
+    {
+      "path": "evidence/s2-008-campaign/provider-receipts-v10-a-known.json",
+      "sha256": "103a4a3b1fa2317c5f8c82386bc4826e60241f67077fda726e170f32507306a9",
+      "bytes": 11210
     },
     {
       "path": "evidence/s2-008-campaign/readiness-v8.json",
@@ -3400,6 +3510,11 @@
       "path": "evidence/s2-008-campaign/readiness-v9.json",
       "sha256": "1b163dec7577c46abdf0d38c69eb1a22d798db12a684ace56b7aebe82f859824",
       "bytes": 722
+    },
+    {
+      "path": "evidence/s2-008-campaign/reconciliation-v10-a.json",
+      "sha256": "147c934d81524761c9f5d973e985d23c25abaa3a7ab29fa970c886ed16b664d0",
+      "bytes": 15158
     },
     {
       "path": "evidence/s2-008-campaign/reconciliation-v6-a.json",
@@ -3437,6 +3552,11 @@
       "bytes": 60250
     },
     {
+      "path": "evidence/s2-008-campaign/run-v10-a.json",
+      "sha256": "93bbedfad7f32919cbb100f2152646187ab57c80dc8689da5906e45d9bd451f1",
+      "bytes": 33761
+    },
+    {
       "path": "evidence/s2-008-campaign/run-v6-a.json",
       "sha256": "9876dd1f2230227118ea5becbee1000802ece46e78f16d5bfe43067a93b668fd",
       "bytes": 6495
@@ -3472,6 +3592,11 @@
       "bytes": 1818
     },
     {
+      "path": "evidence/s2-008-campaign/security-probes-v10.json",
+      "sha256": "183b8c1fdd371000cce5304caf75d0a1e76d7bd107a34f00e22e9fef627f2a4d",
+      "bytes": 39904
+    },
+    {
       "path": "evidence/s2-008-campaign/security-probes-v6.json",
       "sha256": "e3747bb2c4f2bc7033468d8abaf8e1468cfe7f4587989de2b750b1ad4dd41d8c",
       "bytes": 40365
@@ -3490,6 +3615,11 @@
       "path": "evidence/s2-008-campaign/security-probes-v9.json",
       "sha256": "cbf1bef7c65722ee1024cfcaa75a15b64d156bd839d4d18c0b1efd5b53b3be5e",
       "bytes": 40365
+    },
+    {
+      "path": "evidence/s2-008-campaign/stopped-v10-a.json",
+      "sha256": "7afd3e335b54f1b7ffd79a249d6f1910add7edb65d595ffdcb2989e8f46b6156",
+      "bytes": 1907
     },
     {
       "path": "evidence/s2-008-campaign/transport-diagnosis-v8.json",
@@ -4533,8 +4663,8 @@
     },
     {
       "path": "scripts/a-mvp05-review.mjs",
-      "sha256": "d37357b8c0aeade40d94fa3d1eb0dca2aab8449ad7fefde0d6ed0aa9690c23c0",
-      "bytes": 17501
+      "sha256": "7bcab2b4f3b49e22a4ba37183d2540fff4786181c863073749389f448e12bb3c",
+      "bytes": 21645
     },
     {
       "path": "scripts/a-mvp05-runtime.mjs",
@@ -4950,6 +5080,11 @@
       "path": "scripts/s2-008-harness.mjs",
       "sha256": "a3595793f0583f55d82901707fc3218c829acd885d0c72dad442daf3890f37a1",
       "bytes": 66855
+    },
+    {
+      "path": "scripts/s2-008-paid-review.mjs",
+      "sha256": "956fd05712436c35fbefce94f267584c9a6e9135d0f428b96fd143e063e37c53",
+      "bytes": 35356
     },
     {
       "path": "scripts/s2-008-replay.mjs",
@@ -5798,8 +5933,8 @@
     },
     {
       "path": "tests/agentboard/a-mvp05-review.test.mjs",
-      "sha256": "5b3e45e09c4b36deec293437cb253e6998e2d20aac3fd371057f398d16e73b2b",
-      "bytes": 11103
+      "sha256": "f863f5800a26bb07d95eb5d820868916193785c3ec9b1b3ace501c60cb6bbf81",
+      "bytes": 11893
     },
     {
       "path": "tests/agentboard/a-mvp05-runtime.test.mjs",
@@ -5875,6 +6010,11 @@
       "path": "tests/agentboard/recovery.test.mjs",
       "sha256": "e6a079418cc21ea52b7b9fb544403eac3858666a94ad23443fb2d3f57ddace3c",
       "bytes": 53466
+    },
+    {
+      "path": "tests/agentboard/s2-008-paid-review.test.mjs",
+      "sha256": "3ced67d1ff2bca03c6f640d4a25f9b8276270fd50795f14f49ab4ab3f811839f",
+      "bytes": 12603
     },
     {
       "path": "tests/agentboard/summary-aggregator.test.mjs",
