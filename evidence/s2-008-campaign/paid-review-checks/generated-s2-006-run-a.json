@@ -1,0 +1,513 @@
+{
+  "schemaVersion": 1,
+  "ticket": "S2-006",
+  "role": "candidate sealed prediction set (labels, adjudications and thresholds never read before unseal)",
+  "runId": "s2-006-run-a",
+  "executorId": "exec-s2-006-a",
+  "pid": 272152,
+  "nonce": "n-a-7c1e4d90a2b8f3e6",
+  "clock": "2026-01-15T08:00:00.000Z",
+  "outputRoot": "results/s2-006/run-a",
+  "testedImplementationCommit": "e72932d411f5ce7d62fb740ffd05c6b5b90ad649",
+  "corpus": {
+    "manifestId": "anmf-s2006-fixture-corpus",
+    "corpusVersion": "1.0.0",
+    "manifestSha256": "93ca54b2a954fdaffe93616b66c4efdcd70c43e971572b552a5b468c24c6cce0",
+    "rubricDigest": "9559406c3f14249f7c5302b44fddcfe1bc286af0da51e324468f5020062bd0dc",
+    "caseCount": 45,
+    "stratum": "fixture"
+  },
+  "implementationDigest": "ddcc9b6272b6c08ea7a51f5996ee4cb09414db2d5da9e61dcbf25721c8f87046",
+  "implementationModules": {
+    "src/lib/verifier/rubric.mjs": "b9c3856d8ce4308287bb5fd44e87e664fa70d43426d127cfbded29e4a4b98a5c",
+    "src/lib/verifier/canonical-json.mjs": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a"
+  },
+  "predictions": {
+    "case-s2006-01": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-02": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "topic_overlap"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-03": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-04": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-05": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "negation_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-06": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "modality_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-07": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-08": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "source_unavailable"
+    },
+    "case-s2006-09": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-10": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-11": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-12": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-13": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-14": {
+      "verdict": "BLOCKED_POLICY",
+      "reasonCodes": [
+        "policy_block"
+      ],
+      "missingnessKind": "policy_refusal"
+    },
+    "case-s2006-15": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-16": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "future_source"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-17": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-18": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-19": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "causal_overclaim"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-20": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-21": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "family_collapse"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-22": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-23": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-24": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "topic_overlap"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-25": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-26": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-27": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "negation_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-28": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "modality_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-29": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-30": {
+      "verdict": "CONTRADICTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-31": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-32": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "scope_difference"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-33": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "source_unavailable"
+    },
+    "case-s2006-34": {
+      "verdict": "BLOCKED_POLICY",
+      "reasonCodes": [
+        "policy_block"
+      ],
+      "missingnessKind": "policy_refusal"
+    },
+    "case-s2006-35": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "stale_source"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-36": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "future_source"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-37": {
+      "verdict": "STALE_INPUT",
+      "reasonCodes": [
+        "revoked_source"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-38": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-39": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "number_unit_drift"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-40": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "causal_overclaim"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-41": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    },
+    "case-s2006-42": {
+      "verdict": "INSUFFICIENT_EVIDENCE",
+      "reasonCodes": [
+        "missing_citation"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-43": {
+      "verdict": "PARTIALLY_SUPPORTED",
+      "reasonCodes": [
+        "family_collapse"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-44": {
+      "verdict": "OUT_OF_SCOPE",
+      "reasonCodes": [
+        "out_of_scope"
+      ],
+      "missingnessKind": "none"
+    },
+    "case-s2006-45": {
+      "verdict": "SUPPORTED",
+      "reasonCodes": [],
+      "missingnessKind": "none"
+    }
+  },
+  "predictionSetDigest": "3fba44f00dc996263ad62656c4caf0e789a37fd20fdadfbe685b2f38802036ac",
+  "runManifestDigest": "76d1381e53ce5c9048b8514ad0c3d96b64cdd097f2a697193f579199b731954d",
+  "hardCounters": {
+    "unauthorizedLeakageEvents": 0,
+    "lockedLabelAccessEvents": 0,
+    "producerSelfReviewEvents": 0,
+    "upstreamArtifactMutationEvents": 0,
+    "unauthorizedSideEffectEvents": 0
+  },
+  "perCase": [
+    {
+      "caseId": "case-s2006-01",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-02",
+      "verdict": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-03",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-04",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-05",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-06",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-07",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-08",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-09",
+      "verdict": "STALE_INPUT"
+    },
+    {
+      "caseId": "case-s2006-10",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-11",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-12",
+      "verdict": "CONTRADICTED"
+    },
+    {
+      "caseId": "case-s2006-13",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-14",
+      "verdict": "BLOCKED_POLICY"
+    },
+    {
+      "caseId": "case-s2006-15",
+      "verdict": "STALE_INPUT"
+    },
+    {
+      "caseId": "case-s2006-16",
+      "verdict": "STALE_INPUT"
+    },
+    {
+      "caseId": "case-s2006-17",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-18",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-19",
+      "verdict": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-20",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-21",
+      "verdict": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-22",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-23",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-24",
+      "verdict": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-25",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-26",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-27",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-28",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-29",
+      "verdict": "CONTRADICTED"
+    },
+    {
+      "caseId": "case-s2006-30",
+      "verdict": "CONTRADICTED"
+    },
+    {
+      "caseId": "case-s2006-31",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-32",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-33",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-34",
+      "verdict": "BLOCKED_POLICY"
+    },
+    {
+      "caseId": "case-s2006-35",
+      "verdict": "STALE_INPUT"
+    },
+    {
+      "caseId": "case-s2006-36",
+      "verdict": "STALE_INPUT"
+    },
+    {
+      "caseId": "case-s2006-37",
+      "verdict": "STALE_INPUT"
+    },
+    {
+      "caseId": "case-s2006-38",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-39",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-40",
+      "verdict": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-41",
+      "verdict": "SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-42",
+      "verdict": "INSUFFICIENT_EVIDENCE"
+    },
+    {
+      "caseId": "case-s2006-43",
+      "verdict": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "caseId": "case-s2006-44",
+      "verdict": "OUT_OF_SCOPE"
+    },
+    {
+      "caseId": "case-s2006-45",
+      "verdict": "SUPPORTED"
+    }
+  ],
+  "sealedBeforeUnseal": true,
+  "status": "COMPLETED"
+}

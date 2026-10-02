@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: review page is loopback-only, self-contained, and never embeds the bearer token
+ok 1 - review page is loopback-only, self-contained, and never embeds the bearer token
+  ---
+  duration_ms: 34.751376
+  type: 'test'
+  ...
+# Subtest: state reads require the scoped bearer credential and same-origin loopback host
+ok 2 - state reads require the scoped bearer credential and same-origin loopback host
+  ---
+  duration_ms: 21.313122
+  type: 'test'
+  ...
+# Subtest: start is an authenticated fixed operation; caller cannot choose identity or task
+ok 3 - start is an authenticated fixed operation; caller cannot choose identity or task
+  ---
+  duration_ms: 9.49733
+  type: 'test'
+  ...
+# Subtest: decision requires the exact displayed artifact digest and task revision
+ok 4 - decision requires the exact displayed artifact digest and task revision
+  ---
+  duration_ms: 15.067963
+  type: 'test'
+  ...
+# Subtest: decision is refused if current artifact bytes no longer match the manifest shown
+ok 5 - decision is refused if current artifact bytes no longer match the manifest shown
+  ---
+  duration_ms: 11.30372
+  type: 'test'
+  ...
+# Subtest: positive decision passes the observed digest and revision to the canonical workflow
+ok 6 - positive decision passes the observed digest and revision to the canonical workflow
+  ---
+  duration_ms: 4.208055
+  type: 'test'
+  ...
+# Subtest: expired credentials and producer self-review are refused before a decision write
+ok 7 - expired credentials and producer self-review are refused before a decision write
+  ---
+  duration_ms: 11.488136
+  type: 'test'
+  ...
+# Subtest: a review decision is refused unless the canonical task is still IN_REVIEW
+ok 8 - a review decision is refused unless the canonical task is still IN_REVIEW
+  ---
+  duration_ms: 3.497509
+  type: 'test'
+  ...
+# Subtest: browser same-origin GET works without Origin but POST still requires it
+ok 9 - browser same-origin GET works without Origin but POST still requires it
+  ---
+  duration_ms: 10.125765
+  type: 'test'
+  ...
+# Subtest: malformed request target is refused and the server remains available
+ok 10 - malformed request target is refused and the server remains available
+  ---
+  duration_ms: 4.180072
+  type: 'test'
+  ...
+# Subtest: paid campaign presentation is authenticated, evidence-driven, and read-only
+ok 11 - paid campaign presentation is authenticated, evidence-driven, and read-only
+  ---
+  duration_ms: 2.836505
+  type: 'test'
+  ...
+# Subtest: actual stopped A, missing B, and missing evaluation stay visibly not ready with prior spend separated
+ok 12 - actual stopped A, missing B, and missing evaluation stay visibly not ready with prior spend separated
+  ---
+  duration_ms: 26.869734
+  type: 'test'
+  ...
+# Subtest: the existing local review server still requires bearer authentication and rejects caller-supplied actor identity
+ok 13 - the existing local review server still requires bearer authentication and rejects caller-supplied actor identity
+  ---
+  duration_ms: 37.289925
+  type: 'test'
+  ...
+# Subtest: the paid server binds its credential to the owner and view-only permission
+ok 14 - the paid server binds its credential to the owner and view-only permission
+  ---
+  duration_ms: 30.65486
+  type: 'test'
+  ...
+# Subtest: the paid workflow refuses incomplete evidence before database or executor work
+ok 15 - the paid workflow refuses incomplete evidence before database or executor work
+  ---
+  duration_ms: 13.965918
+  type: 'test'
+  ...
+# Subtest: the active preregistration path is resolved only from the canonical manifest allowlist
+ok 16 - the active preregistration path is resolved only from the canonical manifest allowlist
+  ---
+  duration_ms: 3.074168
+  type: 'test'
+  ...
+# Subtest: evidence reads reject parent-directory symlinks that escape the evidence root
+ok 17 - evidence reads reject parent-directory symlinks that escape the evidence root
+  ---
+  duration_ms: 2.139849
+  type: 'test'
+  ...
+# Subtest: the paid state endpoint exposes the evidence-derived current and historical accounting
+ok 18 - the paid state endpoint exposes the evidence-derived current and historical accounting
+  ---
+  duration_ms: 41.117483
+  type: 'test'
+  ...
+# Subtest: paid review is read-only even if an injected workflow claims evidence is ready
+ok 19 - paid review is read-only even if an injected workflow claims evidence is ready
+  ---
+  duration_ms: 18.367172
+  type: 'test'
+  ...
+# Subtest: the existing local review server refuses stale revisions and changed evidence before a decision
+ok 20 - the existing local review server refuses stale revisions and changed evidence before a decision
+  ---
+  duration_ms: 7.138978
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 268.613983

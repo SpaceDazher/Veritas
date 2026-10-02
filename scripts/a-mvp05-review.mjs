@@ -6,7 +6,7 @@ const TOKEN_PATTERN = /^[A-Za-z0-9_-]{24,256}$/;
 const DIGEST_PATTERN = /^[0-9a-f]{64}$/;
 const PRINCIPAL_PATTERN = /^prn-[a-z0-9][a-z0-9-]{0,62}$/;
 const TASK_PATTERN = /^abt-[a-z0-9][a-z0-9-]{0,62}$/;
-const ACTIONS = new Set(['start', 'approve', 'request_changes']);
+const ACTIONS = new Set(['view', 'start', 'approve', 'request_changes']);
 
 const PAGE = [
   '<!doctype html>',
@@ -87,6 +87,46 @@ const APP = [
   'changesButton.addEventListener("click", () => decide("request_changes"));',
 ].join('\n');
 
+const PAID_PAGE = [
+  '<!doctype html>',
+  '<html lang="ru">',
+  '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
+  '<title>S2-008 · просмотр доказательств</title><link rel="stylesheet" href="/style.css"></head>',
+  '<body><main>',
+  '<h1>S2-008 · просмотр доказательств</h1>',
+  '<p>Провайдер: openrouter · Модель: stealth/space-bunny-alpha</p>',
+  '<p>Лимит A — 5 000 000 токенов; лимит B — 5 000 000 токенов. Это отдельные лимиты.</p>',
+  '<p>Равенство A и B показывается только для справки и не решает вопрос о принятии.</p>',
+  '<p>Эта страница работает только для чтения. Она не создаёт задачу и не записывает решение.</p>',
+  '<label for="token">Ключ доступа только для просмотра</label>',
+  '<input id="token" type="password" autocomplete="off" spellcheck="false">',
+  '<button id="open">Загрузить состояние</button>',
+  '<p id="status" aria-live="polite">Введите ключ доступа, чтобы просмотреть связанные доказательства.</p>',
+  '<p id="error" role="alert"></p>',
+  '<section><h2>Результаты A и B, расходы и история</h2><pre id="evidence"></pre></section>',
+  '</main><script src="/paid-app.js" defer></script></body></html>',
+].join('\n');
+
+const PAID_APP = [
+  '"use strict";',
+  'const tokenInput = document.getElementById("token");',
+  'const statusBox = document.getElementById("status");',
+  'const errorBox = document.getElementById("error");',
+  'const evidenceBox = document.getElementById("evidence");',
+  'let bearer = "";',
+  'async function loadState() {',
+  '  const response = await fetch("/api/state", { headers: { authorization: "Bearer " + bearer }, cache: "no-store" });',
+  '  const value = await response.json();',
+  '  if (!response.ok) throw new Error(value.code || "request failed");',
+  '  statusBox.textContent = value.ready === true ? "Состояние требует отдельной проверенной процедуры." : "НЕ ГОТОВО. Просмотр доказательств доступен; создание задачи и решение отключены.";',
+  '  evidenceBox.textContent = JSON.stringify(value.reviewSummary || value, null, 2);',
+  '}',
+  'document.getElementById("open").addEventListener("click", async () => {',
+  '  bearer = tokenInput.value.trim(); tokenInput.value = ""; errorBox.textContent = "";',
+  '  try { await loadState(); } catch (error) { bearer = ""; errorBox.textContent = String(error.message); }',
+  '});',
+].join('\n');
+
 function credentialAction(credential, action) {
   return Array.isArray(credential.actions) && credential.actions.includes(action);
 }
@@ -151,7 +191,7 @@ function exactKeys(value, expected) {
 }
 
 function genericFailure(error) {
-  const known = new Set(['JSON_REQUIRED', 'BODY_TOO_LARGE', 'JSON_INVALID', 'OBJECT_REQUIRED']);
+  const known = new Set(['JSON_REQUIRED', 'BODY_TOO_LARGE', 'JSON_INVALID', 'OBJECT_REQUIRED', 'PAID_REVIEW_NOT_READY']);
   return {
     status: Number.isInteger(error?.status) ? error.status : 503,
     code: known.has(error?.message) ? error.message : 'A05_WORKFLOW_UNAVAILABLE',
@@ -165,14 +205,17 @@ export function hashA05ReviewToken(token) {
   return createHash('sha256').update(token, 'utf8').digest('hex');
 }
 
-export function createA05ReviewServer({ credential, workflow, now = () => new Date() } = {}) {
+export function createA05ReviewServer({ credential, workflow, now = () => new Date(), presentation = 'local-wrapper' } = {}) {
+  if (!['local-wrapper', 'paid-campaign'].includes(presentation)) throw new TypeError('REVIEW_PRESENTATION_INVALID');
   if (!isPlainObject(credential)
       || !DIGEST_PATTERN.test(String(credential.tokenHash ?? ''))
       || !PRINCIPAL_PATTERN.test(String(credential.principalId ?? ''))
       || !TASK_PATTERN.test(String(credential.taskId ?? ''))
       || !Number.isFinite(Date.parse(credential.expiresAt))
       || !Array.isArray(credential.actions)
-      || credential.actions.some((action) => !ACTIONS.has(action))) {
+      || credential.actions.some((action) => !ACTIONS.has(action))
+      || (presentation === 'paid-campaign'
+        && (credential.actions.length !== 1 || credential.actions[0] !== 'view'))) {
     throw new TypeError('REVIEW_CREDENTIAL_INVALID');
   }
   if (!isPlainObject(workflow)
@@ -225,11 +268,18 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
         return;
       }
       if (request.method === 'GET' && path.pathname === '/') {
-        respondText(200, 'text/html; charset=utf-8', PAGE);
+        respondText(200, 'text/html; charset=utf-8', presentation === 'paid-campaign' ? PAID_PAGE : PAGE);
         return;
       }
       if (request.method === 'GET' && path.pathname === '/app.js') {
+        if (presentation === 'paid-campaign') { jsonResponse(response, 404, { code: 'NOT_FOUND' }); return; }
         respondText(200, 'text/javascript; charset=utf-8', APP);
+        return;
+      }
+
+      if (request.method === 'GET' && path.pathname === '/paid-app.js') {
+        if (presentation !== 'paid-campaign') { jsonResponse(response, 404, { code: 'NOT_FOUND' }); return; }
+        respondText(200, 'text/javascript; charset=utf-8', PAID_APP);
         return;
       }
 
@@ -276,7 +326,9 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
       }
 
       if (request.method === 'GET' && path.pathname === '/api/state') {
-        if (!credentialAction(credential, 'start') && !credentialAction(credential, 'approve')) {
+        if (presentation === 'paid-campaign'
+            ? !credentialAction(credential, 'view')
+            : !credentialAction(credential, 'start') && !credentialAction(credential, 'approve')) {
           jsonResponse(response, 403, { code: 'ACTION_FORBIDDEN' });
           return;
         }
@@ -306,6 +358,10 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
           jsonResponse(response, 400, { code: 'START_ARGUMENTS_NOT_ALLOWED' });
           return;
         }
+        if (presentation === 'paid-campaign') {
+          const current = await workflow.status({ principalId: credential.principalId, taskId: credential.taskId });
+          if (current?.ready !== true) { jsonResponse(response, 409, { code: 'PAID_REVIEW_NOT_READY' }); return; }
+        }
         const result = await workflow.start({
           principalId: credential.principalId,
           taskId: credential.taskId,
@@ -334,6 +390,10 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
         principalId: credential.principalId,
         taskId: credential.taskId,
       });
+      if (presentation === 'paid-campaign' && status?.ready !== true) {
+        jsonResponse(response, 409, { code: 'PAID_REVIEW_NOT_READY' });
+        return;
+      }
       if (status?.state !== 'IN_REVIEW') {
         jsonResponse(response, 409, { code: 'TASK_NOT_IN_REVIEW' });
         return;
