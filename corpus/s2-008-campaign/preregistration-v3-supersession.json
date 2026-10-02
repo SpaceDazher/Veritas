@@ -1,0 +1,11 @@
+{
+  "kind": "SUPERSESSION",
+  "supersession_id": "spr-871adf8d4cbfa7ccb833fd9b",
+  "supersedes": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58",
+  "supersedes_confidence": 0.9833333333333333,
+  "supersedes_expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35",
+  "replaced_by_confidence": 0.9833333333333333,
+  "replaced_by_expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "reason": "v3 replaces the trial 01 regex predictor with the model under a 5000000-token cap; trials 02 and 03 remain controls, and the metric, baseline, band, seeds and decision rule remain fixed",
+  "supersession_digest": "36132e097201781a539ddac0d6a81de552a7d5cd98dace2d6c4eb33847675f99"
+}

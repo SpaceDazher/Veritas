@@ -89,7 +89,7 @@ export function fingerprint(value) {
 // happens to be sitting there.
 let secretSpoolCounter = 0;
 
-export function materializeSecret(handle, value, { spoolDir, podman = spawnSync, podmanArgv = [] } = {}) {
+export function materializeSecret(handle, value, { spoolDir, podman = (args, options) => spawnSync('podman', args, options), podmanArgv = [] } = {}) {
   assertHandleId(handle);
   if (typeof value !== 'string' || value.length === 0) {
     throw new Error(`${SECRET_ERRORS.HANDLE_NOT_PROVIDED}:${handle}`);
@@ -127,7 +127,7 @@ export function materializeSecret(handle, value, { spoolDir, podman = spawnSync,
 }
 
 /** Remove the store entry. The spool file is already gone by this point. */
-export function disposeSecret(handle, { podman = spawnSync, podmanArgv = [] } = {}) {
+export function disposeSecret(handle, { podman = (args, options) => spawnSync('podman', args, options), podmanArgv = [] } = {}) {
   assertHandleId(handle);
   const removed = podman([...podmanArgv, 'secret', 'rm', handle], { encoding: 'utf8' });
   if (removed.status !== 0) {

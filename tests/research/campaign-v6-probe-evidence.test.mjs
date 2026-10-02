@@ -1,0 +1,231 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  activeCampaignVersion,
+  validateV6ProbeEvidence,
+  validateV7ProbeEvidence,
+} from '../../scripts/s2-008-campaign-evaluate.mjs';
+import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { V7_CREDENTIAL_ENV_NAME, V7_PI_SETTINGS } from '../../scripts/s2-008-campaign-credential-env.mjs';
+import { RESEARCH_HARD_GATE_COUNTERS } from '../../src/lib/research/constants.mjs';
+import { PROBE_FAMILIES, PROBE_NAMES } from '../../src/lib/research/probes.mjs';
+import { NEGATIVE_CONTROLS, EXTRA_CONTROL_IDS } from '../../src/lib/research/negative-controls.mjs';
+import {
+  childInvocationArgs,
+  resolveProbePreregistrationPath,
+  validateProbePreregistration,
+} from '../../scripts/s2-008-campaign-probes.mjs';
+
+const commit = 'a'.repeat(40);
+const tree = 'b'.repeat(40);
+const preregistrationBody = {
+  rule: 's2-008-prereg-v6',
+  preregistration_id: 'xpr-s2-008c-06',
+  supersession: { supersedes: 'xpr-s2-008c-05' },
+};
+const preregistrationDigest = canonicalDigest(preregistrationBody);
+const probeIds = [
+  'P1_INFRA_IMAGE_ABSENT',
+  'P2_LOST_EVALUATOR',
+  'P3_NO_MEASUREMENT',
+  'P4_PREREGISTERED_TIMEOUT',
+  'P5_INTERRUPTED_THEN_RESTARTED',
+  'P6_EXPIRED_RESERVATION',
+  'P7_MISSING_OUTCOME_DETECTABLE',
+];
+const runA = { base: { commit_sha: commit, tree_sha: tree } };
+const runB = { base: { commit_sha: commit, tree_sha: tree } };
+
+function campaignRecord() {
+  const probes = probeIds.map((probe) => ({ probe, held: true, observed: { outcome: 'INFRA' } }));
+  return {
+    kind: 's2-008-campaign-probes/1',
+    status: 'PASS',
+    ok: true,
+    exitCode: 0,
+    commit_sha: commit,
+    tree_sha: tree,
+    preregistration_digest: preregistrationDigest,
+    probes,
+    summary: { total: 7, held: 7, broken: 0, outcome_classes_exercised: ['INFRA'] },
+  };
+}
+
+function securityRecord() {
+  const counters = Object.fromEntries(RESEARCH_HARD_GATE_COUNTERS.map((counter) => [counter, 0]));
+  return {
+    status: 'PASS',
+    ok: true,
+    exitCode: 0,
+    base: { commit_sha: commit, tree_sha: tree },
+    hardGates: { counters, names: [...RESEARCH_HARD_GATE_COUNTERS], ok: true, moved: [] },
+    totals: {
+      families: 6, probes: 6, probes_ran: 6, passed: 6, failed: 0, not_run: 0, broken: 0,
+      controls_declared: 6, controls_extra_declared: 1, controls_ran: 7, controls_flipped: 7, controls_unaccounted: [],
+    },
+    probes: {
+      results: PROBE_FAMILIES.flatMap((family) => PROBE_NAMES[family].map((probe) => ({ family, probe, status: 'pass', passed: true }))),
+      notRun: [],
+      broken: [],
+    },
+    controls: (() => {
+      const records = [
+        ...NEGATIVE_CONTROLS.map(({ id }) => ({ id, flipped: true })),
+        ...EXTRA_CONTROL_IDS.map((id) => ({ id, flipped: true })),
+      ];
+      const notRun = [];
+      return {
+        allFlipped: true,
+        gate: { ok: true, failures: [] },
+        notRun,
+        records,
+        digest: canonicalDigest({ controls: records, notRun }),
+      };
+    })(),
+  };
+}
+
+test('active campaign routing recognizes v6', () => {
+  assert.equal(activeCampaignVersion({ preregistration: { file: 'preregistration.v6.in-force.json' } }), 'v6');
+});
+
+test('v6 evaluator accepts only complete same-base campaign probes and fresh security controls, then binds both digests', () => {
+  const result = validateV6ProbeEvidence({
+    campaignProbes: campaignRecord(),
+    securityControls: securityRecord(),
+    prereg: { ...preregistrationBody, preregistration_digest: preregistrationDigest },
+    runA, runB,
+  });
+  assert.equal(result.ok, true, result.reason);
+  assert.equal(result.status, 'PASS');
+  assert.equal(result.campaign_probe_digest.length, 64);
+  assert.equal(result.security_controls_digest.length, 64);
+});
+
+test('v6 evaluator refuses missing, duplicate, foreign, or incomplete probe evidence as NOT_RUN', () => {
+  const input = {
+    campaignProbes: campaignRecord(),
+    securityControls: securityRecord(),
+    prereg: { ...preregistrationBody, preregistration_digest: preregistrationDigest },
+    runA, runB,
+  };
+  assert.equal(validateV6ProbeEvidence({ ...input, campaignProbes: null }).status, 'NOT_RUN');
+
+  const duplicate = campaignRecord();
+  duplicate.probes[1].probe = duplicate.probes[0].probe;
+  assert.equal(validateV6ProbeEvidence({ ...input, campaignProbes: duplicate }).status, 'NOT_RUN');
+
+  const foreign = campaignRecord();
+  foreign.preregistration_digest = 'e'.repeat(64);
+  assert.equal(validateV6ProbeEvidence({ ...input, campaignProbes: foreign }).status, 'NOT_RUN');
+
+  const missingCounter = securityRecord();
+  delete missingCounter.hardGates.counters[RESEARCH_HARD_GATE_COUNTERS[0]];
+  assert.equal(validateV6ProbeEvidence({ ...input, securityControls: missingCounter }).status, 'NOT_RUN');
+
+  const wrongTree = securityRecord();
+  wrongTree.base.tree_sha = 'f'.repeat(40);
+  assert.equal(validateV6ProbeEvidence({ ...input, securityControls: wrongTree }).status, 'NOT_RUN');
+  const falseStatus = campaignRecord();
+  falseStatus.status = 'FAIL';
+  falseStatus.ok = false;
+  falseStatus.exitCode = 1;
+  assert.notEqual(validateV6ProbeEvidence({ ...input, campaignProbes: falseStatus }).status, 'PASS');
+
+  const falseProbeBit = securityRecord();
+  falseProbeBit.probes.results[0].passed = false;
+  assert.notEqual(validateV6ProbeEvidence({ ...input, securityControls: falseProbeBit }).status, 'PASS');
+});
+
+test('v6 evaluator reports a failed held-probe assertion and never converts it to PASS', () => {
+  const probes = campaignRecord();
+  probes.probes[3].held = false;
+  const result = validateV6ProbeEvidence({
+    campaignProbes: probes,
+    securityControls: securityRecord(),
+    prereg: { ...preregistrationBody, preregistration_digest: preregistrationDigest },
+    runA, runB,
+  });
+  assert.notEqual(result.status, 'PASS');
+});
+
+test('campaign probe accepts only an in-force preregistration named by the corpus manifest', () => {
+  const prereg = {
+    ...preregistrationBody,
+    preregistration_digest: preregistrationDigest,
+    approval: { status: 'APPROVED', in_force: true },
+  };
+  const manifest = { preregistration: {
+    file: 'preregistration.v6.in-force.json', status: 'IN_FORCE',
+    preregistration_digest: preregistrationDigest,
+  } };
+  assert.equal(validateProbePreregistration({ prereg, manifest }).ok, true);
+  assert.notEqual(validateProbePreregistration({ prereg: { ...prereg, approval: { ...prereg.approval, in_force: false } }, manifest }).ok, true);
+  assert.notEqual(validateProbePreregistration({ prereg, manifest: { preregistration: { ...manifest.preregistration, preregistration_digest: 'e'.repeat(64) } } }).ok, true);
+});
+
+test('explicit v6 preregistration path is canonical and reaches both crash and restart child argv', () => {
+  const root = '/tmp/veritas-probe-root';
+  const selected = resolveProbePreregistrationPath('corpus/s2-008-campaign/preregistration.v6.in-force.json', root);
+  assert.equal(selected, root + '/corpus/s2-008-campaign/preregistration.v6.in-force.json');
+  assert.throws(() => resolveProbePreregistrationPath('../../etc/passwd', root), /PROBE_PREREG_PATH_INVALID/);
+  assert.deepEqual(childInvocationArgs('crash', { preregPath: selected }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'crash', '--prereg', selected,
+  ]);
+  assert.deepEqual(childInvocationArgs('restart', { preregPath: selected, stateFile: '/tmp/state.json', resultOut: '/tmp/result.json' }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'restart',
+    '--state', '/tmp/state.json', '--result-out', '/tmp/result.json', '--prereg', selected,
+  ]);
+});
+
+test('v7 evaluator binds its own preregistration and requires the same complete campaign/security probe contract', () => {
+  const body = {
+    rule: 's2-008-prereg-v7',
+    preregistration_id: 'xpr-s2-008c-07',
+    supersession: { supersedes: 'xpr-s2-008c-06' },
+  };
+  const digest = canonicalDigest(body);
+  const campaign = campaignRecord();
+  campaign.preregistration_digest = digest;
+  const input = {
+    campaignProbes: campaign,
+    securityControls: securityRecord(),
+    prereg: { ...body, preregistration_digest: digest },
+    runA, runB,
+  };
+  const result = validateV7ProbeEvidence(input);
+  assert.equal(result.status, 'PASS');
+  assert.equal(result.campaign_probe_digest.length, 64);
+  const duplicate = structuredClone(campaign);
+  duplicate.probes[1].probe = duplicate.probes[0].probe;
+  assert.equal(validateV7ProbeEvidence({ ...input, campaignProbes: duplicate }).status, 'NOT_RUN');
+  const foreign = structuredClone(campaign);
+  foreign.preregistration_digest = preregistrationDigest;
+  assert.equal(validateV7ProbeEvidence({ ...input, campaignProbes: foreign }).status, 'NOT_RUN');
+});
+
+test('v7 campaign probe paths and active preregistration binding reach both restart children', () => {
+  const root = '/tmp/veritas-probe-root';
+  const selected = resolveProbePreregistrationPath('corpus/s2-008-campaign/preregistration.v7.in-force.json', root);
+  assert.equal(selected, root + '/corpus/s2-008-campaign/preregistration.v7.in-force.json');
+  assert.deepEqual(childInvocationArgs('crash', { preregPath: selected }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'crash', '--prereg', selected,
+  ]);
+  assert.deepEqual(childInvocationArgs('restart', { preregPath: selected, stateFile: '/tmp/state.json', resultOut: '/tmp/result.json' }), [
+    'scripts/s2-008-campaign-probes.mjs', '--child', 'restart',
+    '--state', '/tmp/state.json', '--result-out', '/tmp/result.json', '--prereg', selected,
+  ]);
+  const body = {
+    rule: 's2-008-prereg-v7', preregistration_id: 'xpr-s2-008c-07',
+    executor: { provider: 'zai-coding-cn', credential_env_name: V7_CREDENTIAL_ENV_NAME, pi_settings: structuredClone(V7_PI_SETTINGS) },
+  };
+  const digest = canonicalDigest(body);
+  const prereg = { ...body, preregistration_digest: digest, approval: { status: 'APPROVED', in_force: true } };
+  const manifest = { preregistration: { file: 'preregistration.v7.in-force.json', status: 'IN_FORCE', preregistration_digest: digest } };
+  assert.equal(validateProbePreregistration({ prereg, manifest }).ok, true);
+  const retryMutation = structuredClone(prereg);
+  retryMutation.executor.pi_settings.retry.maxRetries = 2;
+  const { approval: _approval, preregistration_digest: _digest, ...mutatedBody } = retryMutation;
+  retryMutation.preregistration_digest = canonicalDigest(mutatedBody);
+  assert.notEqual(validateProbePreregistration({ prereg: retryMutation, manifest }).ok, true);
+});

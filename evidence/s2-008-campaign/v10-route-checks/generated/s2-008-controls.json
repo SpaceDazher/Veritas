@@ -1,0 +1,234 @@
+{
+  "ticket": "S2-008",
+  "config": {
+    "metric": "case_agreement_rate",
+    "baseline": 0.75,
+    "noise_band": 0.02,
+    "expected_table_digest": "8062bc85f0252e6e48111b5dea3312ad698bca679da14eabd763510074207f63",
+    "inference_mode": "ASSOCIATIONAL",
+    "interval_method": "wilson",
+    "confidence": 0.9833333333333333,
+    "multiplicity_alpha": 0.05,
+    "multiplicity_family_size": 3
+  },
+  "base": {
+    "commit_sha": "addab148639176ee2e678179c831b923172687dd",
+    "tree_sha": "071aa5273795a52e8eaf6476b58ad2d448aef6b8",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+    "worktree_dirty": true,
+    "tracked_files_of_this_track": 109,
+    "tracked_files_scope": "git ls-files matching ^(src/lib/research/|tests/research/|scripts/s2-008-|evidence/s2-008/) — the TRACK sources and the corpus, without the s2-008 evidence records and without the verify-s2-008* aggregator scripts",
+    "track_tracked": true
+  },
+  "controls": [
+    {
+      "id": "holdout_peek",
+      "probe": "P1",
+      "mechanism": "comparator",
+      "injects": "the holdout_peek condition stated in the binding's own content",
+      "before": "ALLOW",
+      "after": "VIOLATION",
+      "before_verdict": "ALLOW",
+      "after_verdict": "VIOLATION",
+      "flipped": true
+    },
+    {
+      "id": "seed_substitution",
+      "probe": "P2",
+      "mechanism": "comparator",
+      "injects": "the seed_substitution condition stated in the binding's own content",
+      "before": "ALLOW",
+      "after": "VIOLATION",
+      "before_verdict": "ALLOW",
+      "after_verdict": "VIOLATION",
+      "flipped": true
+    },
+    {
+      "id": "budget_opacity",
+      "probe": "P4",
+      "mechanism": "comparator",
+      "injects": "the budget_opacity condition stated in the binding's own content",
+      "before": "ALLOW",
+      "after": "VIOLATION",
+      "before_verdict": "ALLOW",
+      "after_verdict": "VIOLATION",
+      "flipped": true
+    },
+    {
+      "id": "label_substitution",
+      "probe": "P5",
+      "mechanism": "guard",
+      "injects": "an observational label swapped to causal",
+      "before": "ADMITTED",
+      "after": "REFUSED",
+      "before_refusal": null,
+      "after_refusal": "CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE",
+      "mutated_field": "proposed_relation.causal_assertion",
+      "flipped": true
+    },
+    {
+      "id": "missing_evaluator",
+      "probe": "P6",
+      "mechanism": "comparator",
+      "injects": "the missing_evaluator condition stated in the binding's own content",
+      "before": "ALLOW",
+      "after": "VIOLATION",
+      "before_verdict": "ALLOW",
+      "after_verdict": "VIOLATION",
+      "flipped": true
+    },
+    {
+      "id": "corrupted_data",
+      "probe": "A2",
+      "mechanism": "table",
+      "injects": "the same corrupted trial in BOTH runs, once per frozen corruption variant, so their digests stay equal",
+      "before": "no_findings",
+      "after": "findings_non_empty",
+      "per_run": [
+        {
+          "letter": "a",
+          "variants": [
+            {
+              "variant": "trial_status_skip",
+              "corrupted": {
+                "field": "trials[0].status",
+                "from": "RESOLVED",
+                "to": "SKIPPED",
+                "variant": "trial_status_skip"
+              },
+              "findings": 1
+            },
+            {
+              "variant": "counter_nudge",
+              "corrupted": {
+                "field": "trials[0].counters.holdoutPeek",
+                "from": 0,
+                "to": 1,
+                "variant": "counter_nudge"
+              },
+              "findings": 6
+            },
+            {
+              "variant": "metric_altered",
+              "corrupted": {
+                "field": "trials[0].numerator",
+                "from": 7,
+                "to": 8,
+                "variant": "metric_altered"
+              },
+              "findings": 1
+            },
+            {
+              "variant": "provenance_field",
+              "corrupted": {
+                "field": "trials[0].provenance.raw_run_id",
+                "from": "s2-008-run-a",
+                "to": "run-forged",
+                "variant": "provenance_field"
+              },
+              "findings": 1
+            }
+          ]
+        },
+        {
+          "letter": "b",
+          "variants": [
+            {
+              "variant": "trial_status_skip",
+              "corrupted": {
+                "field": "trials[0].status",
+                "from": "RESOLVED",
+                "to": "SKIPPED",
+                "variant": "trial_status_skip"
+              },
+              "findings": 1
+            },
+            {
+              "variant": "counter_nudge",
+              "corrupted": {
+                "field": "trials[0].counters.holdoutPeek",
+                "from": 0,
+                "to": 1,
+                "variant": "counter_nudge"
+              },
+              "findings": 6
+            },
+            {
+              "variant": "metric_altered",
+              "corrupted": {
+                "field": "trials[0].numerator",
+                "from": 7,
+                "to": 8,
+                "variant": "metric_altered"
+              },
+              "findings": 1
+            },
+            {
+              "variant": "provenance_field",
+              "corrupted": {
+                "field": "trials[0].provenance.raw_run_id",
+                "from": "s2-008-run-b",
+                "to": "run-forged",
+                "variant": "provenance_field"
+              },
+              "findings": 1
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "variants_declared": [
+          "trial_status_skip",
+          "counter_nudge",
+          "metric_altered",
+          "provenance_field"
+        ],
+        "variants_injected": [
+          "trial_status_skip",
+          "counter_nudge",
+          "metric_altered",
+          "provenance_field"
+        ],
+        "variants_unproductive": [],
+        "note": "a corruption class the control never injects is a class whose detection the control does not demonstrate; the list is itemised in the record rather than left implicit"
+      },
+      "flipped": true
+    },
+    {
+      "id": "ledger_spelling_holdout_peek",
+      "mechanism": "comparator",
+      "injects": "the holdout binding spelled the way registry.mjs#recordHoldoutRead plans the ACCESS payload (decision_point)",
+      "before": "ALLOW",
+      "after": "VIOLATION",
+      "mutated_field": "holdoutBinding.decision_point",
+      "flipped": true
+    }
+  ],
+  "allFlipped": true,
+  "gate": {
+    "ok": true,
+    "failures": []
+  },
+  "notRun": [],
+  "label_substitution": {
+    "control_id": "label_substitution",
+    "labels_flipped": 8,
+    "clean_labels_digest": "9ff4511efa77acd6e202e5ff38ace1dc307cf3288f6ab75705b6d454557dd66b",
+    "substituted_labels_digest": "f4c216f2f8a5140eea52325c73459e9320e26b4680eb02fea5fcd7a20d3bd0ee",
+    "seal_held_on_clean_labels": true,
+    "seal_broke_on_substituted_labels": true,
+    "clean_card": {
+      "admissible": true,
+      "observational": true,
+      "causal_assertion": false,
+      "refusal": null
+    },
+    "swapped_card": {
+      "admissible": false,
+      "observational": true,
+      "causal_assertion": true,
+      "refusal": "CAUSAL_ASSERTION_UNSUPPORTED:CORRELATION_EVIDENCE"
+    },
+    "flipped": true
+  }
+}

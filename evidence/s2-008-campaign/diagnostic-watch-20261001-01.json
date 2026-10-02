@@ -1,0 +1,20 @@
+{
+  "kind": "veritas-openrouter-api-reconciliation/1",
+  "source": "GET /api/v1/generation",
+  "source_verified_via_api": true,
+  "verified_at": "2026-10-01T12:11:58.468Z",
+  "generation_id": "gen-1790855803-OdskAWe0XmN72HcpxOlU",
+  "created_at": "2026-10-01T11:56:43.294Z",
+  "model": "stealth/space-bunny-alpha",
+  "request_id": "req-1790855803-Ec5ml6kkOByGIudQXWju",
+  "native_tokens_prompt": 574,
+  "native_tokens_completion": 4,
+  "native_tokens_cached": 142,
+  "provider_reported_usd": 0,
+  "finish_reason": "stop",
+  "campaign_trial": false,
+  "previous_A_reconciled": false,
+  "local_trace_sha256": "3539cf339761bd75df1e582b61cbf754baabc7138d895c9a20d63c7c1a542402",
+  "actual_tokens": 578,
+  "key_name": "wslPI"
+}

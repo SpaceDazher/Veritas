@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "39d0b37a1aa3585f1aead90820b0d0b858b726ef875561cfe3b4934e5d2c3103",
+  "replaced_by_preregistration_digest": "2ca9dd659ecaa80a978164529bd4674571d42becb5dfdb915f6d124272f1d5c4",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v4 replaces the model image content commitment while preserving the v3 trial list, frozen table and decision rule",
+  "supersession_id": "spr-b5171106edcafca910bd1874",
+  "supersession_digest": "4ae695ff45d2227f4a1e30fda1edb2b987253b02ed863eb01369aa5198a115f8"
+}

@@ -1,0 +1,37 @@
+TAP version 13
+# Subtest: the read-only paid endpoint never reports DONE from an injected workflow
+not ok 1 - the read-only paid endpoint never reports DONE from an injected workflow
+  ---
+  duration_ms: 107.827416
+  type: 'test'
+  location: '/home/daniil/Veritas/tests/agentboard/s2-008-paid-review.test.mjs:258:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'DONE'
+    - 'NOT_READY'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'NOT_READY'
+  actual: 'DONE'
+  operator: 'strictEqual'
+  stack: |-
+    file:///home/daniil/Veritas/tests/agentboard/s2-008-paid-review.test.mjs:270:12
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async withServer (file:///home/daniil/Veritas/tests/agentboard/s2-008-paid-review.test.mjs:25:9)
+    async TestContext.<anonymous> (file:///home/daniil/Veritas/tests/agentboard/s2-008-paid-review.test.mjs:264:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 196.76963

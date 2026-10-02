@@ -1,0 +1,862 @@
+
+> veritas-agent-board@0.1.0 test:s2-002-isolation
+> node --test --test-concurrency=1 "tests/isolation/*.test.mjs"
+
+TAP version 13
+# Subtest: the credential is delivered by a PATH: neither the value nor the variable name is in the argv
+ok 1 - the credential is delivered by a PATH: neither the value nor the variable name is in the argv
+  ---
+  duration_ms: 2.42015
+  type: 'test'
+  ...
+# Subtest: the env file is one line, 0600, and gone after unlink (twice, idempotently)
+ok 2 - the env file is one line, 0600, and gone after unlink (twice, idempotently)
+  ---
+  duration_ms: 0.563724
+  type: 'test'
+  ...
+# Subtest: a value that could inject a second variable is refused, not sanitised
+ok 3 - a value that could inject a second variable is refused, not sanitised
+  ---
+  duration_ms: 0.904161
+  type: 'test'
+  ...
+# Subtest: a value too short to detect, or an env name that is not an identifier, is refused
+ok 4 - a value too short to detect, or an env name that is not an identifier, is refused
+  ---
+  duration_ms: 0.469167
+  type: 'test'
+  ...
+# Subtest: a credential with no DECLARED handle, or with no env file, is refused by the launcher
+ok 5 - a credential with no DECLARED handle, or with no env file, is refused by the launcher
+  ---
+  duration_ms: 0.354383
+  type: 'test'
+  ...
+# Subtest: WITHOUT a credential the invocation is byte-identical to the A-MVP-04 one: no --env-file appears
+ok 6 - WITHOUT a credential the invocation is byte-identical to the A-MVP-04 one: no --env-file appears
+  ---
+  duration_ms: 0.25826
+  type: 'test'
+  ...
+# Subtest: the executor env is the ONE declared surface; every other surface still leaks
+ok 7 - the executor env is the ONE declared surface; every other surface still leaks
+  ---
+  duration_ms: 0.55303
+  type: 'test'
+  ...
+# Subtest: the value never enters an argv: a value-shaped argument is refused outright
+ok 8 - the value never enters an argv: a value-shaped argument is refused outright
+  ---
+  duration_ms: 1.204509
+  type: 'test'
+  ...
+# Subtest: the value is read from the source, with exactly one trailing newline removed
+ok 9 - the value is read from the source, with exactly one trailing newline removed
+  ---
+  duration_ms: 2.064988
+  type: 'test'
+  ...
+# Subtest: after provision the value is in the store and NOWHERE else on this host
+ok 10 - after provision the value is in the store and NOWHERE else on this host
+  ---
+  duration_ms: 2.329557
+  type: 'test'
+  ...
+# Subtest: a handle the profile does not declare is refused, and the store is never touched
+ok 11 - a handle the profile does not declare is refused, and the store is never touched
+  ---
+  duration_ms: 0.483877
+  type: 'test'
+  ...
+# Subtest: a missing source, an empty source, and a missing env name are refused
+ok 12 - a missing source, an empty source, and a missing env name are refused
+  ---
+  duration_ms: 0.62851
+  type: 'test'
+  ...
+# Subtest: the env file is kept ONLY when the run asked for it, and it is 0600
+ok 13 - the env file is kept ONLY when the run asked for it, and it is 0600
+  ---
+  duration_ms: 0.640655
+  type: 'test'
+  ...
+# Subtest: the default Podman launcher passes executable and argv in spawnSync order
+ok 14 - the default Podman launcher passes executable and argv in spawnSync order
+  ---
+  duration_ms: 5.527808
+  type: 'test'
+  ...
+# Subtest: the whole path works for the ONE declared destination
+ok 15 - the whole path works for the ONE declared destination
+  ---
+  duration_ms: 122.623177
+  type: 'test'
+  ...
+# Subtest: EVERY other destination is refused, by the forwarder, over the bridge
+ok 16 - EVERY other destination is refused, by the forwarder, over the bridge
+  ---
+  duration_ms: 4.868294
+  type: 'test'
+  ...
+# Subtest: the bridge binds LOOPBACK only, and says so
+ok 17 - the bridge binds LOOPBACK only, and says so
+  ---
+  duration_ms: 1.364783
+  type: 'test'
+  ...
+# Subtest: a missing socket is its OWN outcome, never an admission
+ok 18 - a missing socket is its OWN outcome, never an admission
+  ---
+  duration_ms: 8001.902249
+  type: 'test'
+  ...
+# Subtest: the bridge forwards the destination the client ASKED for, and logs no payload
+ok 19 - the bridge forwards the destination the client ASKED for, and logs no payload
+  ---
+  duration_ms: 13.097596
+  type: 'test'
+  ...
+# Subtest: the bridge source opens no connection of its own and binds loopback
+ok 20 - the bridge source opens no connection of its own and binds loopback
+  ---
+  duration_ms: 0.797777
+  type: 'test'
+  ...
+# Subtest: a malformed request is not forwarded as a destination
+ok 21 - a malformed request is not forwarded as a destination
+  ---
+  duration_ms: 0.790776
+  type: 'test'
+  ...
+# Subtest: the declared allowlist is the one destination the paid leg needs, and nothing else
+ok 22 - the declared allowlist is the one destination the paid leg needs, and nothing else
+  ---
+  duration_ms: 1.525993
+  type: 'test'
+  ...
+# Subtest: a CONNECT request is parsed, and a malformed one is not
+ok 23 - a CONNECT request is parsed, and a malformed one is not
+  ---
+  duration_ms: 0.47098
+  type: 'test'
+  ...
+# Subtest: the allowlisted destination is ADMITTED and a real socket is opened
+ok 24 - the allowlisted destination is ADMITTED and a real socket is opened
+  ---
+  duration_ms: 26.139936
+  type: 'test'
+  ...
+# Subtest: EVERY other destination is refused, and each refusal is recorded
+ok 25 - EVERY other destination is refused, and each refusal is recorded
+  ---
+  duration_ms: 6.407984
+  type: 'test'
+  ...
+# Subtest: a refusal records the DECISION and never the payload
+ok 26 - a refusal records the DECISION and never the payload
+  ---
+  duration_ms: 4.758645
+  type: 'test'
+  ...
+# Subtest: the forwarder cannot be built into a pass-through
+ok 27 - the forwarder cannot be built into a pass-through
+  ---
+  duration_ms: 2.009895
+  type: 'test'
+  ...
+# Subtest: CONNECT preserves binary bytes, including data arriving with the headers
+ok 28 - CONNECT preserves binary bytes, including data arriving with the headers
+  ---
+  duration_ms: 6.787679
+  type: 'test'
+  ...
+# Subtest: A-MVP-04: the image record exists and pins what it claims to pin
+    # Subtest: the record is present
+    ok 1 - the record is present
+      ---
+      duration_ms: 0.747052
+      type: 'test'
+      ...
+    # Subtest: the base is a registry digest, pulled by that digest, and the store agrees
+    ok 2 - the base is a registry digest, pulled by that digest, and the store agrees
+      ---
+      duration_ms: 0.292514
+      type: 'test'
+      ...
+    # Subtest: the derived image matches BOTH pinned fields, and both are content addresses
+    ok 3 - the derived image matches BOTH pinned fields, and both are content addresses
+      ---
+      duration_ms: 0.340771
+      type: 'test'
+      ...
+    # Subtest: the executor tree that the pin was built from is recorded and matches
+    ok 4 - the executor tree that the pin was built from is recorded and matches
+      ---
+      duration_ms: 0.097233
+      type: 'test'
+      ...
+    # Subtest: the provenance says the executor is genuinely installed, not vendored
+    ok 5 - the provenance says the executor is genuinely installed, not vendored
+      ---
+      duration_ms: 0.112379
+      type: 'test'
+      ...
+    # Subtest: the record says the derived pin is reproducible and names the recipe
+    ok 6 - the record says the derived pin is reproducible and names the recipe
+      ---
+      duration_ms: 0.075023
+      type: 'test'
+      ...
+    # Subtest: the build succeeded and the image carries layers
+    ok 7 - the build succeeded and the image carries layers
+      ---
+      duration_ms: 0.073415
+      type: 'test'
+      ...
+    # Subtest: the limits are stated, not implied away
+    ok 8 - the limits are stated, not implied away
+      ---
+      duration_ms: 0.34634
+      type: 'test'
+      ...
+    1..8
+ok 29 - A-MVP-04: the image record exists and pins what it claims to pin
+  ---
+  duration_ms: 2.999533
+  type: 'suite'
+  ...
+# Subtest: A-MVP-04: the live record observed a real run under the profile
+    # Subtest: the record is present and it is not a skip
+    ok 1 - the record is present and it is not a skip
+      ---
+      duration_ms: 0.221919
+      type: 'test'
+      ...
+    # Subtest: the tier is LOCAL_RESTRICTED and is one of the executable tiers
+    ok 2 - the tier is LOCAL_RESTRICTED and is one of the executable tiers
+      ---
+      duration_ms: 0.859207
+      type: 'test'
+      ...
+    # Subtest: the host could really raise isolation, and the record says which invocation
+    ok 3 - the host could really raise isolation, and the record says which invocation
+      ---
+      duration_ms: 0.10759
+      type: 'test'
+      ...
+    # Subtest: the executor version was OBSERVED inside the container, not read from a file
+    ok 4 - the executor version was OBSERVED inside the container, not read from a file
+      ---
+      duration_ms: 0.17653
+      type: 'test'
+      ...
+    # Subtest: the axis probe and the version run are two runs with two exit codes, both zero
+    ok 5 - the axis probe and the version run are two runs with two exit codes, both zero
+      ---
+      duration_ms: 0.065826
+      type: 'test'
+      ...
+    # Subtest: the image that ran is the pinned image, on both fields
+    ok 6 - the image that ran is the pinned image, on both fields
+      ---
+      duration_ms: 0.069414
+      type: 'test'
+      ...
+    # Subtest: the four axes were each measured from inside the container, not asserted
+    ok 7 - the four axes were each measured from inside the container, not asserted
+      ---
+      duration_ms: 0.142109
+      type: 'test'
+      ...
+    # Subtest: the record separates what is ON from what is OFF, per axis, with the enforcer named
+    ok 8 - the record separates what is ON from what is OFF, per axis, with the enforcer named
+      ---
+      duration_ms: 0.07607
+      type: 'test'
+      ...
+    # Subtest: the process axis states the ceiling it did not independently provoke
+    ok 9 - the process axis states the ceiling it did not independently provoke
+      ---
+      duration_ms: 0.114697
+      type: 'test'
+      ...
+    # Subtest: the record carries no '*' in any executable profile's axes
+    ok 10 - the record carries no '*' in any executable profile's axes
+      ---
+      duration_ms: 0.511489
+      type: 'test'
+      ...
+    1..10
+ok 30 - A-MVP-04: the live record observed a real run under the profile
+  ---
+  duration_ms: 3.181372
+  type: 'suite'
+  ...
+# Subtest: A-MVP-04: the secret arrived as a descriptor and did not leak
+    # Subtest: the handle is a sec- identifier and the mount path carries no value
+    ok 1 - the handle is a sec- identifier and the mount path carries no value
+      ---
+      duration_ms: 0.127743
+      type: 'test'
+      ...
+    # Subtest: the container resolved the descriptor and reported a LENGTH
+    ok 2 - the container resolved the descriptor and reported a LENGTH
+      ---
+      duration_ms: 0.061091
+      type: 'test'
+      ...
+    # Subtest: the value is in neither the container argv nor the container environment
+    ok 3 - the value is in neither the container argv nor the container environment
+      ---
+      duration_ms: 0.179474
+      type: 'test'
+      ...
+    # Subtest: the detector searched every surface and found nothing
+    ok 4 - the detector searched every surface and found nothing
+      ---
+      duration_ms: 0.176004
+      type: 'test'
+      ...
+    # Subtest: the detector fires on a planted value, so its silence above means something
+    ok 5 - the detector fires on a planted value, so its silence above means something
+      ---
+      duration_ms: 0.182394
+      type: 'test'
+      ...
+    # Subtest: the fingerprint is published and the value is not
+    ok 6 - the fingerprint is published and the value is not
+      ---
+      duration_ms: 0.169814
+      type: 'test'
+      ...
+    1..6
+ok 31 - A-MVP-04: the secret arrived as a descriptor and did not leak
+  ---
+  duration_ms: 1.025846
+  type: 'suite'
+  ...
+# Subtest: A-MVP-04: every negative control planted an attempt and got a named refusal
+    # Subtest: all six controls ran and all six passed
+    ok 1 - all six controls ran and all six passed
+      ---
+      duration_ms: 0.137251
+      type: 'test'
+      ...
+    # Subtest: a tier that is not executable is refused, with a code, before any process
+    ok 2 - a tier that is not executable is refused, with a code, before any process
+      ---
+      duration_ms: 0.05273
+      type: 'test'
+      ...
+    # Subtest: the leak detector caught a planted value in a log surface
+    ok 3 - the leak detector caught a planted value in a log surface
+      ---
+      duration_ms: 0.082734
+      type: 'test'
+      ...
+    # Subtest: leaving the network allowlist is refused by host, by port, and by policy
+    ok 4 - leaving the network allowlist is refused by host, by port, and by policy
+      ---
+      duration_ms: 0.071388
+      type: 'test'
+      ...
+    # Subtest: a wildcard is refused on every axis and as a network policy
+    ok 5 - a wildcard is refused on every axis and as a network policy
+      ---
+      duration_ms: 0.063539
+      type: 'test'
+      ...
+    # Subtest: the container had no route at all, so the kernel is the network enforcer
+    ok 6 - the container had no route at all, so the kernel is the network enforcer
+      ---
+      duration_ms: 0.037861
+      type: 'test'
+      ...
+    # Subtest: the operator environment is not inherited: neither the planted variable nor the operator HOME arrived
+    ok 7 - the operator environment is not inherited: neither the planted variable nor the operator HOME arrived
+      ---
+      duration_ms: 0.073622
+      type: 'test'
+      ...
+    1..7
+ok 32 - A-MVP-04: every negative control planted an attempt and got a named refusal
+  ---
+  duration_ms: 0.629597
+  type: 'suite'
+  ...
+# Subtest: A-MVP-04: the raw log is referenced and its bytes are quoted
+    # Subtest: the record points at a raw log that exists, with a matching digest and size
+    ok 1 - the record points at a raw log that exists, with a matching digest and size
+      ---
+      duration_ms: 0.226
+      type: 'test'
+      ...
+    # Subtest: the raw log carries the commands with their exit codes, and each exit code is the one that step expects
+    ok 2 - the raw log carries the commands with their exit codes, and each exit code is the one that step expects
+      ---
+      duration_ms: 0.255293
+      type: 'test'
+      ...
+    # Subtest: the forwarder admitted exactly one destination across the whole run
+    ok 3 - the forwarder admitted exactly one destination across the whole run
+      ---
+      duration_ms: 0.158867
+      type: 'test'
+      ...
+    # Subtest: the raw log contains no secret value either
+    ok 4 - the raw log contains no secret value either
+      ---
+      duration_ms: 0.143569
+      type: 'test'
+      ...
+    # Subtest: no command argv on the record carries a secret handle as a value or a value as an argument
+    ok 5 - no command argv on the record carries a secret handle as a value or a value as an argument
+      ---
+      duration_ms: 0.14448
+      type: 'test'
+      ...
+    1..5
+ok 33 - A-MVP-04: the raw log is referenced and its bytes are quoted
+  ---
+  duration_ms: 1.149333
+  type: 'suite'
+  ...
+# Subtest: A-MVP-04: the record states its own limits
+    # Subtest: the limits name the derived pin, the absent model call, and the unprovoked ceiling
+    ok 1 - the limits name the derived pin, the absent model call, and the unprovoked ceiling
+      ---
+      duration_ms: 0.087295
+      type: 'test'
+      ...
+    # Subtest: nothing in the record claims a model answered, and nothing claims A-MVP-04
+    ok 2 - nothing in the record claims a model answered, and nothing claims A-MVP-04
+      ---
+      duration_ms: 0.262805
+      type: 'test'
+      ...
+    1..2
+ok 34 - A-MVP-04: the record states its own limits
+  ---
+  duration_ms: 0.416776
+  type: 'suite'
+  ...
+# Subtest: image: a pin is a content address, never a tag
+    # Subtest: a registry reference with a digest is accepted
+    ok 1 - a registry reference with a digest is accepted
+      ---
+      duration_ms: 0.914084
+      type: 'test'
+      ...
+    # Subtest: a bare digest is accepted and resolves to itself
+    ok 2 - a bare digest is accepted and resolves to itself
+      ---
+      duration_ms: 0.147637
+      type: 'test'
+      ...
+    # Subtest: a tag is refused: docker.io/library/node:22-bookworm-slim
+    ok 3 - a tag is refused: docker.io/library/node:22-bookworm-slim
+      ---
+      duration_ms: 0.174297
+      type: 'test'
+      ...
+    # Subtest: a tag is refused: docker.io/library/node:latest
+    ok 4 - a tag is refused: docker.io/library/node:latest
+      ---
+      duration_ms: 0.088084
+      type: 'test'
+      ...
+    # Subtest: a tag is refused: localhost/veritas-executor:isolated
+    ok 5 - a tag is refused: localhost/veritas-executor:isolated
+      ---
+      duration_ms: 0.069601
+      type: 'test'
+      ...
+    # Subtest: a tag is refused: node
+    ok 6 - a tag is refused: node
+      ---
+      duration_ms: 0.0549
+      type: 'test'
+      ...
+    # Subtest: a short or malformed digest is refused rather than truncated into one
+    ok 7 - a short or malformed digest is refused rather than truncated into one
+      ---
+      duration_ms: 0.299269
+      type: 'test'
+      ...
+    # Subtest: normalizeDigest equates a bare hex id with its prefixed form
+    ok 8 - normalizeDigest equates a bare hex id with its prefixed form
+      ---
+      duration_ms: 0.281507
+      type: 'test'
+      ...
+    # Subtest: a matching inspect passes; each field alone is not enough
+    ok 9 - a matching inspect passes; each field alone is not enough
+      ---
+      duration_ms: 0.403918
+      type: 'test'
+      ...
+    # Subtest: an image that is not in the store is NOT_BUILT, not a pass
+    ok 10 - an image that is not in the store is NOT_BUILT, not a pass
+      ---
+      duration_ms: 0.608024
+      type: 'test'
+      ...
+    # Subtest: the executor tree digest is a constant next to the pin, not a free variable
+    ok 11 - the executor tree digest is a constant next to the pin, not a free variable
+      ---
+      duration_ms: 0.180152
+      type: 'test'
+      ...
+    1..11
+ok 35 - image: a pin is a content address, never a tag
+  ---
+  duration_ms: 4.422242
+  type: 'suite'
+  ...
+# Subtest: image: assertRealStart separates "ran" from "was permitted"
+    # Subtest: an observed zero exit with an executor-shaped version is a real start
+    ok 1 - an observed zero exit with an executor-shaped version is a real start
+      ---
+      duration_ms: 0.338588
+      type: 'test'
+      ...
+    # Subtest: a null exit code is not a pass
+    ok 2 - a null exit code is not a pass
+      ---
+      duration_ms: 0.202613
+      type: 'test'
+      ...
+    # Subtest: the integer 0 is the only exit status that passes
+    ok 3 - the integer 0 is the only exit status that passes
+      ---
+      duration_ms: 0.123121
+      type: 'test'
+      ...
+    # Subtest: a non-zero exit is not a pass
+    ok 4 - a non-zero exit is not a pass
+      ---
+      duration_ms: 3.852685
+      type: 'test'
+      ...
+    # Subtest: a signal is never a pass, even at exit 0
+    ok 5 - a signal is never a pass, even at exit 0
+      ---
+      duration_ms: 0.111046
+      type: 'test'
+      ...
+    # Subtest: stdout without an executor-shaped version is not a pass
+    ok 6 - stdout without an executor-shaped version is not a pass
+      ---
+      duration_ms: 0.158594
+      type: 'test'
+      ...
+    # Subtest: the observed version is reported, not a constant
+    ok 7 - the observed version is reported, not a constant
+      ---
+      duration_ms: 0.06729
+      type: 'test'
+      ...
+    # Subtest: assertGovernedRun re-checks the pin, so an unpinned run proves nothing
+    ok 8 - assertGovernedRun re-checks the pin, so an unpinned run proves nothing
+      ---
+      duration_ms: 1.031286
+      type: 'test'
+      ...
+    1..8
+ok 36 - image: assertRealStart separates "ran" from "was permitted"
+  ---
+  duration_ms: 6.156554
+  type: 'suite'
+  ...
+# Subtest: profile: the four axes, deny by default
+    # Subtest: the shipped profile is executable and carries no wildcard on any axis
+    ok 1 - the shipped profile is executable and carries no wildcard on any axis
+      ---
+      duration_ms: 0.283839
+      type: 'test'
+      ...
+    # Subtest: the shipped profile is LOCAL_RESTRICTED, not a floor tier
+    ok 2 - the shipped profile is LOCAL_RESTRICTED, not a floor tier
+      ---
+      duration_ms: 0.110558
+      type: 'test'
+      ...
+    # Subtest: a wildcard is refused at any depth on any axis
+    ok 3 - a wildcard is refused at any depth on any axis
+      ---
+      duration_ms: 0.345075
+      type: 'test'
+      ...
+    # Subtest: 'unrestricted' is refused as a network policy even though the contract permits it for HOST_UNISOLATED
+    ok 4 - 'unrestricted' is refused as a network policy even though the contract permits it for HOST_UNISOLATED
+      ---
+      duration_ms: 0.106199
+      type: 'test'
+      ...
+    # Subtest: NO_EXEC and HOST_UNISOLATED are both refused by the launch gate
+    ok 5 - NO_EXEC and HOST_UNISOLATED are both refused by the launch gate
+      ---
+      duration_ms: 0.122886
+      type: 'test'
+      ...
+    # Subtest: an unknown tier is refused too, not just the known-bad ones
+    ok 6 - an unknown tier is refused too, not just the known-bad ones
+      ---
+      duration_ms: 0.12647
+      type: 'test'
+      ...
+    # Subtest: deny_all with a non-empty allowlist is refused, and allowlist with an empty one is refused
+    ok 7 - deny_all with a non-empty allowlist is refused, and allowlist with an empty one is refused
+      ---
+      duration_ms: 0.112413
+      type: 'test'
+      ...
+    # Subtest: a writable root filesystem is refused
+    ok 8 - a writable root filesystem is refused
+      ---
+      duration_ms: 0.07764
+      type: 'test'
+      ...
+    # Subtest: a filesystem root that is relative or traverses is refused
+    ok 9 - a filesystem root that is relative or traverses is refused
+      ---
+      duration_ms: 0.299178
+      type: 'test'
+      ...
+    # Subtest: an allowlist entry must name a real host and at least one real port
+    ok 10 - an allowlist entry must name a real host and at least one real port
+      ---
+      duration_ms: 0.446435
+      type: 'test'
+      ...
+    # Subtest: a secret handle must be a sec- identifier
+    ok 11 - a secret handle must be a sec- identifier
+      ---
+      duration_ms: 0.192988
+      type: 'test'
+      ...
+    # Subtest: process ceilings must be positive integers
+    ok 12 - process ceilings must be positive integers
+      ---
+      duration_ms: 0.203969
+      type: 'test'
+      ...
+    1..12
+ok 37 - profile: the four axes, deny by default
+  ---
+  duration_ms: 2.753018
+  type: 'suite'
+  ...
+# Subtest: profile: resolveEgress denies by default and names its reason
+    # Subtest: deny_all refuses the allowlisted host too
+    ok 1 - deny_all refuses the allowlisted host too
+      ---
+      duration_ms: 0.205169
+      type: 'test'
+      ...
+    # Subtest: under allowlist, the named pair resolves and everything else does not
+    ok 2 - under allowlist, the named pair resolves and everything else does not
+      ---
+      duration_ms: 0.441221
+      type: 'test'
+      ...
+    # Subtest: the egress allowlist itself carries no wildcard and a real host
+    ok 3 - the egress allowlist itself carries no wildcard and a real host
+      ---
+      duration_ms: 0.175568
+      type: 'test'
+      ...
+    1..3
+ok 38 - profile: resolveEgress denies by default and names its reason
+  ---
+  duration_ms: 0.936476
+  type: 'suite'
+  ...
+# Subtest: profile: the environment axis is built, not inherited
+    # Subtest: the child env is exactly the allowlist, as literal pairs
+    ok 1 - the child env is exactly the allowlist, as literal pairs
+      ---
+      duration_ms: 0.862678
+      type: 'test'
+      ...
+    # Subtest: a name on the allowlist with no fixed value is refused rather than passed as empty
+    ok 2 - a name on the allowlist with no fixed value is refused rather than passed as empty
+      ---
+      duration_ms: 0.186575
+      type: 'test'
+      ...
+    # Subtest: a lowercase name is refused, so a secret cannot be smuggled in as a variable
+    ok 3 - a lowercase name is refused, so a secret cannot be smuggled in as a variable
+      ---
+      duration_ms: 0.142889
+      type: 'test'
+      ...
+    # Subtest: the declared handles are the profile’s own, and only those
+    ok 4 - the declared handles are the profile’s own, and only those
+      ---
+      duration_ms: 0.137655
+      type: 'test'
+      ...
+    1..4
+ok 39 - profile: the environment axis is built, not inherited
+  ---
+  duration_ms: 1.470254
+  type: 'suite'
+  ...
+# Subtest: launch: the argv carries the profile and nothing else
+    # Subtest: the four axes appear as flags, each from its own profile field
+    ok 1 - the four axes appear as flags, each from its own profile field
+      ---
+      duration_ms: 0.778591
+      type: 'test'
+      ...
+    # Subtest: the image is a content address and the workload follows it
+    ok 2 - the image is a content address and the workload follows it
+      ---
+      duration_ms: 0.60775
+      type: 'test'
+      ...
+    # Subtest: a secret HANDLE is on the argv and no secret VALUE can be
+    ok 3 - a secret HANDLE is on the argv and no secret VALUE can be
+      ---
+      duration_ms: 0.478391
+      type: 'test'
+      ...
+    # Subtest: an undeclared handle is refused: the profile is the authority on credentials
+    ok 4 - an undeclared handle is refused: the profile is the authority on credentials
+      ---
+      duration_ms: 0.276789
+      type: 'test'
+      ...
+    # Subtest: a tag as the image is refused before anything is spawned
+    ok 5 - a tag as the image is refused before anything is spawned
+      ---
+      duration_ms: 0.301978
+      type: 'test'
+      ...
+    # Subtest: an allowlist profile REQUIRES the egress socket, so the axis cannot be half-wired
+    ok 6 - an allowlist profile REQUIRES the egress socket, so the axis cannot be half-wired
+      ---
+      duration_ms: 0.600632
+      type: 'test'
+      ...
+    # Subtest: a hostile argv is refused: empty, NUL-bearing, oversized, non-string, too long
+    ok 7 - a hostile argv is refused: empty, NUL-bearing, oversized, non-string, too long
+      ---
+      duration_ms: 0.379981
+      type: 'test'
+      ...
+    # Subtest: the launcher is the measured host invocation, not a default
+    ok 8 - the launcher is the measured host invocation, not a default
+      ---
+      duration_ms: 0.275421
+      type: 'test'
+      ...
+    # Subtest: no process.env appears on the path that builds the child environment
+    ok 9 - no process.env appears on the path that builds the child environment
+      ---
+      duration_ms: 1.376348
+      type: 'test'
+      ...
+    1..9
+ok 40 - launch: the argv carries the profile and nothing else
+  ---
+  duration_ms: 5.428592
+  type: 'suite'
+  ...
+# Subtest: secrets: a handle is a name and a value is what must not leak
+    # Subtest: the mount path is derived from the handle and contains no value
+    ok 1 - the mount path is derived from the handle and contains no value
+      ---
+      duration_ms: 0.35237
+      type: 'test'
+      ...
+    # Subtest: a handle that is not sec- prefixed is refused
+    ok 2 - a handle that is not sec- prefixed is refused
+      ---
+      duration_ms: 0.453484
+      type: 'test'
+      ...
+    # Subtest: a clean surface reports no leak
+    ok 3 - a clean surface reports no leak
+      ---
+      duration_ms: 0.980371
+      type: 'test'
+      ...
+    # Subtest: the value is found in every surface it could plausibly reach
+    ok 4 - the value is found in every surface it could plausibly reach
+      ---
+      duration_ms: 0.360875
+      type: 'test'
+      ...
+    # Subtest: a nested surface is searched as JSON, so a value inside a field is found
+    ok 5 - a nested surface is searched as JSON, so a value inside a field is found
+      ---
+      duration_ms: 0.150833
+      type: 'test'
+      ...
+    # Subtest: a required surface that was not supplied is itself a finding
+    ok 6 - a required surface that was not supplied is itself a finding
+      ---
+      duration_ms: 0.148008
+      type: 'test'
+      ...
+    # Subtest: a value too short to detect is refused rather than searched for
+    ok 7 - a value too short to detect is refused rather than searched for
+      ---
+      duration_ms: 0.172006
+      type: 'test'
+      ...
+    # Subtest: the fingerprint identifies a value without being it, and is stable
+    ok 8 - the fingerprint identifies a value without being it, and is stable
+      ---
+      duration_ms: 0.588733
+      type: 'test'
+      ...
+    # Subtest: the secret form this host needs is recorded, because podman changed it
+    ok 9 - the secret form this host needs is recorded, because podman changed it
+      ---
+      duration_ms: 0.161482
+      type: 'test'
+      ...
+    1..9
+ok 41 - secrets: a handle is a name and a value is what must not leak
+  ---
+  duration_ms: 4.534529
+  type: 'suite'
+  ...
+# Subtest: egress: the forwarder filters, and cannot be built into a pass-through
+    # Subtest: only the request line is parsed; a Host header does not make it malformed
+    ok 1 - only the request line is parsed; a Host header does not make it malformed
+      ---
+      duration_ms: 0.75675
+      type: 'test'
+      ...
+    # Subtest: a malformed request line yields null rather than a guess
+    ok 2 - a malformed request line yields null rather than a guess
+      ---
+      duration_ms: 0.206738
+      type: 'test'
+      ...
+    # Subtest: the forwarder refuses to be constructed with a wildcard allowlist
+    ok 3 - the forwarder refuses to be constructed with a wildcard allowlist
+      ---
+      duration_ms: 0.772277
+      type: 'test'
+      ...
+    1..3
+ok 42 - egress: the forwarder filters, and cannot be built into a pass-through
+  ---
+  duration_ms: 1.896782
+  type: 'suite'
+  ...
+1..42
+# tests 125
+# suites 14
+# pass 125
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8808.095877

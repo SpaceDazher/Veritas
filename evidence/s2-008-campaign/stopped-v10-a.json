@@ -1,0 +1,50 @@
+{
+  "kind": "s2-008-v10-a-stopped/1",
+  "created_at": "2026-10-02T07:40:54.010Z",
+  "status": "AWAITING_PROVIDER_RECONCILIATION",
+  "run_id": "s2-008c-v10-a-bc03d54342da48479bb2",
+  "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+  "base": {
+    "commit_sha": "caca2491860c5fbdcb4b3a89cd5755e71a538a88",
+    "tree_sha": "9326a7c2d431478179fc677f8d437cbb4267fd71",
+    "branch": "HEAD",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 282,
+    "track_tracked": true
+  },
+  "raw_run_file": "evidence/s2-008-campaign/run-v10-a.json",
+  "raw_run_sha256": "93bbedfad7f32919cbb100f2152646187ab57c80dc8689da5906e45d9bd451f1",
+  "sidecar_file": "evidence/s2-008-campaign/predictions-v10-a-trl-s2-008c-01-20260926.json",
+  "sidecar_sha256": "f44adbf7a50540bc1cc0a28e328edf2ede64e135ba04badcd2687aa060ae167c",
+  "outcome_class": "INFRA",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "stop_reason": "MODEL_USAGE_NOT_REPORTED",
+  "known_model_calls": 25,
+  "known_tokens_lower_bound": 15856,
+  "unknown_model_attempts": 1,
+  "predictions": 25,
+  "unparsed": 0,
+  "provider_usd_total": null,
+  "provider_usd_total_status": "UNKNOWN_FOR_UNRECONCILED_ATTEMPT",
+  "last_known_generation": {
+    "id": "gen-1790924424-6bL4BoUY8m40FNm8gOvm",
+    "created_at": "2026-10-02T07:00:24.672Z",
+    "generation_time": 3749,
+    "prompt": 594,
+    "completion": 29,
+    "usd": 0,
+    "source": "OpenRouter GET generation HTTP 200"
+  },
+  "report_written_at": "2026-10-02T07:00:31.182Z",
+  "requested_owner_export_window_utc": [
+    "2026-10-02T07:00:20Z",
+    "2026-10-02T07:00:40Z"
+  ],
+  "paid_b": "NOT_RUN",
+  "independent_science_evaluation": "NOT_RUN",
+  "human_paid_acceptance": "NOT_RUN",
+  "automatic_retry": false,
+  "earlier_v9_reconciled_tokens": 7312,
+  "earlier_authorized_diagnostic_tokens": 578,
+  "other_historical_spend": "UNKNOWN; not attributed by this run"
+}

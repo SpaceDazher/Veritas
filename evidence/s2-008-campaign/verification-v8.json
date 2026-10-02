@@ -1,0 +1,69 @@
+{
+  "kind": "s2-008-v8-prepaid-verification/1",
+  "commands": [
+    {
+      "command": "npm test",
+      "exit_code": 0,
+      "log_sha256": "6c3a60ddc5a84c4f139537146089965ca24c0b6d749c93513ea814e796b42260",
+      "tests": 1900,
+      "pass": 1892,
+      "fail": 0,
+      "skipped": 8,
+      "cancelled": 0
+    },
+    {
+      "command": "npm run test:research",
+      "exit_code": 0,
+      "log_sha256": "181cf765dddd4d3a325e64a5f0fc8371b80b4dab1b51bbfc6e0631528ea363f7",
+      "tests": 403,
+      "pass": 403,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    {
+      "command": "npm run test:s2-008",
+      "exit_code": 0,
+      "log_sha256": "c17e58d12f8bd0e7825470eef526de445317208855b800f44ef677cd468bbf37",
+      "tests": 403,
+      "pass": 403,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    {
+      "command": "npm run test:s2-002-isolation",
+      "exit_code": 0,
+      "log_sha256": "6702101747263ecc3791f0ab658b627407b21fd0f6585f364ad522d70424f9e5",
+      "tests": 124,
+      "pass": 124,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    {
+      "command": "npm run lint",
+      "exit_code": 0,
+      "log_sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9"
+    },
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "log_sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592"
+    },
+    {
+      "command": "npm run verify:s2-008",
+      "exit_code": 0,
+      "log_sha256": "d3ddb0e1f4b892d9ac9dcac2917406c3da8103a1a97810d390ac45af98dd717d"
+    },
+    {
+      "command": "node scripts/s2-008-campaign-model-image.mjs --v8 --verify-pin",
+      "exit_code": 0,
+      "log_sha256": "5f325d97e92351d8508c93763c61e2681b6b32b018ba0cccb630106635381775"
+    }
+  ],
+  "skips": "Eight full-suite tests: optional real Codex transport, OS-specific junction, six DATABASE_URL-dependent tests. These were not executed.",
+  "paid_status": "NOT_STARTED",
+  "confirmed_usd": null,
+  "previous_v7_spend": "UNKNOWN"
+}

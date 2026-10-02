@@ -1,0 +1,93 @@
+{
+  "schema": "s2-008-model-image-pin/10",
+  "image_tag": "localhost/veritas-s2-008-model:v10",
+  "base_image": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+  "commitment": {
+    "field": "executor.model_image.content_commitment",
+    "algorithm": "sha256 over canonical JSON of the covered sources",
+    "covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "excludes": [
+      "prereg"
+    ],
+    "why_excluded": "the signed body is COPYed into this image, so a commitment covering it would be a digest of a document containing that digest; the direction is preregistration -> image only"
+  },
+  "first": {
+    "imageId": "sha256:44928e1210b654461745ce826deafb8171adf050235043cb4574dd98ce384e6b",
+    "digest": "sha256:9cedd2d49d64c09c3024e6b320bae25845e3b16d6c3bd7605f68ec7e3ddf8006",
+    "architecture": "amd64",
+    "source_digest": "56514635f39e5c39f5186f70486bf95966028668eb2603d8da8b80bc50705be0",
+    "content_commitment": "cc670161cb4384481909c35f5b050e487c933bffa0bfaa189ab1b4ca13ee842b",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "45581243adb6db9e60dee8c82bb39177ba4c51474838e24e5e4550551820a0f2",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "84e2c6d6426284b3343e7a32c52545a768c81f0b5328c470f0417ccba97010b7",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "7e4fee77ddb6a63ef9bfaa090d82dfbd04ed20ea92e8914574c13782471f60bf",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "credential_env_policy": "f27906980f95d721cbe196d9487f177b24f79a153cd58c507d102acf33ef9395",
+      "pi_runtime_tree": "f26bbada53c01e8948da118e44f521940d147d1817289f7eec11cb252031d258"
+    }
+  },
+  "second": {
+    "imageId": "sha256:44928e1210b654461745ce826deafb8171adf050235043cb4574dd98ce384e6b",
+    "digest": "sha256:9cedd2d49d64c09c3024e6b320bae25845e3b16d6c3bd7605f68ec7e3ddf8006",
+    "architecture": "amd64",
+    "source_digest": "56514635f39e5c39f5186f70486bf95966028668eb2603d8da8b80bc50705be0",
+    "content_commitment": "cc670161cb4384481909c35f5b050e487c933bffa0bfaa189ab1b4ca13ee842b",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "45581243adb6db9e60dee8c82bb39177ba4c51474838e24e5e4550551820a0f2",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "84e2c6d6426284b3343e7a32c52545a768c81f0b5328c470f0417ccba97010b7",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "7e4fee77ddb6a63ef9bfaa090d82dfbd04ed20ea92e8914574c13782471f60bf",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "credential_env_policy": "f27906980f95d721cbe196d9487f177b24f79a153cd58c507d102acf33ef9395",
+      "pi_runtime_tree": "f26bbada53c01e8948da118e44f521940d147d1817289f7eec11cb252031d258"
+    }
+  },
+  "identical": true,
+  "context_digest_stable": true,
+  "content_commitment_stable": true,
+  "commitment_excludes_preregistration": true
+}

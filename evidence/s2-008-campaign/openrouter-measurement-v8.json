@@ -1,0 +1,16 @@
+{
+  "kind": "s2-008-openrouter-measurement/1",
+  "provider": "openrouter",
+  "model": "stealth/space-bunny-alpha",
+  "source": "Stage 2/.bb/chats/thr_hj2st7xwcz/artifacts/pi-measurement-space-bunny-alpha.jsonl",
+  "measurement": {
+    "input": 10941,
+    "output": 3,
+    "cacheRead": 195,
+    "totalTokens": 11139,
+    "traceSha256": "0946e3ffbc079bfda2e7de12a46dae82bc4175426728961322317ef507dd49df"
+  },
+  "configuration": "host tools ON; campaign tools OFF",
+  "confirmed_usd": null,
+  "confirmed_usd_status": "NOT_VERIFIED"
+}

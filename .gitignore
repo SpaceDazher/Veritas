@@ -9,3 +9,6 @@ next-env.d.ts
 .DS_Store
 results/s2-003/
 results/sloqual-001/
+brag-output/**/.render-*/
+.arch-map/
+libpod/

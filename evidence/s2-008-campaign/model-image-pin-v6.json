@@ -1,0 +1,88 @@
+{
+  "schema": "s2-008-model-image-pin/6",
+  "image_tag": "localhost/veritas-s2-008-model:v6",
+  "base_image": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+  "commitment": {
+    "field": "executor.model_image.content_commitment",
+    "algorithm": "sha256 over canonical JSON of the covered sources",
+    "covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "excludes": [
+      "prereg"
+    ],
+    "why_excluded": "the signed body is COPYed into this image, so a commitment covering it would be a digest of a document containing that digest; the direction is preregistration -> image only"
+  },
+  "first": {
+    "imageId": "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+    "digest": "sha256:b247c0966a5177b46ce6d9b0f9a9688d8eb74210b7b56bc8f6e3eca66110e893",
+    "architecture": "amd64",
+    "source_digest": "4a63fcb13a70eceb3e90077c22228b36c5412f874f99a5313074c3330033765b",
+    "content_commitment": "023954d98146c3e1fd8e9e09269a4d8f57e598ea912e55ea0dbfc7f745519006",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "a7009d85b6f53899a346e5f50d5659f5b11e7528c591a70fcd830b45e5967be2",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "598e601ce08ee594820f6b83c3236c2dc941a2239c711746a729f70b7e59eeb4",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "af23555097e8e08e635daba87424b3dcc26cc86209f2ecc8dfa208f564feda9e",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "pi_runtime_tree": "4a69a238d35655656e66ceb8d7c537e561fc7fd27bdd31745cbaf45431ce9416"
+    }
+  },
+  "second": {
+    "imageId": "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+    "digest": "sha256:b247c0966a5177b46ce6d9b0f9a9688d8eb74210b7b56bc8f6e3eca66110e893",
+    "architecture": "amd64",
+    "source_digest": "4a63fcb13a70eceb3e90077c22228b36c5412f874f99a5313074c3330033765b",
+    "content_commitment": "023954d98146c3e1fd8e9e09269a4d8f57e598ea912e55ea0dbfc7f745519006",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "pi_bundle",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "a7009d85b6f53899a346e5f50d5659f5b11e7528c591a70fcd830b45e5967be2",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "598e601ce08ee594820f6b83c3236c2dc941a2239c711746a729f70b7e59eeb4",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "af23555097e8e08e635daba87424b3dcc26cc86209f2ecc8dfa208f564feda9e",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "pi_runtime_tree": "4a69a238d35655656e66ceb8d7c537e561fc7fd27bdd31745cbaf45431ce9416"
+    }
+  },
+  "identical": true,
+  "context_digest_stable": true,
+  "content_commitment_stable": true,
+  "commitment_excludes_preregistration": true
+}

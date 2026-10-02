@@ -1,0 +1,183 @@
+{
+  "kind": "s2-008-paid-review-preparation/1",
+  "status": "VERIFIED_READ_ONLY_NOT_READY",
+  "created_at": "2026-10-02T11:02:46.368102+00:00",
+  "tested_source_base_commit": "e72932d411f5ce7d62fb740ffd05c6b5b90ad649",
+  "source_files": [
+    {
+      "file": "scripts/a-mvp05-review.mjs",
+      "sha256": "7bcab2b4f3b49e22a4ba37183d2540fff4786181c863073749389f448e12bb3c"
+    },
+    {
+      "file": "scripts/s2-008-paid-review.mjs",
+      "sha256": "956fd05712436c35fbefce94f267584c9a6e9135d0f428b96fd143e063e37c53"
+    },
+    {
+      "file": "tests/agentboard/a-mvp05-review.test.mjs",
+      "sha256": "f863f5800a26bb07d95eb5d820868916193785c3ec9b1b3ace501c60cb6bbf81"
+    },
+    {
+      "file": "tests/agentboard/s2-008-paid-review.test.mjs",
+      "sha256": "3ced67d1ff2bca03c6f640d4a25f9b8276270fd50795f14f49ab4ab3f811839f"
+    }
+  ],
+  "checks": [
+    {
+      "command": "node --test tests/agentboard/a-mvp05-review.test.mjs tests/agentboard/s2-008-paid-review.test.mjs",
+      "exit_code": 0,
+      "passed": 21,
+      "failed": 0,
+      "log": "focused-final"
+    },
+    {
+      "command": "npm run lint",
+      "exit_code": 0,
+      "log": "lint-final"
+    },
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "log": "typecheck-final"
+    },
+    {
+      "command": "npm test",
+      "environment_preparation": "source scripts/setup-podman-tmp.sh",
+      "exit_code": 0,
+      "tests": 1935,
+      "passed": 1927,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 8,
+      "log": "npm-test-final"
+    }
+  ],
+  "skips": {
+    "production_database_paths_without_DATABASE_URL": 6,
+    "opt_in_real_transport_without_VERITAS_S2_007R_REAL": 1,
+    "junction_case_without_reason": 1
+  },
+  "first_bare_full_suite": {
+    "exit_code": 1,
+    "passed": 1918,
+    "failed": 0,
+    "cancelled": 8,
+    "skipped": 8,
+    "reason": "Pinned disposable PostgreSQL container could not start before the S2-007 concurrency hook; the sourced rerun passed. Unset DATABASE_URL alone is not treated as the cause."
+  },
+  "parent_counterexample": {
+    "description": "An injected DONE was preserved by the read-only server status.",
+    "red_log": "red-done",
+    "observed_red_failures": 1,
+    "fix": "Always return NOT_READY in paid read-only status."
+  },
+  "guards": [
+    "wrong bearer",
+    "wrong owner/task",
+    "view-only action scope",
+    "start/decision never invoke supplied workflow",
+    "injected ready and DONE suppressed",
+    "parent-directory symlink escape",
+    "evidence bytes and digests retained"
+  ],
+  "logs": [
+    {
+      "name": "focused-final",
+      "file": "evidence/s2-008-campaign/paid-review-checks/focused-final.log",
+      "sha256": "4e8269a4456e16a4971210d82a30bcdc4551cb0518c7392371103beb9c0ee733",
+      "bytes": 5025
+    },
+    {
+      "name": "lint-final",
+      "file": "evidence/s2-008-campaign/paid-review-checks/lint-final.log",
+      "sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9",
+      "bytes": 46
+    },
+    {
+      "name": "typecheck-final",
+      "file": "evidence/s2-008-campaign/paid-review-checks/typecheck-final.log",
+      "sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592",
+      "bytes": 55
+    },
+    {
+      "name": "npm-test-final",
+      "file": "evidence/s2-008-campaign/paid-review-checks/npm-test-final.log",
+      "sha256": "1a225ec442a9af9e27a27f9d28c2848986f9b0d88a576e74424f3f96e603e789",
+      "bytes": 534014
+    },
+    {
+      "name": "red-done",
+      "file": "evidence/s2-008-campaign/paid-review-checks/red-done.log",
+      "sha256": "423c483ba551c9744e53c5112d440258667b37f7d7d2b5641ceac1f75924591b",
+      "bytes": 1223
+    },
+    {
+      "name": "npm-test",
+      "file": "evidence/s2-008-campaign/paid-review-checks/npm-test.log",
+      "sha256": "cc9d5c52d3da48da72a65c72301d25b2421eef80463b27565c4124dbab63c8f7",
+      "bytes": 540495
+    },
+    {
+      "name": "npm-test-sourced",
+      "file": "evidence/s2-008-campaign/paid-review-checks/npm-test-sourced.log",
+      "sha256": "e18912ae03db1314bfcaaaef776bf02c7ad5c2d6c553fbd9584ec1ef53ada0e3",
+      "bytes": 533776
+    },
+    {
+      "name": "red",
+      "file": "evidence/s2-008-campaign/paid-review-checks/red.log",
+      "sha256": "cd611e5cfee0490843eb48c7dec2fd6d472593769fc01cc0b4d7a40fd3915d3f",
+      "bytes": 7752
+    },
+    {
+      "name": "red-runtime",
+      "file": "evidence/s2-008-campaign/paid-review-checks/red-runtime.log",
+      "sha256": "c2b192bceb16e2c8834ac19103f96c19fc44607d585484f7cd2232e7c4ce275b",
+      "bytes": 1388
+    },
+    {
+      "name": "parent-focused-before-done",
+      "file": "evidence/s2-008-campaign/paid-review-checks/parent-focused-before-done.log",
+      "sha256": "96870b5bfa73743338fb7d3335fcfbb3a0209b296013dfb6efd3254b8f6e9c5b",
+      "bytes": 4812
+    }
+  ],
+  "generated_outputs": [
+    {
+      "file": "evidence/s2-006-comparison.json",
+      "generated_sha256": "54ca4a8e4707c2e3d4160c47ea6440332b1da933d8c0cc67017f8a481cab904f",
+      "archived_file": "evidence/s2-008-campaign/paid-review-checks/generated-s2-006-comparison.json",
+      "restored_head_sha256": "a54a000b4985193deb557806e6746280dc4c7cd0c2c2c2d93e268996f4b6ce2c"
+    },
+    {
+      "file": "evidence/s2-006-run-a.json",
+      "generated_sha256": "b967c263e6ac6b174ea49554ee40853239d5958373c324e9ec9d25996b25ac38",
+      "archived_file": "evidence/s2-008-campaign/paid-review-checks/generated-s2-006-run-a.json",
+      "restored_head_sha256": "d3d2ad103912d03c0c3d63d9c86820cf7923785438e9e57d97028b1da78be166"
+    },
+    {
+      "file": "evidence/s2-006-run-b.json",
+      "generated_sha256": "325fab541997085277113ca43487b021fc422a3d5460ccef586adc1977c80954",
+      "archived_file": "evidence/s2-008-campaign/paid-review-checks/generated-s2-006-run-b.json",
+      "restored_head_sha256": "12a2cfe14b7e25b805fe9717826c7fd05f3dee04e0a8ad209102940f6b150ef1"
+    }
+  ],
+  "campaign": {
+    "version": 10,
+    "a_outcome": "INFRA",
+    "predictions": 25,
+    "expected_predictions": 378,
+    "financial_status": "RECONCILED",
+    "tokens": 15856,
+    "provider_reported_usd": 0,
+    "raw_unknown_attempts": 1,
+    "financial_unreconciled_attempts": 0,
+    "b": "NOT_RUN",
+    "independent_evaluation": "NOT_RUN",
+    "human_paid_review": "NOT_RUN"
+  },
+  "limitations": [
+    "Read-only preparation only; positive evidence import and human acceptance workflow are unavailable.",
+    "Six production DB paths, one opt-in transport path and one junction case did not execute.",
+    "No v11 approval, build or paid campaign is performed by this phase."
+  ]
+}

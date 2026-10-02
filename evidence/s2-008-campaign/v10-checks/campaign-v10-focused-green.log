@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: v10 preregistration is accepted by the shared digest and validation contract
+ok 1 - v10 preregistration is accepted by the shared digest and validation contract
+  ---
+  duration_ms: 13.800571
+  type: 'test'
+  ...
+# Subtest: v10 credential routing keeps the signed OpenRouter environment policy
+ok 2 - v10 credential routing keeps the signed OpenRouter environment policy
+  ---
+  duration_ms: 2.8448
+  type: 'test'
+  ...
+# Subtest: v10 is a separate run/image version over the in-force v9 base
+ok 3 - v10 is a separate run/image version over the in-force v9 base
+  ---
+  duration_ms: 0.807658
+  type: 'test'
+  ...
+# Subtest: v10 requires the complete v9 A reconciliation, sidecar and provider receipt
+ok 4 - v10 requires the complete v9 A reconciliation, sidecar and provider receipt
+  ---
+  duration_ms: 17.613975
+  type: 'test'
+  ...
+# Subtest: v10 draft and approval bind the known v9 base and reject every frozen-member mutation
+ok 5 - v10 draft and approval bind the known v9 base and reject every frozen-member mutation
+  ---
+  duration_ms: 49.105997
+  type: 'test'
+  ...
+# Subtest: v10 prediction loading retains the v9 correlation and accounting requirements
+ok 6 - v10 prediction loading retains the v9 correlation and accounting requirements
+  ---
+  duration_ms: 1.695255
+  type: 'test'
+  ...
+# Subtest: v10 keeps the deterministic frozen-table agreement separate from human acceptance
+ok 7 - v10 keeps the deterministic frozen-table agreement separate from human acceptance
+  ---
+  duration_ms: 0.466054
+  type: 'test'
+  ...
+# Subtest: v10 evaluation publishes deterministic agreement only after full scoring and leaves human review pending
+ok 8 - v10 evaluation publishes deterministic agreement only after full scoring and leaves human review pending
+  ---
+  duration_ms: 19.539218
+  type: 'test'
+  ...
+# Subtest: v10 evaluation refuses a corrupted sidecar, unparsed-as-agreement, and duplicate A/B generation IDs
+ok 9 - v10 evaluation refuses a corrupted sidecar, unparsed-as-agreement, and duplicate A/B generation IDs
+  ---
+  duration_ms: 27.821302
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1989.746926

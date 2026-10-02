@@ -1,0 +1,9 @@
+{
+  "kind": "s2-008-v9-evaluation-preflight-refusal/1",
+  "command": "node scripts/s2-008-campaign-evaluate.mjs --v9 --out <persistent-state>/evaluation-v9.json",
+  "exit_code": 1,
+  "evaluation_status": "NOT_RUN",
+  "agrees": null,
+  "reason": "A is BLOCKED and run-v9-b.json does not exist because B was never launched.",
+  "holdout_access_directory_created": false
+}

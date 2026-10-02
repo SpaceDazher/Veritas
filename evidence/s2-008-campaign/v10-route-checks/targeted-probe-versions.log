@@ -1,0 +1,244 @@
+TAP version 13
+# Subtest: v10 preregistration is accepted by the shared digest and validation contract
+ok 1 - v10 preregistration is accepted by the shared digest and validation contract
+  ---
+  duration_ms: 5.647824
+  type: 'test'
+  ...
+# Subtest: v10 credential routing keeps the signed OpenRouter environment policy
+ok 2 - v10 credential routing keeps the signed OpenRouter environment policy
+  ---
+  duration_ms: 1.355689
+  type: 'test'
+  ...
+# Subtest: v10 is a separate run/image version over the in-force v9 base
+ok 3 - v10 is a separate run/image version over the in-force v9 base
+  ---
+  duration_ms: 1.246918
+  type: 'test'
+  ...
+# Subtest: v10 probe path reaches both probe children through the public resolver
+ok 4 - v10 probe path reaches both probe children through the public resolver
+  ---
+  duration_ms: 0.404712
+  type: 'test'
+  ...
+# Subtest: probe path resolver keeps legacy default and rejects unsupported or escaping paths
+ok 5 - probe path resolver keeps legacy default and rejects unsupported or escaping paths
+  ---
+  duration_ms: 1.01842
+  type: 'test'
+  ...
+# Subtest: v10 requires the complete v9 A reconciliation, sidecar and provider receipt
+ok 6 - v10 requires the complete v9 A reconciliation, sidecar and provider receipt
+  ---
+  duration_ms: 9.749819
+  type: 'test'
+  ...
+# Subtest: v10 draft and approval bind the known v9 base and reject every frozen-member mutation
+ok 7 - v10 draft and approval bind the known v9 base and reject every frozen-member mutation
+  ---
+  duration_ms: 47.033714
+  type: 'test'
+  ...
+# Subtest: v10 prediction loading retains the v9 correlation and accounting requirements
+ok 8 - v10 prediction loading retains the v9 correlation and accounting requirements
+  ---
+  duration_ms: 2.557431
+  type: 'test'
+  ...
+# Subtest: v10 keeps the deterministic frozen-table agreement separate from human acceptance
+ok 9 - v10 keeps the deterministic frozen-table agreement separate from human acceptance
+  ---
+  duration_ms: 0.723371
+  type: 'test'
+  ...
+# Subtest: v10 evaluation publishes deterministic agreement only after full scoring and leaves human review pending
+ok 10 - v10 evaluation publishes deterministic agreement only after full scoring and leaves human review pending
+  ---
+  duration_ms: 21.891626
+  type: 'test'
+  ...
+# Subtest: v10 evaluation refuses a corrupted sidecar, unparsed-as-agreement, and duplicate A/B generation IDs
+ok 11 - v10 evaluation refuses a corrupted sidecar, unparsed-as-agreement, and duplicate A/B generation IDs
+  ---
+  duration_ms: 25.015101
+  type: 'test'
+  ...
+# Subtest: active campaign routing recognizes v6
+ok 12 - active campaign routing recognizes v6
+  ---
+  duration_ms: 1.431561
+  type: 'test'
+  ...
+# Subtest: v6 evaluator accepts only complete same-base campaign probes and fresh security controls, then binds both digests
+ok 13 - v6 evaluator accepts only complete same-base campaign probes and fresh security controls, then binds both digests
+  ---
+  duration_ms: 1.932881
+  type: 'test'
+  ...
+# Subtest: v6 evaluator refuses missing, duplicate, foreign, or incomplete probe evidence as NOT_RUN
+ok 14 - v6 evaluator refuses missing, duplicate, foreign, or incomplete probe evidence as NOT_RUN
+  ---
+  duration_ms: 1.232268
+  type: 'test'
+  ...
+# Subtest: v6 evaluator reports a failed held-probe assertion and never converts it to PASS
+ok 15 - v6 evaluator reports a failed held-probe assertion and never converts it to PASS
+  ---
+  duration_ms: 0.272543
+  type: 'test'
+  ...
+# Subtest: campaign probe accepts only an in-force preregistration named by the corpus manifest
+ok 16 - campaign probe accepts only an in-force preregistration named by the corpus manifest
+  ---
+  duration_ms: 0.307404
+  type: 'test'
+  ...
+# Subtest: explicit v6 preregistration path is canonical and reaches both crash and restart child argv
+ok 17 - explicit v6 preregistration path is canonical and reaches both crash and restart child argv
+  ---
+  duration_ms: 1.115323
+  type: 'test'
+  ...
+# Subtest: v7 evaluator binds its own preregistration and requires the same complete campaign/security probe contract
+ok 18 - v7 evaluator binds its own preregistration and requires the same complete campaign/security probe contract
+  ---
+  duration_ms: 0.783621
+  type: 'test'
+  ...
+# Subtest: v7 campaign probe paths and active preregistration binding reach both restart children
+ok 19 - v7 campaign probe paths and active preregistration binding reach both restart children
+  ---
+  duration_ms: 1.317764
+  type: 'test'
+  ...
+# Subtest: v7 approval binds only provider credential routing while retaining frozen science and run policy
+ok 20 - v7 approval binds only provider credential routing while retaining frozen science and run policy
+  ---
+  duration_ms: 17.617236
+  type: 'test'
+  ...
+# Subtest: v7 seal preserves v6 history and commits an immutable supersession
+ok 21 - v7 seal preserves v6 history and commits an immutable supersession
+  ---
+  duration_ms: 30.200266
+  type: 'test'
+  ...
+# Subtest: v7 CLI/image routes select v7 while v6 paid runs refuse before launch
+ok 22 - v7 CLI/image routes select v7 while v6 paid runs refuse before launch
+  ---
+  duration_ms: 2.316217
+  type: 'test'
+  ...
+# Subtest: v7 paid routing keeps signed timeout and per-run cap and dispatches only under v7 pin
+ok 23 - v7 paid routing keeps signed timeout and per-run cap and dispatches only under v7 pin
+  ---
+  duration_ms: 4.348476
+  type: 'test'
+  ...
+# Subtest: paid production CLI requires durable A/B evidence and refuses collisions before launch
+ok 24 - paid production CLI requires durable A/B evidence and refuses collisions before launch
+  ---
+  duration_ms: 5.759549
+  type: 'test'
+  ...
+# Subtest: v8 image paths stage v7 for preseal and dispatch the signed v8 with the shared cap
+ok 25 - v8 image paths stage v7 for preseal and dispatch the signed v8 with the shared cap
+  ---
+  duration_ms: 1.396797
+  type: 'test'
+  ...
+# Subtest: v8 returns the retry-disabled settings actually consumed by the arm
+ok 26 - v8 returns the retry-disabled settings actually consumed by the arm
+  ---
+  duration_ms: 0.753949
+  type: 'test'
+  ...
+# Subtest: v8 approval binds v7 bytes and v8 content, preserves science, and leaves USD unverified
+ok 27 - v8 approval binds v7 bytes and v8 content, preserves science, and leaves USD unverified
+  ---
+  duration_ms: 26.495817
+  type: 'test'
+  ...
+# Subtest: v8 seal carries exact v7 supersession, rejects unsigned or drifting body, and replays manifest
+ok 28 - v8 seal carries exact v7 supersession, rejects unsigned or drifting body, and replays manifest
+  ---
+  duration_ms: 357.012124
+  type: 'test'
+  ...
+# Subtest: v8 independent evaluation recognizes its version and refuses missing probes
+ok 29 - v8 independent evaluation recognizes its version and refuses missing probes
+  ---
+  duration_ms: 3.713111
+  type: 'test'
+  ...
+# Subtest: common preregistration contract covers v8 executor and rejects a retry bypass
+ok 30 - common preregistration contract covers v8 executor and rejects a retry bypass
+  ---
+  duration_ms: 4.288446
+  type: 'test'
+  ...
+# Subtest: all campaign probes resolve and validate the sealed v8 document
+ok 31 - all campaign probes resolve and validate the sealed v8 document
+  ---
+  duration_ms: 80.735193
+  type: 'test'
+  ...
+# Subtest: v9 has unique image pins and stages the signed v8 preregistration
+ok 32 - v9 has unique image pins and stages the signed v8 preregistration
+  ---
+  duration_ms: 1.360977
+  type: 'test'
+  ...
+# Subtest: v9 image staging copies and hashes the inherited policy sources
+ok 33 - v9 image staging copies and hashes the inherited policy sources
+  ---
+  duration_ms: 0.479548
+  type: 'test'
+  ...
+# Subtest: v9 guard validates the complete owner reconciliation and binds the preserved v8 A bytes
+ok 34 - v9 guard validates the complete owner reconciliation and binds the preserved v8 A bytes
+  ---
+  duration_ms: 2.3962
+  type: 'test'
+  ...
+# Subtest: v9 draft carries v8 science and cap with a digest-bound fresh-run reconciliation
+ok 35 - v9 draft carries v8 science and cap with a digest-bound fresh-run reconciliation
+  ---
+  duration_ms: 4.705378
+  type: 'test'
+  ...
+# Subtest: a call reports provider correlation and the sidecar verifies per-case usage totals
+ok 36 - a call reports provider correlation and the sidecar verifies per-case usage totals
+  ---
+  duration_ms: 1.888846
+  type: 'test'
+  ...
+# Subtest: v9 refuses correlation without erasing observed usage or guessing an ID
+ok 37 - v9 refuses correlation without erasing observed usage or guessing an ID
+  ---
+  duration_ms: 0.311258
+  type: 'test'
+  ...
+# Subtest: an uncorrelated paid attempt retains its measured usage through arm and sidecar
+ok 38 - an uncorrelated paid attempt retains its measured usage through arm and sidecar
+  ---
+  duration_ms: 8.339105
+  type: 'test'
+  ...
+# Subtest: the v9 evaluator requires complete unique generation accounting for measured model sidecars
+ok 39 - the v9 evaluator requires complete unique generation accounting for measured model sidecars
+  ---
+  duration_ms: 309.794261
+  type: 'test'
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 39
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2884.809521

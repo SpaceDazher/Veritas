@@ -1,0 +1,12 @@
+{
+  "kind": "s2-008-campaign-predictions/1",
+  "run": "a",
+  "arm_id": "arm-model-zai-glm53flash",
+  "seed": 20260926,
+  "unparsed": 0,
+  "model_calls": 0,
+  "spent_tokens": 0,
+  "usd_spent": 0,
+  "outcome_class": "INFRA",
+  "rows": []
+}

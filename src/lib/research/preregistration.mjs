@@ -715,6 +715,10 @@ export const PREREGISTRATION_RULE = 's2-008-prereg-v1';
  */
 export function preregistrationDigest(prereg) {
   if (!isPlainObject(prereg)) throw malformed('PREREGISTRATION_NOT_AN_OBJECT', `expected a preregistration object, got ${typeName(prereg)}`);
+  if (['s2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10'].includes(prereg.rule)) {
+    const { approval, status, preregistration_digest, ...body } = prereg;
+    return canonicalDigest(body);
+  }
   const projection = {};
   for (const field of DIGEST_FIELDS) {
     if (!Object.hasOwn(prereg, field) || prereg[field] === undefined) throw malformed('PREREGISTRATION_FIELD_MISSING', `digest-covered field absent: ${field}`);
@@ -808,6 +812,18 @@ export function assertPreregistration(prereg) {
   assertMultiplicityRule(prereg.multiplicity_rule, trialIds);
   requireMember(prereg.inference_mode, INFERENCE_MODES, 'inference_mode');
   assertHoldoutAccess(prereg);
+  if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule) &&
+      (prereg.executor?.provider !== (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule) ? 'openrouter' : 'zai-coding-cn') ||
+       (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule) && prereg.executor?.model !== 'stealth/space-bunny-alpha') ||
+       prereg.executor?.credential_env_name !== (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule) ? 'OPENROUTER_API_KEY' : 'ZAI_CODING_CN_API_KEY') ||
+       prereg.executor?.pi_settings?.config_dir_env !== 'PI_CODING_AGENT_DIR' ||
+       prereg.executor?.pi_settings?.retry?.enabled !== false ||
+       prereg.executor?.pi_settings?.retry?.maxRetries !== 0 ||
+       prereg.executor?.pi_settings?.retry?.provider?.maxRetries !== 0 ||
+       prereg.executor?.pi_settings?.cacheWarming !== 'off' ||
+       prereg.executor?.pi_settings?.compaction?.enabled !== false)) {
+    throw malformed('PREREGISTRATION_EXECUTOR_POLICY_INVALID', 'v7/v8/v9/v10 require provider credential routing with disabled retries, cache warming, and compaction');
+  }
   // Optional bindings, checked whenever they are present.
   if (prereg.card !== undefined && prereg.card !== null) {
     const card = requireObject(prereg.card, 'card');
@@ -818,7 +834,7 @@ export function assertPreregistration(prereg) {
   }
   const tableKey = firstPresentKey(prereg, ['expected_table_digest', 'table_digest']);
   if (tableKey !== null) requireDigest(prereg[tableKey], tableKey);
-  if (prereg.rule !== undefined && prereg.rule !== null && prereg.rule !== PREREGISTRATION_RULE) {
+  if (prereg.rule !== undefined && prereg.rule !== null && ![PREREGISTRATION_RULE, 's2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10'].includes(prereg.rule)) {
     throw malformed('PREREGISTRATION_RULE_MISMATCH', `rule must be ${PREREGISTRATION_RULE}, got ${String(prereg.rule)}`);
   }
   for (const key of ['title', 'description', 'notes']) freeText(prereg[key], key);

@@ -1,0 +1,47 @@
+{
+  "kind": "s2-008-v9-host-accounting-replay/1",
+  "scope": "TEST_ONLY; injected recorded outputs, no model/container/provider calls; never a campaign measurement",
+  "raw_paid_run_sha256": "5958cdead994c3474a0496cf3bd41b2e9a4de31b02cf82075ff67339ac135b20",
+  "host_source_sha256": "fe0fedc3c947d1b32da0976fe5c55d51f58ba7dc3111e3b187f3e773294c78eb",
+  "results": [
+    {
+      "name": "actual_partial_stop",
+      "invocations": 1,
+      "status": "BLOCKED",
+      "code": "CHARGE_NOT_MEASURABLE",
+      "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+      "spent_units": 6735,
+      "spent_units_is_lower_bound": true,
+      "model_calls": 11,
+      "model_calls_is_lower_bound": true,
+      "unknown_model_attempts": 1,
+      "unreconciled_spend": true
+    },
+    {
+      "name": "false_complete_flag_with_unaccounted_attempt",
+      "invocations": 1,
+      "status": "BLOCKED",
+      "code": "CHARGE_NOT_MEASURABLE",
+      "reason": "ARM_UNRECONCILED_MODEL_ATTEMPTS:1",
+      "spent_units": 6735,
+      "spent_units_is_lower_bound": true,
+      "model_calls": 11,
+      "model_calls_is_lower_bound": true,
+      "unknown_model_attempts": 1,
+      "unreconciled_spend": true
+    },
+    {
+      "name": "missing_usage",
+      "invocations": 1,
+      "status": "BLOCKED",
+      "code": "CHARGE_NOT_MEASURABLE",
+      "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+      "spent_units": null,
+      "spent_units_is_lower_bound": false,
+      "model_calls": null,
+      "model_calls_is_lower_bound": false,
+      "unknown_model_attempts": null,
+      "unreconciled_spend": true
+    }
+  ]
+}

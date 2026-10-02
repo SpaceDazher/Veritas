@@ -1,0 +1,177 @@
+{
+  "kind": "s2-008-v10-probe-route-preflight/1",
+  "created_at": "2026-10-02T06:53:21.816Z",
+  "status": "SOURCE_GATES_PASSED",
+  "source_commit": "addab148639176ee2e678179c831b923172687dd",
+  "red_commit": "a3aea1d",
+  "source_diff": "One probe-path allowlist regex; image-covered files and signed registration unchanged.",
+  "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+  "content_commitment": "cc670161cb4384481909c35f5b050e487c933bffa0bfaa189ab1b4ca13ee842b",
+  "private_verification_manifest_sha256": "fb11007cee7da4cb675587d94e5f00298ff8d2529ba67f4bb4318d636f8142c7",
+  "checks": [
+    {
+      "name": "probe-path-red",
+      "command": "node --test --test-name-pattern='v10 probe path|probe path resolver keeps legacy default' tests/research/campaign-v10.test.mjs",
+      "exit_code": 1,
+      "log": "evidence/s2-008-campaign/v10-route-checks/probe-path-red.log",
+      "log_sha256": "855678adee75f9d497a3c0acec0b5fc872dfa4ecda93cdf6f0016a0be968992b"
+    },
+    {
+      "name": "probe-path-green",
+      "command": "node --test --test-name-pattern='v10 probe path|probe path resolver keeps legacy default' tests/research/campaign-v10.test.mjs",
+      "exit_code": 0,
+      "summary": "2 passed",
+      "log": "evidence/s2-008-campaign/v10-route-checks/probe-path-green.log",
+      "log_sha256": "46ed409bbc3d088dd61e336b7ca0784c37a0add58ee5bde0213bacaf4d20514e"
+    },
+    {
+      "name": "targeted-probe-versions",
+      "command": "node --test --test-concurrency=1 tests/research/campaign-v6-probe-evidence.test.mjs tests/research/campaign-v7-credential.test.mjs tests/research/campaign-v8.test.mjs tests/research/campaign-v9.test.mjs tests/research/campaign-v10.test.mjs",
+      "exit_code": 0,
+      "summary": "39 passed",
+      "log": "evidence/s2-008-campaign/v10-route-checks/targeted-probe-versions.log",
+      "log_sha256": "863972ef87e4f1f6a73e6cc2d4849192b24573311f511f0c2da1c4bc5eb1c648"
+    },
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "log": "evidence/s2-008-campaign/v10-route-checks/lint.log",
+      "log_sha256": "671cb8726088631d46fec0a0d5cf0d5581eea80bcbbe48eef554b3667e67f7e9"
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "log": "evidence/s2-008-campaign/v10-route-checks/typecheck.log",
+      "log_sha256": "c91a98311197fe3504742acd4ce85c38a111a297a2ee59fd9d985b9910039592"
+    },
+    {
+      "name": "npm-test",
+      "command": "npm test",
+      "exit_code": 0,
+      "summary": "1924 tests; 1916 passed; 0 failed/cancelled; 8 skipped",
+      "log": "evidence/s2-008-campaign/v10-route-checks/npm-test.log",
+      "log_sha256": "77376860b2e60091817c7658e0130af3d32f5d4a3908f8caa602bc7abd2b5ea5"
+    },
+    {
+      "name": "test-research",
+      "command": "npm run test:research",
+      "exit_code": 0,
+      "summary": "426 passed, no skips",
+      "log": "evidence/s2-008-campaign/v10-route-checks/test-research.log",
+      "log_sha256": "945d8c646dc5a0d2d174a2521fcf192c058e64a50ce9198a67bf49c7082a9a6a"
+    },
+    {
+      "name": "test-s2-008",
+      "command": "npm run test:s2-008",
+      "exit_code": 0,
+      "summary": "426 passed, no skips",
+      "log": "evidence/s2-008-campaign/v10-route-checks/test-s2-008.log",
+      "log_sha256": "d040031f5c5a123eef00d8a3bc8989c68ed022c1b884895717fe4941131c5bce"
+    },
+    {
+      "name": "test-s2-002-isolation",
+      "command": "npm run test:s2-002-isolation",
+      "exit_code": 0,
+      "summary": "125 passed, no skips",
+      "log": "evidence/s2-008-campaign/v10-route-checks/test-s2-002-isolation.log",
+      "log_sha256": "3c3821a6e85877cebe72e3de1a9f4be1ca8cf813d6a7ee2bd431e358948c6891"
+    },
+    {
+      "name": "verify-s2-008",
+      "command": "npm run verify:s2-008",
+      "exit_code": 0,
+      "log": "evidence/s2-008-campaign/v10-route-checks/verify-s2-008.log",
+      "log_sha256": "f3ab7a3f7c556fb224e04c6608187dee521d7b70528276ffcfbe77c6f7bc3bd7"
+    }
+  ],
+  "parent_focused": {
+    "exit_code": 0,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "log": "evidence/s2-008-campaign/v10-route-checks/parent-focused.log",
+    "log_sha256": "fe44fcf8ad606bf9e6601f42aece13d970950706b3beb802fa772e81ca3cf755"
+  },
+  "full_suite_skips": {
+    "total": 8,
+    "database_not_run": 6,
+    "database_reason": "NOT_RUN_DB: DATABASE_URL is not configured",
+    "other": [
+      "one VERITAS_S2_007R_REAL opt-in skip",
+      "one skip without a reason in the TAP output"
+    ]
+  },
+  "generated_verification_evidence": [
+    {
+      "repository_path": "evidence/s2-006-comparison.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-006-comparison.json",
+      "sha256": "d0167f163b1832d0f037cfce6c4cfc2d0207f4d85f2bfe2ec911f7e3725bf39e"
+    },
+    {
+      "repository_path": "evidence/s2-006-run-a.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-006-run-a.json",
+      "sha256": "cd09ab24354b53772751946071077278f6d0fcfa82a950d2c94018e4e204150f"
+    },
+    {
+      "repository_path": "evidence/s2-006-run-b.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-006-run-b.json",
+      "sha256": "8d504fb4c5506e809857d6162a0fb9896399937beacdf0886e798ad0cba59f54"
+    },
+    {
+      "repository_path": "evidence/s2-008-comparison.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-comparison.json",
+      "sha256": "7e8c58c58e377c8db760afcc099716dae8fa621e8d10e70cf809a9926399a76e"
+    },
+    {
+      "repository_path": "evidence/s2-008-controls.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-controls.json",
+      "sha256": "33ed42bb6ff8cd5e6966ae7a29c36284a40f9e015142b079207894dd5f4d8666"
+    },
+    {
+      "repository_path": "evidence/s2-008-dependency-binding.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-dependency-binding.json",
+      "sha256": "35c709bb88937d55aa4db29bf4f9353bfae2c796c5add53d7cc0822b7b19c66e"
+    },
+    {
+      "repository_path": "evidence/s2-008-harness.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-harness.json",
+      "sha256": "fbc77c82c970569e874e196048f0540ec7631dae06963f8651ffe37ab2895a2f"
+    },
+    {
+      "repository_path": "evidence/s2-008-probes.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-probes.json",
+      "sha256": "42a6c28b99239c3c73e9c93499f18f780f702c6495dd34ef84d478478906ef44"
+    },
+    {
+      "repository_path": "evidence/s2-008-replay.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-replay.json",
+      "sha256": "219fdab287e9e6eae5642552752f2fd8e3de711bd8e718460ed1115f1a53cde6"
+    },
+    {
+      "repository_path": "evidence/s2-008-run-a.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-run-a.json",
+      "sha256": "9768afcd23ffc92fac9acc6237d1863cbe507de8e91b8364a7553ba10d1f6db8"
+    },
+    {
+      "repository_path": "evidence/s2-008-run-b.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-run-b.json",
+      "sha256": "9285cbeef33f3be271c5c704554e00de43649328dbbf0b065bc99b025aa47347"
+    },
+    {
+      "repository_path": "evidence/s2-008-security-probes.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-security-probes.json",
+      "sha256": "43a86aa703e7e42483c7f9aaa477bce06cb52175b467a72b8b0dbb025c291ef4"
+    },
+    {
+      "repository_path": "evidence/s2-008-summary.json",
+      "archive": "evidence/s2-008-campaign/v10-route-checks/generated/s2-008-summary.json",
+      "sha256": "c9da02fdb8aef4373d78ea1756b54ea2bbe8598d3d1de9160d41bcb833e1a36c"
+    }
+  ],
+  "paid_model_calls": 0,
+  "paid_a": "NOT_RUN",
+  "paid_b": "NOT_RUN",
+  "human_paid_review": "NOT_RUN"
+}

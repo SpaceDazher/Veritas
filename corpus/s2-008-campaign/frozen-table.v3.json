@@ -1,0 +1,37 @@
+{
+  "kind": "s2-008-campaign-table/1",
+  "note": "A real campaign cannot freeze an expected OUTCOME: the data are not authored, so any such expectation would be the hypothesis rewritten to fit the result. What is frozen here is the rule, the family and the precision the design supports, and the four outcome classes the engine may emit. The gate below is that the run agrees with THIS document, not with a predicted answer.",
+  "rule": {
+    "alpha": 0.05,
+    "method": "holm_bonferroni",
+    "family_size": 3,
+    "confidence": 0.9833333333333333,
+    "confidence_derivation": "1 - alpha / family_size",
+    "rejection_floor": 0.016666666666666666,
+    "never_rejects": false,
+    "can_only_answer": "ANY_OUTCOME"
+  },
+  "permitted_outcomes": [
+    "POSITIVE",
+    "NEGATIVE",
+    "NULL",
+    "INFRA",
+    "UNRESOLVED"
+  ],
+  "metric": "case_agreement_rate",
+  "baseline": 0.8803191489361702,
+  "band": 0.06969570950743816,
+  "n_holdout": 126,
+  "seeds": [
+    20260926,
+    20260927,
+    20260928
+  ],
+  "supersession": {
+    "superseded_preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58",
+    "reason": "v3 replaces trial 01 predictor with the model; trials 02 and 03 remain controls"
+  },
+  "budget_ceiling": 5000000,
+  "budget_currency": "tokens",
+  "trial_list_digest": "9137105f249f147f11210b357aebe5753e35916e4fc7653f64436f9414ea98d4"
+}

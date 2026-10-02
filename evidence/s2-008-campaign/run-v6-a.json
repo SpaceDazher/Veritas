@@ -1,0 +1,181 @@
+{
+  "kind": "s2-008-campaign-v6-predictions/1",
+  "status": "BLOCKED",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+  "label": "a",
+  "dry_run": false,
+  "raw_run_id": "s2-008c-v6-a-993a111a8f704565924e",
+  "nonce": "n-a-b9f26d9d2d384aaa",
+  "base": {
+    "commit_sha": "e36cc867a4e37913af2de078f8bc7ed34cd27cff",
+    "tree_sha": "3a75d62e2710f57b42badfce2dda057ee546dbdf",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 155,
+    "track_tracked": true
+  },
+  "preregistration_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
+  "model_image_pin": {
+    "imageId": "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+    "digest": "sha256:b247c0966a5177b46ce6d9b0f9a9688d8eb74210b7b56bc8f6e3eca66110e893",
+    "content_commitment": "023954d98146c3e1fd8e9e09269a4d8f57e598ea912e55ea0dbfc7f745519006"
+  },
+  "reservation": {
+    "id": "rsv-s2-008c-03",
+    "currency": "tokens",
+    "granted_units": 5000000
+  },
+  "spent_units": 0,
+  "unreconciled_spend": true,
+  "model_calls": 0,
+  "launches": 1,
+  "unknown_launch_attempts": 0,
+  "charges": [],
+  "trials": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "INFRA",
+          "predictions": {
+            "digest": "2ba0d98cd5c90e448d99a4db210e49404ea62c035e0ea7a8ba7cb95a1e1fb68e",
+            "rows": 0,
+            "unparsed": 0,
+            "file": "evidence/s2-008-campaign/predictions-v6-a-trl-s2-008c-01-20260926.json"
+          },
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260926,
+            "image": "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+            "image_digest": "sha256:b247c0966a5177b46ce6d9b0f9a9688d8eb74210b7b56bc8f6e3eca66110e893",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--secret",
+              "sec-veritas-executor-credential",
+              "--env-file",
+              "/tmp/veritas-model-credential-MJtSio/.sec-veritas-executor-credential.2082.0.env",
+              "--mount",
+              "type=bind,src=/tmp/veritas-campaign-egress-A7fyuQ/egress.sock,dst=/run/egress.sock",
+              "--name",
+              "s2-008-model-v6-20260926",
+              "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v6.in-force.json",
+              "20260926",
+              "--remaining-tokens",
+              "5000000"
+            ],
+            "axes": {
+              "network": {
+                "policy": "allowlist",
+                "flag": "--network=none",
+                "allowlist": [
+                  {
+                    "host": "open.bigmodel.cn",
+                    "ports": [
+                      443
+                    ]
+                  }
+                ],
+                "egressSocket": "/tmp/veritas-campaign-egress-A7fyuQ/egress.sock"
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [
+                  "/run/egress.sock"
+                ],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": [
+                  "sec-veritas-executor-credential"
+                ]
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 22980000
+              }
+            },
+            "exit_code": 10,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "No API key found for zai-coding-cn.\n\nUse /login to log into a provider via OAuth or API key. See:\n  /opt/pi/docs/providers.md\n  /opt/pi/docs/models.md\n",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260926 n=126 predictions=0 tokens=0 usd=0.000000 dry_run=false pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "4b421c72cce3b6688f7d3d0df3c05dcac76a1aca73292baddb5667f2ae7f8a87",
+            "predictions": {
+              "digest": "2ba0d98cd5c90e448d99a4db210e49404ea62c035e0ea7a8ba7cb95a1e1fb68e",
+              "rows": 0,
+              "unparsed": 0
+            },
+            "real_start": {
+              "proven": false,
+              "container_pid": 1,
+              "host_pid": 2082,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

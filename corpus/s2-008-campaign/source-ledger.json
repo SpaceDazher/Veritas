@@ -1,0 +1,21 @@
+{
+ "kind": "SUPERSESSION_LEDGER/1",
+ "entries": [
+  {
+   "index": 0,
+   "previous_anchor_digest": null,
+   "anchor_digest": "49a6d758e3e5c9cf26eabb0023815a38edb626562ea56e79c81b3835098b07c7",
+   "cases_digest": "2d9b510786c54493c210feb838fd0cf3e9fa38f8c6e0922bc4bd7418b727a544",
+   "expected_table_digest": "c22fb97fce2f5615ed0af50a17a1849880ebda256e84c698be5d4b359aa909ab",
+   "reason": "the first and only freeze of this campaign: the real history, the dev-measured baseline, the design-time band and the rule, sealed before the adapter was ever launched"
+  },
+  {
+   "index": 1,
+   "previous_anchor_digest": "49a6d758e3e5c9cf26eabb0023815a38edb626562ea56e79c81b3835098b07c7",
+   "anchor_digest": "52710b17f4223c5b1c5c31ee61825a52a6086da9c3b12299d2774d0512f9f4ae",
+   "cases_digest": "2d9b510786c54493c210feb838fd0cf3e9fa38f8c6e0922bc4bd7418b727a544",
+   "expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35",
+   "reason": "the freeze of this campaign, and its supersession: the real history, the dev-measured baseline, the design-time band, the rule, the two-process bootstrap and the charged budget, all sealed before the corrected adapter was ever launched"
+  }
+ ]
+}

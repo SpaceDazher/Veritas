@@ -1,0 +1,473 @@
+{
+  "kind": "s2-008-campaign-predictions/1",
+  "run": "a",
+  "arm_id": "arm-model-zai-glm53flash",
+  "seed": 20260926,
+  "unparsed": 0,
+  "model_calls": 25,
+  "spent_tokens": 15856,
+  "usd_spent": 0,
+  "outcome_class": "INFRA",
+  "accounting": {
+    "schema": "s2-008-model-accounting/1",
+    "policy": "GENERATION_ID_REQUIRED",
+    "calls": 25,
+    "tokens": 15856,
+    "prompt_tokens": 14844,
+    "reported_cost_usd": 0,
+    "rows": [
+      {
+        "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+        "generation_id": "gen-1790924330-SYioMDDG2kMRpd9kiPmy",
+        "correlation_status": "CORRELATED",
+        "input": 458,
+        "output": 27,
+        "cacheRead": 138,
+        "cacheWrite": 0,
+        "prompt_tokens": 596,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 623,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+        "generation_id": "gen-1790924333-LrldVcsm3dXF7L11sFJt",
+        "correlation_status": "CORRELATED",
+        "input": 468,
+        "output": 114,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 596,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 710,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+        "generation_id": "gen-1790924336-tQSh2XP2f31EXNBFUTIh",
+        "correlation_status": "CORRELATED",
+        "input": 470,
+        "output": 17,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 598,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 615,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+        "generation_id": "gen-1790924339-DMh8k4eOm2fikQ4hXjZP",
+        "correlation_status": "CORRELATED",
+        "input": 459,
+        "output": 45,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 587,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 632,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+        "generation_id": "gen-1790924341-DO4hCpiyWFwpI5BeI57G",
+        "correlation_status": "CORRELATED",
+        "input": 458,
+        "output": 24,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 586,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 610,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+        "generation_id": "gen-1790924344-WhMeRu03wxSGp3O3U1vV",
+        "correlation_status": "CORRELATED",
+        "input": 456,
+        "output": 74,
+        "cacheRead": 142,
+        "cacheWrite": 0,
+        "prompt_tokens": 598,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 672,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+        "generation_id": "gen-1790924371-4eSx2qhrjDz0D13WseBp",
+        "correlation_status": "CORRELATED",
+        "input": 587,
+        "output": 40,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 587,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 627,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+        "generation_id": "gen-1790924373-17eQc2dkj4cgiWtdbC0z",
+        "correlation_status": "CORRELATED",
+        "input": 458,
+        "output": 105,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 586,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 691,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+        "generation_id": "gen-1790924376-0jwRGg73i2d2Ha51ftfM",
+        "correlation_status": "CORRELATED",
+        "input": 464,
+        "output": 43,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 592,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 635,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+        "generation_id": "gen-1790924381-XzyEAgmUSwBWe860OgoQ",
+        "correlation_status": "CORRELATED",
+        "input": 459,
+        "output": 41,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 587,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 628,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+        "generation_id": "gen-1790924383-bIGBbPdWfAvvjrXujYyF",
+        "correlation_status": "CORRELATED",
+        "input": 458,
+        "output": 71,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 586,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 657,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+        "generation_id": "gen-1790924388-8vC8qmMlSdFdYv0DBHlk",
+        "correlation_status": "CORRELATED",
+        "input": 468,
+        "output": 4,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 596,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 600,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+        "generation_id": "gen-1790924391-0o9zQUVYdRIPqnqs1GLx",
+        "correlation_status": "CORRELATED",
+        "input": 443,
+        "output": 40,
+        "cacheRead": 144,
+        "cacheWrite": 0,
+        "prompt_tokens": 587,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 627,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+        "generation_id": "gen-1790924395-vh4Gl7kcb4gbWddFLgMe",
+        "correlation_status": "CORRELATED",
+        "input": 458,
+        "output": 57,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 586,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 643,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+        "generation_id": "gen-1790924397-3XWBXvsnlwhGVWgDNF2J",
+        "correlation_status": "CORRELATED",
+        "input": 458,
+        "output": 3,
+        "cacheRead": 138,
+        "cacheWrite": 0,
+        "prompt_tokens": 596,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 599,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+        "generation_id": "gen-1790924398-VDp2gPnpaWuk4xTbKWYw",
+        "correlation_status": "CORRELATED",
+        "input": 467,
+        "output": 89,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 595,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 684,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+        "generation_id": "gen-1790924402-PQcf6u3rZTprSznPm8Tq",
+        "correlation_status": "CORRELATED",
+        "input": 465,
+        "output": 33,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 593,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 626,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+        "generation_id": "gen-1790924405-yqoLgnD1xJPBhUetpb4s",
+        "correlation_status": "CORRELATED",
+        "input": 467,
+        "output": 4,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 595,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 599,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+        "generation_id": "gen-1790924409-f8yxHZczgx2vpb78t0g8",
+        "correlation_status": "CORRELATED",
+        "input": 453,
+        "output": 3,
+        "cacheRead": 140,
+        "cacheWrite": 0,
+        "prompt_tokens": 593,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 596,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+        "generation_id": "gen-1790924411-fnLuIowybf0s1ddpu2zo",
+        "correlation_status": "CORRELATED",
+        "input": 491,
+        "output": 4,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 619,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 623,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+        "generation_id": "gen-1790924413-tZJk4sQiGyL5NVXgZf9H",
+        "correlation_status": "CORRELATED",
+        "input": 472,
+        "output": 4,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 600,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 604,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+        "generation_id": "gen-1790924415-uhsftEgb2bGPJljOzrNc",
+        "correlation_status": "CORRELATED",
+        "input": 469,
+        "output": 85,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 597,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 682,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+        "generation_id": "gen-1790924421-uBVPBMGCHD9XhwREjCKZ",
+        "correlation_status": "CORRELATED",
+        "input": 471,
+        "output": 4,
+        "cacheRead": 128,
+        "cacheWrite": 0,
+        "prompt_tokens": 599,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 603,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+        "generation_id": "gen-1790924422-vnTK7KCXlreYdu3Q1CTw",
+        "correlation_status": "CORRELATED",
+        "input": 457,
+        "output": 52,
+        "cacheRead": 138,
+        "cacheWrite": 0,
+        "prompt_tokens": 595,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 647,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+        "generation_id": "gen-1790924424-6bL4BoUY8m40FNm8gOvm",
+        "correlation_status": "CORRELATED",
+        "input": 210,
+        "output": 29,
+        "cacheRead": 384,
+        "cacheWrite": 0,
+        "prompt_tokens": 594,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 623,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+      "predicted": "MINOR"
+    }
+  ]
+}

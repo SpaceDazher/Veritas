@@ -89,7 +89,7 @@ export function readCredential(args, { readFile = readFileSync, stdin = null } =
  * unlink the spool, always. The env file is the delivery channel for the run and
  * is spooled here so the caller never has to construct one.
  */
-export function provision(args, { podman = spawnSync, podmanArgv = [], spoolDir, value: injected = null } = {}) {
+export function provision(args, { podman = (args, options) => spawnSync('podman', args, options), podmanArgv = [], spoolDir, value: injected = null } = {}) {
   if (typeof args.envName !== 'string' || args.envName.length === 0) {
     throw new Error(`${PROVISION_ERRORS.ENV_NAME_REQUIRED}:--env-name`);
   }

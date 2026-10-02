@@ -1,0 +1,70 @@
+{
+  "kind": "s2-008-v9-scope-mutation/1",
+  "unchanged_science": true,
+  "real_draft_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+  "rejected_count": 15,
+  "rejected": [
+    {
+      "member": "card",
+      "refusal": "APPROVAL_SCOPE_DRIFT:card"
+    },
+    {
+      "member": "metric",
+      "refusal": "APPROVAL_SCOPE_DRIFT:metric"
+    },
+    {
+      "member": "frozen_baseline",
+      "refusal": "APPROVAL_SCOPE_DRIFT:frozen_baseline"
+    },
+    {
+      "member": "noise_rule",
+      "refusal": "APPROVAL_SCOPE_DRIFT:noise_rule"
+    },
+    {
+      "member": "multiplicity_rule",
+      "refusal": "APPROVAL_SCOPE_DRIFT:multiplicity_rule"
+    },
+    {
+      "member": "seed_rule",
+      "refusal": "APPROVAL_SCOPE_DRIFT:seed_rule"
+    },
+    {
+      "member": "seeds_digest",
+      "refusal": "APPROVAL_SCOPE_DRIFT:seeds_digest"
+    },
+    {
+      "member": "seed_count",
+      "refusal": "APPROVAL_SCOPE_DRIFT:seed_count"
+    },
+    {
+      "member": "stopping_rule",
+      "refusal": "APPROVAL_SCOPE_DRIFT:stopping_rule"
+    },
+    {
+      "member": "sequential_rule",
+      "refusal": "APPROVAL_SCOPE_DRIFT:sequential_rule"
+    },
+    {
+      "member": "holdout_access",
+      "refusal": "APPROVAL_SCOPE_DRIFT:holdout_access"
+    },
+    {
+      "member": "inference_mode",
+      "refusal": "APPROVAL_SCOPE_DRIFT:inference_mode"
+    },
+    {
+      "member": "trial_list",
+      "refusal": "APPROVAL_SCOPE_DRIFT:trial_list"
+    },
+    {
+      "member": "expected_table_digest",
+      "refusal": "APPROVAL_SCOPE_DRIFT:expected_table_digest"
+    },
+    {
+      "member": "bootstrap_process",
+      "refusal": "APPROVAL_SCOPE_DRIFT:bootstrap_process"
+    }
+  ],
+  "real_signature_validation": true,
+  "validated_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d"
+}

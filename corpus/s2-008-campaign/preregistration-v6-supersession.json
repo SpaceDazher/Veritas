@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "b482cc7ea0325b405e18f33777ba93d387a0a494a01ace65db7a8b8457da6df9",
+  "replaced_by_preregistration_digest": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v6 updates model execution and runtime binding while preserving the frozen scientific members and 5,000,000-token ceiling per A/B run",
+  "supersession_id": "spr-038fe4892c4261aa1d5006e9",
+  "supersession_digest": "ba081fe23d682940a5d9f457998321b430f4d82cd8ec809e9faf11053b1b5741"
+}

@@ -1,0 +1,340 @@
+{
+ "kind": "PREREGISTRATION",
+ "rule": "s2-008-prereg-v1",
+ "preregistration_id": "xpr-s2-008c-01",
+ "expected_table_digest": "def3a5000dd7b2f73e7a76834d7c96f5970ff0c87e1b78d080027551dd76bf35",
+ "card_id": "hyc-s2-008c-01",
+ "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
+ "recorded_at": "2026-09-28T00:00:00.000Z",
+ "inference_mode": "ASSOCIATIONAL",
+ "title": "Do commit-message features agree with a message-independent MAJOR label on the real Veritas history?",
+ "description": "Real project, real history, real predictor run by a digest-pinned installed executor. 3 preregistered arms, one family, frozen before the holdout was opened.",
+ "card": {
+  "contractVersion": "1.0.0",
+  "card_id": "hyc-s2-008c-01",
+  "card_type": "HYPOTHESIS",
+  "type_promotion": null,
+  "originating_domains": [
+   "vcs-history",
+   "commit-message-conventions"
+  ],
+  "nodes": [
+   {
+    "claim_id": "clm-s2-008c-01",
+    "domain": "vcs-history",
+    "revision": 1,
+    "role": "source"
+   },
+   {
+    "claim_id": "clm-s2-008c-02",
+    "domain": "commit-message-conventions",
+    "revision": 1,
+    "role": "target"
+   }
+  ],
+  "proposed_relation": {
+   "subject": "the commit message subject line",
+   "predicate": "is associated with",
+   "object": "whether the commit is MAJOR, on the newest 25% of the real Veritas history",
+   "relation_strength": "CORRELATION_EVIDENCE",
+   "causal_assertion": null
+  },
+  "temporal_ordering": {
+   "established": false,
+   "event_times": [],
+   "evidence_claim_ids": []
+  },
+  "mediators": [],
+  "confounders": [
+   {
+    "claim_id": "clm-s2-008c-03",
+    "description": "the base rate of MAJOR commits is low in the dev partition, so a predictor biased towards MAJOR loses agreement to the majority class; a difference in base rate between the two partitions would move every arm at once",
+    "status": "IDENTIFIED"
+   },
+   {
+    "claim_id": "clm-s2-008c-04",
+    "description": "the partitions are not exchangeable: dev ends 2026-09-26 and the holdout is the following days, during which the ticket itself was under active work",
+    "status": "IDENTIFIED"
+   }
+  ],
+  "alternative_explanations": [
+   {
+    "claim_id": null,
+    "description": "the arms differ only in how often they predict the rare class, and no arm carries information about the message beyond that frequency"
+   },
+   {
+    "claim_id": null,
+    "description": "the dev-partition base rate is an artefact of this checkout's squashed history rather than a property of the project"
+   }
+  ],
+  "scope": {
+   "population": "every commit reachable from the acceptance base of the local Veritas checkout",
+   "geography": null,
+   "period": {
+    "start": "2026-09-09T00:00:00.000Z",
+    "end": "2026-09-28T00:00:00.000Z"
+   },
+   "units": "commit",
+   "domain_limits": [
+    "this one repository and this one checkout; no other project and no other history was measured",
+    "the label is a path-prefix rule, not a judgement of importance: a MAJOR commit that only edits a README is labelled MINOR",
+    "association only; no causal effect of message wording on change size is claimed and none is measurable here"
+   ]
+  },
+  "assumptions": [
+   "the holdout partition is a temporal successor of the dev partition and the base rate did not move materially between them",
+   "the predictor is a pure function of the subject line, so it cannot have seen the diff it is predicting"
+  ],
+  "falsifiers": [
+   {
+    "description": "the dev-partition base rate of MAJOR commits is 0 or 1, so the majority-class baseline is perfect and no arm can beat it",
+    "observable": "frozen_baseline.value == 1.0"
+   },
+   {
+    "description": "the label is not a function of the tree alone",
+    "observable": "re-labelling every dev commit under a constant subject returns a different label vector"
+   },
+   {
+    "description": "the preregistered rule cannot reject anything, so the campaign is undecidable by construction",
+    "observable": "ruleFeasibility never_rejects == true"
+   }
+  ],
+  "test_design": "One preregistered trial per arm (family of 3, Holm-Bonferroni at alpha 0.05, confidence 0.9833333333333333 derived as 1 - alpha/m). Each trial measures case_agreement_rate of the arm's prediction against the message-independent MAJOR label over the temporal holdout partition, opened exactly once through the sealed one-shot unseal, with 3 frozen bootstrap seeds whose intervals are HULLED (widest) so no seed is ever selected. Observational corpus; inference_mode ASSOCIATIONAL.",
+  "counterevidence": [
+   {
+    "claim_id": "clm-s2-008c-05",
+    "relation": "bounds"
+   }
+  ],
+  "novelty": {
+   "assessment": "NOT_ASSESSED",
+   "corpus": null,
+   "search_horizon": null,
+   "similar_prior_refs": []
+  },
+  "uncertainty": {
+   "author_confidence": null,
+   "evidence_support": 0,
+   "expert_trust": null,
+   "measured_calibration": null
+  },
+  "stale": {
+   "is_stale": false,
+   "stale_claim_ids": [],
+   "invalidation_event_ids": []
+  },
+  "status": "FRESH",
+  "created_at": "2026-09-28T00:00:00.000Z",
+  "created_by": "s2-008-campaign-acceptance"
+ },
+ "metric": {
+  "name": "case_agreement_rate",
+  "direction": "HIGHER_IS_BETTER",
+  "unit": "ratio",
+  "noiseBand": 0.06969570950743816,
+  "inferenceMode": "ASSOCIATIONAL",
+  "value_basis": "CASE_AGREEMENT_RATE"
+ },
+ "frozen_baseline": {
+  "value": 0.8803191489361702,
+  "baseline_digest": "2ed46ca47547ad7acca3797a6f5c618d12b8c5f5f73db128d11f7b240cf638d6",
+  "source": "FROZEN_DEV_PARTITION",
+  "corpus_partition": "PRIMARY",
+  "measured_by": "scripts/s2-008-campaign-prepare.mjs",
+  "value_basis": "CASE_AGREEMENT_RATE",
+  "computed_from": "the 376 dev commits; the holdout was not read"
+ },
+ "seed_count": 3,
+ "seed_rule": {
+  "kind": "FIXED_LIST",
+  "seeds": [
+   20260926,
+   20260927,
+   20260928
+  ],
+  "source": "PREREGISTERED",
+  "best_seed_selection": "FORBIDDEN",
+  "decision_interval": "HULL_OF_ALL_SEED_INTERVALS",
+  "point_estimate": "OBSERVED_RATE_SEED_INVARIANT",
+  "disclosure": "every seed is reported with its own interval; no seed is ranked, selected or dropped"
+ },
+ "seeds_digest": "42704357a3a804f6a963e67e14e6f4d27fa9428714649b7e50f0e0e32d9d716c",
+ "stopping_rule": {
+  "kind": "FIXED_TRIALS",
+  "max_trials": 3,
+  "early_stop": false,
+  "on_negative": "RECORD_AND_CONTINUE",
+  "on_null": "RECORD_AND_CONTINUE",
+  "on_infra": "RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO"
+ },
+ "bootstrap_process": {
+  "where": "a second isolated launch, after the decision point, never predicting anything",
+  "why_separate": "a bootstrap needs the agreement vector, which is a function of the label; the predictor must never see a label, so the two cannot be one process",
+  "multiplicity": "every resample is carried as its full per-case multiplicity vector, so a case drawn three times counts three times and the resample mean converges on the measured rate",
+  "guard": "a trial whose resample mean does not sit at its own measured rate is refused, not published"
+ },
+ "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
+ "budget_reservation": {
+  "reservation_id": "rsv-s2-008c-01",
+  "currency": "isolated_executor_launches",
+  "granted_units": 12,
+  "spent_units": 0,
+  "expires_at": "2026-09-28T23:59:59.000Z",
+  "trial_timeout_ms": 120000,
+  "unit_definition": "one podman launch of a digest-pinned executor image; 9 preregistered prediction launches (3 arms x 3 frozen seeds) plus 1 preregistered bootstrap launch, charged one unit each as they happen; monetary spend is zero and no external service is contacted",
+  "enumerated_work": "3 declared trials x 3 frozen seeds + 1 bootstrap launch = 10 preregistered launches, ceiling 12"
+ },
+ "noise_rule": {
+  "band": 0.06969570950743816,
+  "noise_band": 0.06969570950743816,
+  "method": "percentile_bootstrap_over_poisson_binomial_draw_counts",
+  "bootstrap_samples": 2000,
+  "bootstrap_seed": 20260926,
+  "confidence": 0.9833333333333333,
+  "percentile": 0.9833333333333333,
+  "inference_mode": "ASSOCIATIONAL",
+  "unit": "ratio",
+  "positive_rule": "LOWER_MINUS_BASELINE_GT_BAND",
+  "negative_rule": "UPPER_MINUS_BASELINE_LT_BEGATIVE_BAND",
+  "null_rule": "INTERVAL_INSIDE_BAND_AROUND_BASELINE",
+  "band_derivation": {
+   "rule": "noise_band = the Wilson-scaled half-width of the preregistered interval at the preregistered confidence for the preregistered holdout n, evaluated at the DEV-partition baseline",
+   "z": 2.3939798012415405,
+   "half_width": 0.06969570950743816,
+   "n_holdout": 126,
+   "computed_before": "the holdout partition was opened",
+   "why": "a difference below the width this design can resolve is not an effect this campaign is able to see; calling it one would be noise dressed as a finding"
+  }
+ },
+ "source_pin": {
+  "pinned_commit": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+  "rule": "the corpus is a function of this commit and never of HEAD, so the data are the same bytes on any host and after any later commit"
+ },
+ "multiplicity_rule": {
+  "kind": "HOLM_BONFERRONI",
+  "method": "holm_bonferroni",
+  "alpha": 0.05,
+  "confidence": 0.9833333333333333,
+  "family_size": 3,
+  "declared_comparisons": [
+   "trl-s2-008c-01",
+   "trl-s2-008c-02",
+   "trl-s2-008c-03"
+  ],
+  "direction": "increase",
+  "null_value": 0.8803191489361702,
+  "excluded": []
+ },
+ "trial_list": [
+  {
+   "index": 0,
+   "trial_id": "trl-s2-008c-01",
+   "arm_id": "arm-scope-present",
+   "partition": "HOLDOUT",
+   "stratum": "all_commits",
+   "predictor": "predict MAJOR iff the subject matches /^[a-z]+(\\([^)]*\\))?!?:/ (a conventional-commit subject carrying a scope)",
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ],
+   "metric": "case_agreement_rate"
+  },
+  {
+   "index": 1,
+   "trial_id": "trl-s2-008c-02",
+   "arm_id": "arm-type-feat-fix",
+   "partition": "HOLDOUT",
+   "stratum": "all_commits",
+   "predictor": "predict MAJOR iff the subject type is feat or fix",
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ],
+   "metric": "case_agreement_rate"
+  },
+  {
+   "index": 2,
+   "trial_id": "trl-s2-008c-03",
+   "arm_id": "arm-type-chore",
+   "partition": "HOLDOUT",
+   "stratum": "all_commits",
+   "predictor": "predict MINOR iff the subject type is chore, else predict MAJOR",
+   "seeds": [
+    20260926,
+    20260927,
+    20260928
+   ],
+   "metric": "case_agreement_rate"
+  }
+ ],
+ "holdout_access": {
+  "partition": "HOLDOUT",
+  "case_count": 126,
+  "max_opens": 1,
+  "one_shot": true,
+  "decision_point": "AFTER_DECLARED_TRIALS",
+  "reads_before_data": true,
+  "released_actor_kinds": [
+   "EVALUATOR"
+  ],
+  "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+  "unseal_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f"
+ },
+ "recorded_before_first_trial": {
+  "first_trial": "trl-s2-008c-01",
+  "order_proved_by": "REGISTRY_JOURNAL_NOT_A_CLOCK",
+  "proof": "the preregistration row is committed to the registry journal before the first TRIAL row, and the corpus manifest seals a preregistration_digest that the case files cannot be edited past"
+ },
+ "required_fields_present": [
+  "hypothesis",
+  "metric",
+  "frozen_baseline",
+  "seed_count",
+  "stopping_rule",
+  "budget_reservation"
+ ],
+ "source": {
+  "project": "Veritas",
+  "kind": "real repository history, read from the local checkout with git",
+  "pinned_commit": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+  "commit_count": 502,
+  "dev_count": 376,
+  "holdout_count": 126,
+  "split_at_commit": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+  "dev_period": [
+   "2026-09-09T13:49:36.000Z",
+   "2026-09-26T11:23:16.000Z"
+  ],
+  "holdout_period": [
+   "2026-09-26T11:24:16.000Z",
+   "2026-09-28T08:15:00.000Z"
+  ],
+  "label_rule": "MAJOR iff the commit diff touches >= 1 path under src/lib/, contracts/ or migrations/; the rule never reads the commit message",
+  "split_rule": "temporal: the oldest 75% of `git log --reverse <pinned_commit>` is the dev partition (PRIMARY), the newest 25% is the holdout (HOLDOUT)",
+  "frozen_at": "2026-09-28"
+ },
+ "arms": [
+  {
+   "trial_id": "trl-s2-008c-01",
+   "arm_id": "arm-scope-present",
+   "predictor": "predict MAJOR iff the subject matches /^[a-z]+(\\([^)]*\\))?!?:/ (a conventional-commit subject carrying a scope)"
+  },
+  {
+   "trial_id": "trl-s2-008c-02",
+   "arm_id": "arm-type-feat-fix",
+   "predictor": "predict MAJOR iff the subject type is feat or fix"
+  },
+  {
+   "trial_id": "trl-s2-008c-03",
+   "arm_id": "arm-type-chore",
+   "predictor": "predict MINOR iff the subject type is chore, else predict MAJOR"
+  }
+ ],
+ "campaign_metric": {
+  "name": "case_agreement_rate",
+  "subject_is_pooled_aggregate": true
+ },
+ "preregistration_digest": "eb6a6b06d886a105b5f0e8907e45c4490bc6c7aeb26694adcb4e0f45faaa4e58"
+}

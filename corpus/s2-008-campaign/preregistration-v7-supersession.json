@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "34027a198c6734e4e7a03f0f65bdd169ba25968a72d4957aab5c17bd7a1096a7",
+  "replaced_by_preregistration_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v7 corrects provider credential routing and disables retry, cache-warming, and compaction paths while preserving frozen science and the 5,000,000-token ceiling per A/B run",
+  "supersession_id": "spr-e1528d2ad7894ced0439c598",
+  "supersession_digest": "a1618ec9764dc5164856abf8d182f799a2b35aa2e76b619e52c8251a03cdbd64"
+}

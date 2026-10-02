@@ -1,0 +1,52 @@
+{
+  "kind": "s2-008-campaign-v7-operational-block/1",
+  "status": "INCOMPLETE",
+  "preregistration_digest": "8051e5bbdfecc957f17a29833c548dacf809fa2195e8465892ca9acdb420b47e",
+  "base": {
+    "commit_sha": "c6529cf7009bdb19caf090d320eb7c24bee1453d",
+    "tree_sha": "386f53dfed74b47f5610437c4e1738de88dfa78b",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 177,
+    "track_tracked": true
+  },
+  "run_a_digest": "d2f270a5f1b5599a5e7c07157b08cafef287f6fcd34843afb3601a65f459b7d2",
+  "run_a_original_unchanged": true,
+  "run_a": {
+    "status": "BLOCKED",
+    "code": "CHARGE_NOT_MEASURABLE",
+    "confirmed_tokens": 0,
+    "confirmed_model_calls": 0,
+    "unreconciled_spend": true,
+    "attempt_window_utc": "2026-09-30T22:11:49Z/2026-09-30T22:11:53Z",
+    "predictions": 0,
+    "unparsed": 0
+  },
+  "run_b": {
+    "status": "NOT_RUN",
+    "reason": "A stopped with unknown spend; no next model launch authorized by accounting state"
+  },
+  "aggregate_spend": {
+    "confirmed_tokens": 0,
+    "actual_tokens": null,
+    "actual_usd": null,
+    "reason": "provider usage reconciliation pending"
+  },
+  "independent_evaluation": {
+    "status": "NOT_RUN",
+    "command": "node scripts/s2-008-campaign-evaluate.mjs --v7",
+    "exit_code": 1,
+    "reason": "ENOENT: no such file or directory, open '/home/daniil/Veritas/evidence/s2-008-campaign/run-v7-b.json'",
+    "holdout_opened": false
+  },
+  "route_acceptance": {
+    "status": "NOT_CONFIRMED",
+    "reason": "actual A yielded INFRA, no positive billed usage"
+  },
+  "diagnostic_limit": "Offline deny_all replay produced Connection error and zero usage, but is not a reconciliation of original A. Its detailed pi error was not retained by the runner; output_digest alone cannot recover it.",
+  "required_next_evidence": "provider token/cost usage for the original A window and a versioned diagnostic path retaining the own-arm stop before another paid trial",
+  "human_review": {
+    "status": "PENDING",
+    "case": "A-MVP-05"
+  }
+}

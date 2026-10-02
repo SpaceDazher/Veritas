@@ -1,0 +1,3293 @@
+{
+  "kind": "s2-008-campaign-v10-predictions/1",
+  "status": "DRY_RUN",
+  "code": null,
+  "reason": null,
+  "label": "a",
+  "dry_run": true,
+  "raw_run_id": "s2-008c-v10-a-05b00d5ee0bc4bb7baef",
+  "nonce": "n-a-64a47de285c614df",
+  "base": {
+    "commit_sha": "caca2491860c5fbdcb4b3a89cd5755e71a538a88",
+    "tree_sha": "9326a7c2d431478179fc677f8d437cbb4267fd71",
+    "branch": "HEAD",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 282,
+    "track_tracked": true
+  },
+  "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+  "model_image_pin": {
+    "imageId": "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+    "digest": "sha256:2edcad361e8f0963ced19f055f4e848e9bb16d58144083d2dc7f234d9782e66e",
+    "content_commitment": "cc670161cb4384481909c35f5b050e487c933bffa0bfaa189ab1b4ca13ee842b"
+  },
+  "reservation": {
+    "id": "rsv-s2-008c-10",
+    "currency": "tokens",
+    "granted_units": 5000000
+  },
+  "spent_units": 0,
+  "spent_units_is_lower_bound": false,
+  "unreconciled_spend": false,
+  "model_calls": 0,
+  "model_calls_is_lower_bound": false,
+  "unknown_model_attempts": 0,
+  "launches": 9,
+  "unknown_launch_attempts": 0,
+  "charges": [
+    {
+      "trial": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seed": 20260926,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "the executor's own pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified, as carried in the arm record's budget.spent_tokens",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seed": 20260927,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "the executor's own pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified, as carried in the arm record's budget.spent_tokens",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seed": 20260928,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "the executor's own pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified, as carried in the arm record's budget.spent_tokens",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "seed": 20260926,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "regex control: no model call",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "seed": 20260927,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "regex control: no model call",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "seed": 20260928,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "regex control: no model call",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "seed": 20260926,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "regex control: no model call",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "seed": 20260927,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "regex control: no model call",
+      "spent_units_after": 0
+    },
+    {
+      "trial": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "seed": 20260928,
+      "units": 0,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "regex control: no model call",
+      "spent_units_after": 0
+    }
+  ],
+  "trials": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "DRY_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260926,
+            "image": "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+            "image_digest": "sha256:2edcad361e8f0963ced19f055f4e848e9bb16d58144083d2dc7f234d9782e66e",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-model-v10-dry-run",
+              "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v10.in-force.json",
+              "20260926",
+              "--remaining-tokens",
+              "5000000",
+              "--dry-run"
+            ],
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 22980000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260926 n=126 predictions=126 tokens=0 usd=0.000000 dry_run=true pid=1 node=v22.23.3",
+            "payload_chunks": 2,
+            "payload_error": null,
+            "output_digest": "8a533ced69a517d709594ce685396282978a81d149cfab6e5aab385a0929fa18",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "accounting_schema": "s2-008-model-accounting/1",
+              "accounting": [],
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260926,
+              "n_cases": 126,
+              "predictions": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "12990652103986ef5b2eeafa70064c8a9e8473ea",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ac3fbec30c1c0090800cc7744df47eaf9f7cfbe2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2dd5d8d9d0a20f8f211c4ed6adfcd2531064a4bb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "f1665aa6fcc89dfecbb6037b04cf6f1150ec0d45",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "c20a7c8fd3dabf954b74ff1a3b5ea4231945f54a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3852f2bce87c5f0f64705afb1543ff2d6387c41e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "982019e2ce253fa06467dfa82aa91d9729c208c7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a593f7ff4d284980d9842fa4c5ebe2d2658307dc",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e7dd3ac16366cbc2e571e3c82bfb1c5dc08af5e7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "03e47c880a8054cadd72bf972a052dc5e055518b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "69bdf1d6863a1dc9f9aaab28067721c761ea9029",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ca39d44fe749f25b52c25f6473edf2d1f48b8127",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b576e7c455f712b44b90cdb209d32a7cbe0423f5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a676b8d79e4639fc72319e85288f10a9203072b8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "038fc5aa70ba9c8210c39df07b19c5b1ceb67470",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e754d0a938023eb7a223a49cb37cc579f2fcd214",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "97ed8f6be8016c70b3bf204f0e0087678f5925fa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ccd7affa65a8d81b54c71c92c2d43d3abe24d880",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "4891b3c7bbd14786cd9704333f1ce67da953f464",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0f1d78d92792004ee18fcfb2ba258d55a3f996a0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "908d8332837241eeef08c30ef9508845383a4252",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8c98e82313b584e581f7fda6507354717751ad9d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "7bb950eed7fd5ef7deab900dd54c692a81eb6950",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5c54d43738798461499a15091f08cd59fa716413",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41dd515cfd8a4810bfcc19b1a735845cbe8c182b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c231b894b61103bf26209ed89c9179983b0a9b7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "c63001c342bb16592793ee942799712e7c284456",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d0075b4fb174f5b0336b7617251baf4c516cf007",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "75ea661e49a1232bd592b8abd166f4d17c2ade84",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c314e11ba6edd0a846086a50c74e485fa796d2f",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "90bf97cb95c3ed37c6cd179e12b3123d66e5478e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "445970eb7d66198305abddaf45599cfd724ed164",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "593d59731bb9d24560c7ab1116c774c18c7ab136",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ab6a315a813240da5d129971a0ffdc808b05d9ad",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a2f7717203b4f0fcd00ea179c2258e4107eb2bbd",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "23df9053915ac42e21b70cd5988a88288b81241c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "27c92d9870e488395068aac6e7c73764a7ea500b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41d0544905f62e03c001ae2ea9431481eff81f76",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "370eaa0920b07add7ba9764c1889dc7a7e907370",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "35ae3d5ef3c2c460f31b364f99de37de5fd08dd8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "f490517e98f59056543568805ea267f1583aa34e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8e0fec54b3c74ac3255bcb34734bd0e3ae020e1e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d18eafd8f6d61e3e6c194f38755d97eab54500e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d9f37b33a1e5179f2a68f7377b31392214d035a1",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a66a0a1463e6add8860b8af85d7c9b1ab0adeb2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "7e3407920aa1ab35569a278138f0b38418d2b933",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2d6b73cac49e85ee4c96aeaa35029c90e5a1a907",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "42b7a0e630179d8beb8baf2c6338b28b06f374da",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5819560af2f6d568053aed3bb7336c4648fc9645",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e113382da032ce1dfea97746d9997c92c58aaea4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "868f3655706011dbbc35d22174c98f751cc2dbf6",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3df812cf36f3ef1b3c4739a783013d6c464372bc",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "25d3921adbebf70a7d5cb1341bf892e70c5ce205",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3b880342ba4c5bec28e0513108f8cc62142ce22e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "1923dc99d3e5e6e714f3ccb6580269c96a6822d4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cf000e058085aacbadfee3ccdd618a9238308b85",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a3ef83260bf1118bc61ecf2aa5a1b944e34e4fc3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3c328bd117999c27db34cb0705661d739862c6ae",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bd4d8c409f7dc25a91d35c3e3a9fe8d5ef9a9c6e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0d36a3255e7a7b009b2f67e49d11e9734e8366de",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "1b347d5317c65fcecabcd9ecc95660b6cd56f142",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0146d8964018848401ca434691117fa171ec2e39",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b6121227af9a54f4878a4e7d08feccf418c60e84",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "82c0a40d1316742b157ea7de5f1ca57f0787a2e2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5c60e35daf98c446c64bcb91def042e920ddd101",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9170f563519e054dad0a07144dbcd8eea22b7f4b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "388a37956fe63baeee8c57be426aa4a47b913103",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "59cca292e695fc7f84dd1ae8c147035c4373fa31",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3109a6183790d95c0fa9fe7d14a5dc19e48528fb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "16933f35f45a2bee4cecb9bc512b7b6a9f06ec53",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b50f052c6147e3e01cd0cd7ee14d861a6375366e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9876c11c1cbcb7d6df905f0059bd1d54d5730855",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "da41fc9489780cabbb129f88e59d346894e8bc4b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e90dd12d28d127d520d543a1b740abb63ae59360",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "043795c9e3392e537185c83551b10ed6decdd0ee",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "69065630a0e5352939b74ce363af7584e2053896",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "516dbdc427496a8c32282b3438a4d26f012dbb0d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2086fd2c8771125a79edd2a11f5cdc3c7fa95b12",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "42df5c8211b8ab03e6cee5c57a454a702956851c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "740c764f241c43f77bca24c2fc41aea417d6df98",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                }
+              ],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 0,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": false
+              },
+              "stop": null,
+              "dry_run": true,
+              "outcome_class": "DRY_RUN",
+              "executor": {
+                "provider": "openrouter",
+                "model": "stealth/space-bunny-alpha",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "credential_present": false,
+                "credential_in_argv": false,
+                "egress_route": null,
+                "model_calls": 0,
+                "model_attempts": 0,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "per_model_call_timeout_ms": 180000,
+                  "holdout_case_count": 126,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 22980000,
+                  "total_container_timeout_formula": "holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms",
+                  "total_container_timeout_scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                },
+                "accounting_policy": "GENERATION_ID_REQUIRED"
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260926",
+                  "--dry-run"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        },
+        {
+          "seed": 20260927,
+          "outcome_class": "DRY_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260927,
+            "image": "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+            "image_digest": "sha256:2edcad361e8f0963ced19f055f4e848e9bb16d58144083d2dc7f234d9782e66e",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-model-v10-dry-run",
+              "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v10.in-force.json",
+              "20260927",
+              "--remaining-tokens",
+              "5000000",
+              "--dry-run"
+            ],
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 22980000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260927 n=126 predictions=126 tokens=0 usd=0.000000 dry_run=true pid=1 node=v22.23.3",
+            "payload_chunks": 2,
+            "payload_error": null,
+            "output_digest": "d9a2fabf63d9668e589044519923707f3349664d110337a99ecfcc8e78958cc6",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "accounting_schema": "s2-008-model-accounting/1",
+              "accounting": [],
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260927,
+              "n_cases": 126,
+              "predictions": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "12990652103986ef5b2eeafa70064c8a9e8473ea",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ac3fbec30c1c0090800cc7744df47eaf9f7cfbe2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2dd5d8d9d0a20f8f211c4ed6adfcd2531064a4bb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "f1665aa6fcc89dfecbb6037b04cf6f1150ec0d45",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "c20a7c8fd3dabf954b74ff1a3b5ea4231945f54a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3852f2bce87c5f0f64705afb1543ff2d6387c41e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "982019e2ce253fa06467dfa82aa91d9729c208c7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a593f7ff4d284980d9842fa4c5ebe2d2658307dc",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e7dd3ac16366cbc2e571e3c82bfb1c5dc08af5e7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "03e47c880a8054cadd72bf972a052dc5e055518b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "69bdf1d6863a1dc9f9aaab28067721c761ea9029",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ca39d44fe749f25b52c25f6473edf2d1f48b8127",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b576e7c455f712b44b90cdb209d32a7cbe0423f5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a676b8d79e4639fc72319e85288f10a9203072b8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "038fc5aa70ba9c8210c39df07b19c5b1ceb67470",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e754d0a938023eb7a223a49cb37cc579f2fcd214",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "97ed8f6be8016c70b3bf204f0e0087678f5925fa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ccd7affa65a8d81b54c71c92c2d43d3abe24d880",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "4891b3c7bbd14786cd9704333f1ce67da953f464",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0f1d78d92792004ee18fcfb2ba258d55a3f996a0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "908d8332837241eeef08c30ef9508845383a4252",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8c98e82313b584e581f7fda6507354717751ad9d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "7bb950eed7fd5ef7deab900dd54c692a81eb6950",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5c54d43738798461499a15091f08cd59fa716413",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41dd515cfd8a4810bfcc19b1a735845cbe8c182b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c231b894b61103bf26209ed89c9179983b0a9b7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "c63001c342bb16592793ee942799712e7c284456",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d0075b4fb174f5b0336b7617251baf4c516cf007",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "75ea661e49a1232bd592b8abd166f4d17c2ade84",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c314e11ba6edd0a846086a50c74e485fa796d2f",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "90bf97cb95c3ed37c6cd179e12b3123d66e5478e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "445970eb7d66198305abddaf45599cfd724ed164",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "593d59731bb9d24560c7ab1116c774c18c7ab136",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ab6a315a813240da5d129971a0ffdc808b05d9ad",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a2f7717203b4f0fcd00ea179c2258e4107eb2bbd",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "23df9053915ac42e21b70cd5988a88288b81241c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "27c92d9870e488395068aac6e7c73764a7ea500b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41d0544905f62e03c001ae2ea9431481eff81f76",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "370eaa0920b07add7ba9764c1889dc7a7e907370",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "35ae3d5ef3c2c460f31b364f99de37de5fd08dd8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "f490517e98f59056543568805ea267f1583aa34e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8e0fec54b3c74ac3255bcb34734bd0e3ae020e1e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d18eafd8f6d61e3e6c194f38755d97eab54500e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d9f37b33a1e5179f2a68f7377b31392214d035a1",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a66a0a1463e6add8860b8af85d7c9b1ab0adeb2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "7e3407920aa1ab35569a278138f0b38418d2b933",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2d6b73cac49e85ee4c96aeaa35029c90e5a1a907",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "42b7a0e630179d8beb8baf2c6338b28b06f374da",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5819560af2f6d568053aed3bb7336c4648fc9645",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e113382da032ce1dfea97746d9997c92c58aaea4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "868f3655706011dbbc35d22174c98f751cc2dbf6",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3df812cf36f3ef1b3c4739a783013d6c464372bc",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "25d3921adbebf70a7d5cb1341bf892e70c5ce205",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3b880342ba4c5bec28e0513108f8cc62142ce22e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "1923dc99d3e5e6e714f3ccb6580269c96a6822d4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cf000e058085aacbadfee3ccdd618a9238308b85",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a3ef83260bf1118bc61ecf2aa5a1b944e34e4fc3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3c328bd117999c27db34cb0705661d739862c6ae",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bd4d8c409f7dc25a91d35c3e3a9fe8d5ef9a9c6e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0d36a3255e7a7b009b2f67e49d11e9734e8366de",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "1b347d5317c65fcecabcd9ecc95660b6cd56f142",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0146d8964018848401ca434691117fa171ec2e39",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b6121227af9a54f4878a4e7d08feccf418c60e84",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "82c0a40d1316742b157ea7de5f1ca57f0787a2e2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5c60e35daf98c446c64bcb91def042e920ddd101",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9170f563519e054dad0a07144dbcd8eea22b7f4b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "388a37956fe63baeee8c57be426aa4a47b913103",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "59cca292e695fc7f84dd1ae8c147035c4373fa31",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3109a6183790d95c0fa9fe7d14a5dc19e48528fb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "16933f35f45a2bee4cecb9bc512b7b6a9f06ec53",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b50f052c6147e3e01cd0cd7ee14d861a6375366e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9876c11c1cbcb7d6df905f0059bd1d54d5730855",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "da41fc9489780cabbb129f88e59d346894e8bc4b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e90dd12d28d127d520d543a1b740abb63ae59360",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "043795c9e3392e537185c83551b10ed6decdd0ee",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "69065630a0e5352939b74ce363af7584e2053896",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "516dbdc427496a8c32282b3438a4d26f012dbb0d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2086fd2c8771125a79edd2a11f5cdc3c7fa95b12",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "42df5c8211b8ab03e6cee5c57a454a702956851c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "740c764f241c43f77bca24c2fc41aea417d6df98",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                }
+              ],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 0,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": false
+              },
+              "stop": null,
+              "dry_run": true,
+              "outcome_class": "DRY_RUN",
+              "executor": {
+                "provider": "openrouter",
+                "model": "stealth/space-bunny-alpha",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "credential_present": false,
+                "credential_in_argv": false,
+                "egress_route": null,
+                "model_calls": 0,
+                "model_attempts": 0,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "per_model_call_timeout_ms": 180000,
+                  "holdout_case_count": 126,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 22980000,
+                  "total_container_timeout_formula": "holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms",
+                  "total_container_timeout_scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                },
+                "accounting_policy": "GENERATION_ID_REQUIRED"
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260927",
+                  "--dry-run"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        },
+        {
+          "seed": 20260928,
+          "outcome_class": "DRY_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260928,
+            "image": "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+            "image_digest": "sha256:2edcad361e8f0963ced19f055f4e848e9bb16d58144083d2dc7f234d9782e66e",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-model-v10-dry-run",
+              "sha256:2dea20e9a46cf0ad9cee7d273f3c4d442de15cde498ac149790b580b1698dfee",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v10.in-force.json",
+              "20260928",
+              "--remaining-tokens",
+              "5000000",
+              "--dry-run"
+            ],
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 22980000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260928 n=126 predictions=126 tokens=0 usd=0.000000 dry_run=true pid=1 node=v22.23.3",
+            "payload_chunks": 2,
+            "payload_error": null,
+            "output_digest": "6bbaab2d72460d3d0b97d414587a902eefc188690519afdafd7767993c0a6566",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "accounting_schema": "s2-008-model-accounting/1",
+              "accounting": [],
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260928,
+              "n_cases": 126,
+              "predictions": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "12990652103986ef5b2eeafa70064c8a9e8473ea",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ac3fbec30c1c0090800cc7744df47eaf9f7cfbe2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2dd5d8d9d0a20f8f211c4ed6adfcd2531064a4bb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "f1665aa6fcc89dfecbb6037b04cf6f1150ec0d45",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "c20a7c8fd3dabf954b74ff1a3b5ea4231945f54a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3852f2bce87c5f0f64705afb1543ff2d6387c41e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "982019e2ce253fa06467dfa82aa91d9729c208c7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a593f7ff4d284980d9842fa4c5ebe2d2658307dc",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e7dd3ac16366cbc2e571e3c82bfb1c5dc08af5e7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "03e47c880a8054cadd72bf972a052dc5e055518b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "69bdf1d6863a1dc9f9aaab28067721c761ea9029",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ca39d44fe749f25b52c25f6473edf2d1f48b8127",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b576e7c455f712b44b90cdb209d32a7cbe0423f5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a676b8d79e4639fc72319e85288f10a9203072b8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d55a9bbcd4cb0a65c5300a4e68a55be185c57272",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bd0e2f5b3873da33440cda5eb6b878c4a9988496",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "038fc5aa70ba9c8210c39df07b19c5b1ceb67470",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e754d0a938023eb7a223a49cb37cc579f2fcd214",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "97ed8f6be8016c70b3bf204f0e0087678f5925fa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a18a2e5f90a23a0316039dc8fd3dce6ce5f068fa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ccd7affa65a8d81b54c71c92c2d43d3abe24d880",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "4891b3c7bbd14786cd9704333f1ce67da953f464",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0f1d78d92792004ee18fcfb2ba258d55a3f996a0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "813f5be66d8ddd936e925cca491063c6409ff7c3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "908d8332837241eeef08c30ef9508845383a4252",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8c98e82313b584e581f7fda6507354717751ad9d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "7bb950eed7fd5ef7deab900dd54c692a81eb6950",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5c54d43738798461499a15091f08cd59fa716413",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41dd515cfd8a4810bfcc19b1a735845cbe8c182b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "34f8e6582ddf0418c0aec8f3c92d6045a882c983",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c231b894b61103bf26209ed89c9179983b0a9b7",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "c63001c342bb16592793ee942799712e7c284456",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d0075b4fb174f5b0336b7617251baf4c516cf007",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "fde26581658a74ab815311a9e5a2bafcd84f9caa",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "75ea661e49a1232bd592b8abd166f4d17c2ade84",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6f9ac462f8850526ad49a754086dfd340e0d0dce",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0c314e11ba6edd0a846086a50c74e485fa796d2f",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "90bf97cb95c3ed37c6cd179e12b3123d66e5478e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "445970eb7d66198305abddaf45599cfd724ed164",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "593d59731bb9d24560c7ab1116c774c18c7ab136",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ab6a315a813240da5d129971a0ffdc808b05d9ad",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a2f7717203b4f0fcd00ea179c2258e4107eb2bbd",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "23df9053915ac42e21b70cd5988a88288b81241c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ea8d22e4cb3e17c64aab0469bdf8638e21a1fbe6",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "27c92d9870e488395068aac6e7c73764a7ea500b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "41d0544905f62e03c001ae2ea9431481eff81f76",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cf60577d84b3cf17ecc9823e54a60b069f74faae",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "370eaa0920b07add7ba9764c1889dc7a7e907370",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "19fe44fc3491b73ddaff9ab9f7c6cc9971d02abb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "35ae3d5ef3c2c460f31b364f99de37de5fd08dd8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "f490517e98f59056543568805ea267f1583aa34e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "025fe09bbe1efab07ee162ee368853d5ae1c5753",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8e0fec54b3c74ac3255bcb34734bd0e3ae020e1e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d18eafd8f6d61e3e6c194f38755d97eab54500e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "d9f37b33a1e5179f2a68f7377b31392214d035a1",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a66a0a1463e6add8860b8af85d7c9b1ab0adeb2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "7e3407920aa1ab35569a278138f0b38418d2b933",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2d6b73cac49e85ee4c96aeaa35029c90e5a1a907",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "42b7a0e630179d8beb8baf2c6338b28b06f374da",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5819560af2f6d568053aed3bb7336c4648fc9645",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e113382da032ce1dfea97746d9997c92c58aaea4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "868f3655706011dbbc35d22174c98f751cc2dbf6",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3df812cf36f3ef1b3c4739a783013d6c464372bc",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "82a29f2dec71170fe9e553e2ba43fd948ed9b7a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "25d3921adbebf70a7d5cb1341bf892e70c5ce205",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3b880342ba4c5bec28e0513108f8cc62142ce22e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "1923dc99d3e5e6e714f3ccb6580269c96a6822d4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cf000e058085aacbadfee3ccdd618a9238308b85",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a3ef83260bf1118bc61ecf2aa5a1b944e34e4fc3",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3c328bd117999c27db34cb0705661d739862c6ae",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bd4d8c409f7dc25a91d35c3e3a9fe8d5ef9a9c6e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0d36a3255e7a7b009b2f67e49d11e9734e8366de",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "1b347d5317c65fcecabcd9ecc95660b6cd56f142",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0146d8964018848401ca434691117fa171ec2e39",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b6121227af9a54f4878a4e7d08feccf418c60e84",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "82c0a40d1316742b157ea7de5f1ca57f0787a2e2",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "5c60e35daf98c446c64bcb91def042e920ddd101",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9170f563519e054dad0a07144dbcd8eea22b7f4b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "388a37956fe63baeee8c57be426aa4a47b913103",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "59cca292e695fc7f84dd1ae8c147035c4373fa31",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3109a6183790d95c0fa9fe7d14a5dc19e48528fb",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "16933f35f45a2bee4cecb9bc512b7b6a9f06ec53",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "b50f052c6147e3e01cd0cd7ee14d861a6375366e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9876c11c1cbcb7d6df905f0059bd1d54d5730855",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "da41fc9489780cabbb129f88e59d346894e8bc4b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "e90dd12d28d127d520d543a1b740abb63ae59360",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "043795c9e3392e537185c83551b10ed6decdd0ee",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "69065630a0e5352939b74ce363af7584e2053896",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "516dbdc427496a8c32282b3438a4d26f012dbb0d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2086fd2c8771125a79edd2a11f5cdc3c7fa95b12",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "42df5c8211b8ab03e6cee5c57a454a702956851c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "740c764f241c43f77bca24c2fc41aea417d6df98",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                }
+              ],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 0,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": false
+              },
+              "stop": null,
+              "dry_run": true,
+              "outcome_class": "DRY_RUN",
+              "executor": {
+                "provider": "openrouter",
+                "model": "stealth/space-bunny-alpha",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "credential_present": false,
+                "credential_in_argv": false,
+                "egress_route": null,
+                "model_calls": 0,
+                "model_attempts": 0,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "per_model_call_timeout_ms": 180000,
+                  "holdout_case_count": 126,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 22980000,
+                  "total_container_timeout_formula": "holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms",
+                  "total_container_timeout_scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                },
+                "accounting_policy": "GENERATION_ID_REQUIRED"
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260928",
+                  "--dry-run"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "trial_id": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "NOT_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-type-feat-fix",
+            "seed": 20260926,
+            "samples": 2000,
+            "podman": {
+              "executable": "podman",
+              "argv_prefix": [
+                "--root",
+                "/tmp/podman-root",
+                "--runroot",
+                "/tmp/podman-runroot",
+                "--runtime",
+                "/usr/bin/crun"
+              ]
+            },
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-campaign-arm-type-feat-fix-20260926",
+              "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+              "/usr/local/bin/node",
+              "/opt/campaign/arm.mjs",
+              "/opt/campaign/holdout.blind.json",
+              "/tmp/campaign-out.json",
+              "arm-type-feat-fix",
+              "20260926",
+              "2000"
+            ],
+            "image": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+            "image_break_requested": false,
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 180000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-10-02T01:55:41-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-10-02T01:55:41-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-10-02T01:55:41-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+            "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260926 n=126 predictions=126 pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "6754630e2089d39852cfbfd7e9d67b6a768cfb1585fb97dfeb19ade038d4e76c",
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "issues": [],
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+              "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one"
+            }
+          }
+        },
+        {
+          "seed": 20260927,
+          "outcome_class": "NOT_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-type-feat-fix",
+            "seed": 20260927,
+            "samples": 2000,
+            "podman": {
+              "executable": "podman",
+              "argv_prefix": [
+                "--root",
+                "/tmp/podman-root",
+                "--runroot",
+                "/tmp/podman-runroot",
+                "--runtime",
+                "/usr/bin/crun"
+              ]
+            },
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-campaign-arm-type-feat-fix-20260927",
+              "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+              "/usr/local/bin/node",
+              "/opt/campaign/arm.mjs",
+              "/opt/campaign/holdout.blind.json",
+              "/tmp/campaign-out.json",
+              "arm-type-feat-fix",
+              "20260927",
+              "2000"
+            ],
+            "image": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+            "image_break_requested": false,
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 180000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-10-02T01:55:41-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-10-02T01:55:41-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-10-02T01:55:41-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+            "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260927 n=126 predictions=126 pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "25a396cbb6356ce536a3d8bc2fa437394d8c9a793dc1beb2b19595f8724c07e5",
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "issues": [],
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+              "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one"
+            }
+          }
+        },
+        {
+          "seed": 20260928,
+          "outcome_class": "NOT_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-type-feat-fix",
+            "seed": 20260928,
+            "samples": 2000,
+            "podman": {
+              "executable": "podman",
+              "argv_prefix": [
+                "--root",
+                "/tmp/podman-root",
+                "--runroot",
+                "/tmp/podman-runroot",
+                "--runtime",
+                "/usr/bin/crun"
+              ]
+            },
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-campaign-arm-type-feat-fix-20260928",
+              "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+              "/usr/local/bin/node",
+              "/opt/campaign/arm.mjs",
+              "/opt/campaign/holdout.blind.json",
+              "/tmp/campaign-out.json",
+              "arm-type-feat-fix",
+              "20260928",
+              "2000"
+            ],
+            "image": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+            "image_break_requested": false,
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 180000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-10-02T01:55:42-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-10-02T01:55:42-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-10-02T01:55:42-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+            "banner": "ADAPTER_OK arm=arm-type-feat-fix seed=20260928 n=126 predictions=126 pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "0609f46767ecb206afa30f125791f3ca20dd05e32d638b1956d0ccb1d7a4db80",
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "issues": [],
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+              "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "trial_id": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "NOT_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-type-chore",
+            "seed": 20260926,
+            "samples": 2000,
+            "podman": {
+              "executable": "podman",
+              "argv_prefix": [
+                "--root",
+                "/tmp/podman-root",
+                "--runroot",
+                "/tmp/podman-runroot",
+                "--runtime",
+                "/usr/bin/crun"
+              ]
+            },
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-campaign-arm-type-chore-20260926",
+              "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+              "/usr/local/bin/node",
+              "/opt/campaign/arm.mjs",
+              "/opt/campaign/holdout.blind.json",
+              "/tmp/campaign-out.json",
+              "arm-type-chore",
+              "20260926",
+              "2000"
+            ],
+            "image": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+            "image_break_requested": false,
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 180000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-10-02T01:55:42-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-10-02T01:55:42-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-10-02T01:55:42-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+            "banner": "ADAPTER_OK arm=arm-type-chore seed=20260926 n=126 predictions=126 pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "d3da764fe2c54aa2a3bc7f4231f0ce8dece68e6373bbf48d53618c6b7ead802a",
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "issues": [],
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+              "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one"
+            }
+          }
+        },
+        {
+          "seed": 20260927,
+          "outcome_class": "NOT_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-type-chore",
+            "seed": 20260927,
+            "samples": 2000,
+            "podman": {
+              "executable": "podman",
+              "argv_prefix": [
+                "--root",
+                "/tmp/podman-root",
+                "--runroot",
+                "/tmp/podman-runroot",
+                "--runtime",
+                "/usr/bin/crun"
+              ]
+            },
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-campaign-arm-type-chore-20260927",
+              "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+              "/usr/local/bin/node",
+              "/opt/campaign/arm.mjs",
+              "/opt/campaign/holdout.blind.json",
+              "/tmp/campaign-out.json",
+              "arm-type-chore",
+              "20260927",
+              "2000"
+            ],
+            "image": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+            "image_break_requested": false,
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 180000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-10-02T01:55:43-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-10-02T01:55:43-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-10-02T01:55:43-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+            "banner": "ADAPTER_OK arm=arm-type-chore seed=20260927 n=126 predictions=126 pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "ed927c18eeb57499112a01971699663020852d6cd1aedf8803b5685c4835e5e7",
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "issues": [],
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+              "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one"
+            }
+          }
+        },
+        {
+          "seed": 20260928,
+          "outcome_class": "NOT_RUN",
+          "predictions": null,
+          "launch": {
+            "arm_id": "arm-type-chore",
+            "seed": 20260928,
+            "samples": 2000,
+            "podman": {
+              "executable": "podman",
+              "argv_prefix": [
+                "--root",
+                "/tmp/podman-root",
+                "--runroot",
+                "/tmp/podman-runroot",
+                "--runtime",
+                "/usr/bin/crun"
+              ]
+            },
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--name",
+              "s2-008-campaign-arm-type-chore-20260928",
+              "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+              "/usr/local/bin/node",
+              "/opt/campaign/arm.mjs",
+              "/opt/campaign/holdout.blind.json",
+              "/tmp/campaign-out.json",
+              "arm-type-chore",
+              "20260928",
+              "2000"
+            ],
+            "image": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+            "image_break_requested": false,
+            "axes": {
+              "network": {
+                "policy": "deny_all",
+                "flag": "--network=none",
+                "allowlist": [],
+                "egressSocket": null
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": []
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 180000
+              }
+            },
+            "exit_code": 0,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "re is no systemd user session available\"\ntime=\"2026-10-02T01:55:43-05:00\" level=warning msg=\"For using systemd, you may need to log in using a user session\"\ntime=\"2026-10-02T01:55:43-05:00\" level=warning msg=\"Alternatively, you can enable lingering with: `loginctl enable-linger 1000` (possibly as root)\"\ntime=\"2026-10-02T01:55:43-05:00\" level=warning msg=\"Falling back to --cgroup-manager=cgroupfs\"\n",
+            "banner": "ADAPTER_OK arm=arm-type-chore seed=20260928 n=126 predictions=126 pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "60f7ff7c7e309841f7c9330cd4ed9baa56cb73d6ef651955f613db8c9d9f43c1",
+            "predictions": null,
+            "real_start": {
+              "proven": true,
+              "issues": [],
+              "container_pid": 1,
+              "host_pid": 162434,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "src/lib/isolation/image.mjs#assertImageMatchesPin",
+              "a_mvp_04_start_probe": "NOT_APPLICABLE: assertRealStart keys on the pi CLI version shape that A-MVP-04 pins; this adapter is a different installed program and is not asked to impersonate that one"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

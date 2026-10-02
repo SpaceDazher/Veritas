@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
+  "replaced_by_preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v9 binds the completed v8 A owner reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run",
+  "supersession_id": "spr-549689247379c2256057493c",
+  "supersession_digest": "bb12a18b6bceca88f2df2a2d163ac6c9577f0790247c05eb1d23fdc192e55f9c"
+}

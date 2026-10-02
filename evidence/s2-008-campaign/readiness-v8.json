@@ -1,0 +1,32 @@
+{
+  "kind": "s2-008-v8-readiness/1",
+  "preregistration_digest": "f75f9852d1ecf7b7b1007128bc50e1354392c1ff45752b2415cd8e3e3368d917",
+  "approval": {
+    "status": "APPROVED",
+    "authority": "HUMAN_OWNER",
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "issued_at": "2026-10-01T08:25:08.763Z",
+    "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
+    "in_force": true,
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v8 records this digest and supersession in the corpus manifest"
+  },
+  "image": "sha256:8ccb5d17b89f8d4e63b8c4f1325191a191d72bea6cb2af45fb657e3ddfe90006",
+  "digest": "sha256:d55ab8586706c6df39d3fe5089cd430b8ea9e7fbe4f496845a00374ccba98c14",
+  "builds_identical": true,
+  "content_commitment_stable": true,
+  "dry_run": {
+    "status": "DRY_RUN",
+    "spent_units": 0,
+    "model_calls": 0,
+    "launches": 9
+  },
+  "registry": {
+    "exit_code": 0,
+    "stdout": "provider    model                      context  max-out  thinking  images\nopenrouter  stealth/space-bunny-alpha  1M       524.3K   yes       yes   \n",
+    "leak_scan_ok": true
+  },
+  "historical_v7_spend": "UNKNOWN, retained separately; no retry",
+  "paid_v8_status": "NOT_STARTED",
+  "confirmed_usd": null
+}

@@ -1,0 +1,139 @@
+{
+  "title": "Veritas",
+  "repo": "SpaceDazher/Veritas",
+  "tagline": "A verdict is not a permission",
+  "format": "landscape",
+  "fps": 30,
+  "palette": "ember",
+  "seed": 11,
+  "filename": "promo.mp4",
+  "loop": true,
+  "loopSeconds": 0.8,
+  "footer": true,
+  "grid": false,
+  "grain": true,
+  "scanlines": false,
+  "music": {
+    "style": "drift",
+    "bpm": 84,
+    "root": 43,
+    "gain": 0.75
+  },
+  "sfx": true,
+  "scenes": [
+    {
+      "kind": "title",
+      "duration": 2.4,
+      "kicker": "56 COMMITS IN ONE DAY",
+      "headline": "Veritas",
+      "sub": "Most of them are paperwork.",
+      "subWidth": 0.56,
+      "badge": "v0.1.0",
+      "size": 150,
+      "weight": 800,
+      "glow": false
+    },
+    {
+      "kind": "stat",
+      "duration": 2.4,
+      "transition": "dissolve",
+      "value": 330,
+      "kicker": "18 days of history",
+      "label": "commits",
+      "comma": true,
+      "glow": false,
+      "items": [
+        {
+          "value": 80,
+          "label": "test files"
+        },
+        {
+          "value": 56285,
+          "label": "lines of code",
+          "comma": true
+        },
+        {
+          "value": 7,
+          "label": "ordered migrations"
+        }
+      ]
+    },
+    {
+      "kind": "code",
+      "duration": 3.0,
+      "transition": "push",
+      "kicker": "THE RECEIPTS",
+      "headline": "The history is the audit trail",
+      "window": "git log --oneline",
+      "fontSize": 26,
+      "highlight": 1,
+      "lines": [
+        [["$ ", "dim"], ["git log --oneline", "plain"]],
+        "evidence: rebind closure record after the #40 closure",
+        "chore: refreeze the integrity manifest for the #41 review fixes",
+        "S2-002 #41: close the review findings on the cancellation proof",
+        "evidence: reseal inventory and root manifest for the #16 fix"
+      ],
+      "status": "✓ the history is the audit trail"
+    },
+    {
+      "kind": "flow",
+      "duration": 2.6,
+      "transition": "wipe",
+      "kicker": "PIPELINE",
+      "headline": "From source to verdict",
+      "nodes": [
+        {
+          "label": "Sources",
+          "sub": "versioned"
+        },
+        {
+          "label": "Ingestion",
+          "sub": "provenance"
+        },
+        {
+          "label": "Claims",
+          "sub": "atomic"
+        },
+        {
+          "label": "Synthesis",
+          "sub": "cross-domain"
+        },
+        {
+          "label": "Verdict",
+          "sub": "independent check",
+          "hot": true
+        }
+      ]
+    },
+    {
+      "kind": "image",
+      "duration": 2.8,
+      "transition": "push",
+      "kicker": "THE BOARD",
+      "headline": "One shared board",
+      "image": "board-crop.png",
+      "caption": "One shared board. Every agent. One source of truth.",
+      "ratio": 0.82
+    },
+    {
+      "kind": "quote",
+      "duration": 2.4,
+      "transition": "dissolve",
+      "text": "Ad Veritatem: от источников к знаниям, от гипотез к проверяемым решениям.",
+      "attribution": "README.md",
+      "size": 54
+    },
+    {
+      "kind": "outro",
+      "duration": 2.4,
+      "transition": "zoom",
+      "headline": "Veritas",
+      "sub": "A verdict is not a permission",
+      "url": "github.com/SpaceDazher/Veritas",
+      "cta": "clone · read the evidence",
+      "size": 132,
+      "glow": false
+    }
+  ]
+}

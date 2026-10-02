@@ -1,0 +1,18 @@
+{
+  "kind": "s2-008-provider-auth-resolution/1",
+  "status": "PASS",
+  "image": "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+  "runtime_tree": "4a69a238d35655656e66ceb8d7c537e561fc7fd27bdd31745cbaf45431ce9416",
+  "env_name": "ZAI_CODING_CN_API_KEY",
+  "delivered_by": "--env-file",
+  "env_file_mode": "0600",
+  "network_policy": "deny_all",
+  "model_calls": 0,
+  "tokens": 0,
+  "provider": "zai-coding-cn",
+  "credential_present": true,
+  "fingerprint": "e110207689716bec",
+  "legacy_env_present": false,
+  "secret_value_in_argv": false,
+  "secret_value_in_stdout_stderr": false
+}

@@ -1,0 +1,494 @@
+{
+  "kind": "PREREGISTRATION",
+  "rule": "s2-008-prereg-v10",
+  "preregistration_id": "xpr-s2-008c-10",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "card_id": "hyc-s2-008c-01",
+  "card_digest": "ed9b1354ca8a2b97d631336e0677a2b59a311f5a58e2b62061241e76706eec82",
+  "recorded_at": "2026-09-28T00:00:00.000Z",
+  "inference_mode": "ASSOCIATIONAL",
+  "title": "S2-008 acceptance campaign, paid leg: a model-calling executor under the same frozen rule",
+  "description": "One model predictor and two carried control predictors in the original three-comparison family. The model replaces trial 01; the metric, baseline, band, three seeds, stopping rule and one-shot holdout policy stay frozen.",
+  "card": {
+    "contractVersion": "1.0.0",
+    "card_id": "hyc-s2-008c-01",
+    "card_type": "HYPOTHESIS",
+    "type_promotion": null,
+    "originating_domains": [
+      "vcs-history",
+      "commit-message-conventions"
+    ],
+    "nodes": [
+      {
+        "claim_id": "clm-s2-008c-01",
+        "domain": "vcs-history",
+        "revision": 1,
+        "role": "source"
+      },
+      {
+        "claim_id": "clm-s2-008c-02",
+        "domain": "commit-message-conventions",
+        "revision": 1,
+        "role": "target"
+      }
+    ],
+    "proposed_relation": {
+      "subject": "the commit message subject line",
+      "predicate": "is associated with",
+      "object": "whether the commit is MAJOR, on the newest 25% of the real Veritas history",
+      "relation_strength": "CORRELATION_EVIDENCE",
+      "causal_assertion": null
+    },
+    "temporal_ordering": {
+      "established": false,
+      "event_times": [],
+      "evidence_claim_ids": []
+    },
+    "mediators": [],
+    "confounders": [
+      {
+        "claim_id": "clm-s2-008c-03",
+        "description": "the base rate of MAJOR commits is low in the dev partition, so a predictor biased towards MAJOR loses agreement to the majority class; a difference in base rate between the two partitions would move every arm at once",
+        "status": "IDENTIFIED"
+      },
+      {
+        "claim_id": "clm-s2-008c-04",
+        "description": "the partitions are not exchangeable: dev ends 2026-09-26 and the holdout is the following days, during which the ticket itself was under active work",
+        "status": "IDENTIFIED"
+      }
+    ],
+    "alternative_explanations": [
+      {
+        "claim_id": null,
+        "description": "the arms differ only in how often they predict the rare class, and no arm carries information about the message beyond that frequency"
+      },
+      {
+        "claim_id": null,
+        "description": "the dev-partition base rate is an artefact of this checkout's squashed history rather than a property of the project"
+      }
+    ],
+    "scope": {
+      "population": "every commit reachable from the acceptance base of the local Veritas checkout",
+      "geography": null,
+      "period": {
+        "start": "2026-09-09T00:00:00.000Z",
+        "end": "2026-09-28T00:00:00.000Z"
+      },
+      "units": "commit",
+      "domain_limits": [
+        "this one repository and this one checkout; no other project and no other history was measured",
+        "the label is a path-prefix rule, not a judgement of importance: a MAJOR commit that only edits a README is labelled MINOR",
+        "association only; no causal effect of message wording on change size is claimed and none is measurable here"
+      ]
+    },
+    "assumptions": [
+      "the holdout partition is a temporal successor of the dev partition and the base rate did not move materially between them",
+      "the predictor is a pure function of the subject line, so it cannot have seen the diff it is predicting"
+    ],
+    "falsifiers": [
+      {
+        "description": "the dev-partition base rate of MAJOR commits is 0 or 1, so the majority-class baseline is perfect and no arm can beat it",
+        "observable": "frozen_baseline.value == 1.0"
+      },
+      {
+        "description": "the label is not a function of the tree alone",
+        "observable": "re-labelling every dev commit under a constant subject returns a different label vector"
+      },
+      {
+        "description": "the preregistered rule cannot reject anything, so the campaign is undecidable by construction",
+        "observable": "ruleFeasibility never_rejects == true"
+      }
+    ],
+    "test_design": "One preregistered trial per arm (family of 3, Holm-Bonferroni at alpha 0.05, confidence 0.9833333333333333 derived as 1 - alpha/m). Each trial measures case_agreement_rate of the arm's prediction against the message-independent MAJOR label over the temporal holdout partition, opened exactly once through the sealed one-shot unseal, with 3 frozen bootstrap seeds whose intervals are HULLED (widest) so no seed is ever selected. Observational corpus; inference_mode ASSOCIATIONAL.",
+    "counterevidence": [
+      {
+        "claim_id": "clm-s2-008c-05",
+        "relation": "bounds"
+      }
+    ],
+    "novelty": {
+      "assessment": "NOT_ASSESSED",
+      "corpus": null,
+      "search_horizon": null,
+      "similar_prior_refs": []
+    },
+    "uncertainty": {
+      "author_confidence": null,
+      "evidence_support": 0,
+      "expert_trust": null,
+      "measured_calibration": null
+    },
+    "stale": {
+      "is_stale": false,
+      "stale_claim_ids": [],
+      "invalidation_event_ids": []
+    },
+    "status": "FRESH",
+    "created_at": "2026-09-28T00:00:00.000Z",
+    "created_by": "s2-008-campaign-acceptance"
+  },
+  "metric": {
+    "name": "case_agreement_rate",
+    "direction": "HIGHER_IS_BETTER",
+    "unit": "ratio",
+    "noiseBand": 0.06969570950743816,
+    "inferenceMode": "ASSOCIATIONAL",
+    "value_basis": "CASE_AGREEMENT_RATE"
+  },
+  "frozen_baseline": {
+    "value": 0.8803191489361702,
+    "baseline_digest": "2ed46ca47547ad7acca3797a6f5c618d12b8c5f5f73db128d11f7b240cf638d6",
+    "source": "FROZEN_DEV_PARTITION",
+    "corpus_partition": "PRIMARY",
+    "measured_by": "scripts/s2-008-campaign-prepare.mjs",
+    "value_basis": "CASE_AGREEMENT_RATE",
+    "computed_from": "the 376 dev commits; the holdout was not read"
+  },
+  "seed_count": 3,
+  "seed_rule": {
+    "kind": "FIXED_LIST",
+    "seeds": [
+      20260926,
+      20260927,
+      20260928
+    ],
+    "source": "PREREGISTERED",
+    "best_seed_selection": "FORBIDDEN",
+    "decision_interval": "HULL_OF_ALL_SEED_INTERVALS",
+    "point_estimate": "OBSERVED_RATE_SEED_INVARIANT",
+    "disclosure": "every seed is reported with its own interval; no seed is ranked, selected or dropped"
+  },
+  "seeds_digest": "42704357a3a804f6a963e67e14e6f4d27fa9428714649b7e50f0e0e32d9d716c",
+  "stopping_rule": {
+    "kind": "FIXED_TRIALS",
+    "max_trials": 3,
+    "early_stop": false,
+    "on_negative": "RECORD_AND_CONTINUE",
+    "on_null": "RECORD_AND_CONTINUE",
+    "on_infra": "RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO"
+  },
+  "bootstrap_process": {
+    "where": "a second isolated launch, after the decision point, never predicting anything",
+    "why_separate": "a bootstrap needs the agreement vector, which is a function of the label; the predictor must never see a label, so the two cannot be one process",
+    "multiplicity": "every resample is carried as its full per-case multiplicity vector, so a case drawn three times counts three times and the resample mean converges on the measured rate",
+    "guard": "a trial whose resample mean does not sit at its own measured rate is refused, not published"
+  },
+  "sequential_rule": "NO_INTERIM_ANALYSIS_NO_PEEK_FIXED_TRIPLES_ALPHA_CORRECTED_ONCE_OVER_THE_FROZEN_FAMILY",
+  "budget_reservation": {
+    "reservation_id": "rsv-s2-008c-10",
+    "currency": "tokens",
+    "granted_units": 5000000,
+    "spent_units": 0,
+    "unit_definition": "Tokens are the sum of usage.totalTokens across every billed assistant message in pi 0.99.1 final agent_end.messages for each call, reported by the executor; intermediate message and turn events are not independently counted. The pi runtime cost field is an estimate, not an independently verified provider invoice.",
+    "expires_at": "2026-10-05T00:00:00.000Z",
+    "trial_timeout_ms": 180000,
+    "usd_reference": {
+      "confirmed_usd": null,
+      "confirmed_usd_status": "NOT_VERIFIED",
+      "why_null": "Client cost.total=0 is not an independently verified provider price.",
+      "measurement": {
+        "input": 10941,
+        "output": 3,
+        "cacheRead": 195,
+        "totalTokens": 11139,
+        "traceSha256": "0946e3ffbc079bfda2e7de12a46dae82bc4175426728961322317ef507dd49df"
+      },
+      "measurement_basis": "Inherited signed v9 host measurement; no new provider call is made for this reference.",
+      "projection": {
+        "calls": 378,
+        "cases_per_seed": 126,
+        "seeds": 3,
+        "tokens_per_call": 11139,
+        "tokens_estimate": 4210542,
+        "status": "PROJECTION_NOT_MEASUREMENT",
+        "caveat": "Container configuration is not measured by this host trace. Actual usage is charged during execution; the unchanged per-run ceiling applies independently to A and B."
+      },
+      "ceiling_scope": "PER_RUN_A_OR_B",
+      "aggregate_spend": "Report A+B separately; reconciled v9 A historical spend is reported separately."
+    },
+    "enumerated_work": "1 model trial x 3 frozen seeds = 3 model runs x 126 holdout cases = 378 case calls; 2 regex control trials make no model calls",
+    "ceiling_scope": "PER_RUN_A_OR_B",
+    "aggregate_spend_disclosure": "A and B each have an independent 5,000,000-token ceiling; report their total spend separately"
+  },
+  "noise_rule": {
+    "band": 0.06969570950743816,
+    "noise_band": 0.06969570950743816,
+    "method": "percentile_bootstrap_over_poisson_binomial_draw_counts",
+    "bootstrap_samples": 2000,
+    "bootstrap_seed": 20260926,
+    "confidence": 0.9833333333333333,
+    "percentile": 0.9833333333333333,
+    "inference_mode": "ASSOCIATIONAL",
+    "unit": "ratio",
+    "positive_rule": "LOWER_MINUS_BASELINE_GT_BAND",
+    "negative_rule": "UPPER_MINUS_BASELINE_LT_BEGATIVE_BAND",
+    "null_rule": "INTERVAL_INSIDE_BAND_AROUND_BASELINE",
+    "band_derivation": {
+      "rule": "noise_band = the Wilson-scaled half-width of the preregistered interval at the preregistered confidence for the preregistered holdout n, evaluated at the DEV-partition baseline",
+      "z": 2.3939798012415405,
+      "half_width": 0.06969570950743816,
+      "n_holdout": 126,
+      "computed_before": "the holdout partition was opened",
+      "why": "a difference below the width this design can resolve is not an effect this campaign is able to see; calling it one would be noise dressed as a finding"
+    }
+  },
+  "source_pin": {
+    "pinned_commit": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+    "rule": "the corpus is a function of this commit and never of HEAD, so the data are the same bytes on any host and after any later commit"
+  },
+  "multiplicity_rule": {
+    "kind": "HOLM_BONFERRONI",
+    "method": "holm_bonferroni",
+    "alpha": 0.05,
+    "confidence": 0.9833333333333333,
+    "family_size": 3,
+    "declared_comparisons": [
+      "trl-s2-008c-01",
+      "trl-s2-008c-02",
+      "trl-s2-008c-03"
+    ],
+    "direction": "increase",
+    "null_value": 0.8803191489361702,
+    "excluded": []
+  },
+  "trial_list": [
+    {
+      "index": 0,
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "partition": "HOLDOUT",
+      "stratum": "all_commits",
+      "predictor": "the installed executor classifies the commit subject as MAJOR or MINOR — one word, one call per case",
+      "seeds": [
+        20260926,
+        20260927,
+        20260928
+      ],
+      "metric": "case_agreement_rate"
+    },
+    {
+      "index": 1,
+      "trial_id": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "partition": "HOLDOUT",
+      "stratum": "all_commits",
+      "predictor": "predict MAJOR iff the subject type is feat or fix",
+      "seeds": [
+        20260926,
+        20260927,
+        20260928
+      ],
+      "metric": "case_agreement_rate"
+    },
+    {
+      "index": 2,
+      "trial_id": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "partition": "HOLDOUT",
+      "stratum": "all_commits",
+      "predictor": "predict MINOR iff the subject type is chore, else predict MAJOR",
+      "seeds": [
+        20260926,
+        20260927,
+        20260928
+      ],
+      "metric": "case_agreement_rate"
+    }
+  ],
+  "holdout_access": {
+    "partition": "HOLDOUT",
+    "case_count": 126,
+    "max_opens": 1,
+    "one_shot": true,
+    "decision_point": "AFTER_DECLARED_TRIALS",
+    "reads_before_data": true,
+    "released_actor_kinds": [
+      "EVALUATOR"
+    ],
+    "labels_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f",
+    "unseal_digest": "21c83ae01444f7d1b865a36a965ff41b09032eef26bd4994a1de3ec7cdd9911f"
+  },
+  "recorded_before_first_trial": {
+    "first_trial": "NOT_STARTED",
+    "proof": "The stopped v9 A remains INFRA with 11 predictions from 12 reconciled calls, 7,312 tokens and USD 0. The twelfth attempt is bound to its independently verified provider receipt; v9 B was never run. v10 starts separate clean A/B copies."
+  },
+  "required_fields_present": [
+    "hypothesis",
+    "metric",
+    "frozen_baseline",
+    "seed_count",
+    "stopping_rule",
+    "budget_reservation"
+  ],
+  "source": {
+    "project": "Veritas",
+    "kind": "real repository history, read from the local checkout with git",
+    "pinned_commit": "13243186b1573398fc327e245ebd2e5a90a2ced0",
+    "commit_count": 502,
+    "dev_count": 376,
+    "holdout_count": 126,
+    "split_at_commit": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+    "dev_period": [
+      "2026-09-09T13:49:36.000Z",
+      "2026-09-26T11:23:16.000Z"
+    ],
+    "holdout_period": [
+      "2026-09-26T11:24:16.000Z",
+      "2026-09-28T08:15:00.000Z"
+    ],
+    "label_rule": "MAJOR iff the commit diff touches >= 1 path under src/lib/, contracts/ or migrations/; the rule never reads the commit message",
+    "split_rule": "temporal: the oldest 75% of `git log --reverse <pinned_commit>` is the dev partition (PRIMARY), the newest 25% is the holdout (HOLDOUT)",
+    "frozen_at": "2026-09-28"
+  },
+  "arms": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "predictor": "the installed executor classifies the commit subject as MAJOR or MINOR — one word, one call per case",
+      "arm_program": "scripts/s2-008-campaign-arm-model.mjs",
+      "carried_from_v1": false
+    },
+    {
+      "trial_id": "trl-s2-008c-02",
+      "arm_id": "arm-type-feat-fix",
+      "predictor": "predict MAJOR iff the subject type is feat or fix"
+    },
+    {
+      "trial_id": "trl-s2-008c-03",
+      "arm_id": "arm-type-chore",
+      "predictor": "predict MINOR iff the subject type is chore, else predict MAJOR"
+    }
+  ],
+  "campaign_metric": {
+    "name": "case_agreement_rate",
+    "subject_is_pooled_aggregate": true
+  },
+  "executor": {
+    "provider": "openrouter",
+    "model": "stealth/space-bunny-alpha",
+    "package": "@earendil-works/pi-coding-agent",
+    "credential_env_name": "OPENROUTER_API_KEY",
+    "credential_delivery": "podman --env-file — a path on the host argv; neither the value nor the variable name is in any argv",
+    "inside_isolation": "LOCAL_RESTRICTED, digest-pinned, egress allowlist openrouter.ai:443 only",
+    "parallelism": 1,
+    "deterministic": false,
+    "determinism_note": "a model is not a function of its input. The arm records the digest of every raw answer so a repeat can be COMPARED against the committed one. No claim is made that the model is reproducible; the run statement is about the frozen inputs and the recorded outputs.",
+    "unparseable_policy": "an answer that is not exactly one of MAJOR/MINOR is UNPARSED and counts as a disagreement, never as a guess",
+    "model_image": {
+      "content_commitment": "cc670161cb4384481909c35f5b050e487c933bffa0bfaa189ab1b4ca13ee842b",
+      "covers": [
+        "arm",
+        "blind",
+        "bridge",
+        "canonical_json",
+        "credential_env_policy",
+        "pi_bundle",
+        "pi_runtime_tree",
+        "pi_shrinkwrap",
+        "recipe",
+        "timeout_policy"
+      ],
+      "excludes": [
+        "prereg"
+      ],
+      "field_why": "the runtime tree digest covers every staged pi file, nested bundle chunk, mode and symbolic link target; model calls have disabled tools, extensions and skills and usage comes from final assistant messages",
+      "cycle_why": "the signed body is COPYed into this image, so a body carrying the image digest would contain a digest of itself; the direction is preregistration -> image only",
+      "built_image_pin": "evidence/s2-008-campaign/model-image-pin-v10.json",
+      "built_image_pin_reason": "v10 image pin binds this signed OpenRouter document while preserving the v9 executor, provider, model and timeout controls"
+    },
+    "model_launch_timeout": {
+      "per_model_call_timeout_ms": 180000,
+      "holdout_case_count": 126,
+      "bridge_report_margin_ms": 300000,
+      "total_container_timeout_ms": 22980000,
+      "total_container_timeout_formula": "holdout_case_count * per_model_call_timeout_ms + bridge_report_margin_ms",
+      "total_container_timeout_scope": "ONE_MODEL_CONTAINER_PER_SEED",
+      "pi_argv_flags": [
+        "--no-tools",
+        "--no-extensions",
+        "--no-skills"
+      ]
+    },
+    "pi_settings": {
+      "config_dir_env": "PI_CODING_AGENT_DIR",
+      "retry": {
+        "enabled": false,
+        "maxRetries": 0,
+        "provider": {
+          "maxRetries": 0
+        }
+      },
+      "cacheWarming": "off",
+      "compaction": {
+        "enabled": false
+      }
+    }
+  },
+  "supersession": {
+    "supersedes": "xpr-s2-008c-09",
+    "superseded_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+    "scope": "fresh run identity and reconciliation binding; frozen science, executor policy and 5M ceiling per A/B unchanged",
+    "reason": "v10 starts separate clean A/B copies after v9 A spend is reconciled; provider, model, controls and frozen science remain unchanged",
+    "unchanged": [
+      "card",
+      "metric",
+      "frozen_baseline",
+      "noise_rule",
+      "multiplicity_rule",
+      "seed_rule",
+      "seeds_digest",
+      "seed_count",
+      "stopping_rule",
+      "sequential_rule",
+      "holdout_access",
+      "inference_mode",
+      "trial_list",
+      "expected_table_digest",
+      "bootstrap_process"
+    ]
+  },
+  "accounting_protocol": {
+    "schema": "s2-008-model-accounting/1",
+    "generation_id": "one unique observed assistant responseId for each v10 model call",
+    "usage_fields": [
+      "input",
+      "output",
+      "cacheRead",
+      "cacheWrite",
+      "totalTokens",
+      "reported_cost_usd"
+    ],
+    "prompt_token_basis": "input+cacheRead+cacheWrite",
+    "cost_basis": "executor-reported estimate; provider invoice not independently verified",
+    "partial_output": "per-case records become durable only after the isolated process returns; host power loss can leave only confirmed spend and an unknown attempt"
+  },
+  "restart_reconciliation": {
+    "kind": "s2-008-v9-a-reconciliation/1",
+    "file": "evidence/s2-008-campaign/reconciliation-v9-a.json",
+    "canonical_digest": "683380fd4ec9be1344041f05c08b8ecbac08866d337a0afebfd3a51b31c81e0a",
+    "receipt_file": "evidence/s2-008-campaign/provider-receipt-v9-a-attempt-12.json",
+    "receipt_digest": "0e2827b7c542b3d3afbd57ffa5c34add98cb694e0a421fc980c48449051833ab",
+    "prior_run_id": "s2-008c-v9-a-0c58e56c389b4622a70a",
+    "prior_run_sha256": "5958cdead994c3474a0496cf3bd41b2e9a4de31b02cf82075ff67339ac135b20",
+    "prior_sidecar_file": "evidence/s2-008-campaign/predictions-v9-a-trl-s2-008c-01-20260926.json",
+    "prior_sidecar_sha256": "69910f08dbb5d60f1373b58400df8e62c49faf3799e8d0c435ffd2f3a830be63",
+    "preregistration_digest": "6b20bdf8eaa70debcb3ce67ce949caec46fb0f1784c08afcfaeb8381f0c8299d",
+    "reconciled_campaign_tokens": 7312,
+    "reconciled_campaign_usd": 0,
+    "locally_accounted_tokens": 6735,
+    "provider_receipt_tokens": 577,
+    "model_calls": 12
+  },
+  "status": "APPROVED",
+  "approval": {
+    "status": "APPROVED",
+    "authority": "HUMAN_OWNER",
+    "principal_id": "prn-s2007r-owner",
+    "label": "Daniil (repository owner)",
+    "issued_at": "2026-10-02T06:03:49.355Z",
+    "signed_digest_over": "the scientific body: every member except approval, status and preregistration_digest",
+    "in_force": true,
+    "becomes_in_force_when": "scripts/s2-008-campaign-prepare.mjs --seal-v10 records this digest and supersession in the corpus manifest"
+  },
+  "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22"
+}

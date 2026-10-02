@@ -1,0 +1,504 @@
+{
+  "generatedAt": "2026-09-27T06:51:46.936Z",
+  "repo": {
+    "path": "/home/daniil/Veritas",
+    "name": "Veritas"
+  },
+  "manifest": {
+    "name": "veritas-agent-board",
+    "description": "Bounded S2-001 product contract and synthetic Veritas Agent Board workspace",
+    "version": "0.1.0",
+    "license": null,
+    "licenseFile": null,
+    "ecosystem": [
+      "npm"
+    ],
+    "deps": 6,
+    "devDeps": 14,
+    "scripts": [
+      "dev",
+      "build",
+      "start",
+      "lint",
+      "typecheck",
+      "test",
+      "test:identity",
+      "test:sandbox",
+      "test:security-probes",
+      "test:ingestion",
+      "ingestion:types",
+      "test:s2-003-security-probes",
+      "test:s2-004-security-probes",
+      "verify:s2-004"
+    ],
+    "bin": [],
+    "workspaces": null,
+    "python": null,
+    "rust": null,
+    "go": null
+  },
+  "git": {
+    "isRepo": true,
+    "remote": "https://github.com/SpaceDazher/Veritas.git",
+    "branch": "main",
+    "head": "97ed8f6 2026-09-26 evidence: rebind closure record after the #40 closure",
+    "repoSlug": "SpaceDazher/Veritas",
+    "totalCommits": 330,
+    "logScanned": 330,
+    "firstCommit": "2026-09-09",
+    "lastCommit": "2026-09-27",
+    "commits7d": 98,
+    "commits30d": 330,
+    "commits90d": 330,
+    "commits365d": 330,
+    "authors": [
+      {
+        "name": "SpaceDazher",
+        "commits": 297
+      },
+      {
+        "name": "Agent-2 User",
+        "commits": 33
+      }
+    ],
+    "busiestDays": [
+      {
+        "date": "2026-09-13",
+        "commits": 56
+      },
+      {
+        "date": "2026-09-19",
+        "commits": 55
+      },
+      {
+        "date": "2026-09-22",
+        "commits": 44
+      },
+      {
+        "date": "2026-09-26",
+        "commits": 40
+      },
+      {
+        "date": "2026-09-14",
+        "commits": 39
+      }
+    ],
+    "recentSubjects": [
+      "evidence: rebind closure record after the #40 closure",
+      "evidence: reseal inventory and root manifest after the #40 closure docs",
+      "docs: record SLOQUAL-001 issue closure and #20-#40 label state",
+      "Merge pull request #42 from SpaceDazher/bb/spacedazher-veritas-41-s2-002-process-cancellati-thr_fu97ejh397",
+      "chore: close the #41 review-fix manifest and closure binding",
+      "chore: reseal the root manifest after the #41 integrity refreeze",
+      "chore: refreeze the integrity manifest for the #41 review fixes",
+      "chore: reseal the root manifest after the #41 review fixes",
+      "chore: reseal the tracked-file inventory after the #41 review fixes",
+      "S2-002 #41: close the review findings on the cancellation proof",
+      "Merge pull request #44 from SpaceDazher/bb/spacedazher-veritas-16-s2-004-flaky-sandbox-iden-thr_k2piks9trg",
+      "chore: rebind the closure record to the #16 implementation commit",
+      "chore: reseal the root manifest after the #16 inventory and refreeze",
+      "chore: reseal the tracked-file inventory after the #16 fix",
+      "chore: refreeze the integrity manifest for the #16 process-verdict fix",
+      "fix(S2-002): make the process-tree survivor verdict load-tolerant and recoverable",
+      "evidence: close S2-002 #41 two-host wording manifest and closure binding",
+      "evidence: reseal inventory and root manifest for the S2-002 #41 two-host wording",
+      "docs: state the two-host verification wording in DEVELOPMENT",
+      "evidence: close S2-002 #41 Windows replay manifest and closure binding",
+      "evidence: refreeze contract manifest for the S2-002 #41 Windows replay",
+      "evidence: reseal inventory and root manifest for the S2-002 #41 Windows replay",
+      "S2-002 #41: independent Windows replay, and the defects it exposed",
+      "evidence: close S2-002 #41 self-completed guard manifest and closure binding",
+      "evidence: refreeze contract manifest for the S2-002 #41 self-completed guard"
+    ],
+    "tags": [],
+    "subRepos": []
+  },
+  "code": {
+    "files": 732,
+    "codeFiles": 197,
+    "loc": 53104,
+    "bytes": 7897,
+    "locTruncated": false,
+    "byLanguage": {
+      "JavaScript": 169,
+      "TypeScript": 18,
+      "SQL": 7,
+      "Python": 3
+    },
+    "topDirs": [
+      {
+        "dir": "corpus",
+        "files": 281
+      },
+      {
+        "dir": "evidence",
+        "files": 83
+      },
+      {
+        "dir": "tests",
+        "files": 80
+      },
+      {
+        "dir": "src",
+        "files": 69
+      },
+      {
+        "dir": "contracts",
+        "files": 59
+      },
+      {
+        "dir": "scripts",
+        "files": 55
+      },
+      {
+        "dir": "docs",
+        "files": 36
+      },
+      {
+        "dir": "results",
+        "files": 27
+      },
+      {
+        "dir": "pilots",
+        "files": 11
+      },
+      {
+        "dir": "tasks",
+        "files": 8
+      },
+      {
+        "dir": "migrations",
+        "files": 7
+      },
+      {
+        "dir": "Stage 2",
+        "files": 2
+      }
+    ],
+    "topExtensions": [
+      {
+        "ext": ".json",
+        "files": 478
+      },
+      {
+        "ext": ".mjs",
+        "files": 169
+      },
+      {
+        "ext": ".md",
+        "files": 52
+      },
+      {
+        "ext": ".ts",
+        "files": 15
+      },
+      {
+        "ext": ".sql",
+        "files": 7
+      },
+      {
+        "ext": ".tsx",
+        "files": 3
+      },
+      {
+        "ext": ".py",
+        "files": 3
+      },
+      {
+        "ext": "(none)",
+        "files": 2
+      },
+      {
+        "ext": ".example",
+        "files": 1
+      },
+      {
+        "ext": ".tsbuildinfo",
+        "files": 1
+      }
+    ],
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md",
+      "tests/verifier/fixtures/owner-inputs/README.md",
+      "tests/verifier/fixtures/canonical/README.md",
+      "docs/ARCHITECTURE.md",
+      "Stage 2/AGENTS.md",
+      "Stage 2/CLAUDE.md"
+    ],
+    "images": [],
+    "entrypoints": [
+      "src/lib/sloqual/index.mjs",
+      "src/db/index.ts"
+    ],
+    "testFiles": 80,
+    "testSample": [
+      "tests/verifier/api.test.mjs",
+      "tests/verifier/calibration.test.mjs",
+      "tests/verifier/commands.test.mjs",
+      "tests/verifier/comparator.test.mjs",
+      "tests/verifier/contracts.test.mjs",
+      "tests/verifier/db-replay-crash.test.mjs",
+      "tests/verifier/db-replay-freshness.test.mjs",
+      "tests/verifier/model-pilot.test.mjs"
+    ]
+  },
+  "quality": {
+    "ci": [],
+    "tests": 0,
+    "testFramework": null,
+    "linters": [
+      "eslint",
+      "playwright",
+      "tsc"
+    ],
+    "docsWordCount": 947,
+    "hasArchMap": false,
+    "hasAdapters": false,
+    "security": []
+  },
+  "heatmap": {
+    "weeks": 26,
+    "levels": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0,
+        3,
+        4
+      ],
+      [
+        3,
+        2,
+        1,
+        2,
+        0,
+        4,
+        0
+      ],
+      [
+        0,
+        4,
+        0,
+        0,
+        2,
+        4,
+        1
+      ]
+    ],
+    "total": 330
+  }
+}

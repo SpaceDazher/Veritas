@@ -1,0 +1,86 @@
+{
+  "kind": "s2-008-v8-owner-activity-excerpt/1",
+  "source": "Owner typed OpenRouter activity fields in response to reconciliation request.",
+  "date_displayed": "Oct 1",
+  "timezone": null,
+  "seconds": null,
+  "model": null,
+  "generation_id": null,
+  "rows": [
+    {
+      "time_displayed": "03:45 AM",
+      "input_tokens_reported": 116450,
+      "output_tokens_reported": 744,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:44 AM",
+      "input_tokens_reported": 116014,
+      "output_tokens_reported": 199,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:44 AM",
+      "input_tokens_reported": 115445,
+      "output_tokens_reported": 470,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:44 AM",
+      "input_tokens_reported": 115255,
+      "output_tokens_reported": 101,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:44 AM",
+      "input_tokens_reported": 111171,
+      "output_tokens_reported": 99,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:44 AM",
+      "input_tokens_reported": 105008,
+      "output_tokens_reported": 217,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:43 AM",
+      "input_tokens_reported": 104501,
+      "output_tokens_reported": 488,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:43 AM",
+      "input_tokens_reported": 90008,
+      "output_tokens_reported": 9994,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    },
+    {
+      "time_displayed": "03:43 AM",
+      "input_tokens_reported": 89879,
+      "output_tokens_reported": 89,
+      "credits_displayed": 0,
+      "marker_displayed": "tool_calls",
+      "attribution": "UNESTABLISHED"
+    }
+  ],
+  "matching_status": "UNESTABLISHED; minute-level timestamps and totals cannot identify v8 A.",
+  "campaign_prompt_prefix": "Classify this git commit subject as MAJOR or MINOR.",
+  "do_not_sum_into_campaign_budget": true
+}

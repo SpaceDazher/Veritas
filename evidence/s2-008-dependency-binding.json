@@ -10,9 +10,9 @@
     "evidence_presence": "the working tree (a file is either there or not)"
   },
   "scope": "the dependency bindings the issue records, checked against canonical evidence; NOT experiment authorization and NOT the ticket verdict",
-  "head": "3a01e021fbc89949439f0a8212dfdc7124a713f4",
-  "head_tree_sha": "a5f824f6cd568fa9111fe0c2aa822c3eb357a308",
-  "invocation_id": null,
+  "head": "45b6239e6da6425971a854b64914c22df6ff973c",
+  "head_tree_sha": "78d900905062e05629032ebd11654eb214d32ccd",
+  "invocation_id": "92afbeef6faa1929953a73b0e584fc4c",
   "contracts": [
     {
       "id": "hypothesis-card",
@@ -46,8 +46,8 @@
     }
   ],
   "frozen_targets": {
-    "pinned_paths": 614,
-    "verified": 614,
+    "pinned_paths": 616,
+    "verified": 616,
     "issues": [],
     "untracked_in_frozen_trees": [],
     "track_files_expected": [
@@ -69,6 +69,35 @@
       "evidence/s2-008/corpus/preregistration.json",
       "evidence/s2-008/corpus/supersession-ledger.json",
       "scripts/s2-008-build-corpus.mjs",
+      "scripts/s2-008-campaign-adapter.mjs",
+      "scripts/s2-008-campaign-approve.mjs",
+      "scripts/s2-008-campaign-arm-model.mjs",
+      "scripts/s2-008-campaign-arm.mjs",
+      "scripts/s2-008-campaign-bootstrap.mjs",
+      "scripts/s2-008-campaign-credential-env.mjs",
+      "scripts/s2-008-campaign-egress-forwarder.mjs",
+      "scripts/s2-008-campaign-evaluate.mjs",
+      "scripts/s2-008-campaign-model-image.mjs",
+      "scripts/s2-008-campaign-prepare.mjs",
+      "scripts/s2-008-campaign-probes.mjs",
+      "scripts/s2-008-campaign-run.mjs",
+      "scripts/s2-008-campaign-seal-v3.mjs",
+      "scripts/s2-008-campaign-seal-v4.mjs",
+      "scripts/s2-008-campaign-seal-v5.mjs",
+      "scripts/s2-008-campaign-seal-v6.mjs",
+      "scripts/s2-008-campaign-seal-v7.mjs",
+      "scripts/s2-008-campaign-seal-v8.mjs",
+      "scripts/s2-008-campaign-v4-draft.mjs",
+      "scripts/s2-008-campaign-v5-approval.mjs",
+      "scripts/s2-008-campaign-v5-draft.mjs",
+      "scripts/s2-008-campaign-v6-approval.mjs",
+      "scripts/s2-008-campaign-v6-draft.mjs",
+      "scripts/s2-008-campaign-v6-timeout.mjs",
+      "scripts/s2-008-campaign-v7-approval.mjs",
+      "scripts/s2-008-campaign-v7-draft.mjs",
+      "scripts/s2-008-campaign-v8-approval.mjs",
+      "scripts/s2-008-campaign-v8-draft.mjs",
+      "scripts/s2-008-egress-bridge.mjs",
       "scripts/s2-008-harness.mjs",
       "scripts/s2-008-replay.mjs",
       "scripts/s2-008-run.mjs",
@@ -80,6 +109,7 @@
       "src/lib/research/causality.mjs",
       "src/lib/research/comparator.mjs",
       "src/lib/research/constants.mjs",
+      "src/lib/research/content-supersession.mjs",
       "src/lib/research/contracts.mjs",
       "src/lib/research/dataset.mjs",
       "src/lib/research/executor.mjs",
@@ -91,9 +121,33 @@
       "src/lib/research/probes.mjs",
       "src/lib/research/registry.mjs",
       "src/lib/research/runner.mjs",
+      "tests/research/campaign-approval.test.mjs",
+      "tests/research/campaign-arm-egress.test.mjs",
+      "tests/research/campaign-arm-model.test.mjs",
+      "tests/research/campaign-currency-guard.test.mjs",
+      "tests/research/campaign-model-credential-route.test.mjs",
+      "tests/research/campaign-model-dispatch.test.mjs",
+      "tests/research/campaign-model-image-version.test.mjs",
+      "tests/research/campaign-model-pin-record.test.mjs",
+      "tests/research/campaign-model-runtime-tree.test.mjs",
+      "tests/research/campaign-seal-v3.test.mjs",
+      "tests/research/campaign-seal-v4.test.mjs",
+      "tests/research/campaign-seal-v5.test.mjs",
+      "tests/research/campaign-seal-v6.test.mjs",
+      "tests/research/campaign-shared-cap.test.mjs",
+      "tests/research/campaign-v4-draft.test.mjs",
+      "tests/research/campaign-v5-approval.test.mjs",
+      "tests/research/campaign-v6-probe-evidence.test.mjs",
+      "tests/research/campaign-v6-timeout.test.mjs",
+      "tests/research/campaign-v7-credential.test.mjs",
+      "tests/research/campaign-v8.test.mjs",
       "tests/research/comparator-probes.test.mjs",
       "tests/research/comparator.test.mjs",
       "tests/research/dataset.test.mjs",
+      "tests/research/evaluation-recorded-predictions.test.mjs",
+      "tests/research/evaluation-v4-phase.test.mjs",
+      "tests/research/evaluation-v4-scoring.test.mjs",
+      "tests/research/evaluation-v4-sidecars.test.mjs",
       "tests/research/fixtures/README.md",
       "tests/research/fixtures/fixture-corrupted-variants.mjs",
       "tests/research/fixtures/fixture-digest.mjs",
@@ -110,37 +164,14 @@
       "tests/research/replay-two-run.test.mjs",
       "tests/research/triage-hardening.test.mjs"
     ],
-    "track_files_expected_count": 58,
+    "track_files_expected_count": 112,
     "track_files_expected_source": "the WORKING TREE, walked over src/lib/research, tests/research, scripts, evidence/s2-008, evidence and filtered with the same regex the tracked/untracked/modified views use: ^(src/lib/research/|tests/research/|scripts/s2-008-|scripts/verify-s2-008|evidence/s2-008)",
     "track_files_unaccounted": [],
-    "track_files_tracked": 58,
+    "track_files_tracked": 154,
     "track_files_untracked": [],
-    "track_files_modified": [
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-dependency-binding.json",
-      "evidence/s2-008-harness.json",
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-replay.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json",
-      "evidence/s2-008-summary.json"
-    ],
-    "track_files_modified_by_the_chain": [
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-dependency-binding.json",
-      "evidence/s2-008-harness.json",
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-replay.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-security-probes.json"
-    ],
-    "track_files_modified_other": [
-      "evidence/s2-008-summary.json"
-    ],
+    "track_files_modified": [],
+    "track_files_modified_by_the_chain": [],
+    "track_files_modified_other": [],
     "untracked_visibility_note": "scripts/check-inventory.mjs and scripts/generate-manifests.mjs derive their file set from `git ls-files` alone, so they report 0 tracked files of this track and do not see the untracked ones; this list is the honest count and those two scripts are not this gate's files to change",
     "note": "A track whose own files are untracked is NOT bound to a base in any sense a reader can check: `git ls-files` reports 0 and both integrity gates are green for the wrong reason."
   },
@@ -261,7 +292,7 @@
     }
   ],
   "modules": {
-    "modules": 16,
+    "modules": 17,
     "importers": {
       "src/lib/research/campaign-decision.mjs": [
         "scripts/s2-008-harness.mjs",
@@ -295,6 +326,9 @@
         "src/lib/research/probes.mjs",
         "src/lib/research/runner.mjs",
         "scripts/s2-006-run.mjs",
+        "scripts/s2-008-campaign-prepare.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-replay.mjs",
         "scripts/verify-sloqual-001.mjs",
@@ -316,16 +350,29 @@
         "scripts/s2-007-db-replay-executor.mjs",
         "scripts/s2-007-db-replay.mjs",
         "scripts/s2-007-run.mjs",
+        "scripts/s2-007r-derived-selection.mjs",
         "scripts/s2-007r-lifecycle.mjs",
         "scripts/s2-007r-measurement-set.mjs",
         "scripts/s2-007r-probes.mjs",
         "scripts/s2-007r-run.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-run.mjs",
         "scripts/verify-s2-007-dependencies.mjs",
         "scripts/verify-s2-007r.mjs",
+        "tests/research/campaign-v6-probe-evidence.test.mjs",
         "tests/research/comparator-probes.test.mjs",
         "tests/research/fixtures/fixture-measurement-set.mjs",
         "tests/research/replay-two-run.test.mjs"
+      ],
+      "src/lib/research/content-supersession.mjs": [
+        "scripts/s2-008-campaign-seal-v4.mjs",
+        "scripts/s2-008-campaign-seal-v5.mjs",
+        "scripts/s2-008-campaign-seal-v6.mjs",
+        "scripts/s2-008-campaign-seal-v7.mjs",
+        "scripts/s2-008-campaign-seal-v8.mjs",
+        "tests/research/campaign-seal-v4.test.mjs"
       ],
       "src/lib/research/contracts.mjs": [
         "src/lib/research/causality.mjs",
@@ -333,6 +380,7 @@
         "src/lib/research/probes.mjs",
         "src/lib/research/registry.mjs",
         "src/lib/research/runner.mjs",
+        "scripts/a-mvp05-runtime.mjs",
         "scripts/s2-007r-run.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/validate-contracts.mjs",
@@ -348,6 +396,8 @@
         "src/lib/research/index.mjs",
         "src/lib/research/probes.mjs",
         "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-run.mjs",
         "tests/research/dataset.test.mjs",
@@ -388,17 +438,29 @@
         "tests/research/triage-hardening.test.mjs"
       ],
       "src/lib/research/index.mjs": [
+        "scripts/s2-008-campaign-prepare.mjs",
+        "scripts/s2-008-campaign-seal-v3.mjs",
+        "scripts/s2-008-campaign-seal-v4.mjs",
+        "scripts/s2-008-campaign-seal-v5.mjs",
+        "scripts/s2-008-campaign-seal-v6.mjs",
+        "scripts/s2-008-campaign-seal-v7.mjs",
+        "scripts/s2-008-campaign-seal-v8.mjs",
         "scripts/sloqual-freeze.mjs",
         "scripts/sloqual-run.mjs",
         "scripts/verify-s2-008-dependencies.mjs",
-        "scripts/verify-sloqual-001.mjs"
+        "scripts/verify-sloqual-001.mjs",
+        "tests/research/campaign-seal-v3.test.mjs",
+        "tests/research/campaign-seal-v4.test.mjs",
+        "tests/research/campaign-v8.test.mjs"
       ],
       "src/lib/research/negative-controls.mjs": [
         "src/lib/research/index.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-replay.mjs",
         "scripts/s2-008-security-probes.mjs",
         "scripts/verify-s2-008.mjs",
+        "tests/research/campaign-v6-probe-evidence.test.mjs",
         "tests/research/comparator-probes.test.mjs",
         "tests/research/comparator.test.mjs",
         "tests/research/harness.test.mjs"
@@ -419,14 +481,20 @@
       ],
       "src/lib/research/preregistration.mjs": [
         "src/lib/research/comparator.mjs",
+        "src/lib/research/content-supersession.mjs",
         "src/lib/research/index.mjs",
         "src/lib/research/probes.mjs",
         "src/lib/research/runner.mjs",
         "scripts/s2-008-build-corpus.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-replay.mjs",
         "scripts/s2-008-run.mjs",
         "scripts/s2-008-security-probes.mjs",
+        "tests/research/campaign-shared-cap.test.mjs",
+        "tests/research/campaign-v5-approval.test.mjs",
         "tests/research/comparator-probes.test.mjs",
         "tests/research/comparator.test.mjs",
         "tests/research/dataset.test.mjs",
@@ -445,6 +513,8 @@
         "scripts/s2-007-run.mjs",
         "scripts/s2-007-security-probes.mjs",
         "scripts/s2-007r-probes.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-security-probes.mjs",
         "scripts/synthetic-smoke.mjs",
@@ -453,6 +523,8 @@
         "scripts/verify-s2-007.mjs",
         "scripts/verify-s2-007r.mjs",
         "scripts/verify-s2-008.mjs",
+        "tests/research/campaign-v6-probe-evidence.test.mjs",
+        "tests/research/campaign-v8.test.mjs",
         "tests/research/comparator-probes.test.mjs",
         "tests/research/comparator.test.mjs",
         "tests/research/gate-semantics.test.mjs",
@@ -465,6 +537,9 @@
         "src/lib/research/probes.mjs",
         "src/lib/research/runner.mjs",
         "scripts/s2-003-run.mjs",
+        "scripts/s2-008-campaign-evaluate.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-harness.mjs",
         "scripts/s2-008-run.mjs",
         "scripts/security-probes.mjs",
@@ -472,6 +547,9 @@
         "tests/research/registry-prereg.test.mjs"
       ],
       "src/lib/research/runner.mjs": [
+        "scripts/a-mvp05-runtime.mjs",
+        "scripts/s2-008-campaign-probes.mjs",
+        "scripts/s2-008-campaign-run.mjs",
         "scripts/s2-008-replay.mjs",
         "scripts/s2-008-run.mjs",
         "tests/research/replay-two-run.test.mjs"
@@ -483,60 +561,81 @@
     "issues": []
   },
   "syntax": {
-    "modules": 35,
-    "parsed": 35,
+    "modules": 60,
+    "parsed": 60,
     "issues": [],
     "note": "node --check proves the file PARSES; it is not type checking, and tsconfig.json excludes .mjs from `tsc` entirely"
   },
   "evidence": [
     {
       "path": "evidence/s2-008-probes.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 26097,
-      "issues": []
+      "bytes": 26114,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-controls.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 7355,
-      "issues": []
+      "bytes": 7372,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-comparison.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 28677,
-      "issues": []
+      "bytes": 28695,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-security-probes.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 40347,
-      "issues": []
+      "bytes": 40364,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-run-a.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 37920,
-      "issues": []
+      "bytes": 37937,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-run-b.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 37920,
-      "issues": []
+      "bytes": 37937,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-replay.json",
-      "required": true,
+      "required": false,
       "present": true,
-      "bytes": 36849,
-      "issues": []
+      "bytes": 36883,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008/corpus/manifest.json",
@@ -556,15 +655,18 @@
       "path": "evidence/s2-008-summary.json",
       "required": false,
       "present": true,
-      "bytes": 17566,
+      "bytes": 21008,
       "issues": []
     },
     {
       "path": "evidence/s2-008-harness.json",
       "required": false,
       "present": true,
-      "bytes": 71951,
-      "issues": []
+      "bytes": 71969,
+      "issues": [],
+      "excluded_from_required": true,
+      "chain_produced": true,
+      "exclusion_reason": "excluded from REQUIRED by --chain-produced: the chain that spawned this gate (scripts/verify-s2-008.mjs) runs this gate BEFORE it spawns the child that writes this record, so requiring it here makes the FIRST run on a clean base red for a file the chain had not written yet. The record is still read and still reported, and the aggregator owns its presence and its bytes."
     },
     {
       "path": "evidence/s2-008-negative-controls.json",
@@ -576,7 +678,7 @@
   ],
   "chain_run": {
     "flag": "--chain-produced <comma-separated paths>",
-    "flag_seen": false,
+    "flag_seen": true,
     "allowed": [
       "evidence/s2-008-dependency-binding.json",
       "evidence/s2-008-probes.json",
@@ -588,8 +690,19 @@
       "evidence/s2-008-replay.json",
       "evidence/s2-008-security-probes.json"
     ],
-    "excluded": [],
-    "excluded_had_no_effect": [],
+    "excluded": [
+      "evidence/s2-008-probes.json",
+      "evidence/s2-008-controls.json",
+      "evidence/s2-008-comparison.json",
+      "evidence/s2-008-security-probes.json",
+      "evidence/s2-008-run-a.json",
+      "evidence/s2-008-run-b.json",
+      "evidence/s2-008-replay.json",
+      "evidence/s2-008-harness.json"
+    ],
+    "excluded_had_no_effect": [
+      "evidence/s2-008-harness.json"
+    ],
     "refused": [],
     "required": [
       "evidence/s2-008-probes.json",
@@ -603,13 +716,6 @@
       "evidence/s2-008/corpus/preregistration.json"
     ],
     "required_effective": [
-      "evidence/s2-008-probes.json",
-      "evidence/s2-008-controls.json",
-      "evidence/s2-008-comparison.json",
-      "evidence/s2-008-security-probes.json",
-      "evidence/s2-008-run-a.json",
-      "evidence/s2-008-run-b.json",
-      "evidence/s2-008-replay.json",
       "evidence/s2-008/corpus/manifest.json",
       "evidence/s2-008/corpus/preregistration.json"
     ],

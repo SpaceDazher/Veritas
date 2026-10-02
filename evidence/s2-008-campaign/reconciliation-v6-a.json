@@ -1,0 +1,35 @@
+{
+  "kind": "s2-008-v6-local-auth-reconciliation/1",
+  "status": "RECONCILED_LOCAL_AUTH_REFUSAL",
+  "original_run_digest": "b410e2d865b9cbe2d68d741d8c3e0d0333fb9848700408c2bb99b9eb8b7b9664",
+  "original_sidecar_digest": "2ba0d98cd5c90e448d99a4db210e49404ea62c035e0ea7a8ba7cb95a1e1fb68e",
+  "original_unreconciled_flag_preserved": true,
+  "image_id": "sha256:f511787094884579eae2f0f94a583633fa418146ed5f6841931aa560d3a267b9",
+  "image_digest": "sha256:b247c0966a5177b46ce6d9b0f9a9688d8eb74210b7b56bc8f6e3eca66110e893",
+  "runtime_tree_digest": "4a69a238d35655656e66ceb8d7c537e561fc7fd27bdd31745cbaf45431ce9416",
+  "actual_bundle": {
+    "path": "/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/chunks/chunk-GUORCHFS.js",
+    "sha256": "b858ce2c4ddbfa1594142e39d7b6ebce328010e116c08db9663602cd26171425",
+    "prompt_method_offset": 3043324,
+    "auth_guard_offset": 3045149,
+    "before_agent_start_offset": 3045401,
+    "expected_env_name": "ZAI_CODING_CN_API_KEY",
+    "guard_excerpt": "\"handled\");return}let{text:currentText,images:currentImages}=processedInput,expandedText=currentText;if(expandPromptTemplates&&(expandedText=this._expandSkillCommand(expandedText),expandedText=expandPromptTemplate(expandedText,[...this.promptTemplates])),this.isStreaming){if(!options?.streamingBehavior)throw new Error(\"Agent is already processing. Specify streamingBehavior ('steer' or 'followUp') to queue the message.\");options.streamingBehavior===\"followUp\"?await this._queueFollowUp(expandedText,currentImages):await this._queueSteer(expandedText,currentImages),preflightResult?.(\"queued\");return}if(this._flushPendingBashMessages(),this._flushPendingCustomMessages(),!this.model)throw new Error(formatNoModelSelectedMessage());if(!(this._modelRuntime.hasConfiguredAuth(this.model.provider)||await this._modelRuntime.checkAuth(this.model.provider)!==void 0))throw this._modelRuntime.isUsingOAuth(this.model.provider)?new Error(`Authentication failed for \"${this.model.provider}\". Credentials may have expired or network is unavailable. Run '/login ${this.model.provider}' to re-authenticate.`):new Error(formatNoApiKeyFoundMessage(this.model.provider))"
+  },
+  "zero_network_replay": {
+    "digest": "32a3c9ed7ca3cc5fa55a0acc121a28896adf6ddf073661ff9c8156c3feefb65d",
+    "exit_code": 1,
+    "network_policy": "deny_all",
+    "real_credential_used": false,
+    "same_local_auth_error": true,
+    "event_types": [
+      "session"
+    ]
+  },
+  "model_provider_requests": 0,
+  "reconciled_tokens": 0,
+  "reconciled_model_cost_usd": 0,
+  "basis": "Pinned pi bundle rejects missing builtin zai-coding-cn env auth during prompt preflight, before beforeAgentStart/model inference. Actual run emitted this local refusal with no predictions. Direct pi reproduced the refusal under deny_all using a nonsecret ZAI_API_KEY sentinel, with no model events. Zero is a code-path reconciliation, not an invoice measurement.",
+  "paid_retry_performed": false,
+  "observed_at": "2026-09-30T21:01:34.353Z"
+}
