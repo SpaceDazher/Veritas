@@ -328,3 +328,18 @@ test('malformed request target is refused and the server remains available', asy
     assert.equal((await request(server, '/')).status, 200);
   });
 });
+
+test('paid campaign presentation identifies the provider, independent arm budgets, and historical unknowns', async () => {
+  await withServer({ credential: credential(), workflow: workflow(), presentation: 'paid-campaign' }, async ({ server }) => {
+    const response = await request(server, '/');
+    const page = await response.text();
+    assert.match(page, /Paid S2-008 evidence review/);
+    assert.match(page, /stealth\/space-bunny-alpha/);
+    assert.match(page, /A 5,000,000 token cap/);
+    assert.match(page, /B 5,000,000 token cap/);
+    assert.match(page, /A === B is disclosure only/);
+    assert.match(page, /Prior v9: 7,312 tokens/);
+    assert.match(page, /v7: UNKNOWN/);
+    assert.match(page, /Preparing review makes no provider or model calls/);
+  });
+});
