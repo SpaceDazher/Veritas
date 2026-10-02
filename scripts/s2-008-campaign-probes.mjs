@@ -513,7 +513,7 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
   const relative = path.relative(rootPath, candidate);
   const normalized = relative.split(path.sep).join('/');
   if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative) ||
-      !/^corpus\/s2-008-campaign\/preregistration\.v[456789]\.in-force\.json$/.test(normalized)) {
+      !/^corpus\/s2-008-campaign\/preregistration\.v(?:[4-9]|10)\.in-force\.json$/.test(normalized)) {
     throw new Error('PROBE_PREREG_PATH_INVALID');
   }
   return candidate;
