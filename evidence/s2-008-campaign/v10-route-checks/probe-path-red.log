@@ -1,0 +1,33 @@
+TAP version 13
+# Subtest: v10 probe path reaches both probe children through the public resolver
+not ok 1 - v10 probe path reaches both probe children through the public resolver
+  ---
+  duration_ms: 1.124709
+  type: 'test'
+  location: '/home/daniil/Veritas/tests/research/campaign-v10.test.mjs:85:1'
+  failureType: 'testCodeFailure'
+  error: 'PROBE_PREREG_PATH_INVALID'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    resolveProbePreregistrationPath (file:///home/daniil/Veritas/scripts/s2-008-campaign-probes.mjs:517:11)
+    TestContext.<anonymous> (file:///home/daniil/Veritas/tests/research/campaign-v10.test.mjs:87:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: probe path resolver keeps legacy default and rejects unsupported or escaping paths
+ok 2 - probe path resolver keeps legacy default and rejects unsupported or escaping paths
+  ---
+  duration_ms: 1.578304
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2676.621302

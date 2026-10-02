@@ -1,0 +1,34 @@
+
+> veritas-agent-board@0.1.0 verify:s2-008
+> node scripts/verify-s2-008.mjs
+
+{
+  "ticket": "S2-008",
+  "gate": "scripts/verify-s2-008.mjs",
+  "status": "PASS",
+  "ok": true,
+  "exitCode": 0,
+  "gates": {
+    "dependency": "PASS(exit=0)",
+    "corpus": "PASS(exit=0)",
+    "probes": "PASS(exit=0)",
+    "replay": "PASS(exit=0)",
+    "harness": "PASS(exit=0)"
+  },
+  "blockingGates": [],
+  "notRunGates": [],
+  "defects": [],
+  "notRun": [],
+  "invocation_id": "2095d760e4687df77a7060f4ee7b9f31",
+  "scopeNotes": [
+    "the harness's A3 is table-derived, not a measurement (the harness A3 is built FROM the frozen table (agreement_source=TABLE_DERIVED_RUN_RECORDS), so its agreement count is definitional and the replay's A3 is the authoritative one); the authoritative A3 is the replay's",
+    "the campaign behind #12 is NOT_RUN, so this deterministic track does not decide the ticket's own scope; #45 carried that scope and is now CLOSED (PARTIAL) with its remainder in #12"
+  ],
+  "boundaries": [
+    "BOUNDARY (B-low, not closed): the integrity gates read COMMITTED bytes (scripts/generate-manifests.mjs uses `git show HEAD:<file>`, scripts/check-inventory.mjs uses `git ls-files`), so a hand-edited evidence/s2-008-summary.json in the WORKING TREE is invisible to `npm run manifest:check` and `npm run inventory:check` until the next chain run rewrites it. What covers the working tree is per SURFACE, and this one is not the corpus: the corpus drift gate (scripts/s2-008-build-corpus.mjs --check) re-derives tests/research/fixtures/**, so it covers the working tree of the CORPUS, not of the summary; the working-tree surface of the summary is covered by the fact that NOTHING in this chain reads it back (no gate, no property, no verdict term consumes evidence/s2-008-summary.json) and that the next write run overwrites it. That is a stated boundary, not a check, and it is stated here so a reader never has to open the report to learn it"
+  ],
+  "written": {
+    "path": "evidence/s2-008-summary.json",
+    "bytes": 20346
+  }
+}
