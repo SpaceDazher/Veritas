@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1286.
+Generated from `git ls-files`; count: 1312.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -499,6 +499,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `docs/decisions/2026-10-01-s2-008-v9-reconciliation.md`
 - `docs/decisions/2026-10-01-s2-008-v9-restart.md`
 - `docs/decisions/2026-10-02-s2-008-v10-preflight.md`
+- `docs/decisions/2026-10-02-s2-008-v10-probe-route.md`
 - `docs/decisions/ADVERSARIAL_REVIEW.md`
 - `docs/decisions/ASSUMPTIONS.md`
 - `docs/decisions/OPEN_DECISIONS.md`
@@ -673,6 +674,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/predictions-v7-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v8-a-trl-s2-008c-01-20260926.json`
 - `evidence/s2-008-campaign/predictions-v9-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/preflight-v10-route.json`
 - `evidence/s2-008-campaign/preflight-v10.json`
 - `evidence/s2-008-campaign/probes-v6.json`
 - `evidence/s2-008-campaign/probes-v7.json`
@@ -711,6 +713,30 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/v10-checks/test-s2-008.log`
 - `evidence/s2-008-campaign/v10-checks/typecheck.log`
 - `evidence/s2-008-campaign/v10-checks/verify-s2-008.log`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-006-comparison.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-006-run-a.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-006-run-b.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-comparison.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-controls.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-dependency-binding.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-harness.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-probes.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-replay.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-run-a.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-run-b.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-security-probes.json`
+- `evidence/s2-008-campaign/v10-route-checks/generated/s2-008-summary.json`
+- `evidence/s2-008-campaign/v10-route-checks/lint.log`
+- `evidence/s2-008-campaign/v10-route-checks/npm-test.log`
+- `evidence/s2-008-campaign/v10-route-checks/parent-focused.log`
+- `evidence/s2-008-campaign/v10-route-checks/probe-path-green.log`
+- `evidence/s2-008-campaign/v10-route-checks/probe-path-red.log`
+- `evidence/s2-008-campaign/v10-route-checks/targeted-probe-versions.log`
+- `evidence/s2-008-campaign/v10-route-checks/test-research.log`
+- `evidence/s2-008-campaign/v10-route-checks/test-s2-002-isolation.log`
+- `evidence/s2-008-campaign/v10-route-checks/test-s2-008.log`
+- `evidence/s2-008-campaign/v10-route-checks/typecheck.log`
+- `evidence/s2-008-campaign/v10-route-checks/verify-s2-008.log`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/verification-v8.json`
 - `evidence/s2-008-campaign/zero-network-auth-v6.json`
