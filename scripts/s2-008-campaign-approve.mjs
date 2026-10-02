@@ -306,7 +306,7 @@ const V4_PIN = path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-im
 
 const USAGE = `s2-008-campaign-approve — the owner's signature on a campaign preregistration
 
-  --version v2|v3|v4|v8|v9  document to sign (default v2)
+  --version v2|v3|v4|v8|v9|v10  document to sign (default v2)
   --principal <id>     the owner's principal id, recorded like every permit here
   --label "<text>"     who is signing, in words
   --out <path>         where to write the signed document
@@ -339,6 +339,23 @@ async function main() {
     return null;
   }
   try {
+    if (args.version === 'v10') {
+      const { approveV10, readV10MeasurementOnDisk, readV10ReconciliationInputs } = await import('./s2-008-campaign-v10-approval.mjs');
+      const baseBytes = readFileSync(path.join(CORPUS_DIR, 'preregistration.v9.in-force.json'));
+      const signed = approveV10({
+        draft: JSON.parse(readFileSync(path.join(CORPUS_DIR, 'preregistration.v10.draft.json'), 'utf8')),
+        base: JSON.parse(baseBytes), baseBytes,
+        table: JSON.parse(readFileSync(V3_TABLE, 'utf8')),
+        pin: JSON.parse(readFileSync(path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-image-pin-v10-preseal.json'), 'utf8')),
+        measurement: readV10MeasurementOnDisk(), ...readV10ReconciliationInputs(),
+        principal: args.principal, label: args.label, issuedAt: new Date().toISOString(),
+      });
+      const out = args.out ?? path.join(CORPUS_DIR, 'preregistration.v10.approved.json');
+      writeFileSync(out, JSON.stringify(signed, null, 2) + String.fromCharCode(10), { flag: 'wx', mode: 0o644 });
+      process.stdout.write(JSON.stringify({written:out,preregistration_id:signed.preregistration_id,
+        preregistration_digest:signed.preregistration_digest,approved_by:signed.approval.principal_id,in_force:false}) + String.fromCharCode(10));
+      return signed;
+    }
     if (args.version === 'v9') {
       const { approveV9, readV9MeasurementOnDisk, readV9ReconciliationInputs } = await import('./s2-008-campaign-v9-approval.mjs');
       const baseBytes = readFileSync(path.join(CORPUS_DIR, 'preregistration.v8.in-force.json'));

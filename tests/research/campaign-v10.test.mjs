@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { modelImagePaths } from '../../scripts/s2-008-campaign-model-image.mjs';
 import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
-import { activeCampaignVersion, loadV4TrialPredictions, scoreRecordedPredictions, verifyV4FrozenTable } from '../../scripts/s2-008-campaign-evaluate.mjs';
+import { activeCampaignVersion, loadV4TrialPredictions, verifyV4FrozenTable } from '../../scripts/s2-008-campaign-evaluate.mjs';
 
 const evidence = 'evidence/s2-008-campaign';
 const reconciliation = JSON.parse(fs.readFileSync(evidence + '/reconciliation-v9-a.json', 'utf8'));
@@ -174,25 +174,16 @@ test('v10 prediction loading retains the v9 correlation and accounting requireme
   assert.equal(unparsedLoaded.per_seed[0].unparsed, 1);
   assert.equal(unparsedLoaded.per_seed[0].agreeing, 0);
 
-  const expectedLabels = new Map([['case-a', 'MINOR'], ['case-b', 'MAJOR']]);
-  const differentlyPredictedA = scoreRecordedPredictions({
-    rows: [{ case_id: 'case-a', predicted: 'MINOR' }, { case_id: 'case-b', predicted: 'MINOR' }],
-    labels: expectedLabels,
-    expectedIds: ['case-a', 'case-b'],
-  });
-  const differentlyPredictedB = scoreRecordedPredictions({
-    rows: [{ case_id: 'case-a', predicted: 'MAJOR' }, { case_id: 'case-b', predicted: 'MAJOR' }],
-    labels: expectedLabels,
-    expectedIds: ['case-a', 'case-b'],
-  });
-  assert.equal(differentlyPredictedA.ok, true);
-  assert.equal(differentlyPredictedB.ok, true);
-  assert.equal(differentlyPredictedA.agreeing, 1);
-  assert.equal(differentlyPredictedB.agreeing, 1);
+  const differentlyPredictedA = load(make({ predicted: 'MINOR' }));
+  const differentlyPredictedB = load(make({ predicted: 'MAJOR' }));
+  assert.equal(differentlyPredictedA.available, true);
+  assert.equal(differentlyPredictedB.available, true);
+  assert.deepEqual(differentlyPredictedA.per_seed[0].agreement, [1]);
+  assert.deepEqual(differentlyPredictedB.per_seed[0].agreement, [0]);
   assert.notDeepEqual(
-    differentlyPredictedA.agreement,
-    differentlyPredictedB.agreement,
-    'different A/B predictions are scored independently rather than rejected for inequality',
+    differentlyPredictedA.per_seed[0].agreement,
+    differentlyPredictedB.per_seed[0].agreement,
+    'different A/B sidecars are independently scored rather than rejected for inequality',
   );
 });
 

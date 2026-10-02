@@ -42,6 +42,7 @@ import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
 import { assertV8PresealPin } from './s2-008-campaign-v8-approval.mjs';
 import { assertV9PresealPin, assertV8AReconciliation, readV9ReconciliationInputs } from './s2-008-campaign-v9-approval.mjs';
+import { assertV10PresealPin, assertV9AReconciliation, readV10ReconciliationInputs } from './s2-008-campaign-v10-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
@@ -706,6 +707,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v6') return 6;
   if (rule === 's2-008-prereg-v7') return 7;
   if (rule === 's2-008-prereg-v8') return 8;
+  if (rule === 's2-008-prereg-v10') return 10;
   if (rule === 's2-008-prereg-v9') return 9;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
@@ -753,14 +755,26 @@ export function assertPinnedModelImage({
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
     assertV6PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
-  } else if (version === 7 || version === 8 || version === 9) {
+  } else if (version === 7 || version === 8 || version === 9 || version === 10) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v' + version + '.in-force.json'));
-    (version === 9 ? assertV9PresealPin : version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    (version === 10 ? assertV10PresealPin : version === 9 ? assertV9PresealPin : version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     (version === 7 ? assertV7ExecutorPolicy : assertV8ExecutorPolicy)(prereg.executor);
     if (version === 9) {
       const reconciliationBinding = assertV8AReconciliation(readV9ReconciliationInputs());
       if (prereg.restart_reconciliation?.canonical_digest !== reconciliationBinding.canonicalDigest) throw new Error('MODEL_RECONCILIATION_BINDING_MISMATCH');
+    }
+    if (version === 10) {
+      const reconciliationBinding = assertV9AReconciliation(readV10ReconciliationInputs());
+      const bound = prereg.restart_reconciliation;
+      if (bound?.canonical_digest !== reconciliationBinding.canonicalDigest ||
+          bound?.receipt_digest !== reconciliationBinding.receiptDigest ||
+          bound?.prior_run_sha256 !== reconciliationBinding.priorRunSha256 ||
+          bound?.prior_sidecar_sha256 !== reconciliationBinding.priorSidecarSha256 ||
+          bound?.reconciled_campaign_tokens !== reconciliationBinding.actualTokens ||
+          bound?.reconciled_campaign_usd !== reconciliationBinding.actualUsd) {
+        throw new Error('MODEL_RECONCILIATION_BINDING_MISMATCH');
+      }
     }
   }
   if (prereg?.approval?.status !== 'APPROVED' || prereg?.approval?.in_force !== true) {

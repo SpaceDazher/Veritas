@@ -14,8 +14,8 @@ import { modelContainerTimeoutFromPreregistration } from './s2-008-campaign-v6-t
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
 export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
-  if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
-  if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
+  if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9', 'v10'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
   const stagedVersion = preseal ? `v${Number(version.slice(1)) - 1}` : version;
   return Object.freeze({
     tag: `localhost/veritas-s2-008-model:${version}`,
@@ -29,7 +29,7 @@ export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
 export function modelImagePolicyInputs(schema) {
   const match = /^s2-008-model-image-pin\/(\d+)$/.exec(String(schema));
   const version = match ? Number(match[1]) : NaN;
-  if (![4, 5, 6, 7, 8, 9].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (![4, 5, 6, 7, 8, 9, 10].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
   const stageFiles = [
     ...(version >= 6 ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
     ...(version >= 7 ? ['scripts/s2-008-campaign-credential-env.mjs'] : []),
@@ -41,7 +41,7 @@ export function modelImagePolicyInputs(schema) {
   return Object.freeze({ stageFiles: Object.freeze(stageFiles), sourceNames: Object.freeze(sourceNames) });
 }
 const MODEL_PATHS = modelImagePaths(
-  process.argv.includes('--v9') ? 'v9' : process.argv.includes('--v8') ? 'v8' : process.argv.includes('--v7') ? 'v7' : process.argv.includes('--v6') ? 'v6' : process.argv.includes('--v5') ? 'v5' : 'v4',
+  process.argv.includes('--v10') ? 'v10' : process.argv.includes('--v9') ? 'v9' : process.argv.includes('--v8') ? 'v8' : process.argv.includes('--v7') ? 'v7' : process.argv.includes('--v6') ? 'v6' : process.argv.includes('--v5') ? 'v5' : 'v4',
   { preseal: process.argv.includes('--preseal') },
 );
 const TAG = MODEL_PATHS.tag;
@@ -238,7 +238,7 @@ export function assertRecordedModelPin(rebuilt, recorded) {
 export function dryRunModelInImage(pin) {
   const stagedPrereg = JSON.parse(fs.readFileSync(path.join(ROOT, MODEL_PATHS.stagedPrereg), 'utf8'));
   let timeoutMs = 180_000;
-  if (['s2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9'].includes(stagedPrereg.rule)) {
+  if (['s2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10'].includes(stagedPrereg.rule)) {
     timeoutMs = modelContainerTimeoutFromPreregistration(stagedPrereg);
   }
   const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
