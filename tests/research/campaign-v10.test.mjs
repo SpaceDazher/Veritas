@@ -1,10 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { FROZEN_MEMBERS, preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs';
+import { assertPreregistration, preregistrationDigest as sharedPreregistrationDigest } from '../../src/lib/research/preregistration.mjs';
+import { credentialEnvNameForPreregistration } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { modelImagePaths } from '../../scripts/s2-008-campaign-model-image.mjs';
 import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
-import { activeCampaignVersion, loadV4TrialPredictions, verifyV4FrozenTable } from '../../scripts/s2-008-campaign-evaluate.mjs';
+import { activeCampaignVersion, evaluateV4Campaign, loadV4TrialPredictions, verifyV4FrozenTable } from '../../scripts/s2-008-campaign-evaluate.mjs';
 
 const evidence = 'evidence/s2-008-campaign';
 const reconciliation = JSON.parse(fs.readFileSync(evidence + '/reconciliation-v9-a.json', 'utf8'));
@@ -15,6 +20,48 @@ const baseBytes = fs.readFileSync('corpus/s2-008-campaign/preregistration.v9.in-
 const base = JSON.parse(baseBytes);
 const sourcePin = JSON.parse(fs.readFileSync(evidence + '/model-image-pin-v9-preseal.json', 'utf8'));
 const table = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/frozen-table.v3.json'));
+
+function makeV10PresealPin(stagedBytes) {
+  const sources = {
+    ...sourcePin.first.sources,
+    prereg: createHash('sha256').update(stagedBytes).digest('hex'),
+  };
+  const covers = Object.keys(sources).filter((name) => name !== 'prereg').sort();
+  const makeBuild = (previous) => ({
+    ...previous,
+    sources,
+    source_digest: canonicalDigest(sources),
+    content_commitment: canonicalDigest(Object.fromEntries(covers.map((name) => [name, sources[name]]))),
+    content_commitment_covers: covers,
+  });
+  return {
+    ...sourcePin,
+    schema: 's2-008-model-image-pin/10',
+    image_tag: 'localhost/veritas-s2-008-model:v10',
+    first: makeBuild(sourcePin.first),
+    second: makeBuild(sourcePin.second),
+    commitment: { ...sourcePin.commitment, covers, excludes: ['prereg'] },
+  };
+}
+
+const EVALUATION_CASE_ID = '16bb546d7b453454202c315c6106e3a56ec77444';
+
+test('v10 preregistration is accepted by the shared digest and validation contract', () => {
+  const prereg = structuredClone(base);
+  prereg.rule = 's2-008-prereg-v10';
+  prereg.preregistration_id = 'xpr-s2-008c-10';
+  prereg.preregistration_digest = preregistrationDigest(prereg);
+  assert.equal(sharedPreregistrationDigest(prereg), prereg.preregistration_digest);
+  assert.equal(assertPreregistration(prereg), prereg);
+});
+
+test('v10 credential routing keeps the signed OpenRouter environment policy', () => {
+  const prereg = structuredClone(base);
+  prereg.rule = 's2-008-prereg-v10';
+  prereg.preregistration_id = 'xpr-s2-008c-10';
+  prereg.preregistration_digest = preregistrationDigest(prereg);
+  assert.equal(credentialEnvNameForPreregistration(prereg), 'OPENROUTER_API_KEY');
+});
 
 test('v10 is a separate run/image version over the in-force v9 base', () => {
   assert.deepEqual(modelImagePaths('v10', { preseal: true }), {
@@ -76,10 +123,52 @@ test('v10 requires the complete v9 A reconciliation, sidecar and provider receip
   const missingReceiptUsage = structuredClone(receipt);
   missingReceiptUsage.data.native_tokens_prompt = null;
   assert.throws(() => assertV9AReconciliation({ ...inputs, receipt: missingReceiptUsage }), /V10_RECONCILIATION_RECEIPT/);
+
+  const changedId = 'gen-1790862092-qxgqw1Rrl8DGvxXX6i2B';
+  const alternateRequest = structuredClone(reconciliation);
+  const alternateReceipt = structuredClone(receipt);
+  const alternateRow = alternateRequest.rows.at(-1);
+  alternateRow.generation_id = changedId;
+  alternateRow.receipt.generation_id = changedId;
+  alternateRow.receipt.data.id = changedId;
+  alternateReceipt.generation_id = changedId;
+  alternateReceipt.data.id = changedId;
+  assert.throws(() => assertV9AReconciliation({
+    ...inputs, reconciliation: alternateRequest, receipt: alternateReceipt,
+  }), /V10_RECONCILIATION_PROVIDER_EVENT/);
+
+  const outOfWindow = structuredClone(reconciliation);
+  const outOfWindowReceipt = structuredClone(receipt);
+  const stoppedRow = outOfWindow.rows.at(-1);
+  stoppedRow.created_at = '2026-09-01T00:00:00.000Z';
+  stoppedRow.receipt.created_at = stoppedRow.created_at;
+  stoppedRow.receipt.data.created_at = stoppedRow.created_at;
+  outOfWindowReceipt.data.created_at = stoppedRow.created_at;
+  assert.throws(() => assertV9AReconciliation({
+    ...inputs, reconciliation: outOfWindow, receipt: outOfWindowReceipt,
+  }), /V10_RECONCILIATION_PROVIDER_EVENT/);
+
+  const outOfOrder = structuredClone(reconciliation);
+  [outOfOrder.rows[0], outOfOrder.rows[1]] = [outOfOrder.rows[1], outOfOrder.rows[0]];
+  assert.throws(() => assertV9AReconciliation({ ...inputs, reconciliation: outOfOrder }), /V10_RECONCILIATION_PROVIDER_EVENT/);
+
+  const wrongStoppedCase = structuredClone(reconciliation);
+  wrongStoppedCase.rows.at(-1).case_id = '85f721b06317e335e560e5cf01f9235d970dfa74';
+  wrongStoppedCase.missing_prediction_case_id = '85f721b06317e335e560e5cf01f9235d970dfa74';
+  assert.throws(() => assertV9AReconciliation({ ...inputs, reconciliation: wrongStoppedCase }), /V10_RECONCILIATION_PROVIDER_EVENT/);
+
+  const wrongGenerationTime = structuredClone(receipt);
+  const wrongTimeRequest = structuredClone(reconciliation);
+  wrongGenerationTime.data.generation_time = 180783;
+  wrongTimeRequest.rows.at(-1).receipt.data.generation_time = 180783;
+  assert.throws(() => assertV9AReconciliation({
+    ...inputs, reconciliation: wrongTimeRequest, receipt: wrongGenerationTime,
+  }), /V10_RECONCILIATION_PROVIDER_EVENT/);
 });
 
-test('v10 draft accepts only its own preseal pin and keeps the frozen scope', async () => {
+test('v10 draft and approval bind the known v9 base and reject every frozen-member mutation', async () => {
   const {
+    approveV10,
     assertV10PresealPin,
     createV10Draft,
     readV10MeasurementOnDisk,
@@ -88,12 +177,45 @@ test('v10 draft accepts only its own preseal pin and keeps the frozen scope', as
   const inputs = {
     base,
     baseBytes,
-    pin: sourcePin,
+    pin: makeV10PresealPin(baseBytes),
     measurement: readV10MeasurementOnDisk(),
     ...readV10ReconciliationInputs(),
   };
   assert.throws(() => assertV10PresealPin({ pin: sourcePin, baseBytes }), /V10_PRESEAL_PIN/);
-  assert.throws(() => createV10Draft(inputs), /V10_PRESEAL_PIN/);
+  const draft = createV10Draft(inputs);
+  for (const member of FROZEN_MEMBERS) assert.deepEqual(draft[member], base[member], member);
+  assert.equal(draft.restart_reconciliation.reconciled_campaign_tokens, 7312);
+  assert.equal(draft.restart_reconciliation.reconciled_campaign_usd, 0);
+  assert.equal(draft.executor.model_launch_timeout.per_model_call_timeout_ms, 180000);
+  assert.equal(draft.budget_reservation.granted_units, 5000000);
+
+  const approvalArgs = {
+    ...inputs, table, principal: 'prn-daniil', label: 'Daniil', issuedAt: '2026-10-02T00:00:00.000Z',
+  };
+  const approved = approveV10({ ...approvalArgs, draft });
+  assert.equal(approved.approval.status, 'APPROVED');
+  assert.equal(approved.approval.in_force, false);
+  for (const member of FROZEN_MEMBERS) {
+    const moved = structuredClone(draft);
+    const value = moved[member];
+    if (Array.isArray(value)) moved[member] = [...value, 'mutation'];
+    else if (value && typeof value === 'object') moved[member] = { ...value, test_mutation: true };
+    else if (typeof value === 'number') moved[member] = value + 1;
+    else moved[member] = String(value) + '-mutation';
+    moved.preregistration_digest = preregistrationDigest(moved);
+    assert.throws(() => approveV10({ ...approvalArgs, draft: moved }), new RegExp('APPROVAL_SCOPE_DRIFT:' + member));
+  }
+
+  const alteredBase = structuredClone(base);
+  alteredBase.metric = { ...alteredBase.metric, name: alteredBase.metric.name + '-forged' };
+  alteredBase.preregistration_digest = preregistrationDigest(alteredBase);
+  const alteredBaseBytes = Buffer.from(JSON.stringify(alteredBase, null, 2) + '\n');
+  assert.throws(() => createV10Draft({
+    ...inputs,
+    base: alteredBase,
+    baseBytes: alteredBaseBytes,
+    pin: makeV10PresealPin(alteredBaseBytes),
+  }), /V10_BASE_NOT_IN_FORCE/);
 });
 
 test('v10 prediction loading retains the v9 correlation and accounting requirements', () => {
@@ -198,4 +320,181 @@ test('v10 keeps the deterministic frozen-table agreement separate from human acc
   assert.deepEqual(verdict.remarks, []);
   assert.equal(activeCampaignVersion(manifest), 'v10');
   assert.equal(base.approval.in_force, true);
+});
+
+function makeEvaluationFixture({ duplicateAcrossRuns = false, corruptSidecar = false, unparsedMismatch = false } = {}) {
+  const seed = 20260926;
+  const prereg = structuredClone(base);
+  prereg.rule = 's2-008-prereg-v10';
+  prereg.preregistration_id = 'xpr-s2-008c-10';
+  prereg.holdout_access.case_count = 1;
+  prereg.seed_rule.seeds = [seed];
+  const frozenTable = structuredClone(table);
+  frozenTable.n_holdout = 1;
+  frozenTable.seeds = [seed];
+  frozenTable.trial_list_digest = canonicalDigest(prereg.trial_list);
+  prereg.expected_table_digest = canonicalDigest(frozenTable);
+  prereg.preregistration_digest = preregistrationDigest(prereg);
+  const manifest = {
+    preregistration: {
+      file: 'preregistration.v10.in-force.json',
+      status: 'IN_FORCE',
+      preregistration_digest: prereg.preregistration_digest,
+    },
+    frozen_table: { file: 'frozen-table.v3.json', digest: canonicalDigest(frozenTable) },
+  };
+  const campaignProbes = JSON.parse(fs.readFileSync(evidence + '/probes-v9.json', 'utf8'));
+  campaignProbes.preregistration_digest = prereg.preregistration_digest;
+  const securityControls = JSON.parse(fs.readFileSync(evidence + '/security-probes-v9.json', 'utf8'));
+  const runBase = { commit_sha: campaignProbes.commit_sha, tree_sha: campaignProbes.tree_sha, worktree_dirty: false };
+  securityControls.base = { ...securityControls.base, commit_sha: runBase.commit_sha, tree_sha: runBase.tree_sha };
+  const sidecars = new Map();
+  const runs = {};
+  for (const label of ['a', 'b']) {
+    const charges = [];
+    const trials = [];
+    let spentUnits = 0;
+    let modelCalls = 0;
+    for (const entry of prereg.trial_list) {
+      const isModel = entry.arm_id === 'arm-model-zai-glm53flash';
+      const predicted = label === 'a' ? 'MINOR' : 'MAJOR';
+      const unparsed = unparsedMismatch && label === 'a' && isModel ? 0 : 0;
+      const rows = [{ case_id: EVALUATION_CASE_ID, predicted: unparsedMismatch && label === 'a' && isModel ? 'UNPARSED' : predicted }];
+      const generationId = duplicateAcrossRuns
+        ? 'gen-v10-evaluation-duplicate'
+        : 'gen-v10-evaluation-' + label;
+      const body = {
+        kind: 's2-008-campaign-predictions/1',
+        run: label,
+        arm_id: entry.arm_id,
+        seed,
+        unparsed,
+        model_calls: isModel ? 1 : 0,
+        spent_tokens: isModel ? 578 : 0,
+        usd_spent: 0,
+        rows,
+      };
+      if (isModel) {
+        body.outcome_class = 'MEASURED';
+        body.accounting = {
+          schema: 's2-008-model-accounting/1',
+          policy: 'GENERATION_ID_REQUIRED',
+          calls: 1,
+          tokens: 578,
+          prompt_tokens: 574,
+          reported_cost_usd: 0,
+          rows: [{
+            case_id: EVALUATION_CASE_ID,
+            generation_id: generationId,
+            correlation_status: 'CORRELATED',
+            input: 432,
+            output: 4,
+            cacheRead: 142,
+            cacheWrite: 0,
+            prompt_tokens: 574,
+            prompt_token_basis: 'input+cacheRead+cacheWrite',
+            totalTokens: 578,
+            reported_cost_usd: 0,
+            usage_components_consistent: true,
+            usage_component_issue: null,
+          }],
+        };
+        spentUnits += 578;
+        modelCalls += 1;
+      }
+      const file = 'evidence/s2-008-campaign/predictions-v10-' + label + '-' + entry.trial_id + '-' + seed + '.json';
+      const ref = { file, digest: canonicalDigest(body), rows: 1, unparsed };
+      const fullFile = path.join('/tmp', file);
+      sidecars.set(fullFile, JSON.stringify(body));
+      if (corruptSidecar && label === 'b' && isModel) {
+        const changed = structuredClone(body);
+        changed.rows[0].predicted = 'OUTSIDE_CLOSED_SET';
+        sidecars.set(fullFile, JSON.stringify(changed));
+      }
+      const seedRow = { seed, predictions: ref };
+      if (isModel) seedRow.outcome_class = 'MEASURED';
+      trials.push({ trial_id: entry.trial_id, arm_id: entry.arm_id, seeds: [seedRow] });
+      charges.push({ trial: entry.trial_id, seed, arm_id: entry.arm_id, units: isModel ? 578 : 0 });
+    }
+    runs[label] = {
+      kind: 's2-008-campaign-v10-predictions/1',
+      label,
+      status: 'MEASURED',
+      dry_run: false,
+      raw_run_id: 'run-v10-' + label,
+      nonce: 'nonce-v10-' + label,
+      base: structuredClone(runBase),
+      preregistration_digest: prereg.preregistration_digest,
+      model_image_pin: { content_commitment: prereg.executor.model_image.content_commitment },
+      reservation: { currency: 'tokens', granted_units: prereg.budget_reservation.granted_units },
+      spent_units: spentUnits,
+      model_calls: modelCalls,
+      launches: charges.length,
+      trials,
+      charges,
+    };
+  }
+  const bootstrap = ({ vectors, seeds, samples, confidence }) => ({
+    record: { real_start: { proven: true } },
+    output: {
+      kind: 's2-008-campaign-bootstrap-output/1',
+      samples,
+      confidence,
+      results: vectors.map((vector) => {
+        const [trialId, seedText] = vector.trial_id.split('@');
+        const seedValue = Number(seedText);
+        return {
+          trial_id: vector.trial_id,
+          seed: seedValue,
+          arm_id: vector.arm_id,
+          samples,
+          confidence,
+          n: vector.agreement.length,
+          method: 'PERCENTILE_BOOTSTRAP_WITH_MULTIPLICITY',
+          observed_rate: vector.agreement.reduce((sum, value) => sum + value, 0) / vector.agreement.length,
+          mean_matches_observed: true,
+          lower: 0,
+          upper: 1,
+          ignored_trial_id: trialId,
+        };
+      }),
+    },
+  });
+  return {
+    prereg,
+    manifest,
+    frozenTable,
+    runA: runs.a,
+    runB: runs.b,
+    holdoutCases: [{ case_id: EVALUATION_CASE_ID, label: 'MINOR' }],
+    campaignProbes,
+    securityControls,
+    bootstrap,
+    root: '/tmp',
+    readFile: (file) => sidecars.get(file),
+  };
+}
+
+test('v10 evaluation publishes deterministic agreement only after full scoring and leaves human review pending', () => {
+  const result = evaluateV4Campaign(makeEvaluationFixture());
+  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.deepEqual(result.deterministic_evaluation, { verdict: 'AGREES', remarks: [] });
+  assert.equal(result.prediction_source, 'IMMUTABLE_RUN_SIDECARS');
+  assert.equal(result.verdict, 'PENDING_HUMAN_REVIEW');
+  assert.equal(result.reproducibility.same_decision_digest, false);
+});
+
+test('v10 evaluation refuses a corrupted sidecar, unparsed-as-agreement, and duplicate A/B generation IDs', () => {
+  const corrupted = evaluateV4Campaign(makeEvaluationFixture({ corruptSidecar: true }));
+  assert.equal(corrupted.ok, false);
+  assert.match(corrupted.reason, /V4_SIDECAR_DIGEST_MISMATCH/);
+  assert.equal(Object.hasOwn(corrupted, 'deterministic_evaluation'), false);
+
+  const unparsed = evaluateV4Campaign(makeEvaluationFixture({ unparsedMismatch: true }));
+  assert.equal(unparsed.ok, false);
+  assert.match(unparsed.reason, /V4_UNPARSED_COUNT_MISMATCH/);
+
+  const duplicate = evaluateV4Campaign(makeEvaluationFixture({ duplicateAcrossRuns: true }));
+  assert.equal(duplicate.ok, false);
+  assert.equal(duplicate.reason, 'V10_GENERATION_ID_DUPLICATE');
 });
