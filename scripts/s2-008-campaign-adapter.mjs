@@ -43,6 +43,8 @@ import { assertV6PresealPin } from './s2-008-campaign-v6-approval.mjs';
 import { assertV8PresealPin } from './s2-008-campaign-v8-approval.mjs';
 import { assertV9PresealPin, assertV8AReconciliation, readV9ReconciliationInputs } from './s2-008-campaign-v9-approval.mjs';
 import { assertV10PresealPin, assertV9AReconciliation, readV10ReconciliationInputs } from './s2-008-campaign-v10-approval.mjs';
+import { assertV11PresealPin, assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-campaign-v11-approval.mjs';
+import { V11_FAILURE_DIAGNOSTICS_POLICY } from './s2-008-campaign-arm-model.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
@@ -708,6 +710,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v7') return 7;
   if (rule === 's2-008-prereg-v8') return 8;
   if (rule === 's2-008-prereg-v10') return 10;
+  if (rule === 's2-008-prereg-v11') return 11;
   if (rule === 's2-008-prereg-v9') return 9;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
@@ -755,9 +758,9 @@ export function assertPinnedModelImage({
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
     assertV6PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
-  } else if (version === 7 || version === 8 || version === 9 || version === 10) {
+  } else if (version === 7 || version === 8 || version === 9 || version === 10 || version === 11) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v' + version + '.in-force.json'));
-    (version === 10 ? assertV10PresealPin : version === 9 ? assertV9PresealPin : version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    (version === 11 ? assertV11PresealPin : version === 10 ? assertV10PresealPin : version === 9 ? assertV9PresealPin : version === 8 ? assertV8PresealPin : assertV7PresealPin)({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     (version === 7 ? assertV7ExecutorPolicy : assertV8ExecutorPolicy)(prereg.executor);
     if (version === 9) {
@@ -773,6 +776,26 @@ export function assertPinnedModelImage({
           bound?.prior_sidecar_sha256 !== reconciliationBinding.priorSidecarSha256 ||
           bound?.reconciled_campaign_tokens !== reconciliationBinding.actualTokens ||
           bound?.reconciled_campaign_usd !== reconciliationBinding.actualUsd) {
+        throw new Error('MODEL_RECONCILIATION_BINDING_MISMATCH');
+      }
+    }
+    if (version === 11) {
+      const reconciliationBinding = assertV10AReconciliation(readV11ReconciliationInputs());
+      const bound = prereg.restart_reconciliation;
+      if (bound?.kind !== reconciliationBinding.kind ||
+          bound?.canonical_digest !== reconciliationBinding.canonicalDigest ||
+          bound?.raw_sha256 !== reconciliationBinding.reconciliationSha256 ||
+          bound?.known_receipts_sha256 !== reconciliationBinding.knownReceiptSha256 ||
+          bound?.overlap_receipt_sha256 !== reconciliationBinding.overlapReceiptSha256 ||
+          bound?.prior_run_sha256 !== reconciliationBinding.priorRunSha256 ||
+          bound?.prior_sidecar_sha256 !== reconciliationBinding.priorSidecarSha256 ||
+          bound?.preregistration_digest !== reconciliationBinding.preregistrationDigest ||
+          bound?.reconciled_campaign_tokens !== reconciliationBinding.actualTokens ||
+          bound?.reconciled_campaign_usd !== reconciliationBinding.actualUsd ||
+          bound?.provider_calls !== reconciliationBinding.providerCalls ||
+          bound?.local_attempts !== reconciliationBinding.localAttempts ||
+          bound?.unreconciled_attempts !== reconciliationBinding.unreconciledAttempts ||
+          canonicalDigest(prereg.failure_diagnostics_protocol ?? null) !== canonicalDigest(V11_FAILURE_DIAGNOSTICS_POLICY)) {
         throw new Error('MODEL_RECONCILIATION_BINDING_MISMATCH');
       }
     }
@@ -860,7 +883,7 @@ export async function runModelTrial({
       exit_code: observation?.exitCode ?? null,
       signal: observation?.signal ?? null,
       timed_out: observation?.timedOut ?? false,
-      stderr_excerpt: String(observation?.stderr ?? '').slice(-400),
+      stderr_excerpt: prereg.rule === 's2-008-prereg-v11' ? null : String(observation?.stderr ?? '').slice(-400),
       banner, payload_chunks: parsed.chunks, payload_error: parsed.error,
       output_digest: output === null ? null : canonicalDigest(output),
       // Keep the own-arm budget and stop reason; a digest cannot recover an INFRA report.

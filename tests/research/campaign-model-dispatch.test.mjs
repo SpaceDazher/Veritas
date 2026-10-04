@@ -373,3 +373,27 @@ test('positive unknown model attempts stop before another seed even when budget 
   assert.equal(report.model_calls_is_lower_bound, true);
   assert.equal(report.unknown_model_attempts, 1);
 });
+
+
+test('explicit unknown model attempt survives equal call and attempt counts in host charging', async () => {
+  const { runV4Campaign } = await import('../../scripts/s2-008-campaign-run.mjs');
+  let launches = 0;
+  const output = {
+    outcome_class: 'MEASURED',
+    budget: { currency: 'tokens', spent_tokens: 5, unreconciled_spend: false },
+    executor: { model_calls: 1, model_attempts: 1, unknown_model_attempts: 1 },
+  };
+  const report = await runV4Campaign({
+    label: 'attempt-explicit', arm: MODEL, write: false,
+    prereg: preregV7, manifest: manifestV7, modelPin: pinV7, dispatchableArms: [MODEL],
+    resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+    now: () => Date.parse('2026-09-30T00:00:00.000Z'),
+    runModel: async () => { launches += 1; return { ok: true, output, record: { arm_report: output } }; },
+  });
+  assert.equal(launches, 1);
+  assert.equal(report.status, 'BLOCKED');
+  assert.match(report.reason, /ARM_UNRECONCILED_MODEL_ATTEMPTS:1/);
+  assert.equal(report.spent_units, 5);
+  assert.equal(report.spent_units_is_lower_bound, true);
+  assert.equal(report.unknown_model_attempts, 1);
+});

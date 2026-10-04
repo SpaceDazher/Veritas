@@ -32,6 +32,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parsePrepareMode, assertPrepareWriteAllowed } from './s2-008-campaign-prepare-cli.mjs';
 
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import {
@@ -790,37 +791,44 @@ function buildCases(rows, partition) {
 }
 
 const argv = process.argv.slice(2);
-if (argv.includes('--seal-v2')) {
+const mode = parsePrepareMode(argv);
+if (mode === 'seal-v2') {
   throw new Error('V2_NOT_SEALABLE: its frozen trial list names three old arms while its declared arms name one model arm; use an explicitly approved v3');
-} else if (argv.includes('--seal-v3')) {
+} else if (mode === 'seal-v3') {
   const { sealOnDisk } = await import('./s2-008-campaign-seal-v3.mjs');
   console.log(JSON.stringify({ mode: 'seal-v3', ...sealOnDisk() }, null, 2));
-} else if (argv.includes('--seal-v4')) {
+} else if (mode === 'seal-v4') {
   const { sealOnDisk } = await import('./s2-008-campaign-seal-v4.mjs');
   console.log(JSON.stringify({ mode: 'seal-v4', ...sealOnDisk() }, null, 2));
-} else if (argv.includes('--seal-v5')) {
+} else if (mode === 'seal-v5') {
   const { sealV5OnDisk } = await import('./s2-008-campaign-seal-v5.mjs');
   console.log(JSON.stringify({ mode: 'seal-v5', ...sealV5OnDisk() }, null, 2));
-} else if (argv.includes('--seal-v6')) {
+} else if (mode === 'seal-v6') {
   const { sealV6OnDisk } = await import('./s2-008-campaign-seal-v6.mjs');
   console.log(JSON.stringify({ mode: 'seal-v6', ...sealV6OnDisk() }, null, 2));
-} else if (argv.includes('--seal-v7')) {
+} else if (mode === 'seal-v7') {
   const { sealV7OnDisk } = await import('./s2-008-campaign-seal-v7.mjs');
   console.log(JSON.stringify({ mode: 'seal-v7', ...sealV7OnDisk() }, null, 2));
-} else if (argv.includes('--seal-v10')) {
+} else if (mode === 'seal-v11') {
+  const { sealV11OnDisk } = await import('./s2-008-campaign-seal-v11.mjs');
+  console.log(JSON.stringify({ mode: 'seal-v11', ...sealV11OnDisk() }, null, 2));
+} else if (mode === 'seal-v10') {
   const { sealV10OnDisk } = await import('./s2-008-campaign-seal-v10.mjs');
   console.log(JSON.stringify({ mode: 'seal-v10', ...sealV10OnDisk() }, null, 2));
-} else if (argv.includes('--seal-v9')) {
+} else if (mode === 'seal-v9') {
   const { sealV9OnDisk } = await import('./s2-008-campaign-seal-v9.mjs');
   console.log(JSON.stringify({ mode: 'seal-v9', ...sealV9OnDisk() }, null, 2));
-} else if (argv.includes('--seal-v8')) {
+} else if (mode === 'seal-v8') {
   const { sealV8OnDisk } = await import('./s2-008-campaign-seal-v8.mjs');
   console.log(JSON.stringify({ mode: 'seal-v8', ...sealV8OnDisk() }, null, 2));
-} else if (argv.includes('--selftest')) {
+} else if (mode === 'selftest') {
   selftest();
-} else if (argv.includes('--check')) {
+} else if (mode === 'check') {
   const currentManifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
-  if (currentManifest.preregistration?.file === 'preregistration.v10.in-force.json') {
+  if (currentManifest.preregistration?.file === 'preregistration.v11.in-force.json') {
+    const { checkV11OnDisk } = await import('./s2-008-campaign-seal-v11.mjs');
+    console.log(JSON.stringify({ mode: 'check-v11', ...checkV11OnDisk() }, null, 2));
+  } else if (currentManifest.preregistration?.file === 'preregistration.v10.in-force.json') {
     const { checkV10OnDisk } = await import('./s2-008-campaign-seal-v10.mjs');
     console.log(JSON.stringify({ mode: 'check-v10', ...checkV10OnDisk() }, null, 2));
   } else if (currentManifest.preregistration?.file === 'preregistration.v9.in-force.json') {
@@ -859,9 +867,7 @@ if (argv.includes('--seal-v2')) {
 } else {
   if (fs.existsSync(path.join(CORPUS_DIR, 'manifest.json'))) {
     const active = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
-    if (active.preregistration?.file === 'preregistration.v3.in-force.json') {
-      throw new Error('V3_IN_FORCE_REFUSES_V1_REBUILD');
-    }
+    assertPrepareWriteAllowed(active);
   }
   const built = prepare({ write: true });
   console.log(JSON.stringify({

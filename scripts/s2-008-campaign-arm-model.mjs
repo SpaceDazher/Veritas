@@ -58,6 +58,7 @@ export const ARM_ERRORS = Object.freeze({
   NO_CREDENTIAL: 'EXECUTOR_CREDENTIAL_ABSENT',
   PROVIDER_UNREACHABLE: 'MODEL_ENDPOINT_UNREACHABLE',
   NO_USAGE_REPORTED: 'MODEL_USAGE_NOT_REPORTED',
+  PROVIDER_RESPONSE_ERROR: 'MODEL_PROVIDER_RESPONSE_ERROR',
   BUDGET_EXHAUSTED: 'BUDGET_EXHAUSTED',
   SHARED_CAP_REQUIRED: 'SHARED_TOKEN_CAP_REQUIRED',
   SHARED_CAP_INVALID: 'SHARED_TOKEN_CAP_INVALID',
@@ -135,19 +136,186 @@ function finalAgentEnd(stdout) {
   return final;
 }
 
+const FAILURE_STOP_REASONS = new Set(['stop', 'length', 'error', 'aborted', 'cancelled', 'tool_calls', 'content_filter']);
+const FAILURE_CATEGORIES = new Set([
+  'TIMEOUT', 'CLI_UNAVAILABLE', 'CLI_EXIT', 'PROVIDER_TRANSPORT_ERROR',
+  'PROVIDER_RESPONSE_ERROR', 'USAGE_NOT_REPORTED', 'UNKNOWN',
+]);
+export const V11_FAILURE_DIAGNOSTICS_POLICY = Object.freeze({
+  schema: 's2-008-failure-diagnostic/1',
+  raw_streams: 'SHA256_AND_BYTE_LENGTH_ONLY',
+  error_message: 'SHA256_AND_BYTE_LENGTH_ONLY',
+  generation_id_maximum: 8,
+  no_raw_events_prompts_argv_or_environment_values: true,
+  partial_usage: 'retain observed tokens and mark any missing usage or unsupported correlation as unreconciled',
+});
+const safeGenerationId = (value) => typeof value === 'string' && /^gen-[A-Za-z0-9-]{8,128}$/.test(value);
+const safeOpenRouterGenerationId = (value) => typeof value === 'string' && /^gen-\d{10}-[A-Za-z0-9]{20}$/.test(value);
+const SAFE_SIGNALS = new Set(['SIGABRT', 'SIGALRM', 'SIGBUS', 'SIGCHLD', 'SIGCONT', 'SIGFPE', 'SIGHUP', 'SIGILL', 'SIGINT', 'SIGKILL', 'SIGPIPE', 'SIGQUIT', 'SIGSEGV', 'SIGSTOP', 'SIGTERM', 'SIGTRAP', 'SIGTSTP', 'SIGTTIN', 'SIGTTOU', 'SIGURG', 'SIGUSR1', 'SIGUSR2', 'SIGXCPU', 'SIGXFSZ']);
+
+function sdkReportedStatusPrefix(value) {
+  if (typeof value !== 'string') return null;
+  const match = /^(4\d{2}|5\d{2}):(?:\s|$)/.exec(value);
+  return match ? { status: Number(match[1]), source: 'SDK_ERROR_MESSAGE_PREFIX' } : null;
+}
+
+function streamDigest(value) {
+  if (value === undefined || value === null) return { sha256: null, bytes: null };
+  const bytes = Buffer.isBuffer(value) ? value : Buffer.from(String(value), 'utf8');
+  return { sha256: createHash('sha256').update(bytes).digest('hex'), bytes: bytes.length };
+}
+
+function safeFailureCategory({ errorCode, httpStatus, providerStatusPrefix, exitCode, usageStatus }) {
+  if (errorCode === 'ETIMEDOUT' || errorCode === 'ESOCKETTIMEDOUT' || errorCode === 'TIMEOUT') return 'TIMEOUT';
+  if (errorCode === 'ENOENT') return 'CLI_UNAVAILABLE';
+  if (errorCode === 'MODEL_PROVIDER_RESPONSE_ERROR' ||
+      (Number.isInteger(httpStatus) && httpStatus >= 400) || providerStatusPrefix !== null) return 'PROVIDER_RESPONSE_ERROR';
+  if (errorCode === 'MODEL_ENDPOINT_UNREACHABLE') return 'PROVIDER_TRANSPORT_ERROR';
+  if (usageStatus === 'MISSING' || usageStatus === 'ZERO' || usageStatus === 'PARTIAL') return 'USAGE_NOT_REPORTED';
+  if (Number.isInteger(exitCode) && exitCode !== 0) return 'CLI_EXIT';
+  return 'UNKNOWN';
+}
+
+/** Bounded operational facts only; raw process/provider strings never leave the call. */
+export function createSafeFailureDiagnostic({
+  startedAt, finishedAt, exitCode = null, signal = null,
+  stdout = null, stderr = null, errorMessage = null, errorCode = null,
+  httpStatus = null, stopReason = null, generationIds = [], usageStatus = 'UNKNOWN',
+} = {}) {
+  const startMs = typeof startedAt === 'string' ? Date.parse(startedAt) : NaN;
+  const endMs = typeof finishedAt === 'string' ? Date.parse(finishedAt) : NaN;
+  const normalizedUsage = ['MISSING', 'ZERO', 'PARTIAL', 'MEASURED', 'UNKNOWN'].includes(usageStatus) ? usageStatus : 'UNKNOWN';
+  const final = finalAgentEnd(stdout);
+  const assistantMessages = Array.isArray(final?.messages) ? final.messages.filter((message) => message?.role === 'assistant') : [];
+  const lastStopReason = stopReason ?? assistantMessages.at(-1)?.stopReason ?? null;
+  const candidateIds = [
+    ...assistantMessages.map((message) => message?.responseId),
+    ...(Array.isArray(generationIds) ? generationIds : []),
+  ];
+  const uniqueIds = [...new Set(candidateIds.filter(safeOpenRouterGenerationId))];
+  const ids = uniqueIds.slice(0, V11_FAILURE_DIAGNOSTICS_POLICY.generation_id_maximum);
+  const providerStatusPrefix = sdkReportedStatusPrefix(errorMessage);
+  const rawCategory = safeFailureCategory({ errorCode, httpStatus, providerStatusPrefix, exitCode, usageStatus: normalizedUsage });
+  const category = FAILURE_CATEGORIES.has(rawCategory) ? rawCategory : 'UNKNOWN';
+  const messageDigest = streamDigest(errorMessage);
+  return Object.freeze({
+    schema: 's2-008-failure-diagnostic/1',
+    started_at: Number.isFinite(startMs) ? new Date(startMs).toISOString() : null,
+    finished_at: Number.isFinite(endMs) ? new Date(endMs).toISOString() : null,
+    duration_ms: Number.isFinite(startMs) && Number.isFinite(endMs) && endMs >= startMs ? endMs - startMs : null,
+    cli_exit_code: Number.isSafeInteger(exitCode) ? exitCode : null,
+    cli_signal: typeof signal === 'string' && SAFE_SIGNALS.has(signal) ? signal : null,
+    stop_reason: typeof lastStopReason === 'string' && FAILURE_STOP_REASONS.has(lastStopReason) ? lastStopReason : null,
+    error_category: category,
+    http_status: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+    provider_reported_status_prefix: providerStatusPrefix,
+    usage_status: normalizedUsage,
+    generation_ids: ids,
+    generation_ids_truncated: uniqueIds.length > ids.length,
+    stdout: streamDigest(stdout),
+    stderr: streamDigest(stderr),
+    error_message: messageDigest,
+  });
+}
+
+function usageSignature(message) {
+  const usage = message?.usage;
+  if (!usage || typeof usage !== 'object') return null;
+  return JSON.stringify({
+    input: usage.input ?? null, output: usage.output ?? null,
+    cacheRead: usage.cacheRead ?? null, cacheWrite: usage.cacheWrite ?? null,
+    totalTokens: usage.totalTokens ?? null, cost: usage.cost?.total ?? null,
+  });
+}
+
+function usageTotal(message) {
+  const value = message?.usage?.totalTokens;
+  return Number.isSafeInteger(value) && value >= 0 ? value : null;
+}
+
+/** Collapse duplicate pi messages without charging one provider generation twice. */
+function collapseAssistantMessages(messages) {
+  const unique = [];
+  const local = new Map();
+  const generations = new Map();
+  let issue = null;
+  const mark = (value) => { issue ??= value; };
+
+  for (const message of messages) {
+    const localId = typeof message?.id === 'string' ? message.id : null;
+    const generationId = typeof message?.responseId === 'string' ? message.responseId : null;
+    const signature = usageSignature(message);
+    const priorLocal = localId === null ? null : local.get(localId);
+
+    if (priorLocal) {
+      if (priorLocal.generationId && generationId && priorLocal.generationId !== generationId) {
+        mark('CONTRADICTORY_DUPLICATE_MESSAGE_ID');
+      } else if (Boolean(priorLocal.generationId) !== Boolean(generationId)) {
+        mark('CONTRADICTORY_DUPLICATE_MESSAGE_ID');
+        const priorTokens = usageTotal(priorLocal.message);
+        const currentTokens = usageTotal(message);
+        if (currentTokens !== null && (priorTokens === null || currentTokens < priorTokens)) {
+          unique[priorLocal.index] = message;
+          if (priorLocal.generationId) generations.delete(priorLocal.generationId);
+          priorLocal.generationId = generationId;
+          priorLocal.message = message;
+          priorLocal.signature = signature;
+        }
+        continue;
+      } else if (!priorLocal.generationId && !generationId) {
+        if (priorLocal.signature === signature) continue;
+        mark('CONTRADICTORY_DUPLICATE_MESSAGE_ID');
+        const priorTokens = usageTotal(priorLocal.message);
+        const currentTokens = usageTotal(message);
+        if (currentTokens !== null && (priorTokens === null || currentTokens < priorTokens)) {
+          unique[priorLocal.index] = message;
+          priorLocal.message = message;
+          priorLocal.signature = signature;
+        }
+        continue;
+      }
+    } else if (localId !== null) {
+      local.set(localId, { generationId, signature, message, index: unique.length });
+    }
+
+    if (generationId !== null && generations.has(generationId)) {
+      const priorGeneration = generations.get(generationId);
+      if (priorGeneration.signature !== signature) {
+        mark('CONTRADICTORY_DUPLICATE_GENERATION_ID');
+        const priorTokens = usageTotal(priorGeneration.message);
+        const currentTokens = usageTotal(message);
+        if (currentTokens !== null && (priorTokens === null || currentTokens < priorTokens)) {
+          unique[priorGeneration.index] = message;
+          priorGeneration.message = message;
+          priorGeneration.signature = signature;
+        }
+      }
+      if (localId !== null && !priorLocal) {
+        local.set(localId, {
+          generationId, signature: priorGeneration.signature,
+          message: priorGeneration.message, index: priorGeneration.index,
+        });
+      }
+      continue;
+    }
+
+    const index = unique.length;
+    unique.push(message);
+    if (generationId !== null) generations.set(generationId, { signature, message, index });
+  }
+  return { messages: unique, contradiction: issue !== null, issue };
+}
+
 /** Sum billed assistant messages from pi's one authoritative final agent_end. */
 export function extractUsage(stdout) {
   const messages = finalAgentEnd(stdout)?.messages;
   if (!Array.isArray(messages)) return null;
   const billed = messages.filter((message) => message?.role === 'assistant');
   if (billed.length === 0) return null;
-  const seenIds = new Set();
+  const collapsed = collapseAssistantMessages(billed);
+  if (collapsed.contradiction) return null;
   const totals = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { total: 0 } };
-  for (const message of billed) {
-    if (typeof message.id === 'string') {
-      if (seenIds.has(message.id)) continue;
-      seenIds.add(message.id);
-    }
+  for (const message of collapsed.messages) {
     const usage = message.usage;
     if (!usage || typeof usage !== 'object' ||
         !Number.isSafeInteger(usage.totalTokens) || usage.totalTokens < 0 ||
@@ -163,6 +331,83 @@ export function extractUsage(stdout) {
   }
   if (!Number.isSafeInteger(totals.totalTokens) || !Number.isFinite(totals.cost.total)) return null;
   return totals;
+}
+
+function extractObservedUsage(stdout, { requireOpenRouterGenerationId = false } = {}) {
+  const messages = finalAgentEnd(stdout)?.messages;
+  const billed = Array.isArray(messages) ? messages.filter((message) => message?.role === 'assistant') : [];
+  const collapsed = collapseAssistantMessages(billed);
+  const uniqueMessages = collapsed.messages;
+  const totals = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { total: 0 } };
+  let measuredMessages = 0;
+  let incompleteMessages = 0;
+  let zeroMessages = 0;
+  for (const message of uniqueMessages) {
+    const usage = message?.usage;
+    if (!usage || typeof usage !== 'object' || !Number.isSafeInteger(usage.totalTokens) || usage.totalTokens < 0 ||
+        !usage.cost || typeof usage.cost !== 'object' || !Number.isFinite(usage.cost.total) || usage.cost.total < 0 ||
+        ['input', 'output', 'cacheRead', 'cacheWrite'].some((field) => usage[field] !== undefined &&
+          (!Number.isSafeInteger(usage[field]) || usage[field] < 0))) {
+      incompleteMessages += 1;
+      continue;
+    }
+    if (usage.totalTokens === 0) {
+      zeroMessages += 1;
+      incompleteMessages += 1;
+      continue;
+    }
+    for (const field of ['input', 'output', 'cacheRead', 'cacheWrite']) totals[field] += usage[field] ?? 0;
+    totals.totalTokens += usage.totalTokens;
+    totals.cost.total += usage.cost.total;
+    measuredMessages += 1;
+  }
+  if (!Number.isSafeInteger(totals.totalTokens) || !Number.isFinite(totals.cost.total) ||
+      !['input', 'output', 'cacheRead', 'cacheWrite'].every((field) => Number.isSafeInteger(totals[field]))) {
+    return { usage: null, accounting: null, complete: false, billedMessages: uniqueMessages.length, measuredMessages, zeroMessages };
+  }
+  if (measuredMessages === 0) {
+    return { usage: null, accounting: null, complete: false, billedMessages: uniqueMessages.length, measuredMessages, zeroMessages };
+  }
+  const acceptId = requireOpenRouterGenerationId ? safeOpenRouterGenerationId : safeGenerationId;
+  const ids = [...new Set(uniqueMessages.map((message) => message?.responseId).filter(acceptId))];
+  const oneCorrelated = uniqueMessages.length === 1 && ids.length === 1 && !collapsed.contradiction;
+  const promptTokens = totals.input + totals.cacheRead + totals.cacheWrite;
+  const componentsConsistent = totals.totalTokens === promptTokens + totals.output;
+  const correlationIssue = collapsed.issue ?? (uniqueMessages.length > V11_FAILURE_DIAGNOSTICS_POLICY.generation_id_maximum
+    ? 'TOO_MANY_BILLED_MESSAGES'
+    : uniqueMessages.length !== 1 ? 'MULTIPLE_BILLED_MESSAGES' : ids.length !== 1 ? 'GENERATION_ID_MISSING' : null);
+  const truncatedIds = ids.length > V11_FAILURE_DIAGNOSTICS_POLICY.generation_id_maximum;
+  const accounting = {
+    generation_id: oneCorrelated ? ids[0] : null,
+    correlation_status: oneCorrelated ? 'CORRELATED' : 'UNAVAILABLE',
+    correlation_issue: oneCorrelated ? null : correlationIssue,
+    ...(uniqueMessages.length > 1 || collapsed.contradiction
+      ? { observed_generation_ids: ids.slice(0, V11_FAILURE_DIAGNOSTICS_POLICY.generation_id_maximum) } : {}),
+    ...(truncatedIds ? { observed_generation_ids_truncated: true } : {}),
+    input: totals.input, output: totals.output, cacheRead: totals.cacheRead, cacheWrite: totals.cacheWrite,
+    prompt_tokens: promptTokens, prompt_token_basis: 'input+cacheRead+cacheWrite',
+    totalTokens: totals.totalTokens, reported_cost_usd: totals.cost.total,
+    usage_components_consistent: componentsConsistent,
+    usage_component_issue: componentsConsistent ? null : 'TOKEN_COMPONENT_MISMATCH',
+  };
+  return {
+    usage: totals, accounting,
+    complete: incompleteMessages === 0 && !collapsed.contradiction && measuredMessages === uniqueMessages.length && uniqueMessages.length > 0,
+    billedMessages: uniqueMessages.length, measuredMessages, zeroMessages,
+  };
+}
+
+function observedAssistantError(messages) {
+  if (!Array.isArray(messages)) return { message: null, httpStatus: null };
+  for (const message of [...messages].reverse()) {
+    const errorText = typeof message?.errorMessage === 'string' ? message.errorMessage
+      : typeof message?.error?.message === 'string' ? message.error.message : null;
+    const httpStatus = Number.isInteger(message?.error?.status) ? message.error.status
+      : Number.isInteger(message?.error?.statusCode) ? message.error.statusCode
+        : Number.isInteger(message?.statusCode) ? message.statusCode : null;
+    if (errorText !== null || httpStatus !== null) return { message: errorText, httpStatus };
+  }
+  return { message: null, httpStatus: null };
 }
 
 /** Only assistant text blocks can become a prediction; thinking and tool payloads are ignored. */
@@ -282,13 +527,12 @@ export function proxyEnvironment(base, { port, host = '127.0.0.1' } = {}) {
 }
 
 /** One model call. Dry runs skip it and say so. */
-export function callModel(subject, { provider, model, envName, env, dryRun, timeoutMs, piSettings = null, execFile = execFileSync }) {
-  if (dryRun) {
-    return { text: 'MINOR', usage: { totalTokens: 0, cost: { total: 0 } }, model_called: false };
-  }
-  if (!readCredential(envName, env)) {
-    throw new Error(`${ARM_ERRORS.NO_CREDENTIAL}:${envName}`);
-  }
+export function callModel(subject, {
+  provider, model, envName, env, dryRun, timeoutMs, piSettings = null,
+  execFile = execFileSync, captureFailureDiagnostics = false,
+}) {
+  if (dryRun) return { text: 'MINOR', usage: { totalTokens: 0, cost: { total: 0 } }, model_called: false };
+  if (!readCredential(envName, env)) throw new Error(`${ARM_ERRORS.NO_CREDENTIAL}:${envName}`);
   let stdout;
   let runtimeEnv = env;
   let settingsDir = null;
@@ -311,43 +555,83 @@ export function callModel(subject, { provider, model, envName, env, dryRun, time
       throw new Error('V7_PI_SETTINGS_MATERIALIZATION_FAILED');
     }
   }
+  const startedMs = Date.now();
+  const finishFailure = (code, error, output = undefined, usageStatus = 'UNKNOWN') => {
+    const finishedMs = Date.now();
+    const observedOutput = output ?? error?.stdout ?? null;
+    const observed = extractObservedUsage(observedOutput, { requireOpenRouterGenerationId: captureFailureDiagnostics });
+    const final = finalAgentEnd(observedOutput);
+    const assistantMessages = Array.isArray(final?.messages) ? final.messages.filter((message) => message?.role === 'assistant') : [];
+    const providerError = observedAssistantError(assistantMessages);
+    const measured = observed.usage && observed.usage.totalTokens > 0;
+    const observedAssistantCount = assistantMessages.length;
+    const diagnosticUsageStatus = usageStatus !== 'UNKNOWN' ? usageStatus
+      : observedAssistantCount === 0 ? 'UNKNOWN' : observed.measuredMessages > 0
+        ? (observed.complete ? 'MEASURED' : 'PARTIAL') : observed.zeroMessages > 0 ? 'ZERO' : 'MISSING';
+    const diagnostic = captureFailureDiagnostics ? createSafeFailureDiagnostic({
+      startedAt: new Date(startedMs).toISOString(), finishedAt: new Date(finishedMs).toISOString(),
+      exitCode: error?.status ?? error?.exitCode ?? null, signal: error?.signal ?? null,
+      stdout: observedOutput, stderr: error?.stderr ?? null,
+      errorMessage: providerError.message ?? error?.message ?? null,
+      errorCode: error?.code ?? code,
+      httpStatus: providerError.httpStatus ?? (Number.isInteger(error?.statusCode) ? error.statusCode : null),
+      usageStatus: diagnosticUsageStatus,
+      generationIds: assistantMessages.map((message) => message?.responseId).filter(safeOpenRouterGenerationId),
+    }) : null;
+    const failure = new Error(code);
+    if (diagnostic) failure.failure_diagnostic = diagnostic;
+    if (measured) {
+      failure.confirmed_usage = observed.usage;
+      if (observed.accounting) failure.accounting = observed.accounting;
+    }
+    failure.unreconciled_spend = !measured || !observed.complete ||
+      observed.accounting?.correlation_status !== 'CORRELATED' || observed.accounting?.usage_components_consistent !== true;
+    throw failure;
+  };
   try {
-    stdout = execFile('pi', modelCallArgv({
-      provider, model, prompt: buildPrompt(subject),
-    }), { encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env: runtimeEnv });
+    stdout = execFile('pi', modelCallArgv({ provider, model, prompt: buildPrompt(subject) }), {
+      encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env: runtimeEnv,
+    });
   } catch (error) {
-    throw new Error(`${ARM_ERRORS.PROVIDER_UNREACHABLE}:${String(error?.message ?? error).slice(0, 160)}`);
+    finishFailure(ARM_ERRORS.PROVIDER_UNREACHABLE, error, error?.stdout, 'UNKNOWN');
   } finally {
     if (settingsDir) fs.rmSync(settingsDir, { recursive: true, force: true });
   }
-  const usage = extractUsage(stdout);
-  if (usage === null || !Number.isInteger(usage.totalTokens) || usage.totalTokens <= 0) throw new Error(`${ARM_ERRORS.NO_USAGE_REPORTED}`);
+
   const final = finalAgentEnd(stdout);
   const messages = final?.messages;
-  const assistantMessages = Array.isArray(messages)
-    ? messages.filter((message) => message?.role === 'assistant') : [];
+  const assistantMessages = Array.isArray(messages) ? messages.filter((message) => message?.role === 'assistant') : [];
+  const observed = extractObservedUsage(stdout, { requireOpenRouterGenerationId: captureFailureDiagnostics });
+  const usage = observed.usage;
   const text = assistantMessageText(assistantMessages.at(-1));
-  const responseIds = assistantMessages.map((message) => message?.responseId).filter((value) => typeof value === 'string' && value.trim() !== '');
-  const singleResponseId = assistantMessages.length === 1 && responseIds.length === 1 ? responseIds[0] : null;
+  const providerError = observedAssistantError(assistantMessages);
+  if (!observed.complete || usage === null || usage.totalTokens <= 0) {
+    const usageStatus = observed.measuredMessages > 0 ? 'PARTIAL'
+      : observed.zeroMessages > 0 ? 'ZERO' : 'MISSING';
+    finishFailure(ARM_ERRORS.NO_USAGE_REPORTED, {
+      stdout, stderr: null, message: ARM_ERRORS.NO_USAGE_REPORTED,
+      observed_error_message: providerError.message,
+      statusCode: providerError.httpStatus,
+    }, stdout, usageStatus);
+  }
+  const accounting = observed.accounting;
+  const responseIds = assistantMessages.map((message) => message?.responseId)
+    .filter(captureFailureDiagnostics ? safeOpenRouterGenerationId : safeGenerationId);
+  if (captureFailureDiagnostics && responseIds.length > V11_FAILURE_DIAGNOSTICS_POLICY.generation_id_maximum) {
+    finishFailure(ARM_ERRORS.PROVIDER_RESPONSE_ERROR, { stdout, message: ARM_ERRORS.PROVIDER_RESPONSE_ERROR }, stdout, 'MEASURED');
+  }
   const finalMessage = assistantMessages.at(-1);
   const sessionId = final?.session_id ?? final?.sessionId ?? finalMessage?.session_id ?? finalMessage?.sessionId ?? null;
-  const promptTokens = usage.input + usage.cacheRead + usage.cacheWrite;
-  const usageComponentsConsistent = usage.totalTokens === promptTokens + usage.output;
-  const correlationIssue = assistantMessages.length !== 1 ? 'MULTIPLE_BILLED_MESSAGES' : singleResponseId === null ? 'GENERATION_ID_MISSING' : null;
-  const accounting = {
-    generation_id: singleResponseId,
-    ...(typeof sessionId === 'string' && sessionId.trim() !== '' ? { session_id: sessionId } : {}),
-    correlation_status: correlationIssue === null ? 'CORRELATED' : 'UNAVAILABLE',
-    correlation_issue: correlationIssue,
-    input: usage.input, output: usage.output, cacheRead: usage.cacheRead, cacheWrite: usage.cacheWrite,
-    prompt_tokens: promptTokens,
-    prompt_token_basis: 'input+cacheRead+cacheWrite',
-    totalTokens: usage.totalTokens, reported_cost_usd: usage.cost.total,
-    usage_components_consistent: usageComponentsConsistent,
-    usage_component_issue: usageComponentsConsistent ? null : 'TOKEN_COMPONENT_MISMATCH',
-    ...(assistantMessages.length !== 1 ? { observed_generation_ids: responseIds } : {}),
-  };
-  return { text, usage, model_called: true, accounting };
+  // v11's signed policy disables session use; never persist a provider session identifier.
+  if (!captureFailureDiagnostics && typeof sessionId === 'string' && sessionId.trim() !== '') accounting.session_id = sessionId;
+  if (assistantMessages.some((message) => message?.stopReason === 'error') || providerError.message !== null || providerError.httpStatus !== null) {
+    finishFailure(ARM_ERRORS.PROVIDER_RESPONSE_ERROR, {
+      stdout, stderr: null, message: ARM_ERRORS.PROVIDER_RESPONSE_ERROR,
+      observed_error_message: providerError.message,
+      statusCode: providerError.httpStatus,
+    }, stdout, 'MEASURED');
+  }
+  return { text, usage, model_called: true, accounting, observed_generation_ids: responseIds };
 }
 
 /**
@@ -432,6 +716,11 @@ export async function main(argv, env = process.env, deps = {}) {
     process.stderr.write(`${ARM_ERRORS.PREREG_DIGEST_MISMATCH}:signed=${String(prereg.preregistration_digest ?? '').slice(0, 16)}:recomputed=${recomputed.slice(0, 16)}\n`);
     return 8;
   }
+  if (prereg.rule === 's2-008-prereg-v11' &&
+      canonicalDigest(prereg.failure_diagnostics_protocol ?? null) !== canonicalDigest(V11_FAILURE_DIAGNOSTICS_POLICY)) {
+    process.stderr.write('V11_FAILURE_DIAGNOSTICS_POLICY_INVALID\n');
+    return 14;
+  }
   if (prereg.approval?.signed_digest_over !== undefined && prereg.approval.in_force !== true) {
     // A signature that has not been sealed into the corpus manifest by
     // `--seal-v2` is a signature of a document that is not yet the one in force.
@@ -475,7 +764,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let piSettings = null;
   let piSettingsDigest = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11'].includes(prereg.rule)) {
     try {
       const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
       timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -488,10 +777,10 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule)) {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11'].includes(prereg.rule)) {
       try {
         const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        piSettings = (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10'].includes(prereg.rule) ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
+        piSettings = (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11'].includes(prereg.rule) ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {
@@ -503,7 +792,10 @@ export async function main(argv, env = process.env, deps = {}) {
 
   const predictions = [];
   const accounting = [];
-  const requireGenerationId = prereg.rule === 's2-008-prereg-v9' || prereg.rule === 's2-008-prereg-v10';
+  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11'].includes(prereg.rule);
+  const captureFailureDiagnostics = prereg.rule === 's2-008-prereg-v11';
+  const failureDiagnostics = [];
+  let unknownModelAttempts = 0;
   const generationIdsSeen = new Set();
   let spent = 0;
   let usd = 0;
@@ -539,25 +831,44 @@ export async function main(argv, env = process.env, deps = {}) {
     let result;
     if (!dryRun) modelAttempts += 1;
     try {
-      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings });
+      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, captureFailureDiagnostics });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
-      // A transport or usage failure may already have spent tokens. Stop now:
-      // treating it as an unparsed answer with zero usage would bypass the cap.
-      unreconciledSpend = code !== ARM_ERRORS.NO_CREDENTIAL;
+      if (captureFailureDiagnostics && error?.failure_diagnostic?.schema === 's2-008-failure-diagnostic/1') {
+        failureDiagnostics.push({ case_id: String(row.case_id), ...error.failure_diagnostic });
+      }
+      const confirmedUsage = error?.confirmed_usage;
+      if (captureFailureDiagnostics && Number.isSafeInteger(confirmedUsage?.totalTokens) && confirmedUsage.totalTokens > 0 &&
+          Number.isFinite(confirmedUsage?.cost?.total) && confirmedUsage.cost.total >= 0) {
+        spent += confirmedUsage.totalTokens;
+        usd += confirmedUsage.cost.total;
+        if (error.accounting && typeof error.accounting === 'object') {
+          accounting.push({ case_id: String(row.case_id), ...error.accounting });
+          modelCalls += 1;
+        }
+        unreconciledSpend = error.unreconciled_spend === true || error.accounting?.correlation_status !== 'CORRELATED' ||
+          error.accounting?.usage_components_consistent !== true;
+        if (unreconciledSpend) unknownModelAttempts += 1;
+      } else {
+        unreconciledSpend = code !== ARM_ERRORS.NO_CREDENTIAL;
+        if (unreconciledSpend) unknownModelAttempts += 1;
+      }
       stop = Object.freeze({
         reason: code,
         unreconciled_spend: unreconciledSpend,
         spent_tokens_confirmed: spent,
+        ...(captureFailureDiagnostics && Number.isSafeInteger(confirmedUsage?.totalTokens) && confirmedUsage.totalTokens > 0
+          ? { usd_spent: usd, confirmed_failed_case_tokens: confirmedUsage.totalTokens } : {}),
         stopped_before_case: String(row.case_id),
       });
       break;
     }
     if (!dryRun && (!Number.isInteger(result?.usage?.totalTokens) || result.usage.totalTokens <= 0)) {
       unreconciledSpend = true;
+      if (captureFailureDiagnostics) unknownModelAttempts += 1;
       stop = Object.freeze({
         reason: ARM_ERRORS.NO_USAGE_REPORTED,
-        unreconciled_spend: true,
+        unreconciled_spend: unreconciledSpend,
         spent_tokens_confirmed: spent,
         stopped_before_case: String(row.case_id),
       });
@@ -576,14 +887,16 @@ export async function main(argv, env = process.env, deps = {}) {
       }
       accounting.push(accountRow);
       if (requireGenerationId && accountRow.usage_components_consistent !== true) {
+        if (captureFailureDiagnostics) { unreconciledSpend = true; unknownModelAttempts += 1; }
         const issue = accountRow.usage_component_issue ?? 'TOKEN_COMPONENT_STATUS_MISSING';
         stop = Object.freeze({ reason: 'MODEL_CALL_ACCOUNTING_COMPONENTS_UNAVAILABLE', accounting_issue: issue,
-          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+          unreconciled_spend: unreconciledSpend, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
         break;
       }
       if (requireGenerationId && (accountRow.correlation_status !== 'CORRELATED' || typeof accountRow.generation_id !== 'string' || accountRow.generation_id.trim() === '')) {
+        if (captureFailureDiagnostics) { unreconciledSpend = true; unknownModelAttempts += 1; }
         stop = Object.freeze({ reason: 'MODEL_CALL_CORRELATION_UNAVAILABLE', correlation_issue: correlationIssue ?? 'GENERATION_ID_MISSING',
-          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+          unreconciled_spend: unreconciledSpend, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
         break;
       }
       if (typeof accountRow.generation_id === 'string' && accountRow.generation_id !== '') generationIdsSeen.add(accountRow.generation_id);
@@ -598,14 +911,16 @@ export async function main(argv, env = process.env, deps = {}) {
       accountRow.usage_component_issue = accountRow.usage_components_consistent ? null : 'TOKEN_COMPONENT_MISMATCH';
       accounting.push(accountRow);
       if (requireGenerationId && accountRow.usage_components_consistent !== true) {
+        if (captureFailureDiagnostics) { unreconciledSpend = true; unknownModelAttempts += 1; }
         const issue = accountRow.usage_component_issue ?? 'TOKEN_COMPONENT_STATUS_MISSING';
         stop = Object.freeze({ reason: 'MODEL_CALL_ACCOUNTING_COMPONENTS_UNAVAILABLE', accounting_issue: issue,
-          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+          unreconciled_spend: unreconciledSpend, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
         break;
       }
       if (requireGenerationId) {
+        if (captureFailureDiagnostics) { unreconciledSpend = true; unknownModelAttempts += 1; }
         stop = Object.freeze({ reason: 'MODEL_CALL_CORRELATION_UNAVAILABLE', correlation_issue: 'ACCOUNTING_MISSING',
-          unreconciled_spend: false, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
+          unreconciled_spend: unreconciledSpend, spent_tokens_confirmed: spent, usd_spent: usd, stopped_before_case: String(row.case_id) });
         break;
       }
     }
@@ -633,6 +948,7 @@ export async function main(argv, env = process.env, deps = {}) {
     kind: 's2-008-campaign-adapter-predict-model/1',
     accounting_schema: 's2-008-model-accounting/1',
     accounting,
+    ...(captureFailureDiagnostics ? { failure_diagnostics: failureDiagnostics } : {}),
     arm_id: armId,
     seed,
     n_cases: rows.length,
@@ -664,9 +980,11 @@ export async function main(argv, env = process.env, deps = {}) {
         : { via: 'in-container loopback bridge', host: bridge.host, port: bridge.port, port_source: 'BRIDGE_READY' },
       model_calls: modelCalls,
       model_attempts: modelAttempts,
+      ...(captureFailureDiagnostics ? { unknown_model_attempts: unknownModelAttempts } : {}),
       parallel_calls: 1,
       model_launch_timeout: timeoutPolicy,
       accounting_policy: requireGenerationId ? 'GENERATION_ID_REQUIRED' : 'GENERATION_ID_OPTIONAL',
+      failure_diagnostics_policy: captureFailureDiagnostics ? 'BOUNDED_ALLOWLISTED_HASHES_ONLY' : null,
     },
     container: {
       node_version: process.version,

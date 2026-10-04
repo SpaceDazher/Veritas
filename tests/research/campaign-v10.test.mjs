@@ -99,7 +99,6 @@ test('probe path resolver keeps legacy default and rejects unsupported or escapi
   const root = '/tmp/veritas-probe-root';
   assert.equal(resolveProbePreregistrationPath(undefined, root), root + '/corpus/s2-008-campaign/preregistration.json');
   for (const requested of [
-    'corpus/s2-008-campaign/preregistration.v11.in-force.json',
     'corpus/s2-008-campaign/preregistration.v100.in-force.json',
     '/etc/passwd',
     '../../etc/passwd',
