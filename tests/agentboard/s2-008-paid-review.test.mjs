@@ -5,6 +5,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createServer as httpServer } from 'node:http';
 import { createA05ReviewServer } from '../../scripts/a-mvp05-review.mjs';
+import * as paid from '../../scripts/s2-008-paid-review.mjs';
 import {
   createS2PaidReviewServer,
   createS2PaidReviewWorkflow,
@@ -277,4 +278,40 @@ test('the read-only paid endpoint never reports DONE from an injected workflow',
     assert.equal(state.ready, false);
     assert.equal(state.workflow.actionable, false);
   });
+});
+
+
+test('fixture-only comparison rederives every arm, seed, and case while treating A/B equality as disclosure', () => {
+  const trials = [
+    { trial_id: 'trl-s2-008c-01', arm_id: 'arm-model-zai-glm53flash' },
+    { trial_id: 'trl-s2-008c-02', arm_id: 'arm-type-feat-fix' },
+    { trial_id: 'trl-s2-008c-03', arm_id: 'arm-type-chore' },
+  ];
+  const seeds = [20260926, 20260927, 20260928];
+  const holdoutCaseIds = Array.from({ length: 126 }, (_unused, index) => 'case-' + index);
+  const predictions = (run) => trials.flatMap((trial) => seeds.flatMap((seed) => holdoutCaseIds.map((case_id, index) => {
+    let predicted = 'MINOR';
+    if (trial.arm_id === 'arm-model-zai-glm53flash' && seed === seeds[0] && index === 0) predicted = 'UNPARSED';
+    if (run === 'b' && trial.arm_id === 'arm-model-zai-glm53flash' && seed === seeds[0] && index === 1) predicted = 'MAJOR';
+    if (run === 'b' && trial.arm_id === 'arm-type-feat-fix' && seed === seeds[1] && index === 0) predicted = 'MAJOR';
+    return { trial_id: trial.trial_id, arm_id: trial.arm_id, seed, case_id, predicted };
+  })));
+  const input = { preregistrationDigest: 'a'.repeat(64), holdoutCaseIds, aPredictions: predictions('a'), bPredictions: predictions('b') };
+  const comparison = paid.deriveS2PaidReviewComparison(input);
+  assert.equal(comparison.kind, 's2-008-campaign-comparison/1');
+  assert.deepEqual(comparison.scope.predictions_per_run, { total: 1134, model: 378, controls: 756 });
+  assert.equal(comparison.agreement.compared_predictions, 1134);
+  assert.equal(comparison.agreement.equal_predictions, 1132);
+  assert.equal(comparison.agreement.differing_predictions, 2);
+  assert.equal(comparison.agreement.a_equals_b, false);
+  assert.equal(comparison.agreement.criterion, 'DISCLOSURE_ONLY');
+  assert.equal(comparison.agreement.by_trial.length, 3);
+  assert.equal(comparison.agreement.by_seed.length, 3);
+  assert.equal(paid.validateS2PaidReviewComparison({ ...input, comparison }), true);
+  const altered = structuredClone(comparison);
+  altered.agreement.equal_predictions = 1134;
+  assert.throws(() => paid.validateS2PaidReviewComparison({ ...input, comparison: altered }),
+    (error) => error.code === 'PAID_REVIEW_COMPARISON_INVALID');
+  assert.throws(() => paid.deriveS2PaidReviewComparison({ ...input, bPredictions: input.bPredictions.slice(1) }),
+    (error) => error.code === 'PAID_REVIEW_COMPARISON_INVALID');
 });
