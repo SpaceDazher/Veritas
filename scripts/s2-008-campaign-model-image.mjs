@@ -13,6 +13,8 @@ import { modelContainerTimeoutFromPreregistration } from './s2-008-campaign-v6-t
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
+const V11_PI_PACKAGE_NAME = '@earendil-works/pi-coding-agent';
+const V11_PI_PACKAGE_VERSION = '0.99.1';
 export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
   if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
   if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
@@ -37,6 +39,7 @@ export function modelImagePolicyInputs(schema) {
   const sourceNames = [
     ...(version >= 6 ? ['pi_runtime_tree', 'timeout_policy'] : []),
     ...(version >= 7 ? ['credential_env_policy'] : []),
+    ...(version >= 11 ? ['pi_package_manifest', 'pi_launcher'] : []),
   ].sort();
   return Object.freeze({ stageFiles: Object.freeze(stageFiles), sourceNames: Object.freeze(sourceNames) });
 }
@@ -49,6 +52,28 @@ export function modelImageVersionFromArgv(argv = process.argv) {
     throw new Error('MODEL_IMAGE_VERSION_INVALID');
   }
   return values[0] ?? 'v4';
+}
+
+export function parseModelImageCliArgs(argv = process.argv) {
+  const version = modelImageVersionFromArgv(argv);
+  let packageRoot;
+  let seenPackageRoot = false;
+  for (let index = 2; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (typeof arg !== 'string') continue;
+    if (arg.startsWith('--pi-package-dir=')) throw new Error('MODEL_PI_PACKAGE_SOURCE_INVALID');
+    if (arg !== '--pi-package-dir') continue;
+    if (seenPackageRoot || index + 1 >= argv.length || typeof argv[index + 1] !== 'string' ||
+        argv[index + 1].startsWith('--')) throw new Error('MODEL_PI_PACKAGE_SOURCE_INVALID');
+    seenPackageRoot = true;
+    packageRoot = argv[index + 1];
+    index += 1;
+  }
+  if (seenPackageRoot && (version !== 'v11' || !path.isAbsolute(packageRoot))) {
+    throw new Error('MODEL_PI_PACKAGE_SOURCE_INVALID');
+  }
+  if (version === 'v11' && !seenPackageRoot) throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
+  return Object.freeze({ version, preseal: argv.includes('--preseal'), packageRoot });
 }
 
 const MODEL_PATHS = modelImagePaths(modelImageVersionFromArgv(), { preseal: process.argv.includes('--preseal') });
@@ -135,69 +160,233 @@ export function digestRuntimeTree(root) {
   return canonicalDigest(entries);
 }
 
-export function buildModelImage() {
-  const policyInputs = modelImagePolicyInputs(MODEL_PATHS.schema);
+function pathIsWithin(root, candidate) {
+  const relative = path.relative(root, candidate);
+  return relative === '' || (relative !== '..' && !relative.startsWith('..' + path.sep) && !path.isAbsolute(relative));
+}
+
+export function assertPiPackageTreeContained(packageRoot) {
+  let rootStat;
+  let root;
+  try {
+    rootStat = fs.lstatSync(packageRoot);
+    root = fs.realpathSync(packageRoot);
+  } catch {
+    throw new Error('PI_PACKAGE_SOURCE_INVALID');
+  }
+  if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) throw new Error('PI_PACKAGE_SOURCE_INVALID');
+
+  const visit = (directory) => {
+    for (const name of fs.readdirSync(directory).sort()) {
+      const entry = path.join(directory, name);
+      const stat = fs.lstatSync(entry);
+      if (stat.isSymbolicLink()) {
+        const target = fs.readlinkSync(entry);
+        if (path.isAbsolute(target)) throw new Error('PI_PACKAGE_SYMLINK_OUTSIDE_ROOT');
+        const lexicalTarget = path.resolve(path.dirname(entry), target);
+        if (!pathIsWithin(root, lexicalTarget)) throw new Error('PI_PACKAGE_SYMLINK_OUTSIDE_ROOT');
+        let realTarget;
+        try {
+          realTarget = fs.realpathSync(entry);
+        } catch {
+          throw new Error('PI_PACKAGE_SYMLINK_INVALID');
+        }
+        if (!pathIsWithin(root, realTarget)) throw new Error('PI_PACKAGE_SYMLINK_OUTSIDE_ROOT');
+      } else if (stat.isDirectory()) {
+        visit(entry);
+      } else if (!stat.isFile()) {
+        throw new Error('PI_PACKAGE_TREE_ENTRY_UNSUPPORTED');
+      }
+    }
+  };
+  visit(root);
+  return root;
+}
+
+function readJsonFileOrError(file, missingCode, invalidCode) {
+  if (!fs.existsSync(file)) throw new Error(missingCode);
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    throw new Error(invalidCode);
+  }
+}
+
+export function validateV11PiPackageContext(packageRoot, preregistration) {
+  let contract = preregistration;
+  if (Buffer.isBuffer(contract) || typeof contract === 'string') {
+    try {
+      contract = JSON.parse(Buffer.from(contract).toString('utf8'));
+    } catch {
+      throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
+    }
+  }
+  if (!['s2-008-prereg-v10', 's2-008-prereg-v11'].includes(contract?.rule)) {
+    throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
+  }
+  const expectedName = contract.executor?.package;
+  const unit = contract.budget_reservation?.unit_definition;
+  const versionMatch = typeof unit === 'string' ? /\bpi\s+(\d+\.\d+\.\d+)\b/.exec(unit) : null;
+  if (typeof expectedName !== 'string' || !versionMatch) throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
+  const expectedVersion = versionMatch[1];
+  if (expectedName !== V11_PI_PACKAGE_NAME || expectedVersion !== V11_PI_PACKAGE_VERSION) {
+    throw new Error('V11_PI_PACKAGE_CONTRACT_MISMATCH');
+  }
+  if (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot)) throw new Error('PI_PACKAGE_SOURCE_INVALID');
+
+  const manifest = readJsonFileOrError(path.join(packageRoot, 'package.json'),
+    'PI_PACKAGE_MANIFEST_MISSING', 'PI_PACKAGE_METADATA_INVALID');
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) throw new Error('PI_PACKAGE_METADATA_INVALID');
+  if (manifest.name !== expectedName) throw new Error('V11_PI_PACKAGE_NAME_MISMATCH');
+  if (manifest.version !== expectedVersion) throw new Error('V11_PI_PACKAGE_VERSION_MISMATCH');
+
+  const shrinkwrap = readJsonFileOrError(path.join(packageRoot, 'npm-shrinkwrap.json'),
+    'PI_PACKAGE_SHRINKWRAP_MISSING', 'PI_PACKAGE_SHRINKWRAP_INVALID');
+  if (!shrinkwrap || typeof shrinkwrap !== 'object' || Array.isArray(shrinkwrap)) throw new Error('PI_PACKAGE_SHRINKWRAP_INVALID');
+  if (!Number.isSafeInteger(shrinkwrap.lockfileVersion) || shrinkwrap.lockfileVersion < 1 ||
+      shrinkwrap.name !== expectedName || shrinkwrap.version !== expectedVersion ||
+      shrinkwrap.packages?.['']?.name !== expectedName ||
+      shrinkwrap.packages?.['']?.version !== expectedVersion) {
+    throw new Error('PI_PACKAGE_SHRINKWRAP_MISMATCH');
+  }
+  let bundleStat;
+  try {
+    bundleStat = fs.statSync(path.join(packageRoot, 'dist/bundle/cli.js'));
+  } catch {
+    throw new Error('PI_PACKAGE_BUNDLE_MISSING');
+  }
+  if (!bundleStat.isFile()) throw new Error('PI_PACKAGE_BUNDLE_MISSING');
+  return Object.freeze({ name: expectedName, version: expectedVersion });
+}
+
+export function stageModelImageContext({
+  repoRoot = ROOT, contextRoot, packageRoot, version = 'v4', preseal = false,
+} = {}) {
+  if (typeof contextRoot !== 'string' || !path.isAbsolute(contextRoot)) throw new Error('MODEL_CONTEXT_PATH_INVALID');
+  const paths = modelImagePaths(version, { preseal });
+  const policyInputs = modelImagePolicyInputs(paths.schema);
+  const isV11 = version === 'v11';
+  if (isV11 && (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot))) {
+    throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
+  }
+  const runtimeSource = isV11 ? packageRoot : PACKAGE;
+  if (isV11) {
+    assertPiPackageTreeContained(runtimeSource);
+    const sourcePrereg = JSON.parse(fs.readFileSync(path.join(repoRoot, paths.stagedPrereg), 'utf8'));
+    validateV11PiPackageContext(runtimeSource, sourcePrereg);
+  }
+  fs.mkdirSync(contextRoot, { recursive: true });
+  if (fs.readdirSync(contextRoot).length !== 0) throw new Error('MODEL_CONTEXT_NOT_EMPTY');
+
+  const target = path.join(contextRoot, 'opt/veritas');
+  for (const name of [
+    'scripts/s2-008-campaign-arm-model.mjs',
+    'scripts/s2-008-egress-bridge.mjs',
+    'src/lib/verifier/canonical-json.mjs',
+    'corpus/s2-008-campaign/cases/holdout.blind.json',
+    paths.stagedPrereg,
+    ...policyInputs.stageFiles,
+  ]) {
+    const dest = path.join(target, name);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(path.join(repoRoot, name), dest);
+  }
+
+  if (isV11) assertPiPackageTreeContained(runtimeSource);
+  const stagedPi = path.join(contextRoot, 'opt/pi');
+  fs.cpSync(runtimeSource, stagedPi, {
+    recursive: true,
+    ...(isV11 ? { verbatimSymlinks: true } : {}),
+  });
+  if (isV11) {
+    assertPiPackageTreeContained(stagedPi);
+    const stagedPrereg = JSON.parse(fs.readFileSync(path.join(target, paths.stagedPrereg), 'utf8'));
+    validateV11PiPackageContext(stagedPi, stagedPrereg);
+  }
+
+  const bin = path.join(contextRoot, 'usr/local/bin');
+  fs.mkdirSync(bin, { recursive: true });
+  fs.writeFileSync(path.join(bin, 'pi'), '#!/bin/sh\nexec /usr/local/bin/node /opt/pi/dist/bundle/cli.js "$@"\n', { mode: 0o755 });
+  const recipe = [
+    'FROM ' + BASE_IMAGE,
+    'COPY opt/veritas /opt/veritas',
+    'COPY opt/pi /opt/pi',
+    'COPY usr/local/bin/pi /usr/local/bin/pi',
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(contextRoot, 'Containerfile'), recipe);
+  return Object.freeze({ paths, policyInputs });
+}
+
+export function assertModelImageSourcesStable(before, after) {
+  if (canonicalDigest(before) !== canonicalDigest(after)) throw new Error('MODEL_BUILD_CONTEXT_MUTATED');
+  return true;
+}
+
+export function modelImageSourcesFromContext(contextRoot, { version = 'v4', preseal = false } = {}) {
+  const paths = modelImagePaths(version, { preseal });
+  const policyInputs = modelImagePolicyInputs(paths.schema);
+  const veritas = path.join(contextRoot, 'opt/veritas');
+  const sources = {
+    arm: sha(path.join(veritas, 'scripts/s2-008-campaign-arm-model.mjs')),
+    bridge: sha(path.join(veritas, 'scripts/s2-008-egress-bridge.mjs')),
+    canonical_json: sha(path.join(veritas, 'src/lib/verifier/canonical-json.mjs')),
+    blind: sha(path.join(veritas, 'corpus/s2-008-campaign/cases/holdout.blind.json')),
+    prereg: sha(path.join(veritas, paths.stagedPrereg)),
+    pi_bundle: sha(path.join(contextRoot, 'opt/pi/dist/bundle/cli.js')),
+    pi_shrinkwrap: sha(path.join(contextRoot, 'opt/pi/npm-shrinkwrap.json')),
+    recipe: sha(path.join(contextRoot, 'Containerfile')),
+    ...(policyInputs.sourceNames.includes('timeout_policy') ? {
+      timeout_policy: sha(path.join(veritas, 'scripts/s2-008-campaign-v6-timeout.mjs')),
+    } : {}),
+    ...(policyInputs.sourceNames.includes('credential_env_policy') ? {
+      credential_env_policy: sha(path.join(veritas, 'scripts/s2-008-campaign-credential-env.mjs')),
+    } : {}),
+    ...(policyInputs.sourceNames.includes('pi_runtime_tree') ? {
+      pi_runtime_tree: digestRuntimeTree(path.join(contextRoot, 'opt/pi')),
+    } : {}),
+    ...(policyInputs.sourceNames.includes('pi_package_manifest') ? {
+      pi_package_manifest: sha(path.join(contextRoot, 'opt/pi/package.json')),
+    } : {}),
+    ...(policyInputs.sourceNames.includes('pi_launcher') ? {
+      pi_launcher: sha(path.join(contextRoot, 'usr/local/bin/pi')),
+    } : {}),
+  };
+  return Object.freeze(sources);
+}
+
+export function buildModelImage({
+  version = modelImageVersionFromArgv(),
+  preseal = process.argv.includes('--preseal'),
+  packageRoot,
+} = {}) {
+  const paths = modelImagePaths(version, { preseal });
+  if (version === 'v11') {
+    if (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot)) {
+      throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
+    }
+    assertPiPackageTreeContained(packageRoot);
+    const sourcePrereg = JSON.parse(fs.readFileSync(path.join(ROOT, paths.stagedPrereg), 'utf8'));
+    validateV11PiPackageContext(packageRoot, sourcePrereg);
+  }
   const context = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-image-'));
   try {
-    const target = path.join(context, 'opt/veritas');
-    for (const name of [
-      'scripts/s2-008-campaign-arm-model.mjs',
-      // The bridge the model reaches the network THROUGH. It is in the image rather
-      // than bind-mounted because the profile mounts exactly one socket and no
-      // repository path, and because a program that can change between build and
-      // run is not a program a digest can commit to.
-      'scripts/s2-008-egress-bridge.mjs',
-      'src/lib/verifier/canonical-json.mjs',
-      'corpus/s2-008-campaign/cases/holdout.blind.json',
-      MODEL_PATHS.stagedPrereg,
-      ...policyInputs.stageFiles,
-    ]) {
-      const dest = path.join(target, name);
-      fs.mkdirSync(path.dirname(dest), { recursive: true });
-      fs.copyFileSync(path.join(ROOT, name), dest);
-    }
-    fs.cpSync(PACKAGE, path.join(context, 'opt/pi'), { recursive: true });
-    const bin = path.join(context, 'usr/local/bin');
-    fs.mkdirSync(bin, { recursive: true });
-    fs.writeFileSync(path.join(bin, 'pi'), '#!/bin/sh\nexec /usr/local/bin/node /opt/pi/dist/bundle/cli.js "$@"\n', { mode: 0o755 });
-    const recipe = [
-      `FROM ${BASE_IMAGE}`,
-      'COPY opt/veritas /opt/veritas',
-      'COPY opt/pi /opt/pi',
-      'COPY usr/local/bin/pi /usr/local/bin/pi',
-      '',
-    ].join('\n');
-    const file = path.join(context, 'Containerfile');
-    fs.writeFileSync(file, recipe);
-    podman(['build', '--no-cache', '--layers=false', '--timestamp', '0', '--pull=never', '-f', file, '-t', TAG, context]);
-    const [id, digest, architecture] = podman(['inspect', '--format', '{{.Id}}|{{.Digest}}|{{.Architecture}}', TAG]).split('|');
-    const sources = {
-      arm: sha(path.join(ROOT, 'scripts/s2-008-campaign-arm-model.mjs')),
-      bridge: sha(path.join(ROOT, 'scripts/s2-008-egress-bridge.mjs')),
-      canonical_json: sha(path.join(ROOT, 'src/lib/verifier/canonical-json.mjs')),
-      blind: sha(path.join(ROOT, 'corpus/s2-008-campaign/cases/holdout.blind.json')),
-      prereg: sha(path.join(ROOT, MODEL_PATHS.stagedPrereg)),
-      pi_bundle: sha(path.join(PACKAGE, 'dist/bundle/cli.js')),
-      pi_shrinkwrap: sha(path.join(PACKAGE, 'npm-shrinkwrap.json')),
-      recipe: sha(file),
-      ...(policyInputs.sourceNames.includes('timeout_policy') ? {
-        timeout_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-v6-timeout.mjs')),
-      } : {}),
-      ...(policyInputs.sourceNames.includes('credential_env_policy') ? {
-        credential_env_policy: sha(path.join(ROOT, 'scripts/s2-008-campaign-credential-env.mjs')),
-      } : {}),
-      ...(policyInputs.sourceNames.includes('pi_runtime_tree') ? {
-        pi_runtime_tree: digestRuntimeTree(path.join(context, 'opt/pi')),
-      } : {}),
-    };
-    // The two digests are computed from the SAME object, so they cannot drift
-    // apart by being built at different moments from different state.
+    stageModelImageContext({ contextRoot: context, packageRoot, version, preseal });
+    const sources = modelImageSourcesFromContext(context, { version, preseal });
+    const contextDigest = canonicalDigest(sources);
+    podman(['build', '--no-cache', '--layers=false', '--timestamp', '0', '--pull=never', '-f',
+      path.join(context, 'Containerfile'), '-t', paths.tag, context]);
+    const postBuildSources = modelImageSourcesFromContext(context, { version, preseal });
+    assertModelImageSourcesStable(sources, postBuildSources);
+    const [id, digest, architecture] = podman([
+      'inspect', '--format', '{{.Id}}|{{.Digest}}|{{.Architecture}}', paths.tag,
+    ]).split('|');
     const commitment = contentCommitmentOf(sources);
     return {
       imageId: normalizeDigest(id),
       digest: normalizeDigest(digest),
       architecture,
-      source_digest: canonicalDigest(sources),
+      source_digest: contextDigest,
       content_commitment: commitment.digest,
       content_commitment_covers: commitment.covers,
       sources,
@@ -207,9 +396,9 @@ export function buildModelImage() {
   }
 }
 
-export function verifyModelPin() {
-  const first = buildModelImage();
-  const second = buildModelImage();
+export function verifyModelPin(options = {}) {
+  const first = buildModelImage(options);
+  const second = buildModelImage(options);
   return {
     first,
     second,
@@ -282,15 +471,17 @@ export function dryRunModelInImage(pin) {
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
+  const cli = parseModelImageCliArgs();
+  const paths = modelImagePaths(cli.version, { preseal: cli.preseal });
   const writePin = process.argv.includes('--write-pin');
   const result = writePin
-    ? verifyModelPin()
+    ? verifyModelPin(cli)
     : process.argv.includes('--verify-pin')
       ? assertRecordedModelPin(
-        verifyModelPin(),
-        JSON.parse(fs.readFileSync(path.join(ROOT, MODEL_PATHS.pinFile), 'utf8')),
+        verifyModelPin(cli),
+        JSON.parse(fs.readFileSync(path.join(ROOT, paths.pinFile), 'utf8')),
       )
-      : process.argv.includes('--dry-run') ? dryRunModelInImage(buildModelImage()) : buildModelImage();
+      : process.argv.includes('--dry-run') ? dryRunModelInImage(buildModelImage(cli)) : buildModelImage(cli);
   if (writePin) {
     // The pin file is WRITTEN BY THE BUILD, never typed. A hand-written pin is
     // the one thing this whole module exists to make impossible, and the cheapest
@@ -305,10 +496,10 @@ if (isMain) {
       })}\n`);
       process.exitCode = 1;
     } else {
-      const target = path.join(ROOT, MODEL_PATHS.pinFile);
+      const target = path.join(ROOT, paths.pinFile);
       fs.writeFileSync(target, `${JSON.stringify({
-        schema: MODEL_PATHS.schema,
-        image_tag: TAG,
+        schema: paths.schema,
+        image_tag: paths.tag,
         base_image: BASE_IMAGE,
         // What the SIGNED body may carry, and what it deliberately does not. Kept
         // next to the number so a reader never has to guess which digest is which.

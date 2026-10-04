@@ -245,7 +245,12 @@ test('v11 pure draft and seal bind v10 as predecessor and reject all frozen scie
   const preregHash = createHash('sha256').update(baseBytes).digest('hex');
   let covers;
   for (const build of [pin.first, pin.second]) {
-    build.sources = { ...build.sources, prereg: preregHash };
+    build.sources = {
+      ...build.sources,
+      prereg: preregHash,
+      pi_package_manifest: 'a'.repeat(64),
+      pi_launcher: 'b'.repeat(64),
+    };
     covers = Object.keys(build.sources).filter((name) => name !== 'prereg').sort();
     build.content_commitment = canonicalDigest(Object.fromEntries(covers.map((name) => [name, build.sources[name]])));
     build.content_commitment_covers = covers;

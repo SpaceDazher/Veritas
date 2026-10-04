@@ -227,6 +227,12 @@ test('v11 CLI requires an explicit absolute package root and rejects duplicate o
   assert.deepEqual(image.parseModelImageCliArgs(['node', 'builder']), {
     version: 'v4', preseal: false, packageRoot: undefined,
   });
+  const actualCli = spawnSync(process.execPath, [
+    'scripts/s2-008-campaign-model-image.mjs', '--v11', '--preseal',
+  ], { encoding: 'utf8' });
+  assert.notEqual(actualCli.status, 0);
+  assert.match(actualCli.stderr, /MODEL_PI_PACKAGE_SOURCE_REQUIRED/);
+  assert.equal(actualCli.stdout, '');
   for (const argv of [
     ['node', 'builder', '--v11', '--pi-package-dir'],
     ['node', 'builder', '--v11', '--pi-package-dir', 'relative/path'],
@@ -258,13 +264,4 @@ test('bad package identity and missing shrinkwrap fail in pure staging before bu
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
-});
-
-test('actual v11 builder CLI refuses a missing package source before dispatch', () => {
-  const result = spawnSync(process.execPath, [
-    'scripts/s2-008-campaign-model-image.mjs', '--v11', '--preseal',
-  ], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /MODEL_PI_PACKAGE_SOURCE_REQUIRED/);
-  assert.equal(result.stdout, '');
 });

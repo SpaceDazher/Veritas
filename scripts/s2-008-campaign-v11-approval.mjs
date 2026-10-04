@@ -63,8 +63,14 @@ export function readV11MeasurementOnDisk() {
 }
 
 export function assertV11PresealPin(args) {
-  return assertVersionedPresealPin({ ...args, version: 11,
-    requiredSources: ['pi_runtime_tree', 'timeout_policy', 'credential_env_policy'] });
+  return assertVersionedPresealPin({
+    ...args,
+    version: 11,
+    requiredSources: [
+      'pi_runtime_tree', 'timeout_policy', 'credential_env_policy',
+      'pi_shrinkwrap', 'pi_package_manifest', 'pi_launcher',
+    ],
+  });
 }
 
 export function assertV10AReconciliation({
