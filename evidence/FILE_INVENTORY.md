@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1345.
+Generated from `git ls-files`; count: 1346.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -1258,6 +1258,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-currency-guard.test.mjs`
 - `tests/research/campaign-model-credential-route.test.mjs`
 - `tests/research/campaign-model-dispatch.test.mjs`
+- `tests/research/campaign-model-image-v11-provenance.test.mjs`
 - `tests/research/campaign-model-image-version.test.mjs`
 - `tests/research/campaign-model-pin-record.test.mjs`
 - `tests/research/campaign-model-runtime-tree.test.mjs`
