@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+  "replaced_by_preregistration_digest": "244a6801e4b1f6ea4bd71097fb70a768113b72f085d4899e876993627590bf4c",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v11 binds the completed v10 A financial reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run",
+  "supersession_id": "spr-6f5e296f15e53ae440c57ef5",
+  "supersession_digest": "39d04daa7e700305740fb3597fe8ec4cfb3fde4bcffd834ad0130de3c7b4b713"
+}
