@@ -14,16 +14,34 @@ import {
 
 const TOKEN = 'fixture-only-paid-review-bearer-token';
 const PRINCIPAL = 'prn-s2007r-owner';
-const TASK = 'abt-s2-008-v10-paid-review';
+const TASK = 'abt-s2-008-v11-paid-review';
+
+function evidenceFixtureRoot(version = 11) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-paid-review-root-'));
+  const dir = path.join(root, 'corpus', 's2-008-campaign');
+  fs.mkdirSync(dir, { recursive: true });
+  // A manifest-only fixture routes the test to v11 while the missing signed
+  // preregistration guarantees this is never mistaken for campaign evidence.
+  fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify({
+    kind: 's2-008-campaign-corpus/1',
+    preregistration: { file: 'preregistration.v' + version + '.in-force.json', status: 'IN_FORCE', sealed_before_first_trial: true },
+  }));
+  return root;
+}
 
 async function withServer(options, run) {
-  const server = (options.serverFactory ?? createS2PaidReviewServer)(options);
+  const ownsRoot = !options.evidenceRoot;
+  const evidenceRoot = options.evidenceRoot ?? evidenceFixtureRoot();
+  const server = (options.serverFactory ?? createS2PaidReviewServer)({ ...options, evidenceRoot });
   await new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(0, '127.0.0.1', resolve);
   });
   try { await run(server, 'http://127.0.0.1:' + server.address().port); }
-  finally { await new Promise((resolve) => server.close(resolve)); }
+  finally {
+    await new Promise((resolve) => server.close(resolve));
+    if (ownsRoot) fs.rmSync(evidenceRoot, { recursive: true, force: true });
+  }
 }
 
 function credential(actions = ['view']) {
@@ -46,37 +64,18 @@ function notReadyWorkflow() {
   };
 }
 
-test('actual stopped A, missing B, and missing evaluation stay visibly not ready with prior spend separated', () => {
-  const state = inspectS2PaidReviewEvidence();
-  assert.equal(state.ready, false);
-  assert.equal(state.workflow.mode, 'READ_ONLY');
-  assert.equal(state.workflow.actionable, false);
-  assert.ok(state.reasons.includes('PAID_REVIEW_WORKFLOW_UNAVAILABLE'));
-  assert.equal(state.campaign.evaluationRecord.status, 'NOT_RUN');
-  assert.equal(state.version, 10);
-  assert.equal(state.campaign.arms.a.status, 'BLOCKED');
-  assert.equal(state.campaign.arms.a.outcomeClass, 'INFRA');
-  assert.equal(state.campaign.arms.a.rawUnknownAttempts, 1);
-  assert.equal(state.campaign.arms.a.rawTokens, 15_856);
-  assert.equal(state.campaign.arms.a.rawTokensAreLowerBound, true);
-  assert.equal(state.campaign.arms.a.confirmedTokens, 15_856);
-  assert.equal(state.campaign.arms.a.confirmedUsd, 0);
-  assert.equal(state.campaign.arms.a.unreconciledAttempts, 0);
-  assert.equal(state.campaign.arms.a.financialStatus, 'RECONCILED');
-  assert.equal(state.campaign.arms.a.predictions, 25);
-  assert.equal(state.campaign.arms.b.status, 'NOT_RUN');
-  assert.ok(state.reasons.includes('RUN_A_INFRA'));
-  assert.ok(state.reasons.includes('RUN_B_MISSING'));
-  assert.ok(state.reasons.includes('EVALUATION_MISSING'));
-  assert.ok(!state.reasons.includes('RUN_A_UNKNOWN_SPEND'));
-  assert.equal(state.campaign.history.v10.tokens, 15_856);
-  assert.equal(state.campaign.history.v9.tokens, 7_312);
-  assert.equal(state.campaign.history.v8.tokens, 0);
-  assert.equal(state.campaign.history.v7.status, 'UNKNOWN');
-  assert.equal(state.campaign.history.authorizedDiagnosticTokens, 578);
-  assert.equal(state.campaign.history.priorKnownCampaignTokens, 23_168);
-  assert.equal(state.campaign.aggregate.confirmedTokens, 15_856);
-  assert.equal(state.campaign.aggregate.complete, false);
+test('immutable historical financial totals remain separate from the active campaign state', () => {
+  const history = inspectS2PaidReviewEvidence().campaign.history;
+  assert.equal(history.v10.status, 'RECONCILED');
+  assert.equal(history.v10.tokens, 15_856);
+  assert.equal(history.v10.usd, 0);
+  assert.equal(history.v9.status, 'RECONCILED');
+  assert.equal(history.v9.tokens, 7_312);
+  assert.equal(history.v9.usd, 0);
+  assert.equal(history.v8.tokens, 0);
+  assert.equal(history.v7.status, 'UNKNOWN');
+  assert.equal(history.authorizedDiagnosticTokens, 578);
+  assert.equal(history.priorKnownCampaignTokens, 23_168);
 });
 
 test('the existing local review server still requires bearer authentication and rejects caller-supplied actor identity', async () => {
@@ -99,17 +98,18 @@ test('the existing local review server still requires bearer authentication and 
 
 test('the paid server binds its credential to the owner and view-only permission', () => {
   const service = { async status() { return { ready: false }; }, async start() {}, async decide() {} };
+  const evidenceRoot = evidenceFixtureRoot();
   assert.throws(
     () => createS2PaidReviewServer({
       credential: { ...credential(), principalId: 'prn-attacker' },
-      workflow: service,
+      workflow: service, evidenceRoot,
     }),
     (error) => error.message === 'ACTOR_TASK_MISMATCH',
   );
   assert.throws(
     () => createS2PaidReviewServer({
       credential: credential(['view', 'approve']),
-      workflow: service,
+      workflow: service, evidenceRoot,
     }),
     (error) => error.message === 'REVIEW_CREDENTIAL_INVALID',
   );
@@ -118,12 +118,15 @@ test('the paid server binds its credential to the owner and view-only permission
 test('the paid workflow refuses incomplete evidence before database or executor work', async () => {
   let databaseCalls = 0;
   const pool = { async query() { databaseCalls += 1; throw new Error('DB_SHOULD_NOT_BE_TOUCHED'); } };
-  const workflow = createS2PaidReviewWorkflow({ pool });
-  await assert.rejects(
-    workflow.start({ principalId: PRINCIPAL, taskId: TASK }),
-    (error) => error.message === 'PAID_REVIEW_NOT_READY',
-  );
-  assert.equal(databaseCalls, 0);
+  const evidenceRoot = evidenceFixtureRoot();
+  const workflow = createS2PaidReviewWorkflow({ pool, evidenceRoot });
+  try {
+    await assert.rejects(
+      workflow.start({ principalId: PRINCIPAL, taskId: TASK }),
+      (error) => error.message === 'PAID_REVIEW_NOT_READY',
+    );
+    assert.equal(databaseCalls, 0);
+  } finally { fs.rmSync(evidenceRoot, { recursive: true, force: true }); }
 });
 
 // Keep this import visible to the test runner: the paid server must be a separate
@@ -166,20 +169,23 @@ test('evidence reads reject parent-directory symlinks that escape the evidence r
   }
 });
 
-test('the paid state endpoint exposes the evidence-derived current and historical accounting', async () => {
-  const workflow = createS2PaidReviewWorkflow({ pool: { async query() { throw new Error('NO_DATABASE_READ'); } } });
-  await withServer({ credential: credential(), workflow }, async (server, origin) => {
-    const response = await fetch(origin + '/api/state', { headers: { authorization: 'Bearer ' + TOKEN } });
-    assert.equal(response.status, 200);
-    const state = await response.json();
-    assert.equal(state.ready, false);
-    assert.equal(state.campaign.arms.a.confirmedTokens, 15_856);
-    assert.equal(state.campaign.arms.a.rawUnknownAttempts, 1);
-    assert.equal(state.campaign.arms.a.unreconciledAttempts, 0);
-    assert.equal(state.campaign.arms.b.status, 'NOT_RUN');
-    assert.equal(state.campaign.history.v9.tokens, 7_312);
-    assert.equal(state.campaign.history.authorizedDiagnosticTokens, 578);
+test('the paid state endpoint reports an incomplete isolated v11 fixture without touching the database', async () => {
+  const evidenceRoot = evidenceFixtureRoot();
+  const workflow = createS2PaidReviewWorkflow({
+    pool: { async query() { throw new Error('NO_DATABASE_READ'); } }, evidenceRoot,
   });
+  try {
+    await withServer({ credential: credential(), workflow, evidenceRoot }, async (server, origin) => {
+      const response = await fetch(origin + '/api/state', { headers: { authorization: 'Bearer ' + TOKEN } });
+      assert.equal(response.status, 200);
+      const state = await response.json();
+      assert.equal(state.ready, false);
+      assert.equal(state.version, 11);
+      assert.ok(state.reasons.includes('ACTIVE_PREREGISTRATION_INVALID'));
+      assert.equal(state.campaign.arms.a.status, 'NOT_RUN');
+      assert.equal(state.campaign.arms.b.status, 'NOT_RUN');
+    });
+  } finally { fs.rmSync(evidenceRoot, { recursive: true, force: true }); }
 });
 
 test('paid review is read-only even if an injected workflow claims evidence is ready', async () => {
