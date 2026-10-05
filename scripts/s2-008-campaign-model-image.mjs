@@ -9,7 +9,7 @@ import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
 import { BASE_IMAGE, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { PODMAN_HOST, buildInvocation, executeIsolated } from '../src/lib/isolation/launch.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
-import { modelContainerTimeoutFromPreregistration } from './s2-008-campaign-v6-timeout.mjs';
+import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
@@ -433,12 +433,16 @@ export function assertRecordedModelPin(rebuilt, recorded) {
   return rebuilt;
 }
 
+export function modelDryRunTimeoutMs(prereg) {
+  if (/^s2-008-prereg-v(?:[6-9]|1[0-2])$/.test(prereg?.rule ?? '')) {
+    return assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout).total_container_timeout_ms;
+  }
+  return 180_000;
+}
+
 export function dryRunModelInImage(pin) {
   const stagedPrereg = JSON.parse(fs.readFileSync(path.join(ROOT, MODEL_PATHS.stagedPrereg), 'utf8'));
-  let timeoutMs = 180_000;
-  if (['s2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12'].includes(stagedPrereg.rule)) {
-    timeoutMs = modelContainerTimeoutFromPreregistration(stagedPrereg);
-  }
+  const timeoutMs = modelDryRunTimeoutMs(stagedPrereg);
   const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
     image: pin.imageId,
     argv: [

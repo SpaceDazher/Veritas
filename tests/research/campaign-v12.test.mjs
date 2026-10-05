@@ -8,7 +8,7 @@ import { assertPreregistration, preregistrationDigest as sharedDigest } from '..
 import { preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs';
 import { credentialEnvNameForPreregistration } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { parseArgs as parseApprovalArgs } from '../../scripts/s2-008-campaign-approve.mjs';
-import { modelImagePaths, modelImagePolicyInputs, modelImageVersionFromArgv, parseModelImageCliArgs } from '../../scripts/s2-008-campaign-model-image.mjs';
+import { modelImagePaths, modelImagePolicyInputs, modelImageVersionFromArgv, parseModelImageCliArgs, modelDryRunTimeoutMs } from '../../scripts/s2-008-campaign-model-image.mjs';
 import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
 import { activeCampaignVersion } from '../../scripts/s2-008-campaign-evaluate.mjs';
 import { resolveProbePreregistrationPath } from '../../scripts/s2-008-campaign-probes.mjs';
@@ -20,9 +20,37 @@ const BASE_PATH = 'corpus/s2-008-campaign/preregistration.v11.in-force.json';
 const baseBytes = fs.readFileSync(BASE_PATH);
 const base = JSON.parse(baseBytes);
 const table = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/frozen-table.v3.json', 'utf8'));
-const manifest = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json', 'utf8'));
+const ledger = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/source-ledger.v3.json', 'utf8'));
+const activeManifest = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json', 'utf8'));
+const activeV12 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v12.in-force.json', 'utf8'));
 const v11SupersessionBytes = fs.readFileSync('corpus/s2-008-campaign/preregistration-v11-supersession.json');
 const v11Supersession = JSON.parse(v11SupersessionBytes);
+// Historical v11 predecessor fixture built from immutable v11 source inputs;
+// the live manifest is v12 after seal and must not serve as this fixture.
+const manifest = {
+  preregistration: {
+    file: 'preregistration.v11.in-force.json',
+    status: 'IN_FORCE',
+    preregistration_digest: base.preregistration_digest,
+  },
+  supersession: {
+    file: 'preregistration-v11-supersession.json',
+    supersession_id: v11Supersession.supersession_id,
+    supersession_digest: v11Supersession.supersession_digest,
+  },
+  supersession_history: [{
+    file: 'preregistration-v11-supersession.json',
+    supersession_id: v11Supersession.supersession_id,
+    supersession_digest: v11Supersession.supersession_digest,
+  }],
+  superseded_preregistration: {
+    file: 'preregistration-v10-superseded.json',
+    superseded_by: 'preregistration.v11.in-force.json',
+  },
+  frozen_table: { file: 'frozen-table.v3.json', digest: canonicalDigest(table) },
+  source_ledger: { file: 'source-ledger.v3.json', entry_count: ledger.entries.length,
+    last_anchor_digest: ledger.entries.at(-1).anchor_digest },
+};
 const v12Candidate = () => {
   const value = structuredClone(base);
   value.rule = 's2-008-prereg-v12';
@@ -31,6 +59,23 @@ const v12Candidate = () => {
   value.preregistration_digest = preregistrationDigest(value);
   return value;
 };
+
+test('real active manifest remains v12 while lineage tests use a pinned historical v11 manifest', () => {
+  assert.equal(activeManifest.preregistration.file, 'preregistration.v12.in-force.json');
+  assert.equal(activeManifest.preregistration.status, 'IN_FORCE');
+  assert.equal(activeManifest.preregistration.preregistration_digest, activeV12.preregistration_digest);
+  assert.equal(activeV12.rule, 's2-008-prereg-v12');
+  assert.equal(activeV12.approval?.in_force, true);
+  assert.equal(manifest.preregistration.file, 'preregistration.v11.in-force.json');
+  assert.equal(manifest.preregistration.preregistration_digest, base.preregistration_digest);
+});
+
+test('v12 dry-run timeout uses the signed v6 policy and rejects policy drift', () => {
+  assert.equal(modelDryRunTimeoutMs(activeV12), activeV12.executor.model_launch_timeout.total_container_timeout_ms);
+  const mutated = structuredClone(activeV12);
+  mutated.executor.model_launch_timeout.total_container_timeout_ms += 1;
+  assert.throws(() => modelDryRunTimeoutMs(mutated), /V6_MODEL_TIMEOUT_POLICY_INVALID/);
+});
 
 test('v12 routes are strict and retain the v11 predecessor for preseal staging', async () => {
   const prereg = v12Candidate();
@@ -213,7 +258,6 @@ test('v12 pure draft approval and seal preserve all frozen science and bind curr
   }
   const signed = approvalModule.approveV12({ ...inputs, draft, pin, priorExecutionEvidence,
     principal: 'prn-s2007r-owner', label: 'fixture-only source test', issuedAt: '2026-10-05T12:00:00.000Z' });
-  const ledger = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/source-ledger.v3.json', 'utf8'));
   const sealed = sealModule.sealV12({ signed, draft, ...inputs, baseSupersession: v11Supersession,
     baseSupersessionBytes: v11SupersessionBytes, pin, priorExecutionEvidence, ledger });
   assert.equal(sealed.prereg.status, 'APPROVED');
