@@ -24,10 +24,13 @@ function isWithin(root, target) {
   const relative = path.relative(root, target);
   return relative === '' || (relative !== '..' && !relative.startsWith('..' + path.sep) && !path.isAbsolute(relative));
 }
-function readSafe(root, relative, maximum, includeContent = false) {
+function validateRelative(relative) {
   if (typeof relative !== 'string' || !relative || relative.startsWith('/')
       || relative.includes('\\') || relative.split('/').some((part) => !part || part === '.' || part === '..')
       || path.posix.normalize(relative) !== relative) fail('IMPORT_PATH_INVALID');
+}
+function readSafe(root, relative, maximum, includeContent = false) {
+  validateRelative(relative);
   const absolute = path.resolve(root, ...relative.split('/'));
   if (!isWithin(root, absolute)) fail('IMPORT_PATH_INVALID');
   let fd;
@@ -87,12 +90,15 @@ function validateBundle(bundle) {
   const seen = new Set();
   for (const record of bundle.files) {
     if (!record || Object.getPrototypeOf(record) !== Object.prototype
-        || Object.keys(record).sort().join(',') !== 'bytes,path,sha256'
-        || typeof record.path !== 'string' || !Number.isSafeInteger(record.bytes) || record.bytes < 0
-        || record.bytes > MAX_FILE_BYTES || !SHA256.test(record.sha256)
-        || seen.has(record.path)) fail('IMPORT_BUNDLE_INVALID');
+        || typeof record.path !== 'string' || seen.has(record.path)) fail('IMPORT_BUNDLE_INVALID');
+    validateRelative(record.path);
+    const missingRecord = Object.keys(record).sort().join(',') === 'missing,path' && record.missing === true;
+    const fileRecord = Object.keys(record).sort().join(',') === 'bytes,path,sha256'
+      && Number.isSafeInteger(record.bytes) && record.bytes >= 0
+      && record.bytes <= MAX_FILE_BYTES && SHA256.test(record.sha256);
+    if (!missingRecord && !fileRecord) fail('IMPORT_BUNDLE_INVALID');
     seen.add(record.path);
-    total += record.bytes;
+    if (fileRecord) total += record.bytes;
     if (total > MAX_TOTAL_BYTES) fail('IMPORT_BUNDLE_INVALID');
   }
   if (canonicalDigest(bundle.files) !== bundle.artifact_manifest_digest) fail('IMPORT_BUNDLE_INVALID');
@@ -101,16 +107,30 @@ function validateBundle(bundle) {
 export function verifyOfflineImportBundle(bundlePath) {
   const { root, bundle, bundleSha256 } = readBundle(bundlePath);
   const totalBytes = validateBundle(bundle);
+  let verifiedFiles = 0;
+  let verifiedMissing = 0;
   for (const record of bundle.files) {
+    if (record.missing === true) {
+      const absolute = path.resolve(root, ...record.path.split('/'));
+      const parent = fs.realpathSync(path.dirname(absolute));
+      if (!isWithin(root, parent)) fail('IMPORT_PATH_INVALID');
+      try { fs.lstatSync(path.join(parent, path.basename(absolute))); fail('IMPORT_CONTENT_MISMATCH'); }
+      catch (error) { if (error?.code !== 'ENOENT') throw error; }
+      verifiedMissing += 1;
+      continue;
+    }
     const actual = readSafe(root, record.path, MAX_FILE_BYTES);
     if (actual.bytes !== record.bytes || actual.sha256 !== record.sha256) fail('IMPORT_CONTENT_MISMATCH');
+    verifiedFiles += 1;
   }
   return {
     kind: 's2-008-paid-review-import/1',
     status: 'PASS',
     artifact_manifest_digest: bundle.artifact_manifest_digest,
     bundle_sha256: bundleSha256,
-    verified_files: bundle.files.length,
+    verified_records: bundle.files.length,
+    verified_files: verifiedFiles,
+    verified_missing: verifiedMissing,
     verified_bytes: totalBytes,
     fixture_only: bundle.fixture_only,
     network: 'none',
