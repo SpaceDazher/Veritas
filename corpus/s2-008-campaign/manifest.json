@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v11.in-force.json",
-    "preregistration_digest": "244a6801e4b1f6ea4bd71097fb70a768113b72f085d4899e876993627590bf4c",
+    "file": "preregistration.v12.in-force.json",
+    "preregistration_digest": "be2e9cba4629e66d295c2527f6a1842f6282f6526efc10d63acfddec33e0c394",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v10-superseded.json",
-    "preregistration_digest": "580b3fadd655d396662efe21757f0473b830211ef42ae93f230df0445379ae22",
+    "file": "preregistration-v11-superseded.json",
+    "preregistration_digest": "244a6801e4b1f6ea4bd71097fb70a768113b72f085d4899e876993627590bf4c",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v11.in-force.json"
+    "superseded_by": "preregistration.v12.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v11-supersession.json",
-    "supersession_id": "spr-6f5e296f15e53ae440c57ef5",
-    "supersession_digest": "39d04daa7e700305740fb3597fe8ec4cfb3fde4bcffd834ad0130de3c7b4b713",
-    "reason": "v11 binds the completed v10 A financial reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run"
+    "file": "preregistration-v12-supersession.json",
+    "supersession_id": "spr-f547ffdb1b1ffaa2ce5764a8",
+    "supersession_digest": "10ae574d3d6dc17ee6da958821545f34c5c0e8ad760e7a6fe843c8968bf4996f",
+    "reason": "v12 is a distinct successor to the signed v11 preregistration with a fresh reservation expiry and image pin; frozen science, provider, model, package and per-run ceiling remain unchanged"
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -602,6 +602,12 @@
       "supersession_id": "spr-6f5e296f15e53ae440c57ef5",
       "supersession_digest": "39d04daa7e700305740fb3597fe8ec4cfb3fde4bcffd834ad0130de3c7b4b713",
       "reason": "v11 binds the completed v10 A financial reconciliation to a fresh A/B copy while preserving provider, model, frozen science, and the 5,000,000-token ceiling per A/B run"
+    },
+    {
+      "file": "preregistration-v12-supersession.json",
+      "supersession_id": "spr-f547ffdb1b1ffaa2ce5764a8",
+      "supersession_digest": "10ae574d3d6dc17ee6da958821545f34c5c0e8ad760e7a6fe843c8968bf4996f",
+      "reason": "v12 is a distinct successor to the signed v11 preregistration with a fresh reservation expiry and image pin; frozen science, provider, model, package and per-run ceiling remain unchanged"
     }
   ]
 }

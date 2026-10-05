@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "244a6801e4b1f6ea4bd71097fb70a768113b72f085d4899e876993627590bf4c",
+  "replaced_by_preregistration_digest": "be2e9cba4629e66d295c2527f6a1842f6282f6526efc10d63acfddec33e0c394",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v12 is a distinct successor to the signed v11 preregistration with a fresh reservation expiry and image pin; frozen science, provider, model, package and per-run ceiling remain unchanged",
+  "supersession_id": "spr-f547ffdb1b1ffaa2ce5764a8",
+  "supersession_digest": "10ae574d3d6dc17ee6da958821545f34c5c0e8ad760e7a6fe843c8968bf4996f"
+}
