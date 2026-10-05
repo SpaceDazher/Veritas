@@ -45,7 +45,7 @@ import { assertV9PresealPin, assertV8AReconciliation, readV9ReconciliationInputs
 import { assertV10PresealPin, assertV9AReconciliation, readV10ReconciliationInputs } from './s2-008-campaign-v10-approval.mjs';
 import { assertV11PresealPin, assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-campaign-v11-approval.mjs';
 import { V11_FAILURE_DIAGNOSTICS_POLICY } from './s2-008-campaign-arm-model.mjs';
-import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation } from './s2-008-campaign-v12-approval.mjs';
+import { assertV12PresealPin, assertV12PriorExecutionEvidence, assertV12RestartReconciliation } from './s2-008-campaign-v12-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';

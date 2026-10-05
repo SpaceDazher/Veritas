@@ -9,7 +9,7 @@ import { preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs
 import { credentialEnvNameForPreregistration } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { parseArgs as parseApprovalArgs } from '../../scripts/s2-008-campaign-approve.mjs';
 import { modelImagePaths, modelImagePolicyInputs, modelImageVersionFromArgv, parseModelImageCliArgs, modelDryRunTimeoutMs } from '../../scripts/s2-008-campaign-model-image.mjs';
-import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
+import { modelTrialArgv, runModelTrial, assertPinnedModelImage } from '../../scripts/s2-008-campaign-adapter.mjs';
 import { activeCampaignVersion } from '../../scripts/s2-008-campaign-evaluate.mjs';
 import { resolveProbePreregistrationPath } from '../../scripts/s2-008-campaign-probes.mjs';
 import { parsePrepareMode, assertPrepareWriteAllowed } from '../../scripts/s2-008-campaign-prepare-cli.mjs';
@@ -301,6 +301,51 @@ test('v12 capsule sources use the v12 preregistration path while preserving exac
   assert.equal(inputs[0].path, 'corpus/s2-008-campaign/preregistration.v12.in-force.json');
   assert.deepEqual(validateS2PaidReviewCapsuleSourceInputs(inputs, inputs, { version: 12 }), { ok: true });
   assert.deepEqual(validateS2PaidReviewCapsuleSourceInputs(inputs, inputs, { version: 11 }), { ok: false });
+});
+
+test('v12 adapter revalidates the sealed image pin before mocked dry dispatch', async () => {
+  const pin = JSON.parse(fs.readFileSync('evidence/s2-008-campaign/model-image-pin-v12.json', 'utf8'));
+  let inspections = 0;
+  let dryExecutions = 0;
+  const inspect = (imageId) => {
+    inspections += 1;
+    assert.equal(imageId, pin.first.imageId);
+    return { Id: pin.first.imageId, Digest: pin.first.digest, Architecture: pin.first.architecture };
+  };
+  const armId = activeV12.trial_list[0].arm_id;
+  const output = {
+    arm_id: armId, outcome_class: 'DRY_RUN', dry_run: true,
+    budget: { currency: 'tokens', spent_tokens: 0, unreconciled_spend: false },
+    executor: { model_calls: 0 }, predictions: [{ case_id: 'fixture-case', predicted: 'MINOR' }],
+    container: { pid: 123, node_version: 'v22.0.0' },
+  };
+  const payload = Buffer.from(JSON.stringify(output)).toString('base64');
+  const observation = {
+    exitCode: 0, signal: null, timedOut: false,
+    stdout: 'ADAPTER_OK arm=' + armId + ' seed=20260926 n=1 predictions=1 tokens=0 usd=0 dry_run=true pid=123 node=v22.0.0\n'
+      + 'ADAPTER_JSON 1/1 ' + payload + '\nADAPTER_JSON_END ' + payload.length + '\n',
+    stderr: '',
+  };
+  const result = await runModelTrial({
+    armId, seed: 20260926, timeoutMs: 180000, dryRun: true, pin, prereg: activeV12,
+    runLabel: 'v12-adapter-fixture', inspect, predictionsSink: () => {},
+    executePaid: () => { throw new Error('PAID_DISPATCH_FORBIDDEN_IN_TEST'); },
+    executeDry: (invocation) => {
+      dryExecutions += 1;
+      assert.equal(invocation.image, pin.first.imageId);
+      assert.equal(invocation.podmanArgv.includes('--dry-run'), true);
+      assert.equal(invocation.podmanArgv.includes('/opt/veritas/corpus/s2-008-campaign/preregistration.v12.in-force.json'), true);
+      return observation;
+    },
+  });
+  assert.equal(inspections, 1);
+  assert.equal(dryExecutions, 1);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.record.arm_report, output);
+  assert.equal(result.record.predictions.rows, 1);
+  assert.deepEqual(assertPinnedModelImage({ pin, prereg: activeV12, inspect: () => ({
+    Id: pin.first.imageId, Digest: pin.first.digest, Architecture: pin.first.architecture,
+  }) }), { imageId: pin.first.imageId, digest: pin.first.digest, architecture: pin.first.architecture });
 });
 
 test('v12 paid review discovers the active version and allocates distinct fixture task identities', async () => {
