@@ -71,3 +71,39 @@ test('fixture-only offline importer blocks any byte change after the manifest is
   assert.equal(fs.existsSync(outputPath), false);
   assert.doesNotMatch(String(result.stdout) + String(result.stderr), /original fixture bytes|mutated fixture bytes/);
 });
+
+
+test('fixture-only offline importer preserves an optional missing-file record and refuses surprise files', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-paid-review-import-missing-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const evidenceRoot = path.join(root, 'evidence');
+  const outputRoot = path.join(root, 'output');
+  fs.mkdirSync(evidenceRoot);
+  fs.mkdirSync(outputRoot);
+  const bytes = Buffer.from('required evidence\n');
+  fs.writeFileSync(path.join(evidenceRoot, 'required.log'), bytes, { mode: 0o400 });
+  const records = [
+    { path: 'optional.json', missing: true },
+    { path: 'required.log', bytes: bytes.length, sha256: sha256(bytes) },
+  ];
+  const bundlePath = path.join(evidenceRoot, 'bundle.json');
+  const bundle = { kind: 's2-008-paid-review-import-bundle/1', fixture_only: true,
+    artifact_manifest_digest: canonicalDigest(records), files: records };
+  fs.writeFileSync(bundlePath, JSON.stringify(bundle) + '\n', { mode: 0o400 });
+  const outputPath = path.join(outputRoot, 'import.json');
+  let result = spawnSync(process.execPath, [IMPORTER, '--bundle', bundlePath, '--output', outputPath],
+    { encoding: 'utf8', timeout: 10000, maxBuffer: 65536 });
+  assert.equal(result.status, 0, String(result.stderr));
+  const report = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+  assert.equal(report.verified_records, 2);
+  assert.equal(report.verified_files, 1);
+  assert.equal(report.verified_missing, 1);
+
+  fs.rmSync(outputPath);
+  fs.writeFileSync(path.join(evidenceRoot, 'optional.json'), '{}\n', { mode: 0o400 });
+  result = spawnSync(process.execPath, [IMPORTER, '--bundle', bundlePath, '--output', outputPath],
+    { encoding: 'utf8', timeout: 10000, maxBuffer: 65536 });
+  assert.equal(result.status, 1);
+  assert.equal(fs.existsSync(outputPath), false);
+  assert.doesNotMatch(String(result.stdout) + String(result.stderr), /optional\.json/);
+});
