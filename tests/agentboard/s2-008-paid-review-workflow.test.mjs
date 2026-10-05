@@ -117,6 +117,8 @@ test('fixture-only campaign coverage includes all three frozen arms and all thre
   const result = paid.verifyS2PaidReviewCoverage({ trialList, seeds, holdoutCaseIds, observed });
   assert.deepEqual({ total: result.totalPredictions, model: result.modelPredictions, controls: result.controlPredictions },
     { total: 1134, model: 378, controls: 756 });
+  assert.deepEqual({ modelUnparsed: result.modelUnparsed, controlUnparsed: result.controlUnparsed },
+    { modelUnparsed: 0, controlUnparsed: 0 });
   assert.throws(() => paid.verifyS2PaidReviewCoverage({
     trialList: [trialList[2]], seeds, holdoutCaseIds,
     observed: observed.filter((row) => row.arm_id === 'arm-model-zai-glm53flash'),
@@ -198,4 +200,19 @@ test('fixture-only review task binds owner and distinct producer and the journal
   assert.equal(replayA05Journal(task, []).ok, true);
   assert.throws(() => replayA05Journal({ ...task, history_digest: 'sha256:' + '0'.repeat(64) }, []),
     (error) => error.code === 'JOURNAL_HEAD_INVALID');
+});
+
+
+test('production v11 stays not ready for missing A/B evidence without an unavailable-workflow blocker', async () => {
+  const evidence = paid.inspectS2PaidReviewEvidence();
+  assert.equal(evidence.version, 11);
+  assert.equal(evidence.ready, false);
+  assert.equal(evidence.state, 'NOT_READY');
+  assert.equal(evidence.reasons.includes('PAID_REVIEW_WORKFLOW_UNAVAILABLE'), false);
+  assert.equal(evidence.reasons.includes('RUN_A_MISSING'), true);
+  assert.equal(evidence.reasons.includes('RUN_B_MISSING'), true);
+  assert.equal(evidence.campaign.history.priorKnownCampaignTokens, 23168);
+  const workflow = paid.createS2PaidReviewWorkflow({ pool: null });
+  await assert.rejects(workflow.start({ principalId: OWNER, taskId: TASK }),
+    (error) => error.code === 'PAID_REVIEW_NOT_READY');
 });
