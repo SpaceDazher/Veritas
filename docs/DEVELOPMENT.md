@@ -227,3 +227,9 @@ evidence/                  tracked run/closure evidence
 results/                   generated/replayed result records
 tasks/                     active local implementation briefs
 ```
+
+## Проверка доказательств платной кампании S2-008
+
+Порядок локального импорта, авторизации владельца и человеческого A-MVP-05:
+[S2-008 paid review](S2-008-PAID-REVIEW.md). Полный test и research-команды
+выполняются последовательно: они используют общие scratch-каталоги.

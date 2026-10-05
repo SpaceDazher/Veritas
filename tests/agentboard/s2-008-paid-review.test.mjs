@@ -97,12 +97,12 @@ test('the existing local review server still requires bearer authentication and 
   });
 });
 
-test('the paid server binds its credential to the owner and view-only permission', () => {
-  const service = { async status() { return { ready: false }; }, async start() {}, async decide() {} };
+test('the paid server binds its credential to the owner and exact scoped actions', () => {
   const evidenceRoot = evidenceFixtureRoot();
+  const service = createS2PaidReviewWorkflow({ pool: null, evidenceRoot });
   assert.throws(
     () => createS2PaidReviewServer({
-      credential: { ...credential(), principalId: 'prn-attacker' },
+      credential: { ...credential(['approve','request_changes','start','view']), principalId: 'prn-attacker' },
       workflow: service, evidenceRoot,
     }),
     (error) => error.message === 'ACTOR_TASK_MISMATCH',
@@ -176,7 +176,7 @@ test('the paid state endpoint reports an incomplete isolated v11 fixture without
     pool: { async query() { throw new Error('NO_DATABASE_READ'); } }, evidenceRoot,
   });
   try {
-    await withServer({ credential: credential(), workflow, evidenceRoot }, async (server, origin) => {
+    await withServer({ credential: credential(['approve','request_changes','start','view']), workflow, evidenceRoot }, async (server, origin) => {
       const response = await fetch(origin + '/api/state', { headers: { authorization: 'Bearer ' + TOKEN } });
       assert.equal(response.status, 200);
       const state = await response.json();
@@ -189,21 +189,21 @@ test('the paid state endpoint reports an incomplete isolated v11 fixture without
   } finally { fs.rmSync(evidenceRoot, { recursive: true, force: true }); }
 });
 
-test('paid review is read-only even if an injected workflow claims evidence is ready', async () => {
+test('view-only credentials cannot mutate even when a test workflow claims readiness', async () => {
   let starts = 0;
   let decisions = 0;
   const service = {
-    async status() { return { state: 'IN_REVIEW', ready: true, revision: 8 }; },
+    async status() { return { state: 'NOT_READY', ready: false, revision: 1, fixture_only: true, reasons: ['EVIDENCE_MISSING'] }; },
     async start() { starts += 1; return { state: 'IN_REVIEW' }; },
     async decide() { decisions += 1; return { state: 'DONE' }; },
   };
-  await withServer({ credential: credential(), workflow: service }, async (server, origin) => {
+  await withServer({ credential: credential(), workflow: service, serverFactory: createA05ReviewServer, presentation: 'paid-evidence-review' }, async (server, origin) => {
     const stateResponse = await fetch(origin + '/api/state', { headers: { authorization: 'Bearer ' + TOKEN } });
     assert.equal(stateResponse.status, 200);
     const state = await stateResponse.json();
     assert.equal(state.ready, false);
-    assert.equal(state.workflow.mode, 'READ_ONLY');
-    assert.equal(state.workflow.actionable, false);
+    assert.equal(state.ready, false);
+    assert.equal(state.fixture_only, true);
 
     const startResponse = await fetch(origin + '/api/start', {
       method: 'POST',
@@ -262,22 +262,16 @@ test('the existing local review server refuses stale revisions and changed evide
   });
 });
 
-test('the read-only paid endpoint never reports DONE from an injected workflow', async () => {
+test('the paid server rejects an injected workflow that claims DONE', () => {
+  const evidenceRoot = evidenceFixtureRoot();
   const workflow = {
     async status() { return { state: 'DONE', ready: true, revision: 8 }; },
     async start() { throw new Error('NO_START'); },
     async decide() { throw new Error('NO_DECISION'); },
   };
-  await withServer({ credential: credential(), workflow }, async (server, origin) => {
-    const response = await fetch(origin + '/api/state', {
-      headers: { authorization: 'Bearer ' + TOKEN },
-    });
-    assert.equal(response.status, 200);
-    const state = await response.json();
-    assert.equal(state.state, 'NOT_READY');
-    assert.equal(state.ready, false);
-    assert.equal(state.workflow.actionable, false);
-  });
+  assert.throws(() => createS2PaidReviewServer({
+    credential: credential(['approve','request_changes','start','view']), workflow, evidenceRoot,
+  }), (error) => error.code === 'PAID_REVIEW_WORKFLOW_INVALID');
 });
 
 

@@ -87,7 +87,7 @@ async function freePort() {
   const port = server.address().port;
   await new Promise((resolve) => server.close(resolve)); return port;
 }
-async function setupDatabase() {
+export async function setupA05Database() {
   fs.mkdirSync(STATE, { recursive: true, mode: 0o700 });
   fs.mkdirSync(path.join(STATE, 'xdg'), { recursive: true, mode: 0o700 });
   const configFile = path.join(STATE, 'database.private.json');
@@ -358,7 +358,7 @@ export function createA05Workflow({ pool, ticket }) {
 async function main() {
   const mode = process.argv[2];
   if (!['--init','--serve','--preflight','--inspect'].includes(mode) || process.argv.length !== 3) fail('USAGE_A05');
-  const { pool } = await setupDatabase();
+  const { pool } = await setupA05Database();
   try {
     const ticket = prepareTicket(mode === '--preflight' ? 'preflight-v2' : 'live',
       mode === '--preflight' ? 'prn-a05-test-reviewer' : 'prn-a05-daniil-reviewer');

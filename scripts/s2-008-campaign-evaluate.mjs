@@ -20,6 +20,7 @@
 // USAGE: node scripts/s2-008-campaign-evaluate.mjs [--out <file>]
 
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -39,6 +40,37 @@ import { assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
 const DECISION_POINT = '2026-09-28T00:00:00.000Z';
+const V11_REVIEW_CAPSULE_SOURCE_PATHS = Object.freeze([
+  'corpus/s2-008-campaign/preregistration.v11.in-force.json',
+  'corpus/s2-008-campaign/manifest.json',
+  'corpus/s2-008-campaign/frozen-table.v3.json',
+  'corpus/s2-008-campaign/cases/holdout.blind.json',
+  'scripts/s2-008-campaign-evaluate.mjs',
+  'scripts/s2-008-campaign-bootstrap.mjs',
+]);
+
+export function buildV11ReviewCapsuleSourceInputs(entries) {
+  if (!Array.isArray(entries) || entries.length !== V11_REVIEW_CAPSULE_SOURCE_PATHS.length) {
+    throw new Error('V11_REVIEW_CAPSULE_SOURCE_INPUTS_INVALID');
+  }
+  return entries.map((entry, index) => {
+    if (!entry || entry.path !== V11_REVIEW_CAPSULE_SOURCE_PATHS[index]
+        || !(entry.contents instanceof Uint8Array) || entry.contents.length < 1) {
+      throw new Error('V11_REVIEW_CAPSULE_SOURCE_INPUTS_INVALID');
+    }
+    return { path: entry.path, bytes: entry.contents.length,
+      sha256: createHash('sha256').update(entry.contents).digest('hex') };
+  });
+}
+
+export function reserveV11EvaluationAccessRoot(accessRoot) {
+  try { fs.mkdirSync(accessRoot, { recursive: false, mode: 0o700 }); }
+  catch (error) {
+    if (error?.code === 'EEXIST') throw new Error('V11_HOLDOUT_ACCESS_ALREADY_RECORDED');
+    throw error;
+  }
+  return accessRoot;
+}
 
 /** The arm rules, restated here from the CORPUS's own trial_list, not from the
  *  run record. An evaluation that reads the rules out of the thing it is
@@ -254,7 +286,7 @@ function wilsonIndependent(successes, trials, confidence) {
   return { lower: Math.max(0, centre - half), upper: Math.min(1, centre + half), z, confidence };
 }
 
-function decisionIndependent({ observed, lower, upper, noiseBand, alpha, confidence, familySize, direction, nullValue }) {
+export function decisionIndependent({ observed, lower, upper, noiseBand, alpha, confidence, familySize, direction, nullValue }) {
   // The frozen comparator decides a bound that lands EXACTLY on the threshold in
   // the comparison's favour, and it does so with a documented 1e-12 RELATIVE
   // epsilon. This re-implementation applies the same convention, because it is
@@ -780,25 +812,47 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
 
   // The case id is blind; the labels are opened only after both blind runs pass.
   const blind = read('corpus/s2-008-campaign/cases/holdout.blind.json');
-  const accessRoot = path.join(REPO_ROOT, `evidence/s2-008-campaign/${version}-evaluation-access`);
+  const accessRoot = path.join(REPO_ROOT, 'evidence/s2-008-campaign/' + version + '-evaluation-access');
+  // Reserve the signed one-shot production path before the sole holdout open. A
+  // crash or failed read leaves the reservation in place so a second evaluator
+  // cannot silently perform another opening.
+  if (version === 'v11') reserveV11EvaluationAccessRoot(accessRoot);
+  const registryRoot = accessRoot;
   let holdoutCases;
   let accessRows;
   let accessJournalDigest;
+  let accessJournalSha256;
+  let accessJournalPath;
+  let accessRegistryFiles = [];
+  let decisionPointForAudit;
   {
-    const ms = Date.parse(DECISION_POINT);
+    const decisionAt = version === 'v11' ? new Date() : new Date(DECISION_POINT);
+    const decisionPoint = decisionAt.toISOString();
+    decisionPointForAudit = decisionPoint;
+    const ms = decisionAt.getTime();
     let nextId = 0;
     const clock = { nowNs: () => ms * 1e6, nowMs: () => ms,
-      iso: () => DECISION_POINT, now: () => new Date(ms), nowIso: () => DECISION_POINT };
-    const registry = openRegistry({ root: accessRoot, clock, ids: { next: () => `v4-${++nextId}` } });
+      iso: () => decisionPoint, now: () => new Date(ms), nowIso: () => decisionPoint };
+    const registry = openRegistry({ root: registryRoot, clock, ids: { next: () => 'v4-' + (++nextId) } });
     const opened = readCorpus(registry, {
       partition: 'HOLDOUT', caseId: blind[0].case_id,
       unsealDigest: prereg.holdout_access.unseal_digest, corpusDir: CORPUS_DIR,
-      decisionPoint: DECISION_POINT, maxOpens: prereg.holdout_access.max_opens,
+      decisionPoint, maxOpens: prereg.holdout_access.max_opens,
       actorKind: 'EVALUATOR', releasedActorKinds: prereg.holdout_access.released_actor_kinds,
     });
     const journal = readJournal(registry);
     accessRows = journal.filter((row) => row.kind === 'ACCESS').length;
     accessJournalDigest = canonicalDigest(journal);
+    const registryFileNames = ['registry.json', 'journal.ndjson', 'head.json', 'operations.ndjson'];
+    accessRegistryFiles = registryFileNames.map((name) => {
+      const bytes = fs.readFileSync(path.join(registryRoot, name));
+      const file = 'evidence/s2-008-campaign/' + version + '-evaluation-access/' + name;
+      return { path: file, bytes: bytes.length,
+        sha256: createHash('sha256').update(bytes).digest('hex'), contents: bytes };
+    });
+    accessJournalSha256 = accessRegistryFiles.find((row) => row.path.endsWith('/journal.ndjson')).sha256;
+    accessJournalPath = 'evidence/s2-008-campaign/' + version + '-evaluation-access/journal.ndjson';
+    accessRegistryFiles = accessRegistryFiles.map(({ contents, ...row }) => row);
     if (blind.length !== prereg.holdout_access.case_count ||
         new Set(blind.map((row) => row.case_id)).size !== blind.length ||
         blind.some((row) => !Object.hasOwn(opened.labels, row.case_id))) {
@@ -828,8 +882,53 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
     campaignProbes, securityControls,
   });
   if (!evaluation.ok) throw new Error(`${evaluation.reason}:${evaluation.run ?? ''}:${evaluation.trial_id ?? ''}`);
-  const record = { ...evaluation, holdout_one_shot: { access_rows: accessRows,
-    journal_digest: accessJournalDigest, registry: path.relative(REPO_ROOT, accessRoot) } };
+  const holdoutOneShot = { access_rows: accessRows, decision_point: decisionPointForAudit,
+    journal_digest: accessJournalDigest, journal_sha256: accessJournalSha256,
+    registry_files: accessRegistryFiles,
+    registry: path.relative(REPO_ROOT, accessRoot).split(path.sep).join('/') };
+  let reviewCapsule = null;
+  if (version === 'v11') {
+    const sidecarsFor = (run) => run.trials.flatMap((trial) => trial.seeds.map((seed) => {
+      const sidecarBytes = fs.readFileSync(path.join(REPO_ROOT, seed.predictions.file));
+      return { trial_id: trial.trial_id, arm_id: trial.arm_id, seed: seed.seed,
+        path: seed.predictions.file, digest: seed.predictions.digest,
+        sha256: createHash('sha256').update(sidecarBytes).digest('hex'),
+        bytes: sidecarBytes.length, rows: seed.predictions.rows };
+    }));
+    const sourcePaths = [
+      'corpus/s2-008-campaign/preregistration.' + version + '.in-force.json',
+      'corpus/s2-008-campaign/manifest.json',
+      'corpus/s2-008-campaign/frozen-table.v3.json',
+      'corpus/s2-008-campaign/cases/holdout.blind.json',
+      'scripts/s2-008-campaign-evaluate.mjs',
+      'scripts/s2-008-campaign-bootstrap.mjs',
+    ];
+    const capsuleBody = {
+      kind: 's2-008-campaign-review-capsule/1',
+      preregistration_digest: prereg.preregistration_digest,
+      labels_digest: canonicalDigest(Object.fromEntries(holdoutCases.map((row) => [row.case_id, row.label]))),
+      case_ids: holdoutCases.map((row) => row.case_id),
+      labels: holdoutCases.map((row) => ({ case_id: row.case_id, label: row.label })),
+      source_inputs: buildV11ReviewCapsuleSourceInputs(sourcePaths.map((file) => ({
+        path: file, contents: fs.readFileSync(path.join(REPO_ROOT, file)) }))),
+      runs: [
+        { label: 'a', raw_run_id: runA.raw_run_id,
+          report_sha256: createHash('sha256').update(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-' + version + '-a.json'))).digest('hex'),
+          sidecars: sidecarsFor(runA) },
+        { label: 'b', raw_run_id: runB.raw_run_id,
+          report_sha256: createHash('sha256').update(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-' + version + '-b.json'))).digest('hex'),
+          sidecars: sidecarsFor(runB) },
+      ],
+      access: {
+        path: accessJournalPath, rows: accessRows, journal_digest: accessJournalDigest,
+        journal_sha256: accessJournalSha256, registry_files: accessRegistryFiles,
+        actor_kind: 'EVALUATOR', partition: 'HOLDOUT', one_shot: true,
+      },
+    };
+    reviewCapsule = { ...capsuleBody, digest: canonicalDigest(capsuleBody) };
+  }
+  const record = { ...evaluation, holdout_one_shot: holdoutOneShot,
+    ...(reviewCapsule ? { review_capsule: reviewCapsule } : {}) };
   fs.writeFileSync(out, `${JSON.stringify(record, null, 2)}
 `, { flag: 'wx', mode: 0o600 });
   return { verdict: record.verdict, table_verdict: record.table.verdict,

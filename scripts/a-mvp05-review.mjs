@@ -127,6 +127,75 @@ const PAID_APP = [
   '});',
 ].join('\n');
 
+
+const PAID_REVIEW_PAGE = [
+  '<!doctype html>',
+  '<html lang="ru">',
+  '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
+  '<title>S2-008 · решение рецензента</title><link rel="stylesheet" href="/style.css"></head>',
+  '<body><main>',
+  '<h1>S2-008 · просмотр и решение</h1>',
+  '<p>Провайдер: openrouter · Модель: stealth/space-bunny-alpha</p>',
+  '<p>Лимиты A и B независимы: до 5 000 000 токенов каждый. Исторические расходы показаны отдельно.</p>',
+  '<p>Совпадение A и B — только справка. Решение принимает только человек после чтения связанного снимка.</p>',
+  '<label for="token">Личный ключ владельца</label><input id="token" type="password" autocomplete="off" spellcheck="false">',
+  '<button id="open">Загрузить состояние</button><p id="status" aria-live="polite">Введите ключ владельца для просмотра.</p>',
+  '<p id="error" role="alert"></p>',
+  '<section><h2>Доказательства и журнал</h2><pre id="evidence"></pre></section>',
+  '<button id="start" disabled>Запустить локальную проверку доказательств</button>',
+  '<section id="result" hidden><h2>Результат проверки</h2><pre id="report"></pre></section>',
+  '<label for="reason">Причина решения</label><textarea id="reason" maxlength="500"></textarea>',
+  '<button id="approve" disabled>Одобрить</button><button id="changes" disabled>Запросить изменения</button>',
+  '</main><script src="/paid-review-app.js" defer></script></body></html>',
+].join('\n');
+
+const PAID_REVIEW_APP = [
+  '"use strict";',
+  'const tokenInput = document.getElementById("token");',
+  'const statusBox = document.getElementById("status");',
+  'const errorBox = document.getElementById("error");',
+  'const evidenceBox = document.getElementById("evidence");',
+  'const startButton = document.getElementById("start");',
+  'const approveButton = document.getElementById("approve");',
+  'const changesButton = document.getElementById("changes");',
+  'const reasonInput = document.getElementById("reason");',
+  'let bearer = "";',
+  'let observed = null;',
+  'async function call(path, method, body) {',
+  '  const headers = { authorization: "Bearer " + bearer };',
+  '  if (body !== undefined) headers["content-type"] = "application/json";',
+  '  const response = await fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), cache: "no-store" });',
+  '  const value = await response.json();',
+  '  if (!response.ok) throw new Error(value.code || "request failed");',
+  '  return value;',
+  '}',
+  'function show(value) { observed = value; errorBox.textContent = "";',
+  '  const labels = {PENDING:"Доказательства готовы. Нажмите кнопку, чтобы создать задачу проверки.", IN_REVIEW:"Проверьте связанный отчёт и журнал, затем выберите решение.", DONE:"Решение одобрено и сохранено в журнале.", BLOCKED:"Изменения запрошены и сохранены в журнале.", NOT_READY:"НЕ ГОТОВО. Исправьте перечисленные причины."};',
+  '  statusBox.textContent = labels[value.state] || ("Состояние: " + value.state);',
+  '  evidenceBox.textContent = JSON.stringify(value.reviewSummary || value, null, 2);',
+  '  document.getElementById("result").hidden = !value.importReport;',
+  '  document.getElementById("report").textContent = value.importReport ? JSON.stringify(value.importReport, null, 2) : "";',
+  '  startButton.disabled = !(value.ready === true && value.state === "PENDING");',
+  '  approveButton.disabled = !(value.ready === true && value.state === "IN_REVIEW");',
+  '  changesButton.disabled = !(value.ready === true && value.state === "IN_REVIEW");',
+  '}',
+  'document.getElementById("open").addEventListener("click", async () => {',
+  '  bearer = tokenInput.value.trim(); tokenInput.value = ""; errorBox.textContent = "";',
+  '  try { show(await call("/api/state", "GET")); } catch (error) { bearer = ""; errorBox.textContent = String(error.message); }',
+  '});',
+  'startButton.addEventListener("click", async () => {',
+  '  startButton.disabled = true; statusBox.textContent = "Запущена офлайн-проверка…";',
+  '  try { show(await call("/api/start", "POST", {})); } catch (error) { errorBox.textContent = String(error.message); }',
+  '});',
+  'async function decide(decision) {',
+  '  approveButton.disabled = true; changesButton.disabled = true;',
+  '  try { show(await call("/api/decision", "POST", { decision, reason: reasonInput.value.trim(), observed_manifest_digest: observed.artifactManifestDigest, expected_revision: observed.revision })); }',
+  '  catch (error) { errorBox.textContent = String(error.message); }',
+  '}',
+  'approveButton.addEventListener("click", () => decide("approve"));',
+  'changesButton.addEventListener("click", () => decide("request_changes"));',
+].join('\n');
+
 function credentialAction(credential, action) {
   return Array.isArray(credential.actions) && credential.actions.includes(action);
 }
@@ -206,7 +275,7 @@ export function hashA05ReviewToken(token) {
 }
 
 export function createA05ReviewServer({ credential, workflow, now = () => new Date(), presentation = 'local-wrapper' } = {}) {
-  if (!['local-wrapper', 'paid-campaign'].includes(presentation)) throw new TypeError('REVIEW_PRESENTATION_INVALID');
+  if (!['local-wrapper', 'paid-campaign', 'paid-evidence-review'].includes(presentation)) throw new TypeError('REVIEW_PRESENTATION_INVALID');
   if (!isPlainObject(credential)
       || !DIGEST_PATTERN.test(String(credential.tokenHash ?? ''))
       || !PRINCIPAL_PATTERN.test(String(credential.principalId ?? ''))
@@ -214,8 +283,10 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
       || !Number.isFinite(Date.parse(credential.expiresAt))
       || !Array.isArray(credential.actions)
       || credential.actions.some((action) => !ACTIONS.has(action))
+      || new Set(credential.actions).size !== credential.actions.length
       || (presentation === 'paid-campaign'
-        && (credential.actions.length !== 1 || credential.actions[0] !== 'view'))) {
+        && (credential.actions.length !== 1 || credential.actions[0] !== 'view'))
+      || (presentation === 'paid-evidence-review' && !credentialAction(credential, 'view'))) {
     throw new TypeError('REVIEW_CREDENTIAL_INVALID');
   }
   if (!isPlainObject(workflow)
@@ -268,7 +339,7 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
         return;
       }
       if (request.method === 'GET' && path.pathname === '/') {
-        respondText(200, 'text/html; charset=utf-8', presentation === 'paid-campaign' ? PAID_PAGE : PAGE);
+        respondText(200, 'text/html; charset=utf-8', presentation === 'paid-campaign' ? PAID_PAGE : presentation === 'paid-evidence-review' ? PAID_REVIEW_PAGE : PAGE);
         return;
       }
       if (request.method === 'GET' && path.pathname === '/app.js') {
@@ -280,6 +351,11 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
       if (request.method === 'GET' && path.pathname === '/paid-app.js') {
         if (presentation !== 'paid-campaign') { jsonResponse(response, 404, { code: 'NOT_FOUND' }); return; }
         respondText(200, 'text/javascript; charset=utf-8', PAID_APP);
+        return;
+      }
+      if (request.method === 'GET' && path.pathname === '/paid-review-app.js') {
+        if (presentation !== 'paid-evidence-review') { jsonResponse(response, 404, { code: 'NOT_FOUND' }); return; }
+        respondText(200, 'text/javascript; charset=utf-8', PAID_REVIEW_APP);
         return;
       }
 
@@ -326,7 +402,7 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
       }
 
       if (request.method === 'GET' && path.pathname === '/api/state') {
-        if (presentation === 'paid-campaign'
+        if (presentation === 'paid-campaign' || presentation === 'paid-evidence-review'
             ? !credentialAction(credential, 'view')
             : !credentialAction(credential, 'start') && !credentialAction(credential, 'approve')) {
           jsonResponse(response, 403, { code: 'ACTION_FORBIDDEN' });
@@ -358,7 +434,7 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
           jsonResponse(response, 400, { code: 'START_ARGUMENTS_NOT_ALLOWED' });
           return;
         }
-        if (presentation === 'paid-campaign') {
+        if (presentation === 'paid-campaign' || presentation === 'paid-evidence-review') {
           const current = await workflow.status({ principalId: credential.principalId, taskId: credential.taskId });
           if (current?.ready !== true) { jsonResponse(response, 409, { code: 'PAID_REVIEW_NOT_READY' }); return; }
         }
@@ -390,7 +466,7 @@ export function createA05ReviewServer({ credential, workflow, now = () => new Da
         principalId: credential.principalId,
         taskId: credential.taskId,
       });
-      if (presentation === 'paid-campaign' && status?.ready !== true) {
+      if ((presentation === 'paid-campaign' || presentation === 'paid-evidence-review') && status?.ready !== true) {
         jsonResponse(response, 409, { code: 'PAID_REVIEW_NOT_READY' });
         return;
       }

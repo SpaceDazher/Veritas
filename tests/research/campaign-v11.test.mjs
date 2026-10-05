@@ -260,7 +260,11 @@ test('v11 pure draft and seal bind v10 as predecessor and reject all frozen scie
   const inputs = readV11ReconciliationInputs();
   const table = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/frozen-table.v3.json', 'utf8'));
   const ledger = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/source-ledger.v3.json', 'utf8'));
-  const manifest = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json', 'utf8'));
+  const manifest = structuredClone(JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json', 'utf8')));
+  // Keep this pure predecessor test stable after v11 becomes the live manifest.
+  // The seal input is an in-memory v10 state, never a rewritten campaign file.
+  manifest.preregistration = { ...manifest.preregistration, status: 'IN_FORCE',
+    file: 'preregistration.v10.in-force.json', preregistration_digest: digest(base) };
   const measurement = base.budget_reservation.usd_reference.measurement;
   const draft = createV11Draft({ base, baseBytes, pin, measurement, ...inputs });
   assert.equal(draft.rule, 's2-008-prereg-v11');

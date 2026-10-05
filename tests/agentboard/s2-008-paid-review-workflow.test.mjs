@@ -1,21 +1,88 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createA05ReviewServer, hashA05ReviewToken } from '../../scripts/a-mvp05-review.mjs';
+import * as paid from '../../scripts/s2-008-paid-review.mjs';
+import { replayA05Journal } from '../../scripts/a-mvp05-runtime.mjs';
+import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial } from '../../scripts/s2-008-campaign-evaluate.mjs';
+import * as evaluator from '../../scripts/s2-008-campaign-evaluate.mjs';
+import { createHash } from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { contentCommitmentOf } from '../../scripts/s2-008-campaign-model-image.mjs';
+import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 
 const TOKEN = 'fixture-only-paid-review-action-token';
 const OWNER = 'prn-s2007r-owner';
-const TASK = 'abt-s2-008-v11-paid-review';
+const TASK = 'abt-s2-008-v11-fixture-012345abcdef';
 const DIGEST = 'a'.repeat(64);
 
-test('fixture-only paid review uses the authenticated human start and snapshot decision protocol', async (t) => {
+test('v11 evaluator source-input producer matches the paid-review capsule consumer', () => {
+  const paths = [
+    'corpus/s2-008-campaign/preregistration.v11.in-force.json',
+    'corpus/s2-008-campaign/manifest.json',
+    'corpus/s2-008-campaign/frozen-table.v3.json',
+    'corpus/s2-008-campaign/cases/holdout.blind.json',
+    'scripts/s2-008-campaign-evaluate.mjs',
+    'scripts/s2-008-campaign-bootstrap.mjs',
+  ];
+  const entries = paths.map((path, index) => ({ path, contents: Buffer.from('capsule-source-' + index) }));
+  assert.equal(typeof evaluator.buildV11ReviewCapsuleSourceInputs, 'function');
+  assert.equal(typeof paid.validateS2PaidReviewCapsuleSourceInputs, 'function');
+  const emitted = evaluator.buildV11ReviewCapsuleSourceInputs(entries);
+  assert.deepEqual(emitted, entries.map(({ path, contents }) => ({ path,
+    bytes: contents.length, sha256: createHash('sha256').update(contents).digest('hex') })));
+  assert.equal(paid.validateS2PaidReviewCapsuleSourceInputs(emitted, emitted).ok, true);
+  const changed = structuredClone(emitted);
+  changed[0].bytes += 1;
+  assert.equal(paid.validateS2PaidReviewCapsuleSourceInputs(changed, emitted).ok, false);
+});
+
+test('v11 run readiness uses measured per-seed outcomes from the actual root report schema', () => {
+  const report = {
+    status: 'MEASURED', unreconciled_spend: false, spent_units_is_lower_bound: false,
+    model_calls_is_lower_bound: false, unknown_model_attempts: 0,
+    trials: [
+      { trial_id: 'trl-s2-008c-01', arm_id: 'arm-model-zai-glm53flash', seeds: [20260926, 20260927, 20260928] },
+      { trial_id: 'trl-s2-008c-02', arm_id: 'arm-type-feat-fix', seeds: [20260926, 20260927, 20260928] },
+      { trial_id: 'trl-s2-008c-03', arm_id: 'arm-type-chore', seeds: [20260926, 20260927, 20260928] },
+    ].map((trial) => ({ ...trial, seeds: trial.seeds.map((seed) => ({ seed,
+      outcome_class: 'MEASURED', launch: { exit_code: 0, signal: null, timed_out: false } })) })),
+  };
+  const input = { report, accounting: { modelRows: 378, controlRows: 756, rows: 1134 },
+    reconciliation: { valid: true, unreconciledAttempts: 0 } };
+  assert.equal(typeof paid.validateS2PaidReviewRunReadiness, 'function');
+  assert.equal(paid.validateS2PaidReviewRunReadiness(input).ok, true,
+    'the real root report has status but no root outcome_class; validated seed outcomes carry measurement status');
+  const incompleteSeed = structuredClone(input);
+  incompleteSeed.report.trials[1].seeds[2].outcome_class = 'INFRA';
+  assert.equal(paid.validateS2PaidReviewRunReadiness(incompleteSeed).ok, false);
+  const lowerBound = structuredClone(input);
+  lowerBound.report.spent_units_is_lower_bound = true;
+  assert.equal(paid.validateS2PaidReviewRunReadiness(lowerBound).ok, false);
+});
+
+test('v11 holdout access-root reservation is exclusive and durable before opening', () => {
+  assert.equal(typeof evaluator.reserveV11EvaluationAccessRoot, 'function');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-v11-access-reservation-'));
+  try {
+    const accessRoot = path.join(root, 'v11-evaluation-access');
+    assert.equal(evaluator.reserveV11EvaluationAccessRoot(accessRoot), accessRoot);
+    assert.equal(fs.statSync(accessRoot).isDirectory(), true);
+    assert.throws(() => evaluator.reserveV11EvaluationAccessRoot(accessRoot), /V11_HOLDOUT_ACCESS_ALREADY_RECORDED/);
+    assert.equal(fs.statSync(accessRoot).isDirectory(), true, 'a failed second attempt cannot release the one-shot reservation');
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+test('fixture-only review uses a distinct task and permits only the owner request-changes decision', async (t) => {
   const credential = {
     tokenHash: hashA05ReviewToken(TOKEN),
     principalId: OWNER,
     taskId: TASK,
     expiresAt: new Date(Date.now() + 60_000).toISOString(),
-    actions: ['view', 'start', 'approve', 'request_changes'],
+    actions: ['view', 'start', 'request_changes'],
   };
-  let task = { state: 'PENDING', ready: true, revision: 1,
+  let task = { state: 'PENDING', ready: true, fixture_only: true, revision: 1,
     producerPrincipalId: 'prn-s2-008-evidence-importer' };
   let starts = 0;
   let decisions = 0;
@@ -34,11 +101,11 @@ test('fixture-only paid review uses the authenticated human start and snapshot d
     async decide({ principalId, taskId, decision, observed }) {
       assert.equal(principalId, OWNER);
       assert.equal(taskId, TASK);
-      assert.equal(decision, 'approve');
+      assert.equal(decision, 'request_changes');
       assert.deepEqual(observed, { artifactManifestDigest: DIGEST, taskRevision: 2 });
       decisions += 1;
-      task = { ...task, state: 'DONE', revision: 3 };
-      return { ...(await this.status()), decisionReceipt: { actor: OWNER, fixture_test_only: true } };
+      task = { ...task, state: 'BLOCKED', revision: 3 };
+      return { ...(await this.status()), decisionReceipt: { actor: OWNER, fixture_only: true } };
     },
   };
   const server = createA05ReviewServer({ credential, workflow, presentation: 'paid-evidence-review' });
@@ -58,7 +125,7 @@ test('fixture-only paid review uses the authenticated human start and snapshot d
 
   const stateResponse = await fetch(origin + '/api/state', { headers });
   assert.equal(stateResponse.status, 200);
-  assert.equal((await stateResponse.json()).state, 'PENDING');
+  assert.equal((await stateResponse.json()).fixture_only, true);
   const started = await fetch(origin + '/api/start', {
     method: 'POST', headers: { ...headers, origin, 'content-type': 'application/json' }, body: '{}',
   });
@@ -68,19 +135,23 @@ test('fixture-only paid review uses the authenticated human start and snapshot d
 
   const decided = await fetch(origin + '/api/decision', {
     method: 'POST', headers: { ...headers, origin, 'content-type': 'application/json' },
-    body: JSON.stringify({ decision: 'approve', reason: 'Reviewed the bound paid evidence snapshot.',
+    body: JSON.stringify({ decision: 'request_changes', reason: 'Fixture only; verify exact snapshot binding.',
       observed_manifest_digest: DIGEST, expected_revision: 2 }),
   });
   assert.equal(decided.status, 200);
   const receipt = await decided.json();
-  assert.equal(receipt.state, 'DONE');
+  assert.equal(receipt.state, 'BLOCKED');
   assert.equal(receipt.decisionReceipt.actor, OWNER);
+  assert.equal(receipt.decisionReceipt.fixture_only, true);
+
+  const deniedApproval = await fetch(origin + '/api/decision', {
+    method: 'POST', headers: { ...headers, origin, 'content-type': 'application/json' },
+    body: JSON.stringify({ decision: 'approve', reason: 'Must never approve fixture.', observed_manifest_digest: DIGEST, expected_revision: 2 }),
+  });
+  assert.equal(deniedApproval.status, 403);
   assert.equal(starts, 1);
   assert.equal(decisions, 1);
 });
-
-import * as paid from '../../scripts/s2-008-paid-review.mjs';
-import { replayA05Journal } from '../../scripts/a-mvp05-runtime.mjs';
 
 test('fixture-only successful checks require command, test summaries, and an observed zero exit', () => {
   const good = [
@@ -186,9 +257,9 @@ test('fixture-only v11 reconciliation binds each receipt to the local generation
     (error) => error.code === 'V11_RECONCILIATION_COMPLETENESS_INVALID');
 });
 
-test('fixture-only review task binds owner and distinct producer and the journal head', () => {
+test('paid review task binds owner, distinct producer, the small offline grant, and journal head', () => {
   const task = paid.buildS2PaidReviewTask({
-    version: 11, taskId: TASK, workspaceId: 'ws-s2-008-v11-paid-review',
+    version: 11, taskId: 'abt-s2-008-v11-paid-review', workspaceId: 'ws-s2-008-v11-paid-review',
     evidenceDigest: DIGEST, imageId: 'sha256:' + 'b'.repeat(64),
     ownerPrincipalId: OWNER, producerPrincipalId: 'prn-s2-008-evidence-importer',
     adapterId: 'adr-s2-008-v11-importer', at: '2026-10-04T12:00:00.000Z',
@@ -213,6 +284,229 @@ test('production v11 stays not ready for missing A/B evidence without an unavail
   assert.equal(evidence.reasons.includes('RUN_B_MISSING'), true);
   assert.equal(evidence.campaign.history.priorKnownCampaignTokens, 23168);
   const workflow = paid.createS2PaidReviewWorkflow({ pool: null });
-  await assert.rejects(workflow.start({ principalId: OWNER, taskId: TASK }),
+  assert.equal(Object.isFrozen(workflow), true);
+  const view = await workflow.status({ principalId: OWNER, taskId: 'abt-s2-008-v11-paid-review' });
+  assert.equal(view.reviewSummary.campaign.version, 11);
+  assert.equal(view.importReport, null);
+  await assert.rejects(workflow.start({ principalId: OWNER, taskId: 'abt-s2-008-v11-paid-review' }),
     (error) => error.code === 'PAID_REVIEW_NOT_READY');
+});
+
+
+test('fixture-only verifier replays the existing bootstrap from all primary predictions', () => {
+  const holdoutCases = Array.from({ length: 126 }, (_unused, index) => ({
+    case_id: 'case-' + index, label: index < 63 ? 'MAJOR' : 'MINOR',
+  }));
+  const trials = [
+    { trial_id: 'trl-s2-008c-01', arm_id: 'arm-model-zai-glm53flash' },
+    { trial_id: 'trl-s2-008c-02', arm_id: 'arm-type-feat-fix' },
+    { trial_id: 'trl-s2-008c-03', arm_id: 'arm-type-chore' },
+  ];
+  const seeds = [20260926, 20260927, 20260928];
+  const prereg = {
+    seed_rule: { seeds, point_estimate: 'OBSERVED_RATE_SEED_INVARIANT' },
+    noise_rule: { band: 0.02 },
+    multiplicity_rule: { alpha: 0.05, confidence: 0.9833333333333333,
+      family_size: 3, direction: 'two_sided', null_value: 0.5, bootstrap_samples: 200 },
+  };
+  const predictionRowsByArm = {};
+  const runReports = {};
+  const evaluation = {
+    kind: 's2-008-campaign-v11-evaluation/1',
+    verdict: 'PENDING_HUMAN_REVIEW',
+    prediction_source: 'IMMUTABLE_RUN_SIDECARS',
+    deterministic_evaluation: { verdict: 'AGREES', remarks: [] },
+    table: { verdict: 'AGREES' },
+    reproducibility: { same_base: true, distinct_raw_run_ids: true },
+    runs: [],
+  };
+  const base = { commit_sha: 'c'.repeat(40), tree_sha: 'd'.repeat(40) };
+  for (const arm of ['a', 'b']) {
+    const rows = [];
+    const vectors = [];
+    const perSeedByTrial = new Map();
+    for (const entry of trials) for (const seed of seeds) {
+      const cell = holdoutCases.map((item, index) => {
+        let predicted = item.label;
+        if (arm === 'b' && entry.trial_id === trials[0].trial_id && index === 0) predicted = 'UNPARSED';
+        return { trial_id: entry.trial_id, arm_id: entry.arm_id, seed,
+          case_id: item.case_id, predicted };
+      });
+      const predictionDigest = canonicalDigest(cell);
+      rows.push(...cell.map((row) => ({ ...row, prediction_digest: predictionDigest })));
+      const score = scoreRecordedPredictions({
+        rows: cell, labels: new Map(holdoutCases.map((item) => [item.case_id, item.label])),
+        expectedIds: holdoutCases.map((item) => item.case_id),
+      });
+      const agreement = holdoutCases.map((item) => cell.find((row) => row.case_id === item.case_id)?.predicted === item.label ? 1 : 0);
+      perSeedByTrial.set(entry.trial_id, [...(perSeedByTrial.get(entry.trial_id) ?? []), {
+        seed, agreeing: score.agreeing, denominator: score.rows,
+        observed: score.agreeing / score.rows, unparsed: score.unparsed,
+        prediction_digest: predictionDigest,
+      }]);
+      vectors.push({ trial_id: entry.trial_id + '@' + seed, arm_id: entry.arm_id, agreement });
+    }
+    predictionRowsByArm[arm] = rows;
+    const bootstrap = paid.runS2PaidReviewBootstrap({
+      vectors, seeds, samples: prereg.multiplicity_rule.bootstrap_samples,
+      confidence: prereg.multiplicity_rule.confidence,
+    });
+    const scoredTrials = trials.map((entry) => {
+      const perSeed = perSeedByTrial.get(entry.trial_id);
+      const bootstrapRows = perSeed.map((row) => {
+        const result = bootstrap.results.find((item) => item.trial_id === entry.trial_id + '@' + row.seed
+          && item.arm_id === entry.arm_id && item.seed === row.seed);
+        return { ...result, trial_id: entry.trial_id };
+      });
+      const scored = scoreV4Trial({ entry, per_seed: perSeed, bootstrapRows, prereg });
+      assert.equal(scored.ok, true);
+      return scored;
+    });
+    const numerator = scoredTrials.reduce((sum, row) => sum + row.agreeing, 0);
+    const denominator = scoredTrials.reduce((sum, row) => sum + row.denominator, 0);
+    const interval = { lower: Math.min(...scoredTrials.map((row) => row.interval.lower)),
+      upper: Math.max(...scoredTrials.map((row) => row.interval.upper)) };
+    const decision = decisionIndependent({
+      observed: numerator / denominator, lower: interval.lower, upper: interval.upper,
+      noiseBand: prereg.noise_rule.band, alpha: prereg.multiplicity_rule.alpha,
+      confidence: prereg.multiplicity_rule.confidence, familySize: prereg.multiplicity_rule.family_size,
+      direction: prereg.multiplicity_rule.direction, nullValue: prereg.multiplicity_rule.null_value,
+    });
+    const projection = { trials: scoredTrials.map((row) => ({
+      trial_id: row.trial_id, agreeing: row.agreeing, denominator: row.denominator,
+      interval: row.interval, outcome: row.outcome,
+    })), campaign: decision.decision };
+    const rawRunId = 'run-' + arm;
+    runReports[arm] = { raw_run_id: rawRunId, spent_units: 0, model_calls: 0, base, trials: [] };
+    evaluation.runs.push({
+      label: arm, raw_run_id: rawRunId, spent_units: 0, model_calls: 0, base,
+      bootstrap: { record: { real_start: { proven: true } }, output_digest: canonicalDigest(bootstrap) },
+      trials: scoredTrials,
+      pooled: { numerator, denominator, observed: numerator / denominator, interval, decision },
+      decision_digest: canonicalDigest(projection),
+    });
+  }
+  evaluation.reproducibility.same_decision_digest =
+    evaluation.runs[0].decision_digest === evaluation.runs[1].decision_digest;
+  const input = { evaluation, runReports, predictionRowsByArm, holdoutCases, prereg, capsuleVerified: true };
+  assert.equal(paid.validateS2PaidReviewEvaluation(input).ok, true,
+    'A/B may differ; each evaluation is independently rederived from the primary sidecars');
+
+  const alteredCount = structuredClone(input);
+  alteredCount.evaluation.runs[0].trials[0].agreeing += 1;
+  assert.equal(paid.validateS2PaidReviewEvaluation(alteredCount).ok, false);
+
+  const alteredDecision = structuredClone(input);
+  const recordedDecision = alteredDecision.evaluation.runs[1].trials[1].decision.decision;
+  alteredDecision.evaluation.runs[1].trials[1].decision.decision = recordedDecision === 'POSITIVE' ? 'NEGATIVE' : 'POSITIVE';
+  assert.notEqual(alteredDecision.evaluation.runs[1].trials[1].decision.decision, recordedDecision);
+  assert.equal(paid.validateS2PaidReviewEvaluation(alteredDecision).ok, false);
+
+  const unparsedDisagreement = structuredClone(input);
+  unparsedDisagreement.predictionRowsByArm.a[0].predicted = 'UNPARSED';
+  assert.equal(paid.validateS2PaidReviewEvaluation(unparsedDisagreement).ok, false);
+
+  const forgedInterval = structuredClone(input);
+  const forgedRun = forgedInterval.evaluation.runs[0];
+  const changedTrial = forgedRun.trials[0];
+  changedTrial.per_seed.forEach((row) => { row.interval = { lower: 0.99, upper: 0.99 }; });
+  changedTrial.interval = { lower: 0.99, upper: 0.99, method: 'HULL_OF_ALL_SEED_INTERVALS' };
+  const pooledLower = Math.min(...forgedRun.trials.map((row) => row.interval.lower));
+  const pooledUpper = Math.max(...forgedRun.trials.map((row) => row.interval.upper));
+  forgedRun.pooled.interval = { lower: pooledLower, upper: pooledUpper };
+  const changedDecision = decisionIndependent({
+    observed: forgedRun.pooled.observed, lower: pooledLower, upper: pooledUpper,
+    noiseBand: prereg.noise_rule.band, alpha: prereg.multiplicity_rule.alpha,
+    confidence: prereg.multiplicity_rule.confidence, familySize: prereg.multiplicity_rule.family_size,
+    direction: prereg.multiplicity_rule.direction, nullValue: prereg.multiplicity_rule.null_value,
+  });
+  forgedRun.pooled.decision = changedDecision;
+  const forgedProjection = { trials: forgedRun.trials.map((row) => ({
+    trial_id: row.trial_id, agreeing: row.agreeing, denominator: row.denominator,
+    interval: row.interval, outcome: row.outcome,
+  })), campaign: changedDecision.decision };
+  forgedRun.decision_digest = canonicalDigest(forgedProjection);
+  forgedInterval.evaluation.reproducibility.same_decision_digest =
+    forgedInterval.evaluation.runs[0].decision_digest === forgedInterval.evaluation.runs[1].decision_digest;
+  assert.equal(forgedInterval.evaluation.deterministic_evaluation.verdict, 'AGREES');
+  assert.equal(paid.validateS2PaidReviewEvaluation(forgedInterval).ok, false,
+    'A coherent interval and decision rewrite still fails the bootstrap replay.');
+});
+
+test('fixture-only blind holdout index accepts the frozen integer commitment timestamps without reading labels', () => {
+  const rows = Array.from({ length: 126 }, (_unused, index) => ({
+    case_id: 'case-' + index,
+    subject: 'fix: example ' + index,
+    committed_at: 1790000000000 + index,
+  }));
+  const declared = rows.map((row) => row.case_id);
+  assert.deepEqual(paid.validateS2PaidReviewBlindIndex(rows, declared), { ok: true, caseIds: declared });
+  const malformed = structuredClone(rows);
+  malformed[0].committed_at = '2026-10-05T00:00:00.000Z';
+  assert.equal(paid.validateS2PaidReviewBlindIndex(malformed, declared).ok, false);
+});
+
+
+test('fixture-only v11 image pin rederives both build commitments and source bindings', () => {
+  const sources = {
+    arm: 'a'.repeat(64), blind: 'b'.repeat(64), prereg: 'c'.repeat(64), recipe: 'd'.repeat(64),
+  };
+  const commitment = contentCommitmentOf(sources);
+  const first = {
+    imageId: 'sha256:' + '1'.repeat(64), digest: 'sha256:' + '2'.repeat(64),
+    source_digest: canonicalDigest(sources),
+    content_commitment: commitment.digest, content_commitment_covers: commitment.covers, sources,
+  };
+  const pin = {
+    schema: 's2-008-model-image-pin/11',
+    commitment: { field: 'executor.model_image.content_commitment', covers: commitment.covers, excludes: ['prereg'] },
+    first, second: structuredClone(first), identical: true, context_digest_stable: true,
+    content_commitment_stable: true, commitment_excludes_preregistration: true,
+  };
+  assert.equal(paid.validateS2PaidReviewPin({
+    pin, preregistrationSha256: sources.prereg, blindSha256: sources.blind,
+  }).ok, true);
+  const forged = structuredClone(pin);
+  forged.first.sources.arm = 'e'.repeat(64);
+  assert.equal(paid.validateS2PaidReviewPin({
+    pin: forged, preregistrationSha256: sources.prereg, blindSha256: sources.blind,
+  }).ok, false);
+});
+
+test('fixture-only dry-run refuses absent accounting fields instead of treating them as zero', () => {
+  const preregistrationDigest = 'a'.repeat(64);
+  const imagePin = { imageId: 'sha256:' + '1'.repeat(64), digest: 'sha256:' + '2'.repeat(64),
+    content_commitment: '3'.repeat(64) };
+  const dry = {
+    status: 'DRY_RUN', dry_run: true, raw_run_id: 'dry-run-a', nonce: 'dry-nonce-a',
+    preregistration_digest: preregistrationDigest,
+    model_image_pin: imagePin, spent_units: 0, spent_units_is_lower_bound: false,
+    unreconciled_spend: false, model_calls: 0, model_calls_is_lower_bound: false,
+    unknown_model_attempts: 0, unknown_launch_attempts: 0, launches: 9,
+    charges: Array.from({ length: 9 }, () => ({ units: 0 })),
+    reservation: { currency: 'tokens', granted_units: 5000000 },
+    base: { commit_sha: 'c'.repeat(40), tree_sha: 'd'.repeat(40) },
+    trials: [
+      { trial_id: 'trl-s2-008c-01', arm_id: 'arm-model-zai-glm53flash' },
+      { trial_id: 'trl-s2-008c-02', arm_id: 'arm-type-feat-fix' },
+      { trial_id: 'trl-s2-008c-03', arm_id: 'arm-type-chore' },
+    ].map((trial) => ({ ...trial, seeds: [20260926,20260927,20260928].map((seed) => ({
+      seed, outcome_class: 'DRY_RUN', launch: {
+        exit_code: 0, signal: null, timed_out: false, container_argv: ['run','--network=none'],
+        image: imagePin.imageId, image_digest: imagePin.digest,
+        arm_report: { dry_run: true, outcome_class: 'DRY_RUN', n_cases: 126,
+          predictions: Array.from({ length: 126 }, (_unused, caseIndex) => ({ case_id: 'c' + caseIndex, predicted: 'MINOR' })),
+          accounting: [], stop: null, executor: { model_calls: 0, model_attempts: 0, unknown_model_attempts: 0,
+            provider: 'openrouter', model: 'stealth/space-bunny-alpha', credential_present: false, credential_in_argv: false, egress_route: null } },
+      },
+    })) })),
+  };
+  const input = { dry, preregistrationDigest, pin: imagePin, expectedBase: { commit: dry.base.commit_sha, tree: dry.base.tree_sha } };
+  assert.equal(paid.validateS2PaidReviewDryRun(input).ok, true);
+  const missingSpend = structuredClone(input);
+  delete missingSpend.dry.spent_units;
+  assert.equal(paid.validateS2PaidReviewDryRun(missingSpend).ok, false);
+  const missingCalls = structuredClone(input);
+  delete missingCalls.dry.model_calls;
+  assert.equal(paid.validateS2PaidReviewDryRun(missingCalls).ok, false);
 });

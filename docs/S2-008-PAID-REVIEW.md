@@ -1,0 +1,74 @@
+# S2-008 — локальная проверка доказательств и A-MVP-05
+
+Компонент готовит связанный снимок для решения владельца. Он не запускает
+модель и не заменяет человеческое ревью. Production workflow поддерживает v11;
+срок подписанного бюджета закончился 5 октября 2026 года в 00:00 UTC.
+Продолжение платной кампании требует новой подписанной версии.
+
+## Компоненты
+
+- `scripts/s2-008-paid-review.mjs`: проверка исходных отчётов A/B, всех seed,
+  prediction sidecars, provider receipts, сверки расходов, пина, dry-run, проб,
+  обязательных проверок, независимой оценки и сравнения A/B.
+- `scripts/s2-008-paid-review-workflow.mjs`: staging неизменяемого снимка,
+  изолированный импорт, PostgreSQL AgentBoard и решение владельца,
+  связанное с SHA-256 артефакта и ревизией задачи.
+- `scripts/s2-008-paid-review-import.mjs`: отдельный офлайн-импортер снимка.
+- `scripts/a-mvp05-review.mjs`: HTTP на loopback с bearer-авторизацией,
+  проверкой Host и Origin. Старый paid-campaign интерфейс остаётся просмотром.
+
+## Порядок
+
+```bash
+source scripts/setup-podman-tmp.sh
+node scripts/s2-008-paid-review.mjs --inspect
+node scripts/s2-008-paid-review.mjs --init
+node scripts/s2-008-paid-review.mjs --serve
+```
+
+`--inspect` сообщает `ready: false` и причины, пока комплект отсутствует.
+`--init` создаёт личные файлы доступа с закрытыми правами в
+`~/.local/state/veritas/s2-008-paid-review/v11/`; значение токена не печатается.
+`--serve` открывает `http://127.0.0.1:8787`. Владелец вводит личный токен,
+читает доказательства, запускает локальную проверку и выбирает решение.
+Просроченные credential-файлы не заменяются молча.
+
+После START используется закреплённая Node-база, а не модельный образ:
+`--network=none`, read-only root, вход и исходник только для чтения,
+ограничения памяти, процессов и CPU. Импортер не получает API-ключей;
+его наблюдаемый отчёт содержит нулевые model_calls и tokens.
+Локальный AgentBoard grant в USD ограничивает импорт; он не является
+разрешением на модельные расходы и не меняет бюджеты A/B.
+
+Production задача проходит READY → RUNNING → IN_REVIEW. Авторизованное
+человеческое решение переводит её в DONE или BLOCKED и сохраняется отдельно.
+START и решение имеют неизменяемые intent-записи: неизвестный результат
+требует сверки, автоматического повторного запуска нет.
+
+## Holdout и независимая оценка
+
+Единственное раскрытие выполняет campaign evaluator после A/B и проб.
+Production путь реестра эксклюзивно резервируется до `readCorpus`; сбой оставляет
+резервацию. Evaluator сохраняет review capsule, размеры и SHA-256 исходников,
+prediction sidecars, раскрытые метки и привязанные файлы журнала доступа.
+Review проверяет уже выпущенный снимок и воспроизводит научное решение
+из подписанных констант. Повторного чтения запечатанных меток нет.
+
+UNPARSED учитывается отдельно как несогласие. Совпадение A/B показывается
+дополнительно и не заменяет научный критерий. Отсутствующий расход не становится
+нулём; незакрытые model attempts блокируют готовность.
+
+## Проверки
+
+Полный test и research-команды используют общие scratch-каталоги;
+запускайте их последовательно с podman-обёрткой в PATH.
+
+```bash
+node --test --test-concurrency=1 tests/agentboard/s2-008-paid-review-import.test.mjs tests/agentboard/s2-008-paid-review-workflow.test.mjs tests/agentboard/s2-008-paid-review.test.mjs tests/research/campaign-v11.test.mjs
+S2_008_PAID_REVIEW_INTEGRATION=1 node --test --test-concurrency=1 tests/agentboard/s2-008-paid-review.integration.test.mjs
+```
+
+Интеграционная проверка использует отдельные случайные fixture-идентификаторы,
+реальные PostgreSQL, HTTP и контейнер. Она завершает только fixture в BLOCKED
+через request_changes; approve запрещён. Это не закрывает A-MVP-05 для платной
+кампании. Пропуск opt-in проверки не является доказательством запуска.
