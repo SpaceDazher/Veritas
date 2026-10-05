@@ -274,22 +274,50 @@ test('paid review task binds owner, distinct producer, the small offline grant, 
 });
 
 
-test('production v11 stays not ready for missing A/B evidence without an unavailable-workflow blocker', async () => {
-  const evidence = paid.inspectS2PaidReviewEvidence();
-  assert.equal(evidence.version, 11);
-  assert.equal(evidence.ready, false);
-  assert.equal(evidence.state, 'NOT_READY');
-  assert.equal(evidence.reasons.includes('PAID_REVIEW_WORKFLOW_UNAVAILABLE'), false);
-  assert.equal(evidence.reasons.includes('RUN_A_MISSING'), true);
-  assert.equal(evidence.reasons.includes('RUN_B_MISSING'), true);
-  assert.equal(evidence.campaign.history.priorKnownCampaignTokens, 23168);
-  const workflow = paid.createS2PaidReviewWorkflow({ pool: null });
-  assert.equal(Object.isFrozen(workflow), true);
-  const view = await workflow.status({ principalId: OWNER, taskId: 'abt-s2-008-v11-paid-review' });
-  assert.equal(view.reviewSummary.campaign.version, 11);
-  assert.equal(view.importReport, null);
-  await assert.rejects(workflow.start({ principalId: OWNER, taskId: 'abt-s2-008-v11-paid-review' }),
-    (error) => error.code === 'PAID_REVIEW_NOT_READY');
+test('isolated active-v12 evidence root stays not ready when its A/B records are absent', async () => {
+  const evidenceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-v12-review-missing-'));
+  const sourceRoot = process.cwd();
+  const copiedPaths = [
+    'corpus/s2-008-campaign/manifest.json',
+    'corpus/s2-008-campaign/preregistration.v12.in-force.json',
+    'evidence/s2-008-campaign/reconciliation-v8-a.json',
+    'evidence/s2-008-campaign/reconciliation-v9-a.json',
+    'evidence/s2-008-campaign/reconciliation-v10-a.json',
+    'evidence/s2-008-campaign/run-v10-a.json',
+    'evidence/s2-008-campaign/stopped-v10-a.json',
+  ];
+  try {
+    for (const relative of copiedPaths) {
+      const target = path.join(evidenceRoot, relative);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.copyFileSync(path.join(sourceRoot, relative), target);
+    }
+    const evidence = paid.inspectS2PaidReviewEvidence(evidenceRoot);
+    assert.equal(evidence.version, 12);
+    assert.equal(evidence.reasons.includes('ACTIVE_PREREGISTRATION_INVALID'), false);
+    assert.equal(evidence.campaign.history.v10RestartReconciliationBinding.status, 'RECONCILED');
+    assert.equal(evidence.ready, false);
+    assert.equal(evidence.state, 'NOT_READY');
+    assert.equal(evidence.reasons.includes('PAID_REVIEW_WORKFLOW_UNAVAILABLE'), false);
+    assert.equal(evidence.reasons.includes('RUN_A_MISSING'), true);
+    assert.equal(evidence.reasons.includes('RUN_B_MISSING'), true);
+    assert.equal(evidence.campaign.history.priorKnownCampaignTokens, 23168);
+    assert.equal(fs.existsSync(path.join(evidenceRoot, 'evidence/s2-008-campaign/run-v12-a.json')), false);
+    assert.equal(fs.existsSync(path.join(evidenceRoot, 'evidence/s2-008-campaign/run-v12-b.json')), false);
+
+    const workflow = paid.createS2PaidReviewWorkflow({
+      pool: null, evidenceRoot, version: evidence.version, stateRoot: path.join(evidenceRoot, 'review-state'),
+    });
+    assert.equal(Object.isFrozen(workflow), true);
+    const taskId = 'abt-s2-008-v12-paid-review';
+    const view = await workflow.status({ principalId: OWNER, taskId });
+    assert.equal(view.reviewSummary.campaign.version, evidence.version);
+    assert.equal(view.importReport, null);
+    await assert.rejects(workflow.start({ principalId: OWNER, taskId }),
+      (error) => error.code === 'PAID_REVIEW_NOT_READY');
+  } finally {
+    fs.rmSync(evidenceRoot, { recursive: true, force: true });
+  }
 });
 
 
