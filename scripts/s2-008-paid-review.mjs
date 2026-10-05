@@ -13,10 +13,11 @@ import { PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
 import { BASE_IMAGE } from '../src/lib/isolation/image.mjs';
 import { replayA05Journal, setupA05Database } from './a-mvp05-runtime.mjs';
 import { createA05ReviewServer, hashA05ReviewToken } from './a-mvp05-review.mjs';
-import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
+import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, validateV12ProbeEvidence, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
 import { contentCommitmentOf } from './s2-008-campaign-model-image.mjs';
 import { openRegistry, readJournal, verifyChain } from '../src/lib/research/registry.mjs';
 import { createS2PaidReviewWorkflow as createPaidWorkflow, isTrustedS2PaidReviewWorkflow } from './s2-008-paid-review-workflow.mjs';
+import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation, inspectV11PriorExecutionEvidence } from './s2-008-campaign-v12-approval.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BOOTSTRAP_SCRIPT = path.join(ROOT, 'scripts/s2-008-campaign-bootstrap.mjs');
@@ -43,17 +44,21 @@ const V11_CAPSULE_SOURCE_PATHS = Object.freeze([
   'scripts/s2-008-campaign-evaluate.mjs',
   'scripts/s2-008-campaign-bootstrap.mjs',
 ]);
+const capsuleSourcePaths = (version) => V11_CAPSULE_SOURCE_PATHS.map((value) =>
+  version === 12 && value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
+    ? 'corpus/s2-008-campaign/preregistration.v12.in-force.json' : value);
+const isCapsuleVersion = (version) => version === 11 || version === 12;
 
-export function validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, sourceInputs) {
+export function validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, sourceInputs, { version = 11 } = {}) {
   try {
-    if (!Array.isArray(capsuleInputs) || !Array.isArray(sourceInputs)
-        || capsuleInputs.length !== V11_CAPSULE_SOURCE_PATHS.length
-        || sourceInputs.length !== V11_CAPSULE_SOURCE_PATHS.length
+    const paths = capsuleSourcePaths(version);
+    if (!isCapsuleVersion(version) || !Array.isArray(capsuleInputs) || !Array.isArray(sourceInputs)
+        || capsuleInputs.length !== paths.length || sourceInputs.length !== paths.length
         || canonicalDigest(capsuleInputs) !== canonicalDigest(sourceInputs)) return { ok: false };
-    for (let index = 0; index < V11_CAPSULE_SOURCE_PATHS.length; index += 1) {
+    for (let index = 0; index < paths.length; index += 1) {
       for (const row of [capsuleInputs[index], sourceInputs[index]]) {
         if (!row || Object.keys(row).sort().join(',') !== 'bytes,path,sha256'
-            || row.path !== V11_CAPSULE_SOURCE_PATHS[index]
+            || row.path !== paths[index]
             || !Number.isSafeInteger(row.bytes) || row.bytes < 1
             || !DIGEST_RE.test(row.sha256 ?? '')) return { ok: false };
       }
@@ -169,9 +174,9 @@ export function verifyS2PaidReviewCoverage({ trialList, seeds, holdoutCaseIds, o
 }
 
 export function deriveS2PaidReviewComparison({
-  preregistrationDigest, holdoutCaseIds, aPredictions, bPredictions,
+  preregistrationDigest, holdoutCaseIds, aPredictions, bPredictions, version = 11,
 } = {}) {
-  if (typeof preregistrationDigest !== 'string' || !DIGEST_RE.test(preregistrationDigest)
+  if (!isCapsuleVersion(version) || typeof preregistrationDigest !== 'string' || !DIGEST_RE.test(preregistrationDigest)
       || !Array.isArray(holdoutCaseIds) || holdoutCaseIds.length !== 126
       || new Set(holdoutCaseIds).size !== 126
       || holdoutCaseIds.some((id) => typeof id !== 'string' || id.length < 1 || id.length > 200)
@@ -253,7 +258,7 @@ export function deriveS2PaidReviewComparison({
   }
   return {
     kind: 's2-008-campaign-comparison/1',
-    version: 11,
+    version,
     preregistration_digest: preregistrationDigest,
     prediction_source: 'IMMUTABLE_RUN_SIDECARS',
     scope: {
@@ -283,9 +288,9 @@ export function deriveS2PaidReviewComparison({
 }
 
 export function validateS2PaidReviewComparison({
-  comparison, preregistrationDigest, holdoutCaseIds, aPredictions, bPredictions,
+  comparison, preregistrationDigest, holdoutCaseIds, aPredictions, bPredictions, version = 11,
 } = {}) {
-  const expected = deriveS2PaidReviewComparison({ preregistrationDigest, holdoutCaseIds, aPredictions, bPredictions });
+  const expected = deriveS2PaidReviewComparison({ preregistrationDigest, holdoutCaseIds, aPredictions, bPredictions, version });
   if (!comparison || canonicalDigest(comparison) !== canonicalDigest(expected)) fail('PAID_REVIEW_COMPARISON_INVALID');
   return true;
 }
@@ -300,11 +305,12 @@ function canonicalInstant(value) {
   return Number.isFinite(date.getTime()) && date.toISOString() === value;
 }
 
-export function replayS2PaidReviewAccessFiles({ files, journalSha256 } = {}) {
+export function replayS2PaidReviewAccessFiles({ files, journalSha256, version = 11 } = {}) {
+  if (!isCapsuleVersion(version)) return { ok: false };
   const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-review-access-replay-'));
-  const registryRoot = path.join(rootDir, 'v11-evaluation-access');
+  const registryRoot = path.join(rootDir, 'v' + version + '-evaluation-access');
   const names = ['registry.json', 'journal.ndjson', 'head.json', 'operations.ndjson'];
-  const expectedPaths = names.map((name) => 'evidence/s2-008-campaign/v11-evaluation-access/' + name);
+  const expectedPaths = names.map((name) => 'evidence/s2-008-campaign/v' + version + '-evaluation-access/' + name);
   try {
     if (!Array.isArray(files) || files.length !== names.length
         || files.some((file, index) => file?.path !== expectedPaths[index]
@@ -354,13 +360,13 @@ export function validateS2PaidReviewBlindIndex(rows, declaredIds) {
   return { ok: true, caseIds };
 }
 
-export function validateS2PaidReviewPin({ pin, preregistrationSha256, blindSha256 } = {}) {
+export function validateS2PaidReviewPin({ pin, preregistrationSha256, blindSha256, version = 11 } = {}) {
   try {
     const first = pin?.first;
     const second = pin?.second;
     const hash = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
     const prefixed = (value) => typeof value === 'string' && /^sha256:[0-9a-f]{64}$/.test(value);
-    if (pin?.schema !== 's2-008-model-image-pin/11' || pin.identical !== true
+    if (!isCapsuleVersion(version) || pin?.schema !== 's2-008-model-image-pin/' + version || pin.identical !== true
         || pin.context_digest_stable !== true || pin.content_commitment_stable !== true
         || pin.commitment_excludes_preregistration !== true
         || pin.commitment?.field !== 'executor.model_image.content_commitment'
@@ -446,10 +452,10 @@ export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, ex
 
 export function validateS2PaidReviewReviewCapsule({
   capsule, evaluation, prereg, declaredCaseIds, runReports, runReportSha256,
-  sidecarRefs, sourceInputs, accessJournal, accessJournalSha256, registryFiles, registryReplay,
+  sidecarRefs, sourceInputs, accessJournal, accessJournalSha256, registryFiles, registryReplay, version = 11,
 } = {}) {
   try {
-    if (!capsule || Object.keys(capsule).sort().join(',') !== 'access,case_ids,digest,kind,labels,labels_digest,preregistration_digest,runs,source_inputs'
+    if (!isCapsuleVersion(version) || !capsule || Object.keys(capsule).sort().join(',') !== 'access,case_ids,digest,kind,labels,labels_digest,preregistration_digest,runs,source_inputs'
         || capsule.kind !== 's2-008-campaign-review-capsule/1'
         || typeof capsule.digest !== 'string' || !DIGEST_RE.test(capsule.digest)) return { ok: false };
     const { digest, ...body } = capsule;
@@ -465,7 +471,7 @@ export function validateS2PaidReviewReviewCapsule({
         || capsule.labels_digest !== sealedLabelsDigest || prereg.holdout_access?.partition !== 'HOLDOUT'
         || prereg.holdout_access?.case_count !== 126 || prereg.holdout_access?.max_opens !== 1
         || prereg.holdout_access?.one_shot !== true) return { ok: false };
-    if (!validateS2PaidReviewCapsuleSourceInputs(capsule.source_inputs, sourceInputs).ok) return { ok: false };
+    if (!validateS2PaidReviewCapsuleSourceInputs(capsule.source_inputs, sourceInputs, { version }).ok) return { ok: false };
     if (!Array.isArray(capsule.runs) || capsule.runs.length !== 2
         || canonicalDigest(capsule.runs.map((row) => row?.label)) !== canonicalDigest(['a', 'b'])) return { ok: false };
     for (const arm of ['a', 'b']) {
@@ -478,12 +484,12 @@ export function validateS2PaidReviewReviewCapsule({
           || canonicalDigest(capsuleRun.sidecars) !== canonicalDigest(sidecarRefs?.[arm])) return { ok: false };
     }
     const access = capsule.access;
-    const journalPath = 'evidence/s2-008-campaign/v11-evaluation-access/journal.ndjson';
+    const journalPath = 'evidence/s2-008-campaign/v' + version + '-evaluation-access/journal.ndjson';
     const expectedRegistryPaths = [
-      'evidence/s2-008-campaign/v11-evaluation-access/registry.json',
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/registry.json',
       journalPath,
-      'evidence/s2-008-campaign/v11-evaluation-access/head.json',
-      'evidence/s2-008-campaign/v11-evaluation-access/operations.ndjson',
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/head.json',
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/operations.ndjson',
     ];
     if (!access || Object.keys(access).sort().join(',') !== 'actor_kind,journal_digest,journal_sha256,one_shot,partition,path,registry_files,rows'
         || access.path !== journalPath || access.rows !== 1 || access.actor_kind !== 'EVALUATOR'
@@ -496,7 +502,7 @@ export function validateS2PaidReviewReviewCapsule({
         || registryReplay?.ok !== true || registryReplay.journalSha256 !== access.journal_sha256
         || !Array.isArray(registryReplay.rows) || canonicalDigest(registryReplay.rows) !== canonicalDigest(accessJournal)
         || evaluation?.holdout_one_shot?.access_rows !== 1
-        || evaluation.holdout_one_shot.registry !== 'evidence/s2-008-campaign/v11-evaluation-access'
+        || evaluation.holdout_one_shot.registry !== 'evidence/s2-008-campaign/v' + version + '-evaluation-access'
         || evaluation.holdout_one_shot.decision_point !== accessJournal?.[0]?.payload?.decision_point
         || evaluation.holdout_one_shot.journal_digest !== access.journal_digest
         || evaluation.holdout_one_shot.journal_sha256 !== access.journal_sha256
@@ -790,23 +796,24 @@ export function buildS2PaidReviewTask({
   version, taskId, workspaceId, evidenceDigest, imageId,
   ownerPrincipalId, producerPrincipalId, adapterId, at, fixtureOnly = false,
 } = {}) {
-  const productionIdentity = taskId === 'abt-s2-008-v11-paid-review'
-    && workspaceId === 'ws-s2-008-v11-paid-review' && adapterId === 'adr-s2-008-v11-importer';
+  const productionIdentity = taskId === 'abt-s2-008-v' + version + '-paid-review'
+    && workspaceId === 'ws-s2-008-v' + version + '-paid-review' && adapterId === 'adr-s2-008-v' + version + '-importer';
+  const fixturePrefix = 'v' + version + '-fixture-';
   const fixtureIdentity = fixtureOnly === true
-    && /^abt-s2-008-v11-fixture-[a-f0-9]{12}$/.test(taskId ?? '')
-    && /^ws-s2-008-v11-fixture-[a-f0-9]{12}$/.test(workspaceId ?? '')
-    && /^adr-s2-008-v11-fixture-[a-f0-9]{12}$/.test(adapterId ?? '');
+    && new RegExp('^abt-s2-008-' + fixturePrefix + '[a-f0-9]{12}$').test(taskId ?? '')
+    && new RegExp('^ws-s2-008-' + fixturePrefix + '[a-f0-9]{12}$').test(workspaceId ?? '')
+    && new RegExp('^adr-s2-008-' + fixturePrefix + '[a-f0-9]{12}$').test(adapterId ?? '');
   const adapterIdentity = fixtureOnly === true
-    ? /^adr-s2-008-v11-fixture-[a-f0-9]{12}$/.test(adapterId ?? '')
-    : adapterId === 'adr-s2-008-v11-importer';
-  if (version !== 11 || (!productionIdentity && !fixtureIdentity) || !DIGEST_RE.test(evidenceDigest)
+    ? new RegExp('^adr-s2-008-' + fixturePrefix + '[a-f0-9]{12}$').test(adapterId ?? '')
+    : adapterId === 'adr-s2-008-v' + version + '-importer';
+  if (!isCapsuleVersion(version) || (!productionIdentity && !fixtureIdentity) || !DIGEST_RE.test(evidenceDigest)
       || !/^sha256:[0-9a-f]{64}$/.test(imageId ?? '') || ownerPrincipalId !== OWNER
       || producerPrincipalId !== PRODUCER || ownerPrincipalId === producerPrincipalId
       || !adapterIdentity || !canonicalInstant(at)) fail('PAID_REVIEW_TASK_INVALID');
   const digest = (value) => 'sha256:' + canonicalDigest(value);
   const task = {
     contractVersion: '1.0.0', task_id: taskId, workspace_id: workspaceId,
-    title: fixtureOnly ? '[FIXTURE ONLY] Проверить изолированный snapshot A-MVP-05' : 'Проверить неизменяемые результаты кампании S2-008 v11',
+    title: fixtureOnly ? '[FIXTURE ONLY] Проверить изолированный snapshot A-MVP-05' : 'Проверить неизменяемые результаты кампании S2-008 v' + version,
     goal: fixtureOnly ? 'Только тестовый офлайн-импорт синтетического snapshot; не является решением по кампании.' : 'Связать опубликованные A/B результаты с подписанным протоколом и передать точный снимок владельцу для решения.',
     description: fixtureOnly ? '[FIXTURE ONLY] Синтетические данные в случайном пространстве; нет кампании, модели или фактических расходов.' : 'Офлайн-импорт фиксированных отчетов, sidecar, квитанций, проверки и оценки; запуск модели запрещен.',
     acceptance_criteria: ['Все три preregistered arms и три seed представлены; A/B, оценка, проверки и квитанции связаны по хешам.'],
@@ -965,7 +972,7 @@ function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds
         predictionRows.push({ trial_id: trial.trial_id, arm_id: trial.arm_id, seed: seed.seed,
           case_id: row.case_id, predicted: row.predicted, prediction_digest: seed.predictions.digest });
       }
-      if (version === 11 && (sidecar.rows.length !== holdoutCount || cellSeen.size !== holdoutCount)) {
+      if (isCapsuleVersion(version) && (sidecar.rows.length !== holdoutCount || cellSeen.size !== holdoutCount)) {
         addReason(reasons, 'PREDICTION_CELL_INCOMPLETE');
       }
       coverageCells.push({ trial_id: trial.trial_id, arm_id: trial.arm_id, seed: seed.seed,
@@ -1006,9 +1013,9 @@ function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds
       }
     }
   }
-  const maximum = version === 11 ? holdoutCount * 9 : holdoutCount * 3;
+  const maximum = isCapsuleVersion(version) ? holdoutCount * 9 : holdoutCount * 3;
   if (rows > maximum) addReason(reasons, 'PREDICTION_COUNT_INVALID');
-  if (version === 11) {
+  if (isCapsuleVersion(version)) {
     try {
       verifyS2PaidReviewCoverage({ trialList: trials.map(({ trial_id, arm_id }) => ({ trial_id, arm_id })),
         seeds: V11_SEEDS, holdoutCaseIds, observed: coverageCells });
@@ -1026,21 +1033,21 @@ function basePair(value) {
 
 function validateReconciliationFile(reader, report, version, arm, preregDigest, accounting, sidecarRefs, reasons, sharedIds) {
   const rel = 'evidence/s2-008-campaign/reconciliation-v' + version + '-' + arm + '.json';
-  if (version === 11) {
-    const reconciliation = reader.json(rel, /^evidence\/s2-008-campaign\/reconciliation-v11-[ab]\.json$/);
-    const reconciliationBytes = reader.text(rel, /^evidence\/s2-008-campaign\/reconciliation-v11-[ab]\.json$/);
-    const reportPath = 'evidence/s2-008-campaign/run-v11-' + arm + '.json';
-    const reportBytes = reader.text(reportPath, new RegExp('^evidence/s2-008-campaign/run-v11-' + arm + '\\.json$'));
+  if (isCapsuleVersion(version)) {
+    const reconciliation = reader.json(rel, new RegExp('^evidence/s2-008-campaign/reconciliation-v' + version + '-[ab]\\.json$'));
+    const reconciliationBytes = reader.text(rel, new RegExp('^evidence/s2-008-campaign/reconciliation-v' + version + '-[ab]\\.json$'));
+    const reportPath = 'evidence/s2-008-campaign/run-v' + version + '-' + arm + '.json';
+    const reportBytes = reader.text(reportPath, new RegExp('^evidence/s2-008-campaign/run-v' + version + '-' + arm + '\\.json$'));
     const receiptRef = reconciliation?.known_receipts_file;
-    const receiptPrefix = 'evidence/s2-008-campaign/provider-receipts-v11-' + arm + '-';
+    const receiptPrefix = 'evidence/s2-008-campaign/provider-receipts-v' + version + '-' + arm + '-' ;
     const receiptPathOk = typeof receiptRef === 'string'
       && receiptRef.startsWith(receiptPrefix)
       && /^[A-Za-z0-9._-]+\.json$/.test(receiptRef.slice(receiptPrefix.length));
     const receipts = receiptPathOk
-      ? reader.json(receiptRef, new RegExp('^evidence/s2-008-campaign/provider-receipts-v11-' + arm + '-[A-Za-z0-9._-]+\\.json$'))
+      ? reader.json(receiptRef, new RegExp('^evidence/s2-008-campaign/provider-receipts-v' + version + '-' + arm + '-[A-Za-z0-9._-]+\\.json$'))
       : null;
     const receiptBytes = receiptPathOk
-      ? reader.text(receiptRef, new RegExp('^evidence/s2-008-campaign/provider-receipts-v11-' + arm + '-[A-Za-z0-9._-]+\\.json$'))
+      ? reader.text(receiptRef, new RegExp('^evidence/s2-008-campaign/provider-receipts-v' + version + '-' + arm + '-[A-Za-z0-9._-]+\\.json$'))
       : null;
     let totals = null;
     try {
@@ -1056,7 +1063,7 @@ function validateReconciliationFile(reader, report, version, arm, preregDigest, 
       && boundSidecars.length === expectedFinancialSidecars.length
       && expectedFinancialSidecars.every((row) => boundSidecars.some((item) => item.file === row.file && item.sha256 === row.sha256));
     const valid = totals !== null
-      && reconciliation?.kind === 's2-008-v11-' + arm + '-reconciliation/1'
+      && reconciliation?.kind === 's2-008-v' + version + '-' + arm + '-reconciliation/1'
       && reconciliation.status === 'RECONCILED'
       && reconciliation.preregistration_digest === preregDigest
       && reconciliation.prior_run_id === report.raw_run_id
@@ -1193,14 +1200,14 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   const reader = readerFor(root, reasons);
   const manifestPath = 'corpus/s2-008-campaign/manifest.json';
   const manifest = reader.json(manifestPath, /^corpus\/s2-008-campaign\/manifest\.json$/);
-  const versionMatch = manifest?.preregistration?.file?.match(/^preregistration\.v(10|11)\.in-force\.json$/);
+  const versionMatch = manifest?.preregistration?.file?.match(/^preregistration\.v(10|11|12)\.in-force\.json$/);
   const version = versionMatch ? Number(versionMatch[1]) : null;
   if (!versionMatch) addReason(reasons, 'ACTIVE_PREREGISTRATION_PATH_INVALID');
   if (manifest?.preregistration?.status !== 'IN_FORCE'
       || manifest?.preregistration?.sealed_before_first_trial !== true) addReason(reasons, 'ACTIVE_PREREGISTRATION_NOT_IN_FORCE');
 
   const preregPath = version ? 'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json' : null;
-  const prereg = preregPath ? reader.json(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11)\.in-force\.json$/) : null;
+  const prereg = preregPath ? reader.json(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12)\.in-force\.json$/) : null;
   let digest = null;
   let preregValid = false;
   if (prereg && version) {
@@ -1233,6 +1240,27 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     }
   }
   if (!preregValid) addReason(reasons, 'ACTIVE_PREREGISTRATION_INVALID');
+  let v11PriorScanStatus = 'NOT_INSPECTED';
+  let v10RestartReconciliationStatus = 'NOT_INSPECTED';
+  if (version === 12 && preregValid) {
+    try {
+      assertV12RestartReconciliation(prereg);
+      v10RestartReconciliationStatus = 'RECONCILED';
+    } catch {
+      v10RestartReconciliationStatus = 'UNKNOWN';
+      addReason(reasons, 'V10_RESTART_RECONCILIATION_NOT_VERIFIED');
+    }
+  }
+  if (version === 12 && preregValid) {
+    try {
+      const prior = assertV12PriorExecutionEvidence(prereg.v11_prior_execution_evidence?.scan, { repoRoot: root });
+      v11PriorScanStatus = prior.status;
+      if (prereg.v11_prior_execution_evidence?.scan_digest !== canonicalDigest(prior)
+          || prereg.v11_prior_execution_evidence?.base_preregistration_digest !== prereg.supersession?.superseded_digest) {
+        addReason(reasons, 'V11_PRIOR_EXECUTION_EVIDENCE_BINDING_INVALID');
+      }
+    } catch { addReason(reasons, 'V11_PRIOR_EXECUTION_EVIDENCE_RECONCILIATION_REQUIRED'); }
+  }
 
   const filePattern = /^evidence\/s2-008-campaign\/[A-Za-z0-9._/-]+\.(?:json|log|ndjson)$/;
   let historyV9 = validateHistorical(reader, 'evidence/s2-008-campaign/reconciliation-v9-a.json', 9);
@@ -1294,6 +1322,10 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       v9: historyV9,
       v8: historyV8,
       v7: { status: 'UNKNOWN', tokens: null },
+      ...(version === 12 ? {
+        v10RestartReconciliationBinding: { status: v10RestartReconciliationStatus },
+        v11: { status: v11PriorScanStatus, provider_completeness_claimed: false, tokens: null },
+      } : {}),
       authorizedDiagnosticTokens: diagnosticTokens,
       priorKnownCampaignTokens: historyV10.status === 'RECONCILED' && historyV9.status === 'RECONCILED'
         ? historyV10.tokens + historyV9.tokens : null,
@@ -1313,11 +1345,11 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     'evidence/s2-008-campaign/reconciliation-v' + (version ?? 10) + '-b.json',
     'evidence/s2-008-campaign/evaluation-v' + (version ?? 10) + '.json',
     'evidence/s2-008-campaign/comparison-v' + (version ?? 10) + '.json',
-    ...(version === 11 ? [
-      'evidence/s2-008-campaign/v11-evaluation-access/registry.json',
-      'evidence/s2-008-campaign/v11-evaluation-access/journal.ndjson',
-      'evidence/s2-008-campaign/v11-evaluation-access/head.json',
-      'evidence/s2-008-campaign/v11-evaluation-access/operations.ndjson',
+    ...(isCapsuleVersion(version) ? [
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/registry.json',
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/journal.ndjson',
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/head.json',
+      'evidence/s2-008-campaign/v' + version + '-evaluation-access/operations.ndjson',
       'scripts/s2-008-campaign-evaluate.mjs',
       'scripts/s2-008-campaign-bootstrap.mjs',
     ] : []),
@@ -1334,7 +1366,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         : filePattern;
     const captured = reader.text(rel, allow, false);
     if (!captured && (rel.includes('-checks/') || isImporter
-        || (version === 11 && rel.startsWith('scripts/s2-008-campaign-')))) addReason(reasons, 'VERIFICATION_EVIDENCE_MISSING');
+        || (isCapsuleVersion(version) && rel.startsWith('scripts/s2-008-campaign-')))) addReason(reasons, 'VERIFICATION_EVIDENCE_MISSING');
     if (rel.includes('-checks/')) {
       const name = rel.slice(rel.lastIndexOf('/') + 1, -4);
       if (captured) {
@@ -1346,7 +1378,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
 
   let holdoutCaseIds = [];
   let blindSha256 = null;
-  if (version === 11) {
+  if (isCapsuleVersion(version)) {
     const blindPath = 'corpus/s2-008-campaign/cases/holdout.blind.json';
     const blindRows = reader.json(blindPath, /^corpus\/s2-008-campaign\/cases\/holdout\.blind\.json$/);
     const blindBytes = reader.text(blindPath, /^corpus\/s2-008-campaign\/cases\/holdout\.blind\.json$/);
@@ -1358,16 +1390,16 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     else holdoutCaseIds = blindIndex.caseIds;
   }
   const pinPath = 'evidence/s2-008-campaign/model-image-pin-v' + (version ?? 10) + '.json';
-  const pin = reader.json(pinPath, /^evidence\/s2-008-campaign\/model-image-pin-v(?:10|11)\.json$/);
+  const pin = reader.json(pinPath, /^evidence\/s2-008-campaign\/model-image-pin-v(?:10|11|12)\.json$/);
   const preregBytes = preregPath
-    ? reader.text(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11)\.in-force\.json$/, false)
+    ? reader.text(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12)\.in-force\.json$/, false)
     : null;
   const pinValidation = validateS2PaidReviewPin({
-    pin, preregistrationSha256: preregBytes?.sha256, blindSha256,
+    pin, preregistrationSha256: preregBytes?.sha256, blindSha256, version,
   });
-  const pinOk = version === 11
+  const pinOk = isCapsuleVersion(version)
     ? pinValidation.ok === true
-      && pin?.schema === 's2-008-model-image-pin/11'
+      && pin?.schema === 's2-008-model-image-pin/' + version
       && prereg?.executor?.model_image?.built_image_pin === pinPath
       && pin.first.content_commitment === prereg?.executor?.model_image?.content_commitment
     : pin?.schema === 's2-008-model-image-pin/' + version
@@ -1379,13 +1411,13 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       && /^sha256:[0-9a-f]{64}$/.test(pin.first.digest);
   if (!pinOk) addReason(reasons, 'MODEL_IMAGE_PIN_INVALID');
 
-  const probes = reader.json('evidence/s2-008-campaign/probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/probes-v(?:10|11)\.json$/);
-  const security = reader.json('evidence/s2-008-campaign/security-probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/security-probes-v(?:10|11)\.json$/);
-  const dry = reader.json('evidence/s2-008-campaign/dry-run-v' + (version ?? 10) + '-clean-base.json', /^evidence\/s2-008-campaign\/dry-run-v(?:10|11)-clean-base\.json$/);
+  const probes = reader.json('evidence/s2-008-campaign/probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/probes-v(?:10|11|12)\.json$/);
+  const security = reader.json('evidence/s2-008-campaign/security-probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/security-probes-v(?:10|11|12)\.json$/);
+  const dry = reader.json('evidence/s2-008-campaign/dry-run-v' + (version ?? 10) + '-clean-base.json', /^evidence\/s2-008-campaign\/dry-run-v(?:10|11|12)-clean-base\.json$/);
   const base = basePair(probes);
   const securityBase = basePair(security);
   const dryBase = basePair(dry);
-  const dryValidation = version === 11
+  const dryValidation = isCapsuleVersion(version)
     ? validateS2PaidReviewDryRun({ dry, preregistrationDigest: digest, pin, expectedBase: base })
     : { ok: dry?.status === 'DRY_RUN' && dry?.dry_run === true
         && Number.isSafeInteger(dry?.model_calls) && dry.model_calls === 0
@@ -1468,9 +1500,10 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   }
 
   let probeValidation = null;
-  if (version === 11) {
+  if (isCapsuleVersion(version)) {
     try {
-      probeValidation = validateV11ProbeEvidence({ campaignProbes: probes, securityControls: security,
+      const validateProbe = version === 12 ? validateV12ProbeEvidence : validateV11ProbeEvidence;
+      probeValidation = validateProbe({ campaignProbes: probes, securityControls: security,
         prereg, runA: armReports.a, runB: armReports.b });
       if (probeValidation?.ok !== true || probeValidation.status !== 'PASS') addReason(reasons, 'PROBE_OR_DRY_RUN_INVALID');
     } catch { addReason(reasons, 'PROBE_OR_DRY_RUN_INVALID'); }
@@ -1478,30 +1511,30 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
 
   const evaluationPath = 'evidence/s2-008-campaign/evaluation-v' + (version ?? 10) + '.json';
   const comparisonPath = 'evidence/s2-008-campaign/comparison-v' + (version ?? 10) + '.json';
-  const checksComplete = version !== 11 || Object.keys(PAID_CHECK_COMMANDS)
+  const checksComplete = !isCapsuleVersion(version) || Object.keys(PAID_CHECK_COMMANDS)
     .every((name) => campaign.verificationChecks[name]?.exitStatus === 0);
-  const runsComplete = version !== 11 || ['a', 'b'].every((arm) => {
+  const runsComplete = !isCapsuleVersion(version) || ['a', 'b'].every((arm) => {
     const report = armReports[arm];
     const accounting = armSidecars[arm];
     const reconciliation = armReconciliations[arm];
     return validateS2PaidReviewRunReadiness({ report, accounting, reconciliation }).ok;
   });
-  const canReadEvaluation = version !== 11
+  const canReadEvaluation = !isCapsuleVersion(version)
     || (reasons.length === 0 && checksComplete && runsComplete && pinOk && dryValidation.ok === true
       && probeValidation?.ok === true && preregValid);
   const evaluation = canReadEvaluation
-    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11)\.json$/, false)
+    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12)\.json$/, false)
     : null;
-  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11)\.json$/, false);
-  if (version === 11 && !canReadEvaluation) {
+  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12)\.json$/, false);
+  if (isCapsuleVersion(version) && !canReadEvaluation) {
     campaign.evaluationRecord = { status: 'NOT_RUN', recordedVerdict: null, recordedRemarks: null,
       linkage: 'NOT_VALIDATED', independentScoringValidation: 'WAITING_FOR_COMPLETE_A_B_AND_REQUIRED_CHECKS' };
     addReason(reasons, 'EVALUATION_NOT_RUN_UNTIL_PREREQUISITES_COMPLETE');
   } else if (!evaluation) addReason(reasons, 'EVALUATION_MISSING');
-  else if (version === 11) {
+  else if (isCapsuleVersion(version)) {
     try {
       const capturedSourceInputs = [
-        'corpus/s2-008-campaign/preregistration.v11.in-force.json',
+        'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json',
         'corpus/s2-008-campaign/manifest.json',
         'corpus/s2-008-campaign/frozen-table.v3.json',
         'corpus/s2-008-campaign/cases/holdout.blind.json',
@@ -1517,13 +1550,13 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       const runReportSha256 = {};
       const capsuleSidecars = {};
       for (const arm of ['a', 'b']) {
-        const runPath = 'evidence/s2-008-campaign/run-v11-' + arm + '.json';
-        const runBytes = reader.text(runPath, new RegExp('^evidence/s2-008-campaign/run-v11-' + arm + '\\.json$'));
+        const runPath = 'evidence/s2-008-campaign/run-v' + version + '-' + arm + '.json';
+        const runBytes = reader.text(runPath, new RegExp('^evidence/s2-008-campaign/run-v' + version + '-' + arm + '\\.json$'));
         runReportSha256[arm] = runBytes?.sha256;
         capsuleSidecars[arm] = [];
         for (const trial of armReports[arm].trials) for (const seed of trial.seeds) {
           const sidecarPath = seed.predictions.file;
-          const sidecar = reader.text(sidecarPath, /^evidence\/s2-008-campaign\/predictions-v11-[ab]-[A-Za-z0-9._-]+\.json$/);
+          const sidecar = reader.text(sidecarPath, new RegExp('^evidence/s2-008-campaign/predictions-v' + version + '-[ab]-[A-Za-z0-9._-]+\\.json$'));
           if (!sidecar) throw new Error('PAID_REVIEW_SIDECAR_MISSING');
           capsuleSidecars[arm].push({
             trial_id: trial.trial_id, arm_id: trial.arm_id, seed: seed.seed,
@@ -1533,26 +1566,26 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         }
       }
       const registryPaths = [
-        'evidence/s2-008-campaign/v11-evaluation-access/registry.json',
-        'evidence/s2-008-campaign/v11-evaluation-access/journal.ndjson',
-        'evidence/s2-008-campaign/v11-evaluation-access/head.json',
-        'evidence/s2-008-campaign/v11-evaluation-access/operations.ndjson',
+        'evidence/s2-008-campaign/v' + version + '-evaluation-access/registry.json',
+        'evidence/s2-008-campaign/v' + version + '-evaluation-access/journal.ndjson',
+        'evidence/s2-008-campaign/v' + version + '-evaluation-access/head.json',
+        'evidence/s2-008-campaign/v' + version + '-evaluation-access/operations.ndjson',
       ];
       const registryFiles = registryPaths.map((file) => {
-        const bytes = reader.text(file, /^evidence\/s2-008-campaign\/v11-evaluation-access\/[A-Za-z0-9._-]+\.(?:json|ndjson)$/);
+        const bytes = reader.text(file, new RegExp('^evidence/s2-008-campaign/v' + version + '-evaluation-access/[A-Za-z0-9._-]+\\.(?:json|ndjson)$'));
         return bytes ? { path: file, bytes: bytes.bytes.length, sha256: bytes.sha256, contents: bytes.bytes } : null;
       });
       const capsuleFiles = registryFiles.map((file) => file && ({ path: file.path, bytes: file.bytes, sha256: file.sha256 }));
       const accessJournal = registryFiles[1];
       const replay = registryFiles.every(Boolean)
-        ? replayS2PaidReviewAccessFiles({ files: registryFiles, journalSha256: accessJournal.sha256 })
+        ? replayS2PaidReviewAccessFiles({ files: registryFiles, journalSha256: accessJournal.sha256, version })
         : { ok: false };
       const capsuleValidation = validateS2PaidReviewReviewCapsule({
         capsule: evaluation.review_capsule, evaluation, prereg, declaredCaseIds: holdoutCaseIds,
         runReports: armReports, runReportSha256,
         sidecarRefs: capsuleSidecars, sourceInputs: capturedSourceInputs,
         accessJournal: replay.ok ? replay.rows : [], accessJournalSha256: accessJournal?.sha256,
-        registryFiles: capsuleFiles, registryReplay: replay,
+        registryFiles: capsuleFiles, registryReplay: replay, version,
       });
       if (!replay.ok || !capsuleValidation.ok) throw new Error('PAID_REVIEW_EVALUATION_CAPSULE_INVALID');
       const validation = validateS2PaidReviewEvaluation({
@@ -1612,10 +1645,10 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     };
   }
   if (!comparison) addReason(reasons, 'COMPARISON_MISSING');
-  else if (version === 11) {
+  else if (isCapsuleVersion(version)) {
     try {
       validateS2PaidReviewComparison({
-        comparison,
+        comparison, version,
         preregistrationDigest: digest,
         holdoutCaseIds,
         aPredictions: armSidecars.a?.predictionRows ?? [],
@@ -1646,7 +1679,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     campaign.aggregate = { confirmedTokens: known.length ? known.reduce((sum, value) => sum + value, 0) : null,
       complete: false, equalityIsDisclosureOnly: true };
   }
-  if (version !== 11) addReason(reasons, 'PAID_REVIEW_VERSION_UNSUPPORTED');
+  if (!isCapsuleVersion(version)) addReason(reasons, 'PAID_REVIEW_VERSION_UNSUPPORTED');
   const records = reader.records();
   const artifactManifestDigest = canonicalDigest(records);
   return {
@@ -1695,7 +1728,7 @@ export function createS2PaidReviewWorkflow(options = {}) {
     stateRoot: fixtureOnly && typeof options.stateRoot === 'string' ? options.stateRoot : STATE,
     replayJournal: replayA05Journal, fixtureOnly,
     fixtureRoot: fixtureOnly ? options.fixtureRoot : null,
-    fixtureRecords: fixtureOnly ? options.fixtureRecords : null,
+    fixtureRecords: fixtureOnly ? options.fixtureRecords : null, version: options.version ?? 11,
   });
 }
 
@@ -1724,7 +1757,7 @@ async function main() {
     try { credential = JSON.parse(privateRead(credentialPath)); }
     catch { fail('PRIVATE_CREDENTIAL_UNAVAILABLE'); }
     const { pool } = await setupA05Database();
-    const workflow = createS2PaidReviewWorkflow({ pool, evidenceRoot: ROOT });
+    const workflow = createS2PaidReviewWorkflow({ pool, evidenceRoot: ROOT, version: evidence.version });
     const server = createS2PaidReviewServer({ credential, workflow, evidenceRoot: ROOT });
     server.once('close', () => pool.end());
     await new Promise((resolve, reject) => {

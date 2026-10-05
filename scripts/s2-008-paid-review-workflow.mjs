@@ -93,18 +93,19 @@ function runPodman(args, timeout = 120000) {
 
 export function createS2PaidReviewWorkflow({
   pool, evidenceRoot, inspectEvidence, buildTask, ownerPrincipalId, producerPrincipalId,
-  stateRoot, replayJournal, fixtureOnly = false, fixtureRoot = null, fixtureRecords = null,
+  stateRoot, replayJournal, fixtureOnly = false, fixtureRoot = null, fixtureRecords = null, version = 11,
 } = {}) {
   if (typeof inspectEvidence !== 'function' || typeof buildTask !== 'function'
       || typeof replayJournal !== 'function' || !ownerPrincipalId || !producerPrincipalId
       || typeof stateRoot !== 'string') fail('PAID_REVIEW_WORKFLOW_INVALID');
   if (fixtureOnly && (!fixtureRoot || !Array.isArray(fixtureRecords) || fixtureRecords.length < 1)) fail('PAID_REVIEW_FIXTURE_INVALID');
+  if (version !== 11 && version !== 12) fail('PAID_REVIEW_VERSION_UNSUPPORTED');
   const suffix = randomBytes(6).toString('hex');
-  const taskId = fixtureOnly ? 'abt-s2-008-v11-fixture-' + suffix : 'abt-s2-008-v11-paid-review';
-  const workspaceId = fixtureOnly ? 'ws-s2-008-v11-fixture-' + suffix : 'ws-s2-008-v11-paid-review';
-  const adapterId = fixtureOnly ? 'adr-s2-008-v11-fixture-' + suffix : 'adr-s2-008-v11-importer';
+  const taskId = fixtureOnly ? 'abt-s2-008-v' + version + '-fixture-' + suffix : 'abt-s2-008-v' + version + '-paid-review';
+  const workspaceId = fixtureOnly ? 'ws-s2-008-v' + version + '-fixture-' + suffix : 'ws-s2-008-v' + version + '-paid-review';
+  const adapterId = fixtureOnly ? 'adr-s2-008-v' + version + '-fixture-' + suffix : 'adr-s2-008-v' + version + '-importer';
   const workRoot = privateDirectory(stateRoot);
-  const taskDirectory = path.join(workRoot, fixtureOnly ? 'fixtures' : 'v11', taskId);
+  const taskDirectory = path.join(workRoot, fixtureOnly ? 'fixtures' : 'v' + version, taskId);
   const clock = { now: () => new Date() };
   const store = pool ? new PostgresAgentBoardStore({ pool, clock, ids: () => randomBytes(16).toString('hex') }) : null;
   const producer = (who) => ({
@@ -132,7 +133,7 @@ export function createS2PaidReviewWorkflow({
   async function campaignEvidence() {
     if (fixtureOnly) {
       const records = structuredClone(fixtureRecords);
-      return { ready: true, version: 11, state: 'PENDING', reasons: [], fixture_only: true,
+      return { ready: true, version, state: 'PENDING', reasons: [], fixture_only: true,
         artifactManifest: records, artifactManifestDigest: canonicalDigest(records), campaign: { arms: {} } };
     }
     return inspectEvidence(evidenceRoot);
@@ -243,7 +244,7 @@ export function createS2PaidReviewWorkflow({
   async function status({ principalId, taskId: requestedTaskId }) {
     if (principalId !== ownerPrincipalId || requestedTaskId !== taskId) fail('ACTOR_TASK_MISMATCH');
     const evidence = await campaignEvidence();
-    if (!fixtureOnly && evidence.version !== 11) fail('PAID_REVIEW_VERSION_UNSUPPORTED');
+    if (!fixtureOnly && evidence.version !== version) fail('PAID_REVIEW_VERSION_UNSUPPORTED');
     if (!fixtureOnly && evidence.ready !== true) {
       return { ...evidence, ready: false, state: 'NOT_READY', revision: 1, taskId, workspaceId,
         producerPrincipalId, fixture_only: false, importReport: null,
@@ -368,7 +369,7 @@ export function createS2PaidReviewWorkflow({
   async function start({ principalId, taskId: requestedTaskId }) {
     if (principalId !== ownerPrincipalId || requestedTaskId !== taskId) fail('ACTOR_TASK_MISMATCH');
     const evidence = await campaignEvidence();
-    if ((!fixtureOnly && evidence.version !== 11) || evidence.ready !== true) fail('PAID_REVIEW_NOT_READY');
+    if ((!fixtureOnly && evidence.version !== version) || evidence.ready !== true) fail('PAID_REVIEW_NOT_READY');
     if (await findTask()) return status({ principalId, taskId: requestedTaskId });
     const paths = recordPaths();
     if (fs.existsSync(paths.intent)) fail('RECONCILIATION_REQUIRED');
@@ -393,7 +394,7 @@ export function createS2PaidReviewWorkflow({
         detail: 'Fixed offline evidence importer only; no model executor is installed or invoked.' },
       registered_at: at,
     };
-    const taskDocument = buildTask({ version: 11, taskId, workspaceId,
+    const taskDocument = buildTask({ version, taskId, workspaceId,
       evidenceDigest: evidence.artifactManifestDigest, imageId, ownerPrincipalId, producerPrincipalId,
       adapterId, at, fixtureOnly });
     await command('adapters.register', { registration }, 'human', 'register-adapter');
@@ -489,7 +490,7 @@ export function createS2PaidReviewWorkflow({
     saveImmutable(paths.decisionReceipt, Buffer.from(JSON.stringify(receipt) + '\n'));
     return { ...result, decisionReceipt: receipt };
   }
-  const workflow = Object.freeze({ status, start, decide, store, taskId, workspaceId, adapterId, fixtureOnly });
+  const workflow = Object.freeze({ status, start, decide, store, taskId, workspaceId, adapterId, version, fixtureOnly });
   TRUSTED_WORKFLOWS.add(workflow);
   return workflow;
 }

@@ -716,7 +716,7 @@ export async function main(argv, env = process.env, deps = {}) {
     process.stderr.write(`${ARM_ERRORS.PREREG_DIGEST_MISMATCH}:signed=${String(prereg.preregistration_digest ?? '').slice(0, 16)}:recomputed=${recomputed.slice(0, 16)}\n`);
     return 8;
   }
-  if (prereg.rule === 's2-008-prereg-v11' &&
+  if ((prereg.rule === 's2-008-prereg-v11' || prereg.rule === 's2-008-prereg-v12') &&
       canonicalDigest(prereg.failure_diagnostics_protocol ?? null) !== canonicalDigest(V11_FAILURE_DIAGNOSTICS_POLICY)) {
     process.stderr.write('V11_FAILURE_DIAGNOSTICS_POLICY_INVALID\n');
     return 14;
@@ -764,7 +764,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let piSettings = null;
   let piSettingsDigest = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)) {
     try {
       const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
       timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -777,10 +777,10 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11'].includes(prereg.rule)) {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)) {
       try {
         const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        piSettings = (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11'].includes(prereg.rule) ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
+        piSettings = (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule) ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {
@@ -792,8 +792,8 @@ export async function main(argv, env = process.env, deps = {}) {
 
   const predictions = [];
   const accounting = [];
-  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11'].includes(prereg.rule);
-  const captureFailureDiagnostics = prereg.rule === 's2-008-prereg-v11';
+  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12'].includes(prereg.rule);
+  const captureFailureDiagnostics = prereg.rule === 's2-008-prereg-v11' || prereg.rule === 's2-008-prereg-v12';
   const failureDiagnostics = [];
   let unknownModelAttempts = 0;
   const generationIdsSeen = new Set();
