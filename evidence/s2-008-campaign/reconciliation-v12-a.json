@@ -1,0 +1,102 @@
+{
+  "kind": "s2-008-v12-a-reconciliation/1",
+  "status": "RECONCILED",
+  "created_at": "2026-10-05T19:48:00.459Z",
+  "prior_run_id": "s2-008c-v12-a-92b479ad27f349728672",
+  "prior_run_sha256": "1e64d455a837c8e8c10e5fea1c606231908c134e8b58e0d3fe0bccacf16dbdf4",
+  "prior_sidecar_file": "evidence/s2-008-campaign/predictions-v12-a-trl-s2-008c-01-20260926.json",
+  "prior_sidecar_sha256": "1db420961471ff82ebc41d68fe16c9460ce53a7f244dd242320ebc70af5e0740",
+  "preregistration_digest": "be2e9cba4629e66d295c2527f6a1842f6282f6526efc10d63acfddec33e0c394",
+  "method": "OWNER_CONFIRMED_EMPTY_INTERVAL",
+  "completeness_basis": "OWNER_CONFIRMED_EMPTY_INTERVAL",
+  "provider": "openrouter",
+  "model": "stealth/space-bunny-alpha",
+  "interval": {
+    "from": "2026-10-05T19:34:00.000Z",
+    "to_exclusive": "2026-10-05T19:35:00.000Z",
+    "timezone": "America/Chicago",
+    "local_date": "2026-10-05",
+    "local_minute": "14:34"
+  },
+  "provider_key": {
+    "name": "wslPI",
+    "id": 37352615
+  },
+  "completeness": {
+    "confirmed_by": "Daniil",
+    "principal_id": "prn-s2007r-owner",
+    "complete": true,
+    "unfiltered": true,
+    "includes_errors_and_cancellations": true,
+    "statement": "Полный список пуст",
+    "source": "Direct owner reply in this conversation",
+    "recorded_at": "2026-10-05T19:48:00.459Z"
+  },
+  "completeness_verified_via_api": false,
+  "provider_rows_verified_via_api": false,
+  "unfiltered_account_ledger_claimed": true,
+  "matching_requests": 0,
+  "local_model_attempts": 1,
+  "locally_accounted_model_calls": 0,
+  "actual_tokens": 0,
+  "actual_usd": 0,
+  "unreconciled_attempts": 0,
+  "raw_unknown_attempts": 1,
+  "closed_unknown_attempts": 1,
+  "rows": [],
+  "owner_confirmed_minute": {
+    "total_records": 0,
+    "matching_known_records": 0,
+    "excluded_records": 0
+  },
+  "failure_diagnostic": {
+    "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+    "schema": "s2-008-failure-diagnostic/1",
+    "started_at": "2026-10-05T19:34:52.577Z",
+    "finished_at": "2026-10-05T19:34:53.853Z",
+    "duration_ms": 1276,
+    "cli_exit_code": null,
+    "cli_signal": null,
+    "stop_reason": "error",
+    "error_category": "PROVIDER_RESPONSE_ERROR",
+    "http_status": null,
+    "provider_reported_status_prefix": {
+      "status": 404,
+      "source": "SDK_ERROR_MESSAGE_PREFIX"
+    },
+    "usage_status": "ZERO",
+    "generation_ids": [],
+    "generation_ids_truncated": false,
+    "stdout": {
+      "sha256": "5305fd3eaa5d05dea595d566d569ea64871b664a51daba875ed16bde0adac8fb",
+      "bytes": 8471
+    },
+    "stderr": {
+      "sha256": null,
+      "bytes": null
+    },
+    "error_message": {
+      "sha256": "c30ba227450653ef43ebf154776073007d1c5de727eefe9bef4c842ebc6b8a7f",
+      "bytes": 79
+    }
+  },
+  "campaign_outcome_class": "INFRA",
+  "predictions_recorded": 0,
+  "predictions_expected": 378,
+  "prior_report_retained_unchanged": true,
+  "b": {
+    "status": "NOT_RUN",
+    "model_attempts": 0,
+    "tokens": 0
+  },
+  "scientific_evaluation": {
+    "status": "NOT_RUN",
+    "reason": "Incomplete A; B never started."
+  },
+  "human_paid_review": {
+    "status": "NOT_RUN"
+  },
+  "scope": "Only stopped v12 A; account-wide and earlier campaign totals are outside this reconciliation.",
+  "limitations": "Zero spend follows the owner-confirmed complete empty provider interval. No generation receipt exists to verify through the API. SDK error prefix reports 404; it is not a captured HTTP status. The raw report keeps its unknown attempt and lower-bound counters.",
+  "new_run_policy": "Retain stopped v12 A. New model requires a separately signed v13 and fresh clean A/B identities."
+}

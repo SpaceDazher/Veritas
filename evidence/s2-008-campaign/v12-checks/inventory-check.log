@@ -1,0 +1,16 @@
+COMMAND: npm run inventory:check
+
+> veritas-agent-board@0.1.0 inventory:check
+> node scripts/check-inventory.mjs
+
+{
+  "exitCode": 0,
+  "trackedFiles": 1370,
+  "listedFiles": 1370,
+  "missingFromInventory": [],
+  "missingFromGit": [],
+  "inventoryPath": "evidence/FILE_INVENTORY.md",
+  "source": "git ls-files -z"
+}
+
+EXIT_STATUS=0

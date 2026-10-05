@@ -1,0 +1,7 @@
+COMMAND: npm run lint
+
+> veritas-agent-board@0.1.0 lint
+> eslint .
+
+
+EXIT_STATUS=0

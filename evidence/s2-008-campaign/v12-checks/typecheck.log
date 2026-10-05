@@ -1,0 +1,7 @@
+COMMAND: npm run typecheck
+
+> veritas-agent-board@0.1.0 typecheck
+> tsc --noEmit
+
+
+EXIT_STATUS=0

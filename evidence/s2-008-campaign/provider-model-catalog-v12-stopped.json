@@ -1,0 +1,12 @@
+{
+  "kind": "s2-008-v12-provider-model-catalog-check/1",
+  "fetched_at": "2026-10-05T19:37:20.690Z",
+  "endpoint": "https://openrouter.ai/api/v1/models",
+  "http_status": 200,
+  "models_count": 464,
+  "requested_model": "stealth/space-bunny-alpha",
+  "requested_model_present": false,
+  "requested_model_entries": [],
+  "bunny_entries": [],
+  "scope": "Public current model catalog; not request ledger or proof of zero spend"
+}

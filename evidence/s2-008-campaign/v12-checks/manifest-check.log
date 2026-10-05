@@ -1,0 +1,16 @@
+COMMAND: npm run manifest:check
+
+> veritas-agent-board@0.1.0 manifest:check
+> node scripts/generate-manifests.mjs --check
+
+{
+  "exitCode": 0,
+  "mode": "check",
+  "trackedFileCount": 1370,
+  "manifestFileCount": 1365,
+  "payloadManifestSha256": "a99c3e47c39d444823403010d0d29b0b0e0efdc116b3a237aa5ad855aacce236",
+  "fileManifestSha256": "3346628d2b911ded29974d19e3befb90bb057bd1e3e4436ae1cdaef1836464d0",
+  "rootManifestFileSha256": "b2c632436aca6d8cb6123155c6b689b79c4e588e8bab5a7e16b8de61bd013700"
+}
+
+EXIT_STATUS=0
