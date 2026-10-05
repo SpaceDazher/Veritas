@@ -15,6 +15,7 @@ import { replayA05Journal, setupA05Database } from './a-mvp05-runtime.mjs';
 import { createA05ReviewServer, hashA05ReviewToken } from './a-mvp05-review.mjs';
 import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, validateV12ProbeEvidence, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
 import { contentCommitmentOf } from './s2-008-campaign-model-image.mjs';
+import { validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { openRegistry, readJournal, verifyChain } from '../src/lib/research/registry.mjs';
 import { createS2PaidReviewWorkflow as createPaidWorkflow, isTrustedS2PaidReviewWorkflow } from './s2-008-paid-review-workflow.mjs';
 import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation, inspectV11PriorExecutionEvidence } from './s2-008-campaign-v12-approval.mjs';
@@ -44,10 +45,57 @@ const V11_CAPSULE_SOURCE_PATHS = Object.freeze([
   'scripts/s2-008-campaign-evaluate.mjs',
   'scripts/s2-008-campaign-bootstrap.mjs',
 ]);
-const capsuleSourcePaths = (version) => V11_CAPSULE_SOURCE_PATHS.map((value) =>
-  version === 12 && value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
-    ? 'corpus/s2-008-campaign/preregistration.v12.in-force.json' : value);
+const capsuleSourcePaths = (version) => {
+  const paths = V11_CAPSULE_SOURCE_PATHS.map((value) =>
+    version === 12 && value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
+      ? 'corpus/s2-008-campaign/preregistration.v12.in-force.json' : value);
+  return version === 12 ? [...paths, 'scripts/s2-008-campaign-adapter.mjs'] : paths;
+};
 const isCapsuleVersion = (version) => version === 11 || version === 12;
+const CONTROL_RAW_KEYS = Object.freeze([
+  'arm_id', 'seed', 'samples', 'podman', 'container_argv', 'image', 'image_break_requested',
+  'axes', 'exit_code', 'signal', 'timed_out', 'stderr_excerpt', 'banner', 'payload_chunks',
+  'payload_error', 'output_digest', 'predictions', 'real_start',
+]);
+const CONTROL_WRAPPER_KEYS = Object.freeze([...CONTROL_RAW_KEYS, 'image_digest', 'arm_report', 'control_execution']);
+
+export function validateS2PaidReviewControlPinEvidence(pin, expectedBase) {
+  return validateControlImagePinEvidence(pin, expectedBase);
+}
+
+
+function validV12ControlCell({ report, trial, seed, pin, caseIds, expectedOutcome, samples, timeoutMs, sidecar = null }) {
+  try {
+    const launch = seed?.launch;
+    if (!launch || Object.keys(launch).sort().join(',') !== [...CONTROL_WRAPPER_KEYS].sort().join(',')
+        || launch.arm_report === null || !launch.control_execution
+        || launch.image !== pin?.first?.imageId || launch.image_digest !== pin?.first?.digest
+        || launch.control_execution.kind !== 's2-008-campaign-control-execution/1'
+        || launch.control_execution.outcome_class !== expectedOutcome
+        || launch.control_execution.pin_digest !== canonicalDigest(pin)
+        || launch.control_execution.output_digest !== canonicalDigest(launch.arm_report)
+        || launch.output_digest !== canonicalDigest(launch.arm_report)
+        || seed.outcome_class !== expectedOutcome
+        || seed.predictions?.digest !== launch.predictions?.digest
+        || seed.predictions?.rows !== 126 || seed.predictions?.unparsed !== 0) return false;
+    const raw = Object.fromEntries(CONTROL_RAW_KEYS.map((key) => [key, launch[key]]));
+    if (!validateControlExecution({ ok: true, output: launch.arm_report, record: raw }, {
+      armId: trial.arm_id, seed: seed.seed, samples, timeoutMs,
+      runLabel: report.label, caseIds,
+      imageId: pin.first.imageId, imageDigest: pin.first.digest,
+    })) return false;
+    if (sidecar !== null) {
+      if (sidecar.kind !== 's2-008-campaign-predictions/1' || sidecar.run !== report.label
+          || sidecar.arm_id !== trial.arm_id || sidecar.seed !== seed.seed
+          || sidecar.unparsed !== 0 || sidecar.model_calls !== null
+          || sidecar.spent_tokens !== null || sidecar.usd_spent !== null || sidecar.outcome_class !== null
+          || canonicalDigest(sidecar.rows) !== canonicalDigest(launch.arm_report.predictions)
+          || canonicalDigest(sidecar) !== seed.predictions.digest) return false;
+    }
+    return true;
+  } catch { return false; }
+}
+
 
 export function validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, sourceInputs, { version = 11 } = {}) {
   try {
@@ -67,12 +115,14 @@ export function validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, sourceInp
   } catch { return { ok: false }; }
 }
 
-export function validateS2PaidReviewRunReadiness({ report, accounting, reconciliation } = {}) {
+export function validateS2PaidReviewRunReadiness({ report, accounting, reconciliation, version = 11, controlPin = null, caseIds = [], samples, timeoutMs } = {}) {
   try {
     if (!report || report.status !== 'MEASURED' || report.unreconciled_spend !== false
         || report.spent_units_is_lower_bound !== false || report.model_calls_is_lower_bound !== false
         || report.unknown_model_attempts !== 0 || !Array.isArray(report.trials)
         || report.trials.length !== V11_TRIALS.length) return { ok: false };
+    if (version === 12 && (!validateS2PaidReviewControlPinEvidence(controlPin, basePair(report))
+        || canonicalDigest(report.control_image_pin) !== canonicalDigest(controlPin))) return { ok: false };
     for (let index = 0; index < V11_TRIALS.length; index += 1) {
       const expected = V11_TRIALS[index];
       const trial = report.trials[index];
@@ -80,13 +130,18 @@ export function validateS2PaidReviewRunReadiness({ report, accounting, reconcili
           || !Array.isArray(trial.seeds) || trial.seeds.length !== V11_SEEDS.length) return { ok: false };
       for (let seedIndex = 0; seedIndex < V11_SEEDS.length; seedIndex += 1) {
         const row = trial.seeds[seedIndex];
-        if (row?.seed !== V11_SEEDS[seedIndex] || row.outcome_class !== 'MEASURED'
+        const expectedOutcome = version === 12 && expected.arm_id !== V11_MODEL_ARM ? 'MEASURED_CONTROL' : 'MEASURED';
+        if (row?.seed !== V11_SEEDS[seedIndex] || row.outcome_class !== expectedOutcome
             || row.launch?.exit_code !== 0 || row.launch?.signal !== null
             || row.launch?.timed_out !== false) return { ok: false };
+        if (version === 12 && expected.arm_id !== V11_MODEL_ARM
+            && !validV12ControlCell({ report, trial, seed: row, pin: controlPin, caseIds, samples, timeoutMs,
+              expectedOutcome: 'MEASURED_CONTROL' })) return { ok: false };
       }
     }
     if (accounting?.modelRows !== 378 || accounting?.controlRows !== 756 || accounting?.rows !== 1134
-        || reconciliation?.valid !== true || reconciliation.unreconciledAttempts !== 0) return { ok: false };
+        || reconciliation?.valid !== true || reconciliation.unreconciledAttempts !== 0
+        || (version === 12 && accounting?.controlExecutions !== 6)) return { ok: false };
     return { ok: true };
   } catch { return { ok: false }; }
 }
@@ -395,7 +450,7 @@ export function validateS2PaidReviewPin({ pin, preregistrationSha256, blindSha25
   }
 }
 
-export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, expectedBase } = {}) {
+export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, expectedBase, version = 11, controlPin = null, expectedCaseIds = [], samples, timeoutMs } = {}) {
   try {
     const first = pin?.first ?? pin;
     if (!dry || dry.status !== 'DRY_RUN' || dry.dry_run !== true
@@ -417,6 +472,8 @@ export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, ex
         || !expectedBase?.commit || !expectedBase?.tree
         || dry.base?.commit_sha !== expectedBase.commit || dry.base?.tree_sha !== expectedBase.tree
         || !Array.isArray(dry.trials) || dry.trials.length !== V11_TRIALS.length) return { ok: false };
+    if (version === 12 && (!validateS2PaidReviewControlPinEvidence(controlPin, expectedBase)
+        || canonicalDigest(dry.control_image_pin) !== canonicalDigest(controlPin))) return { ok: false };
     for (let index = 0; index < V11_TRIALS.length; index += 1) {
       const expected = V11_TRIALS[index];
       const trial = dry.trials[index];
@@ -424,6 +481,12 @@ export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, ex
           || !Array.isArray(trial.seeds) || trial.seeds.length !== V11_SEEDS.length) return { ok: false };
       for (let seedIndex = 0; seedIndex < V11_SEEDS.length; seedIndex += 1) {
         const seed = trial.seeds[seedIndex];
+        if (seed?.seed !== V11_SEEDS[seedIndex]) return { ok: false };
+        if (version === 12 && expected.arm_id !== V11_MODEL_ARM) {
+          if (!validV12ControlCell({ report: dry, trial: expected, seed, pin: controlPin,
+            caseIds: expectedCaseIds, samples, timeoutMs, expectedOutcome: 'EXECUTED_CONTROL_DRY_RUN' })) return { ok: false };
+          continue;
+        }
         const launch = seed?.launch;
         const arm = launch?.arm_report;
         if (seed?.seed !== V11_SEEDS[seedIndex] || seed.outcome_class !== 'DRY_RUN'
@@ -905,7 +968,7 @@ function readerFor(root, reasons) {
   };
 }
 
-function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds, reasons, holdoutCaseIds = []) {
+function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds, reasons, holdoutCaseIds = [], controlPin = null, controlSamples = null, controlTimeoutMs = null) {
   let rows = 0;
   let modelRows = 0;
   let controlRows = 0;
@@ -919,6 +982,7 @@ function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds
   const accountingIds = new Set();
   const accountingSidecars = [];
   const coverageCells = [];
+  let controlExecutions = 0;
   const trials = Array.isArray(report?.trials) ? report.trials : [];
   if (!trials.length) addReason(reasons, 'RUN_TRIALS_MISSING');
   for (const trial of trials) {
@@ -944,6 +1008,12 @@ function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds
           || sidecar.rows.length !== seed.predictions?.rows) {
         addReason(reasons, 'RUN_SIDECAR_BINDING_INVALID');
         continue;
+      }
+      if (version === 12 && trial.arm_id !== V11_MODEL_ARM) {
+        if (!validV12ControlCell({ report, trial, seed, pin: controlPin, caseIds: holdoutCaseIds,
+          samples: controlSamples, timeoutMs: controlTimeoutMs, expectedOutcome: 'MEASURED_CONTROL', sidecar })) {
+          addReason(reasons, 'CONTROL_EXECUTION_INVALID');
+        } else controlExecutions += 1;
       }
       rows += sidecar.rows.length;
       const isModelArm = trial.arm_id === V11_MODEL_ARM;
@@ -1021,7 +1091,7 @@ function verifyRunSidecars(reader, report, version, arm, holdoutCount, sharedIds
         seeds: V11_SEEDS, holdoutCaseIds, observed: coverageCells });
     } catch { addReason(reasons, 'RUN_COVERAGE_INVALID'); }
   }
-  return { rows, modelRows, controlRows, unparsed, modelUnparsed, controlUnparsed, calls, tokens, predictions, predictionRows, accountingIds, accountingSidecars, coverageCells };
+  return { rows, modelRows, controlRows, unparsed, modelUnparsed, controlUnparsed, calls, tokens, predictions, predictionRows, accountingIds, accountingSidecars, coverageCells, controlExecutions };
 }
 
 function basePair(value) {
@@ -1029,6 +1099,46 @@ function basePair(value) {
     commit: value?.commit_sha ?? value?.base?.commit_sha ?? null,
     tree: value?.tree_sha ?? value?.base?.tree_sha ?? null,
   };
+}
+
+export function validateS2PaidReviewControlPinArtifact({ bytes, reference, report, label, expectedBase } = {}) {
+  try {
+    const relative = 'evidence/s2-008-campaign/control-image-pin-v12-' + label + '.json';
+    if (!Buffer.isBuffer(bytes) || !reference
+        || Object.keys(reference).sort().join(',') !== 'bytes,file,sha256'
+        || reference.file !== relative || reference.bytes !== bytes.length
+        || reference.sha256 !== hash(bytes)) return { ok: false };
+    const artifact = JSON.parse(bytes.toString('utf8'));
+    if (Object.keys(artifact ?? {}).sort().join(',') !== 'base,control_image_pin,kind,label,nonce,raw_run_id'
+        || artifact.kind !== 's2-008-campaign-control-image-pin-artifact/1'
+        || artifact.label !== label || artifact.raw_run_id !== report?.raw_run_id
+        || artifact.nonce !== report?.nonce
+        || artifact.base?.commit_sha !== expectedBase?.commit
+        || artifact.base?.tree_sha !== expectedBase?.tree
+        || canonicalDigest(artifact.control_image_pin) !== canonicalDigest(report?.control_image_pin)
+        || !validateS2PaidReviewControlPinEvidence(artifact.control_image_pin, expectedBase)) return { ok: false };
+    return { ok: true, pin: artifact.control_image_pin };
+  } catch { return { ok: false }; }
+}
+
+function readV12ControlPinArtifact(reader, report, label, expectedBase, reasons) {
+  const relative = 'evidence/s2-008-campaign/control-image-pin-v12-' + label + '.json';
+  const ref = report?.control_image_pin_artifact;
+  if (!ref || Object.keys(ref).sort().join(',') !== 'bytes,file,sha256'
+      || ref.file !== relative || !Number.isSafeInteger(ref.bytes) || ref.bytes < 1
+      || !DIGEST_RE.test(ref.sha256 ?? '')) {
+    addReason(reasons, 'CONTROL_IMAGE_PIN_REFERENCE_INVALID');
+    return null;
+  }
+  const captured = reader.text(relative, new RegExp('^evidence/s2-008-campaign/control-image-pin-v12-' + label + '[.]json$'));
+  const validation = captured && validateS2PaidReviewControlPinArtifact({
+    bytes: captured.bytes, reference: ref, report, label, expectedBase,
+  });
+  if (!validation?.ok) {
+    addReason(reasons, 'CONTROL_IMAGE_PIN_ARTIFACT_INVALID');
+    return null;
+  }
+  return validation.pin;
 }
 
 function validateReconciliationFile(reader, report, version, arm, preregDigest, accounting, sidecarRefs, reasons, sharedIds) {
@@ -1417,8 +1527,12 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   const base = basePair(probes);
   const securityBase = basePair(security);
   const dryBase = basePair(dry);
+  const dryControlPin = version === 12
+    ? readV12ControlPinArtifact(reader, dry, 'clean-base', dryBase, reasons) : null;
   const dryValidation = isCapsuleVersion(version)
-    ? validateS2PaidReviewDryRun({ dry, preregistrationDigest: digest, pin, expectedBase: base })
+    ? validateS2PaidReviewDryRun({ dry, preregistrationDigest: digest, pin, expectedBase: base,
+      version, controlPin: dryControlPin, expectedCaseIds: holdoutCaseIds,
+      samples: prereg?.noise_rule?.bootstrap_samples, timeoutMs: prereg?.budget_reservation?.trial_timeout_ms })
     : { ok: dry?.status === 'DRY_RUN' && dry?.dry_run === true
         && Number.isSafeInteger(dry?.model_calls) && dry.model_calls === 0
         && Number.isSafeInteger(dry?.spent_units) && dry.spent_units === 0
@@ -1434,6 +1548,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   const armReconciliations = {};
   const armSidecars = {};
   const armReports = {};
+  const armControlPins = {};
   for (const arm of ['a', 'b']) {
     const rel = 'evidence/s2-008-campaign/run-v' + (version ?? 10) + '-' + arm + '.json';
     const report = reader.json(rel, new RegExp('^evidence/s2-008-campaign/run-v' + (version ?? 10) + '-' + arm + '\\.json$'), false);
@@ -1444,6 +1559,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     }
     armReports[arm] = report;
     const baseRun = basePair(report);
+    const controlPin = version === 12
+      ? readV12ControlPinArtifact(reader, report, arm, baseRun, reasons) : null;
+    armControlPins[arm] = controlPin;
     const reportPin = report.model_image_pin ?? report.image_pin ?? {};
     if (report.label !== arm || report.preregistration_digest !== digest
         || reportPin.imageId !== pin?.first?.imageId
@@ -1454,7 +1572,8 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     }
     const sidecarRefs = [];
     const originalText = reader.text(rel, new RegExp('^evidence/s2-008-campaign/run-v' + (version ?? 10) + '-' + arm + '\\.json$'));
-    const accounting = verifyRunSidecars(reader, report, version ?? 10, arm, 126, sharedIds, reasons, holdoutCaseIds);
+    const accounting = verifyRunSidecars(reader, report, version ?? 10, arm, 126, sharedIds, reasons, holdoutCaseIds,
+      controlPin, prereg?.noise_rule?.bootstrap_samples, prereg?.budget_reservation?.trial_timeout_ms);
     for (const trial of report.trials ?? []) for (const seed of trial.seeds ?? []) {
       const ref = seed?.predictions?.file;
       if (typeof ref === 'string') {
@@ -1474,6 +1593,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       && report.unknown_model_attempts === 0
       && accounting.modelRows === expectedModel && accounting.controlRows === expectedControls
       && accounting.rows === expectedTotal && accounting.calls === expectedModel
+      && (version !== 12 || accounting.controlExecutions === 6)
       && recon.valid && recon.unreconciledAttempts === 0;
     campaign.arms[arm] = {
       status: report.status === 'MEASURED' ? 'MEASURED' : report.status === 'BLOCKED' ? 'BLOCKED' : 'INVALID',
@@ -1499,6 +1619,12 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     if (!measured) addReason(reasons, 'RUN_' + arm.toUpperCase() + '_INCOMPLETE');
   }
 
+  if (version === 12 && (!dryControlPin || !armControlPins.a || !armControlPins.b
+      || canonicalDigest(dryControlPin) !== canonicalDigest(armControlPins.a)
+      || canonicalDigest(dryControlPin) !== canonicalDigest(armControlPins.b))) {
+    addReason(reasons, 'CONTROL_IMAGE_PIN_LINEAGE_INVALID');
+  }
+
   let probeValidation = null;
   if (isCapsuleVersion(version)) {
     try {
@@ -1517,7 +1643,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     const report = armReports[arm];
     const accounting = armSidecars[arm];
     const reconciliation = armReconciliations[arm];
-    return validateS2PaidReviewRunReadiness({ report, accounting, reconciliation }).ok;
+    return validateS2PaidReviewRunReadiness({ report, accounting, reconciliation, version,
+      controlPin: armControlPins[arm], caseIds: holdoutCaseIds, samples: prereg?.noise_rule?.bootstrap_samples,
+      timeoutMs: prereg?.budget_reservation?.trial_timeout_ms }).ok;
   });
   const canReadEvaluation = !isCapsuleVersion(version)
     || (reasons.length === 0 && checksComplete && runsComplete && pinOk && dryValidation.ok === true

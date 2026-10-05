@@ -33,7 +33,7 @@ import { preregistrationDigest } from '../src/lib/research/preregistration.mjs';
 import { RESEARCH_HARD_GATE_COUNTERS } from '../src/lib/research/constants.mjs';
 import { PROBE_FAMILIES, PROBE_NAMES } from '../src/lib/research/probes.mjs';
 import { NEGATIVE_CONTROLS, EXTRA_CONTROL_IDS } from '../src/lib/research/negative-controls.mjs';
-import { buildBootstrapImage, runBootstrap } from './s2-008-campaign-adapter.mjs';
+import { buildBootstrapImage, runBootstrap, validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-campaign-v11-approval.mjs';
 import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation, inspectV11PriorExecutionEvidence } from './s2-008-campaign-v12-approval.mjs';
 
@@ -49,9 +49,12 @@ const V11_REVIEW_CAPSULE_SOURCE_PATHS = Object.freeze([
   'scripts/s2-008-campaign-evaluate.mjs',
   'scripts/s2-008-campaign-bootstrap.mjs',
 ]);
-const V12_REVIEW_CAPSULE_SOURCE_PATHS = Object.freeze(V11_REVIEW_CAPSULE_SOURCE_PATHS.map((value) =>
-  value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
-    ? 'corpus/s2-008-campaign/preregistration.v12.in-force.json' : value));
+const V12_REVIEW_CAPSULE_SOURCE_PATHS = Object.freeze([
+  ...V11_REVIEW_CAPSULE_SOURCE_PATHS.map((value) =>
+    value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
+      ? 'corpus/s2-008-campaign/preregistration.v12.in-force.json' : value),
+  'scripts/s2-008-campaign-adapter.mjs',
+]);
 
 export function buildV11ReviewCapsuleSourceInputs(entries) {
   if (!Array.isArray(entries) || entries.length !== V11_REVIEW_CAPSULE_SOURCE_PATHS.length) {
@@ -531,7 +534,7 @@ export function validateV7ProbeEvidence(args) {
 }
 
 /** Refuse before the holdout is opened if either blind phase is incomplete. */
-export function preflightV4Runs({ runA, runB, prereg, manifest }) {
+export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file) => fs.readFileSync(file, 'utf8'), root = REPO_ROOT }) {
   const refuse = (reason) => ({ ok: false, reason });
   const version = activeCampaignVersion(manifest);
   if (version === null ||
@@ -541,7 +544,80 @@ export function preflightV4Runs({ runA, runB, prereg, manifest }) {
       prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true) {
     return refuse('V4_PREREGISTRATION_NOT_IN_FORCE');
   }
+  const v12ControlPins = [];
+  let v12CaseIds = null;
+  if (version === 'v12') {
+    try {
+      const blind = JSON.parse(readFile(path.join(root, 'corpus/s2-008-campaign/cases/holdout.blind.json')));
+      if (!Array.isArray(blind) || blind.length !== 126) return refuse('V12_CONTROL_BLIND_INDEX_INVALID');
+      v12CaseIds = blind.map((row) => row.case_id);
+      if (v12CaseIds.some((id) => typeof id !== 'string' || !id) || new Set(v12CaseIds).size !== 126) {
+        return refuse('V12_CONTROL_BLIND_INDEX_INVALID');
+      }
+    } catch { return refuse('V12_CONTROL_BLIND_INDEX_INVALID'); }
+  }
+  const readV12ControlPin = (run, label) => {
+    const file = 'evidence/s2-008-campaign/control-image-pin-v12-' + label + '.json';
+    const reference = run?.control_image_pin_artifact;
+    if (!reference || Object.keys(reference).sort().join(',') !== 'bytes,file,sha256'
+        || reference.file !== file || !Number.isSafeInteger(reference.bytes) || reference.bytes < 1
+        || !/^[0-9a-f]{64}$/.test(reference.sha256 ?? '')) return null;
+    try {
+      const raw = readFile(path.join(root, file));
+      const bytes = Buffer.isBuffer(raw) ? raw : Buffer.from(String(raw));
+      if (bytes.length !== reference.bytes || createHash('sha256').update(bytes).digest('hex') !== reference.sha256) return null;
+      const artifact = JSON.parse(bytes.toString('utf8'));
+      if (Object.keys(artifact ?? {}).sort().join(',') !== 'base,control_image_pin,kind,label,nonce,raw_run_id'
+          || artifact.kind !== 's2-008-campaign-control-image-pin-artifact/1'
+          || artifact.label !== label || artifact.raw_run_id !== run.raw_run_id || artifact.nonce !== run.nonce
+          || artifact.base?.commit_sha !== run.base?.commit_sha || artifact.base?.tree_sha !== run.base?.tree_sha
+          || canonicalDigest(artifact.control_image_pin) !== canonicalDigest(run.control_image_pin)
+          || !validateControlImagePinEvidence(artifact.control_image_pin,
+            { commit: run.base?.commit_sha, tree: run.base?.tree_sha })) return null;
+      return artifact.control_image_pin;
+    } catch { return null; }
+  };
+  const validateV12ControlCell = (run, label, trial, row, pin) => {
+    const launch = row?.launch;
+    const rawKeys = ['arm_id', 'seed', 'samples', 'podman', 'container_argv', 'image', 'image_break_requested',
+      'axes', 'exit_code', 'signal', 'timed_out', 'stderr_excerpt', 'banner', 'payload_chunks',
+      'payload_error', 'output_digest', 'predictions', 'real_start'];
+    const expectedLaunchKeys = [...rawKeys, 'image_digest', 'arm_report', 'control_execution'].sort().join(',');
+    if (!launch || Object.keys(launch).sort().join(',') !== expectedLaunchKeys
+        || row.outcome_class !== 'MEASURED_CONTROL'
+        || launch.control_execution?.kind !== 's2-008-campaign-control-execution/1'
+        || launch.control_execution?.outcome_class !== 'MEASURED_CONTROL'
+        || launch.control_execution?.pin_digest !== canonicalDigest(pin)
+        || launch.control_execution?.output_digest !== canonicalDigest(launch.arm_report)
+        || launch.output_digest !== canonicalDigest(launch.arm_report)
+        || launch.image !== pin?.first?.imageId || launch.image_digest !== pin?.first?.digest
+        || row.predictions?.digest !== launch.predictions?.digest
+        || row.predictions?.rows !== 126 || row.predictions?.unparsed !== 0) return false;
+    const record = Object.fromEntries(rawKeys.map((key) => [key, launch[key]]));
+    if (!validateControlExecution({ ok: true, output: launch.arm_report, record }, {
+      armId: trial.arm_id, seed: row.seed, samples: prereg.noise_rule.bootstrap_samples,
+      timeoutMs: prereg.budget_reservation.trial_timeout_ms, runLabel: label, caseIds: v12CaseIds,
+      imageId: pin.first.imageId, imageDigest: pin.first.digest,
+    })) return false;
+    const expectedSidecar = 'evidence/s2-008-campaign/predictions-v12-' + label + '-' + trial.trial_id + '-' + row.seed + '.json';
+    if (row.predictions?.file !== expectedSidecar) return false;
+    try {
+      const raw = readFile(path.join(root, expectedSidecar));
+      const sidecar = JSON.parse(Buffer.isBuffer(raw) ? raw.toString('utf8') : String(raw));
+      return sidecar.kind === 's2-008-campaign-predictions/1' && sidecar.run === label
+        && sidecar.arm_id === trial.arm_id && sidecar.seed === row.seed
+        && sidecar.unparsed === 0 && sidecar.model_calls === null && sidecar.spent_tokens === null
+        && sidecar.usd_spent === null && sidecar.outcome_class === null
+        && canonicalDigest(sidecar) === row.predictions.digest
+        && canonicalDigest(sidecar.rows) === canonicalDigest(launch.arm_report.predictions);
+    } catch { return false; }
+  };
   for (const [label, run] of [['a', runA], ['b', runB]]) {
+    const controlPin = version === 'v12' ? readV12ControlPin(run, label) : null;
+    if (version === 'v12') {
+      if (!controlPin) return refuse('V12_CONTROL_IMAGE_PIN_INVALID:' + label);
+      v12ControlPins.push(controlPin);
+    }
     if (run?.kind !== `s2-008-campaign-${version}-predictions/1` || run.label !== label ||
         run.status !== 'MEASURED' || run.dry_run !== false) return refuse(`V4_RUN_NOT_MEASURED:${label}`);
     if (run.preregistration_digest !== prereg.preregistration_digest ||
@@ -573,7 +649,12 @@ export function preflightV4Runs({ runA, runB, prereg, manifest }) {
         }
         if (declared.arm_id === 'arm-model-zai-glm53flash') {
           if (row.outcome_class !== 'MEASURED' || charge.units <= 0) return refuse(`V4_RUN_NOT_MEASURED:${label}`);
-        } else if (charge.units !== 0) return refuse(`V4_CONTROL_CHARGED_TOKENS:${label}`);
+        } else {
+          if (charge.units !== 0) return refuse('V4_CONTROL_CHARGED_TOKENS:' + label);
+          if (version === 'v12' && !validateV12ControlCell(run, label, declared, row, controlPin)) {
+            return refuse('V12_CONTROL_EXECUTION_INVALID:' + label + ':' + declared.trial_id + ':' + seed);
+          }
+        }
         charged += charge.units;
       }
     }
@@ -584,6 +665,8 @@ export function preflightV4Runs({ runA, runB, prereg, manifest }) {
   }
   if (runA.raw_run_id === runB.raw_run_id || runA.nonce === runB.nonce) return refuse('V4_RUN_PROVENANCE_NOT_DISTINCT');
   if (runA.base.commit_sha !== runB.base.commit_sha || runA.base.tree_sha !== runB.base.tree_sha) return refuse('V4_RUN_BASE_MOVED');
+  if (version === 'v12' && (v12ControlPins.length !== 2
+      || canonicalDigest(v12ControlPins[0]) !== canonicalDigest(v12ControlPins[1]))) return refuse('V12_CONTROL_IMAGE_PINS_DIVERGE');
   return { ok: true, base: runA.base, distinct_run_ids: true, distinct_nonces: true };
 }
 
@@ -662,7 +745,7 @@ export function verifyV4FrozenTable({ prereg, manifest, frozenTable }) {
 export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, holdoutCases, bootstrap,
   campaignProbes = null, securityControls = null,
   readFile = (file) => fs.readFileSync(file, 'utf8'), root = REPO_ROOT }) {
-  const gate = preflightV4Runs({ runA, runB, prereg, manifest });
+  const gate = preflightV4Runs({ runA, runB, prereg, manifest, readFile, root });
   if (!gate.ok) return gate;
   const table = verifyV4FrozenTable({ prereg, manifest, frozenTable });
   if (!table.ok) return table;
@@ -835,7 +918,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
   const frozenTable = read('corpus/s2-008-campaign/frozen-table.v3.json');
   const runA = read(`evidence/s2-008-campaign/run-${version}-a.json`);
   const runB = read(`evidence/s2-008-campaign/run-${version}-b.json`);
-  const preflight = preflightV4Runs({ runA, runB, prereg, manifest });
+  const preflight = preflightV4Runs({ runA, runB, prereg, manifest, readFile: (file) => fs.readFileSync(file), root: REPO_ROOT });
   if (!preflight.ok) throw new Error(preflight.reason);
   let campaignProbes = null;
   let securityControls = null;
@@ -946,6 +1029,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
       'corpus/s2-008-campaign/cases/holdout.blind.json',
       'scripts/s2-008-campaign-evaluate.mjs',
       'scripts/s2-008-campaign-bootstrap.mjs',
+      ...(version === 'v12' ? ['scripts/s2-008-campaign-adapter.mjs'] : []),
     ];
     const capsuleBody = {
       kind: 's2-008-campaign-review-capsule/1',

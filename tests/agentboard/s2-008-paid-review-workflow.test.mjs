@@ -11,6 +11,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { contentCommitmentOf } from '../../scripts/s2-008-campaign-model-image.mjs';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { campaignImageContextDigest } from '../../scripts/s2-008-campaign-adapter.mjs';
+import { buildInvocation } from '../../src/lib/isolation/launch.mjs';
+import { SANDBOX_ISOLATION_EXECUTOR } from '../../src/lib/isolation/profile.mjs';
 
 const TOKEN = 'fixture-only-paid-review-action-token';
 const OWNER = 'prn-s2007r-owner';
@@ -537,4 +540,152 @@ test('fixture-only dry-run refuses absent accounting fields instead of treating 
   const missingCalls = structuredClone(input);
   delete missingCalls.dry.model_calls;
   assert.equal(paid.validateS2PaidReviewDryRun(missingCalls).ok, false);
+});
+
+
+test('v12 dry-run validates deterministic controls from the separately double-built control pin', () => {
+  const preregistrationDigest = 'a'.repeat(64);
+  const modelPin = { imageId: 'sha256:' + '1'.repeat(64), digest: 'sha256:' + '2'.repeat(64), content_commitment: '3'.repeat(64) };
+  const sourceBase = { commit_sha: 'c'.repeat(40), tree_sha: 'd'.repeat(40) };
+  const samples = 2000;
+  const timeoutMs = 180000;
+  const caseIds = Array.from({ length: 126 }, (_unused, i) => 'case-' + i);
+  const controlPin = {
+    kind: 's2-008-campaign-control-image-pin/1',
+    first: { imageId: 'sha256:' + '4'.repeat(64), digest: 'sha256:' + '5'.repeat(64), architecture: 'amd64', context_digest: campaignImageContextDigest(), build_exit: 0 },
+    second: { imageId: 'sha256:' + '4'.repeat(64), digest: 'sha256:' + '5'.repeat(64), architecture: 'amd64', context_digest: campaignImageContextDigest(), build_exit: 0 },
+    identical: true, context_digest_stable: true,
+    source_base: sourceBase,
+  };
+  const controlRows = caseIds.map((case_id) => ({ case_id, predicted: 'MINOR' }));
+  const dry = {
+    status: 'DRY_RUN', dry_run: true, raw_run_id: 'v12-dry-run', nonce: 'v12-dry-nonce', label: 'clean-base',
+    preregistration_digest: preregistrationDigest, model_image_pin: modelPin, control_image_pin: controlPin,
+    spent_units: 0, spent_units_is_lower_bound: false, unreconciled_spend: false,
+    model_calls: 0, model_calls_is_lower_bound: false, unknown_model_attempts: 0, unknown_launch_attempts: 0,
+    launches: 9, charges: Array.from({ length: 9 }, () => ({ units: 0 })),
+    reservation: { currency: 'tokens', granted_units: 5000000 }, base: sourceBase,
+    trials: [
+      { trial_id: 'trl-s2-008c-01', arm_id: 'arm-model-zai-glm53flash' },
+      { trial_id: 'trl-s2-008c-02', arm_id: 'arm-type-feat-fix' },
+      { trial_id: 'trl-s2-008c-03', arm_id: 'arm-type-chore' },
+    ].map((trial) => ({ ...trial, seeds: [20260926, 20260927, 20260928].map((seed) => {
+      if (trial.arm_id === 'arm-model-zai-glm53flash') return {
+        seed, outcome_class: 'DRY_RUN', launch: {
+          exit_code: 0, signal: null, timed_out: false, container_argv: ['run', '--network=none'],
+          image: modelPin.imageId, image_digest: modelPin.digest,
+          arm_report: { dry_run: true, outcome_class: 'DRY_RUN', n_cases: 126, predictions: controlRows,
+            accounting: [], stop: null, executor: { provider: 'openrouter', model: 'stealth/space-bunny-alpha',
+              model_calls: 0, model_attempts: 0, unknown_model_attempts: 0,
+              credential_present: false, credential_in_argv: false, egress_route: null } },
+        },
+      };
+      const armReport = {
+        kind: 's2-008-campaign-adapter-predict/1', arm_id: trial.arm_id, seed, n_cases: 126,
+        predictions: controlRows,
+        container: { node_version: 'v22.23.3', pid: 1, argv_tail: [trial.arm_id, String(seed)], cwd: '/work', labels_seen: false },
+      };
+      const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
+        image: controlPin.first.imageId,
+        argv: ['/usr/local/bin/node', '/opt/campaign/arm.mjs', '/opt/campaign/holdout.blind.json',
+          '/tmp/campaign-out.json', trial.arm_id, String(seed), String(samples)],
+        timeoutMs,
+        name: 's2-008-campaign-' + trial.arm_id + '-' + seed,
+      });
+      const sidecar = {
+        kind: 's2-008-campaign-predictions/1', run: 'clean-base', arm_id: trial.arm_id, seed,
+        unparsed: 0, model_calls: null, spent_tokens: null, usd_spent: null, outcome_class: null,
+        rows: controlRows,
+      };
+      const outputDigest = canonicalDigest(armReport);
+      return {
+        seed, outcome_class: 'EXECUTED_CONTROL_DRY_RUN',
+        predictions: { digest: canonicalDigest(sidecar), rows: 126, unparsed: 0, file: 'predictions-v12-clean-base-' + trial.trial_id + '-' + seed + '.json' },
+        launch: {
+          arm_id: trial.arm_id, seed, samples, podman: { executable: 'podman', argv_prefix: [] },
+          container_argv: [...invocation.podmanArgv], image: controlPin.first.imageId, image_break_requested: false,
+          axes: invocation.axes, exit_code: 0, signal: null, timed_out: false, stderr_excerpt: '', payload_chunks: 1,
+          payload_error: null, banner: 'ADAPTER_OK arm=' + trial.arm_id + ' seed=' + seed + ' n=126 predictions=126 pid=1 node=v22.23.3',
+          output_digest: outputDigest, predictions: { digest: canonicalDigest(sidecar), rows: 126, unparsed: 0 },
+          real_start: { proven: true, separate_process: true, container_pid: 1, host_pid: 777,
+            container_runtime_version: 'v22.23.3', pin_rechecked_by: 'src/lib/isolation/image.mjs#assertImageMatchesPin' },
+          image_digest: controlPin.first.digest, arm_report: armReport,
+          control_execution: { kind: 's2-008-campaign-control-execution/1',
+            outcome_class: 'EXECUTED_CONTROL_DRY_RUN', output_digest: outputDigest,
+            pin_digest: canonicalDigest(controlPin) },
+        },
+      };
+    }) })),
+  };
+  const input = { version: 12, dry, preregistrationDigest, pin: modelPin,
+    expectedBase: { commit: sourceBase.commit_sha, tree: sourceBase.tree_sha },
+    controlPin, expectedCaseIds: caseIds, samples, timeoutMs };
+  assert.equal(paid.validateS2PaidReviewDryRun(input).ok, true);
+  const wrongControlImage = structuredClone(input);
+  wrongControlImage.dry.trials[1].seeds[0].launch.image_digest = 'sha256:' + '9'.repeat(64);
+  assert.equal(paid.validateS2PaidReviewDryRun(wrongControlImage).ok, false);
+  const wrongControlSeed = structuredClone(input);
+  const changedSeed = wrongControlSeed.dry.trials[1].seeds[0];
+  changedSeed.seed = 20260927;
+  changedSeed.launch.seed = 20260927;
+  changedSeed.launch.arm_report.seed = 20260927;
+  const changedOutputDigest = canonicalDigest(changedSeed.launch.arm_report);
+  changedSeed.launch.output_digest = changedOutputDigest;
+  changedSeed.launch.control_execution.output_digest = changedOutputDigest;
+  const rehashedSidecar = {
+    kind: 's2-008-campaign-predictions/1', run: 'clean-base',
+    arm_id: changedSeed.launch.arm_report.arm_id, seed: changedSeed.seed,
+    unparsed: 0, model_calls: null, spent_tokens: null, usd_spent: null, outcome_class: null,
+    rows: changedSeed.launch.arm_report.predictions,
+  };
+  changedSeed.launch.predictions.digest = canonicalDigest(rehashedSidecar);
+  changedSeed.predictions.digest = canonicalDigest(rehashedSidecar);
+  assert.equal(paid.validateS2PaidReviewDryRun(wrongControlSeed).ok, false);
+  const networkEnabled = structuredClone(input);
+  networkEnabled.dry.trials[1].seeds[0].launch.axes.network.policy = 'allowlist';
+  assert.equal(paid.validateS2PaidReviewDryRun(networkEnabled).ok, false);
+  const missingOwnReport = structuredClone(input);
+  delete missingOwnReport.dry.trials[1].seeds[0].launch.arm_report;
+  assert.equal(paid.validateS2PaidReviewDryRun(missingOwnReport).ok, false);
+  const forgedControlPin = structuredClone(input);
+  forgedControlPin.controlPin = { ...forgedControlPin.controlPin, first: { ...forgedControlPin.controlPin.first, digest: 'sha256:' + '9'.repeat(64) } };
+  assert.equal(paid.validateS2PaidReviewDryRun(forgedControlPin).ok, false);
+});
+
+
+test('v12 control pin artifact is bound to raw bytes, label, run identity, base, and double builds', () => {
+  const base = { commit: 'c'.repeat(40), tree: 'd'.repeat(40) };
+  const pin = {
+    kind: 's2-008-campaign-control-image-pin/1',
+    first: { imageId: 'sha256:' + '4'.repeat(64), digest: 'sha256:' + '5'.repeat(64),
+      architecture: 'amd64', context_digest: campaignImageContextDigest(), build_exit: 0 },
+    second: { imageId: 'sha256:' + '4'.repeat(64), digest: 'sha256:' + '5'.repeat(64),
+      architecture: 'amd64', context_digest: campaignImageContextDigest(), build_exit: 0 },
+    identical: true, context_digest_stable: true,
+    source_base: { commit_sha: base.commit, tree_sha: base.tree },
+  };
+  const report = { raw_run_id: 's2-008c-v12-a-runsafe', nonce: 'nonce-safe', control_image_pin: pin };
+  const artifact = {
+    kind: 's2-008-campaign-control-image-pin-artifact/1',
+    label: 'a',
+    raw_run_id: report.raw_run_id,
+    nonce: report.nonce,
+    base: { commit_sha: base.commit, tree_sha: base.tree },
+    control_image_pin: pin,
+  };
+  const bytes = Buffer.from(JSON.stringify(artifact) + '\n');
+  const reference = {
+    file: 'evidence/s2-008-campaign/control-image-pin-v12-a.json',
+    bytes: bytes.length,
+    sha256: createHash('sha256').update(bytes).digest('hex'),
+  };
+  const input = { bytes, reference, report, label: 'a', expectedBase: base };
+  assert.equal(paid.validateS2PaidReviewControlPinArtifact(input).ok, true);
+  const changedBytes = Buffer.from(bytes);
+  changedBytes[0] ^= 1;
+  assert.equal(paid.validateS2PaidReviewControlPinArtifact({ ...input, bytes: changedBytes }).ok, false);
+  assert.equal(paid.validateS2PaidReviewControlPinArtifact({ ...input,
+    reference: { ...reference, file: 'evidence/s2-008-campaign/control-image-pin-v12-b.json' } }).ok, false);
+  assert.equal(paid.validateS2PaidReviewControlPinArtifact({ ...input,
+    report: { ...report, nonce: 'other-nonce' } }).ok, false);
 });

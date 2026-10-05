@@ -32,6 +32,7 @@
 //                                              [--break-image]   # the INFRA probe
 
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -88,6 +89,66 @@ function podmanTry(args) {
   return { exitCode: Number.isInteger(run.status) ? run.status : null, stdout: String(run.stdout ?? ''), stderr: String(run.stderr ?? '') };
 }
 
+function campaignContainerfileContents(label = 'acceptance') {
+  return [
+    '# The S2-008 real-campaign adapter image. Read-only recipe: every',
+    '# instruction is a literal or a digest, nothing is passed as a build arg.',
+    '# There is no RUN step; the base image already carries the runtime.',
+    '#',
+    '# ' + String.fromCharCode(96) + '--timestamp 0' + String.fromCharCode(96) + ' is what makes the derived digest a function of CONTENT.',
+    '# Without it buildah stamps each layer with the wall clock, two builds of',
+    '# identical bytes get different digests, and the pin is a coincidence.',
+    'FROM ' + BASE_IMAGE,
+    'COPY opt/campaign /opt/campaign',
+    'LABEL org.veritas.subject="S2-008-CAMPAIGN" org.veritas.label="' + label + '" org.veritas.program="' + IN_CONTAINER_PROGRAM + '" org.veritas.base.digest="sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"',
+    '',
+  ].join('\n');
+}
+
+function sha256Bytes(bytes) {
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+/** Re-derive the image context from current source bytes without building. */
+export function campaignImageContextDigest({ label = 'acceptance' } = {}) {
+  return canonicalDigest({
+    program_sha256: sha256Of(path.join(REPO_ROOT, ARM_PROGRAM)),
+    blind_input_sha256: sha256Of(path.join(CORPUS_DIR, 'cases/holdout.blind.json')),
+    containerfile_sha256: sha256Bytes(campaignContainerfileContents(label)),
+  });
+}
+
+export function validateControlImagePinEvidence(pin, expectedBase) {
+  try {
+    const keys = ['architecture', 'build_exit', 'context_digest', 'digest', 'imageId'];
+    const validBuild = (build) => build && Object.keys(build).sort().join(',') === [...keys].sort().join(',')
+      && /^sha256:[0-9a-f]{64}$/.test(build.imageId ?? '')
+      && /^sha256:[0-9a-f]{64}$/.test(build.digest ?? '')
+      && typeof build.architecture === 'string' && build.architecture.length > 0
+      && build.build_exit === 0
+      && /^[0-9a-f]{64}$/.test(build.context_digest ?? '')
+      && build.context_digest === campaignImageContextDigest();
+    return pin?.kind === 's2-008-campaign-control-image-pin/1'
+      && Object.keys(pin).sort().join(',') === 'context_digest_stable,first,identical,kind,second,source_base'
+      && validBuild(pin.first) && validBuild(pin.second)
+      && pin.identical === (pin.first.imageId === pin.second.imageId
+        && pin.first.digest === pin.second.digest && pin.first.architecture === pin.second.architecture)
+      && pin.identical === true
+      && pin.context_digest_stable === (pin.first.context_digest === pin.second.context_digest)
+      && pin.context_digest_stable === true
+      && pin.source_base?.commit_sha === expectedBase?.commit
+      && pin.source_base?.tree_sha === expectedBase?.tree;
+  } catch { return false; }
+}
+
+function stagedCampaignImageContextDigest({ opt, containerfile }) {
+  return canonicalDigest({
+    program_sha256: sha256Of(path.join(opt, 'arm.mjs')),
+    blind_input_sha256: sha256Of(path.join(opt, 'holdout.blind.json')),
+    containerfile_sha256: sha256Of(containerfile),
+  });
+}
+
 /** Build the content-pinned image. The context is staged from the committed
  *  bytes: the arm program and the sealed blind input, nothing else. */
 export function buildImage({ label = 'acceptance' } = {}) {
@@ -96,19 +157,7 @@ export function buildImage({ label = 'acceptance' } = {}) {
   fs.mkdirSync(opt, { recursive: true });
   fs.copyFileSync(path.join(REPO_ROOT, ARM_PROGRAM), path.join(opt, 'arm.mjs'));
   fs.copyFileSync(path.join(CORPUS_DIR, 'cases/holdout.blind.json'), path.join(opt, 'holdout.blind.json'));
-  const containerfile = [
-    '# The S2-008 real-campaign adapter image. Read-only recipe: every',
-    '# instruction is a literal or a digest, nothing is passed as a build arg.',
-    '# There is no RUN step; the base image already carries the runtime.',
-    '#',
-    '# `--timestamp 0` is what makes the derived digest a function of CONTENT.',
-    '# Without it buildah stamps each layer with the wall clock, two builds of',
-    '# identical bytes get different digests, and the pin is a coincidence.',
-    `FROM ${BASE_IMAGE}`,
-    'COPY opt/campaign /opt/campaign',
-    `LABEL org.veritas.subject="S2-008-CAMPAIGN" org.veritas.label="${label}" org.veritas.program="${IN_CONTAINER_PROGRAM}" org.veritas.base.digest="sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"`,
-    '',
-  ].join('\n');
+  const containerfile = campaignContainerfileContents(label);
   const file = path.join(context, 'Containerfile.campaign');
   fs.writeFileSync(file, containerfile);
 
@@ -123,12 +172,10 @@ export function buildImage({ label = 'acceptance' } = {}) {
   // correct image.
   const pin = { imageId: normalizeDigest(inspect[0]), digest: normalizeDigest(inspect[1]), architecture: inspect[2] };
   assertDigestPinned(pin.imageId);
-  const contextDigest = canonicalDigest({
-    program_sha256: sha256Of(path.join(REPO_ROOT, ARM_PROGRAM)),
-    blind_input_sha256: sha256Of(path.join(CORPUS_DIR, 'cases/holdout.blind.json')),
-    containerfile_sha256: sha256Of(file),
-  });
+  const contextDigest = stagedCampaignImageContextDigest({ opt, containerfile: file });
+  const currentContextDigest = campaignImageContextDigest({ label });
   fs.rmSync(context, { recursive: true, force: true });
+  if (contextDigest !== currentContextDigest) throw new Error('ADAPTER_IMAGE_SOURCE_CHANGED_DURING_BUILD');
   return { pin, context_digest: contextDigest, build_exit: build.exitCode };
 }
 
@@ -255,6 +302,67 @@ export function persistPredictions({ output, armId, seed, runLabel, sink }) {
   const digest = canonicalDigest(body);
   sink(digest, body);
   return Object.freeze({ digest, rows: body.rows.length, unparsed: body.unparsed, accounting_calls: accounting?.calls ?? null, accounting_tokens: accounting?.tokens ?? null });
+}
+
+export function validateControlExecution(result, { armId, seed, samples, timeoutMs, runLabel, caseIds, imageId, imageDigest }) {
+  try {
+    const output = result?.output;
+    const record = result?.record;
+    const exactKeys = (value, keys) => value && Object.keys(value).sort().join(",") === [...keys].sort().join(",");
+    if (result?.ok !== true
+        || !exactKeys(output, ["kind", "arm_id", "seed", "n_cases", "predictions", "container"])
+        || output.kind !== "s2-008-campaign-adapter-predict/1"
+        || output.arm_id !== armId || output.seed !== seed || output.n_cases !== 126
+        || !Array.isArray(output.predictions) || output.predictions.length !== 126
+        || !exactKeys(output.container, ["node_version", "pid", "argv_tail", "cwd", "labels_seen"])
+        || !/^v[0-9]+[.][0-9]+[.][0-9]+$/.test(output.container.node_version ?? "")
+        || !Number.isSafeInteger(output.container.pid) || output.container.pid < 1
+        || canonicalDigest(output.container.argv_tail) !== canonicalDigest([armId, String(seed)])
+        || typeof output.container.cwd !== "string" || !output.container.cwd
+        || output.container.labels_seen !== false
+        || !exactKeys(record, ["arm_id", "seed", "samples", "podman", "container_argv", "image", "image_break_requested",
+          "axes", "exit_code", "signal", "timed_out", "stderr_excerpt", "banner", "payload_chunks", "payload_error",
+          "output_digest", "predictions", "real_start"])
+        || record.arm_id !== armId || record.seed !== seed || record.samples !== samples
+        || record.exit_code !== 0 || record.signal !== null || record.timed_out !== false
+        || record.image !== imageId || record.image_break_requested !== false
+        || record.output_digest !== canonicalDigest(output)
+        || record.payload_error !== null || !Number.isSafeInteger(record.payload_chunks) || record.payload_chunks < 1
+        || record.real_start?.proven !== true || record.real_start?.separate_process !== true
+        || record.real_start.container_pid !== output.container.pid
+        || record.real_start.host_pid === output.container.pid
+        || record.real_start.container_runtime_version !== output.container.node_version
+        || record.real_start.pin_rechecked_by !== "src/lib/isolation/image.mjs#assertImageMatchesPin"
+        || !/^sha256:[0-9a-f]{64}$/.test(imageId ?? "") || !/^sha256:[0-9a-f]{64}$/.test(imageDigest ?? "")
+        || !Array.isArray(caseIds) || caseIds.length !== 126 || new Set(caseIds).size !== 126) return false;
+    const outputIds = new Set();
+    for (const row of output.predictions) {
+      if (!exactKeys(row, ["case_id", "predicted"]) || typeof row.case_id !== "string"
+          || !["MAJOR", "MINOR"].includes(row.predicted) || outputIds.has(row.case_id)) return false;
+      outputIds.add(row.case_id);
+    }
+    if (caseIds.some((id) => !outputIds.has(id))) return false;
+    const expectedSidecar = {
+      kind: "s2-008-campaign-predictions/1", run: runLabel, arm_id: armId, seed,
+      unparsed: 0, model_calls: null, spent_tokens: null, usd_spent: null, outcome_class: null,
+      rows: output.predictions,
+    };
+    if (record.predictions?.digest !== canonicalDigest(expectedSidecar)
+        || record.predictions.rows !== 126 || record.predictions.unparsed !== 0) return false;
+    const expectedInvocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
+      image: imageId,
+      argv: ["/usr/local/bin/node", IN_CONTAINER_PROGRAM, IN_CONTAINER_INPUT,
+        "/tmp/campaign-out.json", armId, String(seed), String(samples)],
+      timeoutMs,
+      name: "s2-008-campaign-" + armId + "-" + seed,
+    });
+    if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1
+        || canonicalDigest(record.container_argv) !== canonicalDigest(expectedInvocation.podmanArgv)
+        || canonicalDigest(record.axes) !== canonicalDigest(expectedInvocation.axes)
+        || record.banner !== "ADAPTER_OK arm=" + armId + " seed=" + seed + " n=126 predictions=126 pid="
+          + output.container.pid + " node=" + output.container.node_version) return false;
+    return true;
+  } catch { return false; }
 }
 
 export function runTrial({ armId, seed, samples, timeoutMs, pin, breakImage = false, predictionsSink = null, runLabel = null }) {

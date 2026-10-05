@@ -3,17 +3,19 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
+import { BASE_IMAGE } from '../../src/lib/isolation/image.mjs';
 import { FROZEN_MEMBERS } from '../../scripts/s2-008-campaign-approve.mjs';
 import { assertPreregistration, preregistrationDigest as sharedDigest } from '../../src/lib/research/preregistration.mjs';
 import { preregistrationDigest } from '../../scripts/s2-008-campaign-approve.mjs';
 import { credentialEnvNameForPreregistration } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { parseArgs as parseApprovalArgs } from '../../scripts/s2-008-campaign-approve.mjs';
 import { modelImagePaths, modelImagePolicyInputs, modelImageVersionFromArgv, parseModelImageCliArgs, modelDryRunTimeoutMs } from '../../scripts/s2-008-campaign-model-image.mjs';
-import { modelTrialArgv, runModelTrial, assertPinnedModelImage } from '../../scripts/s2-008-campaign-adapter.mjs';
+import { modelTrialArgv, runModelTrial, assertPinnedModelImage, campaignImageContextDigest } from '../../scripts/s2-008-campaign-adapter.mjs';
 import { activeCampaignVersion } from '../../scripts/s2-008-campaign-evaluate.mjs';
 import { resolveProbePreregistrationPath } from '../../scripts/s2-008-campaign-probes.mjs';
 import { parsePrepareMode, assertPrepareWriteAllowed } from '../../scripts/s2-008-campaign-prepare-cli.mjs';
 import { createS2PaidReviewWorkflow, validateS2PaidReviewCapsuleSourceInputs } from '../../scripts/s2-008-paid-review.mjs';
+import { runV4Campaign } from '../../scripts/s2-008-campaign-run.mjs';
 import { createS2PaidReviewWorkflow as createS2PaidReviewWorkflowFactory } from '../../scripts/s2-008-paid-review-workflow.mjs';
 
 const BASE_PATH = 'corpus/s2-008-campaign/preregistration.v11.in-force.json';
@@ -68,6 +70,30 @@ test('real active manifest remains v12 while lineage tests use a pinned historic
   assert.equal(activeV12.approval?.in_force, true);
   assert.equal(manifest.preregistration.file, 'preregistration.v11.in-force.json');
   assert.equal(manifest.preregistration.preregistration_digest, base.preregistration_digest);
+});
+
+test('control image context digest preserves the existing literal recipe bytes', () => {
+  const tick = String.fromCharCode(96);
+  const recipe = [
+    '# The S2-008 real-campaign adapter image. Read-only recipe: every',
+    '# instruction is a literal or a digest, nothing is passed as a build arg.',
+    '# There is no RUN step; the base image already carries the runtime.',
+    '#',
+    '# ' + tick + '--timestamp 0' + tick + ' is what makes the derived digest a function of CONTENT.',
+    '# Without it buildah stamps each layer with the wall clock, two builds of',
+    '# identical bytes get different digests, and the pin is a coincidence.',
+    'FROM ' + BASE_IMAGE,
+    'COPY opt/campaign /opt/campaign',
+    'LABEL org.veritas.subject="S2-008-CAMPAIGN" org.veritas.label="acceptance" org.veritas.program="/opt/campaign/arm.mjs" org.veritas.base.digest="sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2"',
+    '',
+  ].join('\n');
+  const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
+  const expected = canonicalDigest({
+    program_sha256: digest(fs.readFileSync('scripts/s2-008-campaign-arm.mjs')),
+    blind_input_sha256: digest(fs.readFileSync('corpus/s2-008-campaign/cases/holdout.blind.json')),
+    containerfile_sha256: digest(Buffer.from(recipe)),
+  });
+  assert.equal(campaignImageContextDigest(), expected);
 });
 
 test('v12 dry-run timeout uses the signed v6 policy and rejects policy drift', () => {
@@ -295,6 +321,7 @@ test('v12 capsule sources use the v12 preregistration path while preserving exac
     'corpus/s2-008-campaign/cases/holdout.blind.json',
     'scripts/s2-008-campaign-evaluate.mjs',
     'scripts/s2-008-campaign-bootstrap.mjs',
+    'scripts/s2-008-campaign-adapter.mjs',
   ];
   const entries = paths.map((sourcePath, index) => ({ path: sourcePath, contents: Buffer.from('source-' + index) }));
   const inputs = buildV12ReviewCapsuleSourceInputs(entries);
@@ -413,4 +440,36 @@ test('v12 comparison output is version-bound and rederived from every arm, seed,
   assert.equal(validateS2PaidReviewComparison({ ...input, comparison }), true);
   assert.throws(() => validateS2PaidReviewComparison({ ...input, comparison, version: 11 }),
     (error) => error.code === 'PAID_REVIEW_COMPARISON_INVALID');
+});
+
+test('v12 mismatched independent control builds refuse before any model or control dispatch', async () => {
+  const modelPin = JSON.parse(fs.readFileSync('evidence/s2-008-campaign/model-image-pin-v12.json', 'utf8'));
+  let builds = 0;
+  let dispatches = 0;
+  const report = await runV4Campaign({
+    label: 'a',
+    dryRun: true,
+    write: false,
+    prereg: activeV12,
+    manifest: activeManifest,
+    modelPin,
+    resolveBaseFn: () => ({ commit_sha: 'c'.repeat(40), tree_sha: 'd'.repeat(40), worktree_dirty: true }),
+    buildRegex: () => {
+      builds += 1;
+      const suffix = String(builds).repeat(64);
+      return {
+        pin: { imageId: 'sha256:' + suffix, digest: 'sha256:' + 'e'.repeat(64), architecture: 'amd64' },
+        context_digest: campaignImageContextDigest(),
+        build_exit: 0,
+      };
+    },
+    runModel: async () => { dispatches += 1; throw new Error('unexpected model dispatch'); },
+    runRegex: async () => { dispatches += 1; throw new Error('unexpected control dispatch'); },
+  });
+  assert.equal(builds, 2);
+  assert.equal(dispatches, 0);
+  assert.equal(report.status, 'BLOCKED');
+  assert.equal(report.code, 'CONTROL_IMAGE_PIN_INVALID');
+  assert.equal(report.launches, 0);
+  assert.deepEqual(report.trials, []);
 });

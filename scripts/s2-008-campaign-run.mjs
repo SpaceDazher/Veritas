@@ -32,7 +32,7 @@
 //   node scripts/s2-008-campaign-run.mjs --label b --out evidence/<file>.json
 
 import { execFileSync } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -61,7 +61,7 @@ import {
   TRIAL_STATUSES, RESEARCH_OUTCOMES, TRIAL_VERDICTS, RESEARCH_PARTITIONS,
 } from '../src/lib/research/constants.mjs';
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
-import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin } from './s2-008-campaign-adapter.mjs';
+import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin, campaignImageContextDigest, validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 import { assertV8AReconciliation, readV9ReconciliationInputs } from './s2-008-campaign-v9-approval.mjs';
@@ -1052,6 +1052,32 @@ export async function runCampaign({ label = 'a', write = true, out = null, verif
 }
 
 
+function controlImagePinFromBuilds(firstBuild, secondBuild, base) {
+  const buildRecord = (value) => ({
+    imageId: value?.pin?.imageId ?? null,
+    digest: value?.pin?.digest ?? null,
+    architecture: value?.pin?.architecture ?? null,
+    context_digest: value?.context_digest ?? null,
+    build_exit: value?.build_exit ?? null,
+  });
+  return {
+    kind: 's2-008-campaign-control-image-pin/1',
+    first: buildRecord(firstBuild),
+    second: buildRecord(secondBuild),
+    identical: firstBuild?.pin?.imageId === secondBuild?.pin?.imageId
+      && firstBuild?.pin?.digest === secondBuild?.pin?.digest
+      && firstBuild?.pin?.architecture === secondBuild?.pin?.architecture,
+    context_digest_stable: firstBuild?.context_digest === secondBuild?.context_digest,
+    source_base: { commit_sha: base?.commit_sha ?? null, tree_sha: base?.tree_sha ?? null },
+  };
+}
+
+function controlImagePinEvidenceValid(evidence, base) {
+  return validateControlImagePinEvidence(evidence, {
+    commit: base?.commit_sha ?? null, tree: base?.tree_sha ?? null,
+  });
+}
+
 /**
  * V4 prediction phase. The model is called while every input is blind; labels
  * are opened later by the independent evaluator. Each seed's exact rows are
@@ -1193,13 +1219,19 @@ export async function runV4Campaign({
     };
   }
   const entries = arm === null ? prereg.trial_list : prereg.trial_list.filter((entry) => entry.arm_id === arm);
+  const controlCaseIds = version === 12
+    ? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, "cases/holdout.blind.json"), "utf8")).map((row) => row.case_id)
+    : null;
   if (entries.length === 0) throw new Error('CAMPAIGN_ARM_NOT_PREREGISTERED');
   const seeds = seed === null ? prereg.seed_rule.seeds : prereg.seed_rule.seeds.filter((value) => value === Number(seed));
   if (seeds.length === 0) throw new Error('CAMPAIGN_SEED_NOT_PREREGISTERED');
   if (write) {
     const reportTarget = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);
-    const planned = [reportTarget, ...entries.flatMap((entry) => seeds.map((currentSeed) =>
-      path.join(REPO_ROOT, 'evidence/s2-008-campaign', `predictions-v${version}-${safeLabel}-${entry.trial_id}-${currentSeed}.json`)))];
+    const hasControlArms = entries.some((entry) => entry.arm_id !== 'arm-model-zai-glm53flash');
+    const controlPinTarget = version === 12 && hasControlArms
+      ? path.join(REPO_ROOT, 'evidence/s2-008-campaign', 'control-image-pin-v12-' + safeLabel + '.json') : null;
+    const planned = [reportTarget, ...(controlPinTarget ? [controlPinTarget] : []), ...entries.flatMap((entry) => seeds.map((currentSeed) =>
+      path.join(REPO_ROOT, 'evidence/s2-008-campaign', 'predictions-v' + version + '-' + safeLabel + '-' + entry.trial_id + '-' + currentSeed + '.json')))];
     const collision = planned.find((target) => fs.existsSync(target));
     if (collision) return {
       kind: campaignKind, status: 'BLOCKED', code: 'CAMPAIGN_EVIDENCE_TARGET_EXISTS',
@@ -1220,7 +1252,41 @@ export async function runV4Campaign({
     preregistration_digest: prereg.preregistration_digest,
   };
 
-  const regexPin = entries.some((entry) => entry.arm_id !== 'arm-model-zai-glm53flash') ? buildRegex().pin : null;
+  const hasControlArms = entries.some((entry) => entry.arm_id !== 'arm-model-zai-glm53flash');
+  let controlImagePin = null;
+  let controlImagePinArtifact = null;
+  let controlPinBlocked = false;
+  if (version === 12 && hasControlArms) {
+    try {
+      const firstBuild = buildRegex();
+      const secondBuild = buildRegex();
+      controlImagePin = controlImagePinFromBuilds(firstBuild, secondBuild, base);
+      controlPinBlocked = !controlImagePinEvidenceValid(controlImagePin, base);
+    } catch {
+      controlPinBlocked = true;
+    }
+    if (write && controlImagePin !== null) {
+      const relative = 'evidence/s2-008-campaign/control-image-pin-v12-' + safeLabel + '.json';
+      const artifact = {
+        kind: 's2-008-campaign-control-image-pin-artifact/1',
+        label: safeLabel,
+        raw_run_id: runId,
+        nonce,
+        base: { commit_sha: base.commit_sha, tree_sha: base.tree_sha },
+        control_image_pin: controlImagePin,
+      };
+      const bytes = Buffer.from(JSON.stringify(artifact, null, 2) + '\n');
+      fs.writeFileSync(path.join(REPO_ROOT, relative), bytes, { flag: 'wx', mode: 0o600 });
+      controlImagePinArtifact = {
+        file: relative,
+        bytes: bytes.length,
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+      };
+    }
+  }
+  const regexPin = version === 12
+    ? controlImagePin?.first ?? null
+    : (hasControlArms ? buildRegex().pin : null);
   const trials = [];
   const charges = [];
   let spentUnits = 0;
@@ -1230,9 +1296,9 @@ export async function runV4Campaign({
   let launches = 0;
   let unknownLaunchAttempts = 0;
   let unreconciledSpend = false;
-  let status = dryRun ? 'DRY_RUN' : 'MEASURED';
-  let reason = null;
-  let code = null;
+  let status = controlPinBlocked ? 'BLOCKED' : (dryRun ? 'DRY_RUN' : 'MEASURED');
+  let reason = controlPinBlocked ? 'independent deterministic control image builds did not match their staged source context' : null;
+  let code = controlPinBlocked ? 'CONTROL_IMAGE_PIN_INVALID' : null;
   let modelCalls = 0;
   let hasModelCallsReport = false;
   let modelCallsUnknown = false;
@@ -1240,7 +1306,7 @@ export async function runV4Campaign({
   let unknownModelAttempts = 0;
   let unknownModelAttemptsUnknown = false;
   const granted = prereg.budget_reservation.granted_units;
-  for (const entry of entries) {
+  for (const entry of (controlPinBlocked ? [] : entries)) {
     const perSeed = [];
     for (const currentSeed of seeds) {
       if (!dryRun && entry.arm_id === 'arm-model-zai-glm53flash' && version >= 6) {
@@ -1311,9 +1377,45 @@ export async function runV4Campaign({
           },
         };
       }
+      const isModelArm = entry.arm_id === 'arm-model-zai-glm53flash';
+      if (version === 12 && !isModelArm) {
+        const controlValid = controlImagePin !== null && validateControlExecution(result, {
+          armId: entry.arm_id, seed: currentSeed, samples: prereg.noise_rule.bootstrap_samples,
+          imageId: controlImagePin.first.imageId, imageDigest: controlImagePin.first.digest,
+          timeoutMs: prereg.budget_reservation.trial_timeout_ms,
+          runLabel: safeLabel, caseIds: controlCaseIds,
+        });
+        if (!controlValid) {
+          result = {
+            ...result,
+            ok: false,
+            control_outcome_class: 'NOT_RUN',
+            record: { ...result.record, control_validation: 'CONTROL_OUTPUT_OR_LAUNCH_INVALID' },
+          };
+        }
+      }
+      if (version === 12 && !isModelArm && result.ok === true && result.output !== null
+          && result.record && controlImagePin !== null) {
+        const controlOutcome = dryRun ? 'EXECUTED_CONTROL_DRY_RUN' : 'MEASURED_CONTROL';
+        const outputDigest = canonicalDigest(result.output);
+        result = {
+          ...result,
+          control_outcome_class: controlOutcome,
+          record: {
+            ...result.record,
+            image_digest: controlImagePin.first.digest,
+            arm_report: result.output,
+            control_execution: {
+              kind: 's2-008-campaign-control-execution/1',
+              outcome_class: controlOutcome,
+              pin_digest: canonicalDigest(controlImagePin),
+              output_digest: outputDigest,
+            },
+          },
+        };
+      }
       if (result.launch_unknown) unknownLaunchAttempts += 1;
       else launches += 1;
-      const isModelArm = entry.arm_id === 'arm-model-zai-glm53flash';
       if (isModelArm) {
         const accounting = observedModelAccounting(result.output);
         if (accounting.model_calls === null) modelCallsUnknown = true;
@@ -1351,7 +1453,7 @@ export async function runV4Campaign({
           spentUnits = step.spent_units;
           spentUnitsIsLowerBound = true;
         }
-        perSeed.push({ seed: currentSeed, outcome_class: result.output?.outcome_class ?? 'NOT_RUN', predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null, launch: result.record });
+        perSeed.push({ seed: currentSeed, outcome_class: result.control_outcome_class ?? result.output?.outcome_class ?? 'NOT_RUN', predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null, launch: result.record });
         break;
       }
       spentUnits = step.spent_units;
@@ -1362,7 +1464,7 @@ export async function runV4Campaign({
         spent_units_after: spentUnits,
       });
       perSeed.push({
-        seed: currentSeed, outcome_class: result.output?.outcome_class ?? 'NOT_RUN',
+        seed: currentSeed, outcome_class: result.control_outcome_class ?? result.output?.outcome_class ?? 'NOT_RUN',
         predictions: result.record?.predictions ? { ...result.record.predictions, file: sidecarFile } : null,
         launch: result.record,
       });
@@ -1384,6 +1486,10 @@ export async function runV4Campaign({
     raw_run_id: runId, nonce, base,
     preregistration_digest: prereg.preregistration_digest,
     model_image_pin: { imageId: activeModelPin.first.imageId, digest: activeModelPin.first.digest, content_commitment: activeModelPin.first.content_commitment },
+    ...(version === 12 && controlImagePin !== null ? {
+      control_image_pin: controlImagePin,
+      control_image_pin_artifact: controlImagePinArtifact,
+    } : {}),
     reservation: { id: prereg.budget_reservation.reservation_id, currency, granted_units: granted },
     spent_units: spendUncertain && !hasKnownSpendReport ? null : spentUnits,
     spent_units_is_lower_bound: spentUnitsIsLowerBound,
