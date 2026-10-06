@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1398.
+Generated from `git ls-files`; count: 1408.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -445,7 +445,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration-v10-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v11-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v11-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v12-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v12-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v13-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v3-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v3-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v4-superseded.json`
@@ -470,6 +472,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration.v12.approved.json`
 - `corpus/s2-008-campaign/preregistration.v12.draft.json`
 - `corpus/s2-008-campaign/preregistration.v12.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v13.approved.json`
+- `corpus/s2-008-campaign/preregistration.v13.draft.json`
+- `corpus/s2-008-campaign/preregistration.v13.in-force.json`
 - `corpus/s2-008-campaign/preregistration.v2.approved.json`
 - `corpus/s2-008-campaign/preregistration.v2.draft.json`
 - `corpus/s2-008-campaign/preregistration.v3.approved.json`
@@ -673,6 +678,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v11.json`
 - `evidence/s2-008-campaign/model-image-pin-v12-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v12.json`
+- `evidence/s2-008-campaign/model-image-pin-v13-preseal.json`
+- `evidence/s2-008-campaign/model-image-pin-v13.json`
 - `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/model-image-pin-v4.json`
 - `evidence/s2-008-campaign/model-image-pin-v5-preseal.json`
@@ -1045,6 +1052,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-seal-v10.mjs`
 - `scripts/s2-008-campaign-seal-v11.mjs`
 - `scripts/s2-008-campaign-seal-v12.mjs`
+- `scripts/s2-008-campaign-seal-v13.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
 - `scripts/s2-008-campaign-seal-v4.mjs`
 - `scripts/s2-008-campaign-seal-v5.mjs`
@@ -1057,6 +1065,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-v11-approval.mjs`
 - `scripts/s2-008-campaign-v11-draft.mjs`
 - `scripts/s2-008-campaign-v12-approval.mjs`
+- `scripts/s2-008-campaign-v13-approval.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-campaign-v5-approval.mjs`
 - `scripts/s2-008-campaign-v5-draft.mjs`
@@ -1321,6 +1330,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-v10.test.mjs`
 - `tests/research/campaign-v11.test.mjs`
 - `tests/research/campaign-v12.test.mjs`
+- `tests/research/campaign-v13.test.mjs`
 - `tests/research/campaign-v4-draft.test.mjs`
 - `tests/research/campaign-v5-approval.test.mjs`
 - `tests/research/campaign-v6-probe-evidence.test.mjs`
