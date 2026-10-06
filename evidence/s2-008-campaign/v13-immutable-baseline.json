@@ -1,0 +1,60 @@
+{
+  "head": "c8654c381e5dfb9937e8c3826792428568d08c99",
+  "files": [
+    {
+      "file": "corpus/s2-008-campaign/preregistration.v13.approved.json",
+      "sha256": "3357b412d0811ea089c8350773533e1784859c0950b91c713a702b1f095ff5aa",
+      "bytes": 25380
+    },
+    {
+      "file": "corpus/s2-008-campaign/preregistration.v13.in-force.json",
+      "sha256": "80da47105d3ec77a707c867fcb5fc29ae564ace482eea2d7fb868d609ac995cd",
+      "bytes": 25379
+    },
+    {
+      "file": "corpus/s2-008-campaign/preregistration-v13-supersession.json",
+      "sha256": "c40fd6e8e84b9c84c01d74dc366c0326353d0c6abbf3b7f8df4c78947e0aa03e",
+      "bytes": 691
+    },
+    {
+      "file": "evidence/s2-008-campaign/model-image-pin-v13.json",
+      "sha256": "6f655d3336dbe73c0eacc0d967743008741aadc5f84851c4545003a0558ad45f",
+      "bytes": 5077
+    },
+    {
+      "file": "evidence/s2-008-campaign/run-v13-a.json",
+      "sha256": "44b4c2af8ff3d12b5295572d7ffa5a8bf0ec951e815b35d1ff49eaa6eb1ccf11",
+      "bytes": 13174
+    },
+    {
+      "file": "evidence/s2-008-campaign/reconciliation-v13-a-first-old-key-confirmed.json",
+      "sha256": "ee24a8b777c347623dab78e0828899fe8974cbdab7fe1287d79f5ba9bd31ac6f",
+      "bytes": 2983
+    },
+    {
+      "file": "evidence/s2-008-campaign/reconciliation-v13-a-second-old-key-confirmed.json",
+      "sha256": "80a45812ee995dc9f962100830a4f1a75cd410b1904a241ce1484ac3a16765e9",
+      "bytes": 3004
+    },
+    {
+      "file": "evidence/s2-008-campaign/v13-a-second-stopped/run-v13-a.json",
+      "sha256": "be85ff414cb86ba06b9ab9a83fa2643b35038cc0bd8de740fa858aefd2128bd0",
+      "bytes": 13174
+    },
+    {
+      "file": "evidence/s2-008-campaign/v13-a-third-stopped/run-v13-a.json",
+      "sha256": "9b48f3de8e6e275f38e7c5eb2d5c9d05647671303a5c1effdfb9cd264e10b13a",
+      "bytes": 15139
+    },
+    {
+      "file": "evidence/s2-008-campaign/v13-a-third-stopped/reconciliation.json",
+      "sha256": "9c1c75d83c3952af147aed141c5fbd3c556815c8b81c97b7f2535a3b6d5bee81",
+      "bytes": 3876
+    },
+    {
+      "file": "evidence/s2-008-campaign/v13-a-third-stopped/upstream-429-observation.json",
+      "sha256": "a19a7af72919780e4602261555aa16a025af1fca4e128a9f80d61a9f5ccdeebd",
+      "bytes": 1139
+    }
+  ]
+}
