@@ -229,3 +229,20 @@ test('v14 paid review keeps the actual receipt model id and accepts only request
   }));
 });
 
+
+const v14Approval = await import('../../scripts/s2-008-campaign-v14-approval.mjs');
+
+test('v14 restart lineage binds the corrected 3-attempt closure without upgrading old or failed calls', () => {
+  const { base } = v14Approval.readV14BaseInputs();
+  const closure = v14Approval.assertV14RestartReconciliation(base, v14Approval.readV14RestartInputs());
+  assert.equal(closure.third_attempt.local_attempts, 3);
+  assert.equal(closure.third_attempt.successful_generations, 2);
+  assert.equal(closure.third_attempt.failed_upstream_requests, 1);
+  assert.equal(closure.third_attempt.owner_closed_unknown_attempts, 1);
+  assert.equal(closure.third_attempt.known_tokens, 1586);
+  assert.equal(closure.third_attempt.known_usd, 0);
+  assert.equal(closure.third_attempt.third_failure_cost, null);
+  assert.equal(closure.account_wide_completeness_claimed, false);
+  assert.equal(closure.historical_old_key_reconciliations.length, 2);
+  assert.equal(closure.superseded_incorrect_reconciliation_file, 'evidence/s2-008-campaign/reconciliation-v13-a.json');
+});
