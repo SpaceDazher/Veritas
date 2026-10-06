@@ -39,11 +39,11 @@ test('v11 keeps the signed OpenRouter executor and canonical preregistration con
   assert.equal(activeCampaignVersion({ preregistration: { file: 'preregistration.v11.in-force.json' } }), 'v11');
   assert.equal(resolveProbePreregistrationPath('corpus/s2-008-campaign/preregistration.v11.in-force.json', '/tmp/veritas-probe-root'),
     '/tmp/veritas-probe-root/corpus/s2-008-campaign/preregistration.v11.in-force.json');
-  for (const bad of ['v13', 'v110']) {
+  for (const bad of ['v14', 'v110']) {
     assert.throws(() => modelImagePaths(bad), /MODEL_IMAGE_VERSION_INVALID/);
   }
   assert.equal(modelImageVersionFromArgv(['node', 'builder', '--v11']), 'v11');
-  for (const bad of ['--v13', '--v110', '--v11junk', '--v11/../../v10', '--v11=foo']) {
+  for (const bad of ['--v14', '--v110', '--v11junk', '--v11/../../v10', '--v11=foo']) {
     assert.throws(() => modelImageVersionFromArgv(['node', 'builder', bad]), /MODEL_IMAGE_VERSION_INVALID/);
   }
   assert.throws(() => modelImageVersionFromArgv(['node', 'builder', '--v10', '--v11']), /MODEL_IMAGE_VERSION_INVALID/);
@@ -362,7 +362,7 @@ test('model image CLI rejects unsupported and conflicting versions before invoki
   const { spawnSync } = await import('node:child_process');
   const path = await import('node:path');
   const script = path.resolve('scripts/s2-008-campaign-model-image.mjs');
-  for (const flags of [['--v13'], ['--v110'], ['--v11junk'], ['--v11/../../v10'], ['--v11=foo'], ['--v10', '--v11']]) {
+  for (const flags of [['--v14'], ['--v110'], ['--v11junk'], ['--v11/../../v10'], ['--v11=foo'], ['--v10', '--v11']]) {
     const result = spawnSync(process.execPath, [script, ...flags], { cwd: process.cwd(), encoding: 'utf8' });
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /MODEL_IMAGE_VERSION_INVALID/);
@@ -375,10 +375,10 @@ test('strict campaign CLI helpers reject version and mode ambiguity before dispa
   assert.equal(prepareCli.parsePrepareMode(['--check']), 'check');
   assert.equal(prepareCli.parsePrepareMode(['--seal-v11']), 'seal-v11');
   for (const args of [
-    ['--seal-v13'], ['--seal-v110'], ['--seal-v011'], ['--seal-v11junk'], ['--seal-v11=foo'],
+    ['--seal-v14'], ['--seal-v110'], ['--seal-v011'], ['--seal-v11junk'], ['--seal-v11=foo'],
     ['--seal-v10', '--seal-v11'], ['--check', '--selftest'],
   ]) assert.throws(() => prepareCli.parsePrepareMode(args), /PREPARE_(?:VERSION|MODE)_INVALID/);
-  for (let version = 2; version <= 12; version += 1) {
+  for (let version = 2; version <= 13; version += 1) {
     assert.throws(() => prepareCli.assertPrepareWriteAllowed({
       preregistration: { file: 'preregistration.v' + version + '.in-force.json', status: 'IN_FORCE' },
     }), /VERSIONED_IN_FORCE_REFUSES_DEFAULT_WRITE/);
@@ -390,13 +390,13 @@ test('strict campaign CLI helpers reject version and mode ambiguity before dispa
   const approveModule = await import('../../scripts/s2-008-campaign-approve.mjs');
   assert.throws(() => approveModule.parseArgs(['--version', 'v11', '--version', 'v11']), /VERSION_CONFLICT/);
   assert.throws(() => approveModule.parseArgs(['--version', 'v10', '--version', 'v11']), /VERSION_CONFLICT/);
-  assert.throws(() => approveModule.parseArgs(['--version', 'v13']), /VERSION_INVALID/);
+  assert.throws(() => approveModule.parseArgs(['--version', 'v14']), /VERSION_INVALID/);
 
   const runModule = await import('../../scripts/s2-008-campaign-run.mjs');
   assert.equal(runModule.campaignCliMode({ v11: true }).requestedVersion, 11);
   assert.equal(runModule.campaignCliMode({ arm: 'arm-model-zai-glm53flash', dryRun: true }).predictionRunner, true);
   for (const args of [
-    { v13: true }, { v110: true }, { v11junk: true }, { v11: 'true' },
+    { v14: true }, { v110: true }, { v11junk: true }, { v11: 'true' },
     { v10: true, v11: true }, { v11: true, v12: true },
   ]) assert.throws(() => runModule.campaignCliMode(args), /CAMPAIGN_VERSION_(?:INVALID|FLAGS_CONFLICT)/);
 });
@@ -416,7 +416,7 @@ test('actual CLI refusals preserve the in-force manifest and never write approva
 
   const prepareScript = path.join(root, 'scripts/s2-008-campaign-prepare.mjs');
   const rejectedPrepareModes = [
-    ['--seal-v13'], ['--seal-v110'], ['--seal-v011'], ['--seal-v11junk'], ['--seal-v11=foo'],
+    ['--seal-v14'], ['--seal-v110'], ['--seal-v011'], ['--seal-v11junk'], ['--seal-v11=foo'],
     ['--seal-v10', '--seal-v11'], ['--check', '--selftest'],
   ];
   for (const flags of rejectedPrepareModes) {
@@ -451,7 +451,7 @@ test('actual CLI refusals preserve the in-force manifest and never write approva
 
     const runScript = path.join(root, 'scripts/s2-008-campaign-run.mjs');
     for (const flags of [
-      ['--v13'], ['--v110'], ['--v11junk'], ['--v11=foo'], ['--v11', 'false'],
+      ['--v14'], ['--v110'], ['--v11junk'], ['--v11=foo'], ['--v11', 'false'],
       ['--v10', '--v11'], ['--v11', '--v12'],
     ]) {
       const result = spawnSync(process.execPath, [runScript, ...flags], { cwd: root, encoding: 'utf8' });

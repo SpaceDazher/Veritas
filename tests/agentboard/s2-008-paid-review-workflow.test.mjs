@@ -277,11 +277,10 @@ test('paid review task binds owner, distinct producer, the small offline grant, 
 });
 
 
-test('isolated active-v12 evidence root stays not ready when its A/B records are absent', async () => {
+test('isolated historical-v12 evidence root stays not ready when its A/B records are absent', async () => {
   const evidenceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-v12-review-missing-'));
   const sourceRoot = process.cwd();
   const copiedPaths = [
-    'corpus/s2-008-campaign/manifest.json',
     'corpus/s2-008-campaign/preregistration.v12.in-force.json',
     'evidence/s2-008-campaign/reconciliation-v8-a.json',
     'evidence/s2-008-campaign/reconciliation-v9-a.json',
@@ -295,6 +294,25 @@ test('isolated active-v12 evidence root stays not ready when its A/B records are
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(sourceRoot, relative), target);
     }
+    const historicalV12 = JSON.parse(fs.readFileSync(path.join(sourceRoot,
+      'corpus/s2-008-campaign/preregistration.v12.in-force.json'), 'utf8'));
+    const v12Supersession = JSON.parse(fs.readFileSync(path.join(sourceRoot,
+      'corpus/s2-008-campaign/preregistration-v12-supersession.json'), 'utf8'));
+    const historicalV12Manifest = {
+      preregistration: {
+        file: 'preregistration.v12.in-force.json',
+        status: 'IN_FORCE',
+        preregistration_digest: historicalV12.preregistration_digest,
+        sealed_before_first_trial: true,
+      },
+      supersession: {
+        file: 'preregistration-v12-supersession.json',
+        supersession_id: v12Supersession.supersession_id,
+        supersession_digest: v12Supersession.supersession_digest,
+      },
+    };
+    fs.writeFileSync(path.join(evidenceRoot, 'corpus/s2-008-campaign/manifest.json'),
+      JSON.stringify(historicalV12Manifest));
     const evidence = paid.inspectS2PaidReviewEvidence(evidenceRoot);
     assert.equal(evidence.version, 12);
     assert.equal(evidence.reasons.includes('ACTIVE_PREREGISTRATION_INVALID'), false);
