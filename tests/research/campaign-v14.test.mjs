@@ -13,7 +13,24 @@ const V13_MODEL_POLICY = credentialPolicy.V13_MODEL_POLICY;
 const V14_MODEL_POLICY = credentialPolicy.V14_MODEL_POLICY;
 const V7_PI_SETTINGS = credentialPolicy.V7_PI_SETTINGS;
 const paidReviewRoute = await import('../../scripts/s2-008-paid-review.mjs');
+const modelImageRoute = await import('../../scripts/s2-008-campaign-model-image.mjs');
 const validateS2PaidReviewGenerationAccounting = paidReviewRoute.validateS2PaidReviewGenerationAccounting;
+
+test('v14 model-image dry run binds its timeout and interval to the staged in-force preregistration', () => {
+  const timeout = pacing.createV14ModelTimeoutPolicy();
+  assert.deepEqual(timeout.pi_argv_flags, ['--no-tools', '--no-extensions', '--no-skills']);
+  const active = { rule: 's2-008-prereg-v14', executor: { model_launch_timeout: timeout } };
+  assert.equal(modelImageRoute.modelDryRunTimeoutMs(active), 30540000);
+  assert.equal(typeof modelImageRoute.modelDryRunArgv, 'function');
+  const v14Args = modelImageRoute.modelDryRunArgv(active, modelImageRoute.modelImagePaths('v14'));
+  assert.deepEqual(v14Args.slice(-3), ['--dry-run', '--min-start-interval-ms', '60000']);
+  const v13Preseal = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../corpus/s2-008-campaign/preregistration.v13.in-force.json'), 'utf8'));
+  assert.equal(modelImageRoute.modelDryRunTimeoutMs(v13Preseal), 22980000);
+  const presealArgs = modelImageRoute.modelDryRunArgv(v13Preseal,
+    modelImageRoute.modelImagePaths('v14', { preseal: true }));
+  assert.deepEqual(presealArgs.slice(-1), ['--dry-run']);
+  assert.equal(presealArgs.includes('--min-start-interval-ms'), false);
+});
 
 test('v14 pacing keeps at least 60 seconds between call starts', () => {
   assert.equal(typeof pacing.createV14StartPacer, 'function');
@@ -333,6 +350,31 @@ function v14PresealPinFixture(baseBytes) {
     content_commitment_stable: true, commitment_excludes_preregistration: true,
     commitment: { covers, excludes: ['prereg'] }, first, second };
 }
+
+test('paid-review inspector accepts the complete synthetic v14 in-force preregistration', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'v14-review-prereg-'));
+  try {
+    const inputs = v14Approval.readV14BaseInputs();
+    const draft = v14Approval.createV14Draft({ ...inputs,
+      pin: v14PresealPinFixture(inputs.baseBytes), restartInputs: v14Approval.readV14RestartInputs() });
+    const prereg = { ...draft, status: 'APPROVED', approval: { ...draft.approval,
+      status: 'APPROVED', authority: 'HUMAN_OWNER', principal_id: 'prn-s2007r-owner', label: 'Daniil',
+      issued_at: '2026-10-06T15:00:00.000Z', in_force: true } };
+    prereg.preregistration_digest = campaignApproval.preregistrationDigest(prereg);
+    const corpus = path.join(root, 'corpus/s2-008-campaign');
+    fs.mkdirSync(corpus, { recursive: true });
+    fs.writeFileSync(path.join(corpus, 'preregistration.v14.in-force.json'), JSON.stringify(prereg));
+    fs.writeFileSync(path.join(corpus, 'manifest.json'), JSON.stringify({ preregistration: {
+      file: 'preregistration.v14.in-force.json', status: 'IN_FORCE', sealed_before_first_trial: true,
+      preregistration_digest: prereg.preregistration_digest,
+    } }));
+    const inspected = paidReviewRoute.inspectS2PaidReviewEvidence(root);
+    assert.equal(inspected.version, 14);
+    assert.equal(inspected.reasons.includes('ACTIVE_PREREGISTRATION_INVALID'), false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
 
 test('v14 draft preserves all 15 frozen members and every frozen member tamper is detected', () => {
   const inputs = v14Approval.readV14BaseInputs();

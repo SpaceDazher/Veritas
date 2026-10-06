@@ -10,6 +10,7 @@ import { BASE_IMAGE, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { PODMAN_HOST, buildInvocation, executeIsolated } from '../src/lib/isolation/launch.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
+import { assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 import { V13_MODEL_POLICY } from './s2-008-campaign-credential-env.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -453,10 +454,31 @@ export function assertRecordedModelPin(rebuilt, recorded) {
 }
 
 export function modelDryRunTimeoutMs(prereg) {
-  if (/^s2-008-prereg-v(?:[6-9]|1[0-2])$/.test(prereg?.rule ?? '')) {
+  if (prereg?.rule === 's2-008-prereg-v14') {
+    return assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout).total_container_timeout_ms;
+  }
+  if (/^s2-008-prereg-v(?:[6-9]|1[0-3])$/.test(prereg?.rule ?? '')) {
     return assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout).total_container_timeout_ms;
   }
   return 180_000;
+}
+
+export function modelDryRunArgv(prereg, paths = MODEL_PATHS) {
+  const argv = [
+    '/usr/local/bin/node',
+    '/opt/veritas/scripts/s2-008-campaign-arm-model.mjs',
+    '/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json',
+    '/tmp/model-out.json',
+    'arm-model-zai-glm53flash',
+    `/opt/veritas/${paths.stagedPrereg}`,
+    '20260926',
+    '--dry-run',
+  ];
+  if (prereg?.rule === 's2-008-prereg-v14') {
+    const policy = assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    argv.push('--min-start-interval-ms', String(policy.min_start_interval_ms));
+  }
+  return argv;
 }
 
 export function dryRunModelInImage(pin) {
@@ -464,16 +486,7 @@ export function dryRunModelInImage(pin) {
   const timeoutMs = modelDryRunTimeoutMs(stagedPrereg);
   const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
     image: pin.imageId,
-    argv: [
-      '/usr/local/bin/node',
-      '/opt/veritas/scripts/s2-008-campaign-arm-model.mjs',
-      '/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json',
-      '/tmp/model-out.json',
-      'arm-model-zai-glm53flash',
-      `/opt/veritas/${MODEL_PATHS.stagedPrereg}`,
-      '20260926',
-      '--dry-run',
-    ],
+    argv: modelDryRunArgv(stagedPrereg, MODEL_PATHS),
     timeoutMs,
     name: `s2-008-model-${MODEL_PATHS.schema.split('/').at(-1)}-dry-run`,
   });

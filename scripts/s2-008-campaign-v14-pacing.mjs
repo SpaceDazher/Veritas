@@ -9,6 +9,7 @@ export const V14_TIMEOUT_POLICY = Object.freeze({
   total_container_timeout_ms: 30540000,
   formula: 'holdout_case_count * (per_model_call_timeout_ms + min_start_interval_ms) + bridge_report_margin_ms',
   scope: 'ONE_MODEL_CONTAINER_PER_SEED',
+  pi_argv_flags: Object.freeze(['--no-tools', '--no-extensions', '--no-skills']),
 });
 
 export function assertV14MinStartInterval(value) {
@@ -26,7 +27,9 @@ export function assertV14ModelTimeoutPolicy(policy) {
   const expected = V14_TIMEOUT_POLICY;
   if (policy === null || typeof policy !== 'object' ||
       Object.keys(policy).sort().join(',') !== Object.keys(expected).sort().join(',') ||
-      Object.keys(expected).some((key) => policy[key] !== expected[key])) {
+      Object.keys(expected).some((key) => Array.isArray(expected[key])
+        ? JSON.stringify(policy[key]) !== JSON.stringify(expected[key])
+        : policy[key] !== expected[key])) {
     throw new Error('V14_MODEL_TIMEOUT_POLICY_INVALID');
   }
   return policy;

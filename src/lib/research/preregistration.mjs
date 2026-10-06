@@ -895,6 +895,7 @@ export function assertPreregistration(prereg) {
       bridge_report_margin_ms: 300000, total_container_timeout_ms: 30540000,
       formula: 'holdout_case_count * (per_model_call_timeout_ms + min_start_interval_ms) + bridge_report_margin_ms',
       scope: 'ONE_MODEL_CONTAINER_PER_SEED',
+      pi_argv_flags: ['--no-tools', '--no-extensions', '--no-skills'],
     };
     const binding = executor?.pi_model_catalog_binding;
     if (executor?.provider !== 'openrouter' || executor?.model !== 'inclusionai/ling-3.1-flash' ||
