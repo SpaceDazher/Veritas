@@ -13,13 +13,16 @@ import { PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
 import { BASE_IMAGE } from '../src/lib/isolation/image.mjs';
 import { replayA05Journal, setupA05Database } from './a-mvp05-runtime.mjs';
 import { createA05ReviewServer, hashA05ReviewToken } from './a-mvp05-review.mjs';
-import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, validateV12ProbeEvidence, validateV13ProbeEvidence, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
+import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, validateV12ProbeEvidence, validateV13ProbeEvidence, validateV14ProbeEvidence, V14_REVIEW_CAPSULE_SOURCE_PATHS, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
 import { contentCommitmentOf } from './s2-008-campaign-model-image.mjs';
 import { validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { openRegistry, readJournal, verifyChain } from '../src/lib/research/registry.mjs';
 import { createS2PaidReviewWorkflow as createPaidWorkflow, isTrustedS2PaidReviewWorkflow } from './s2-008-paid-review-workflow.mjs';
 import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation, inspectV11PriorExecutionEvidence } from './s2-008-campaign-v12-approval.mjs';
-import { V13_MODEL_POLICY, assertV13ExecutorPolicy, assertV14ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { V13_MODEL_POLICY, V14_MODEL_POLICY, assertV13ExecutorPolicy, assertV14ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
+import { assertV14RestartReconciliation, readV14BaseInputs, readV14RestartInputs } from './s2-008-campaign-v14-approval.mjs';
+import { assertV14PresealPin } from './s2-008-campaign-v14-approval.mjs';
 import { assertV13PresealPin, assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,6 +51,7 @@ const V11_CAPSULE_SOURCE_PATHS = Object.freeze([
   'scripts/s2-008-campaign-bootstrap.mjs',
 ]);
 const capsuleSourcePaths = (version) => {
+  if (version === 14) return [...V14_REVIEW_CAPSULE_SOURCE_PATHS];
   const paths = V11_CAPSULE_SOURCE_PATHS.map((value) =>
     version >= 12 && value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
       ? 'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json' : value);
@@ -59,8 +63,8 @@ const capsuleSourcePaths = (version) => {
     'scripts/s2-008-campaign-model-image.mjs',
     'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'];
 };
-const isCapsuleVersion = (version) => version === 11 || version === 12 || version === 13;
-const isControlPinVersion = (version) => version === 12 || version === 13;
+const isCapsuleVersion = (version) => version === 11 || version === 12 || version === 13 || version === 14;
+const isControlPinVersion = (version) => version === 12 || version === 13 || version === 14;
 const CONTROL_RAW_KEYS = Object.freeze([
   'arm_id', 'seed', 'samples', 'podman', 'container_argv', 'image', 'image_break_requested',
   'axes', 'exit_code', 'signal', 'timed_out', 'stderr_excerpt', 'banner', 'payload_chunks',
@@ -151,6 +155,21 @@ export function validateS2PaidReviewRunReadiness({ report, accounting, reconcili
     if (accounting?.modelRows !== 378 || accounting?.controlRows !== 756 || accounting?.rows !== 1134
         || reconciliation?.valid !== true || reconciliation.unreconciledAttempts !== 0
         || (isControlPinVersion(version) && accounting?.controlExecutions !== 6)) return { ok: false };
+    if (version === 14) {
+      const modelContainers = report.trials.filter((row) => row.arm_id === V11_MODEL_ARM)
+        .reduce((sum, row) => sum + row.seeds.length, 0);
+      const pacing = report.model_call_pacing;
+      if (!pacing || pacing.min_start_interval_ms !== 60000 || pacing.container_starts !== modelContainers
+          || pacing.wait_count !== Math.max(0, modelContainers - 1)
+          || pacing.waited_ms < Math.max(0, modelContainers - 1) * 60000) return { ok: false };
+      for (const trial of report.trials.filter((row) => row.arm_id === V11_MODEL_ARM)) for (const seed of trial.seeds) {
+        const modelPacing = seed.launch?.arm_report?.executor?.model_call_pacing;
+        if (!modelPacing || modelPacing.min_start_interval_ms !== 60000
+            || modelPacing.call_starts !== seed.launch.arm_report.executor.model_calls
+            || modelPacing.wait_count !== Math.max(0, modelPacing.call_starts - 1)
+            || !Number.isSafeInteger(modelPacing.waited_ms) || modelPacing.waited_ms < 0) return { ok: false };
+      }
+    }
     return { ok: true };
   } catch { return { ok: false }; }
 }
@@ -452,7 +471,8 @@ export function validateS2PaidReviewPin({ pin, preregistrationSha256, blindSha25
         || canonicalDigest(pin.commitment?.covers) !== canonicalDigest(contentCommitmentOf(first.sources).covers)
         || !Object.values(first.sources).every(hash)
         || first.sources.prereg !== preregistrationSha256
-        || first.sources.blind !== blindSha256) return { ok: false };
+        || first.sources.blind !== blindSha256
+        || (version === 14 && !hash(first.sources.model_call_pacing_policy))) return { ok: false };
     return { ok: true, contentCommitment: first.content_commitment, sourceDigest: first.source_digest };
   } catch {
     return { ok: false };
@@ -505,7 +525,10 @@ export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, ex
             || !arm || arm.dry_run !== true || arm.outcome_class !== 'DRY_RUN'
             || arm.n_cases !== 126 || !Array.isArray(arm.predictions) || arm.predictions.length !== 126
             || !Array.isArray(arm.accounting) || arm.accounting.length !== 0
-            || arm.stop !== null) return { ok: false };
+            || arm.stop !== null
+            || (version === 14 && (executor?.model_call_pacing?.min_start_interval_ms !== 60000
+              || executor.model_call_pacing.call_starts !== 0 || executor.model_call_pacing.wait_count !== 0
+              || executor.model_call_pacing.waited_ms !== 0))) return { ok: false };
         const executor = arm.executor;
         if (expected.arm_id === V11_MODEL_ARM) {
           if (!executor || executor.provider !== 'openrouter' || executor.model !== (version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
@@ -1195,7 +1218,7 @@ function validateReconciliationFile(reader, report, version, arm, preregDigest, 
       && reconciliation.prior_run_id === report.raw_run_id
       && reconciliation.prior_run_sha256 === reportBytes?.sha256
       && reconciliation.provider === 'openrouter'
-      && reconciliation.model === (version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
+      && reconciliation.model === (version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
       && sidecarsMatch
       && receipts?.run_id === report.raw_run_id
       && receiptBytes?.sha256 === reconciliation.known_receipts_sha256
@@ -1326,21 +1349,29 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   const reader = readerFor(root, reasons);
   const manifestPath = 'corpus/s2-008-campaign/manifest.json';
   const manifest = reader.json(manifestPath, /^corpus\/s2-008-campaign\/manifest\.json$/);
-  const versionMatch = manifest?.preregistration?.file?.match(/^preregistration\.v(10|11|12|13)\.in-force\.json$/);
+  const versionMatch = manifest?.preregistration?.file?.match(/^preregistration\.v(10|11|12|13|14)\.in-force\.json$/);
   const version = versionMatch ? Number(versionMatch[1]) : null;
   if (!versionMatch) addReason(reasons, 'ACTIVE_PREREGISTRATION_PATH_INVALID');
   if (manifest?.preregistration?.status !== 'IN_FORCE'
       || manifest?.preregistration?.sealed_before_first_trial !== true) addReason(reasons, 'ACTIVE_PREREGISTRATION_NOT_IN_FORCE');
 
   const preregPath = version ? 'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json' : null;
-  const prereg = preregPath ? reader.json(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13)\.in-force\.json$/) : null;
+  const prereg = preregPath ? reader.json(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13|14)\.in-force\.json$/) : null;
   let digest = null;
   let preregValid = false;
   if (prereg && version) {
     try {
       assertPreregistration(prereg);
       if (version === 13) assertV13ExecutorPolicy(prereg.executor);
+      if (version === 14) { assertV14ExecutorPolicy(prereg.executor); assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout); }
       const { approval, status, preregistration_digest: storedDigest, ...body } = prereg;
+      const v14ApprovalKeys = 'authority,becomes_in_force_when,in_force,issued_at,label,principal_id,signed_digest_over,status';
+      const validV14Approval = version !== 14 || (approval && Object.keys(approval).sort().join(',') === v14ApprovalKeys
+        && approval.status === 'APPROVED' && approval.authority === 'HUMAN_OWNER' && approval.principal_id === OWNER
+        && approval.label === 'Daniil' && approval.in_force === true
+        && approval.signed_digest_over === 'the scientific body: every member except approval, status and preregistration_digest'
+        && approval.becomes_in_force_when === 'scripts/s2-008-campaign-prepare.mjs --seal-v14 records this digest and supersession in the corpus manifest'
+        && Number.isFinite(Date.parse(approval.issued_at)) && new Date(approval.issued_at).toISOString() === approval.issued_at);
       digest = canonicalDigest(body);
       preregValid = prereg.rule === 's2-008-prereg-v' + version
         && prereg.preregistration_id === 'xpr-s2-008c-' + String(version).padStart(2, '0')
@@ -1350,16 +1381,20 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         && approval?.principal_id === OWNER
         && approval?.in_force === true
         && approval?.signed_digest_over === 'the scientific body: every member except approval, status and preregistration_digest'
+        && validV14Approval
         && storedDigest === digest
         && preregistrationDigest(prereg) === digest
         && manifest?.preregistration?.file === 'preregistration.v' + version + '.in-force.json'
         && manifest?.preregistration?.preregistration_digest === digest
         && prereg.executor?.provider === 'openrouter'
-        && prereg.executor?.model === (version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
+        && prereg.executor?.model === (version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
         && prereg.executor?.model_launch_timeout?.per_model_call_timeout_ms === 180000
-        && (version !== 13 || (prereg.budget_reservation?.granted_units === 5000000
+        && ([13, 14].includes(version) ? (prereg.budget_reservation?.granted_units === 5000000
           && prereg.budget_reservation?.ceiling_scope === 'PER_RUN_A_OR_B'
-          && prereg.budget_reservation?.expires_at === '2026-10-12T00:00:00.000Z'))
+          && prereg.budget_reservation?.expires_at === '2026-10-12T00:00:00.000Z') : true)
+        && (version !== 14 || (prereg.executor?.model_call_pacing?.min_start_interval_ms === 60000
+          && prereg.executor?.model_launch_timeout?.total_container_timeout_ms === 30540000
+          && prereg.holdout_access?.case_count === 126))
         && prereg.executor?.model_launch_timeout?.pi_argv_flags?.includes('--no-tools')
         && prereg.executor?.pi_settings?.retry?.enabled === false
         && prereg.executor?.pi_settings?.retry?.maxRetries === 0
@@ -1373,6 +1408,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   let v11PriorScanStatus = 'NOT_INSPECTED';
   let v10RestartReconciliationStatus = 'NOT_INSPECTED';
   let v12APriorReconciliationStatus = 'NOT_INSPECTED';
+  let v14PriorReconciliationStatus = 'NOT_INSPECTED';
   if (version === 12 && preregValid) {
     try {
       assertV12RestartReconciliation(prereg);
@@ -1396,6 +1432,19 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       v10RestartReconciliationStatus = 'UNKNOWN';
       v12APriorReconciliationStatus = 'UNKNOWN';
       addReason(reasons, 'V13_PRIOR_RECONCILIATION_NOT_VERIFIED');
+    }
+  }
+  if (version === 14 && preregValid) {
+    try {
+      const baseInputs = readV14BaseInputs({ repoRoot: root, allowHistorical: true });
+      const prior = assertV14RestartReconciliation(baseInputs.base, readV14RestartInputs({ repoRoot: root }));
+      if (canonicalDigest(prereg.v13_restart_reconciliation) !== canonicalDigest(prior)) throw new Error('V14_PRIOR_BINDING_INVALID');
+      v10RestartReconciliationStatus = 'RECONCILED';
+      v12APriorReconciliationStatus = 'RECONCILED';
+      v14PriorReconciliationStatus = 'RECONCILED';
+    } catch {
+      v14PriorReconciliationStatus = 'UNKNOWN';
+      addReason(reasons, 'V14_PRIOR_RECONCILIATION_NOT_VERIFIED');
     }
   }
   if (version === 12 && preregValid) {
@@ -1469,10 +1518,11 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       v9: historyV9,
       v8: historyV8,
       v7: { status: 'UNKNOWN', tokens: null },
-      ...([12, 13].includes(version) ? {
+      ...([12, 13, 14].includes(version) ? {
         v10RestartReconciliationBinding: { status: v10RestartReconciliationStatus },
         v11: { status: v11PriorScanStatus, provider_completeness_claimed: false, tokens: null },
-        ...(version === 13 ? { v12APriorReconciliationBinding: { status: v12APriorReconciliationStatus, account_completeness_claimed: false } } : {}),
+        ...([13, 14].includes(version) ? { v12APriorReconciliationBinding: { status: v12APriorReconciliationStatus, account_completeness_claimed: false } } : {}),
+        ...(version === 14 ? { v13RestartReconciliationBinding: { status: v14PriorReconciliationStatus, account_completeness_claimed: false } } : {}),
       } : {}),
       authorizedDiagnosticTokens: diagnosticTokens,
       priorKnownCampaignTokens: historyV10.status === 'RECONCILED' && historyV9.status === 'RECONCILED'
@@ -1538,21 +1588,26 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     else holdoutCaseIds = blindIndex.caseIds;
   }
   const pinPath = 'evidence/s2-008-campaign/model-image-pin-v' + (version ?? 10) + '.json';
-  const pin = reader.json(pinPath, /^evidence\/s2-008-campaign\/model-image-pin-v(?:10|11|12|13)\.json$/);
+  const pin = reader.json(pinPath, /^evidence\/s2-008-campaign\/model-image-pin-v(?:10|11|12|13|14)\.json$/);
   const preregBytes = preregPath
-    ? reader.text(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13)\.in-force\.json$/, false)
+    ? reader.text(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13|14)\.in-force\.json$/, false)
     : null;
   const pinValidation = validateS2PaidReviewPin({
     pin, preregistrationSha256: preregBytes?.sha256, blindSha256, version,
   });
   let v13PinValid = true;
+  let v14PinValid = true;
   if (version === 13) {
     try { assertV13PresealPin({ pin, baseBytes: preregBytes?.bytes,
       commitment: prereg?.executor?.model_image?.content_commitment }); }
     catch { v13PinValid = false; }
   }
+  if (version === 14) {
+    try { assertV14PresealPin({ pin, baseBytes: preregBytes?.bytes, commitment: prereg?.executor?.model_image?.content_commitment }); }
+    catch { v14PinValid = false; }
+  }
   const pinOk = isCapsuleVersion(version)
-    ? pinValidation.ok === true && (version !== 13 || v13PinValid)
+    ? pinValidation.ok === true && (version !== 13 || v13PinValid) && (version !== 14 || v14PinValid)
       && pin?.schema === 's2-008-model-image-pin/' + version
       && prereg?.executor?.model_image?.built_image_pin === pinPath
       && pin.first.content_commitment === prereg?.executor?.model_image?.content_commitment
@@ -1565,9 +1620,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       && /^sha256:[0-9a-f]{64}$/.test(pin.first.digest);
   if (!pinOk) addReason(reasons, 'MODEL_IMAGE_PIN_INVALID');
 
-  const probes = reader.json('evidence/s2-008-campaign/probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/probes-v(?:10|11|12|13)\.json$/);
-  const security = reader.json('evidence/s2-008-campaign/security-probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/security-probes-v(?:10|11|12|13)\.json$/);
-  const dry = reader.json('evidence/s2-008-campaign/dry-run-v' + (version ?? 10) + '-clean-base.json', /^evidence\/s2-008-campaign\/dry-run-v(?:10|11|12|13)-clean-base\.json$/);
+  const probes = reader.json('evidence/s2-008-campaign/probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/probes-v(?:10|11|12|13|14)\.json$/);
+  const security = reader.json('evidence/s2-008-campaign/security-probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/security-probes-v(?:10|11|12|13|14)\.json$/);
+  const dry = reader.json('evidence/s2-008-campaign/dry-run-v' + (version ?? 10) + '-clean-base.json', /^evidence\/s2-008-campaign\/dry-run-v(?:10|11|12|13|14)-clean-base\.json$/);
   const base = basePair(probes);
   const securityBase = basePair(security);
   const dryBase = basePair(dry);
@@ -1672,7 +1727,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   let probeValidation = null;
   if (isCapsuleVersion(version)) {
     try {
-      const validateProbe = version === 13 ? validateV13ProbeEvidence : version === 12 ? validateV12ProbeEvidence : validateV11ProbeEvidence;
+      const validateProbe = version === 14 ? validateV14ProbeEvidence : version === 13 ? validateV13ProbeEvidence : version === 12 ? validateV12ProbeEvidence : validateV11ProbeEvidence;
       probeValidation = validateProbe({ campaignProbes: probes, securityControls: security,
         prereg, runA: armReports.a, runB: armReports.b });
       if (probeValidation?.ok !== true || probeValidation.status !== 'PASS') addReason(reasons, 'PROBE_OR_DRY_RUN_INVALID');
@@ -1695,9 +1750,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     || (reasons.length === 0 && checksComplete && runsComplete && pinOk && dryValidation.ok === true
       && probeValidation?.ok === true && preregValid);
   const evaluation = canReadEvaluation
-    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12|13)\.json$/, false)
+    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12|13|14)\.json$/, false)
     : null;
-  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12|13)\.json$/, false);
+  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12|13|14)\.json$/, false);
   if (isCapsuleVersion(version) && !canReadEvaluation) {
     campaign.evaluationRecord = { status: 'NOT_RUN', recordedVerdict: null, recordedRemarks: null,
       linkage: 'NOT_VALIDATED', independentScoringValidation: 'WAITING_FOR_COMPLETE_A_B_AND_REQUIRED_CHECKS' };
@@ -1705,7 +1760,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   } else if (!evaluation) addReason(reasons, 'EVALUATION_MISSING');
   else if (isCapsuleVersion(version)) {
     try {
-      const capturedSourcePaths = [
+      const capturedSourcePaths = version === 14 ? [...V14_REVIEW_CAPSULE_SOURCE_PATHS] : [
         'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json',
         'corpus/s2-008-campaign/manifest.json',
         'corpus/s2-008-campaign/frozen-table.v3.json',
@@ -1725,7 +1780,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
           ? /^corpus\/s2-008-campaign\/(?:cases\/)?[A-Za-z0-9._-]+\.json$/
           : file === 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'
             ? /^evidence\/s2-008-campaign\/provider-model-catalog-ling-v13\.json$/
-            : /^scripts\/s2-008-campaign-(?:evaluate|bootstrap|adapter|arm-model|credential-env|model-image)\.mjs$/;
+            : /^scripts\/s2-008-campaign-(?:evaluate|bootstrap|adapter|arm-model|credential-env|model-image|v14-approval|v14-pacing|seal-v14|run|approve|prepare|prepare-cli)\.mjs$/;
         const value = reader.text(file, allow);
         return value ? { path: file, bytes: value.bytes.length, sha256: value.sha256 } : null;
       });

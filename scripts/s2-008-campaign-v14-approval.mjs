@@ -31,6 +31,20 @@ const WRONG_SHA = '770396c10afd2e0e0e6ad70729e207da41ec7dbbaafa33b7db07d2de09d52
 const CORRECTION = 'evidence/s2-008-campaign/credential-attribution-correction-v13.json';
 const CORRECTION_SHA = '47de529c0b72bdba18568080c157324d730f7cb42b394ff5482776616026c09c';
 const EXPIRY = '2026-10-12T00:00:00.000Z';
+
+const APPROVAL_DIGEST_SCOPE = 'the scientific body: every member except approval, status and preregistration_digest';
+const DRAFT_SEAL_TEXT = 'scripts/s2-008-campaign-prepare.mjs --seal-v14 records this digest and supersession in the corpus manifest';
+const APPROVAL_KEYS = Object.freeze(['authority','becomes_in_force_when','in_force','issued_at','label','principal_id','signed_digest_over','status']);
+const hasExactApprovalKeys = (value) => value && typeof value === 'object' &&
+  Object.keys(value).sort().join(',') === [...APPROVAL_KEYS].sort().join(',');
+export function assertV14DraftApprovalMetadata(approval) {
+  if (!hasExactApprovalKeys(approval) || approval.status !== null || approval.authority !== 'HUMAN_OWNER' ||
+      approval.principal_id !== null || approval.label !== null || approval.issued_at !== null ||
+      approval.signed_digest_over !== APPROVAL_DIGEST_SCOPE || approval.in_force !== false ||
+      approval.becomes_in_force_when !== DRAFT_SEAL_TEXT) throw new Error('V14_APPROVAL_METADATA_INVALID');
+  return true;
+}
+
 const EXPECTED_BASELINE = [
   ['corpus/s2-008-campaign/preregistration.v13.approved.json','3357b412d0811ea089c8350773533e1784859c0950b91c713a702b1f095ff5aa',25380],
   ['corpus/s2-008-campaign/preregistration.v13.in-force.json',BASE_SHA,25379],
@@ -52,7 +66,7 @@ const safeRead = (root, name) => {
   return fs.readFileSync(full);
 };
 
-function historicalV13Manifest(manifest, base) {
+function historicalV13Manifest(manifest, base, supersession) {
   if (manifest?.preregistration?.file === BASE_FILE && manifest.preregistration.status === 'IN_FORCE') return manifest;
   if (manifest?.preregistration?.file !== 'preregistration.v14.in-force.json' || manifest.preregistration.status !== 'IN_FORCE') {
     throw new Error('V14_BASE_MANIFEST_INVALID');
@@ -60,7 +74,7 @@ function historicalV13Manifest(manifest, base) {
   const history = manifest.supersession_history;
   const index = Array.isArray(history) ? history.findIndex((item) =>
     item.file === 'preregistration-v13-supersession.json' &&
-    item.supersession_digest === base.supersession?.supersession_digest) : -1;
+    item.supersession_digest === supersession?.supersession_digest) : -1;
   if (index < 0 || manifest.superseded_preregistration?.file !== 'preregistration-v13-superseded.json' ||
       manifest.superseded_preregistration.preregistration_digest !== base.preregistration_digest) {
     throw new Error('V14_BASE_MANIFEST_INVALID');
@@ -82,7 +96,7 @@ export function readV14BaseInputs({ repoRoot = ROOT, allowHistorical = false } =
   if (!allowHistorical && activeManifest.preregistration?.file !== BASE_FILE) throw new Error('V14_BASE_NOT_CURRENT');
   const supersessionBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v13-supersession.json');
   const supersession = parse(supersessionBytes);
-  const manifest = historicalV13Manifest(activeManifest, base);
+  const manifest = historicalV13Manifest(activeManifest, base, supersession);
   const table = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/frozen-table.v3.json'));
   const ledger = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/source-ledger.v3.json'));
   return { base, baseBytes, manifest, activeManifest, supersession, supersessionBytes, table, ledger };
@@ -211,9 +225,14 @@ export function assertV14RestartReconciliation(base, inputs = readV14RestartInpu
       inputs.attributionCorrection.value?.selected_credential_fingerprint !== '63ba91bbeb808e17' ||
       inputs.attributionCorrection.value?.raw_reports_unchanged !== true) throw new Error('V14_CREDENTIAL_CORRECTION_EVIDENCE_INVALID');
 
+  const latestEvidenceTimes = [recon.created_at, inputs.attributionCorrection.value?.recorded_at,
+    observation.recorded_at].map((value) => Date.parse(value ?? ''));
+  if (latestEvidenceTimes.some((value) => !Number.isFinite(value))) throw new Error('V14_LINEAGE_CHRONOLOGY_INVALID');
+  const latestBoundEvidenceAt = new Date(Math.max(...latestEvidenceTimes)).toISOString();
   return Object.freeze({
     kind: 's2-008-v14-v13-restart-closure/1',
     base_preregistration_digest: digest,
+    latest_bound_evidence_at: latestBoundEvidenceAt,
     immutable_baseline_file: BASELINE_FILE,
     immutable_baseline_sha256: BASELINE_SHA,
     historical_old_key_reconciliations: [
@@ -245,11 +264,14 @@ export function assertV14BaseBinding({ base, baseBytes, manifest, supersession, 
   if (!base || !Buffer.isBuffer(baseBytes) || !manifest || !supersession ||
       !Buffer.isBuffer(supersessionBytes) || !table || !Array.isArray(ledger?.entries)) throw new Error('V14_BASE_INPUTS_MISSING');
   const digest = base.preregistration_digest;
+  const expectedBaseApproval = { status: 'APPROVED', authority: 'HUMAN_OWNER', principal_id: OWNER,
+    label: 'Daniil', issued_at: base.approval?.issued_at,
+    signed_digest_over: APPROVAL_DIGEST_SCOPE, in_force: true,
+    becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v13 records this digest and supersession in the corpus manifest' };
   if (sha(baseBytes) !== BASE_SHA || base.rule !== 's2-008-prereg-v13' ||
       base.preregistration_id !== 'xpr-s2-008c-13' || digest !== preregistrationDigest(base) ||
-      base.status !== 'APPROVED' || base.approval?.status !== 'APPROVED' ||
-      base.approval?.authority !== 'HUMAN_OWNER' || base.approval?.principal_id !== OWNER ||
-      base.approval?.in_force !== true || !Number.isFinite(Date.parse(base.approval?.issued_at ?? '')) ||
+      base.status !== 'APPROVED' || canonicalDigest(base.approval) !== canonicalDigest(expectedBaseApproval) ||
+      !Number.isFinite(Date.parse(base.approval?.issued_at ?? '')) ||
       base.budget_reservation?.granted_units !== 5000000 ||
       base.budget_reservation?.ceiling_scope !== 'PER_RUN_A_OR_B' ||
       base.budget_reservation?.expires_at !== EXPIRY) throw new Error('V14_BASE_BINDING_INVALID');
@@ -320,8 +342,7 @@ export function createV14Draft({ base, baseBytes, manifest, supersession, supers
       proof: 'Exact v13 in-force bytes, eleven immutable baseline inputs, both old-key closures, two successful provider generations, separate failed upstream request and owner closure bind before any v14 trial.' },
     status: 'DRAFT',
     approval: { status: null, authority: 'HUMAN_OWNER', principal_id: null, label: null, issued_at: null,
-      signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
-      in_force: false, becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v14 records this digest and supersession in the corpus manifest' },
+      signed_digest_over: APPROVAL_DIGEST_SCOPE, in_force: false, becomes_in_force_when: DRAFT_SEAL_TEXT },
   };
   draft.preregistration_digest = preregistrationDigest(draft);
   const drift = scopeDrift(base, draft);
@@ -339,11 +360,12 @@ export function approveV14({ draft, base, baseBytes, manifest, supersession, sup
       !Number.isFinite(Date.parse(issuedAt)) || Date.parse(issuedAt) >= Date.parse(EXPIRY)) throw new Error('V14_APPROVAL_IDENTITY_INVALID');
   if (draft?.rule !== 's2-008-prereg-v14' || draft.preregistration_id !== 'xpr-s2-008c-14') throw new Error('V14_VERSION_MISMATCH');
   if (draft.status !== 'DRAFT' || draft.approval?.status !== null) throw new Error('V14_ALREADY_SIGNED');
+  assertV14DraftApprovalMetadata(draft.approval);
   if (draft.preregistration_digest !== preregistrationDigest(draft)) throw new Error('V14_DIGEST_MISMATCH');
   const lineage = assertV14BaseBinding({ base, baseBytes, manifest, supersession, supersessionBytes, table, ledger });
   const prior = assertV14RestartReconciliation(base, restartInputs);
-  const closureTime = Date.parse(restartInputs.thirdReconciliation.value.created_at);
-  const earliest = Math.max(Date.parse(base.approval.issued_at), closureTime);
+  const latestEvidenceTime = Date.parse(prior.latest_bound_evidence_at);
+  const earliest = Math.max(Date.parse(base.approval.issued_at), latestEvidenceTime);
   if (!Number.isFinite(earliest) || Date.parse(issuedAt) < earliest) throw new Error('V14_APPROVAL_CHRONOLOGY_INVALID');
   if (canonicalDigest(draft.v13_restart_reconciliation) !== canonicalDigest(prior) ||
       draft.supersession?.superseded_digest !== lineage.baseDigest ||

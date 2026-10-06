@@ -20,6 +20,31 @@ const OWNER = 'prn-s2007r-owner';
 const TASK = 'abt-s2-008-v11-fixture-012345abcdef';
 const DIGEST = 'a'.repeat(64);
 
+test('paid-review workflow accepts v14 and rejects unsupported v15', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-paid-review-version-'));
+  const options = {
+    pool: null, evidenceRoot: root,
+    inspectEvidence: () => ({ version: 14, ready: false }),
+    buildTask: (value) => value,
+    ownerPrincipalId: OWNER, producerPrincipalId: 'prn-s2-008-evidence-importer',
+    stateRoot: path.join(root, 'state'), replayJournal: () => ({ ok: true }),
+    fixtureOnly: true, fixtureRoot: root,
+    fixtureRecords: [{ path: 'fixture.json', bytes: 0, sha256: '0'.repeat(64) }],
+  };
+  try {
+    const workflow = paid.createS2PaidReviewWorkflow({ ...options, version: 14 });
+    assert.equal(workflow.version, 14);
+    assert.equal(workflow.fixtureOnly, true);
+    const status = await workflow.status({ principalId: OWNER, taskId: workflow.taskId });
+    assert.equal(status.version, 14);
+    assert.equal(status.fixture_only, true);
+    assert.throws(() => paid.createS2PaidReviewWorkflow({ ...options, version: 15 }),
+      (error) => error.code === 'PAID_REVIEW_VERSION_UNSUPPORTED');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('v11 evaluator source-input producer matches the paid-review capsule consumer', () => {
   const paths = [
     'corpus/s2-008-campaign/preregistration.v11.in-force.json',

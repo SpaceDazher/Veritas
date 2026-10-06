@@ -715,7 +715,7 @@ export const PREREGISTRATION_RULE = 's2-008-prereg-v1';
  */
 export function preregistrationDigest(prereg) {
   if (!isPlainObject(prereg)) throw malformed('PREREGISTRATION_NOT_AN_OBJECT', `expected a preregistration object, got ${typeName(prereg)}`);
-  if (['s2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14'].includes(prereg.rule)) {
     const { approval, status, preregistration_digest, ...body } = prereg;
     return canonicalDigest(body);
   }
@@ -878,6 +878,61 @@ export function assertPreregistration(prereg) {
       throw malformed('V13_PRIOR_V12_RECONCILIATION_BINDING_INVALID', 'v13 must bind the exact stopped-v12-A reconciliation without extending its scope');
     }
   }
+  if (prereg.rule === 's2-008-prereg-v14') {
+    const executor = prereg.executor;
+    const registration = {
+      id: 'inclusionai/ling-3.1-flash', name: 'inclusionAI: Ling 3.1 Flash',
+      api: 'openai-completions', baseUrl: 'https://openrouter.ai/api/v1', input: ['text'],
+      contextWindow: 262144, maxTokens: 32768, reasoning: true,
+    };
+    const settings = {
+      config_dir_env: 'PI_CODING_AGENT_DIR',
+      retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0 } },
+      cacheWarming: 'off', compaction: { enabled: false },
+    };
+    const timeout = {
+      holdout_case_count: 126, per_model_call_timeout_ms: 180000, min_start_interval_ms: 60000,
+      bridge_report_margin_ms: 300000, total_container_timeout_ms: 30540000,
+      formula: 'holdout_case_count * (per_model_call_timeout_ms + min_start_interval_ms) + bridge_report_margin_ms',
+      scope: 'ONE_MODEL_CONTAINER_PER_SEED',
+    };
+    const binding = executor?.pi_model_catalog_binding;
+    if (executor?.provider !== 'openrouter' || executor?.model !== 'inclusionai/ling-3.1-flash' ||
+        executor?.credential_env_name !== 'OPENROUTER_API_KEY' || executor?.credential_source !== 'EXPLICIT_PROCESS_ENV_ONLY' ||
+        canonicalDigest(executor?.pi_settings ?? null) !== canonicalDigest(settings) ||
+        canonicalDigest(executor?.pi_model_registration ?? null) !== canonicalDigest(registration)) {
+      throw malformed('V14_MODEL_POLICY_INVALID', 'v14 must use the exact Ling model, explicit credential source and disabled PI retries');
+    }
+    if (!binding || binding.file !== 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json' ||
+        binding.sha256 !== '5f8d6f77af15a6af97bcd06229a146e10a524f76f2d06878b941e586e3c765a6' ||
+        binding.canonical_slug !== 'inclusionai/ling-3.1-flash-20261002' ||
+        binding.prompt_completion_pricing_source !== 'PROVIDER_CATALOG_LISTING_ONLY' ||
+        binding.cache_pricing !== 'NOT_PROVIDED' ||
+        binding.client_cost_authority !== 'ESTIMATE_ONLY_PROVIDER_RECEIPT_AUTHORITATIVE') {
+      throw malformed('V14_MODEL_CATALOG_BINDING_INVALID', 'v14 provider catalog binding must match the signed Ling catalog');
+    }
+    if (executor?.package !== '@earendil-works/pi-coding-agent' ||
+        canonicalDigest(executor?.model_call_pacing ?? null) !== canonicalDigest({ min_start_interval_ms: 60000 }) ||
+        canonicalDigest(executor?.model_launch_timeout ?? null) !== canonicalDigest(timeout) ||
+        prereg.budget_reservation?.granted_units !== 5000000 ||
+        prereg.budget_reservation?.ceiling_scope !== 'PER_RUN_A_OR_B' ||
+        prereg.budget_reservation?.expires_at !== '2026-10-12T00:00:00.000Z' ||
+        prereg.holdout_access?.case_count !== 126) {
+      throw malformed('V14_EXECUTION_BUDGET_OR_PACING_INVALID', 'v14 must sign exact call pacing, timeout and independent A/B token reservations');
+    }
+    const prior = prereg.v13_restart_reconciliation;
+    if (prior?.kind !== 's2-008-v14-v13-restart-closure/1' ||
+        prior.base_preregistration_digest !== prereg.supersession?.superseded_digest ||
+        prior.third_attempt?.local_attempts !== 3 || prior.third_attempt?.successful_generations !== 2 ||
+        prior.third_attempt?.failed_upstream_requests !== 1 || prior.third_attempt?.owner_closed_unknown_attempts !== 1 ||
+        prior.third_attempt?.unreconciled_attempts !== 0 || prior.third_attempt?.known_tokens !== 1586 ||
+        prior.third_attempt?.known_usd !== 0 || prior.third_attempt?.third_failure_cost !== null ||
+        prior.account_wide_completeness_claimed !== false || !Number.isFinite(Date.parse(prior.latest_bound_evidence_at)) ||
+        new Date(prior.latest_bound_evidence_at).toISOString() !== prior.latest_bound_evidence_at) {
+      throw malformed('V14_PRIOR_V13_RECONCILIATION_BINDING_INVALID', 'v14 must preserve the bounded v13 attempt and provider-receipt closure');
+    }
+  }
+
   // Optional bindings, checked whenever they are present.
   if (prereg.card !== undefined && prereg.card !== null) {
     const card = requireObject(prereg.card, 'card');
@@ -888,7 +943,7 @@ export function assertPreregistration(prereg) {
   }
   const tableKey = firstPresentKey(prereg, ['expected_table_digest', 'table_digest']);
   if (tableKey !== null) requireDigest(prereg[tableKey], tableKey);
-  if (prereg.rule !== undefined && prereg.rule !== null && ![PREREGISTRATION_RULE, 's2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule)) {
+  if (prereg.rule !== undefined && prereg.rule !== null && ![PREREGISTRATION_RULE, 's2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14'].includes(prereg.rule)) {
     throw malformed('PREREGISTRATION_RULE_MISMATCH', `rule must be ${PREREGISTRATION_RULE}, got ${String(prereg.rule)}`);
   }
   for (const key of ['title', 'description', 'notes']) freeText(prereg[key], key);

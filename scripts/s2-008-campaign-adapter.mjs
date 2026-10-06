@@ -1065,7 +1065,7 @@ export async function runModelTrial({
       exit_code: observation?.exitCode ?? null,
       signal: observation?.signal ?? null,
       timed_out: observation?.timedOut ?? false,
-      stderr_excerpt: ['s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13'].includes(prereg.rule) ? null : String(observation?.stderr ?? '').slice(-400),
+      stderr_excerpt: ['s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14'].includes(prereg.rule) ? null : String(observation?.stderr ?? '').slice(-400),
       banner, payload_chunks: parsed.chunks, payload_error: parsed.error,
       output_digest: output === null ? null : canonicalDigest(output),
       // Keep the own-arm budget and stop reason; a digest cannot recover an INFRA report.

@@ -19,12 +19,21 @@ const pin = (name) => JSON.parse(fs.readFileSync(path.join(EVIDENCE, name), 'utf
 const write = (name, value) => fs.writeFileSync(path.join(DIR, name), JSON.stringify(value, null, 2) + '\n', { flag: 'wx', mode: 0o644 });
 
 export function assertV14ApprovalBinding({ signed, prereg, expected }) {
-  const sealedApproval = { ...signed?.approval, in_force: true };
-  if (signed?.status !== 'APPROVED' || signed.approval?.status !== 'APPROVED' ||
+  const signedApproval = { status: 'APPROVED', authority: 'HUMAN_OWNER', principal_id: OWNER, label: 'Daniil',
+    issued_at: signed?.approval?.issued_at,
+    signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+    in_force: false,
+    becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v14 records this digest and supersession in the corpus manifest' };
+  const sealedApproval = { ...signedApproval, in_force: true };
+  if (!signed?.approval || Object.keys(signed.approval).sort().join(',') !== Object.keys(signedApproval).sort().join(',') ||
+      !prereg?.approval || Object.keys(prereg.approval).sort().join(',') !== Object.keys(sealedApproval).sort().join(',') ||
+      canonicalDigest(signed.approval) !== canonicalDigest(signedApproval) ||
+      canonicalDigest(expected?.approval ?? null) !== canonicalDigest(signedApproval) ||
+      canonicalDigest(prereg.approval) !== canonicalDigest(sealedApproval) ||
+      signed?.status !== 'APPROVED' || signed.approval?.status !== 'APPROVED' ||
       signed.approval?.authority !== 'HUMAN_OWNER' || signed.approval?.principal_id !== OWNER ||
       signed.approval?.label !== 'Daniil' || signed.approval?.in_force !== false ||
       prereg?.status !== 'APPROVED' || prereg.approval?.in_force !== true ||
-      canonicalDigest(expected?.approval ?? null) !== canonicalDigest(signed.approval ?? null) ||
       canonicalDigest(prereg.approval ?? null) !== canonicalDigest(sealedApproval) ||
       signed.preregistration_digest !== preregistrationDigest(signed) ||
       prereg.preregistration_digest !== preregistrationDigest(prereg) ||
@@ -118,7 +127,21 @@ export function sealV14({ signed, draft, base, baseBytes, manifest, baseSuperses
   return result;
 }
 
+export const V14_SEAL_TARGETS = Object.freeze(['preregistration.v14.in-force.json',
+  'preregistration-v13-superseded.json', 'preregistration-v14-supersession.json', 'manifest.v14.next.json']);
+
+export function assertV14SealTargetsAbsent(dir = DIR) {
+  const targets = V14_SEAL_TARGETS;
+  for (const name of targets) {
+    try { fs.lstatSync(path.join(dir, name)); }
+    catch (error) { if (error?.code === 'ENOENT') continue; throw error; }
+    throw new Error('V14_SEAL_TARGET_EXISTS');
+  }
+  return true;
+}
+
 export function sealV14OnDisk() {
+  assertV14SealTargetsAbsent();
   const inputs = readV14BaseInputs(), restartInputs = readV14RestartInputs();
   const result = sealV14({ signed: read('preregistration.v14.approved.json'),
     draft: read('preregistration.v14.draft.json'), ...inputs,

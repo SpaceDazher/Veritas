@@ -134,6 +134,9 @@ export function createV14ContainerPacer({
   const interval = assertV14MinStartInterval(minStartIntervalMs);
   let lastCompletion = null;
   let failed = false;
+  let containerStarts = 0;
+  let waitCount = 0;
+  let waitedMs = 0;
   const readClock = () => {
     const value = now();
     if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new Error('V14_MONOTONIC_CLOCK_INVALID');
@@ -153,12 +156,16 @@ export function createV14ContainerPacer({
       while (readClock() < deadline) {
         if (!canContinue(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
         const before = readClock();
-        await sleepAsync(deadline - before);
+        const delay = deadline - before;
+        await sleepAsync(delay);
+        waitCount += 1;
+        waitedMs += delay;
         if (readClock() <= before) throw new Error('V14_PACING_CLOCK_DID_NOT_ADVANCE');
       }
     }
     if (!canContinue(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
     const startedAt = readClock();
+    containerStarts += 1;
     try {
       const value = await operation();
       lastCompletion = readClock();
@@ -168,5 +175,5 @@ export function createV14ContainerPacer({
       throw error;
     }
   }
-  return Object.freeze({ run, snapshot: () => Object.freeze({ minStartIntervalMs: interval, lastCompletion, failed }) });
+  return Object.freeze({ run, snapshot: () => Object.freeze({ minStartIntervalMs: interval, lastCompletion, containerStarts, waitCount, waitedMs, failed }) });
 }

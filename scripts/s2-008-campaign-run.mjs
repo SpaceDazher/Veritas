@@ -64,6 +64,7 @@ import {
 import { wilsonInterval } from '../src/lib/sloqual/statistics.mjs';
 import { buildImage, runTrial, runModelTrial, buildBootstrapImage, runBootstrap, verifyImagePin, campaignImageContextDigest, validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
+import { assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 import { assertV8AReconciliation, readV9ReconciliationInputs } from './s2-008-campaign-v9-approval.mjs';
 import { assertV9AReconciliation, readV10ReconciliationInputs } from './s2-008-campaign-v10-approval.mjs';
@@ -1214,7 +1215,8 @@ export async function runV4Campaign({
     };
   }
   if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14'].includes(prereg.rule)) {
-    assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    if (prereg.rule === 's2-008-prereg-v14') assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    else assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     if (prereg.holdout_access?.case_count !== 126) throw new Error('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH');
   }
   if (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)) assertV8ExecutorPolicy(prereg.executor);
@@ -1547,6 +1549,9 @@ export async function runV4Campaign({
     model_calls: modelCallsUnknown && !hasModelCallsReport ? null : modelCalls,
     model_calls_is_lower_bound: hasModelCallsReport && modelCallsIsLowerBound,
     unknown_model_attempts: unknownModelAttemptsUnknown ? null : unknownModelAttempts,
+    ...(version === 14 ? { model_call_pacing: { min_start_interval_ms: v14ContainerPacer.snapshot().minStartIntervalMs,
+      container_starts: v14ContainerPacer.snapshot().containerStarts,
+      wait_count: v14ContainerPacer.snapshot().waitCount, waited_ms: v14ContainerPacer.snapshot().waitedMs } } : {}),
     launches, unknown_launch_attempts: unknownLaunchAttempts, charges, trials,
   };
   if (write) {

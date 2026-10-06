@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 
 const pacing = await import('../../scripts/s2-008-campaign-v14-pacing.mjs').catch(() => ({}));
@@ -10,7 +12,8 @@ const credentialPolicy = await import('../../scripts/s2-008-campaign-credential-
 const V13_MODEL_POLICY = credentialPolicy.V13_MODEL_POLICY;
 const V14_MODEL_POLICY = credentialPolicy.V14_MODEL_POLICY;
 const V7_PI_SETTINGS = credentialPolicy.V7_PI_SETTINGS;
-const validateS2PaidReviewGenerationAccounting = (await import('../../scripts/s2-008-paid-review.mjs')).validateS2PaidReviewGenerationAccounting;
+const paidReviewRoute = await import('../../scripts/s2-008-paid-review.mjs');
+const validateS2PaidReviewGenerationAccounting = paidReviewRoute.validateS2PaidReviewGenerationAccounting;
 
 test('v14 pacing keeps at least 60 seconds between call starts', () => {
   assert.equal(typeof pacing.createV14StartPacer, 'function');
@@ -55,8 +58,9 @@ const routes = await Promise.all([
   import('../../scripts/s2-008-campaign-adapter.mjs'),
   import('../../scripts/s2-008-campaign-credential-env.mjs'),
   import('../../scripts/s2-008-campaign-arm-model.mjs'),
+  import('../../scripts/s2-008-campaign-probes.mjs'),
 ]);
-const [approvalRoute, prepareRoute, runRoute, evalRoute, imageRoute, adapterRoute, credentialRoute, armRoute] = routes;
+const [approvalRoute, prepareRoute, runRoute, evalRoute, imageRoute, adapterRoute, credentialRoute, armRoute, probeRoute] = routes;
 
 test('v14 version dispatch reaches image, approval, seal, run and evaluation entry points', () => {
   assert.deepEqual(imageRoute.modelImagePaths('v14', { preseal: true }), {
@@ -306,7 +310,181 @@ test('v14 paid review keeps the actual receipt model id and accepts only request
 });
 
 
+
 const v14Approval = await import('../../scripts/s2-008-campaign-v14-approval.mjs');
+const sealRoute = await import('../../scripts/s2-008-campaign-seal-v14.mjs');
+const campaignApproval = await import('../../scripts/s2-008-campaign-approve.mjs');
+
+function v14PresealPinFixture(baseBytes) {
+  const sha = (value) => createHash('sha256').update(value).digest('hex');
+  const names = ['pi_runtime_tree','timeout_policy','credential_env_policy','pi_shrinkwrap',
+    'pi_package_manifest','pi_launcher','provider_model_catalog','model_call_pacing_policy'];
+  const sources = Object.fromEntries(names.map((name, index) => [name,
+    name === 'provider_model_catalog' ? V14_MODEL_POLICY.catalog_sha256
+      : name === 'model_call_pacing_policy' ? sha(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../scripts/s2-008-campaign-v14-pacing.mjs')))
+        : sha(Buffer.from('fixture-' + index))]));
+  sources.prereg = sha(baseBytes);
+  const covers = Object.keys(sources).filter((name) => name !== 'prereg').sort();
+  const contentCommitment = canonicalDigest(Object.fromEntries(covers.map((name) => [name, sources[name]])));
+  const first = { imageId: 'sha256:' + 'a'.repeat(64), digest: 'sha256:' + 'b'.repeat(64), sources,
+    source_digest: canonicalDigest(sources), content_commitment: contentCommitment, content_commitment_covers: covers };
+  const second = structuredClone(first);
+  return { schema: 's2-008-model-image-pin/14', identical: true, context_digest_stable: true,
+    content_commitment_stable: true, commitment_excludes_preregistration: true,
+    commitment: { covers, excludes: ['prereg'] }, first, second };
+}
+
+test('v14 draft preserves all 15 frozen members and every frozen member tamper is detected', () => {
+  const inputs = v14Approval.readV14BaseInputs();
+  const restartInputs = v14Approval.readV14RestartInputs();
+  const draft = v14Approval.createV14Draft({ ...inputs, pin: v14PresealPinFixture(inputs.baseBytes), restartInputs });
+  assert.equal(campaignApproval.FROZEN_MEMBERS.length, 15);
+  for (const member of campaignApproval.FROZEN_MEMBERS) {
+    assert.deepEqual(draft[member], inputs.base[member], member);
+    const changed = structuredClone(draft);
+    changed[member] = draft[member] === null ? 'tampered' : null;
+    assert.equal(campaignApproval.scopeDrift(inputs.base, changed, [member]).member, member);
+  }
+});
+
+test('v14 probe validation binds signed policy, timeout, historical closure, path and output file', () => {
+  const inputs = v14Approval.readV14BaseInputs();
+  const draft = v14Approval.createV14Draft({ ...inputs, pin: v14PresealPinFixture(inputs.baseBytes),
+    restartInputs: v14Approval.readV14RestartInputs() });
+  const prereg = { ...draft, status: 'APPROVED', approval: { ...draft.approval,
+    status: 'APPROVED', authority: 'HUMAN_OWNER', principal_id: 'prn-s2007r-owner', label: 'Daniil',
+    issued_at: '2026-10-06T15:00:00.000Z', in_force: true } };
+  prereg.preregistration_digest = campaignApproval.preregistrationDigest(prereg);
+  const manifest = { preregistration: { file: 'preregistration.v14.in-force.json', status: 'IN_FORCE',
+    preregistration_digest: prereg.preregistration_digest } };
+  assert.deepEqual(probeRoute.validateProbePreregistration({ prereg, manifest }), {
+    ok: true, digest: prereg.preregistration_digest, file: 'preregistration.v14.in-force.json' });
+  assert.equal(probeRoute.resolveProbePreregistrationPath('corpus/s2-008-campaign/preregistration.v14.in-force.json'),
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..', 'corpus/s2-008-campaign/preregistration.v14.in-force.json'));
+  assert.equal(probeRoute.defaultProbeOutputPath(prereg),
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..', 'evidence/s2-008-campaign/probes-v14.json'));
+  const invalid = { ...prereg, executor: { ...prereg.executor, model_call_pacing: { min_start_interval_ms: 59999 } } };
+  invalid.preregistration_digest = campaignApproval.preregistrationDigest(invalid);
+  assert.equal(probeRoute.validateProbePreregistration({ prereg: invalid, manifest: {
+    preregistration: { ...manifest.preregistration, preregistration_digest: invalid.preregistration_digest } } }).ok, false);
+});
+
+test('v14 draft and signed approval metadata reject extra fields in either copy', () => {
+  const approvedAt = '2026-10-06T15:00:00.000Z';
+  const validDraftApproval = { status: null, authority: 'HUMAN_OWNER', principal_id: null, label: null,
+    issued_at: null, signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+    in_force: false, becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v14 records this digest and supersession in the corpus manifest' };
+  assert.equal(v14Approval.assertV14DraftApprovalMetadata(validDraftApproval), true);
+  const invalidValues = { status: 'APPROVED', authority: 'OTHER', principal_id: 'prn-s2007r-owner', label: 'Daniil',
+    issued_at: approvedAt, signed_digest_over: 'other', in_force: true, becomes_in_force_when: 'other' };
+  for (const [key, value] of Object.entries(invalidValues)) {
+    assert.throws(() => v14Approval.assertV14DraftApprovalMetadata({ ...validDraftApproval, [key]: value }),
+      /V14_APPROVAL_METADATA_INVALID/);
+  }
+  const draftApproval = { ...validDraftApproval, extra: true };
+  assert.throws(() => v14Approval.approveV14({
+    draft: { rule: 's2-008-prereg-v14', preregistration_id: 'xpr-s2-008c-14', status: 'DRAFT', approval: draftApproval },
+    principal: 'prn-s2007r-owner', label: 'Daniil', issuedAt: approvedAt,
+  }), /V14_APPROVAL_METADATA_INVALID/);
+
+  const approval = { status: 'APPROVED', authority: 'HUMAN_OWNER', principal_id: 'prn-s2007r-owner',
+    label: 'Daniil', issued_at: approvedAt,
+    signed_digest_over: 'the scientific body: every member except approval, status and preregistration_digest',
+    in_force: false,
+    becomes_in_force_when: 'scripts/s2-008-campaign-prepare.mjs --seal-v14 records this digest and supersession in the corpus manifest',
+    extra: true };
+  const signed = { rule: 's2-008-prereg-v14', preregistration_id: 'xpr-s2-008c-14', status: 'APPROVED',
+    test_scientific_member: 'bound', approval };
+  signed.preregistration_digest = campaignApproval.preregistrationDigest(signed);
+  const prereg = { ...signed, approval: { ...approval, in_force: true } };
+  prereg.preregistration_digest = campaignApproval.preregistrationDigest(prereg);
+  assert.throws(() => sealRoute.assertV14ApprovalBinding({ signed, prereg, expected: { approval } }),
+    /V14_APPROVAL_BINDING_MISMATCH/);
+});
+
+test('v14 seal preflight rejects each stale target before writing', () => {
+  assert.equal(sealRoute.V14_SEAL_TARGETS.length, 4);
+  for (const staleTarget of sealRoute.V14_SEAL_TARGETS) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'v14-seal-preflight-'));
+    try {
+      assert.equal(sealRoute.assertV14SealTargetsAbsent(dir), true);
+      fs.writeFileSync(path.join(dir, staleTarget), '{}');
+      assert.throws(() => sealRoute.assertV14SealTargetsAbsent(dir), /V14_SEAL_TARGET_EXISTS/);
+      assert.deepEqual(fs.readdirSync(dir), [staleTarget]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  }
+});
+
+test('v14 evaluator and paid-review routing accept only v14 capsule version and source list', () => {
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: 'preregistration.v14.in-force.json' } }), 'v14');
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: 'preregistration.v15.in-force.json' } }), null);
+  const entries = evalRoute.V14_REVIEW_CAPSULE_SOURCE_PATHS.map((entryPath) => ({ path: entryPath, contents: Buffer.from(entryPath) }));
+  const inputs = evalRoute.buildV14ReviewCapsuleSourceInputs(entries);
+  assert.equal(inputs.length, evalRoute.V14_REVIEW_CAPSULE_SOURCE_PATHS.length);
+  for (let i = 0; i < inputs.length; i += 1) {
+    assert.equal(inputs[i].path, entries[i].path);
+    assert.equal(inputs[i].bytes, entries[i].contents.length);
+    assert.equal(inputs[i].sha256, createHash('sha256').update(entries[i].contents).digest('hex'));
+  }
+  assert.ok(inputs.some((row) => row.path === 'scripts/s2-008-campaign-v14-pacing.mjs'));
+  assert.ok(inputs.some((row) => row.path === 'scripts/s2-008-campaign-v14-approval.mjs'));
+  assert.deepEqual(paidReviewRoute.validateS2PaidReviewCapsuleSourceInputs(inputs, inputs, { version: 14 }), { ok: true });
+  assert.deepEqual(paidReviewRoute.validateS2PaidReviewCapsuleSourceInputs(inputs, inputs, { version: 13 }), { ok: false });
+  const changed = entries.map((entry) => ({ ...entry }));
+  changed[0].path = 'corpus/s2-008-campaign/preregistration.v13.in-force.json';
+  assert.throws(() => evalRoute.buildV14ReviewCapsuleSourceInputs(changed), /V14_REVIEW_CAPSULE_SOURCE_INPUTS_INVALID/);
+});
+
+test('v14 evaluation reservation is one-shot and sealed manifests retain the v13 lineage reader', () => {
+  const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'v14-sealed-manifest-'));
+  const access = path.join(dir, 'access-once');
+  try {
+    assert.equal(evalRoute.reserveV14EvaluationAccessRoot(access), access);
+    assert.throws(() => evalRoute.reserveV14EvaluationAccessRoot(access), /V14_HOLDOUT_ACCESS_ALREADY_RECORDED/);
+    const sourceInputs = v14Approval.readV14RestartInputs();
+    const baselineFiles = sourceInputs.baseline.value.files.map((row) => row.file);
+    const required = [
+      'corpus/s2-008-campaign/preregistration.v13.in-force.json',
+      'corpus/s2-008-campaign/preregistration-v13-supersession.json',
+      'corpus/s2-008-campaign/frozen-table.v3.json',
+      'corpus/s2-008-campaign/source-ledger.v3.json',
+      'corpus/s2-008-campaign/manifest.json',
+      'evidence/s2-008-campaign/v13-immutable-baseline.json',
+      'evidence/s2-008-campaign/reconciliation-v13-a-first-old-key-confirmed.json',
+      'evidence/s2-008-campaign/reconciliation-v13-a-second-old-key-confirmed.json',
+      'evidence/s2-008-campaign/v13-a-third-stopped/run-v13-a.json',
+      'evidence/s2-008-campaign/v13-a-third-stopped/reconciliation.json',
+      'evidence/s2-008-campaign/v13-a-third-stopped/predictions-v13-a-trl-s2-008c-01-20260926.json',
+      'evidence/s2-008-campaign/v13-a-third-stopped/known-generation-receipts.json',
+      'evidence/s2-008-campaign/v13-a-third-stopped/provider-receipts-api-recheck.json',
+      'evidence/s2-008-campaign/v13-a-third-stopped/upstream-429-observation.json',
+      'evidence/s2-008-campaign/reconciliation-v13-a.json',
+      'evidence/s2-008-campaign/credential-attribution-correction-v13.json',
+      ...baselineFiles,
+    ];
+    for (const relative of new Set(required)) {
+      const target = path.join(dir, relative);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.copyFileSync(path.join(sourceRoot, relative), target);
+    }
+    const manifestPath = path.join(dir, 'corpus/s2-008-campaign/manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const supersession = JSON.parse(fs.readFileSync(path.join(dir, 'corpus/s2-008-campaign/preregistration-v13-supersession.json'), 'utf8'));
+    manifest.supersession_history = Array.isArray(manifest.supersession_history) ? manifest.supersession_history : [];
+    if (!manifest.supersession_history.some((row) => row.file === 'preregistration-v13-supersession.json')) {
+      manifest.supersession_history.push({ file: 'preregistration-v13-supersession.json', supersession_digest: supersession.supersession_digest });
+    }
+    manifest.preregistration = { ...manifest.preregistration, file: 'preregistration.v14.in-force.json', status: 'IN_FORCE' };
+    manifest.superseded_preregistration = { file: 'preregistration-v13-superseded.json',
+      preregistration_digest: JSON.parse(fs.readFileSync(path.join(dir, 'corpus/s2-008-campaign/preregistration.v13.in-force.json'), 'utf8')).preregistration_digest,
+      status: 'SUPERSEDED', superseded_by: 'preregistration.v14.in-force.json' };
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest));
+    const historical = v14Approval.readV14BaseInputs({ repoRoot: dir, allowHistorical: true });
+    assert.equal(historical.activeManifest.preregistration.file, 'preregistration.v14.in-force.json');
+    assert.equal(historical.manifest.preregistration.file, 'preregistration.v13.in-force.json');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
 
 test('v14 restart lineage binds the corrected 3-attempt closure without upgrading old or failed calls', () => {
   const { base } = v14Approval.readV14BaseInputs();
