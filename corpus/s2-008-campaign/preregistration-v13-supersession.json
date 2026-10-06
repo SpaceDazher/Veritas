@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "be2e9cba4629e66d295c2527f6a1842f6282f6526efc10d63acfddec33e0c394",
+  "replaced_by_preregistration_digest": "b8c8a142a8305692c5d01989128896c014fbb9950e92c13062b2a3041271e9af",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v13 selects the owner-approved Ling model and exact Pi catalog registration while preserving frozen science, v12 financial closure and the independent per-run A/B token ceilings",
+  "supersession_id": "spr-84ea3ae5cd4e1dccd1fa93d3",
+  "supersession_digest": "cc47b268ecc5e9c1766b44a226a7104d13770d0acbdb0519368e96b272c15f55"
+}
