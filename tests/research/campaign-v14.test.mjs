@@ -354,7 +354,7 @@ function v14PresealPinFixture(baseBytes) {
 test('paid-review inspector accepts the complete synthetic v14 in-force preregistration', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'v14-review-prereg-'));
   try {
-    const inputs = v14Approval.readV14BaseInputs();
+    const inputs = v14Approval.readV14BaseInputs({ allowHistorical: true });
     const draft = v14Approval.createV14Draft({ ...inputs,
       pin: v14PresealPinFixture(inputs.baseBytes), restartInputs: v14Approval.readV14RestartInputs() });
     const prereg = { ...draft, status: 'APPROVED', approval: { ...draft.approval,
@@ -377,7 +377,7 @@ test('paid-review inspector accepts the complete synthetic v14 in-force preregis
 });
 
 test('v14 draft preserves all 15 frozen members and every frozen member tamper is detected', () => {
-  const inputs = v14Approval.readV14BaseInputs();
+  const inputs = v14Approval.readV14BaseInputs({ allowHistorical: true });
   const restartInputs = v14Approval.readV14RestartInputs();
   const draft = v14Approval.createV14Draft({ ...inputs, pin: v14PresealPinFixture(inputs.baseBytes), restartInputs });
   assert.equal(campaignApproval.FROZEN_MEMBERS.length, 15);
@@ -390,7 +390,7 @@ test('v14 draft preserves all 15 frozen members and every frozen member tamper i
 });
 
 test('v14 probe validation binds signed policy, timeout, historical closure, path and output file', () => {
-  const inputs = v14Approval.readV14BaseInputs();
+  const inputs = v14Approval.readV14BaseInputs({ allowHistorical: true });
   const draft = v14Approval.createV14Draft({ ...inputs, pin: v14PresealPinFixture(inputs.baseBytes),
     restartInputs: v14Approval.readV14RestartInputs() });
   const prereg = { ...draft, status: 'APPROVED', approval: { ...draft.approval,
@@ -529,7 +529,7 @@ test('v14 evaluation reservation is one-shot and sealed manifests retain the v13
 });
 
 test('v14 restart lineage binds the corrected 3-attempt closure without upgrading old or failed calls', () => {
-  const { base } = v14Approval.readV14BaseInputs();
+  const { base } = v14Approval.readV14BaseInputs({ allowHistorical: true });
   const closure = v14Approval.assertV14RestartReconciliation(base, v14Approval.readV14RestartInputs());
   assert.equal(closure.third_attempt.local_attempts, 3);
   assert.equal(closure.third_attempt.successful_generations, 2);

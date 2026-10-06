@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "b8c8a142a8305692c5d01989128896c014fbb9950e92c13062b2a3041271e9af",
+  "replaced_by_preregistration_digest": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v14 binds the signed 60-second model call-start interval and explicit credential source after the v13 upstream 429, with frozen science and independent A/B ceilings preserved.",
+  "supersession_id": "spr-341aa8e0c3b114e8a906c4a5",
+  "supersession_digest": "c9e53c0cf3a0834136b22be61bb41936998d4a78e76f95cc2d3ec6b05a74b9a9"
+}

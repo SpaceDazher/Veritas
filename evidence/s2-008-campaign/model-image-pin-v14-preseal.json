@@ -1,0 +1,113 @@
+{
+  "schema": "s2-008-model-image-pin/14",
+  "image_tag": "localhost/veritas-s2-008-model:v14",
+  "base_image": "docker.io/library/node@sha256:25330af3531fb5e23318554a0aa911125b6e91b1b777edf7655501d207c067a2",
+  "commitment": {
+    "field": "executor.model_image.content_commitment",
+    "algorithm": "sha256 over canonical JSON of the covered sources",
+    "covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "model_call_pacing_policy",
+      "pi_bundle",
+      "pi_launcher",
+      "pi_package_manifest",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "provider_model_catalog",
+      "recipe",
+      "timeout_policy"
+    ],
+    "excludes": [
+      "prereg"
+    ],
+    "why_excluded": "the signed body is COPYed into this image, so a commitment covering it would be a digest of a document containing that digest; the direction is preregistration -> image only"
+  },
+  "first": {
+    "imageId": "sha256:9da253d1a159c170c018a202406179d83cfdcb9b135c204786e2766bb3fd105a",
+    "digest": "sha256:b72a289d7a88f2d2e6da8817f592a4ef0321143581149a6557d9da5a0041307a",
+    "architecture": "amd64",
+    "source_digest": "8f47960a61df0f5439ba0b3ee5e2335396f8c82242df68f3c2db3ea1e3243a2b",
+    "content_commitment": "3418f62ef558b12ed6197461a20c22542f1837c2f55f1277aa9b7a27c3096234",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "model_call_pacing_policy",
+      "pi_bundle",
+      "pi_launcher",
+      "pi_package_manifest",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "provider_model_catalog",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "9a85b7f7031071f0883f34fe66dbb3f51924d9800a3cc8e6de9b18a01915f75a",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "80da47105d3ec77a707c867fcb5fc29ae564ace482eea2d7fb868d609ac995cd",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "af23555097e8e08e635daba87424b3dcc26cc86209f2ecc8dfa208f564feda9e",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "credential_env_policy": "52c5e0eb4ece08e7d5617eaee9cf2428c194d748952673a1a031b21cad2036ed",
+      "pi_runtime_tree": "b2fc2b9e4478217ca5c8c94082389d85a77fad8358a4704dab91f5607c1b35f8",
+      "pi_package_manifest": "c701ddbf28b5170deb478b8586ee713f9372027c04736946a4ffe82168ece5ba",
+      "pi_launcher": "2c15f5fcb5ad40fb0399b71179de1e810bfa61af9645d066dfb2cced71fca76c",
+      "provider_model_catalog": "5f8d6f77af15a6af97bcd06229a146e10a524f76f2d06878b941e586e3c765a6",
+      "model_call_pacing_policy": "17caf05791fb14ee7d79d90f9c92861c19bc0c14889e2a1182fbf32730a271a3"
+    }
+  },
+  "second": {
+    "imageId": "sha256:9da253d1a159c170c018a202406179d83cfdcb9b135c204786e2766bb3fd105a",
+    "digest": "sha256:b72a289d7a88f2d2e6da8817f592a4ef0321143581149a6557d9da5a0041307a",
+    "architecture": "amd64",
+    "source_digest": "8f47960a61df0f5439ba0b3ee5e2335396f8c82242df68f3c2db3ea1e3243a2b",
+    "content_commitment": "3418f62ef558b12ed6197461a20c22542f1837c2f55f1277aa9b7a27c3096234",
+    "content_commitment_covers": [
+      "arm",
+      "blind",
+      "bridge",
+      "canonical_json",
+      "credential_env_policy",
+      "model_call_pacing_policy",
+      "pi_bundle",
+      "pi_launcher",
+      "pi_package_manifest",
+      "pi_runtime_tree",
+      "pi_shrinkwrap",
+      "provider_model_catalog",
+      "recipe",
+      "timeout_policy"
+    ],
+    "sources": {
+      "arm": "9a85b7f7031071f0883f34fe66dbb3f51924d9800a3cc8e6de9b18a01915f75a",
+      "bridge": "01e92665ec8f942d17417a1c6f200b97d4fa91da61701f8727c74f4920d92198",
+      "canonical_json": "27ea533a1700b927f0646f27eec30b06fef414db1c6acfb4a9e3b3f5e58d4f1a",
+      "blind": "dd4ed275b809cc877191fbb8b8c0078c5c564bfaef2fe725b3f3d6ff9e37448f",
+      "prereg": "80da47105d3ec77a707c867fcb5fc29ae564ace482eea2d7fb868d609ac995cd",
+      "pi_bundle": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
+      "pi_shrinkwrap": "af23555097e8e08e635daba87424b3dcc26cc86209f2ecc8dfa208f564feda9e",
+      "recipe": "2ad281e972d0d9653af7b320bbddf6d2af67632f17758cdbd9a66ec5bc4a2c58",
+      "timeout_policy": "02f2037299c741506a6a1892ea08a5ce76286a95592b1364485ebf129055527d",
+      "credential_env_policy": "52c5e0eb4ece08e7d5617eaee9cf2428c194d748952673a1a031b21cad2036ed",
+      "pi_runtime_tree": "b2fc2b9e4478217ca5c8c94082389d85a77fad8358a4704dab91f5607c1b35f8",
+      "pi_package_manifest": "c701ddbf28b5170deb478b8586ee713f9372027c04736946a4ffe82168ece5ba",
+      "pi_launcher": "2c15f5fcb5ad40fb0399b71179de1e810bfa61af9645d066dfb2cced71fca76c",
+      "provider_model_catalog": "5f8d6f77af15a6af97bcd06229a146e10a524f76f2d06878b941e586e3c765a6",
+      "model_call_pacing_policy": "17caf05791fb14ee7d79d90f9c92861c19bc0c14889e2a1182fbf32730a271a3"
+    }
+  },
+  "identical": true,
+  "context_digest_stable": true,
+  "content_commitment_stable": true,
+  "commitment_excludes_preregistration": true
+}
