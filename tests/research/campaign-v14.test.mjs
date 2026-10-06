@@ -542,3 +542,26 @@ test('v14 restart lineage binds the corrected 3-attempt closure without upgradin
   assert.equal(closure.historical_old_key_reconciliations.length, 2);
   assert.equal(closure.superseded_incorrect_reconciliation_file, 'evidence/s2-008-campaign/reconciliation-v13-a.json');
 });
+
+test('v14 seals real v13 lineage and rejects missing or changed historical digest', () => {
+  const inputs = v14Approval.readV14BaseInputs({ allowHistorical: true });
+  const restartInputs = v14Approval.readV14RestartInputs();
+  const pin = v14PresealPinFixture(inputs.baseBytes);
+  const draft = v14Approval.createV14Draft({ ...inputs, pin, restartInputs });
+  const signed = v14Approval.approveV14({ ...inputs, draft, pin, restartInputs,
+    principal: 'prn-s2007r-owner', label: 'Daniil', issuedAt: '2026-10-06T15:00:00.000Z' });
+  const result = sealRoute.sealV14({ ...inputs, signed, draft, pin, restartInputs,
+    baseSupersession: inputs.supersession, baseSupersessionBytes: inputs.supersessionBytes });
+  assert.equal(result.prereg.approval.in_force, true);
+  const binding = { ...result, base: inputs.base, baseSupersession: inputs.supersession, table: inputs.table };
+  assert.deepEqual(sealRoute.assertV14ManifestBinding(binding), { ok: true });
+  for (const digest of [undefined, '0'.repeat(64)]) {
+    const changed = structuredClone(result.manifest);
+    const prior = changed.supersession_history.find(row => row.file === 'preregistration-v13-supersession.json');
+    prior.supersession_digest = digest;
+    assert.throws(() => sealRoute.assertV14ManifestBinding({ ...binding, manifest: changed }),
+      /V14_MANIFEST_BINDING_MISMATCH/);
+  }
+  assert.throws(() => sealRoute.assertV14ManifestBinding({ ...binding, baseSupersession: undefined }),
+    /V14_MANIFEST_BINDING_MISMATCH/);
+});

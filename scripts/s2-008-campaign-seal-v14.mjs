@@ -44,11 +44,12 @@ export function assertV14ApprovalBinding({ signed, prereg, expected }) {
   return { ok: true };
 }
 
-export function assertV14ManifestBinding({ prereg, base, manifest, supersession, table, ledger }) {
+export function assertV14ManifestBinding({ prereg, base, baseSupersession, manifest, supersession, table, ledger }) {
   const history = manifest?.supersession_history;
   const priorV13 = Array.isArray(history) ? history.find((entry) =>
     entry.file === 'preregistration-v13-supersession.json' &&
-    entry.supersession_digest === base?.supersession?.supersession_digest) : null;
+    typeof baseSupersession?.supersession_digest === 'string' &&
+    entry.supersession_digest === baseSupersession.supersession_digest) : null;
   if (!prereg || prereg.rule !== 's2-008-prereg-v14' || prereg.approval?.in_force !== true ||
       prereg.preregistration_digest !== preregistrationDigest(prereg) ||
       manifest?.preregistration?.file !== 'preregistration.v14.in-force.json' ||
@@ -123,7 +124,7 @@ export function sealV14({ signed, draft, base, baseBytes, manifest, baseSuperses
   nextManifest.frozen_table = { file: 'frozen-table.v3.json', digest: canonicalDigest(table) };
   nextManifest.source_ledger = structuredClone(manifest.source_ledger);
   const result = { prereg, supersession, ledger: { ...ledger, entries: ledger.entries }, manifest: nextManifest };
-  assertV14ManifestBinding({ prereg, base, manifest: nextManifest, supersession, table, ledger });
+  assertV14ManifestBinding({ prereg, base, baseSupersession, manifest: nextManifest, supersession, table, ledger });
   return result;
 }
 
@@ -176,7 +177,7 @@ export function checkV14OnDisk() {
   const final = assertV14PresealPin({ pin: finalPin, baseBytes: bytes('preregistration.v14.in-force.json'),
     commitment: prereg.executor.model_image.content_commitment });
   if (preseal.commitment !== final.commitment) throw new Error('V14_CONTENT_COMMITMENT_MOVED');
-  assertV14ManifestBinding({ prereg, base, manifest: activeManifest, supersession, table, ledger });
+  assertV14ManifestBinding({ prereg, base, baseSupersession: baseInputs.supersession, manifest: activeManifest, supersession, table, ledger });
   return { ok: true, preregistration_digest: prereg.preregistration_digest,
     supersession_id: supersession.supersession_id, content_commitment: final.commitment };
 }
