@@ -57,6 +57,21 @@ export const V13_MODEL_POLICY = Object.freeze({
   }),
 });
 
+export const V14_MODEL_POLICY = Object.freeze({
+  ...V13_MODEL_POLICY,
+  credential_source: 'EXPLICIT_PROCESS_ENV_ONLY',
+  min_start_interval_ms: 60000,
+});
+
+export function assertV14ExecutorPolicy(executor) {
+  const base = assertV13ExecutorPolicy(executor);
+  if (executor?.credential_source !== V14_MODEL_POLICY.credential_source ||
+      canonicalDigest(executor?.model_call_pacing ?? null) !== canonicalDigest({ min_start_interval_ms: V14_MODEL_POLICY.min_start_interval_ms })) {
+    throw new Error('V14_MODEL_PACING_OR_CREDENTIAL_POLICY_INVALID');
+  }
+  return Object.freeze({ ...base, credentialSource: V14_MODEL_POLICY.credential_source, minStartIntervalMs: V14_MODEL_POLICY.min_start_interval_ms });
+}
+
 export function assertV13ExecutorPolicy(executor) {
   const binding = executor?.pi_model_catalog_binding;
   if (executor?.provider !== V13_MODEL_POLICY.provider ||
@@ -127,6 +142,7 @@ export function credentialEnvNamesForProvider(provider) {
 }
 
 export function credentialEnvNameForPreregistration(prereg) {
+  if (prereg?.rule === 's2-008-prereg-v14') return assertV14ExecutorPolicy(prereg.executor).envName;
   if (prereg?.rule === 's2-008-prereg-v13') return assertV13ExecutorPolicy(prereg.executor).envName;
   if (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg?.rule)) return assertV8ExecutorPolicy(prereg.executor).envName;
   if (prereg?.rule === 's2-008-prereg-v7') return assertV7ExecutorPolicy(prereg.executor).envName;

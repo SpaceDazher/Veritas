@@ -25,7 +25,7 @@ test('v14 pacing keeps at least 60 seconds between call starts', () => {
 
 test('v14 pacing rejects non-integer intervals and avoids waiting after a stop or in dry run', () => {
   assert.equal(pacing.assertV14MinStartInterval(60000), 60000);
-  for (const value of [0, -1, 60000.5, Infinity, '60000', null]) {
+  for (const value of [0, -1, 1, 59999, 60000.5, 60001, Infinity, '60000', null]) {
     assert.throws(() => pacing.assertV14MinStartInterval(value));
   }
   let now = 0, calls = 0, allowed = false;
@@ -34,8 +34,10 @@ test('v14 pacing rejects non-integer intervals and avoids waiting after a stop o
     now: () => now, sleep: (ms) => { sleeps.push(ms); now += ms; } });
   assert.equal(pacer.runSync(() => { calls += 1; }, { shouldContinue: () => allowed }).proceeded, false);
   assert.deepEqual(sleeps, []);
-  assert.equal(pacer.runSync(() => { calls += 1; }, { enabled: false }).proceeded, true);
-  assert.equal(calls, 1);
+  const dry = pacer.runSync(() => { calls += 1; }, { enabled: false });
+  assert.equal(dry.proceeded, true);
+  assert.equal(dry.called, false);
+  assert.equal(calls, 0);
   assert.deepEqual(sleeps, []);
 });
 
@@ -137,9 +139,13 @@ test('v14 credential route uses only explicit process environment and checks saf
   const request = { image: 'sha256:' + 'a'.repeat(64), argv: ['/usr/local/bin/node'], timeoutMs: 1000,
     provider: 'openrouter', envName: 'OPENROUTER_API_KEY', credentialEnv: { OPENROUTER_API_KEY: key },
     requireExplicitCredentialSource: true, credentialValue: key, credentialPresent: () => true,
-    credentialMetadata: () => ({ present: true, fingerprint: 'different-fingerprint' }),
+    credentialMetadata: () => ({ present: true, fingerprint: '0000000000000000' }),
     startForwarder: async () => { forwarded = true; throw new Error('unexpected'); },
     execute: () => { forwarded = true; throw new Error('unexpected'); } };
+  for (const metadata of [undefined, { present: true, fingerprint: null }, { present: true, fingerprint: 'bad' }]) {
+    await assert.rejects(() => adapterRoute.executeModelWithCredential({ ...request, credentialMetadata: () => metadata }),
+      /EXECUTOR_CREDENTIAL_(?:ABSENT|FINGERPRINT_UNAVAILABLE)/);
+  }
   await assert.rejects(() => adapterRoute.executeModelWithCredential(request),
     /EXECUTOR_CREDENTIAL_FINGERPRINT_MISMATCH/);
   assert.equal(forwarded, false);
@@ -201,7 +207,7 @@ function paidEvidence(model) {
 test('v14 paid review keeps the actual receipt model id and accepts only request id or signed catalog slug', () => {
   const prereg = { rule: 's2-008-prereg-v14', executor: {
     provider: 'openrouter', model: 'inclusionai/ling-3.1-flash',
-    credential_env_name: 'OPENROUTER_API_KEY',
+    credential_env_name: 'OPENROUTER_API_KEY', credential_source: 'EXPLICIT_PROCESS_ENV_ONLY',
     pi_model_registration: { id: 'inclusionai/ling-3.1-flash', name: 'inclusionAI: Ling 3.1 Flash',
       api: 'openai-completions', baseUrl: 'https://openrouter.ai/api/v1', input: ['text'],
       contextWindow: 262144, maxTokens: 32768, reasoning: true },

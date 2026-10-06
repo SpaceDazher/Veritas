@@ -389,7 +389,7 @@ export function decisionIndependent({ observed, lower, upper, noiseBand, alpha, 
 
 
 export function activeCampaignVersion(manifest) {
-  const match = /^preregistration\.(v(?:[4-9]|1[0-3]))\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
+  const match = /^preregistration\.(v(?:[4-9]|1[0-4]))\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
   return match?.[1] ?? null;
 }
 

@@ -1548,7 +1548,7 @@ export function productionPaidRunRefusal({ dryRun = false, label = 'a', write = 
 
 export function campaignCliMode(args = {}) {
   const versionKeys = Object.keys(args).filter((name) => /^v\d/.test(name));
-  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13']);
+  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14']);
   if (versionKeys.some((name) => !supported.has(name) || args[name] !== true)) {
     throw new Error('CAMPAIGN_VERSION_INVALID');
   }

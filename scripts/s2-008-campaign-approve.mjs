@@ -118,7 +118,7 @@ export function parseArgs(argv) {
     else if (token === '--out') out.out = take();
     else if (token === '--version') {
       const version = take();
-      if (!/^v(?:2|[3-9]|1[0-3])$/.test(version)) throw new Error('APPROVE_VERSION_INVALID');
+      if (!/^v(?:2|[3-9]|1[0-4])$/.test(version)) throw new Error('APPROVE_VERSION_INVALID');
       if (explicitVersion !== null) throw new Error('APPROVE_VERSION_CONFLICT');
       explicitVersion = version;
       out.version = version;

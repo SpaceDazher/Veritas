@@ -19,7 +19,7 @@ import { validateControlImagePinEvidence, validateControlExecution } from './s2-
 import { openRegistry, readJournal, verifyChain } from '../src/lib/research/registry.mjs';
 import { createS2PaidReviewWorkflow as createPaidWorkflow, isTrustedS2PaidReviewWorkflow } from './s2-008-paid-review-workflow.mjs';
 import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation, inspectV11PriorExecutionEvidence } from './s2-008-campaign-v12-approval.mjs';
-import { V13_MODEL_POLICY, assertV13ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { V13_MODEL_POLICY, assertV13ExecutorPolicy, assertV14ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 import { assertV13PresealPin, assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -742,7 +742,7 @@ export function validateS2PaidReviewEvaluation({
   }
 }
 
-export function validateS2PaidReviewGenerationAccounting({ report, sidecar, sidecars, reconciliation, receipts, version = 11 } = {}) {
+export function validateS2PaidReviewGenerationAccounting({ report, sidecar, sidecars, reconciliation, receipts, version = 11, prereg = null } = {}) {
   const sidecarList = Array.isArray(sidecars) ? sidecars : (sidecar ? [sidecar] : []);
   const localRows = [];
   let sidecarCalls = 0;
@@ -822,13 +822,15 @@ export function validateS2PaidReviewGenerationAccounting({ report, sidecar, side
     const reconciled = reconById.get(id);
     const idEpoch = Number(id.match(/^gen-(\d{10})-/)?.[1]);
     const createdEpoch = canonicalInstant(receipt?.created_at) ? Math.floor(Date.parse(receipt.created_at) / 1000) : NaN;
-    const expectedModel = version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha';
-    const v13ProviderBound = version === 13
+    const allowedModels = version === 14
+      ? [assertV14ExecutorPolicy(prereg?.executor).model, prereg.executor.pi_model_catalog_binding.canonical_slug]
+      : [version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha'];
+    const v13ProviderBound = version === 13 || version === 14
       ? typeof receipt?.provider === 'string' && /^[A-Za-z0-9][A-Za-z0-9 ._:+/-]{0,63}$/.test(receipt.provider)
         && reconciled?.provider === receipt.provider
       : receipt?.provider === 'Stealth';
     if (!receipt || !reconciled || receipt.http_status !== 200 || !v13ProviderBound
-        || receipt.model !== expectedModel || !canonicalInstant(receipt.created_at)
+        || !allowedModels.includes(receipt.model) || !canonicalInstant(receipt.created_at)
         || Math.abs(createdEpoch - idEpoch) > 1
         || !Number.isSafeInteger(receipt.native_prompt) || receipt.native_prompt !== local.prompt_tokens
         || !Number.isSafeInteger(receipt.native_completion) || receipt.native_completion !== local.output

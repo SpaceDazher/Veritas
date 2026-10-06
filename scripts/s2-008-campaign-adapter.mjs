@@ -49,7 +49,7 @@ import { V11_FAILURE_DIAGNOSTICS_POLICY } from './s2-008-campaign-arm-model.mjs'
 import { assertV12PresealPin, assertV12PriorExecutionEvidence, assertV12RestartReconciliation } from './s2-008-campaign-v12-approval.mjs';
 import { assertV13PresealPin, assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
-import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, assertV13ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
+import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, assertV13ExecutorPolicy, assertV14ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -630,6 +630,7 @@ const FORWARDER_PROGRAM = path.join(REPO_ROOT, 'scripts/s2-008-campaign-egress-f
 export function modelCredentialValue({
   provider = 'zai-coding-cn',
   env = process.env,
+  allowAuthFallback = true,
   readAuth = () => fs.readFileSync(path.join(os.homedir(), '.pi/agent/auth.json'), 'utf8'),
 } = {}) {
   const names = credentialEnvNamesForProvider(provider);
@@ -637,6 +638,7 @@ export function modelCredentialValue({
     const injected = env?.[envName];
     if (typeof injected === 'string' && injected.length >= 8) return injected;
   }
+  if (allowAuthFallback !== true) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
   let auth;
   try { auth = JSON.parse(readAuth()); } catch { throw new Error('EXECUTOR_CREDENTIAL_ABSENT'); }
   const value = auth?.[provider]?.key;
@@ -645,6 +647,25 @@ export function modelCredentialValue({
 }
 
 /** Inspect only metadata. A missing store entry refuses before a model call. */
+export function credentialFingerprint(value) {
+  if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+  return createHash('sha256').update(value).digest('hex').slice(0, 16);
+}
+
+export function modelCredentialMetadata(handle = MODEL_CREDENTIAL_HANDLE) {
+  const inspected = spawnSync('podman', [...PODMAN_HOST.argvPrefix, 'secret', 'inspect', '--showsecret', handle], {
+    encoding: 'utf8', env: PODMAN_ENV, maxBuffer: 1 << 20,
+  });
+  if (inspected.status !== 0) return Object.freeze({ present: false, fingerprint: null });
+  try {
+    const parsed = JSON.parse(inspected.stdout);
+    const secret = Array.isArray(parsed) ? parsed[0] : parsed;
+    const value = secret?.SecretData;
+    if (typeof value !== 'string' || value.length < 8) return Object.freeze({ present: true, fingerprint: null });
+    return Object.freeze({ present: true, fingerprint: credentialFingerprint(value) });
+  } catch { return Object.freeze({ present: true, fingerprint: null }); }
+}
+
 export function modelCredentialPresent(handle = MODEL_CREDENTIAL_HANDLE) {
   const inspected = spawnSync('podman', [...PODMAN_HOST.argvPrefix, 'secret', 'inspect', handle], {
     encoding: 'utf8', env: PODMAN_ENV, maxBuffer: 16 * 1024,
@@ -735,6 +756,9 @@ export async function executeModelWithCredential({
   handle = MODEL_CREDENTIAL_HANDLE,
   credentialValue = undefined,
   credentialPresent = modelCredentialPresent,
+  credentialEnv = process.env,
+  requireExplicitCredentialSource = false,
+  credentialMetadata = modelCredentialMetadata,
   startForwarder = (_socketPath, options) => startCampaignForwarder(options),
   execute = executeIsolated,
 } = {}) {
@@ -749,8 +773,25 @@ export async function executeModelWithCredential({
   envName = effectiveEnvName;
   const egressAllowlist = egressAllowlistForProvider(provider);
   if (credentialPresent(handle) !== true) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
-  const value = credentialValue === undefined ? modelCredentialValue({ provider }) : credentialValue;
+  const explicitValue = credentialEnv?.[envName];
+  if (requireExplicitCredentialSource === true &&
+      (typeof explicitValue !== 'string' || explicitValue.length < 8 ||
+       (credentialValue !== undefined && credentialValue !== explicitValue))) {
+    throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+  }
+  const value = requireExplicitCredentialSource === true
+    ? explicitValue
+    : credentialValue === undefined ? modelCredentialValue({ provider }) : credentialValue;
   if (typeof value !== 'string' || value.length < 8) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+  if (requireExplicitCredentialSource === true) {
+    let metadata;
+    try { metadata = credentialMetadata(handle); } catch { throw new Error('EXECUTOR_CREDENTIAL_FINGERPRINT_UNAVAILABLE'); }
+    if (metadata?.present !== true) throw new Error('EXECUTOR_CREDENTIAL_ABSENT');
+    if (typeof metadata?.fingerprint !== 'string' || !/^[0-9a-f]{16}$/.test(metadata.fingerprint)) {
+      throw new Error('EXECUTOR_CREDENTIAL_FINGERPRINT_UNAVAILABLE');
+    }
+    if (metadata.fingerprint !== credentialFingerprint(value)) throw new Error('EXECUTOR_CREDENTIAL_FINGERPRINT_MISMATCH');
+  }
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-credential-'));
   let envFile = null;
   let forwarder = null;
@@ -823,12 +864,13 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v11') return 11;
   if (rule === 's2-008-prereg-v12') return 12;
   if (rule === 's2-008-prereg-v13') return 13;
+  if (rule === 's2-008-prereg-v14') return 14;
   if (rule === 's2-008-prereg-v9') return 9;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
 
 
-export function modelTrialArgv({ armId, seed, dryRun = false, remainingTokens = undefined, preregRule = 's2-008-prereg-v4' } = {}) {
+export function modelTrialArgv({ armId, seed, dryRun = false, remainingTokens = undefined, preregRule = 's2-008-prereg-v4', minStartIntervalMs = undefined } = {}) {
   if (armId !== MODEL_ARM_ID || !Number.isInteger(Number(seed))) throw new Error('MODEL_TRIAL_REQUEST_INVALID');
   const version = modelPreregVersion(preregRule);
   const preregPath = `/opt/veritas/corpus/s2-008-campaign/preregistration.v${version}.in-force.json`;
@@ -836,10 +878,14 @@ export function modelTrialArgv({ armId, seed, dryRun = false, remainingTokens = 
   if (remainingTokens !== undefined && (!Number.isSafeInteger(remainingTokens) || remainingTokens < 0)) {
     throw new Error('SHARED_TOKEN_CAP_INVALID');
   }
+  if (version === 14) {
+    if (minStartIntervalMs !== 60000) throw new Error('V14_MIN_START_INTERVAL_INVALID');
+  } else if (minStartIntervalMs !== undefined) throw new Error('V14_MIN_START_INTERVAL_INVALID');
   return [
     '/usr/local/bin/node', MODEL_PROGRAM_IN_IMAGE, MODEL_INPUT_IN_IMAGE,
     '/tmp/model-out.json', armId, preregPath, String(seed),
     ...(remainingTokens === undefined ? [] : ['--remaining-tokens', String(remainingTokens)]),
+    ...(version === 14 ? ['--min-start-interval-ms', String(minStartIntervalMs)] : []),
     ...(dryRun ? ['--dry-run'] : []),
   ];
 }
@@ -975,7 +1021,8 @@ export async function runModelTrial({
   inspect, executeDry = executeIsolated, executePaid = executeModelWithCredential,
 } = {}) {
   const pinned = assertPinnedModelImage({ pin, prereg, inspect });
-  const argv = modelTrialArgv({ armId, seed, dryRun, remainingTokens, preregRule: prereg.rule });
+  const v14Policy = prereg.rule === 's2-008-prereg-v14' ? assertV14ExecutorPolicy(prereg.executor) : null;
+  const argv = modelTrialArgv({ armId, seed, dryRun, remainingTokens, preregRule: prereg.rule, minStartIntervalMs: v14Policy?.minStartIntervalMs });
   let observation;
   let invocation = null;
   if (dryRun) {
@@ -989,6 +1036,7 @@ export async function runModelTrial({
       name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-' + String(seed),
       provider: prereg.executor.provider,
       envName: credentialEnvNameForPreregistration(prereg),
+      ...(v14Policy ? { requireExplicitCredentialSource: true, credentialEnv: process.env } : {}),
     });
     observation = paid.observation;
     invocation = paid.invocation;

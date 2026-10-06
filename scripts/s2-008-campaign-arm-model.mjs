@@ -42,7 +42,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { assertV13ExecutorPolicy, createV13PiModelsFile } from './s2-008-campaign-credential-env.mjs';
+import { assertV13ExecutorPolicy, assertV14ExecutorPolicy, createV13PiModelsFile } from './s2-008-campaign-credential-env.mjs';
+import { createV14StartPacer, assertV14MinStartInterval, assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 
 
 /** The only value that lets a preregistration be run under. */
@@ -530,7 +531,7 @@ export function proxyEnvironment(base, { port, host = '127.0.0.1' } = {}) {
 /** One model call. Dry runs skip it and say so. */
 export function callModel(subject, {
   provider, model, envName, env, dryRun, timeoutMs, piSettings = null, piExecutor = null,
-  execFile = execFileSync, captureFailureDiagnostics = false,
+  execFile = execFileSync, captureFailureDiagnostics = false, pacer = null, shouldContinue = () => true,
 }) {
   if (dryRun) return { text: 'MINOR', usage: { totalTokens: 0, cost: { total: 0 } }, model_called: false };
   if (!readCredential(envName, env)) throw new Error(`${ARM_ERRORS.NO_CREDENTIAL}:${envName}`);
@@ -560,9 +561,10 @@ export function callModel(subject, {
       throw new Error('V7_PI_SETTINGS_MATERIALIZATION_FAILED');
     }
   }
-  const startedMs = Date.now();
+  let startedMs = null;
   const finishFailure = (code, error, output = undefined, usageStatus = 'UNKNOWN') => {
     const finishedMs = Date.now();
+    const attemptStartedMs = startedMs ?? finishedMs;
     const observedOutput = output ?? error?.stdout ?? null;
     const observed = extractObservedUsage(observedOutput, { requireOpenRouterGenerationId: captureFailureDiagnostics });
     const final = finalAgentEnd(observedOutput);
@@ -574,7 +576,7 @@ export function callModel(subject, {
       : observedAssistantCount === 0 ? 'UNKNOWN' : observed.measuredMessages > 0
         ? (observed.complete ? 'MEASURED' : 'PARTIAL') : observed.zeroMessages > 0 ? 'ZERO' : 'MISSING';
     const diagnostic = captureFailureDiagnostics ? createSafeFailureDiagnostic({
-      startedAt: new Date(startedMs).toISOString(), finishedAt: new Date(finishedMs).toISOString(),
+      startedAt: new Date(attemptStartedMs).toISOString(), finishedAt: new Date(finishedMs).toISOString(),
       exitCode: error?.status ?? error?.exitCode ?? null, signal: error?.signal ?? null,
       stdout: observedOutput, stderr: error?.stderr ?? null,
       errorMessage: providerError.message ?? error?.message ?? null,
@@ -594,9 +596,17 @@ export function callModel(subject, {
     throw failure;
   };
   try {
-    stdout = execFile('pi', modelCallArgv({ provider, model, prompt: buildPrompt(subject) }), {
+    const invoke = () => {
+      startedMs = Date.now();
+      return execFile('pi', modelCallArgv({ provider, model, prompt: buildPrompt(subject) }), {
       encoding: 'utf8', timeout: timeoutMs, maxBuffer: 1 << 26, env: runtimeEnv,
-    });
+      });
+    };
+    if (pacer) {
+      const paced = pacer.runSync(invoke, { shouldContinue });
+      if (!paced.proceeded || !paced.called) throw new Error('V14_PACING_STOPPED_BEFORE_CALL');
+      stdout = paced.value;
+    } else stdout = invoke();
   } catch (error) {
     finishFailure(ARM_ERRORS.PROVIDER_UNREACHABLE, error, error?.stdout, 'UNKNOWN');
   } finally {
@@ -660,11 +670,14 @@ export async function main(argv, env = process.env, deps = {}) {
   const invokeModel = deps.callModel ?? callModel;
   const writeStdout = deps.writeStdout ?? ((text) => process.stdout.write(text));
   const capPositions = argv.flatMap((value, index) => value === '--remaining-tokens' ? [index] : []);
+  const intervalPositions = argv.flatMap((value, index) => value === '--min-start-interval-ms' ? [index] : []);
   const capPosition = capPositions.length === 1 ? capPositions[0] : -1;
   const capText = capPosition >= 0 ? argv[capPosition + 1] : undefined;
+  const intervalPosition = intervalPositions.length === 1 ? intervalPositions[0] : -1;
+  const intervalText = intervalPosition >= 0 ? argv[intervalPosition + 1] : undefined;
   const flags = new Set(argv.filter((a) => a.startsWith('--')));
-  const positional = argv.filter((a, index) => !a.startsWith('--') && !(capPosition >= 0 && index === capPosition + 1));
-  if (capPositions.length > 1 || [...flags].some((flag) => flag !== '--dry-run' && flag !== '--remaining-tokens')) {
+  const positional = argv.filter((a, index) => !a.startsWith('--') && !(capPosition >= 0 && index === capPosition + 1) && !(intervalPosition >= 0 && index === intervalPosition + 1));
+  if (capPositions.length > 1 || intervalPositions.length > 1 || [...flags].some((flag) => flag !== '--dry-run' && flag !== '--remaining-tokens' && flag !== '--min-start-interval-ms')) {
     process.stderr.write(`${ARM_ERRORS.SHARED_CAP_INVALID}:flags\n`);
     return 11;
   }
@@ -696,6 +709,15 @@ export async function main(argv, env = process.env, deps = {}) {
   }
 
   const prereg = JSON.parse(fs.readFileSync(preregPath, 'utf8'));
+  const isV14 = prereg.rule === 's2-008-prereg-v14';
+  let minStartIntervalMs = null;
+  if (isV14) {
+    try {
+      const policy = assertV14ExecutorPolicy(prereg.executor);
+      minStartIntervalMs = assertV14MinStartInterval(Number(intervalText));
+      if (String(minStartIntervalMs) !== intervalText || minStartIntervalMs !== policy.minStartIntervalMs) throw new Error('V14_MIN_START_INTERVAL_INVALID');
+    } catch { process.stderr.write('V14_MODEL_POLICY_INVALID\n'); return 14; }
+  } else if (intervalPositions.length !== 0) { process.stderr.write('V14_MIN_START_INTERVAL_INVALID\n'); return 14; }
 
   // AN UNAPPROVED PREREGISTRATION IS NOT A PREREGISTRATION. v2 exists on disk as a
   // draft with `approval.status: null`, and a draft that a run could pick up would
@@ -721,7 +743,7 @@ export async function main(argv, env = process.env, deps = {}) {
     process.stderr.write(`${ARM_ERRORS.PREREG_DIGEST_MISMATCH}:signed=${String(prereg.preregistration_digest ?? '').slice(0, 16)}:recomputed=${recomputed.slice(0, 16)}\n`);
     return 8;
   }
-  if (['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule) &&
+  if (['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14'].includes(prereg.rule) &&
       canonicalDigest(prereg.failure_diagnostics_protocol ?? null) !== canonicalDigest(V11_FAILURE_DIAGNOSTICS_POLICY)) {
     process.stderr.write('V11_FAILURE_DIAGNOSTICS_POLICY_INVALID\n');
     return 14;
@@ -770,10 +792,10 @@ export async function main(argv, env = process.env, deps = {}) {
   let piSettingsDigest = null;
   let piExecutor = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14'].includes(prereg.rule)) {
     try {
-      const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
-      timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+      timeoutPolicy = isV14 ? assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout)
+        : (await import('./s2-008-campaign-v6-timeout.mjs')).assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     } catch {
       process.stderr.write('V6_MODEL_TIMEOUT_POLICY_INVALID\n');
       return 12;
@@ -783,19 +805,19 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13'].includes(prereg.rule)) {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14'].includes(prereg.rule)) {
       try {
         const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        const policy = prereg.rule === 's2-008-prereg-v13'
-          ? assertV13ExecutorPolicy(prereg.executor)
+        const policy = prereg.rule === 's2-008-prereg-v14' ? assertV14ExecutorPolicy(prereg.executor)
+          : prereg.rule === 's2-008-prereg-v13' ? assertV13ExecutorPolicy(prereg.executor)
           : (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)
             ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor);
         piSettings = policy.settings;
-        piExecutor = prereg.rule === 's2-008-prereg-v13' ? prereg.executor : null;
+        piExecutor = ['s2-008-prereg-v13','s2-008-prereg-v14'].includes(prereg.rule) ? prereg.executor : null;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {
-        process.stderr.write(prereg.rule === 's2-008-prereg-v13' ? 'V13_MODEL_POLICY_INVALID\n' : 'V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
+        process.stderr.write(prereg.rule === 's2-008-prereg-v14' ? 'V14_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v13' ? 'V13_MODEL_POLICY_INVALID\n' : 'V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
         return 13;
       }
     }
@@ -803,8 +825,8 @@ export async function main(argv, env = process.env, deps = {}) {
 
   const predictions = [];
   const accounting = [];
-  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule);
-  const captureFailureDiagnostics = ['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule);
+  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14'].includes(prereg.rule);
+  const captureFailureDiagnostics = ['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14'].includes(prereg.rule);
   const failureDiagnostics = [];
   let unknownModelAttempts = 0;
   const generationIdsSeen = new Set();
@@ -812,6 +834,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let usd = 0;
   let modelCalls = 0;
   let modelAttempts = 0;
+  const pacer = isV14 ? createV14StartPacer({ minStartIntervalMs }) : null;
   let unreconciledSpend = false;
   let stop = null;
   // THE THIRD STAGE OF THE LAUNCH ORDER, and the one that lives in here. The
@@ -842,7 +865,7 @@ export async function main(argv, env = process.env, deps = {}) {
     let result;
     if (!dryRun) modelAttempts += 1;
     try {
-      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, piExecutor, captureFailureDiagnostics });
+      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, piExecutor, captureFailureDiagnostics, pacer, shouldContinue: () => spent < launchCap });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
       if (captureFailureDiagnostics && error?.failure_diagnostic?.schema === 's2-008-failure-diagnostic/1') {
