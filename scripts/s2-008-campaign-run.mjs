@@ -1167,7 +1167,7 @@ export async function runV4Campaign({
   }
   if (prereg.rule === 's2-008-prereg-v14') {
     const inputs = readV14RestartInputs();
-    const baseInputs = readV14BaseInputs();
+    const baseInputs = readV14BaseInputs({ allowHistorical: true });
     const prior = assertV14RestartReconciliation(baseInputs.base, inputs);
     if (canonicalDigest(prereg.v13_restart_reconciliation) !== canonicalDigest(prior)) throw new Error('V14_PRIOR_V13_RESTART_BINDING_MISMATCH');
   }

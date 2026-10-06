@@ -565,3 +565,12 @@ test('v14 seals real v13 lineage and rejects missing or changed historical diges
   assert.throws(() => sealRoute.assertV14ManifestBinding({ ...binding, baseSupersession: undefined }),
     /V14_MANIFEST_BINDING_MISMATCH/);
 });
+
+test('v14 sealed runtime validates historical v13 before refusing an undeclared arm', async () => {
+  const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const manifest = JSON.parse(fs.readFileSync(path.join(sourceRoot, 'corpus/s2-008-campaign/manifest.json'), 'utf8'));
+  if (manifest.preregistration.file !== 'preregistration.v14.in-force.json') return;
+  await assert.rejects(() => runRoute.runV4Campaign({
+    dryRun: true, write: false, expectedVersion: 14, arm: 'not-preregistered',
+  }), /CAMPAIGN_ARM_NOT_PREREGISTERED/);
+});
