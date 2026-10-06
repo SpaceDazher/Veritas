@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1408.
+Generated from `git ls-files`; count: 1425.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -660,6 +660,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-007r-summary.json`
 - `evidence/s2-008-campaign/control-image-pin-v12-a.json`
 - `evidence/s2-008-campaign/control-image-pin-v12-clean-base.json`
+- `evidence/s2-008-campaign/credential-attribution-correction-v13.json`
 - `evidence/s2-008-campaign/diagnostic-watch-20261001-01.json`
 - `evidence/s2-008-campaign/dry-run-v10-clean-base.json`
 - `evidence/s2-008-campaign/dry-run-v10.json`
@@ -747,6 +748,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/readiness-v9.json`
 - `evidence/s2-008-campaign/reconciliation-v10-a.json`
 - `evidence/s2-008-campaign/reconciliation-v12-a.json`
+- `evidence/s2-008-campaign/reconciliation-v13-a-first-old-key-confirmed.json`
+- `evidence/s2-008-campaign/reconciliation-v13-a-second-old-key-confirmed.json`
+- `evidence/s2-008-campaign/reconciliation-v13-a.json`
 - `evidence/s2-008-campaign/reconciliation-v6-a.json`
 - `evidence/s2-008-campaign/reconciliation-v8-a.json`
 - `evidence/s2-008-campaign/reconciliation-v9-a-partial.json`
@@ -756,6 +760,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/run-b.json`
 - `evidence/s2-008-campaign/run-v10-a.json`
 - `evidence/s2-008-campaign/run-v12-a.json`
+- `evidence/s2-008-campaign/run-v13-a.json`
 - `evidence/s2-008-campaign/run-v6-a.json`
 - `evidence/s2-008-campaign/run-v7-a.json`
 - `evidence/s2-008-campaign/run-v8-a.json`
@@ -813,6 +818,14 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/v12-checks/test-s2-008.log`
 - `evidence/s2-008-campaign/v12-checks/typecheck.log`
 - `evidence/s2-008-campaign/v12-checks/verify-s2-008.log`
+- `evidence/s2-008-campaign/v13-a-second-stopped/run-v13-a.json`
+- `evidence/s2-008-campaign/v13-a-third-stopped/known-generation-receipts.json`
+- `evidence/s2-008-campaign/v13-a-third-stopped/predictions-v13-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/v13-a-third-stopped/provider-receipts-api-recheck.json`
+- `evidence/s2-008-campaign/v13-a-third-stopped/reconciliation.json`
+- `evidence/s2-008-campaign/v13-a-third-stopped/run-v13-a.json`
+- `evidence/s2-008-campaign/v13-a-third-stopped/upstream-429-observation.json`
+- `evidence/s2-008-campaign/v13-immutable-baseline.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/verification-v8.json`
 - `evidence/s2-008-campaign/zero-network-auth-v6.json`
@@ -1053,6 +1066,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-seal-v11.mjs`
 - `scripts/s2-008-campaign-seal-v12.mjs`
 - `scripts/s2-008-campaign-seal-v13.mjs`
+- `scripts/s2-008-campaign-seal-v14.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
 - `scripts/s2-008-campaign-seal-v4.mjs`
 - `scripts/s2-008-campaign-seal-v5.mjs`
@@ -1066,6 +1080,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-v11-draft.mjs`
 - `scripts/s2-008-campaign-v12-approval.mjs`
 - `scripts/s2-008-campaign-v13-approval.mjs`
+- `scripts/s2-008-campaign-v14-approval.mjs`
+- `scripts/s2-008-campaign-v14-pacing.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-campaign-v5-approval.mjs`
 - `scripts/s2-008-campaign-v5-draft.mjs`
@@ -1331,6 +1347,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-v11.test.mjs`
 - `tests/research/campaign-v12.test.mjs`
 - `tests/research/campaign-v13.test.mjs`
+- `tests/research/campaign-v14.test.mjs`
 - `tests/research/campaign-v4-draft.test.mjs`
 - `tests/research/campaign-v5-approval.test.mjs`
 - `tests/research/campaign-v6-probe-evidence.test.mjs`
