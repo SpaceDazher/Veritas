@@ -1,0 +1,59 @@
+{
+  "kind": "s2-008-campaign-predictions/1",
+  "run": "a",
+  "arm_id": "arm-model-zai-glm53flash",
+  "seed": 20260926,
+  "unparsed": 0,
+  "model_calls": 2,
+  "spent_tokens": 1586,
+  "usd_spent": 0,
+  "outcome_class": "INFRA",
+  "accounting": {
+    "schema": "s2-008-model-accounting/1",
+    "policy": "GENERATION_ID_REQUIRED",
+    "calls": 2,
+    "tokens": 1586,
+    "prompt_tokens": 965,
+    "reported_cost_usd": 0,
+    "rows": [
+      {
+        "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+        "generation_id": "gen-1791296014-FwcCFzTEuvMR5N26GFbW",
+        "correlation_status": "CORRELATED",
+        "input": 483,
+        "output": 297,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 483,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 780,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+        "generation_id": "gen-1791296022-TGzTrBtGh0gnMEuCgbwT",
+        "correlation_status": "CORRELATED",
+        "input": 482,
+        "output": 324,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 482,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 806,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+      "predicted": "MINOR"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "kind": "s2-008-v13-upstream-failure-observation/1",
+  "recorded_at": "2026-10-06T14:28:29.693+00:00",
+  "raw_run_id": "s2-008c-v13-a-9e07aa239f9543298675",
+  "source": "Owner-provided OpenRouter Upstream Requests screenshot",
+  "upstream_request": {
+    "generation_id": "gen-1791296028-YhoZZaxE3YaBb6RMSa72",
+    "provider_name": "Novita",
+    "model": "inclusionai/ling-3.1-flash-20261002",
+    "status": 429,
+    "attempts": 1,
+    "failed_attempts": 1,
+    "fallback_latency_ms": 0,
+    "total_latency_ms": 266
+  },
+  "generation_api_lookup": {
+    "id": "gen-1791296028-YhoZZaxE3YaBb6RMSa72",
+    "http_status": 404,
+    "error_message": "Generation gen-1791296028-YhoZZaxE3YaBb6RMSa72 not found"
+  },
+  "clarification": "Two successful Generations plus one failed Upstream Request. Previous owner-confirmed two-row Generations view does not mean only two upstream requests. Raw run and previous reconciliation preserved; this observation supplements their provenance.",
+  "cause": "UPSTREAM_PROVIDER_429",
+  "cause_details": "No response body or Retry-After shown; specific upstream quota or overload reason remains unknown."
+}

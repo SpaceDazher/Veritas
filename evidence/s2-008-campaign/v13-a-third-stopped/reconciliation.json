@@ -1,0 +1,112 @@
+{
+  "kind": "s2-008-v13-stopped-a-reconciliation/1",
+  "status": "RECONCILED",
+  "created_at": "2026-10-06T14:24:44.029Z",
+  "prior_run_id": "s2-008c-v13-a-9e07aa239f9543298675",
+  "prior_run_sha256": "9b48f3de8e6e275f38e7c5eb2d5c9d05647671303a5c1effdfb9cd264e10b13a",
+  "preregistration_digest": "b8c8a142a8305692c5d01989128896c014fbb9950e92c13062b2a3041271e9af",
+  "provider": "openrouter",
+  "requested_model": "inclusionai/ling-3.1-flash",
+  "resolved_model": "inclusionai/ling-3.1-flash-20261002",
+  "provider_key": {
+    "name": "testVeritas",
+    "id": 39451823,
+    "fingerprint": "8f7ea446a8707bea"
+  },
+  "interval": {
+    "from": "2026-10-06T14:13:00.000Z",
+    "to_exclusive": "2026-10-06T14:14:00.000Z",
+    "timezone": "America/Chicago",
+    "local_minute": "09:13"
+  },
+  "method": "API_KNOWN_RECEIPTS_AND_OWNER_CONFIRMED_COMPLETE_INTERVAL",
+  "completeness_basis": "OWNER_CONFIRMED_ALL_INTERVAL_REQUESTS",
+  "completeness": {
+    "confirmed_by": "Daniil",
+    "principal_id": "prn-s2007r-owner",
+    "statement": "да",
+    "source": "Direct reply confirming supplied two records are entire 09:13 list including errors and cancellations",
+    "complete": true,
+    "unfiltered": true,
+    "includes_errors_and_cancellations": true,
+    "recorded_at": "2026-10-06T14:24:44.029Z"
+  },
+  "completeness_verified_via_api": false,
+  "provider_rows_verified_via_api": true,
+  "matching_requests": 2,
+  "local_model_attempts": 3,
+  "locally_accounted_model_calls": 2,
+  "actual_tokens": 1586,
+  "actual_usd": 0,
+  "raw_unknown_attempts": 1,
+  "closed_unknown_attempts": 1,
+  "unreconciled_attempts": 0,
+  "rows": [
+    {
+      "id": "gen-1791296014-FwcCFzTEuvMR5N26GFbW",
+      "http_status": 200,
+      "model": "inclusionai/ling-3.1-flash-20261002",
+      "provider_name": "Novita",
+      "created_at": "2026-10-06T14:13:33.895Z",
+      "native_tokens_prompt": 483,
+      "native_tokens_completion": 297,
+      "native_tokens_cached": 0,
+      "total_cost": 0
+    },
+    {
+      "id": "gen-1791296022-TGzTrBtGh0gnMEuCgbwT",
+      "http_status": 200,
+      "model": "inclusionai/ling-3.1-flash-20261002",
+      "provider_name": "Novita",
+      "created_at": "2026-10-06T14:13:42.43Z",
+      "native_tokens_prompt": 482,
+      "native_tokens_completion": 324,
+      "native_tokens_cached": 0,
+      "total_cost": 0
+    }
+  ],
+  "failure_diagnostic": {
+    "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+    "schema": "s2-008-failure-diagnostic/1",
+    "started_at": "2026-10-06T14:13:48.641Z",
+    "finished_at": "2026-10-06T14:13:49.867Z",
+    "duration_ms": 1226,
+    "cli_exit_code": null,
+    "cli_signal": null,
+    "stop_reason": "error",
+    "error_category": "PROVIDER_RESPONSE_ERROR",
+    "http_status": null,
+    "provider_reported_status_prefix": {
+      "status": 429,
+      "source": "SDK_ERROR_MESSAGE_PREFIX"
+    },
+    "usage_status": "ZERO",
+    "generation_ids": [],
+    "generation_ids_truncated": false,
+    "stdout": {
+      "sha256": "02768f888e7fd1068020deaa04ef8eb1aabdce38aa22ed3411241a73e47cc2ca",
+      "bytes": 10464
+    },
+    "stderr": {
+      "sha256": null,
+      "bytes": null
+    },
+    "error_message": {
+      "sha256": "ce4c5b8a23050b1b8f141c03e67e2a5a86e267b5ec635616ca1f286ba483cdab",
+      "bytes": 554
+    }
+  },
+  "prior_report_retained_unchanged": true,
+  "campaign_outcome_class": "INFRA",
+  "predictions_recorded": 2,
+  "predictions_expected": 378,
+  "b": {
+    "status": "NOT_RUN"
+  },
+  "scientific_evaluation": {
+    "status": "NOT_RUN",
+    "reason": "Incomplete A and B absent"
+  },
+  "scope": "Only stopped v13 A s2-008c-v13-a-9e07aa239f9543298675",
+  "limitations": "Known spend independently verified via two provider receipts; interval completeness and no third generation are owner-attested, not API-verified. Original unknown counters remain unchanged. Reason for SDK-prefix 429 not yet established."
+}

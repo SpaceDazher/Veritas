@@ -1,0 +1,76 @@
+{
+  "kind": "s2-008-v13-stopped-a-owner-reconciliation/1",
+  "status": "RECONCILED",
+  "created_at": "2026-10-06T14:12:49.701Z",
+  "prior_run_id": "s2-008c-v13-a-df1fed3b15b84812bf37",
+  "prior_run_sha256": "be85ff414cb86ba06b9ab9a83fa2643b35038cc0bd8de740fa858aefd2128bd0",
+  "prior_sidecar_file": "/home/daniil/Veritas/evidence/s2-008-campaign/v13-a-second-stopped/predictions-v13-a-trl-s2-008c-01-20260926.json",
+  "prior_sidecar_sha256": "1db420961471ff82ebc41d68fe16c9460ce53a7f244dd242320ebc70af5e0740",
+  "preregistration_digest": "b8c8a142a8305692c5d01989128896c014fbb9950e92c13062b2a3041271e9af",
+  "provider": "openrouter",
+  "model": "inclusionai/ling-3.1-flash",
+  "provider_key": {
+    "name": "wslPI",
+    "fingerprint": "63ba91bbeb808e17"
+  },
+  "interval": {
+    "from": "2026-10-06T14:05:00.000Z",
+    "to_exclusive": "2026-10-06T14:06:00.000Z"
+  },
+  "method": "OWNER_CONFIRMED_EMPTY_INTERVAL",
+  "completeness_basis": "OWNER_CONFIRMED_EMPTY_INTERVAL",
+  "completeness": {
+    "confirmed_by": "Daniil",
+    "principal_id": "prn-s2007r-owner",
+    "statement": "все еще нет запросов",
+    "source": "Direct owner reply to request for both old-key intervals; attached empty Generations view for past 30 minutes",
+    "complete": true,
+    "recorded_at": "2026-10-06T14:12:49.701Z"
+  },
+  "completeness_verified_via_api": false,
+  "provider_rows_verified_via_api": false,
+  "matching_requests": 0,
+  "local_model_attempts": 1,
+  "locally_accounted_model_calls": 0,
+  "actual_tokens": 0,
+  "actual_usd": 0,
+  "raw_unknown_attempts": 1,
+  "closed_unknown_attempts": 1,
+  "unreconciled_attempts": 0,
+  "rows": [],
+  "failure_diagnostic": {
+    "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+    "schema": "s2-008-failure-diagnostic/1",
+    "started_at": "2026-10-06T14:05:00.753Z",
+    "finished_at": "2026-10-06T14:05:02.008Z",
+    "duration_ms": 1255,
+    "cli_exit_code": null,
+    "cli_signal": null,
+    "stop_reason": "error",
+    "error_category": "PROVIDER_RESPONSE_ERROR",
+    "http_status": null,
+    "provider_reported_status_prefix": {
+      "status": 403,
+      "source": "SDK_ERROR_MESSAGE_PREFIX"
+    },
+    "usage_status": "ZERO",
+    "generation_ids": [],
+    "generation_ids_truncated": false,
+    "stdout": {
+      "sha256": "46897979dcf55724c87418432e6ec36d510c5ffba763b35b9620d52c666461ab",
+      "bytes": 8919
+    },
+    "stderr": {
+      "sha256": null,
+      "bytes": null
+    },
+    "error_message": {
+      "sha256": "c143d71bd26debcecff83d237e2c2c8764c983d920fb05a96b6e33ae7d3919db",
+      "bytes": 190
+    }
+  },
+  "prior_report_retained_unchanged": true,
+  "campaign_outcome_class": "INFRA",
+  "scope": "Only this stopped v13 A attempt. Other requests and standalone diagnostic are outside scope.",
+  "limitations": "Owner attestation, not API-verified generation evidence. Screenshot alone shows no transactions over past 30 minutes, without explicit key selector or exact absolute range. Original raw unknown counters are preserved."
+}
