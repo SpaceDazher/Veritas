@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "5d8991c829607a13d21714d2f44947d2ff2bac49",
-  "sourceTree": "c4f04e995666ada8fb0954293da428973f1468a5",
-  "trackedFileCount": 1408,
-  "manifestFileCount": 1403,
-  "payloadManifestSha256": "aefa57126fe19358aea3a657eecde4255bd547578a8c5c70d52213ab0cbaec8c",
-  "fileManifestSha256": "101ae1337f517f35bbc1e02cd028f4645e9fa0daf6ff840cb0003e9c9f7e5023",
+  "sourceCommit": "e98bd9f41a73cdad2ad0616035573c0f03a65ee0",
+  "sourceTree": "75a7ed0efef3e6dc95e937a3c0008e363cec418f",
+  "trackedFileCount": 1425,
+  "manifestFileCount": 1420,
+  "payloadManifestSha256": "174b1095c348c01bc3824b173ac0cd706ab425091883bfa5f73cffdcc9c6679f",
+  "fileManifestSha256": "50eadca0408c2677204b07d003f176b384ca5752e75da57b8b0d96e5ad3a0165",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2883,8 +2883,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "c2326465b3e7441aa15f19714cd8ab28528f3d05dfebb264c2a6944355915ef2",
-      "bytes": 66541
+      "sha256": "519ad496fa6986d6dd54ab5f6d8c4ea54eb02a4c4339ed1e96ff9350609e5eae",
+      "bytes": 67635
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3275,6 +3275,11 @@
       "path": "evidence/s2-008-campaign/control-image-pin-v12-clean-base.json",
       "sha256": "208a6321876f50682f093f7366154c489bfd0a515272984581e6d6624ec1ccd2",
       "bytes": 1323
+    },
+    {
+      "path": "evidence/s2-008-campaign/credential-attribution-correction-v13.json",
+      "sha256": "47de529c0b72bdba18568080c157324d730f7cb42b394ff5482776616026c09c",
+      "bytes": 1617
     },
     {
       "path": "evidence/s2-008-campaign/diagnostic-watch-20261001-01.json",
@@ -3712,6 +3717,21 @@
       "bytes": 3647
     },
     {
+      "path": "evidence/s2-008-campaign/reconciliation-v13-a-first-old-key-confirmed.json",
+      "sha256": "ee24a8b777c347623dab78e0828899fe8974cbdab7fe1287d79f5ba9bd31ac6f",
+      "bytes": 2983
+    },
+    {
+      "path": "evidence/s2-008-campaign/reconciliation-v13-a-second-old-key-confirmed.json",
+      "sha256": "80a45812ee995dc9f962100830a4f1a75cd410b1904a241ce1484ac3a16765e9",
+      "bytes": 3004
+    },
+    {
+      "path": "evidence/s2-008-campaign/reconciliation-v13-a.json",
+      "sha256": "770396c10afd2e0e0e6ad70729e207da41ec7dbbaafa33b7db07d2de09d52fe7",
+      "bytes": 3646
+    },
+    {
       "path": "evidence/s2-008-campaign/reconciliation-v6-a.json",
       "sha256": "f08209924410cc7e810bd34561f8e8370456c948371752c6947e0e3f358fde3f",
       "bytes": 3024
@@ -3755,6 +3775,11 @@
       "path": "evidence/s2-008-campaign/run-v12-a.json",
       "sha256": "1e64d455a837c8e8c10e5fea1c606231908c134e8b58e0d3fe0bccacf16dbdf4",
       "bytes": 12439
+    },
+    {
+      "path": "evidence/s2-008-campaign/run-v13-a.json",
+      "sha256": "44b4c2af8ff3d12b5295572d7ffa5a8bf0ec951e815b35d1ff49eaa6eb1ccf11",
+      "bytes": 13174
     },
     {
       "path": "evidence/s2-008-campaign/run-v6-a.json",
@@ -4040,6 +4065,46 @@
       "path": "evidence/s2-008-campaign/v12-checks/verify-s2-008.log",
       "sha256": "92a8faac95be80191813837fd2903c09582604dd46f1d68ce9e41d96d4959f56",
       "bytes": 2082
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-second-stopped/run-v13-a.json",
+      "sha256": "be85ff414cb86ba06b9ab9a83fa2643b35038cc0bd8de740fa858aefd2128bd0",
+      "bytes": 13174
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-third-stopped/known-generation-receipts.json",
+      "sha256": "3717dac69409ebb9d290aa6965c35aae64b97b1b5cf732d05e59e3d0aa3f0e0c",
+      "bytes": 496
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-third-stopped/predictions-v13-a-trl-s2-008c-01-20260926.json",
+      "sha256": "db370f2cb50497ddd22458a30c4d84e403a4ab1bbe99e44ca9df43885997664b",
+      "bytes": 1612
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-third-stopped/provider-receipts-api-recheck.json",
+      "sha256": "d421ff258c084eb9f9716bf98bf2648b9d93d4dab748650f41124ae9fcbb1412",
+      "bytes": 775
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-third-stopped/reconciliation.json",
+      "sha256": "9c1c75d83c3952af147aed141c5fbd3c556815c8b81c97b7f2535a3b6d5bee81",
+      "bytes": 3876
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-third-stopped/run-v13-a.json",
+      "sha256": "9b48f3de8e6e275f38e7c5eb2d5c9d05647671303a5c1effdfb9cd264e10b13a",
+      "bytes": 15139
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-a-third-stopped/upstream-429-observation.json",
+      "sha256": "a19a7af72919780e4602261555aa16a025af1fca4e128a9f80d61a9f5ccdeebd",
+      "bytes": 1139
+    },
+    {
+      "path": "evidence/s2-008-campaign/v13-immutable-baseline.json",
+      "sha256": "56f8f82ab9a83298487490aaf94ec5bc54e5040064b668283103a24ec4042739",
+      "bytes": 2229
     },
     {
       "path": "evidence/s2-008-campaign/v3-readiness-report.md",
@@ -5153,18 +5218,18 @@
     },
     {
       "path": "scripts/s2-008-campaign-adapter.mjs",
-      "sha256": "d125ed9621d13aae0b42ab3c5bd358e34d0e5f3b719162b6fdee7f5d40fcceb2",
-      "bytes": 57207
+      "sha256": "f67d0aa98f2451dedc0b73017640b977b3170c3243c849b2ece0e7830d4e3b98",
+      "bytes": 60081
     },
     {
       "path": "scripts/s2-008-campaign-approve.mjs",
-      "sha256": "b700d1f695a0cc33d6b22f55d8abff0a8934fdae557192cb0a8160785fbfaebc",
-      "bytes": 28376
+      "sha256": "b964f4ff0e3a2c958dfa5b1670126b4a8d50434b4e8abafb5044edc8e0f91e1d",
+      "bytes": 29541
     },
     {
       "path": "scripts/s2-008-campaign-arm-model.mjs",
-      "sha256": "c5d33452c7f22f3f9e0a8f5fd706e7ea205c6468d5bd21e01f89542b872eb0ab",
-      "bytes": 54694
+      "sha256": "9a85b7f7031071f0883f34fe66dbb3f51924d9800a3cc8e6de9b18a01915f75a",
+      "bytes": 57944
     },
     {
       "path": "scripts/s2-008-campaign-arm.mjs",
@@ -5178,8 +5243,8 @@
     },
     {
       "path": "scripts/s2-008-campaign-credential-env.mjs",
-      "sha256": "4b18399d1ace94a2c50405d4c51a119f1ac9084463258907a17bbc97b5b67740",
-      "bytes": 6550
+      "sha256": "52c5e0eb4ece08e7d5617eaee9cf2428c194d748952673a1a031b21cad2036ed",
+      "bytes": 7364
     },
     {
       "path": "scripts/s2-008-campaign-draft-v12.mjs",
@@ -5193,33 +5258,33 @@
     },
     {
       "path": "scripts/s2-008-campaign-evaluate.mjs",
-      "sha256": "d33a843199164b35c98612ec2d7b00371be0f231a15a6eb3a140bbb7d18006bf",
-      "bytes": 85659
+      "sha256": "426b5159959717e39036e66d3f883e8f3cdd04413878518ed0a70d2e9b4b46bd",
+      "bytes": 89821
     },
     {
       "path": "scripts/s2-008-campaign-model-image.mjs",
-      "sha256": "f78293eefdf009fb9f9960d29aa6933272a2af5d55108e008e425afafecfa2a5",
-      "bytes": 26634
+      "sha256": "c369ba3e66f5059de33df8319d81906e8912334d9991d025e4a044a66ccabdd5",
+      "bytes": 27660
     },
     {
       "path": "scripts/s2-008-campaign-prepare-cli.mjs",
-      "sha256": "02f25e4270eb27552522b68337369b7a9a3d3ab3f2438416915bbcf3302c7eff",
-      "bytes": 1130
+      "sha256": "635a6c644695af73cae1a1b4d6c3ce27fbe52b4e97626410762124789cfa7c8b",
+      "bytes": 1134
     },
     {
       "path": "scripts/s2-008-campaign-prepare.mjs",
-      "sha256": "71e62eb20552d649fa800cb2c3a6d91ebe2cdbf04039fb5cb50114dda46ce632",
-      "bytes": 48510
+      "sha256": "99d2610160ea13d04010c26c011c52372c9a7efba34bba3b887f8b259b503993",
+      "bytes": 48961
     },
     {
       "path": "scripts/s2-008-campaign-probes.mjs",
-      "sha256": "4c0832853b55e67a5fe413c79f95668d000649f8d5660221bf1f7daeb3efcda8",
-      "bytes": 39792
+      "sha256": "0f797520e7e7d5998c5b4897b8f1eab3fe6ec1cc60ab066ff83039ba62f9e4e5",
+      "bytes": 39986
     },
     {
       "path": "scripts/s2-008-campaign-run.mjs",
-      "sha256": "a77d3f3de2f9d97607ab033dc29d4f2e6add43c48fbb90dd880d8a37676d6ed2",
-      "bytes": 84700
+      "sha256": "85a1d88d839325d5e01c70ff78646430d0b9228fcb120c03359d68bbb2b83c44",
+      "bytes": 87428
     },
     {
       "path": "scripts/s2-008-campaign-seal-v10.mjs",
@@ -5240,6 +5305,11 @@
       "path": "scripts/s2-008-campaign-seal-v13.mjs",
       "sha256": "17f200bfca3ce0519d5a8d740058f82ea975f47b04e710e4a2961d4ea91daba1",
       "bytes": 11806
+    },
+    {
+      "path": "scripts/s2-008-campaign-seal-v14.mjs",
+      "sha256": "41758bb30b172a9fe690b516d1bcef347605b8669b4b8f9905af9583fa8e89e8",
+      "bytes": 12665
     },
     {
       "path": "scripts/s2-008-campaign-seal-v3.mjs",
@@ -5305,6 +5375,16 @@
       "path": "scripts/s2-008-campaign-v13-approval.mjs",
       "sha256": "51310194135ab839503327ee9d07762651c52b93ce55b5f5c19d64b579ad4be7",
       "bytes": 23101
+    },
+    {
+      "path": "scripts/s2-008-campaign-v14-approval.mjs",
+      "sha256": "5c6545144867bf51e43548463ea2359c13f42456d1dca2ea2f26c90c1d8abd66",
+      "bytes": 28525
+    },
+    {
+      "path": "scripts/s2-008-campaign-v14-pacing.mjs",
+      "sha256": "17caf05791fb14ee7d79d90f9c92861c19bc0c14889e2a1182fbf32730a271a3",
+      "bytes": 7289
     },
     {
       "path": "scripts/s2-008-campaign-v4-draft.mjs",
@@ -5383,13 +5463,13 @@
     },
     {
       "path": "scripts/s2-008-paid-review-workflow.mjs",
-      "sha256": "5d2262cdcb78ff697812c8c35c0a27798bd2dd134077afac59c149bc04da624e",
-      "bytes": 31964
+      "sha256": "332a1b9995f87d41d91f9970d9b5bf8e566a830aee343f49f1fb3fd8e86ba1e5",
+      "bytes": 31982
     },
     {
       "path": "scripts/s2-008-paid-review.mjs",
-      "sha256": "d59e663e2ae09478630d240229eddad0847411a1499af03475f202ae625b0de3",
-      "bytes": 117236
+      "sha256": "90b4e8e90b1d620c4a54959fb7dba05c5dd9b1d866670a36c919b47c93acba32",
+      "bytes": 122027
     },
     {
       "path": "scripts/s2-008-replay.mjs",
@@ -6043,8 +6123,8 @@
     },
     {
       "path": "src/lib/research/preregistration.mjs",
-      "sha256": "61d0d2f0ee7a63d2500beaa13f4cde58e83c233826de44217c33f55e5bebde96",
-      "bytes": 96724
+      "sha256": "850cecd2f0b43f4dc799f085f5ea1a76ba5cc55c711605e1185cf6a7152ba356",
+      "bytes": 100748
     },
     {
       "path": "src/lib/research/probes.mjs",
@@ -6323,8 +6403,8 @@
     },
     {
       "path": "tests/agentboard/s2-008-paid-review-workflow.test.mjs",
-      "sha256": "cb6f937d88a990f9ed8df2ecdcbb0253d1571ef5680675f6afdd294380115487",
-      "bytes": 40075
+      "sha256": "5ece10f6e93874b6d57cc31a791e7454c637b128348a042ad88e2e21ecd7d6aa",
+      "bytes": 41266
     },
     {
       "path": "tests/agentboard/s2-008-paid-review.integration.test.mjs",
@@ -6630,6 +6710,11 @@
       "path": "tests/research/campaign-v13.test.mjs",
       "sha256": "f9bb5de7efaa83fef187e9c1b525d8573459e4335620c8544d325457bfc61efb",
       "bytes": 20092
+    },
+    {
+      "path": "tests/research/campaign-v14.test.mjs",
+      "sha256": "80f67945dd2c50c750b6dd780ba6523fddc99944cdecd4271a8c10c01b41a6e6",
+      "bytes": 34773
     },
     {
       "path": "tests/research/campaign-v4-draft.test.mjs",
