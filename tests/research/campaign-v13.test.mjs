@@ -93,13 +93,14 @@ test('v13 preregistration validates the exact Ling policy with full-body digest 
   assert.equal(assertPreregistration(prereg), prereg);
 });
 
-test('approval CLI accepts v13 and rejects duplicate or malformed version flags', () => {
+test('approval CLI accepts v13 and v14 and rejects duplicate, malformed, or future versions', () => {
   assert.deepEqual(parseApprovalArgs(['--version', 'v13', '--principal', 'prn-s2007r-owner', '--label', 'Daniil']), {
     principal: 'prn-s2007r-owner', label: 'Daniil', out: null, version: 'v13',
   });
+  assert.equal(parseApprovalArgs(['--version', 'v14']).version, 'v14');
   assert.throws(() => parseApprovalArgs(['--version', 'v13', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
   assert.throws(() => parseApprovalArgs(['--version', 'v12', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
-  for (const version of ['v013', 'v14', 'v1', 'v12x']) {
+  for (const version of ['v013', 'v15', 'v1', 'v12x']) {
     assert.throws(() => parseApprovalArgs(['--version', version]), /APPROVE_VERSION_INVALID/);
   }
 });
@@ -129,11 +130,13 @@ test('v13 model image routes use v12 as staged predecessor and require the pinne
   assert.throws(() => modelImagePolicyInputs('s2-008-model-image-pin/013'), /MODEL_IMAGE_VERSION_INVALID/);
 });
 
-test('active version and prepare seal routing recognize v13 without allowing malformed versions', () => {
+test('active version and prepare seal routing recognize v13 and v14 without allowing malformed versions', () => {
   assert.equal(activeCampaignVersion({ preregistration: { file: 'preregistration.v13.in-force.json' } }), 'v13');
+  assert.equal(activeCampaignVersion({ preregistration: { file: 'preregistration.v14.in-force.json' } }), 'v14');
   assert.equal(parsePrepareMode(['--seal-v13']), 'seal-v13');
+  assert.equal(parsePrepareMode(['--seal-v14']), 'seal-v14');
   assert.throws(() => parsePrepareMode(['--seal-v013']), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => parsePrepareMode(['--seal-v14']), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => parsePrepareMode(['--seal-v15']), /PREPARE_VERSION_INVALID/);
 });
 
 test('v13 model image preflight binds the exact public catalog bytes', () => {
