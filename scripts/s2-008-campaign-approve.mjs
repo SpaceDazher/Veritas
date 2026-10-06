@@ -313,7 +313,7 @@ const V4_PIN = path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-im
 
 const USAGE = `s2-008-campaign-approve — the owner's signature on a campaign preregistration
 
-  --version v2|v3|v4|v8|v9|v10|v11|v12|v13  document to sign (default v2)
+  --version v2|v3|v4|v8|v9|v10|v11|v12|v13|v14  document to sign (default v2)
   --principal <id>     the owner's principal id, recorded like every permit here
   --label "<text>"     who is signing, in words
   --out <path>         where to write the signed document
@@ -346,6 +346,23 @@ async function main() {
     return null;
   }
   try {
+    if (args.version === 'v14') {
+      const { approveV14, readV14BaseInputs, readV14RestartInputs } = await import('./s2-008-campaign-v14-approval.mjs');
+      const inputs = readV14BaseInputs();
+      const restartInputs = readV14RestartInputs();
+      const signed = approveV14({
+        draft: JSON.parse(readFileSync(path.join(CORPUS_DIR, 'preregistration.v14.draft.json'), 'utf8')),
+        ...inputs,
+        pin: JSON.parse(readFileSync(path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-image-pin-v14-preseal.json'), 'utf8')),
+        restartInputs,
+        principal: args.principal, label: args.label, issuedAt: new Date().toISOString(),
+      });
+      const out = args.out ?? path.join(CORPUS_DIR, 'preregistration.v14.approved.json');
+      writeFileSync(out, JSON.stringify(signed, null, 2) + String.fromCharCode(10), { flag: 'wx', mode: 0o644 });
+      process.stdout.write(JSON.stringify({ written: out, preregistration_id: signed.preregistration_id,
+        preregistration_digest: signed.preregistration_digest, approved_by: signed.approval.principal_id, in_force: false }) + String.fromCharCode(10));
+      return signed;
+    }
     if (args.version === 'v13') {
       const { approveV13, readV13BaseInputs, readV13PriorV12AInputs } = await import('./s2-008-campaign-v13-approval.mjs');
       const inputs = readV13BaseInputs();

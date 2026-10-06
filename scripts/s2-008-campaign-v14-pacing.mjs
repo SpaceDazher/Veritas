@@ -41,6 +41,9 @@ export function createV14StartPacer({
   const interval = assertV14MinStartInterval(minStartIntervalMs);
   let lastStart = null;
   let failed = false;
+  let callsStarted = 0;
+  let waitCount = 0;
+  let waitedMs = 0;
 
   const readClock = () => {
     const value = now();
@@ -70,12 +73,15 @@ export function createV14StartPacer({
         const before = readClock();
         const remaining = deadline - before;
         sleep(remaining);
+        waitCount += 1;
+        waitedMs += remaining;
         const after = readClock();
         if (after <= before) throw new Error('V14_PACING_CLOCK_DID_NOT_ADVANCE');
       }
     }
     if (!check(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
     lastStart = readClock();
+    callsStarted += 1;
     try {
       return Object.freeze({ proceeded: true, called: true, value: operation(), startedAt: lastStart });
     } catch (error) {
@@ -95,7 +101,10 @@ export function createV14StartPacer({
       while (readClock() < deadline) {
         if (!check(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
         const before = readClock();
-        await sleepAsync(deadline - before);
+        const remaining = deadline - before;
+        await sleepAsync(remaining);
+        waitCount += 1;
+        waitedMs += remaining;
         const after = readClock();
         if (after <= before) throw new Error('V14_PACING_CLOCK_DID_NOT_ADVANCE');
       }
@@ -113,6 +122,51 @@ export function createV14StartPacer({
   return Object.freeze({
     runSync,
     run,
-    snapshot: () => Object.freeze({ minStartIntervalMs: interval, lastStart, failed }),
+    snapshot: () => Object.freeze({ minStartIntervalMs: interval, lastStart, callsStarted, waitCount, waitedMs, failed }),
   });
+}
+
+export function createV14ContainerPacer({
+  minStartIntervalMs = V14_MIN_START_INTERVAL_MS,
+  now = () => performance.now(),
+  sleepAsync = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+} = {}) {
+  const interval = assertV14MinStartInterval(minStartIntervalMs);
+  let lastCompletion = null;
+  let failed = false;
+  const readClock = () => {
+    const value = now();
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new Error('V14_MONOTONIC_CLOCK_INVALID');
+    return value;
+  };
+  const canContinue = (shouldContinue) => {
+    if (failed) throw new Error('V14_PACING_STOPPED_AFTER_FAILURE');
+    return typeof shouldContinue === 'function' && shouldContinue() === true;
+  };
+  async function run(operation, { enabled = true, shouldContinue = () => true } = {}) {
+    if (typeof operation !== 'function') throw new Error('V14_PACING_OPERATION_INVALID');
+    if (enabled === false) return Object.freeze({ proceeded: true, called: false });
+    if (enabled !== true) throw new Error('V14_PACING_ENABLED_INVALID');
+    if (!canContinue(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
+    if (lastCompletion !== null) {
+      const deadline = lastCompletion + interval;
+      while (readClock() < deadline) {
+        if (!canContinue(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
+        const before = readClock();
+        await sleepAsync(deadline - before);
+        if (readClock() <= before) throw new Error('V14_PACING_CLOCK_DID_NOT_ADVANCE');
+      }
+    }
+    if (!canContinue(shouldContinue)) return Object.freeze({ proceeded: false, called: false });
+    const startedAt = readClock();
+    try {
+      const value = await operation();
+      lastCompletion = readClock();
+      return Object.freeze({ proceeded: true, called: true, value, startedAt, completedAt: lastCompletion });
+    } catch (error) {
+      failed = true;
+      throw error;
+    }
+  }
+  return Object.freeze({ run, snapshot: () => Object.freeze({ minStartIntervalMs: interval, lastCompletion, failed }) });
 }

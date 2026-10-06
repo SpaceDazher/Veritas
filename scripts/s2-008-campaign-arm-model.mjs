@@ -43,7 +43,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { assertV13ExecutorPolicy, assertV14ExecutorPolicy, createV13PiModelsFile } from './s2-008-campaign-credential-env.mjs';
-import { createV14StartPacer, assertV14MinStartInterval, assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 
 
 /** The only value that lets a preregistration be run under. */
@@ -65,6 +64,7 @@ export const ARM_ERRORS = Object.freeze({
   SHARED_CAP_REQUIRED: 'SHARED_TOKEN_CAP_REQUIRED',
   SHARED_CAP_INVALID: 'SHARED_TOKEN_CAP_INVALID',
   BRIDGE_NOT_READY: 'EGRESS_BRIDGE_NOT_READY',
+  V14_PACING_STOPPED_BEFORE_CALL: 'V14_PACING_STOPPED_BEFORE_CALL',
 });
 
 /**
@@ -604,10 +604,11 @@ export function callModel(subject, {
     };
     if (pacer) {
       const paced = pacer.runSync(invoke, { shouldContinue });
-      if (!paced.proceeded || !paced.called) throw new Error('V14_PACING_STOPPED_BEFORE_CALL');
+      if (!paced.proceeded || !paced.called) throw new Error(ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL);
       stdout = paced.value;
     } else stdout = invoke();
   } catch (error) {
+    if (error?.message === ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL) throw error;
     finishFailure(ARM_ERRORS.PROVIDER_UNREACHABLE, error, error?.stdout, 'UNKNOWN');
   } finally {
     if (settingsDir) fs.rmSync(settingsDir, { recursive: true, force: true });
@@ -668,6 +669,7 @@ export function classifyOutcome({ dryRun, stopped, measured }) {
 export async function main(argv, env = process.env, deps = {}) {
   const startBridge = deps.startBridge ?? startEgressBridge;
   const invokeModel = deps.callModel ?? callModel;
+  const wallNow = deps.wallNow ?? (() => Date.now());
   const writeStdout = deps.writeStdout ?? ((text) => process.stdout.write(text));
   const capPositions = argv.flatMap((value, index) => value === '--remaining-tokens' ? [index] : []);
   const intervalPositions = argv.flatMap((value, index) => value === '--min-start-interval-ms' ? [index] : []);
@@ -711,11 +713,14 @@ export async function main(argv, env = process.env, deps = {}) {
   const prereg = JSON.parse(fs.readFileSync(preregPath, 'utf8'));
   const isV14 = prereg.rule === 's2-008-prereg-v14';
   let minStartIntervalMs = null;
+  let v14Pacing = null;
   if (isV14) {
     try {
+      v14Pacing = await import('./s2-008-campaign-v14-pacing.mjs');
       const policy = assertV14ExecutorPolicy(prereg.executor);
-      minStartIntervalMs = assertV14MinStartInterval(Number(intervalText));
-      if (String(minStartIntervalMs) !== intervalText || minStartIntervalMs !== policy.minStartIntervalMs) throw new Error('V14_MIN_START_INTERVAL_INVALID');
+      minStartIntervalMs = v14Pacing.assertV14MinStartInterval(Number(intervalText));
+      if (String(minStartIntervalMs) !== intervalText || minStartIntervalMs !== policy.minStartIntervalMs ||
+          !Number.isFinite(Date.parse(prereg.budget_reservation?.expires_at ?? ''))) throw new Error('V14_MIN_START_INTERVAL_INVALID');
     } catch { process.stderr.write('V14_MODEL_POLICY_INVALID\n'); return 14; }
   } else if (intervalPositions.length !== 0) { process.stderr.write('V14_MIN_START_INTERVAL_INVALID\n'); return 14; }
 
@@ -794,7 +799,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
   if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14'].includes(prereg.rule)) {
     try {
-      timeoutPolicy = isV14 ? assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout)
+      timeoutPolicy = isV14 ? v14Pacing.assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout)
         : (await import('./s2-008-campaign-v6-timeout.mjs')).assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     } catch {
       process.stderr.write('V6_MODEL_TIMEOUT_POLICY_INVALID\n');
@@ -834,7 +839,8 @@ export async function main(argv, env = process.env, deps = {}) {
   let usd = 0;
   let modelCalls = 0;
   let modelAttempts = 0;
-  const pacer = isV14 ? createV14StartPacer({ minStartIntervalMs }) : null;
+  const pacer = isV14 ? (deps.pacer ?? v14Pacing.createV14StartPacer({ minStartIntervalMs })) : null;
+  const reservationExpiresAt = isV14 ? Date.parse(reservation.expires_at) : Number.POSITIVE_INFINITY;
   let unreconciledSpend = false;
   let stop = null;
   // THE THIRD STAGE OF THE LAUNCH ORDER, and the one that lives in here. The
@@ -865,11 +871,17 @@ export async function main(argv, env = process.env, deps = {}) {
     let result;
     if (!dryRun) modelAttempts += 1;
     try {
-      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, piExecutor, captureFailureDiagnostics, pacer, shouldContinue: () => spent < launchCap });
+      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, piExecutor, captureFailureDiagnostics, pacer, shouldContinue: () => spent < launchCap && (!isV14 || Number(wallNow()) < reservationExpiresAt) });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
       if (captureFailureDiagnostics && error?.failure_diagnostic?.schema === 's2-008-failure-diagnostic/1') {
         failureDiagnostics.push({ case_id: String(row.case_id), ...error.failure_diagnostic });
+      }
+      if (code === ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL) {
+        modelAttempts = Math.max(0, modelAttempts - 1);
+        stop = Object.freeze({ reason: 'BUDGET_RESERVATION_EXPIRED_BEFORE_MODEL_CALL', stopped_before_case: String(row.case_id),
+          spent_tokens: spent, granted_tokens: launchCap, reservation_expires_at: reservation.expires_at });
+        break;
       }
       const confirmedUsage = error?.confirmed_usage;
       if (captureFailureDiagnostics && Number.isSafeInteger(confirmedUsage?.totalTokens) && confirmedUsage.totalTokens > 0 &&
@@ -978,6 +990,7 @@ export async function main(argv, env = process.env, deps = {}) {
   }
 
   bridge?.stop();
+  const pacingState = isV14 ? pacer.snapshot() : null;
   const out = {
     kind: 's2-008-campaign-adapter-predict-model/1',
     accounting_schema: 's2-008-model-accounting/1',
@@ -1015,7 +1028,9 @@ export async function main(argv, env = process.env, deps = {}) {
         ? null
         : { via: 'in-container loopback bridge', host: bridge.host, port: bridge.port, port_source: 'BRIDGE_READY' },
       model_calls: modelCalls,
-      model_attempts: modelAttempts,
+      model_attempts: isV14 ? pacingState.callsStarted : modelAttempts,
+      ...(isV14 ? { model_call_pacing: { min_start_interval_ms: minStartIntervalMs,
+        call_starts: pacingState.callsStarted, wait_count: pacingState.waitCount, waited_ms: pacingState.waitedMs } } : {}),
       ...(captureFailureDiagnostics ? { unknown_model_attempts: unknownModelAttempts } : {}),
       parallel_calls: 1,
       model_launch_timeout: timeoutPolicy,
@@ -1025,7 +1040,8 @@ export async function main(argv, env = process.env, deps = {}) {
     container: {
       node_version: process.version,
       pid: process.pid,
-      argv_tail: [armId, seedText, ...(dryRun ? ['--dry-run'] : [])],
+      argv_tail: [armId, seedText, ...(dryRun ? ['--dry-run'] : []),
+        ...(isV14 ? ['--min-start-interval-ms', String(minStartIntervalMs)] : [])],
       cwd: process.cwd(),
       labels_seen: false,
     },

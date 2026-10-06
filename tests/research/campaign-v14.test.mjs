@@ -1,9 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 
 const pacing = await import('../../scripts/s2-008-campaign-v14-pacing.mjs').catch(() => ({}));
 const credentialPolicy = await import('../../scripts/s2-008-campaign-credential-env.mjs');
 const V13_MODEL_POLICY = credentialPolicy.V13_MODEL_POLICY;
+const V14_MODEL_POLICY = credentialPolicy.V14_MODEL_POLICY;
 const V7_PI_SETTINGS = credentialPolicy.V7_PI_SETTINGS;
 const validateS2PaidReviewGenerationAccounting = (await import('../../scripts/s2-008-paid-review.mjs')).validateS2PaidReviewGenerationAccounting;
 
@@ -104,22 +109,93 @@ test('arm callModel applies pacing before actual PI calls, preserves usage, skip
   assert.equal(refusedCalls, 1);
 });
 
-test('v14 cross-seed coordinator spaces container starts and stops before a call when budget is closed', async () => {
-  let now = 0, budgetAvailable = true;
+test('v14 container coordinator waits 60 seconds after completion, checks budget during wait, and skips dry runs', async () => {
+  assert.equal(typeof pacing.createV14ContainerPacer, 'function');
+  let now = 0, calls = 0, budgetAvailable = true;
   const starts = [], sleeps = [];
-  const pacer = pacing.createV14StartPacer({ minStartIntervalMs: 60000,
+  const pacer = pacing.createV14ContainerPacer({ minStartIntervalMs: 60000,
     now: () => now, sleepAsync: async (ms) => { sleeps.push(ms); now += ms; } });
-  await pacer.run(async () => { starts.push(now); now += 5; });
-  await pacer.run(async () => { starts.push(now); now += 7; });
-  assert.deepEqual(starts, [0, 60000]);
-  assert.ok(starts[1] - starts[0] >= 60000);
+  const first = await pacer.run(async () => { calls += 1; starts.push(now); now += 200; return 'first'; });
+  const second = await pacer.run(async () => { calls += 1; starts.push(now); return 'second'; },
+    { shouldContinue: () => budgetAvailable });
+  assert.deepEqual([first.value, second.value], ['first', 'second']);
+  assert.deepEqual(starts, [0, 60200]);
+  assert.deepEqual(sleeps, [60000]);
   budgetAvailable = false;
-  const stopped = await pacer.run(async () => { starts.push(now); }, {
-    shouldContinue: () => budgetAvailable,
-  });
+  const stopped = await pacer.run(async () => { calls += 1; }, { shouldContinue: () => budgetAvailable });
   assert.equal(stopped.proceeded, false);
-  assert.deepEqual(sleeps, [59995]);
-  assert.deepEqual(starts, [0, 60000]);
+  const dry = await pacer.run(async () => { calls += 1; }, { enabled: false });
+  assert.equal(dry.called, false);
+  assert.equal(calls, 2);
+  assert.deepEqual(sleeps, [60000]);
+  let expiryNow = 0, expiryOpen = true, expiryCalls = 0;
+  const expiryPacer = pacing.createV14ContainerPacer({ minStartIntervalMs: 60000,
+    now: () => expiryNow, sleepAsync: async (ms) => { expiryNow += ms; expiryOpen = false; } });
+  await expiryPacer.run(async () => { expiryCalls += 1; });
+  const expired = await expiryPacer.run(async () => { expiryCalls += 1; }, { shouldContinue: () => expiryOpen });
+  assert.equal(expired.proceeded, false);
+  assert.equal(expiryCalls, 1);
+});
+
+test('arm expiry during a 60-second call wait stops without a second attempt or unknown usage', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'v14-arm-expiry-'));
+  try {
+    const inputPath = path.join(dir, 'input.json'), preregPath = path.join(dir, 'prereg.json'), outPath = path.join(dir, 'out.json');
+    fs.writeFileSync(inputPath, JSON.stringify(Array.from({ length: 126 }, (_, i) => ({ case_id: `case-${i}`, subject: 'fixture' }))));
+    const executor = {
+      provider: V14_MODEL_POLICY.provider, model: V14_MODEL_POLICY.model,
+      credential_env_name: V14_MODEL_POLICY.credential_env_name,
+      credential_source: V14_MODEL_POLICY.credential_source,
+      model_call_pacing: { min_start_interval_ms: 60000 },
+      model_launch_timeout: pacing.createV14ModelTimeoutPolicy(),
+      pi_settings: V7_PI_SETTINGS,
+      pi_model_registration: V14_MODEL_POLICY.pi_model_registration,
+      pi_model_catalog_binding: { file: 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json',
+        sha256: V14_MODEL_POLICY.catalog_sha256, canonical_slug: V14_MODEL_POLICY.catalog_slug,
+        prompt_completion_pricing_source: 'PROVIDER_CATALOG_LISTING_ONLY', cache_pricing: 'NOT_PROVIDED',
+        client_cost_authority: 'ESTIMATE_ONLY_PROVIDER_RECEIPT_AUTHORITATIVE' },
+    };
+    const prereg = { rule: 's2-008-prereg-v14', status: 'APPROVED', preregistration_id: 'xpr-s2-008c-14',
+      approval: { status: 'APPROVED', in_force: true, signed_digest_over: 'scientific body' },
+      failure_diagnostics_protocol: armRoute.V11_FAILURE_DIAGNOSTICS_POLICY, executor,
+      budget_reservation: { currency: 'tokens', granted_units: 5000000, expires_at: '1970-01-01T00:00:00.030Z', trial_timeout_ms: 30540000 } };
+    const { approval, status, preregistration_digest: _digest, ...scientificBody } = prereg;
+    prereg.preregistration_digest = canonicalDigest(scientificBody);
+    fs.writeFileSync(preregPath, JSON.stringify(prereg));
+    let now = 0, calls = 0;
+    const pacer = pacing.createV14StartPacer({ minStartIntervalMs: 60000, now: () => now,
+      sleep: (ms) => { now += ms; } });
+    const exitCode = await armRoute.main([inputPath, outPath, 'arm-model-zai-glm53flash', preregPath, '20260926',
+      '--remaining-tokens', '5000000', '--min-start-interval-ms', '60000'], { OPENROUTER_API_KEY: 'fixture-only-key' }, {
+      startBridge: async () => ({ port: 18080, stop() {} }), pacer, wallNow: () => now,
+      writeStdout() {},
+      callModel: (_subject, options) => {
+        const attempt = calls + 1;
+        const paced = options.pacer.runSync(() => { calls += 1; now += 20; return attempt; }, { shouldContinue: options.shouldContinue });
+        if (!paced.proceeded || !paced.called) throw new Error('V14_PACING_STOPPED_BEFORE_CALL');
+        return { text: 'MINOR', model_called: true,
+          usage: { input: 1, output: 1, cacheRead: 0, cacheWrite: 0, totalTokens: 2, cost: { total: 0 } },
+          accounting: { generation_id: `gen-${attempt}`, correlation_status: 'CORRELATED', correlation_issue: null,
+            input: 1, output: 1, cacheRead: 0, cacheWrite: 0, prompt_tokens: 1,
+            prompt_token_basis: 'input+cacheRead+cacheWrite', totalTokens: 2, reported_cost_usd: 0,
+            usage_components_consistent: true } };
+      },
+    });
+    const report = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+    assert.equal(exitCode, 10);
+    assert.equal(calls, 1);
+    assert.equal(report.stop.reason, 'BUDGET_RESERVATION_EXPIRED_BEFORE_MODEL_CALL');
+    assert.equal(report.executor.model_attempts, 1);
+    assert.equal(report.executor.model_calls, 1);
+    assert.equal(report.executor.unknown_model_attempts, 0);
+    assert.equal(report.budget.unreconciled_spend, false);
+    assert.deepEqual(report.executor.model_call_pacing, { min_start_interval_ms: 60000,
+      call_starts: 1, wait_count: 1, waited_ms: 59980 });
+    assert.ok(report.container.argv_tail.includes('--min-start-interval-ms'));
+    assert.ok(report.container.argv_tail.includes('60000'));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('v14 credential route uses only explicit process environment and checks safe secret metadata fingerprints', async () => {
