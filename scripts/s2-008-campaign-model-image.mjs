@@ -10,14 +10,15 @@ import { BASE_IMAGE, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { PODMAN_HOST, buildInvocation, executeIsolated } from '../src/lib/isolation/launch.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
+import { V13_MODEL_POLICY } from './s2-008-campaign-credential-env.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
 const V11_PI_PACKAGE_NAME = '@earendil-works/pi-coding-agent';
 const V11_PI_PACKAGE_VERSION = '0.99.1';
 export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
-  if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
-  if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
+  if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
   const stagedVersion = preseal ? `v${Number(version.slice(1)) - 1}` : version;
   return Object.freeze({
     tag: `localhost/veritas-s2-008-model:${version}`,
@@ -29,18 +30,20 @@ export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
 
 /** Policy files copied into the container and source names committed by each image generation. */
 export function modelImagePolicyInputs(schema) {
-  const match = /^s2-008-model-image-pin\/(\d+)$/.exec(String(schema));
+  const match = /^s2-008-model-image-pin\/(0|[1-9][0-9]*)$/.exec(String(schema));
   const version = match ? Number(match[1]) : NaN;
-  if (![4, 5, 6, 7, 8, 9, 10, 11, 12].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (![4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
   const stageFiles = [
     ...(version >= 6 ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
     ...(version >= 7 ? ['scripts/s2-008-campaign-credential-env.mjs'] : []),
+    ...(version >= 13 ? ['evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'] : []),
   ];
   const sourceNames = [
     ...(version >= 6 ? ['pi_runtime_tree', 'timeout_policy'] : []),
     ...(version >= 7 ? ['credential_env_policy'] : []),
     ...(version >= 11 ? ['pi_package_manifest', 'pi_launcher'] : []),
     ...(version >= 12 ? ['pi_shrinkwrap'] : []),
+    ...(version >= 13 ? ['provider_model_catalog'] : []),
   ].sort();
   return Object.freeze({ stageFiles: Object.freeze(stageFiles), sourceNames: Object.freeze(sourceNames) });
 }
@@ -48,7 +51,7 @@ export function modelImageVersionFromArgv(argv = process.argv) {
   const versionArgs = argv.filter((arg) => typeof arg === 'string' && arg.startsWith('--v') && arg !== '--verify-pin');
   if (versionArgs.some((arg) => !/^--v\d+$/.test(arg))) throw new Error('MODEL_IMAGE_VERSION_INVALID');
   const values = versionArgs.map((arg) => arg.slice(2));
-  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12']);
+  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13']);
   if (values.some((version) => !supported.has(version)) || new Set(values).size > 1) {
     throw new Error('MODEL_IMAGE_VERSION_INVALID');
   }
@@ -70,10 +73,10 @@ export function parseModelImageCliArgs(argv = process.argv) {
     packageRoot = argv[index + 1];
     index += 1;
   }
-  if (seenPackageRoot && (!['v11', 'v12'].includes(version) || !path.isAbsolute(packageRoot))) {
+  if (seenPackageRoot && (!['v11', 'v12', 'v13'].includes(version) || !path.isAbsolute(packageRoot))) {
     throw new Error('MODEL_PI_PACKAGE_SOURCE_INVALID');
   }
-  if (['v11', 'v12'].includes(version) && !seenPackageRoot) throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
+  if (['v11', 'v12', 'v13'].includes(version) && !seenPackageRoot) throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
   return Object.freeze({ version, preseal: argv.includes('--preseal'), packageRoot });
 }
 
@@ -222,7 +225,7 @@ export function validateV11PiPackageContext(packageRoot, preregistration) {
       throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
     }
   }
-  if (!['s2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12'].includes(contract?.rule)) {
+  if (!['s2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(contract?.rule)) {
     throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
   }
   const expectedName = contract.executor?.package;
@@ -260,17 +263,23 @@ export function validateV11PiPackageContext(packageRoot, preregistration) {
   return Object.freeze({ name: expectedName, version: expectedVersion });
 }
 
+export function assertV13ModelCatalogFile(file) {
+  if (sha(file) !== V13_MODEL_POLICY.catalog_sha256) throw new Error('V13_MODEL_CATALOG_ARTIFACT_INVALID');
+  return true;
+}
+
 export function stageModelImageContext({
   repoRoot = ROOT, contextRoot, packageRoot, version = 'v4', preseal = false,
 } = {}) {
   if (typeof contextRoot !== 'string' || !path.isAbsolute(contextRoot)) throw new Error('MODEL_CONTEXT_PATH_INVALID');
   const paths = modelImagePaths(version, { preseal });
   const policyInputs = modelImagePolicyInputs(paths.schema);
-  const isV11 = version === 'v11' || version === 'v12';
+  const isV11 = version === 'v11' || version === 'v12' || version === 'v13';
   if (isV11 && (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot))) {
     throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
   }
   const runtimeSource = isV11 ? packageRoot : PACKAGE;
+  if (version === 'v13') assertV13ModelCatalogFile(path.join(repoRoot, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'));
   if (isV11) {
     assertPiPackageTreeContained(runtimeSource);
     const sourcePrereg = JSON.parse(fs.readFileSync(path.join(repoRoot, paths.stagedPrereg), 'utf8'));
@@ -299,6 +308,7 @@ export function stageModelImageContext({
     recursive: true,
     ...(isV11 ? { verbatimSymlinks: true } : {}),
   });
+  if (version === 'v13') assertV13ModelCatalogFile(path.join(target, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'));
   if (isV11) {
     assertPiPackageTreeContained(stagedPi);
     const stagedPrereg = JSON.parse(fs.readFileSync(path.join(target, paths.stagedPrereg), 'utf8'));
@@ -352,6 +362,9 @@ export function modelImageSourcesFromContext(contextRoot, { version = 'v4', pres
     ...(policyInputs.sourceNames.includes('pi_launcher') ? {
       pi_launcher: sha(path.join(contextRoot, 'usr/local/bin/pi')),
     } : {}),
+    ...(policyInputs.sourceNames.includes('provider_model_catalog') ? {
+      provider_model_catalog: sha(path.join(veritas, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json')),
+    } : {}),
   };
   return Object.freeze(sources);
 }
@@ -362,7 +375,7 @@ export function buildModelImage({
   packageRoot,
 } = {}) {
   const paths = modelImagePaths(version, { preseal });
-  if (version === 'v11' || version === 'v12') {
+  if (version === 'v11' || version === 'v12' || version === 'v13') {
     if (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot)) {
       throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
     }
@@ -370,6 +383,7 @@ export function buildModelImage({
     const sourcePrereg = JSON.parse(fs.readFileSync(path.join(ROOT, paths.stagedPrereg), 'utf8'));
     validateV11PiPackageContext(packageRoot, sourcePrereg);
   }
+  if (version === 'v13') assertV13ModelCatalogFile(path.join(ROOT, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'));
   const context = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-image-'));
   try {
     stageModelImageContext({ contextRoot: context, packageRoot, version, preseal });

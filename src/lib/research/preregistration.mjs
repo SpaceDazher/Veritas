@@ -715,7 +715,7 @@ export const PREREGISTRATION_RULE = 's2-008-prereg-v1';
  */
 export function preregistrationDigest(prereg) {
   if (!isPlainObject(prereg)) throw malformed('PREREGISTRATION_NOT_AN_OBJECT', `expected a preregistration object, got ${typeName(prereg)}`);
-  if (['s2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule)) {
     const { approval, status, preregistration_digest, ...body } = prereg;
     return canonicalDigest(body);
   }
@@ -824,6 +824,60 @@ export function assertPreregistration(prereg) {
        prereg.executor?.pi_settings?.compaction?.enabled !== false)) {
     throw malformed('PREREGISTRATION_EXECUTOR_POLICY_INVALID', 'v7/v8/v9/v10/v11 require provider credential routing with disabled retries, cache warming, and compaction');
   }
+  if (prereg.rule === 's2-008-prereg-v13') {
+    const executor = prereg.executor;
+    const registration = {
+      id: 'inclusionai/ling-3.1-flash',
+      name: 'inclusionAI: Ling 3.1 Flash',
+      api: 'openai-completions',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      input: ['text'],
+      contextWindow: 262144,
+      maxTokens: 32768,
+      reasoning: true,
+    };
+    if (executor?.provider !== 'openrouter' ||
+        executor?.model !== 'inclusionai/ling-3.1-flash' ||
+        executor?.credential_env_name !== 'OPENROUTER_API_KEY' ||
+        canonicalDigest(executor?.pi_settings ?? null) !== canonicalDigest({
+          config_dir_env: 'PI_CODING_AGENT_DIR',
+          retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0 } },
+          cacheWarming: 'off',
+          compaction: { enabled: false },
+        }) ||
+        canonicalDigest(executor?.pi_model_registration ?? null) !== canonicalDigest(registration)) {
+      throw malformed('V13_MODEL_POLICY_INVALID', 'v13 must use the exact registered Ling OpenRouter model with the frozen PI settings');
+    }
+    const binding = executor?.pi_model_catalog_binding;
+    if (!binding || binding.file !== 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json' ||
+        binding.sha256 !== '5f8d6f77af15a6af97bcd06229a146e10a524f76f2d06878b941e586e3c765a6' ||
+        binding.canonical_slug !== 'inclusionai/ling-3.1-flash-20261002' ||
+        binding.prompt_completion_pricing_source !== 'PROVIDER_CATALOG_LISTING_ONLY' ||
+        binding.cache_pricing !== 'NOT_PROVIDED' ||
+        binding.client_cost_authority !== 'ESTIMATE_ONLY_PROVIDER_RECEIPT_AUTHORITATIVE') {
+      throw malformed('V13_MODEL_CATALOG_BINDING_INVALID', 'v13 provider catalog binding must match the preserved exact catalog evidence');
+    }
+    if (executor?.package !== '@earendil-works/pi-coding-agent' ||
+        prereg.budget_reservation?.granted_units !== 5000000 ||
+        prereg.budget_reservation?.ceiling_scope !== 'PER_RUN_A_OR_B' ||
+        prereg.budget_reservation?.expires_at !== '2026-10-12T00:00:00.000Z') {
+      throw malformed('V13_EXECUTION_BUDGET_OR_PACKAGE_INVALID', 'v13 runtime and per-run token cap must match the approved successor scope');
+    }
+    const prior = prereg.v12_prior_execution_reconciliation;
+    if (prior?.kind !== 's2-008-v12-a-reconciliation/1' ||
+        prior.file !== 'evidence/s2-008-campaign/reconciliation-v12-a.json' ||
+        prior.raw_sha256 !== '19dca90fb603749b012d11a68317dff36e3d688af28585c85479f1c48a364493' ||
+        prior.canonical_digest !== '266a48545aa92838a3a3aed0548de05f196020a198fd2db61c2bbbff2b44f352' ||
+        prior.prior_run_id !== 's2-008c-v12-a-92b479ad27f349728672' ||
+        prior.prior_run_sha256 !== '1e64d455a837c8e8c10e5fea1c606231908c134e8b58e0d3fe0bccacf16dbdf4' ||
+        prior.prior_sidecar_file !== 'evidence/s2-008-campaign/predictions-v12-a-trl-s2-008c-01-20260926.json' ||
+        prior.prior_sidecar_sha256 !== '1db420961471ff82ebc41d68fe16c9460ce53a7f244dd242320ebc70af5e0740' ||
+        prior.preregistration_digest !== 'be2e9cba4629e66d295c2527f6a1842f6282f6526efc10d63acfddec33e0c394' ||
+        prior.raw_unknown_attempts !== 1 || prior.closed_unknown_attempts !== 1 ||
+        prior.unreconciled_attempts !== 0 || prior.scope !== 'Only stopped v12 A; account-wide and earlier campaign totals are outside this reconciliation') {
+      throw malformed('V13_PRIOR_V12_RECONCILIATION_BINDING_INVALID', 'v13 must bind the exact stopped-v12-A reconciliation without extending its scope');
+    }
+  }
   // Optional bindings, checked whenever they are present.
   if (prereg.card !== undefined && prereg.card !== null) {
     const card = requireObject(prereg.card, 'card');
@@ -834,7 +888,7 @@ export function assertPreregistration(prereg) {
   }
   const tableKey = firstPresentKey(prereg, ['expected_table_digest', 'table_digest']);
   if (tableKey !== null) requireDigest(prereg[tableKey], tableKey);
-  if (prereg.rule !== undefined && prereg.rule !== null && ![PREREGISTRATION_RULE, 's2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12'].includes(prereg.rule)) {
+  if (prereg.rule !== undefined && prereg.rule !== null && ![PREREGISTRATION_RULE, 's2-008-prereg-v3', 's2-008-prereg-v4', 's2-008-prereg-v5', 's2-008-prereg-v6', 's2-008-prereg-v7', 's2-008-prereg-v8', 's2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule)) {
     throw malformed('PREREGISTRATION_RULE_MISMATCH', `rule must be ${PREREGISTRATION_RULE}, got ${String(prereg.rule)}`);
   }
   for (const key of ['title', 'description', 'notes']) freeText(prereg[key], key);

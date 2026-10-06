@@ -99,7 +99,7 @@ export function createS2PaidReviewWorkflow({
       || typeof replayJournal !== 'function' || !ownerPrincipalId || !producerPrincipalId
       || typeof stateRoot !== 'string') fail('PAID_REVIEW_WORKFLOW_INVALID');
   if (fixtureOnly && (!fixtureRoot || !Array.isArray(fixtureRecords) || fixtureRecords.length < 1)) fail('PAID_REVIEW_FIXTURE_INVALID');
-  if (version !== 11 && version !== 12) fail('PAID_REVIEW_VERSION_UNSUPPORTED');
+  if (version !== 11 && version !== 12 && version !== 13) fail('PAID_REVIEW_VERSION_UNSUPPORTED');
   const suffix = randomBytes(6).toString('hex');
   const taskId = fixtureOnly ? 'abt-s2-008-v' + version + '-fixture-' + suffix : 'abt-s2-008-v' + version + '-paid-review';
   const workspaceId = fixtureOnly ? 'ws-s2-008-v' + version + '-fixture-' + suffix : 'ws-s2-008-v' + version + '-paid-review';

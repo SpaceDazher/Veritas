@@ -1,5 +1,5 @@
 const VERSIONED_IN_FORCE_FILE = /^preregistration\.v\d+\.in-force\.json$/;
-const SEAL_VERSIONS = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+const SEAL_VERSIONS = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
 
 export function parsePrepareMode(argv = []) {
   if (!Array.isArray(argv)) throw new Error('PREPARE_MODE_INVALID');
@@ -8,7 +8,7 @@ export function parsePrepareMode(argv = []) {
     if (token === '--check') modes.push('check');
     else if (token === '--selftest') modes.push('selftest');
     else if (typeof token === 'string' && token.startsWith('--seal-v')) {
-      const match = /^--seal-v(2|[3-9]|1[012])$/.exec(token);
+      const match = /^--seal-v(2|[3-9]|1[0-3])$/.exec(token);
       if (!match || !SEAL_VERSIONS.has(Number(match[1]))) throw new Error('PREPARE_VERSION_INVALID');
       modes.push('seal-v' + match[1]);
     } else throw new Error('PREPARE_MODE_INVALID');

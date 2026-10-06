@@ -53,6 +53,8 @@ import {
 import { buildImage, runTrial } from './s2-008-campaign-adapter.mjs';
 import { assertV7ExecutorPolicy, assertV8ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 import { assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-campaign-v11-approval.mjs';
+import { assertV13ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation } from './s2-008-campaign-v12-approval.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -515,7 +517,7 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
   const relative = path.relative(rootPath, candidate);
   const normalized = relative.split(path.sep).join('/');
   if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative) ||
-      !/^corpus\/s2-008-campaign\/preregistration\.v(?:[4-9]|1[012])\.in-force\.json$/.test(normalized)) {
+      !/^corpus\/s2-008-campaign\/preregistration\.v(?:[4-9]|1[0-3])\.in-force\.json$/.test(normalized)) {
     throw new Error('PROBE_PREREG_PATH_INVALID');
   }
   return candidate;
@@ -524,10 +526,11 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
 export function validateProbePreregistration({ prereg, manifest }) {
   try {
     const digest = preregistrationDigest(prereg);
-    const version = prereg?.rule === 's2-008-prereg-v12' ? 12 : prereg?.rule === 's2-008-prereg-v11' ? 11 : prereg?.rule === 's2-008-prereg-v10' ? 10 : prereg?.rule === 's2-008-prereg-v9' ? 9 : prereg?.rule === 's2-008-prereg-v8' ? 8 : prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
+    const version = prereg?.rule === 's2-008-prereg-v13' ? 13 : prereg?.rule === 's2-008-prereg-v12' ? 12 : prereg?.rule === 's2-008-prereg-v11' ? 11 : prereg?.rule === 's2-008-prereg-v10' ? 10 : prereg?.rule === 's2-008-prereg-v9' ? 9 : prereg?.rule === 's2-008-prereg-v8' ? 8 : prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
     const file = version === null ? null : `preregistration.v${version}.in-force.json`;
     if (version === 7) assertV7ExecutorPolicy(prereg.executor);
-    if (version === 8 || version === 9 || version === 10 || version === 11 || version === 12) assertV8ExecutorPolicy(prereg.executor);
+    if (version === 13) assertV13ExecutorPolicy(prereg.executor);
+    else if (version === 8 || version === 9 || version === 10 || version === 11 || version === 12) assertV8ExecutorPolicy(prereg.executor);
     if (version === null || prereg.preregistration_digest !== digest ||
         prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true ||
         manifest?.preregistration?.file !== file ||
@@ -545,6 +548,14 @@ export function validateProbePreregistration({ prereg, manifest }) {
           bound?.provider_calls !== binding.providerCalls || bound?.local_attempts !== binding.localAttempts ||
           bound?.unreconciled_attempts !== binding.unreconciledAttempts) {
         return { ok: false, reason: 'PROBE_V11_RECONCILIATION_BINDING_MISMATCH' };
+      }
+    }
+    if (version === 13) {
+      const inputs = readV13PriorV12AInputs();
+      const baseInputs = readV13BaseInputs({ allowHistorical: true });
+      const prior = assertV13RestartReconciliation(baseInputs.base, inputs);
+      if (canonicalDigest(prereg.v12_prior_execution_reconciliation) !== canonicalDigest(prior)) {
+        return { ok: false, reason: 'PROBE_V13_V12A_RECONCILIATION_BINDING_MISMATCH' };
       }
     }
     if (version === 12) {
@@ -668,7 +679,9 @@ if (isEntry && args.child === 'restart') {
       outcome_classes_exercised: [...new Set(probes.flatMap((probe) => (probe.observed?.outcome === undefined ? [] : [probe.observed.outcome])))].sort(),
     },
   };
-  const defaultOut = prereg.rule === 's2-008-prereg-v12'
+  const defaultOut = prereg.rule === 's2-008-prereg-v13'
+    ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v13.json')
+    : prereg.rule === 's2-008-prereg-v12'
     ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v12.json')
     : prereg.rule === 's2-008-prereg-v11'
     ? path.join(REPO_ROOT, 'evidence/s2-008-campaign/probes-v11.json')

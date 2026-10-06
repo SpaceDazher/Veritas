@@ -42,6 +42,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { assertV13ExecutorPolicy, createV13PiModelsFile } from './s2-008-campaign-credential-env.mjs';
 
 
 /** The only value that lets a preregistration be run under. */
@@ -528,7 +529,7 @@ export function proxyEnvironment(base, { port, host = '127.0.0.1' } = {}) {
 
 /** One model call. Dry runs skip it and say so. */
 export function callModel(subject, {
-  provider, model, envName, env, dryRun, timeoutMs, piSettings = null,
+  provider, model, envName, env, dryRun, timeoutMs, piSettings = null, piExecutor = null,
   execFile = execFileSync, captureFailureDiagnostics = false,
 }) {
   if (dryRun) return { text: 'MINOR', usage: { totalTokens: 0, cost: { total: 0 } }, model_called: false };
@@ -549,6 +550,10 @@ export function callModel(subject, {
       const { config_dir_env: _configDirEnv, ...settings } = piSettings;
       settingsDir = fs.mkdtempSync(path.join(os.tmpdir(), 's2-008-pi-settings-'));
       fs.writeFileSync(path.join(settingsDir, 'settings.json'), JSON.stringify(settings) + '\n', { mode: 0o600, flag: 'wx' });
+      if (piExecutor !== null) {
+        const models = createV13PiModelsFile(piExecutor);
+        fs.writeFileSync(path.join(settingsDir, 'models.json'), JSON.stringify(models) + '\n', { mode: 0o600, flag: 'wx' });
+      }
       runtimeEnv = { ...env, PI_CODING_AGENT_DIR: settingsDir };
     } catch {
       if (settingsDir) fs.rmSync(settingsDir, { recursive: true, force: true });
@@ -716,7 +721,7 @@ export async function main(argv, env = process.env, deps = {}) {
     process.stderr.write(`${ARM_ERRORS.PREREG_DIGEST_MISMATCH}:signed=${String(prereg.preregistration_digest ?? '').slice(0, 16)}:recomputed=${recomputed.slice(0, 16)}\n`);
     return 8;
   }
-  if ((prereg.rule === 's2-008-prereg-v11' || prereg.rule === 's2-008-prereg-v12') &&
+  if (['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule) &&
       canonicalDigest(prereg.failure_diagnostics_protocol ?? null) !== canonicalDigest(V11_FAILURE_DIAGNOSTICS_POLICY)) {
     process.stderr.write('V11_FAILURE_DIAGNOSTICS_POLICY_INVALID\n');
     return 14;
@@ -763,8 +768,9 @@ export async function main(argv, env = process.env, deps = {}) {
   let timeoutPolicy = null;
   let piSettings = null;
   let piSettingsDigest = null;
+  let piExecutor = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13'].includes(prereg.rule)) {
     try {
       const { assertV6ModelTimeoutPolicy } = await import('./s2-008-campaign-v6-timeout.mjs');
       timeoutPolicy = assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -777,14 +783,19 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)) {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13'].includes(prereg.rule)) {
       try {
         const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        piSettings = (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule) ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor).settings;
+        const policy = prereg.rule === 's2-008-prereg-v13'
+          ? assertV13ExecutorPolicy(prereg.executor)
+          : (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)
+            ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor);
+        piSettings = policy.settings;
+        piExecutor = prereg.rule === 's2-008-prereg-v13' ? prereg.executor : null;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {
-        process.stderr.write('V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
+        process.stderr.write(prereg.rule === 's2-008-prereg-v13' ? 'V13_MODEL_POLICY_INVALID\n' : 'V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
         return 13;
       }
     }
@@ -792,8 +803,8 @@ export async function main(argv, env = process.env, deps = {}) {
 
   const predictions = [];
   const accounting = [];
-  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12'].includes(prereg.rule);
-  const captureFailureDiagnostics = prereg.rule === 's2-008-prereg-v11' || prereg.rule === 's2-008-prereg-v12';
+  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule);
+  const captureFailureDiagnostics = ['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13'].includes(prereg.rule);
   const failureDiagnostics = [];
   let unknownModelAttempts = 0;
   const generationIdsSeen = new Set();
@@ -831,7 +842,7 @@ export async function main(argv, env = process.env, deps = {}) {
     let result;
     if (!dryRun) modelAttempts += 1;
     try {
-      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, captureFailureDiagnostics });
+      result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, piExecutor, captureFailureDiagnostics });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
       if (captureFailureDiagnostics && error?.failure_diagnostic?.schema === 's2-008-failure-diagnostic/1') {
@@ -971,6 +982,8 @@ export async function main(argv, env = process.env, deps = {}) {
       model,
       credential_env_name: envName,
       pi_settings_sha256: piSettingsDigest,
+      ...(piExecutor ? { pi_model_registration_digest: canonicalDigest(piExecutor.pi_model_registration),
+        pi_model_catalog_binding: structuredClone(piExecutor.pi_model_catalog_binding) } : {}),
       credential_present: readCredential(envName, env),
       credential_in_argv: false,
       // What the call travelled over, and where the number came from. The port is

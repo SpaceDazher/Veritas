@@ -36,6 +36,8 @@ import { NEGATIVE_CONTROLS, EXTRA_CONTROL_IDS } from '../src/lib/research/negati
 import { buildBootstrapImage, runBootstrap, validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-campaign-v11-approval.mjs';
 import { assertV12PriorExecutionEvidence, assertV12RestartReconciliation, inspectV11PriorExecutionEvidence } from './s2-008-campaign-v12-approval.mjs';
+import { assertV13ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
+import { assertV13PresealPin, assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -54,6 +56,15 @@ const V12_REVIEW_CAPSULE_SOURCE_PATHS = Object.freeze([
     value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
       ? 'corpus/s2-008-campaign/preregistration.v12.in-force.json' : value),
   'scripts/s2-008-campaign-adapter.mjs',
+]);
+const V13_REVIEW_CAPSULE_SOURCE_PATHS = Object.freeze([
+  ...V12_REVIEW_CAPSULE_SOURCE_PATHS.map((value) =>
+    value === 'corpus/s2-008-campaign/preregistration.v12.in-force.json'
+      ? 'corpus/s2-008-campaign/preregistration.v13.in-force.json' : value),
+  'scripts/s2-008-campaign-arm-model.mjs',
+  'scripts/s2-008-campaign-credential-env.mjs',
+  'scripts/s2-008-campaign-model-image.mjs',
+  'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json',
 ]);
 
 export function buildV11ReviewCapsuleSourceInputs(entries) {
@@ -97,6 +108,29 @@ export function reserveV12EvaluationAccessRoot(accessRoot) {
   try { fs.mkdirSync(accessRoot, { recursive: false, mode: 0o700 }); }
   catch (error) {
     if (error?.code === 'EEXIST') throw new Error('V12_HOLDOUT_ACCESS_ALREADY_RECORDED');
+    throw error;
+  }
+  return accessRoot;
+}
+
+export function buildV13ReviewCapsuleSourceInputs(entries) {
+  if (!Array.isArray(entries) || entries.length !== V13_REVIEW_CAPSULE_SOURCE_PATHS.length) {
+    throw new Error('V13_REVIEW_CAPSULE_SOURCE_INPUTS_INVALID');
+  }
+  return entries.map((entry, index) => {
+    if (!entry || entry.path !== V13_REVIEW_CAPSULE_SOURCE_PATHS[index]
+        || !(entry.contents instanceof Uint8Array) || entry.contents.length < 1) {
+      throw new Error('V13_REVIEW_CAPSULE_SOURCE_INPUTS_INVALID');
+    }
+    return { path: entry.path, bytes: entry.contents.length,
+      sha256: createHash('sha256').update(entry.contents).digest('hex') };
+  });
+}
+
+export function reserveV13EvaluationAccessRoot(accessRoot) {
+  try { fs.mkdirSync(accessRoot, { recursive: false, mode: 0o700 }); }
+  catch (error) {
+    if (error?.code === 'EEXIST') throw new Error('V13_HOLDOUT_ACCESS_ALREADY_RECORDED');
     throw error;
   }
   return accessRoot;
@@ -148,7 +182,7 @@ export function loadV4TrialPredictions({
         (seedRow.outcome_class !== undefined && body.outcome_class !== seedRow.outcome_class)) {
       return refuse(`V4_SIDECAR_BODY_MISMATCH:${seed}`);
     }
-    if (['v9', 'v10', 'v11', 'v12'].includes(version) && entry.arm_id === 'arm-model-zai-glm53flash') {
+    if (['v9', 'v10', 'v11', 'v12', 'v13'].includes(version) && entry.arm_id === 'arm-model-zai-glm53flash') {
       const accounting = body.accounting;
       if (accounting?.schema !== 's2-008-model-accounting/1' ||
           accounting?.policy !== 'GENERATION_ID_REQUIRED' ||
@@ -355,7 +389,7 @@ export function decisionIndependent({ observed, lower, upper, noiseBand, alpha, 
 
 
 export function activeCampaignVersion(manifest) {
-  const match = /^preregistration\.(v(?:[4-9]|1[012]))\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
+  const match = /^preregistration\.(v(?:[4-9]|1[0-3]))\.in-force\.json$/.exec(manifest?.preregistration?.file ?? '');
   return match?.[1] ?? null;
 }
 
@@ -396,6 +430,17 @@ function validateVersionedProbeEvidence({ campaignProbes, securityControls, prer
         bound?.reconciled_campaign_tokens !== binding.actualTokens || bound?.reconciled_campaign_usd !== binding.actualUsd ||
         bound?.provider_calls !== binding.providerCalls || bound?.local_attempts !== binding.localAttempts ||
         bound?.unreconciled_attempts !== binding.unreconciledAttempts) return notRun('V11_RECONCILIATION_BINDING_MISMATCH');
+  }
+  if (version === 13) {
+    try {
+      assertV13ExecutorPolicy(prereg.executor);
+      const inputs = readV13PriorV12AInputs();
+      const baseInputs = readV13BaseInputs({ allowHistorical: true });
+      const prior = assertV13RestartReconciliation(baseInputs.base, inputs);
+      if (canonicalDigest(prereg.v12_prior_execution_reconciliation) !== canonicalDigest(prior)) {
+        return notRun('V13_V12A_RECONCILIATION_BINDING_MISMATCH');
+      }
+    } catch { return notRun('V13_PRIOR_RECONCILIATION_NOT_VERIFIED'); }
   }
   if (version === 12) {
     let prior;
@@ -529,6 +574,10 @@ export function validateV12ProbeEvidence(args) {
   return validateVersionedProbeEvidence({ ...args, version: 12 });
 }
 
+export function validateV13ProbeEvidence(args) {
+  return validateVersionedProbeEvidence({ ...args, version: 13 });
+}
+
 export function validateV7ProbeEvidence(args) {
   return validateVersionedProbeEvidence({ ...args, version: 7 });
 }
@@ -544,9 +593,25 @@ export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file
       prereg.approval?.status !== 'APPROVED' || prereg.approval?.in_force !== true) {
     return refuse('V4_PREREGISTRATION_NOT_IN_FORCE');
   }
+  if (version === 'v13') {
+    try {
+      assertV13ExecutorPolicy(prereg.executor);
+      const inputs = readV13PriorV12AInputs();
+      const baseInputs = readV13BaseInputs({ allowHistorical: true });
+      const prior = assertV13RestartReconciliation(baseInputs.base, inputs);
+      if (canonicalDigest(prereg.v12_prior_execution_reconciliation) !== canonicalDigest(prior)) {
+        return refuse('V13_PRIOR_RECONCILIATION_BINDING_INVALID');
+      }
+      const finalBytes = readFile(path.join(root, 'corpus/s2-008-campaign/preregistration.v13.in-force.json'));
+      const pinPath = prereg.executor?.model_image?.built_image_pin;
+      const pin = JSON.parse(readFile(path.join(root, pinPath)));
+      assertV13PresealPin({ pin, baseBytes: Buffer.isBuffer(finalBytes) ? finalBytes : Buffer.from(String(finalBytes)),
+        commitment: prereg.executor?.model_image?.content_commitment });
+    } catch { return refuse('V13_MODEL_OR_IMAGE_BINDING_INVALID'); }
+  }
   const v12ControlPins = [];
   let v12CaseIds = null;
-  if (version === 'v12') {
+  if (version === 'v12' || version === 'v13') {
     try {
       const blind = JSON.parse(readFile(path.join(root, 'corpus/s2-008-campaign/cases/holdout.blind.json')));
       if (!Array.isArray(blind) || blind.length !== 126) return refuse('V12_CONTROL_BLIND_INDEX_INVALID');
@@ -557,7 +622,7 @@ export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file
     } catch { return refuse('V12_CONTROL_BLIND_INDEX_INVALID'); }
   }
   const readV12ControlPin = (run, label) => {
-    const file = 'evidence/s2-008-campaign/control-image-pin-v12-' + label + '.json';
+    const file = 'evidence/s2-008-campaign/control-image-pin-' + version + '-' + label + '.json';
     const reference = run?.control_image_pin_artifact;
     if (!reference || Object.keys(reference).sort().join(',') !== 'bytes,file,sha256'
         || reference.file !== file || !Number.isSafeInteger(reference.bytes) || reference.bytes < 1
@@ -599,7 +664,7 @@ export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file
       timeoutMs: prereg.budget_reservation.trial_timeout_ms, runLabel: label, caseIds: v12CaseIds,
       imageId: pin.first.imageId, imageDigest: pin.first.digest,
     })) return false;
-    const expectedSidecar = 'evidence/s2-008-campaign/predictions-v12-' + label + '-' + trial.trial_id + '-' + row.seed + '.json';
+    const expectedSidecar = 'evidence/s2-008-campaign/predictions-' + version + '-' + label + '-' + trial.trial_id + '-' + row.seed + '.json';
     if (row.predictions?.file !== expectedSidecar) return false;
     try {
       const raw = readFile(path.join(root, expectedSidecar));
@@ -613,9 +678,9 @@ export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file
     } catch { return false; }
   };
   for (const [label, run] of [['a', runA], ['b', runB]]) {
-    const controlPin = version === 'v12' ? readV12ControlPin(run, label) : null;
-    if (version === 'v12') {
-      if (!controlPin) return refuse('V12_CONTROL_IMAGE_PIN_INVALID:' + label);
+    const controlPin = ['v12', 'v13'].includes(version) ? readV12ControlPin(run, label) : null;
+    if (['v12', 'v13'].includes(version)) {
+      if (!controlPin) return refuse(version.toUpperCase() + '_CONTROL_IMAGE_PIN_INVALID:' + label);
       v12ControlPins.push(controlPin);
     }
     if (run?.kind !== `s2-008-campaign-${version}-predictions/1` || run.label !== label ||
@@ -651,8 +716,8 @@ export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file
           if (row.outcome_class !== 'MEASURED' || charge.units <= 0) return refuse(`V4_RUN_NOT_MEASURED:${label}`);
         } else {
           if (charge.units !== 0) return refuse('V4_CONTROL_CHARGED_TOKENS:' + label);
-          if (version === 'v12' && !validateV12ControlCell(run, label, declared, row, controlPin)) {
-            return refuse('V12_CONTROL_EXECUTION_INVALID:' + label + ':' + declared.trial_id + ':' + seed);
+          if (['v12', 'v13'].includes(version) && !validateV12ControlCell(run, label, declared, row, controlPin)) {
+            return refuse(version.toUpperCase() + '_CONTROL_EXECUTION_INVALID:' + label + ':' + declared.trial_id + ':' + seed);
           }
         }
         charged += charge.units;
@@ -665,8 +730,8 @@ export function preflightV4Runs({ runA, runB, prereg, manifest, readFile = (file
   }
   if (runA.raw_run_id === runB.raw_run_id || runA.nonce === runB.nonce) return refuse('V4_RUN_PROVENANCE_NOT_DISTINCT');
   if (runA.base.commit_sha !== runB.base.commit_sha || runA.base.tree_sha !== runB.base.tree_sha) return refuse('V4_RUN_BASE_MOVED');
-  if (version === 'v12' && (v12ControlPins.length !== 2
-      || canonicalDigest(v12ControlPins[0]) !== canonicalDigest(v12ControlPins[1]))) return refuse('V12_CONTROL_IMAGE_PINS_DIVERGE');
+  if (['v12', 'v13'].includes(version) && (v12ControlPins.length !== 2
+      || canonicalDigest(v12ControlPins[0]) !== canonicalDigest(v12ControlPins[1]))) return refuse(version.toUpperCase() + '_CONTROL_IMAGE_PINS_DIVERGE');
   return { ok: true, base: runA.base, distinct_run_ids: true, distinct_nonces: true };
 }
 
@@ -757,7 +822,7 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
   const version = activeCampaignVersion(manifest);
   const probeEvidence = version === 'v6'
     ? validateV6ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
-    : version === 'v12' ? validateV12ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
+    : version === 'v13' ? validateV13ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB }) : version === 'v12' ? validateV12ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
     : version === 'v11' ? validateV11ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
     : version === 'v10' ? validateV10ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
     : version === 'v9' ? validateV9ProbeEvidence({ campaignProbes, securityControls, prereg, runA, runB })
@@ -780,10 +845,10 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
         holdoutCases, readFile, root, version,
       });
       if (!result.available) return { ok: false, reason: result.reason, run: label, trial_id: entry.trial_id };
-      if (['v9', 'v10', 'v11', 'v12'].includes(version)) {
+      if (['v9', 'v10', 'v11', 'v12', 'v13'].includes(version)) {
         for (const generationId of result.provider_generation_ids ?? []) {
           if (v9ProviderGenerationIds.has(generationId)) {
-            return { ok: false, reason: version === 'v12' ? 'V12_GENERATION_ID_DUPLICATE' : version === 'v11' ? 'V11_GENERATION_ID_DUPLICATE' : version === 'v10' ? 'V10_GENERATION_ID_DUPLICATE' : 'V9_GENERATION_ID_DUPLICATE', run: label, trial_id: entry.trial_id };
+            return { ok: false, reason: version === 'v13' ? 'V13_GENERATION_ID_DUPLICATE' : version === 'v12' ? 'V12_GENERATION_ID_DUPLICATE' : version === 'v11' ? 'V11_GENERATION_ID_DUPLICATE' : version === 'v10' ? 'V10_GENERATION_ID_DUPLICATE' : 'V9_GENERATION_ID_DUPLICATE', run: label, trial_id: entry.trial_id };
           }
           v9ProviderGenerationIds.add(generationId);
         }
@@ -872,7 +937,7 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
     ok: true, kind: `s2-008-campaign-${version}-evaluation/1`,
     preregistration_digest: prereg.preregistration_digest,
     holdout_cases: holdoutCases.length, table,
-    probes: ['v6','v7','v8','v9','v10','v11','v12'].includes(version)
+    probes: ['v6','v7','v8','v9','v10','v11','v12','v13'].includes(version)
       ? {
           status: probeEvidence.status, total: EXPECTED_CAMPAIGN_PROBES.length,
           items: campaignProbes.probes.map((row) => ({ probe: row.probe, status: 'PASS' })),
@@ -881,11 +946,11 @@ export function evaluateV4Campaign({ runA, runB, prereg, manifest, frozenTable, 
         }
       : { status: 'NOT_RUN', total: V4_PROBES.length,
           items: V4_PROBES.map((probe) => ({ probe, status: 'NOT_RUN' })) },
-    verdict: ['v6','v7','v8','v9','v10','v11','v12'].includes(version) ? 'PENDING_HUMAN_REVIEW' : 'PENDING_PROBES',
+    verdict: ['v6','v7','v8','v9','v10','v11','v12','v13'].includes(version) ? 'PENDING_HUMAN_REVIEW' : 'PENDING_PROBES',
     aggregate_spend: { currency: 'tokens', units: runA.spent_units + runB.spent_units,
       usd_reported: scoredRuns.reduce((sum, row) => sum + row.usd_spent, 0) },
-    ...(['v10', 'v11', 'v12'].includes(version) ? { prediction_source: 'IMMUTABLE_RUN_SIDECARS' } : {}),
-    ...(['v10', 'v11', 'v12'].includes(version) ? { deterministic_evaluation: { verdict: 'AGREES', remarks: [] } } : {}),
+    ...(['v10', 'v11', 'v12', 'v13'].includes(version) ? { prediction_source: 'IMMUTABLE_RUN_SIDECARS' } : {}),
+    ...(['v10', 'v11', 'v12', 'v13'].includes(version) ? { deterministic_evaluation: { verdict: 'AGREES', remarks: [] } } : {}),
     prediction_independence: 'Model predictions come from immutable run sidecars; labels, counts, bootstrap intervals and decisions are recomputed here.',
     runs: scoredRuns,
     reproducibility: {
@@ -922,7 +987,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
   if (!preflight.ok) throw new Error(preflight.reason);
   let campaignProbes = null;
   let securityControls = null;
-  if (['v6','v7','v8','v9','v10','v11','v12'].includes(version)) {
+  if (['v6','v7','v8','v9','v10','v11','v12','v13'].includes(version)) {
     const label = version.toUpperCase();
     try {
       campaignProbes = read(`evidence/s2-008-campaign/probes-${version}.json`);
@@ -930,7 +995,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
     } catch {
       throw new Error(`${label}_PROBE_EVIDENCE_NOT_RUN`);
     }
-    const validate = version === 'v12' ? validateV12ProbeEvidence : version === 'v11' ? validateV11ProbeEvidence : version === 'v10' ? validateV10ProbeEvidence : version === 'v9' ? validateV9ProbeEvidence : version === 'v8' ? validateV8ProbeEvidence : version === 'v6' ? validateV6ProbeEvidence : validateV7ProbeEvidence;
+    const validate = version === 'v13' ? validateV13ProbeEvidence : version === 'v12' ? validateV12ProbeEvidence : version === 'v11' ? validateV11ProbeEvidence : version === 'v10' ? validateV10ProbeEvidence : version === 'v9' ? validateV9ProbeEvidence : version === 'v8' ? validateV8ProbeEvidence : version === 'v6' ? validateV6ProbeEvidence : validateV7ProbeEvidence;
     const evidence = validate({ campaignProbes, securityControls, prereg, runA, runB });
     if (!evidence.ok) throw new Error(`${label}_PROBE_EVIDENCE_${evidence.status}:${evidence.reason}`);
   }
@@ -944,6 +1009,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
   // cannot silently perform another opening.
   if (version === 'v11') reserveV11EvaluationAccessRoot(accessRoot);
   if (version === 'v12') reserveV12EvaluationAccessRoot(accessRoot);
+  if (version === 'v13') reserveV13EvaluationAccessRoot(accessRoot);
   const registryRoot = accessRoot;
   let holdoutCases;
   let accessRows;
@@ -953,7 +1019,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
   let accessRegistryFiles = [];
   let decisionPointForAudit;
   {
-    const decisionAt = ['v11', 'v12'].includes(version) ? new Date() : new Date(DECISION_POINT);
+    const decisionAt = ['v11', 'v12', 'v13'].includes(version) ? new Date() : new Date(DECISION_POINT);
     const decisionPoint = decisionAt.toISOString();
     decisionPointForAudit = decisionPoint;
     const ms = decisionAt.getTime();
@@ -1014,7 +1080,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
     registry_files: accessRegistryFiles,
     registry: path.relative(REPO_ROOT, accessRoot).split(path.sep).join('/') };
   let reviewCapsule = null;
-  if (version === 'v11' || version === 'v12') {
+  if (version === 'v11' || version === 'v12' || version === 'v13') {
     const sidecarsFor = (run) => run.trials.flatMap((trial) => trial.seeds.map((seed) => {
       const sidecarBytes = fs.readFileSync(path.join(REPO_ROOT, seed.predictions.file));
       return { trial_id: trial.trial_id, arm_id: trial.arm_id, seed: seed.seed,
@@ -1029,7 +1095,8 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
       'corpus/s2-008-campaign/cases/holdout.blind.json',
       'scripts/s2-008-campaign-evaluate.mjs',
       'scripts/s2-008-campaign-bootstrap.mjs',
-      ...(version === 'v12' ? ['scripts/s2-008-campaign-adapter.mjs'] : []),
+      ...(['v12', 'v13'].includes(version) ? ['scripts/s2-008-campaign-adapter.mjs'] : []),
+      ...(version === 'v13' ? V13_REVIEW_CAPSULE_SOURCE_PATHS.slice(V12_REVIEW_CAPSULE_SOURCE_PATHS.length) : []),
     ];
     const capsuleBody = {
       kind: 's2-008-campaign-review-capsule/1',
@@ -1037,7 +1104,7 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
       labels_digest: canonicalDigest(Object.fromEntries(holdoutCases.map((row) => [row.case_id, row.label]))),
       case_ids: holdoutCases.map((row) => row.case_id),
       labels: holdoutCases.map((row) => ({ case_id: row.case_id, label: row.label })),
-      source_inputs: (version === 'v12' ? buildV12ReviewCapsuleSourceInputs : buildV11ReviewCapsuleSourceInputs)(sourcePaths.map((file) => ({
+      source_inputs: (version === 'v13' ? buildV13ReviewCapsuleSourceInputs : version === 'v12' ? buildV12ReviewCapsuleSourceInputs : buildV11ReviewCapsuleSourceInputs)(sourcePaths.map((file) => ({
         path: file, contents: fs.readFileSync(path.join(REPO_ROOT, file)) }))),
       runs: [
         { label: 'a', raw_run_id: runA.raw_run_id,
@@ -1067,14 +1134,14 @@ function evaluateV4OnDisk({ out, requestedVersion }) {
 
 const args = parseArgs(process.argv);
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain && (args.v4 || args.v5 || args.v6 || args.v7 || args.v8 || args.v9 || args.v10 || args.v11 || args.v12)) {
+if (isMain && (args.v4 || args.v5 || args.v6 || args.v7 || args.v8 || args.v9 || args.v10 || args.v11 || args.v12 || args.v13)) {
   try {
-    const requestedVersion = args.v12 ? 'v12' : args.v11 ? 'v11' : args.v10 ? 'v10' : args.v9 ? 'v9' : args.v8 ? 'v8' : args.v7 ? 'v7' : args.v6 ? 'v6' : args.v5 ? 'v5' : 'v4';
+    const requestedVersion = args.v13 ? 'v13' : args.v12 ? 'v12' : args.v11 ? 'v11' : args.v10 ? 'v10' : args.v9 ? 'v9' : args.v8 ? 'v8' : args.v7 ? 'v7' : args.v6 ? 'v6' : args.v5 ? 'v5' : 'v4';
     const out = typeof args.out === 'string' ? path.resolve(args.out) : path.join(REPO_ROOT, `evidence/s2-008-campaign/evaluation-${requestedVersion}.json`);
     console.log(JSON.stringify(evaluateV4OnDisk({ out, requestedVersion }), null, 2));
   } catch (error) { console.error(String(error?.message ?? error)); process.exitCode = 1; }
 }
-if (isMain && !args.v4 && !args.v5 && !args.v6 && !args.v7 && !args.v8 && !args.v9 && !args.v10 && !args.v11 && !args.v12) {
+if (isMain && !args.v4 && !args.v5 && !args.v6 && !args.v7 && !args.v8 && !args.v9 && !args.v10 && !args.v11 && !args.v12 && !args.v13) {
 const runA = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-a.json'), 'utf8'));
 const runB = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'evidence/s2-008-campaign/run-b.json'), 'utf8'));
 /** Which run this evaluation scores, and therefore which sidecar it reads. Derived

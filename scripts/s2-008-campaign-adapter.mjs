@@ -47,8 +47,9 @@ import { assertV10PresealPin, assertV9AReconciliation, readV10ReconciliationInpu
 import { assertV11PresealPin, assertV10AReconciliation, readV11ReconciliationInputs } from './s2-008-campaign-v11-approval.mjs';
 import { V11_FAILURE_DIAGNOSTICS_POLICY } from './s2-008-campaign-arm-model.mjs';
 import { assertV12PresealPin, assertV12PriorExecutionEvidence, assertV12RestartReconciliation } from './s2-008-campaign-v12-approval.mjs';
+import { assertV13PresealPin, assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
-import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
+import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, assertV13ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -821,6 +822,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v10') return 10;
   if (rule === 's2-008-prereg-v11') return 11;
   if (rule === 's2-008-prereg-v12') return 12;
+  if (rule === 's2-008-prereg-v13') return 13;
   if (rule === 's2-008-prereg-v9') return 9;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
 }
@@ -864,7 +866,18 @@ export function assertPinnedModelImage({
   if (prereg?.executor?.model_image?.content_commitment !== built.content_commitment) {
     throw new Error('MODEL_CONTENT_COMMITMENT_MISMATCH');
   }
-  if (version === 6) {
+  if (version === 13) {
+    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v13.in-force.json'));
+    assertV13PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+    assertV13ExecutorPolicy(prereg.executor);
+    const inputs = readV13PriorV12AInputs();
+    const baseInputs = readV13BaseInputs({ allowHistorical: true });
+    const prior = assertV13RestartReconciliation(baseInputs.base, inputs);
+    if (canonicalDigest(prereg.v12_prior_execution_reconciliation) !== canonicalDigest(prior)) {
+      throw new Error('MODEL_V13_PRIOR_RECONCILIATION_BINDING_MISMATCH');
+    }
+  } else if (version === 6) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v6.in-force.json'));
     assertV6PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
     assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -1004,7 +1017,7 @@ export async function runModelTrial({
       exit_code: observation?.exitCode ?? null,
       signal: observation?.signal ?? null,
       timed_out: observation?.timedOut ?? false,
-      stderr_excerpt: ['s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule) ? null : String(observation?.stderr ?? '').slice(-400),
+      stderr_excerpt: ['s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13'].includes(prereg.rule) ? null : String(observation?.stderr ?? '').slice(-400),
       banner, payload_chunks: parsed.chunks, payload_error: parsed.error,
       output_digest: output === null ? null : canonicalDigest(output),
       // Keep the own-arm budget and stop reason; a digest cannot recover an INFRA report.
