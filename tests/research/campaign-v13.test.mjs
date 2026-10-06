@@ -10,13 +10,27 @@ import { activeCampaignVersion } from '../../scripts/s2-008-campaign-evaluate.mj
 import { parsePrepareMode } from '../../scripts/s2-008-campaign-prepare-cli.mjs';
 import { canonicalDigest } from '../../src/lib/verifier/canonical-json.mjs';
 import { V13_MODEL_POLICY } from '../../scripts/s2-008-campaign-credential-env.mjs';
-import { assertV13BaseBinding, assertV13PriorV12AReconciliation, approveV13, createV13Draft, readV13BaseInputs, readV13PriorV12AInputs } from '../../scripts/s2-008-campaign-v13-approval.mjs';
+import { assertV13BaseBinding, assertV13PriorV12AReconciliation, approveV13, createV13Draft, readV13BaseInputs, historicalV12BaseManifest, readV13PriorV12AInputs } from '../../scripts/s2-008-campaign-v13-approval.mjs';
 import { sealV13, assertV13ApprovalBinding, assertV13ManifestBinding } from '../../scripts/s2-008-campaign-seal-v13.mjs';
 import { createV13PiModelsFile } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { modelTrialArgv } from '../../scripts/s2-008-campaign-adapter.mjs';
 import { campaignCliMode } from '../../scripts/s2-008-campaign-run.mjs';
 import { validateProbePreregistration } from '../../scripts/s2-008-campaign-probes.mjs';
 import { validateS2PaidReviewGenerationAccounting } from '../../scripts/s2-008-paid-review.mjs';
+
+import { readV14BaseInputs } from '../../scripts/s2-008-campaign-v14-approval.mjs';
+
+function historicalV13BaseInputs() {
+  const current = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json', 'utf8'));
+  if (current.preregistration.file !== 'preregistration.v14.in-force.json') return readV13BaseInputs({ allowHistorical: true });
+  const inputs = readV14BaseInputs({ allowHistorical: true });
+  const baseBytes = fs.readFileSync('corpus/s2-008-campaign/preregistration.v12.in-force.json');
+  const base = JSON.parse(baseBytes);
+  const supersessionBytes = fs.readFileSync('corpus/s2-008-campaign/preregistration-v12-supersession.json');
+  return { base, baseBytes, manifest: historicalV12BaseManifest(inputs.manifest, base),
+    activeManifest: inputs.manifest, supersession: JSON.parse(supersessionBytes), supersessionBytes,
+    table: inputs.table, ledger: inputs.ledger };
+}
 
 const v12 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v12.in-force.json', 'utf8'));
 const catalogFile = 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json';
@@ -179,7 +193,7 @@ function fakeV13Pin(baseBytes) {
 }
 
 function signedV13Fixture() {
-  const baseInputs = readV13BaseInputs({ allowHistorical: true });
+  const baseInputs = historicalV13BaseInputs();
   const restartInputs = readV13PriorV12AInputs();
   const pin = fakeV13Pin(baseInputs.baseBytes);
   const draft = createV13Draft({ ...baseInputs, pin, restartInputs });
@@ -192,7 +206,7 @@ function signedV13Fixture() {
 }
 
 test('v13 lineage validators bind positive exact v12 base and v12-A bytes and reject byte drift', () => {
-  const base = readV13BaseInputs({ allowHistorical: true });
+  const base = historicalV13BaseInputs();
   const restart = readV13PriorV12AInputs();
   assert.equal(assertV13BaseBinding(base).baseDigest, v12.preregistration_digest);
   assert.equal(assertV13PriorV12AReconciliation(restart).raw_unknown_attempts, 1);
@@ -216,7 +230,8 @@ test('v13 approval and seal preserve the signed lineage and append one manifest 
   assert.equal(sealed.manifest.supersession_history.at(-1).file, 'preregistration-v13-supersession.json');
   assert.equal(assertV13ManifestBinding({ prereg: sealed.prereg, base: baseInputs.base,
     manifest: sealed.manifest, supersession: sealed.supersession, table: baseInputs.table, ledger: baseInputs.ledger }).ok, true);
-  assert.equal(validateProbePreregistration({ prereg: sealed.prereg, manifest: sealed.manifest }).ok, true);
+  // The canonical corpus is now v14; an inactive v13 probe must refuse.
+  assert.equal(validateProbePreregistration({ prereg: sealed.prereg, manifest: sealed.manifest }).ok, false);
   assert.throws(() => sealV13({ signed, draft, ...baseInputs, baseSupersession: baseInputs.supersession,
     baseSupersessionBytes: baseInputs.supersessionBytes, pin,
     restartInputs: { ...restartInputs, sidecarBytes: Buffer.concat([restartInputs.sidecarBytes, Buffer.from(' ')]) },

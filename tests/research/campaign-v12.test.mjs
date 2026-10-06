@@ -26,6 +26,7 @@ const ledger = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/source-ledger.
 const activeManifest = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/manifest.json', 'utf8'));
 const activeV12 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v12.in-force.json', 'utf8'));
 const activeV13 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v13.in-force.json', 'utf8'));
+const activeV14 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v14.in-force.json', 'utf8'));
 const v12Supersession = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration-v12-supersession.json', 'utf8'));
 const v11SupersessionBytes = fs.readFileSync('corpus/s2-008-campaign/preregistration-v11-supersession.json');
 const v11Supersession = JSON.parse(v11SupersessionBytes);
@@ -92,10 +93,11 @@ const v12Candidate = () => {
   return value;
 };
 
-test('canonical manifest is active v13 while lineage tests use pinned historical v11 and v12 manifests', () => {
-  assert.equal(activeManifest.preregistration.file, 'preregistration.v13.in-force.json');
+test('canonical manifest is active v14 while lineage tests use pinned historical v11 and v12 manifests', () => {
+  assert.equal(activeManifest.preregistration.file, 'preregistration.v14.in-force.json');
   assert.equal(activeManifest.preregistration.status, 'IN_FORCE');
-  assert.equal(activeManifest.preregistration.preregistration_digest, activeV13.preregistration_digest);
+  assert.equal(activeManifest.preregistration.preregistration_digest, activeV14.preregistration_digest);
+  assert.equal(activeV14.approval?.in_force, true);
   assert.equal(activeV13.rule, 's2-008-prereg-v13');
   assert.equal(activeV13.approval?.in_force, true);
   assert.equal(activeV12.rule, 's2-008-prereg-v12');
