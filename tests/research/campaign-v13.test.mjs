@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { assertPreregistration, preregistrationDigest } from '../../src/lib/research/preregistration.mjs';
-import { FROZEN_MEMBERS } from '../../scripts/s2-008-campaign-approve.mjs';
+import { FROZEN_MEMBERS, parseArgs as parseApprovalArgs } from '../../scripts/s2-008-campaign-approve.mjs';
 import { credentialEnvNameForPreregistration } from '../../scripts/s2-008-campaign-credential-env.mjs';
 import { modelImagePaths, modelImageVersionFromArgv, modelImagePolicyInputs, parseModelImageCliArgs, assertV13ModelCatalogFile } from '../../scripts/s2-008-campaign-model-image.mjs';
 import { activeCampaignVersion } from '../../scripts/s2-008-campaign-evaluate.mjs';
@@ -91,6 +91,17 @@ test('v13 preregistration validates the exact Ling policy with full-body digest 
   assert.equal(prereg.budget_reservation.expires_at, '2026-10-12T00:00:00.000Z');
   assert.notEqual(preregistrationDigest({ ...prereg, executor: { ...prereg.executor, model: 'other/model' } }), prereg.preregistration_digest);
   assert.equal(assertPreregistration(prereg), prereg);
+});
+
+test('approval CLI accepts v13 and rejects duplicate or malformed version flags', () => {
+  assert.deepEqual(parseApprovalArgs(['--version', 'v13', '--principal', 'prn-s2007r-owner', '--label', 'Daniil']), {
+    principal: 'prn-s2007r-owner', label: 'Daniil', out: null, version: 'v13',
+  });
+  assert.throws(() => parseApprovalArgs(['--version', 'v13', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
+  assert.throws(() => parseApprovalArgs(['--version', 'v12', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
+  for (const version of ['v013', 'v14', 'v1', 'v12x']) {
+    assert.throws(() => parseApprovalArgs(['--version', version]), /APPROVE_VERSION_INVALID/);
+  }
 });
 
 test('v13 OpenRouter credential route accepts only the registered model policy', () => {
