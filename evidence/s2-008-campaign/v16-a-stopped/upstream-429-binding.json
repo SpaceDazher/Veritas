@@ -1,0 +1,21 @@
+{
+  "generation_id": "gen-1791385538-Kv8guCF6fgfxeioKvMfY",
+  "raw_run_id": "s2-008c-v16-a-6610a7c4fae8418dace6",
+  "source": "OWNER_UI_AND_GENERATION_ID_EPOCH",
+  "generation_id_epoch_utc": "2026-10-07T15:05:38Z",
+  "local_attempt_window": [
+    "2026-10-07T15:05:36.314Z",
+    "2026-10-07T15:05:39.513Z"
+  ],
+  "inside_attempt_window": true,
+  "provider": "Poolside",
+  "model": "poolside/laguna-s-2.1-20260720",
+  "variant": "free",
+  "http_status_owner_observed": 429,
+  "attempts_owner_observed": 1,
+  "fallback_latency_ms_owner_observed": 0,
+  "generation_api_http_status": 404,
+  "retry_performed": false,
+  "raw_unreconciled_spend_preserved": true,
+  "B": "NOT_RUN"
+}

@@ -1,0 +1,37 @@
+{
+  "status": "REQUEST_OUTCOMES_RECONCILED",
+  "raw_run_id": "s2-008c-v16-a-6610a7c4fae8418dace6",
+  "preregistration_digest": "bd230c0856930cab13372473bdb9e59dbf3d667fdbd1493e2119dc2c378d36b0",
+  "local_model_attempts": 1,
+  "successful_generations": 0,
+  "failed_upstream_requests": 1,
+  "classified_unknown_attempts": 1,
+  "unclassified_attempts": 0,
+  "known_tokens_lower_bound": 0,
+  "known_provider_usd_lower_bound": 0,
+  "failed_generation_id": "gen-1791385538-Kv8guCF6fgfxeioKvMfY",
+  "failed_request_tokens_confirmed": null,
+  "failed_request_usd_confirmed": null,
+  "total_tokens_confirmed": null,
+  "total_usd_confirmed": null,
+  "financial_reconciliation_complete": false,
+  "raw_unreconciled_spend_preserved": true,
+  "no_cost_claim_for_failed_request": true,
+  "account_wide_completeness_claimed": false,
+  "provider_rows_verified_via_api": false,
+  "completeness": {
+    "complete": true,
+    "unfiltered": true,
+    "includes_errors_and_cancellations": true,
+    "basis": "DIRECT_OWNER_UNFILTERED_MINUTE_ATTESTATION",
+    "statement": "Да, полный список; только этот 429",
+    "UTC_interval": [
+      "2026-10-07T15:05:00Z",
+      "2026-10-07T15:05:59Z"
+    ]
+  },
+  "retry_performed": false,
+  "B": "NOT_RUN",
+  "independent_evaluation": "NOT_RUN",
+  "A_MVP_05": "NOT_RUN_HUMAN_REVIEW_REQUIRED"
+}

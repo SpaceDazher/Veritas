@@ -1,0 +1,21 @@
+{
+  "source": "direct_owner_pasted_openrouter_request_details",
+  "generation_id": "gen-1791385538-Kv8guCF6fgfxeioKvMfY",
+  "status": 429,
+  "provider": "Poolside",
+  "model": "poolside/laguna-s-2.1-20260720",
+  "variant": "free",
+  "key_type": "OpenRouter",
+  "total_latency_ms": 126,
+  "attempts": 1,
+  "failed_attempts": 1,
+  "fallback_latency_ms": 0,
+  "generation_id_epoch_utc": "2026-10-07T15:05:38+00:00",
+  "timestamp_source": "generation_id_epoch",
+  "inside_local_attempt_window": true,
+  "generation_api_http_status": 404,
+  "failed_request_tokens_confirmed": null,
+  "failed_request_usd_confirmed": null,
+  "complete_window_attestation": null,
+  "retry_performed": false
+}

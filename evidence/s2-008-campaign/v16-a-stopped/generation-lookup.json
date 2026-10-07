@@ -1,0 +1,12 @@
+{
+  "generation_id": "gen-1791385538-Kv8guCF6fgfxeioKvMfY",
+  "generation_api_http_status": 404,
+  "body": {
+    "error": {
+      "message": "Generation gen-1791385538-Kv8guCF6fgfxeioKvMfY not found",
+      "code": 404
+    }
+  },
+  "failed_request_tokens_confirmed": null,
+  "failed_request_usd_confirmed": null
+}

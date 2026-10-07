@@ -1,0 +1,34 @@
+{
+  "previous_files_unchanged": {
+    "files.json": "8ba910dfecdee529fce78c802dcd3151c8af2bafdb442735a2abb3d498f87f97",
+    "credential-check.json": "6417048d4a5b0fc4e577986bd50a894f1a90b1f4842a45757752237e27afae8e",
+    "owner-execution-authorization.json": "c4c751651da981cce1f2d12ad63a77adee4ef1332b574419f8404b060aa92bd2",
+    "reconciliation-required.json": "07fa38734f9cca02e4fe6289674af259cda2169c2cb4ac7a91565132af2c0ffe",
+    "control-image-pin-v16-a.json": "b276faeaf4abdb44dbdd70b3c53e6e850fa6c1461ce4dbad9cdb8cefebcc75bc",
+    "status.json": "ca255935baf454aea6ebf325de2336d23e3dc6526f7aab45390c625e01834163",
+    "predictions-v16-a-trl-s2-008c-01-20260926.json": "1db420961471ff82ebc41d68fe16c9460ce53a7f244dd242320ebc70af5e0740",
+    "run-v16-a.json": "c58eb4f72d3f42ace21aac31592cee6c668b5c8f5d675fb9564a01b7c0fe8280"
+  },
+  "added_files": {
+    "generation-lookup.json": {
+      "bytes": 314,
+      "sha256": "714ed1084039e1f6ac5ac88ae552251523f13e6dd7c6abdd33ec0ab54e596190"
+    },
+    "upstream-429-observation.json": {
+      "bytes": 685,
+      "sha256": "0a4e9589d44cd1f6858c2257140a3a1125b760004eabf2a32d0eb578ad737b28"
+    },
+    "owner-completeness-attestation.json": {
+      "bytes": 546,
+      "sha256": "d9882dbb65c1f642fbc089237040bd105a21f157408054898aee19ff0048b807"
+    },
+    "upstream-429-binding.json": {
+      "bytes": 676,
+      "sha256": "59d2d6302668c511863084450256b23f0a774765c2d5507b02860af709cecc5a"
+    },
+    "request-outcome-reconciliation.json": {
+      "bytes": 1338,
+      "sha256": "5b295ee12198d1b453bbe3f0061acbc9fadf565d36b4ef4e8f7fbf63dac38da3"
+    }
+  }
+}
