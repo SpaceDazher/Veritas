@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1447.
+Generated from `git ls-files`; count: 1454.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -449,7 +449,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration-v12-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v13-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v13-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v14-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v14-supersession.json`
+- `corpus/s2-008-campaign/preregistration-v15-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v3-superseded.json`
 - `corpus/s2-008-campaign/preregistration-v3-supersession.json`
 - `corpus/s2-008-campaign/preregistration-v4-superseded.json`
@@ -480,6 +482,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `corpus/s2-008-campaign/preregistration.v14.approved.json`
 - `corpus/s2-008-campaign/preregistration.v14.draft.json`
 - `corpus/s2-008-campaign/preregistration.v14.in-force.json`
+- `corpus/s2-008-campaign/preregistration.v15.approved.json`
+- `corpus/s2-008-campaign/preregistration.v15.draft.json`
+- `corpus/s2-008-campaign/preregistration.v15.in-force.json`
 - `corpus/s2-008-campaign/preregistration.v2.approved.json`
 - `corpus/s2-008-campaign/preregistration.v2.draft.json`
 - `corpus/s2-008-campaign/preregistration.v3.approved.json`
@@ -688,6 +693,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/model-image-pin-v13.json`
 - `evidence/s2-008-campaign/model-image-pin-v14-preseal.json`
 - `evidence/s2-008-campaign/model-image-pin-v14.json`
+- `evidence/s2-008-campaign/model-image-pin-v15-preseal.json`
+- `evidence/s2-008-campaign/model-image-pin-v15.json`
 - `evidence/s2-008-campaign/model-image-pin-v3.json`
 - `evidence/s2-008-campaign/model-image-pin-v4.json`
 - `evidence/s2-008-campaign/model-image-pin-v5-preseal.json`

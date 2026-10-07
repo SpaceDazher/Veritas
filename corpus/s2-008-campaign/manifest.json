@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v14.in-force.json",
-    "preregistration_digest": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
+    "file": "preregistration.v15.in-force.json",
+    "preregistration_digest": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v13-superseded.json",
-    "preregistration_digest": "b8c8a142a8305692c5d01989128896c014fbb9950e92c13062b2a3041271e9af",
+    "file": "preregistration-v14-superseded.json",
+    "preregistration_digest": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v14.in-force.json"
+    "superseded_by": "preregistration.v15.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v14-supersession.json",
-    "supersession_id": "spr-341aa8e0c3b114e8a906c4a5",
-    "supersession_digest": "c9e53c0cf3a0834136b22be61bb41936998d4a78e76f95cc2d3ec6b05a74b9a9",
-    "reason": "v14 binds the signed 60-second model call-start interval and explicit credential source after the v13 upstream 429, with frozen science and independent A/B ceilings preserved."
+    "file": "preregistration-v15-supersession.json",
+    "supersession_id": "spr-b402f11bd6f39e0a9a9681f9",
+    "supersession_digest": "4387b8d444737a41dbc2738115e55fb0c3a8cf6177cbcd1b4f3629d1cc0c9218",
+    "reason": "v15 binds the free Gemma model selected under owner delegation, its zero-priced current provider descriptor, explicit process credential, 60-second pacing and preserved v14 request-outcome closure while keeping the frozen experiment unchanged."
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -620,6 +620,12 @@
       "supersession_id": "spr-341aa8e0c3b114e8a906c4a5",
       "supersession_digest": "c9e53c0cf3a0834136b22be61bb41936998d4a78e76f95cc2d3ec6b05a74b9a9",
       "reason": "v14 binds the signed 60-second model call-start interval and explicit credential source after the v13 upstream 429, with frozen science and independent A/B ceilings preserved."
+    },
+    {
+      "file": "preregistration-v15-supersession.json",
+      "supersession_id": "spr-b402f11bd6f39e0a9a9681f9",
+      "supersession_digest": "4387b8d444737a41dbc2738115e55fb0c3a8cf6177cbcd1b4f3629d1cc0c9218",
+      "reason": "v15 binds the free Gemma model selected under owner delegation, its zero-priced current provider descriptor, explicit process credential, 60-second pacing and preserved v14 request-outcome closure while keeping the frozen experiment unchanged."
     }
   ]
 }

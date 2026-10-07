@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
+  "replaced_by_preregistration_digest": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v15 binds the free Gemma model selected under owner delegation, its zero-priced current provider descriptor, explicit process credential, 60-second pacing and preserved v14 request-outcome closure while keeping the frozen experiment unchanged.",
+  "supersession_id": "spr-b402f11bd6f39e0a9a9681f9",
+  "supersession_digest": "4387b8d444737a41dbc2738115e55fb0c3a8cf6177cbcd1b4f3629d1cc0c9218"
+}
