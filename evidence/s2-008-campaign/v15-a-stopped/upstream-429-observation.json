@@ -1,0 +1,19 @@
+{
+  "source": "human owner supplied OpenRouter Request details in chat",
+  "generation_id": "gen-1791370937-0Ten4t5o0cYcyazZ5LAu",
+  "status": 429,
+  "provider": "Google AI Studio",
+  "model": "google/gemma-4-31b-it-20260402",
+  "variant": "free",
+  "key_type": "OpenRouter",
+  "total_latency_ms": 107,
+  "attempts": 1,
+  "failed_attempts": 1,
+  "fallback_latency_ms": 0,
+  "generation_id_epoch_utc": "2026-10-07T11:02:17+00:00",
+  "generation_id_epoch_is_created_at_receipt": false,
+  "generation_api_http_status": 404,
+  "failed_request_tokens_confirmed": null,
+  "failed_request_usd_confirmed": null,
+  "complete_window_attestation": null
+}
