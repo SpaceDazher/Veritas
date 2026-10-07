@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "2faed02bac9c10d121157546219d28c5aae775ee",
-  "sourceTree": "8b0990d2b711b3cc73f272cabf37e86bf45febd3",
-  "trackedFileCount": 1467,
-  "manifestFileCount": 1462,
-  "payloadManifestSha256": "0c502cd47f8e34161abc489a104dffd745c59b4ff6db6ccfc22ca64530fba1bf",
-  "fileManifestSha256": "7029d38381a8736a30f1cd93fd8e94d3c46846c03437bc2089d627b65474bcb4",
+  "sourceCommit": "387e8f216afe3427cc85fcdaeb916f2d5787650e",
+  "sourceTree": "6676f6dad97acdd7dff0f72cea570f6eeef5a3c2",
+  "trackedFileCount": 1469,
+  "manifestFileCount": 1464,
+  "payloadManifestSha256": "2aa96461ba45eeb4e9a65d4152aaa69dbf95b729248d4fffa3235e62c82c707a",
+  "fileManifestSha256": "da3d7b5e27f437eb7a09366561c9af9577a2098ac15e9e66fcdd2922905a6202",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2933,8 +2933,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "26bba8aafff57dc883db47171ca89a491e70a6e87c6de8072e77b742923b1da4",
-      "bytes": 70315
+      "sha256": "dbef29354d627da98df9c56537d3b47600ef7f8352b4724fa400e1af9597c19f",
+      "bytes": 70473
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -4252,6 +4252,11 @@
       "bytes": 852
     },
     {
+      "path": "evidence/s2-008-campaign/v15-a-stopped/owner-completeness-attestation.json",
+      "sha256": "39174498b8eb4be6a36faabffb6e04204e44deb3d6c3dbefca0bd556c23ff574",
+      "bytes": 541
+    },
+    {
       "path": "evidence/s2-008-campaign/v15-a-stopped/owner-external-disclosure-approval.json",
       "sha256": "af5a82d1d32b38f1dd0b9500380cf0b37c53954dd48e5fa24398f1bd8b66d683",
       "bytes": 447
@@ -4275,6 +4280,11 @@
       "path": "evidence/s2-008-campaign/v15-a-stopped/reconciliation-required.json",
       "sha256": "8afeec1928223e668715d08de348a3766cc53b45cf8879ec3bf1064d0b91449a",
       "bytes": 1026
+    },
+    {
+      "path": "evidence/s2-008-campaign/v15-a-stopped/request-outcome-reconciliation.json",
+      "sha256": "85b87e560f4fbd6b386bd348cf8b17029532216681bbf7f2a7b7dd66e8b82b07",
+      "bytes": 1544
     },
     {
       "path": "evidence/s2-008-campaign/v15-a-stopped/run-v15-a.json",
