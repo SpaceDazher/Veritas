@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268",
+  "replaced_by_preregistration_digest": "bd230c0856930cab13372473bdb9e59dbf3d667fdbd1493e2119dc2c378d36b0",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v16 binds the delegated free Poolside Laguna model, a Poolside-only OpenRouter route with fallbacks disabled, its catalog listing, explicit process credential, 60-second pacing and preserved v15 unknown-outcome closure while keeping frozen science unchanged.",
+  "supersession_id": "spr-fe28483f2e4642f17872720d",
+  "supersession_digest": "e61b9f4a2d1b611d312f5e6f23a6d2765218d982aadb931ca06023d342395c9c"
+}

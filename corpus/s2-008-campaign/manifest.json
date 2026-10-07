@@ -522,22 +522,22 @@
     "HOLDOUT:13243186b1573398fc327e245ebd2e5a90a2ced0": "bf92d6abf0d2b491f79d48ab2ed814d0d9cfb72e1b706dd42311d54de391f0f2"
   },
   "preregistration": {
-    "file": "preregistration.v15.in-force.json",
-    "preregistration_digest": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268",
+    "file": "preregistration.v16.in-force.json",
+    "preregistration_digest": "bd230c0856930cab13372473bdb9e59dbf3d667fdbd1493e2119dc2c378d36b0",
     "status": "IN_FORCE",
     "sealed_before_first_trial": true
   },
   "superseded_preregistration": {
-    "file": "preregistration-v14-superseded.json",
-    "preregistration_digest": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
+    "file": "preregistration-v15-superseded.json",
+    "preregistration_digest": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268",
     "status": "SUPERSEDED",
-    "superseded_by": "preregistration.v15.in-force.json"
+    "superseded_by": "preregistration.v16.in-force.json"
   },
   "supersession": {
-    "file": "preregistration-v15-supersession.json",
-    "supersession_id": "spr-b402f11bd6f39e0a9a9681f9",
-    "supersession_digest": "4387b8d444737a41dbc2738115e55fb0c3a8cf6177cbcd1b4f3629d1cc0c9218",
-    "reason": "v15 binds the free Gemma model selected under owner delegation, its zero-priced current provider descriptor, explicit process credential, 60-second pacing and preserved v14 request-outcome closure while keeping the frozen experiment unchanged."
+    "file": "preregistration-v16-supersession.json",
+    "supersession_id": "spr-fe28483f2e4642f17872720d",
+    "supersession_digest": "e61b9f4a2d1b611d312f5e6f23a6d2765218d982aadb931ca06023d342395c9c",
+    "reason": "v16 binds the delegated free Poolside Laguna model, a Poolside-only OpenRouter route with fallbacks disabled, its catalog listing, explicit process credential, 60-second pacing and preserved v15 unknown-outcome closure while keeping frozen science unchanged."
   },
   "frozen_table": {
     "file": "frozen-table.v3.json",
@@ -626,6 +626,12 @@
       "supersession_id": "spr-b402f11bd6f39e0a9a9681f9",
       "supersession_digest": "4387b8d444737a41dbc2738115e55fb0c3a8cf6177cbcd1b4f3629d1cc0c9218",
       "reason": "v15 binds the free Gemma model selected under owner delegation, its zero-priced current provider descriptor, explicit process credential, 60-second pacing and preserved v14 request-outcome closure while keeping the frozen experiment unchanged."
+    },
+    {
+      "file": "preregistration-v16-supersession.json",
+      "supersession_id": "spr-fe28483f2e4642f17872720d",
+      "supersession_digest": "e61b9f4a2d1b611d312f5e6f23a6d2765218d982aadb931ca06023d342395c9c",
+      "reason": "v16 binds the delegated free Poolside Laguna model, a Poolside-only OpenRouter route with fallbacks disabled, its catalog listing, explicit process credential, 60-second pacing and preserved v15 unknown-outcome closure while keeping frozen science unchanged."
     }
   ]
 }
