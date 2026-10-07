@@ -1,0 +1,70 @@
+{
+  "kind": "s2-008-v14-stopped-a-reconciliation/1",
+  "status": "REQUEST_OUTCOMES_RECONCILED",
+  "created_at": "2026-10-07T08:37:58.873496+00:00",
+  "prior_run_id": "s2-008c-v14-a-6081b00e762f4fed8029",
+  "prior_run_sha256": "f9fecbafd1eedf7dcfc3a953151d922033bfde970d14258b4db325d78975502b",
+  "preregistration_digest": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
+  "provider": "openrouter",
+  "requested_model": "inclusionai/ling-3.1-flash",
+  "resolved_model": "inclusionai/ling-3.1-flash-20261002",
+  "provider_key": {
+    "name": "testVeritas",
+    "id": 39451823,
+    "fingerprint": "8f7ea446a8707bea"
+  },
+  "known_receipts_sha256": "de91fd4f776055fb8e174fa07cbd6911af8ccff952b65108f48d719084dd7931",
+  "upstream_observation_sha256": "032187c8a473d1a2b050f4ba171fab2b25fd93749645490ffdf64bbb2327def3",
+  "completeness": {
+    "confirmed_by": "Daniil",
+    "principal_id": "prn-s2007r-owner",
+    "statement": "Это все больше нет",
+    "source": "Direct answer to request confirming Generations empty and only supplied 429 in Upstream Requests for 16:00 minute",
+    "interval_from": "2026-10-06T21:00:00Z",
+    "interval_to_exclusive": "2026-10-06T21:01:00Z",
+    "timezone": "America/Chicago",
+    "complete": true,
+    "unfiltered": true,
+    "includes_errors_and_cancellations": true,
+    "recorded_at": "2026-10-07T08:37:58.873496+00:00"
+  },
+  "completeness_verified_via_api": false,
+  "known_provider_rows_verified_via_api": true,
+  "local_model_attempts": 33,
+  "successful_generations": 32,
+  "failed_upstream_requests": 1,
+  "raw_unknown_attempts": 1,
+  "classified_unknown_attempts": 1,
+  "unclassified_attempts": 0,
+  "known_tokens": 33246,
+  "known_provider_usd": 0,
+  "failed_request_tokens_confirmed": null,
+  "failed_request_usd_confirmed": null,
+  "total_tokens_confirmed": null,
+  "total_usd_confirmed": null,
+  "no_cost_claim_for_failed_request": true,
+  "failure": {
+    "generation_id": "gen-1791320426-Czrswj5nXxDzTpuQHNXU",
+    "provider": "Novita",
+    "http_status": 429,
+    "attempts": 1,
+    "failed_attempts": 1,
+    "fallback_latency_ms": 0,
+    "total_latency_ms": 186,
+    "generation_api_http_status": 404
+  },
+  "prior_report_retained_unchanged": true,
+  "raw_unreconciled_spend_preserved": true,
+  "campaign_outcome_class": "INFRA",
+  "predictions_recorded": 32,
+  "predictions_expected": 378,
+  "b": {
+    "status": "NOT_RUN"
+  },
+  "scientific_evaluation": {
+    "status": "NOT_RUN",
+    "reason": "A incomplete, B absent"
+  },
+  "account_wide_completeness_claimed": false,
+  "limitations": "All 33 request outcomes classified. Only 32 successful generations have API-confirmed tokens and cost. Failed-request token consumption and cost are not independently confirmed. A remains BLOCKED and is not promoted to scientific success."
+}

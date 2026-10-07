@@ -1,0 +1,23 @@
+{
+  "kind": "s2-008-v14-a-owner-upstream-observation/1",
+  "source": "Daniil supplied request details on 2026-10-07",
+  "generation_id": "gen-1791320426-Czrswj5nXxDzTpuQHNXU",
+  "model": "inclusionai/ling-3.1-flash-20261002",
+  "provider": "Novita",
+  "status": 429,
+  "total_latency_ms": 186,
+  "attempts": 1,
+  "failed_attempts": 1,
+  "fallback_latency_ms": 0,
+  "variant": "standard",
+  "key_type": "OpenRouter",
+  "time_inferred_from_generation_id": "2026-10-06T21:00:26+00:00",
+  "local_time_inferred": "2026-10-06T16:00:26-05:00",
+  "matches_failure_window": true,
+  "generation_api_http_status": 404,
+  "generation_api_receipt": null,
+  "ledger_completeness_confirmed": false,
+  "failed_request_cost_confirmed": null,
+  "unknown_attempts_closed": 0,
+  "raw_run_preserved": true
+}

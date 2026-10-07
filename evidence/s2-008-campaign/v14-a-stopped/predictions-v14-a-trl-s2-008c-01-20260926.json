@@ -1,0 +1,599 @@
+{
+  "kind": "s2-008-campaign-predictions/1",
+  "run": "a",
+  "arm_id": "arm-model-zai-glm53flash",
+  "seed": 20260926,
+  "unparsed": 0,
+  "model_calls": 32,
+  "spent_tokens": 33246,
+  "usd_spent": 0,
+  "outcome_class": "INFRA",
+  "accounting": {
+    "schema": "s2-008-model-accounting/1",
+    "policy": "GENERATION_ID_REQUIRED",
+    "calls": 32,
+    "tokens": 33246,
+    "prompt_tokens": 15340,
+    "reported_cost_usd": 0,
+    "rows": [
+      {
+        "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+        "generation_id": "gen-1791318506-638RTV79RSran9zSPbXw",
+        "correlation_status": "CORRELATED",
+        "input": 483,
+        "output": 260,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 483,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 743,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+        "generation_id": "gen-1791318566-oLMJHs4hKG7RVbPAx0Ag",
+        "correlation_status": "CORRELATED",
+        "input": 34,
+        "output": 377,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 482,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 859,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+        "generation_id": "gen-1791318626-brQbGYP3a5iQh7tX7Wk8",
+        "correlation_status": "CORRELATED",
+        "input": 36,
+        "output": 155,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 484,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 639,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+        "generation_id": "gen-1791318686-3PSWW6XBxU0rdjfU2Cjn",
+        "correlation_status": "CORRELATED",
+        "input": 23,
+        "output": 200,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 471,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 671,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+        "generation_id": "gen-1791318746-8PyGmbleaS60b6NwwFNH",
+        "correlation_status": "CORRELATED",
+        "input": 22,
+        "output": 386,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 470,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 856,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+        "generation_id": "gen-1791318806-SGxewY5mn6XiCreUuE1E",
+        "correlation_status": "CORRELATED",
+        "input": 37,
+        "output": 1167,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 485,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1652,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+        "generation_id": "gen-1791318865-rOqWX4w9Apbv2xdyshZX",
+        "correlation_status": "CORRELATED",
+        "input": 23,
+        "output": 387,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 471,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 858,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+        "generation_id": "gen-1791318926-ccq3QaeK9ExBM5V9lkQW",
+        "correlation_status": "CORRELATED",
+        "input": 22,
+        "output": 532,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 470,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1002,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+        "generation_id": "gen-1791318986-zmb1XS2cE6e74t2xzoV9",
+        "correlation_status": "CORRELATED",
+        "input": 31,
+        "output": 4328,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 479,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 4807,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+        "generation_id": "gen-1791319045-pXXorNn8sOvVjiPDSqY3",
+        "correlation_status": "CORRELATED",
+        "input": 23,
+        "output": 45,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 471,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 516,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+        "generation_id": "gen-1791319106-jcebMIFRjurGMqdL7pc5",
+        "correlation_status": "CORRELATED",
+        "input": 22,
+        "output": 552,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 470,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1022,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+        "generation_id": "gen-1791319166-rbi2GaRmAdvJdkTJCdLO",
+        "correlation_status": "CORRELATED",
+        "input": 36,
+        "output": 122,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 484,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 606,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+        "generation_id": "gen-1791319226-I0fkTeENPk6ByZ58FaMH",
+        "correlation_status": "CORRELATED",
+        "input": 23,
+        "output": 75,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 471,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 546,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+        "generation_id": "gen-1791319286-b3ec4YIvgYunh0MY9K1A",
+        "correlation_status": "CORRELATED",
+        "input": 22,
+        "output": 896,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 470,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1366,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+        "generation_id": "gen-1791319345-UmHARzOSRHOJ2mI2KcVu",
+        "correlation_status": "CORRELATED",
+        "input": 484,
+        "output": 85,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 484,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 569,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+        "generation_id": "gen-1791319406-GRUqWT2NrWfeHfRYrdKt",
+        "correlation_status": "CORRELATED",
+        "input": 32,
+        "output": 696,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 480,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1176,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+        "generation_id": "gen-1791319466-fnaXvYdaQ4ghwavtbpi9",
+        "correlation_status": "CORRELATED",
+        "input": 30,
+        "output": 537,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 478,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1015,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+        "generation_id": "gen-1791319526-uIIm14j56WJwZIpCzykq",
+        "correlation_status": "CORRELATED",
+        "input": 32,
+        "output": 236,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 480,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 716,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+        "generation_id": "gen-1791319586-TZnAQEa5Ql67Dm2j8eue",
+        "correlation_status": "CORRELATED",
+        "input": 30,
+        "output": 181,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 478,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 659,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+        "generation_id": "gen-1791319645-VMo2qKeCV8ltZAVyRcXT",
+        "correlation_status": "CORRELATED",
+        "input": 59,
+        "output": 734,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 507,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1241,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+        "generation_id": "gen-1791319706-WO2uZdTP7FOG0JW6ydG5",
+        "correlation_status": "CORRELATED",
+        "input": 37,
+        "output": 213,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 485,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 698,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+        "generation_id": "gen-1791319767-zzaxhw8uRpeRot5Pd4SX",
+        "correlation_status": "CORRELATED",
+        "input": 38,
+        "output": 2536,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 486,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 3022,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+        "generation_id": "gen-1791319826-tMKp1Qcc9rEtNKwKbrl9",
+        "correlation_status": "CORRELATED",
+        "input": 37,
+        "output": 372,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 485,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 857,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+        "generation_id": "gen-1791319886-2dgFI0w2DbCluF1jOssV",
+        "correlation_status": "CORRELATED",
+        "input": 34,
+        "output": 426,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 482,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 908,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+        "generation_id": "gen-1791319946-oS2lOMeV1LWRkMP6Y2Je",
+        "correlation_status": "CORRELATED",
+        "input": 31,
+        "output": 700,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 479,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1179,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+        "generation_id": "gen-1791320006-B3VuJBX58vrjvPHRhwbH",
+        "correlation_status": "CORRELATED",
+        "input": 30,
+        "output": 123,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 478,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 601,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+        "generation_id": "gen-1791320066-lSc84vDBCiQOYRDcsNcC",
+        "correlation_status": "CORRELATED",
+        "input": 30,
+        "output": 320,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 478,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 798,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+        "generation_id": "gen-1791320126-DraD8xmueMAHrfwNd9hM",
+        "correlation_status": "CORRELATED",
+        "input": 35,
+        "output": 172,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 483,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 655,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+        "generation_id": "gen-1791320186-IFHQhtLYE94vRQPwGjLq",
+        "correlation_status": "CORRELATED",
+        "input": 31,
+        "output": 651,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 479,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 1130,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+        "generation_id": "gen-1791320246-qFNHFDzjzcXNo3draKr2",
+        "correlation_status": "CORRELATED",
+        "input": 30,
+        "output": 35,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 478,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 513,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+        "generation_id": "gen-1791320306-KeM8S9SSuyuHGG3YMdrM",
+        "correlation_status": "CORRELATED",
+        "input": 479,
+        "output": 219,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "prompt_tokens": 479,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 698,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      },
+      {
+        "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+        "generation_id": "gen-1791320366-ntQWe1c0VlkBUm0tDWq4",
+        "correlation_status": "CORRELATED",
+        "input": 32,
+        "output": 188,
+        "cacheRead": 448,
+        "cacheWrite": 0,
+        "prompt_tokens": 480,
+        "prompt_token_basis": "input+cacheRead+cacheWrite",
+        "totalTokens": 668,
+        "reported_cost_usd": 0,
+        "usage_components_consistent": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+      "predicted": "MINOR"
+    },
+    {
+      "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+      "predicted": "MAJOR"
+    },
+    {
+      "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+      "predicted": "MINOR"
+    }
+  ]
+}

@@ -1,0 +1,1027 @@
+{
+  "kind": "s2-008-campaign-v14-predictions/1",
+  "status": "BLOCKED",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+  "label": "a",
+  "dry_run": false,
+  "raw_run_id": "s2-008c-v14-a-6081b00e762f4fed8029",
+  "nonce": "n-a-4a575bad817cfa42",
+  "base": {
+    "commit_sha": "5e9c1ac45bd05f88e478442640fa214ffa87c15e",
+    "tree_sha": "edcfbc0c0d0b35c48777be6e246a300045aa845d",
+    "branch": "bb/spacedazher-veritas-8-s2-008-acceptance-campaign-thr_7vhmxxrpg9",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 394,
+    "track_tracked": true
+  },
+  "preregistration_digest": "2f44f017e1b133e91eaad92d49c60bf8d14b39cdea846394724918d2a14fb547",
+  "model_image_pin": {
+    "imageId": "sha256:8bec32c070335f96d3ea5285227f09ceea8c8c5aa31c9ccba9d6962707a962f6",
+    "digest": "sha256:65fef200f903b5ede2557961cf8417f5a1bdefbf551d3bde6ee8b2ee70a83f5f",
+    "content_commitment": "3418f62ef558b12ed6197461a20c22542f1837c2f55f1277aa9b7a27c3096234"
+  },
+  "control_image_pin": {
+    "kind": "s2-008-campaign-control-image-pin/1",
+    "first": {
+      "imageId": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+      "digest": "sha256:d9c2a7c3ac64ff9d3e3e13f91316c092b9946f31d14932824f94e7bba781ee02",
+      "architecture": "amd64",
+      "context_digest": "a5dfd55cdc0ff3377b693cafcb82fc9db26530f81eac7feaf3e19f0d3f568f09",
+      "build_exit": 0
+    },
+    "second": {
+      "imageId": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+      "digest": "sha256:d9c2a7c3ac64ff9d3e3e13f91316c092b9946f31d14932824f94e7bba781ee02",
+      "architecture": "amd64",
+      "context_digest": "a5dfd55cdc0ff3377b693cafcb82fc9db26530f81eac7feaf3e19f0d3f568f09",
+      "build_exit": 0
+    },
+    "identical": true,
+    "context_digest_stable": true,
+    "source_base": {
+      "commit_sha": "5e9c1ac45bd05f88e478442640fa214ffa87c15e",
+      "tree_sha": "edcfbc0c0d0b35c48777be6e246a300045aa845d"
+    }
+  },
+  "control_image_pin_artifact": {
+    "file": "evidence/s2-008-campaign/control-image-pin-v14-a.json",
+    "bytes": 1296,
+    "sha256": "72ab1bffba64799fa502961361e090d7e059aeee0e68d3768376cb0d635e0662"
+  },
+  "reservation": {
+    "id": "rsv-s2-008c-14",
+    "currency": "tokens",
+    "granted_units": 5000000
+  },
+  "spent_units": 33246,
+  "spent_units_is_lower_bound": true,
+  "unreconciled_spend": true,
+  "model_calls": 32,
+  "model_calls_is_lower_bound": true,
+  "unknown_model_attempts": 1,
+  "model_call_pacing": {
+    "min_start_interval_ms": 60000,
+    "container_starts": 1,
+    "wait_count": 0,
+    "waited_ms": 0
+  },
+  "launches": 1,
+  "unknown_launch_attempts": 0,
+  "charges": [
+    {
+      "trial": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seed": 20260926,
+      "units": 33246,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "arm-reported tokens retained as a lower bound after refusal",
+      "spent_units_after": 33246,
+      "lower_bound": true,
+      "unreconciled_spend": true
+    }
+  ],
+  "trials": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "INFRA",
+          "predictions": {
+            "digest": "e8824259c22875b0b54f740c24e1759715e8a66936c40f3fbb0792ce6dccd300",
+            "rows": 32,
+            "unparsed": 0,
+            "file": "evidence/s2-008-campaign/predictions-v14-a-trl-s2-008c-01-20260926.json"
+          },
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260926,
+            "image": "sha256:8bec32c070335f96d3ea5285227f09ceea8c8c5aa31c9ccba9d6962707a962f6",
+            "image_digest": "sha256:65fef200f903b5ede2557961cf8417f5a1bdefbf551d3bde6ee8b2ee70a83f5f",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--secret",
+              "sec-veritas-executor-credential",
+              "--env-file",
+              "/tmp/veritas-model-credential-iQ7mzg/.sec-veritas-executor-credential.332584.0.env",
+              "--mount",
+              "type=bind,src=/tmp/veritas-campaign-egress-UrsFwr/egress.sock,dst=/run/egress.sock",
+              "--name",
+              "s2-008-model-v14-20260926",
+              "sha256:8bec32c070335f96d3ea5285227f09ceea8c8c5aa31c9ccba9d6962707a962f6",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v14.in-force.json",
+              "20260926",
+              "--remaining-tokens",
+              "5000000",
+              "--min-start-interval-ms",
+              "60000"
+            ],
+            "axes": {
+              "network": {
+                "policy": "allowlist",
+                "flag": "--network=none",
+                "allowlist": [
+                  {
+                    "host": "openrouter.ai",
+                    "ports": [
+                      443
+                    ]
+                  }
+                ],
+                "egressSocket": "/tmp/veritas-campaign-egress-UrsFwr/egress.sock"
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [
+                  "/run/egress.sock"
+                ],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": [
+                  "sec-veritas-executor-credential"
+                ]
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 30540000
+              }
+            },
+            "exit_code": 10,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": null,
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260926 n=126 predictions=32 tokens=33246 usd=0.000000 dry_run=false pid=1 node=v22.23.3",
+            "payload_chunks": 2,
+            "payload_error": null,
+            "output_digest": "bfc91cfde0e339428d0d704b8133f28df1030cfffb47537e45475fdcb455335e",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "accounting_schema": "s2-008-model-accounting/1",
+              "accounting": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "generation_id": "gen-1791318506-638RTV79RSran9zSPbXw",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 483,
+                  "output": 260,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 483,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 743,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "generation_id": "gen-1791318566-oLMJHs4hKG7RVbPAx0Ag",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 34,
+                  "output": 377,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 482,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 859,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "generation_id": "gen-1791318626-brQbGYP3a5iQh7tX7Wk8",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 36,
+                  "output": 155,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 484,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 639,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "generation_id": "gen-1791318686-3PSWW6XBxU0rdjfU2Cjn",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 23,
+                  "output": 200,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 471,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 671,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "generation_id": "gen-1791318746-8PyGmbleaS60b6NwwFNH",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 22,
+                  "output": 386,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 470,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 856,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "generation_id": "gen-1791318806-SGxewY5mn6XiCreUuE1E",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 37,
+                  "output": 1167,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 485,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1652,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "generation_id": "gen-1791318865-rOqWX4w9Apbv2xdyshZX",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 23,
+                  "output": 387,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 471,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 858,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "generation_id": "gen-1791318926-ccq3QaeK9ExBM5V9lkQW",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 22,
+                  "output": 532,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 470,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1002,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "generation_id": "gen-1791318986-zmb1XS2cE6e74t2xzoV9",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 31,
+                  "output": 4328,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 479,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 4807,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "generation_id": "gen-1791319045-pXXorNn8sOvVjiPDSqY3",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 23,
+                  "output": 45,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 471,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 516,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "generation_id": "gen-1791319106-jcebMIFRjurGMqdL7pc5",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 22,
+                  "output": 552,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 470,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1022,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+                  "generation_id": "gen-1791319166-rbi2GaRmAdvJdkTJCdLO",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 36,
+                  "output": 122,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 484,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 606,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+                  "generation_id": "gen-1791319226-I0fkTeENPk6ByZ58FaMH",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 23,
+                  "output": 75,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 471,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 546,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+                  "generation_id": "gen-1791319286-b3ec4YIvgYunh0MY9K1A",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 22,
+                  "output": 896,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 470,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1366,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+                  "generation_id": "gen-1791319345-UmHARzOSRHOJ2mI2KcVu",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 484,
+                  "output": 85,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 484,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 569,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+                  "generation_id": "gen-1791319406-GRUqWT2NrWfeHfRYrdKt",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 32,
+                  "output": 696,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 480,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1176,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+                  "generation_id": "gen-1791319466-fnaXvYdaQ4ghwavtbpi9",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 30,
+                  "output": 537,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 478,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1015,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+                  "generation_id": "gen-1791319526-uIIm14j56WJwZIpCzykq",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 32,
+                  "output": 236,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 480,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 716,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+                  "generation_id": "gen-1791319586-TZnAQEa5Ql67Dm2j8eue",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 30,
+                  "output": 181,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 478,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 659,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+                  "generation_id": "gen-1791319645-VMo2qKeCV8ltZAVyRcXT",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 59,
+                  "output": 734,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 507,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1241,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+                  "generation_id": "gen-1791319706-WO2uZdTP7FOG0JW6ydG5",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 37,
+                  "output": 213,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 485,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 698,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+                  "generation_id": "gen-1791319767-zzaxhw8uRpeRot5Pd4SX",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 38,
+                  "output": 2536,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 486,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 3022,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+                  "generation_id": "gen-1791319826-tMKp1Qcc9rEtNKwKbrl9",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 37,
+                  "output": 372,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 485,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 857,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+                  "generation_id": "gen-1791319886-2dgFI0w2DbCluF1jOssV",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 34,
+                  "output": 426,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 482,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 908,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+                  "generation_id": "gen-1791319946-oS2lOMeV1LWRkMP6Y2Je",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 31,
+                  "output": 700,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 479,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1179,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+                  "generation_id": "gen-1791320006-B3VuJBX58vrjvPHRhwbH",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 30,
+                  "output": 123,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 478,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 601,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+                  "generation_id": "gen-1791320066-lSc84vDBCiQOYRDcsNcC",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 30,
+                  "output": 320,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 478,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 798,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+                  "generation_id": "gen-1791320126-DraD8xmueMAHrfwNd9hM",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 35,
+                  "output": 172,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 483,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 655,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+                  "generation_id": "gen-1791320186-IFHQhtLYE94vRQPwGjLq",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 31,
+                  "output": 651,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 479,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1130,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+                  "generation_id": "gen-1791320246-qFNHFDzjzcXNo3draKr2",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 30,
+                  "output": 35,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 478,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 513,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+                  "generation_id": "gen-1791320306-KeM8S9SSuyuHGG3YMdrM",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 479,
+                  "output": 219,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 479,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 698,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+                  "generation_id": "gen-1791320366-ntQWe1c0VlkBUm0tDWq4",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 32,
+                  "output": 188,
+                  "cacheRead": 448,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 480,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 668,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                }
+              ],
+              "failure_diagnostics": [
+                {
+                  "case_id": "12990652103986ef5b2eeafa70064c8a9e8473ea",
+                  "schema": "s2-008-failure-diagnostic/1",
+                  "started_at": "2026-10-06T21:00:25.281Z",
+                  "finished_at": "2026-10-06T21:00:26.495Z",
+                  "duration_ms": 1214,
+                  "cli_exit_code": null,
+                  "cli_signal": null,
+                  "stop_reason": "error",
+                  "error_category": "PROVIDER_RESPONSE_ERROR",
+                  "http_status": null,
+                  "provider_reported_status_prefix": {
+                    "status": 429,
+                    "source": "SDK_ERROR_MESSAGE_PREFIX"
+                  },
+                  "usage_status": "ZERO",
+                  "generation_ids": [],
+                  "generation_ids_truncated": false,
+                  "stdout": {
+                    "sha256": "bf176e467209f76e9f83894d69f8beaccab50da1f09da3db0ec61f6948bb7e26",
+                    "bytes": 10482
+                  },
+                  "stderr": {
+                    "sha256": null,
+                    "bytes": null
+                  },
+                  "error_message": {
+                    "sha256": "ce4c5b8a23050b1b8f141c03e67e2a5a86e267b5ec635616ca1f286ba483cdab",
+                    "bytes": 554
+                  }
+                }
+              ],
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260926,
+              "n_cases": 126,
+              "predictions": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "85f721b06317e335e560e5cf01f9235d970dfa73",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "41656d63fbb7c7b3bb192637b6b18bfd4e7b8fd3",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "af2dad0386bc83c80080a429a21b6dacca6efd2c",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "142964e65ff467ee5c3920ddf4b1105a113d3839",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "0c044ca11bac20d1d0a4f55bea50239aed4a5994",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "dab762bf775f45c6bd57b89c5c62bd80aab0ba07",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "cfc5095ee74724f58aa5a0a8e45e573838828320",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "6e52c5b1daa93eab452f0d2229fd025072479971",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "bba3b7f0a8af06f5d51259b823e0830c2b22ee5a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0bf7e616ee20ade8c53974c3ee190d0d006ecdb2",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "6eee8d552e6a1c13ff6f669eb54b8c5cda63c762",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0acaaa1352f48e287d6ee9c52801aba6aadc6974",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "cb0468924ba378d434e1f6644ec745df3077aaea",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "3a6ee5be72b2ce7ec0c1ca028856b71200390bca",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "0afd54ff40f3e29771984db6ebc2bc620904658e",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "467da72d317be29f295abb6e0c260a78aaf17ceb",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "2772808672601f413b95bb51cc9d2c4ab40ebf38",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "94d145a4593467d9d31b586795023c63a87b2cd5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ceb7070bd9b9457dd31a06df4212343a9b56846a",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "564b67e2c113cae913b293e1f92e80db6684cd10",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "208c0b77a86833701ccfad21addee2262006a0a8",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                }
+              ],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 33246,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": true
+              },
+              "stop": {
+                "reason": "MODEL_USAGE_NOT_REPORTED",
+                "unreconciled_spend": true,
+                "spent_tokens_confirmed": 33246,
+                "stopped_before_case": "12990652103986ef5b2eeafa70064c8a9e8473ea"
+              },
+              "dry_run": false,
+              "outcome_class": "INFRA",
+              "executor": {
+                "provider": "openrouter",
+                "model": "inclusionai/ling-3.1-flash",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "pi_model_registration_digest": "e3cb374138ac13582f2723fe5886409634de75ee2cd8002c5ead7f5ae41ff8a8",
+                "pi_model_catalog_binding": {
+                  "file": "evidence/s2-008-campaign/provider-model-catalog-ling-v13.json",
+                  "sha256": "5f8d6f77af15a6af97bcd06229a146e10a524f76f2d06878b941e586e3c765a6",
+                  "canonical_slug": "inclusionai/ling-3.1-flash-20261002",
+                  "prompt_completion_pricing_source": "PROVIDER_CATALOG_LISTING_ONLY",
+                  "cache_pricing": "NOT_PROVIDED",
+                  "client_cost_authority": "ESTIMATE_ONLY_PROVIDER_RECEIPT_AUTHORITATIVE"
+                },
+                "credential_present": true,
+                "credential_in_argv": false,
+                "egress_route": {
+                  "via": "in-container loopback bridge",
+                  "host": "127.0.0.1",
+                  "port": 37285,
+                  "port_source": "BRIDGE_READY"
+                },
+                "model_calls": 32,
+                "model_attempts": 33,
+                "model_call_pacing": {
+                  "min_start_interval_ms": 60000,
+                  "call_starts": 33,
+                  "wait_count": 32,
+                  "waited_ms": 1606137.616089
+                },
+                "unknown_model_attempts": 1,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "holdout_case_count": 126,
+                  "per_model_call_timeout_ms": 180000,
+                  "min_start_interval_ms": 60000,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 30540000,
+                  "formula": "holdout_case_count * (per_model_call_timeout_ms + min_start_interval_ms) + bridge_report_margin_ms",
+                  "scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                },
+                "accounting_policy": "GENERATION_ID_REQUIRED",
+                "failure_diagnostics_policy": "BOUNDED_ALLOWLISTED_HASHES_ONLY"
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260926",
+                  "--min-start-interval-ms",
+                  "60000"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": {
+              "digest": "e8824259c22875b0b54f740c24e1759715e8a66936c40f3fbb0792ce6dccd300",
+              "rows": 32,
+              "unparsed": 0
+            },
+            "real_start": {
+              "proven": false,
+              "container_pid": 1,
+              "host_pid": 332584,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

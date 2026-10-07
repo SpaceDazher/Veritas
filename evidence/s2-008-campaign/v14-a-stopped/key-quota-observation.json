@@ -1,0 +1,16 @@
+{
+  "label": "sk-or-v1-b9a...9b3",
+  "limit": 2,
+  "limit_remaining": 2,
+  "limit_reset": "monthly",
+  "usage": 0,
+  "usage_daily": 0,
+  "usage_monthly": 0,
+  "is_free_tier": false,
+  "rate_limit": {
+    "requests": -1,
+    "interval": "10s",
+    "note": "This field is deprecated and safe to ignore."
+  },
+  "observed_at": "2026-10-07T08:22:43.670056+00:00"
+}

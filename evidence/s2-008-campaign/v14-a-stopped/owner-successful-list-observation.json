@@ -1,0 +1,237 @@
+{
+  "kind": "s2-008-v14-a-owner-generation-list-observation/1",
+  "source": "Daniil message on 2026-10-07",
+  "key_name": "testVeritas",
+  "rows": [
+    {
+      "local_time": "2026-10-06T15:59:00-05:00",
+      "input": 480,
+      "output": 188,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320366-ntQWe1c0VlkBUm0tDWq4"
+    },
+    {
+      "local_time": "2026-10-06T15:58:00-05:00",
+      "input": 479,
+      "output": 219,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320306-KeM8S9SSuyuHGG3YMdrM"
+    },
+    {
+      "local_time": "2026-10-06T15:57:00-05:00",
+      "input": 478,
+      "output": 35,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320246-qFNHFDzjzcXNo3draKr2"
+    },
+    {
+      "local_time": "2026-10-06T15:56:00-05:00",
+      "input": 479,
+      "output": 651,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320186-IFHQhtLYE94vRQPwGjLq"
+    },
+    {
+      "local_time": "2026-10-06T15:55:00-05:00",
+      "input": 483,
+      "output": 172,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320126-DraD8xmueMAHrfwNd9hM"
+    },
+    {
+      "local_time": "2026-10-06T15:54:00-05:00",
+      "input": 478,
+      "output": 320,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320066-lSc84vDBCiQOYRDcsNcC"
+    },
+    {
+      "local_time": "2026-10-06T15:53:00-05:00",
+      "input": 478,
+      "output": 123,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791320006-B3VuJBX58vrjvPHRhwbH"
+    },
+    {
+      "local_time": "2026-10-06T15:52:00-05:00",
+      "input": 479,
+      "output": 700,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319946-oS2lOMeV1LWRkMP6Y2Je"
+    },
+    {
+      "local_time": "2026-10-06T15:51:00-05:00",
+      "input": 482,
+      "output": 426,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319886-2dgFI0w2DbCluF1jOssV"
+    },
+    {
+      "local_time": "2026-10-06T15:50:00-05:00",
+      "input": 485,
+      "output": 372,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319826-tMKp1Qcc9rEtNKwKbrl9"
+    },
+    {
+      "local_time": "2026-10-06T15:49:00-05:00",
+      "input": 486,
+      "output": 2536,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319767-zzaxhw8uRpeRot5Pd4SX"
+    },
+    {
+      "local_time": "2026-10-06T15:48:00-05:00",
+      "input": 485,
+      "output": 213,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319706-WO2uZdTP7FOG0JW6ydG5"
+    },
+    {
+      "local_time": "2026-10-06T15:47:00-05:00",
+      "input": 507,
+      "output": 734,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319645-VMo2qKeCV8ltZAVyRcXT"
+    },
+    {
+      "local_time": "2026-10-06T15:46:00-05:00",
+      "input": 478,
+      "output": 181,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319586-TZnAQEa5Ql67Dm2j8eue"
+    },
+    {
+      "local_time": "2026-10-06T15:45:00-05:00",
+      "input": 480,
+      "output": 236,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319526-uIIm14j56WJwZIpCzykq"
+    },
+    {
+      "local_time": "2026-10-06T15:44:00-05:00",
+      "input": 478,
+      "output": 537,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319466-fnaXvYdaQ4ghwavtbpi9"
+    },
+    {
+      "local_time": "2026-10-06T15:43:00-05:00",
+      "input": 480,
+      "output": 696,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319406-GRUqWT2NrWfeHfRYrdKt"
+    },
+    {
+      "local_time": "2026-10-06T15:42:00-05:00",
+      "input": 484,
+      "output": 85,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319345-UmHARzOSRHOJ2mI2KcVu"
+    },
+    {
+      "local_time": "2026-10-06T15:41:00-05:00",
+      "input": 470,
+      "output": 896,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319286-b3ec4YIvgYunh0MY9K1A"
+    },
+    {
+      "local_time": "2026-10-06T15:40:00-05:00",
+      "input": 471,
+      "output": 75,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319226-I0fkTeENPk6ByZ58FaMH"
+    },
+    {
+      "local_time": "2026-10-06T15:39:00-05:00",
+      "input": 484,
+      "output": 122,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319166-rbi2GaRmAdvJdkTJCdLO"
+    },
+    {
+      "local_time": "2026-10-06T15:38:00-05:00",
+      "input": 470,
+      "output": 552,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319106-jcebMIFRjurGMqdL7pc5"
+    },
+    {
+      "local_time": "2026-10-06T15:37:00-05:00",
+      "input": 471,
+      "output": 45,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791319045-pXXorNn8sOvVjiPDSqY3"
+    },
+    {
+      "local_time": "2026-10-06T15:36:00-05:00",
+      "input": 479,
+      "output": 4328,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318986-zmb1XS2cE6e74t2xzoV9"
+    },
+    {
+      "local_time": "2026-10-06T15:35:00-05:00",
+      "input": 470,
+      "output": 532,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318926-ccq3QaeK9ExBM5V9lkQW"
+    },
+    {
+      "local_time": "2026-10-06T15:34:00-05:00",
+      "input": 471,
+      "output": 387,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318865-rOqWX4w9Apbv2xdyshZX"
+    },
+    {
+      "local_time": "2026-10-06T15:33:00-05:00",
+      "input": 485,
+      "output": 1167,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318806-SGxewY5mn6XiCreUuE1E"
+    },
+    {
+      "local_time": "2026-10-06T15:32:00-05:00",
+      "input": 470,
+      "output": 386,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318746-8PyGmbleaS60b6NwwFNH"
+    },
+    {
+      "local_time": "2026-10-06T15:31:00-05:00",
+      "input": 471,
+      "output": 200,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318686-3PSWW6XBxU0rdjfU2Cjn"
+    },
+    {
+      "local_time": "2026-10-06T15:30:00-05:00",
+      "input": 484,
+      "output": 155,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318626-brQbGYP3a5iQh7tX7Wk8"
+    },
+    {
+      "local_time": "2026-10-06T15:29:00-05:00",
+      "input": 482,
+      "output": 377,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318566-oLMJHs4hKG7RVbPAx0Ag"
+    },
+    {
+      "local_time": "2026-10-06T15:28:00-05:00",
+      "input": 483,
+      "output": 260,
+      "matches_known_receipt": true,
+      "generation_id": "gen-1791318506-638RTV79RSran9zSPbXw"
+    }
+  ],
+  "known_tokens": 33246,
+  "completeness_confirmed": false,
+  "failed_minute_1600_included": false,
+  "unknown_attempts_closed": 0,
+  "unreconciled_spend": true,
+  "note": "09:13 diagnostic rows in the same message are outside campaign A and excluded."
+}
