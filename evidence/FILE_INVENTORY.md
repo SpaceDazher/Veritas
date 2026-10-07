@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1432.
+Generated from `git ls-files`; count: 1440.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -833,6 +833,14 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/v13-a-third-stopped/run-v13-a.json`
 - `evidence/s2-008-campaign/v13-a-third-stopped/upstream-429-observation.json`
 - `evidence/s2-008-campaign/v13-immutable-baseline.json`
+- `evidence/s2-008-campaign/v14-a-stopped/files.json`
+- `evidence/s2-008-campaign/v14-a-stopped/key-quota-observation.json`
+- `evidence/s2-008-campaign/v14-a-stopped/known-generation-receipts.json`
+- `evidence/s2-008-campaign/v14-a-stopped/owner-successful-list-observation.json`
+- `evidence/s2-008-campaign/v14-a-stopped/predictions-v14-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/v14-a-stopped/reconciliation.json`
+- `evidence/s2-008-campaign/v14-a-stopped/run-v14-a.json`
+- `evidence/s2-008-campaign/v14-a-stopped/upstream-429-observation.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/verification-v8.json`
 - `evidence/s2-008-campaign/zero-network-auth-v6.json`
