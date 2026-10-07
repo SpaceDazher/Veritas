@@ -1,0 +1,26 @@
+{
+  "status": "RECONCILIATION_REQUIRED",
+  "raw_run_id": "s2-008c-v16-a-6610a7c4fae8418dace6",
+  "preregistration_digest": "bd230c0856930cab13372473bdb9e59dbf3d667fdbd1493e2119dc2c378d36b0",
+  "local_model_attempts": 1,
+  "unknown_model_attempts": 1,
+  "SDK_reported_status_prefix": 429,
+  "HTTP_status_confirmed": null,
+  "generation_id": null,
+  "failed_request_tokens_confirmed": null,
+  "failed_request_usd_confirmed": null,
+  "total_tokens_confirmed": null,
+  "total_usd_confirmed": null,
+  "raw_unreconciled_spend_preserved": true,
+  "no_zero_cost_claim": true,
+  "retry_performed": false,
+  "owner_completeness_pending": true,
+  "UTC_window": [
+    "2026-10-07T15:05:36.314Z",
+    "2026-10-07T15:05:39.513Z"
+  ],
+  "local_log_minute": "2026-10-07 10:05 America/Chicago",
+  "B": "NOT_RUN",
+  "independent_evaluation": "NOT_RUN",
+  "A_MVP_05": "NOT_RUN_HUMAN_REVIEW_REQUIRED"
+}

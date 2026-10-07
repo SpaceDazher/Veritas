@@ -1,0 +1,15 @@
+{
+  "actor_label": "Daniil",
+  "principal_id": "prn-s2007r-owner",
+  "source": "persistent_direct_user_authorization",
+  "model_request": "думаю эта модель не работает попробуй poolside/laguna-s-2.1:free",
+  "continue_request": "продолжай",
+  "prior_AB_disclosure_authorization_file": "/home/daniil/.local/state/veritas/s2-008-v15-execution/owner-external-disclosure-approval.json",
+  "provider": "openrouter",
+  "upstream_provider": "Poolside",
+  "requested_model": "poolside/laguna-s-2.1:free",
+  "tokens_ceiling_per_run": 5000000,
+  "ground_truth_labels_sent": false,
+  "automatic_retry": false,
+  "new_run_label": "a"
+}

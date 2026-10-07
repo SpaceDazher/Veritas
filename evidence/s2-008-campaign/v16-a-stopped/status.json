@@ -1,0 +1,32 @@
+{
+  "status": "FINISHED",
+  "revision": "443b9a0e1a07a3d9052de8c5d1ab621777c6cd8a",
+  "model": "poolside/laguna-s-2.1:free",
+  "credential_fingerprint": "8f7ea446a8707bea",
+  "label": "a",
+  "started_at": "2026-10-07T15:05:33.123234+00:00",
+  "worker_pid": 266682,
+  "command": [
+    "node",
+    "scripts/s2-008-campaign-run.mjs",
+    "--v16",
+    "--label",
+    "a",
+    "--out",
+    "/home/daniil/.local/state/veritas/s2-008-v16-execution/paid-a-443b9a0/run-v16-a.json"
+  ],
+  "report": "/home/daniil/.local/state/veritas/s2-008-v16-execution/paid-a-443b9a0/run-v16-a.json",
+  "runner_pid": 266917,
+  "exit_status": 4,
+  "finished_at": "2026-10-07T15:05:39.699336+00:00",
+  "result": {
+    "status": "BLOCKED",
+    "code": "CHARGE_NOT_MEASURABLE",
+    "spent_units": 0,
+    "model_calls": 0,
+    "model_attempts": null,
+    "unknown_model_attempts": 1,
+    "unreconciled_spend": true,
+    "raw_run_id": "s2-008c-v16-a-6610a7c4fae8418dace6"
+  }
+}

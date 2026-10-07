@@ -1,0 +1,46 @@
+{
+  "files": [
+    {
+      "file": "run-v16-a.json",
+      "source": "/home/daniil/.local/state/veritas/s2-008-v16-execution/paid-a-443b9a0/run-v16-a.json",
+      "bytes": 12871,
+      "sha256": "c58eb4f72d3f42ace21aac31592cee6c668b5c8f5d675fb9564a01b7c0fe8280"
+    },
+    {
+      "file": "status.json",
+      "source": "/home/daniil/.local/state/veritas/s2-008-v16-execution/paid-a-443b9a0/status.json",
+      "bytes": 948,
+      "sha256": "ca255935baf454aea6ebf325de2336d23e3dc6526f7aab45390c625e01834163"
+    },
+    {
+      "file": "predictions-v16-a-trl-s2-008c-01-20260926.json",
+      "source": "/home/daniil/.local/state/veritas/s2-008-v16-execution/paid-a-443b9a0/repo/evidence/s2-008-campaign/predictions-v16-a-trl-s2-008c-01-20260926.json",
+      "bytes": 444,
+      "sha256": "1db420961471ff82ebc41d68fe16c9460ce53a7f244dd242320ebc70af5e0740"
+    },
+    {
+      "file": "control-image-pin-v16-a.json",
+      "source": "/home/daniil/.local/state/veritas/s2-008-v16-execution/paid-a-443b9a0/repo/evidence/s2-008-campaign/control-image-pin-v12-a.json",
+      "bytes": 1296,
+      "sha256": "b276faeaf4abdb44dbdd70b3c53e6e850fa6c1461ce4dbad9cdb8cefebcc75bc"
+    },
+    {
+      "file": "owner-execution-authorization.json",
+      "source": "/home/daniil/.local/state/veritas/s2-008-v16-execution/owner-v16-execution-authorization.json",
+      "bytes": 665,
+      "sha256": "c4c751651da981cce1f2d12ad63a77adee4ef1332b574419f8404b060aa92bd2"
+    },
+    {
+      "file": "credential-check.json",
+      "source": "/home/daniil/.local/state/veritas/s2-008-v16-execution/parent-podman-credential-check.json",
+      "bytes": 132,
+      "sha256": "6417048d4a5b0fc4e577986bd50a894f1a90b1f4842a45757752237e27afae8e"
+    },
+    {
+      "file": "reconciliation-required.json",
+      "bytes": 883,
+      "sha256": "07fa38734f9cca02e4fe6289674af259cda2169c2cb4ac7a91565132af2c0ffe"
+    }
+  ],
+  "raw_artifacts_unchanged": true
+}
