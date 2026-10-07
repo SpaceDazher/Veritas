@@ -457,9 +457,10 @@ test('v14 seal preflight rejects each stale target before writing', () => {
   }
 });
 
-test('v14 evaluator and paid-review routing accept only v14 capsule version and source list', () => {
+test('evaluator and paid-review routing accept v14 and v15 capsule versions and source lists', () => {
   assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: 'preregistration.v14.in-force.json' } }), 'v14');
-  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: 'preregistration.v15.in-force.json' } }), null);
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: 'preregistration.v15.in-force.json' } }), 'v15');
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: 'preregistration.v16.in-force.json' } }), null);
   const entries = evalRoute.V14_REVIEW_CAPSULE_SOURCE_PATHS.map((entryPath) => ({ path: entryPath, contents: Buffer.from(entryPath) }));
   const inputs = evalRoute.buildV14ReviewCapsuleSourceInputs(entries);
   assert.equal(inputs.length, evalRoute.V14_REVIEW_CAPSULE_SOURCE_PATHS.length);

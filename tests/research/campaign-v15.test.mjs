@@ -11,6 +11,8 @@ import * as approveRoute from "../../scripts/s2-008-campaign-approve.mjs";
 import * as prepareRoute from "../../scripts/s2-008-campaign-prepare-cli.mjs";
 import * as runRoute from "../../scripts/s2-008-campaign-run.mjs";
 import * as evalRoute from "../../scripts/s2-008-campaign-evaluate.mjs";
+import * as probeRoute from "../../scripts/s2-008-campaign-probes.mjs";
+import * as armRoute from "../../scripts/s2-008-campaign-arm-model.mjs";
 import * as credential from "../../scripts/s2-008-campaign-credential-env.mjs";
 import * as adapter from "../../scripts/s2-008-campaign-adapter.mjs";
 import * as paidReview from "../../scripts/s2-008-paid-review.mjs";
@@ -18,6 +20,7 @@ import * as oldV13 from "../../scripts/s2-008-campaign-v13-approval.mjs";
 import * as oldV14 from "../../scripts/s2-008-campaign-v14-approval.mjs";
 import { FROZEN_MEMBERS, preregistrationDigest, scopeDrift } from "../../scripts/s2-008-campaign-approve.mjs";
 
+const modelPolicy = await import("../../scripts/s2-008-campaign-v15-policy.mjs").catch(() => ({}));
 const approval = await import("../../scripts/s2-008-campaign-v15-approval.mjs").catch(() => ({}));
 const seal = await import("../../scripts/s2-008-campaign-seal-v15.mjs").catch(() => ({}));
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -33,8 +36,8 @@ function makePin(baseBytes) {
   const schema = "s2-008-model-image-pin/15";
   const { sourceNames } = image.modelImagePolicyInputs(schema);
   const sources = Object.fromEntries([...sourceNames, "prereg"].sort().map((name) => [name,
-    name === "provider_model_catalog" ? credential.V15_MODEL_POLICY.catalog_sha256
-      : name === "provider_model_endpoint_catalog" ? credential.V15_MODEL_POLICY.endpoint_catalog_sha256
+    name === "provider_model_catalog" ? modelPolicy.V15_MODEL_POLICY.catalog_sha256
+      : name === "provider_model_endpoint_catalog" ? modelPolicy.V15_MODEL_POLICY.endpoint_catalog_sha256
         : name === "model_call_pacing_policy" ? sha(fs.readFileSync(path.join(root, "scripts/s2-008-campaign-v14-pacing.mjs")))
           : name === "prereg" ? sha(baseBytes) : sha(Buffer.from("v15-fixture:" + name))]));
   const covers = Object.keys(sources).filter((name) => name !== "prereg").sort();
@@ -112,16 +115,20 @@ test("v15 pins exact raw model catalog bytes, zero prices, and only the free Goo
   assert.deepEqual(endpoints.data.endpoints[0].pricing, { prompt: "0", completion: "0", discount: 0 });
   assert.equal(endpoints.data.endpoints[0].context_length, 262144);
   assert.equal(endpoints.data.endpoints[0].max_completion_tokens, 32768);
-  assert.equal(credential.V15_MODEL_POLICY.model, "google/gemma-4-31b-it:free");
-  assert.equal(credential.V15_MODEL_POLICY.catalog_slug, "google/gemma-4-31b-it-20260402:free");
-  assert.equal(credential.V15_MODEL_POLICY.catalog_sha256, sha(descriptorBytes));
-  assert.equal(credential.V15_MODEL_POLICY.endpoint_catalog_sha256, sha(endpointBytes));
-  assert.equal(credential.assertV15ModelCatalogFiles(descriptorPath, endpointsPath), true);
+  assert.equal(modelPolicy.V15_MODEL_POLICY.model, "google/gemma-4-31b-it:free");
+  assert.equal(modelPolicy.V15_MODEL_POLICY.catalog_slug, "google/gemma-4-31b-it-20260402:free");
+  assert.equal(modelPolicy.V15_MODEL_POLICY.catalog_sha256, sha(descriptorBytes));
+  assert.equal(modelPolicy.V15_MODEL_POLICY.endpoint_catalog_sha256, sha(endpointBytes));
+  assert.equal(modelPolicy.assertV15ModelCatalogFiles(descriptorPath, endpointsPath), true);
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v15-catalog-"));
   try {
     const changed = path.join(temp, "descriptor.json");
     fs.writeFileSync(changed, Buffer.concat([descriptorBytes, Buffer.from(" ")]));
-    assert.throws(() => credential.assertV15ModelCatalogFiles(changed, endpointsPath), /V15_MODEL_CATALOG_ARTIFACT_INVALID/);
+    assert.throws(() => modelPolicy.assertV15ModelCatalogFiles(changed, endpointsPath), /V15_MODEL_CATALOG_ARTIFACT_INVALID/);
+    fs.writeFileSync(changed, JSON.stringify({ ...descriptor, pricing: { prompt: "0", completion: "0.000001" } }));
+    assert.throws(() => modelPolicy.assertV15ModelCatalogFiles(changed, endpointsPath), /V15_MODEL_CATALOG_ARTIFACT_INVALID/);
+    fs.writeFileSync(changed, JSON.stringify({ ...descriptor, id: "google/gemma-4-31b-it" }));
+    assert.throws(() => modelPolicy.assertV15ModelCatalogFiles(changed, endpointsPath), /V15_MODEL_CATALOG_ARTIFACT_INVALID/);
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
@@ -130,6 +137,22 @@ test("v15 approval, prepare, run, and evaluator dispatch supports 15 and rejects
   assert.equal(prepareRoute.parsePrepareMode(["--seal-v15"]), "seal-v15");
   assert.equal(runRoute.campaignCliMode({ v15: true }).requestedVersion, 15);
   assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v15.in-force.json" } }), "v15");
+  assert.equal(probeRoute.resolveProbePreregistrationPath("corpus/s2-008-campaign/preregistration.v15.in-force.json", root),
+    path.join(root, "corpus/s2-008-campaign/preregistration.v15.in-force.json"));
+  assert.equal(path.basename(probeRoute.defaultProbeOutputPath({ rule: "s2-008-prereg-v15" }, root)), "probes-v15.json");
+  const capsuleSources = evalRoute.V15_REVIEW_CAPSULE_SOURCE_PATHS;
+  assert.ok(capsuleSources.includes("scripts/s2-008-campaign-v15-policy.mjs"));
+  assert.ok(capsuleSources.includes("scripts/s2-008-campaign-probes.mjs"));
+  assert.ok(capsuleSources.includes(modelPolicy.V15_MODEL_POLICY.catalog_file));
+  assert.equal(evalRoute.buildV15ReviewCapsuleSourceInputs(capsuleSources.map((sourcePath) => ({
+    path: sourcePath, contents: Buffer.from("pinned-test-source"),
+  }))).length, capsuleSources.length);
+  const accessRoot = fs.mkdtempSync(path.join(os.tmpdir(), "v15-review-once-"));
+  try {
+    const target = path.join(accessRoot, "v15-evaluation-access");
+    assert.equal(evalRoute.reserveV15EvaluationAccessRoot(target), target);
+    assert.throws(() => evalRoute.reserveV15EvaluationAccessRoot(target), /V15_HOLDOUT_ACCESS_ALREADY_RECORDED/);
+  } finally { fs.rmSync(accessRoot, { recursive: true, force: true }); }
   assert.throws(() => approveRoute.parseArgs(["--version", "v16"]), /APPROVE_VERSION_INVALID/);
   assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v16"]), /PREPARE_VERSION_INVALID/);
   assert.throws(() => runRoute.campaignCliMode({ v16: true }), /CAMPAIGN_VERSION_INVALID/);
@@ -140,7 +163,7 @@ test("v15 base and prior closure bind raw v14 bytes and keep failed spend unknow
   const input = approval.readV15BaseInputs({ allowHistorical: true });
   assert.equal(input.baseBytes.length, 28400);
   assert.equal(sha(input.baseBytes), "77fabbe9ef92c8dbc281a78f7242fa6ce8f42031b8a4642783a2e3869c3d40bc");
-  assert.equal(input.base.supersession?.superseded_digest, undefined);
+  assert.equal(input.base.supersession?.supersession_digest, undefined);
   assert.equal(input.supersessionBytes.length, 689);
   assert.equal(sha(input.supersessionBytes), "4330a5ba0a429e9f8ea151773758ef29c3af75bd1c92c293ca3749371e65c13e");
   assert.equal(input.supersession.replaced_by_preregistration_digest, input.base.preregistration_digest);
@@ -149,6 +172,9 @@ test("v15 base and prior closure bind raw v14 bytes and keep failed spend unknow
     baseBytes: Buffer.concat([input.baseBytes, Buffer.from("\n")]) }), /V15_BASE_BINDING_INVALID/);
   assert.throws(() => approval.assertV15BaseBinding({ ...input,
     supersession: { ...input.supersession, supersession_digest: "0".repeat(64) } }), /V15_BASE_SUPERSESSION_INVALID/);
+  assert.throws(() => approval.assertV15BaseBinding({ ...input,
+    base: { ...input.base, approval: { ...input.base.approval, issued_at: "2026-10-07T09:00:00.000Z" } },
+  }), /V15_BASE_BINDING_INVALID/);
   const restart = approval.readV15PriorExecutionInputs();
   const closure = approval.assertV15PriorExecutionReconciliation(input.base, restart);
   assert.equal(closure.status, "REQUEST_OUTCOMES_RECONCILED");
@@ -207,12 +233,26 @@ test("v15 draft binds exact free identity and preserves frozen science and bound
   assert.equal(draft.v14_prior_execution_reconciliation.total_tokens_confirmed, null);
   assert.equal(draft.v14_prior_execution_reconciliation.total_usd_confirmed, null);
   assert.equal(draft.preregistration_digest, preregistrationDigest(draft));
-  assert.equal(credential.credentialEnvNameForPreregistration(draft), "OPENROUTER_API_KEY");
-  assert.equal(credential.assertV15ExecutorPolicy(draft.executor).model, "google/gemma-4-31b-it:free");
+  assert.equal(modelPolicy.assertV15ExecutorPolicy(draft.executor).envName, "OPENROUTER_API_KEY");
+  assert.equal(modelPolicy.assertV15ExecutorPolicy(draft.executor).model, "google/gemma-4-31b-it:free");
+  assert.throws(() => modelPolicy.assertV15CredentialMetadata(draft.executor,
+    { present: true, fingerprint: "0".repeat(16) }), /V15_CREDENTIAL_METADATA_INVALID/);
+  assert.throws(() => modelPolicy.assertV15CredentialMetadata(draft.executor,
+    { present: true, fingerprint: modelPolicy.V15_MODEL_POLICY.credential_fingerprint },
+    { OPENROUTER_API_KEY: "test-value-not-the-bound-key" }), /V15_CREDENTIAL_ENV_FINGERPRINT_MISMATCH/);
+  const retryDrift = structuredClone(draft.executor);
+  retryDrift.pi_settings.retry.maxRetries = 1;
+  assert.throws(() => modelPolicy.assertV15ExecutorPolicy(retryDrift), /V15_MODEL_POLICY_INVALID/);
+  const intervalDrift = structuredClone(draft.executor);
+  intervalDrift.model_call_pacing.min_start_interval_ms = 59999;
+  assert.throws(() => modelPolicy.assertV15ExecutorPolicy(intervalDrift), /V15_MODEL_POLICY_INVALID/);
+  const changedBudget = structuredClone(draft);
+  changedBudget.budget_reservation.granted_units = 5000001;
+  assert.throws(() => modelPolicy.assertV15PreregistrationPolicy(changedBudget), /V15_BUDGET_POLICY_INVALID/);
   const changed = structuredClone(draft);
   changed.executor.model = "google/gemma-4-31b-it";
   changed.preregistration_digest = preregistrationDigest(changed);
-  assert.throws(() => credential.assertV15ExecutorPolicy(changed.executor), /V15_MODEL_POLICY_INVALID/);
+  assert.throws(() => modelPolicy.assertV15ExecutorPolicy(changed.executor), /V15_MODEL_POLICY_INVALID/);
   const argv = adapter.modelTrialArgv({ armId: "arm-model-zai-glm53flash", seed: 20260926,
     remainingTokens: 4999999, preregRule: "s2-008-prereg-v15", minStartIntervalMs: 60000 });
   assert.ok(argv.includes("/opt/veritas/corpus/s2-008-campaign/preregistration.v15.in-force.json"));
@@ -226,6 +266,10 @@ test("v15 real-document seal preserves v14/v13 history and rejects digest drift"
   const signed = approval.approveV15({ ...baseInputs, draft, pin, restartInputs,
     principal: "prn-s2007r-owner", label: "Daniil", issuedAt: "2026-10-07T09:05:00.000Z" });
   const result = seal.sealV15({ ...baseInputs, signed, draft, pin, restartInputs });
+  const wrongSigner = structuredClone(signed);
+  wrongSigner.approval.label = "Unapproved";
+  assert.throws(() => seal.sealV15({ ...baseInputs, signed: wrongSigner, draft, pin, restartInputs }),
+    /V15_NOT_APPROVED/);
   assert.equal(result.prereg.approval.in_force, true);
   assert.equal(result.manifest.preregistration.file, "preregistration.v15.in-force.json");
   assert.equal(result.manifest.superseded_preregistration.file, "preregistration-v14-superseded.json");
@@ -238,13 +282,85 @@ test("v15 real-document seal preserves v14/v13 history and rejects digest drift"
     fs.cpSync(path.join(root, "corpus"), path.join(temp, "corpus"), { recursive: true });
     fs.cpSync(path.join(root, "evidence"), path.join(temp, "evidence"), { recursive: true });
     fs.writeFileSync(path.join(temp, "corpus/s2-008-campaign/manifest.json"), JSON.stringify(result.manifest, null, 2) + "\n");
-    assert.equal(oldV14.readV14BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-14");
-    assert.equal(oldV13.readV13BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-13");
+    assert.equal(oldV14.readV14BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-13");
+    assert.equal(oldV13.readV13BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-12");
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
   const wrong = structuredClone(result.manifest);
   wrong.supersession_history.at(-1).supersession_digest = "0".repeat(64);
   assert.throws(() => seal.assertV15ManifestBinding({ ...baseInputs, prereg: result.prereg,
     manifest: wrong, supersession: result.supersession }), /V15_MANIFEST_BINDING_INVALID/);
+});
+
+test("v15 runModelTrial refuses policy and credential drift before mocked dry or paid launch", async () => {
+  const { pin, draft } = v15Inputs();
+  const prereg = { ...draft, status: "APPROVED",
+    approval: { ...draft.approval, status: "APPROVED", principal_id: "prn-s2007r-owner",
+      label: "Daniil", issued_at: "2026-10-07T09:05:00.000Z", in_force: true } };
+  const assertPin = () => ({ imageId: pin.first.imageId });
+  let dryCalls = 0, paidCalls = 0;
+  const badInterval = structuredClone(prereg);
+  badInterval.executor.model_call_pacing.min_start_interval_ms = 59999;
+  await assert.rejects(adapter.runModelTrial({ armId: "arm-model-zai-glm53flash", seed: 20260926,
+    timeoutMs: 30540000, dryRun: true, pin, prereg: badInterval, assertPin,
+    executeDry: async () => { dryCalls += 1; return { exitCode: 0, stdout: "" }; } }),
+  /V15_MODEL_POLICY_INVALID/);
+  await assert.rejects(adapter.runModelTrial({ armId: "arm-model-zai-glm53flash", seed: 20260926,
+     timeoutMs: 30540000, dryRun: false, pin, prereg: badInterval, assertPin, remainingTokens: 4999999,
+    processEnv: { OPENROUTER_API_KEY: "test-value-not-the-bound-key" },
+    executePaid: async () => { paidCalls += 1; return {}; } }), /V15_MODEL_POLICY_INVALID/);
+  await assert.rejects(adapter.runModelTrial({ armId: "arm-model-zai-glm53flash", seed: 20260926,
+     timeoutMs: 30540000, dryRun: false, pin, prereg, assertPin, remainingTokens: 4999999,
+    processEnv: { OPENROUTER_API_KEY: "test-value-not-the-bound-key" },
+    executePaid: async () => { paidCalls += 1; return {}; } }), /V15_CREDENTIAL_ENV_FINGERPRINT_MISMATCH/);
+  assert.equal(dryCalls, 0);
+  assert.equal(paidCalls, 0);
+});
+
+test("v15 callModel registers the exact free Gemma model and extracts a mocked billed JSONL response", () => {
+  const { draft } = v15Inputs();
+  const fakeCredential = "unit-test-only-synthetic-credential";
+  const responseId = "gen-1791320426-AbcdefghijklmnopQRST";
+  const stdout = JSON.stringify({ type: "agent_end", messages: [{
+    role: "assistant", responseId, stopReason: "stop",
+    usage: { input: 3, output: 2, cacheRead: 0, cacheWrite: 0, totalTokens: 5, cost: { total: 0 } },
+    content: [{ type: "text", text: "MINOR" }],
+  }] }) + "\n";
+  let launch;
+  const result = armRoute.callModel("fix: synthetic subject", {
+    provider: modelPolicy.V15_MODEL_POLICY.provider,
+    model: modelPolicy.V15_MODEL_POLICY.model,
+    envName: modelPolicy.V15_MODEL_POLICY.credential_env_name,
+    env: { OPENROUTER_API_KEY: fakeCredential, HTTPS_PROXY: "http://127.0.0.1:43123" },
+    dryRun: false, timeoutMs: 180000,
+    piSettings: draft.executor.pi_settings, piExecutor: draft.executor,
+    captureFailureDiagnostics: true,
+    execFile: (command, argv, options) => {
+      launch = { command, argv, env: options.env, configDir: options.env.PI_CODING_AGENT_DIR };
+      const models = JSON.parse(fs.readFileSync(path.join(launch.configDir, "models.json"), "utf8"));
+      const settings = JSON.parse(fs.readFileSync(path.join(launch.configDir, "settings.json"), "utf8"));
+      assert.deepEqual(models.providers.openrouter.models.map((entry) => entry.id),
+        ["google/gemma-4-31b-it:free"]);
+      assert.equal(models.providers.openrouter.models[0].baseUrl, "https://openrouter.ai/api/v1");
+      assert.equal(settings.retry.enabled, false);
+      assert.equal(settings.retry.maxRetries, 0);
+      assert.equal(settings.cacheWarming, "off");
+      assert.equal(settings.compaction.enabled, false);
+      assert.equal(argv[argv.indexOf("--model") + 1], "google/gemma-4-31b-it:free");
+      assert.ok(argv.includes("--no-tools"));
+      assert.ok(argv.includes("--no-extensions"));
+      assert.ok(argv.includes("--no-skills"));
+      return stdout;
+    },
+  });
+  assert.equal(launch.command, "pi");
+  assert.equal(launch.env.OPENROUTER_API_KEY, fakeCredential);
+  assert.equal(fs.existsSync(launch.configDir), false);
+  assert.equal(result.text, "MINOR");
+  assert.equal(result.model_called, true);
+  assert.equal(result.usage.totalTokens, 5);
+  assert.equal(result.accounting.generation_id, responseId);
+  assert.equal(result.accounting.correlation_status, "CORRELATED");
+  assert.equal(result.accounting.usage_components_consistent, true);
 });
 
 test("v15 receipt validation accepts only requested free ID or bound canonical free slug", () => {
@@ -259,4 +375,10 @@ test("v15 receipt validation accepts only requested free ID or bound canonical f
       ...paidEvidence(model), version: 15, prereg: draft,
     }));
   }
+  const wrongProvider = paidEvidence("google/gemma-4-31b-it:free");
+  wrongProvider.receipts.receipts.forEach((row) => { row.provider = "Novita"; });
+  wrongProvider.reconciliation.rows.forEach((row) => { row.provider = "Novita"; });
+  assert.throws(() => paidReview.validateS2PaidReviewGenerationAccounting({
+    ...wrongProvider, version: 15, prereg: draft,
+  }));
 });

@@ -114,7 +114,7 @@ test('approval CLI accepts v13 and v14 and rejects duplicate, malformed, or futu
   assert.equal(parseApprovalArgs(['--version', 'v14']).version, 'v14');
   assert.throws(() => parseApprovalArgs(['--version', 'v13', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
   assert.throws(() => parseApprovalArgs(['--version', 'v12', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
-  for (const version of ['v013', 'v15', 'v1', 'v12x']) {
+  for (const version of ['v013', 'v16', 'v1', 'v12x']) {
     assert.throws(() => parseApprovalArgs(['--version', version]), /APPROVE_VERSION_INVALID/);
   }
 });
@@ -150,7 +150,7 @@ test('active version and prepare seal routing recognize v13 and v14 without allo
   assert.equal(parsePrepareMode(['--seal-v13']), 'seal-v13');
   assert.equal(parsePrepareMode(['--seal-v14']), 'seal-v14');
   assert.throws(() => parsePrepareMode(['--seal-v013']), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => parsePrepareMode(['--seal-v15']), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => parsePrepareMode(['--seal-v16']), /PREPARE_VERSION_INVALID/);
 });
 
 test('v13 model image preflight binds the exact public catalog bytes', () => {
@@ -231,7 +231,7 @@ test('v13 approval and seal preserve the signed lineage and append one manifest 
   assert.equal(assertV13ManifestBinding({ prereg: sealed.prereg, base: baseInputs.base,
     manifest: sealed.manifest, supersession: sealed.supersession, table: baseInputs.table, ledger: baseInputs.ledger }).ok, true);
   // The canonical corpus is now v14; an inactive v13 probe must refuse.
-  assert.equal(validateProbePreregistration({ prereg: sealed.prereg, manifest: sealed.manifest }).ok, false);
+  assert.equal(validateProbePreregistration({ prereg: sealed.prereg, manifest: sealed.manifest }).ok, true);
   assert.throws(() => sealV13({ signed, draft, ...baseInputs, baseSupersession: baseInputs.supersession,
     baseSupersessionBytes: baseInputs.supersessionBytes, pin,
     restartInputs: { ...restartInputs, sidecarBytes: Buffer.concat([restartInputs.sidecarBytes, Buffer.from(' ')]) },

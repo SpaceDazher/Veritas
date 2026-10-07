@@ -68,15 +68,23 @@ const safeRead = (root, name) => {
 
 function historicalV13Manifest(manifest, base, supersession) {
   if (manifest?.preregistration?.file === BASE_FILE && manifest.preregistration.status === 'IN_FORCE') return manifest;
-  if (manifest?.preregistration?.file !== 'preregistration.v14.in-force.json' || manifest.preregistration.status !== 'IN_FORCE') {
+  const isV14 = manifest?.preregistration?.file === 'preregistration.v14.in-force.json';
+  const isV15 = manifest?.preregistration?.file === 'preregistration.v15.in-force.json';
+  if ((!isV14 && !isV15) || manifest.preregistration.status !== 'IN_FORCE') {
     throw new Error('V14_BASE_MANIFEST_INVALID');
   }
   const history = manifest.supersession_history;
   const index = Array.isArray(history) ? history.findIndex((item) =>
     item.file === 'preregistration-v13-supersession.json' &&
     item.supersession_digest === supersession?.supersession_digest) : -1;
-  if (index < 0 || manifest.superseded_preregistration?.file !== 'preregistration-v13-superseded.json' ||
-      manifest.superseded_preregistration.preregistration_digest !== base.preregistration_digest) {
+  const successor = history?.[index + 1];
+  const expectedNext = isV15
+    ? successor?.file === 'preregistration-v14-supersession.json' &&
+      successor?.supersession_digest === 'c9e53c0cf3a0834136b22be61bb41936998d4a78e76f95cc2d3ec6b05a74b9a9'
+    : true;
+  if (index < 0 || !expectedNext ||
+      manifest.superseded_preregistration?.file !== (isV15 ? 'preregistration-v14-superseded.json' : 'preregistration-v13-superseded.json') ||
+      (isV14 && manifest.superseded_preregistration.preregistration_digest !== base.preregistration_digest)) {
     throw new Error('V14_BASE_MANIFEST_INVALID');
   }
   return {

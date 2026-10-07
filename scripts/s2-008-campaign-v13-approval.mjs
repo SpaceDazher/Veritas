@@ -56,14 +56,27 @@ const safeRead = (root, name) => {
 
 export function historicalV12BaseManifest(manifest, base) {
   if (manifest?.preregistration?.file === BASE_FILE) return manifest;
-  if (manifest?.preregistration?.file !== 'preregistration.v13.in-force.json' || manifest.preregistration.status !== 'IN_FORCE') {
+  const isV13 = manifest?.preregistration?.file === 'preregistration.v13.in-force.json';
+  const isV14 = manifest?.preregistration?.file === 'preregistration.v14.in-force.json';
+  const isV15 = manifest?.preregistration?.file === 'preregistration.v15.in-force.json';
+  if ((!isV13 && !isV14 && !isV15) || manifest.preregistration.status !== 'IN_FORCE') {
     throw new Error('V13_BASE_MANIFEST_INVALID');
   }
   const h = manifest.supersession_history;
   const i = Array.isArray(h) ? h.findIndex((x) => x.file === BASE_SUPERSESSION_FILE &&
     x.supersession_id === BASE_SUPERSESSION_ID && x.supersession_digest === BASE_SUPERSESSION_DIGEST) : -1;
-  if (i < 0 || manifest.superseded_preregistration?.file !== 'preregistration-v12-superseded.json' ||
-      manifest.superseded_preregistration.preregistration_digest !== BASE_DIGEST) throw new Error('V13_BASE_MANIFEST_INVALID');
+  const v13 = h?.[i + 1];
+  const v14 = h?.[i + 2];
+  const chainOk = (!isV14 && !isV15) || (v13?.file === 'preregistration-v13-supersession.json' &&
+    v13?.supersession_digest === 'cc47b268ecc5e9c1766b44a226a7104d13770d0acbdb0519368e96b272c15f55');
+  const v14ChainOk = !isV15 || (v14?.file === 'preregistration-v14-supersession.json' &&
+    v14?.supersession_digest === 'c9e53c0cf3a0834136b22be61bb41936998d4a78e76f95cc2d3ec6b05a74b9a9');
+  if (i < 0 || !chainOk || !v14ChainOk ||
+      manifest.superseded_preregistration?.file !== (isV15 ? 'preregistration-v14-superseded.json'
+        : isV14 ? 'preregistration-v13-superseded.json' : 'preregistration-v12-superseded.json') ||
+      (isV13 && manifest.superseded_preregistration.preregistration_digest !== BASE_DIGEST)) {
+    throw new Error('V13_BASE_MANIFEST_INVALID');
+  }
   return {
     ...manifest,
     preregistration: { file: BASE_FILE, status: 'IN_FORCE', preregistration_digest: base.preregistration_digest },
