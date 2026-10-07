@@ -1,0 +1,11 @@
+{
+  "kind": "s2-008-campaign-v15-predictions/1",
+  "status": "BLOCKED",
+  "code": "DIRTY_SOURCE_BASE",
+  "reason": "paid model launch refused because the source tree differs from the signed image and preregistration review state",
+  "spent_units": 0,
+  "launches": 0,
+  "charges": [],
+  "trials": [],
+  "preregistration_digest": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268"
+}

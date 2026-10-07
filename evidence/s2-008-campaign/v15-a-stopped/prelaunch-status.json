@@ -1,0 +1,22 @@
+{
+  "status": "FINISHED",
+  "revision": "ae15decb2bda632a3ae899bfe4329094ecf03ad4",
+  "model": "google/gemma-4-31b-it:free",
+  "credential_fingerprint": "8f7ea446a8707bea",
+  "label": "a",
+  "started_at": "2026-10-07T10:58:57.056565+00:00",
+  "worker_pid": 135479,
+  "command": [
+    "node",
+    "scripts/s2-008-campaign-run.mjs",
+    "--v15",
+    "--label",
+    "a",
+    "--out",
+    "/home/daniil/.local/state/veritas/s2-008-v15-execution/paid-a-15f0e5c/run-v15-a.json"
+  ],
+  "report": "/home/daniil/.local/state/veritas/s2-008-v15-execution/paid-a-15f0e5c/run-v15-a.json",
+  "runner_pid": 135488,
+  "exit_status": 4,
+  "finished_at": "2026-10-07T10:58:57.754653+00:00"
+}

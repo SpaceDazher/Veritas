@@ -1,0 +1,32 @@
+{
+  "status": "FINISHED",
+  "revision": "ae15decb2bda632a3ae899bfe4329094ecf03ad4",
+  "model": "google/gemma-4-31b-it:free",
+  "credential_fingerprint": "8f7ea446a8707bea",
+  "label": "a",
+  "started_at": "2026-10-07T11:02:14.329194+00:00",
+  "worker_pid": 135697,
+  "command": [
+    "node",
+    "scripts/s2-008-campaign-run.mjs",
+    "--v15",
+    "--label",
+    "a",
+    "--out",
+    "/home/daniil/.local/state/veritas/s2-008-v15-execution/paid-a-15f0e5c-ready/run-v15-a.json"
+  ],
+  "report": "/home/daniil/.local/state/veritas/s2-008-v15-execution/paid-a-15f0e5c-ready/run-v15-a.json",
+  "runner_pid": 135709,
+  "exit_status": 4,
+  "finished_at": "2026-10-07T11:02:18.478763+00:00",
+  "result": {
+    "status": "BLOCKED",
+    "code": "CHARGE_NOT_MEASURABLE",
+    "spent_units": 0,
+    "model_calls": 0,
+    "model_attempts": null,
+    "unknown_model_attempts": 1,
+    "unreconciled_spend": true,
+    "raw_run_id": "s2-008c-v15-a-2f7449f1c8a34f73bbbd"
+  }
+}

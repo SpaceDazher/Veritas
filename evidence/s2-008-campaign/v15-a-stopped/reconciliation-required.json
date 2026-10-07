@@ -1,0 +1,30 @@
+{
+  "status": "RECONCILIATION_REQUIRED",
+  "raw_run_id": "s2-008c-v15-a-2f7449f1c8a34f73bbbd",
+  "preregistration_digest": "84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268",
+  "local_model_attempts": 1,
+  "successful_model_calls_confirmed": 0,
+  "known_tokens_lower_bound": 0,
+  "attempt_tokens_confirmed": null,
+  "attempt_usd_confirmed": null,
+  "unreconciled_spend_preserved": true,
+  "provider_status_observation": {
+    "status": 429,
+    "source": "SDK_ERROR_MESSAGE_PREFIX"
+  },
+  "http_status_confirmed": null,
+  "generation_ids": [],
+  "window_utc": {
+    "start": "2026-10-07T11:02:16.660Z",
+    "end": "2026-10-07T11:02:18.346Z"
+  },
+  "owner_log_window": "2026-10-07 06:02:00–06:02:59 America/Chicago",
+  "credential_name": "testVeritas",
+  "credential_fingerprint": "8f7ea446a8707bea",
+  "no_automatic_retry": true,
+  "B": "NOT_RUN",
+  "independent_evaluation": "NOT_RUN",
+  "A_MVP_05": "NOT_CLOSED",
+  "prelaunch_refusal_preserved": true,
+  "key_usage_metadata_is_not_request_receipt": true
+}

@@ -1,0 +1,11 @@
+{
+  "actor_label": "Daniil",
+  "source": "direct user chat",
+  "statement": "разрешаю",
+  "recorded_at": "2026-10-07T10:58:52.082425+00:00",
+  "scope": "A/B: 126 holdout commit subjects plus fixed classification prompt, three seeds, up to 378 requests each; 5M tokens per run",
+  "destination": "https://openrouter.ai/api/v1",
+  "model": "google/gemma-4-31b-it:free",
+  "provider": "Google AI Studio",
+  "credential_name": "testVeritas"
+}

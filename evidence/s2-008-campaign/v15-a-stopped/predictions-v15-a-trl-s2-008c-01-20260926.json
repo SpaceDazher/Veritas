@@ -1,0 +1,21 @@
+{
+  "kind": "s2-008-campaign-predictions/1",
+  "run": "a",
+  "arm_id": "arm-model-zai-glm53flash",
+  "seed": 20260926,
+  "unparsed": 0,
+  "model_calls": 0,
+  "spent_tokens": 0,
+  "usd_spent": 0,
+  "outcome_class": "INFRA",
+  "accounting": {
+    "schema": "s2-008-model-accounting/1",
+    "policy": "GENERATION_ID_REQUIRED",
+    "calls": 0,
+    "tokens": 0,
+    "prompt_tokens": 0,
+    "reported_cost_usd": 0,
+    "rows": []
+  },
+  "rows": []
+}
