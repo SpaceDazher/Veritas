@@ -13,14 +13,15 @@ import { assertV6ModelTimeoutPolicy } from './s2-008-campaign-v6-timeout.mjs';
 import { assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 import { V13_MODEL_POLICY } from './s2-008-campaign-credential-env.mjs';
 import { assertV15ModelCatalogFiles, V15_MODEL_POLICY } from './s2-008-campaign-v15-policy.mjs';
+import { assertV16ModelCatalogFiles, V16_MODEL_POLICY } from './s2-008-campaign-v16-policy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKAGE = '/home/daniil/.local/lib/node_modules/@earendil-works/pi-coding-agent';
 const V11_PI_PACKAGE_NAME = '@earendil-works/pi-coding-agent';
 const V11_PI_PACKAGE_VERSION = '0.99.1';
 export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
-  if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
-  if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
+  if (!['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16'].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (preseal && !['v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16'].includes(version)) throw new Error('MODEL_PRESEAL_VERSION_INVALID');
   const stagedVersion = preseal ? `v${Number(version.slice(1)) - 1}` : version;
   return Object.freeze({
     tag: `localhost/veritas-s2-008-model:${version}`,
@@ -34,13 +35,15 @@ export function modelImagePaths(version = 'v4', { preseal = false } = {}) {
 export function modelImagePolicyInputs(schema) {
   const match = /^s2-008-model-image-pin\/(0|[1-9][0-9]*)$/.exec(String(schema));
   const version = match ? Number(match[1]) : NaN;
-  if (![4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
+  if (![4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].includes(version)) throw new Error('MODEL_IMAGE_VERSION_INVALID');
   const stageFiles = [
     ...(version >= 6 ? ['scripts/s2-008-campaign-v6-timeout.mjs'] : []),
     ...(version >= 7 ? ['scripts/s2-008-campaign-credential-env.mjs'] : []),
     ...(version >= 13 ? ['evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'] : []),
     ...(version >= 14 ? ['scripts/s2-008-campaign-v14-pacing.mjs'] : []),
-    ...(version >= 15 ? ['scripts/s2-008-campaign-v15-policy.mjs', 'evidence/s2-008-campaign/provider-model-catalog-gemma-v15.json', 'evidence/s2-008-campaign/provider-model-endpoints-gemma-v15.json'] : []),
+    ...(version === 15 ? ['scripts/s2-008-campaign-v15-policy.mjs', 'evidence/s2-008-campaign/provider-model-catalog-gemma-v15.json', 'evidence/s2-008-campaign/provider-model-endpoints-gemma-v15.json'] : []),
+    ...(version === 16 ? ['scripts/s2-008-campaign-v16-policy.mjs', V16_MODEL_POLICY.catalog_response_file,
+      V16_MODEL_POLICY.catalog_file, V16_MODEL_POLICY.endpoint_catalog_file] : []),
   ];
   const sourceNames = [
     ...(version >= 6 ? ['pi_runtime_tree', 'timeout_policy'] : []),
@@ -49,7 +52,8 @@ export function modelImagePolicyInputs(schema) {
     ...(version >= 12 ? ['pi_shrinkwrap'] : []),
     ...(version >= 13 ? ['provider_model_catalog'] : []),
     ...(version >= 14 ? ['model_call_pacing_policy'] : []),
-    ...(version >= 15 ? ['provider_model_endpoint_catalog', 'v15_model_policy'] : []),
+    ...(version === 15 ? ['provider_model_endpoint_catalog', 'v15_model_policy'] : []),
+    ...(version === 16 ? ['provider_model_catalog_response', 'provider_model_endpoint_catalog', 'v16_model_policy'] : []),
   ].sort();
   return Object.freeze({ stageFiles: Object.freeze(stageFiles), sourceNames: Object.freeze(sourceNames) });
 }
@@ -57,7 +61,7 @@ export function modelImageVersionFromArgv(argv = process.argv) {
   const versionArgs = argv.filter((arg) => typeof arg === 'string' && arg.startsWith('--v') && arg !== '--verify-pin');
   if (versionArgs.some((arg) => !/^--v\d+$/.test(arg))) throw new Error('MODEL_IMAGE_VERSION_INVALID');
   const values = versionArgs.map((arg) => arg.slice(2));
-  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15']);
+  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16']);
   if (values.some((version) => !supported.has(version)) || new Set(values).size > 1) {
     throw new Error('MODEL_IMAGE_VERSION_INVALID');
   }
@@ -79,7 +83,7 @@ export function parseModelImageCliArgs(argv = process.argv) {
     packageRoot = argv[index + 1];
     index += 1;
   }
-  if (seenPackageRoot && (!['v11', 'v12', 'v13', 'v14', 'v15'].includes(version) || !path.isAbsolute(packageRoot))) {
+  if (seenPackageRoot && (!['v11', 'v12', 'v13', 'v14', 'v15', 'v16'].includes(version) || !path.isAbsolute(packageRoot))) {
     throw new Error('MODEL_PI_PACKAGE_SOURCE_INVALID');
   }
   if (['v11', 'v12', 'v13'].includes(version) && !seenPackageRoot) throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
@@ -231,7 +235,7 @@ export function validateV11PiPackageContext(packageRoot, preregistration) {
       throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
     }
   }
-  if (!['s2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15'].includes(contract?.rule)) {
+  if (!['s2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16'].includes(contract?.rule)) {
     throw new Error('V11_PI_PACKAGE_CONTRACT_INVALID');
   }
   const expectedName = contract.executor?.package;
@@ -280,13 +284,14 @@ export function stageModelImageContext({
   if (typeof contextRoot !== 'string' || !path.isAbsolute(contextRoot)) throw new Error('MODEL_CONTEXT_PATH_INVALID');
   const paths = modelImagePaths(version, { preseal });
   const policyInputs = modelImagePolicyInputs(paths.schema);
-  const isV11 = version === 'v11' || version === 'v12' || version === 'v13' || version === 'v14' || version === 'v15';
+  const isV11 = version === 'v11' || version === 'v12' || version === 'v13' || version === 'v14' || version === 'v15' || version === 'v16';
   if (isV11 && (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot))) {
     throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
   }
   const runtimeSource = isV11 ? packageRoot : PACKAGE;
   if (version === 'v13' || version === 'v14') assertV13ModelCatalogFile(path.join(repoRoot, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'));
   if (version === 'v15') assertV15ModelCatalogFiles(path.join(repoRoot, V15_MODEL_POLICY.catalog_file), path.join(repoRoot, V15_MODEL_POLICY.endpoint_catalog_file));
+  if (version === 'v16') assertV16ModelCatalogFiles(path.join(repoRoot, V16_MODEL_POLICY.catalog_file), path.join(repoRoot, V16_MODEL_POLICY.endpoint_catalog_file), path.join(repoRoot, V16_MODEL_POLICY.catalog_response_file));
   if (isV11) {
     assertPiPackageTreeContained(runtimeSource);
     const sourcePrereg = JSON.parse(fs.readFileSync(path.join(repoRoot, paths.stagedPrereg), 'utf8'));
@@ -317,6 +322,7 @@ export function stageModelImageContext({
   });
   if (version === 'v13' || version === 'v14') assertV13ModelCatalogFile(path.join(target, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'));
   if (version === 'v15') assertV15ModelCatalogFiles(path.join(target, V15_MODEL_POLICY.catalog_file), path.join(target, V15_MODEL_POLICY.endpoint_catalog_file));
+  if (version === 'v16') assertV16ModelCatalogFiles(path.join(target, V16_MODEL_POLICY.catalog_file), path.join(target, V16_MODEL_POLICY.endpoint_catalog_file), path.join(target, V16_MODEL_POLICY.catalog_response_file));
   if (isV11) {
     assertPiPackageTreeContained(stagedPi);
     const stagedPrereg = JSON.parse(fs.readFileSync(path.join(target, paths.stagedPrereg), 'utf8'));
@@ -371,13 +377,19 @@ export function modelImageSourcesFromContext(contextRoot, { version = 'v4', pres
       pi_launcher: sha(path.join(contextRoot, 'usr/local/bin/pi')),
     } : {}),
     ...(policyInputs.sourceNames.includes('provider_model_catalog') ? {
-      provider_model_catalog: sha(path.join(veritas, version === 'v15' ? V15_MODEL_POLICY.catalog_file : 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json')),
+      provider_model_catalog: sha(path.join(veritas, version === 'v16' ? V16_MODEL_POLICY.catalog_file : version === 'v15' ? V15_MODEL_POLICY.catalog_file : 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json')),
     } : {}),
     ...(policyInputs.sourceNames.includes('provider_model_endpoint_catalog') ? {
-      provider_model_endpoint_catalog: sha(path.join(veritas, V15_MODEL_POLICY.endpoint_catalog_file)),
+      provider_model_endpoint_catalog: sha(path.join(veritas, version === 'v16' ? V16_MODEL_POLICY.endpoint_catalog_file : V15_MODEL_POLICY.endpoint_catalog_file)),
     } : {}),
     ...(policyInputs.sourceNames.includes('v15_model_policy') ? {
       v15_model_policy: sha(path.join(veritas, 'scripts/s2-008-campaign-v15-policy.mjs')),
+    } : {}),
+    ...(policyInputs.sourceNames.includes('provider_model_catalog_response') ? {
+      provider_model_catalog_response: sha(path.join(veritas, V16_MODEL_POLICY.catalog_response_file)),
+    } : {}),
+    ...(policyInputs.sourceNames.includes('v16_model_policy') ? {
+      v16_model_policy: sha(path.join(veritas, 'scripts/s2-008-campaign-v16-policy.mjs')),
     } : {}),
     ...(policyInputs.sourceNames.includes('model_call_pacing_policy') ? {
       model_call_pacing_policy: sha(path.join(veritas, 'scripts/s2-008-campaign-v14-pacing.mjs')),
@@ -392,7 +404,7 @@ export function buildModelImage({
   packageRoot,
 } = {}) {
   const paths = modelImagePaths(version, { preseal });
-  if (version === 'v11' || version === 'v12' || version === 'v13' || version === 'v14') {
+  if (version === 'v11' || version === 'v12' || version === 'v13' || version === 'v14' || version === 'v15' || version === 'v16') {
     if (typeof packageRoot !== 'string' || !path.isAbsolute(packageRoot)) {
       throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
     }
@@ -402,6 +414,7 @@ export function buildModelImage({
   }
   if (version === 'v13') assertV13ModelCatalogFile(path.join(ROOT, 'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'));
   if (version === 'v15') assertV15ModelCatalogFiles();
+  if (version === 'v16') assertV16ModelCatalogFiles();
   const context = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-model-image-'));
   try {
     stageModelImageContext({ contextRoot: context, packageRoot, version, preseal });
@@ -466,7 +479,7 @@ export function assertRecordedModelPin(rebuilt, recorded) {
 }
 
 export function modelDryRunTimeoutMs(prereg) {
-  if (prereg?.rule === 's2-008-prereg-v14' || prereg?.rule === 's2-008-prereg-v15') {
+  if (prereg?.rule === 's2-008-prereg-v14' || prereg?.rule === 's2-008-prereg-v15' || prereg?.rule === 's2-008-prereg-v16') {
     return assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout).total_container_timeout_ms;
   }
   if (/^s2-008-prereg-v(?:[6-9]|1[0-3])$/.test(prereg?.rule ?? '')) {
@@ -486,7 +499,7 @@ export function modelDryRunArgv(prereg, paths = MODEL_PATHS) {
     '20260926',
     '--dry-run',
   ];
-  if (prereg?.rule === 's2-008-prereg-v14' || prereg?.rule === 's2-008-prereg-v15') {
+  if (prereg?.rule === 's2-008-prereg-v14' || prereg?.rule === 's2-008-prereg-v15' || prereg?.rule === 's2-008-prereg-v16') {
     const policy = assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     argv.push('--min-start-interval-ms', String(policy.min_start_interval_ms));
   }

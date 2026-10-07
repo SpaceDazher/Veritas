@@ -809,6 +809,9 @@ if (mode === 'seal-v2') {
 } else if (mode === 'seal-v7') {
   const { sealV7OnDisk } = await import('./s2-008-campaign-seal-v7.mjs');
   console.log(JSON.stringify({ mode: 'seal-v7', ...sealV7OnDisk() }, null, 2));
+} else if (mode === 'seal-v16') {
+  const { sealV16OnDisk } = await import('./s2-008-campaign-seal-v16.mjs');
+  console.log(JSON.stringify({ mode: 'seal-v16', ...sealV16OnDisk() }, null, 2));
 } else if (mode === 'seal-v15') {
   const { sealV15OnDisk } = await import('./s2-008-campaign-seal-v15.mjs');
   console.log(JSON.stringify({ mode: 'seal-v15', ...sealV15OnDisk() }, null, 2));
@@ -837,7 +840,10 @@ if (mode === 'seal-v2') {
   selftest();
 } else if (mode === 'check') {
   const currentManifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8'));
-  if (currentManifest.preregistration?.file === 'preregistration.v15.in-force.json') {
+  if (currentManifest.preregistration?.file === 'preregistration.v16.in-force.json') {
+    const { checkV16OnDisk } = await import('./s2-008-campaign-seal-v16.mjs');
+    console.log(JSON.stringify({ mode: 'check-v16', ...checkV16OnDisk() }, null, 2));
+  } else if (currentManifest.preregistration?.file === 'preregistration.v15.in-force.json') {
     const { checkV15OnDisk } = await import('./s2-008-campaign-seal-v15.mjs');
     console.log(JSON.stringify({ mode: 'check-v15', ...checkV15OnDisk() }, null, 2));
   } else if (currentManifest.preregistration?.file === 'preregistration.v14.in-force.json') {

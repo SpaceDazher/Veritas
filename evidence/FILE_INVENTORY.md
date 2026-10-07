@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1469.
+Generated from `git ls-files`; count: 1476.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -756,8 +756,11 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/provider-model-catalog-capture-v15.json`
 - `evidence/s2-008-campaign/provider-model-catalog-gemma-v15.json`
 - `evidence/s2-008-campaign/provider-model-catalog-ling-v13.json`
+- `evidence/s2-008-campaign/provider-model-catalog-poolside-v16.json`
+- `evidence/s2-008-campaign/provider-model-catalog-response-poolside-v16.json`
 - `evidence/s2-008-campaign/provider-model-catalog-v12-stopped.json`
 - `evidence/s2-008-campaign/provider-model-endpoints-gemma-v15.json`
+- `evidence/s2-008-campaign/provider-model-endpoints-poolside-v16.json`
 - `evidence/s2-008-campaign/provider-receipt-v10-a-overlap.json`
 - `evidence/s2-008-campaign/provider-receipt-v9-a-attempt-12.json`
 - `evidence/s2-008-campaign/provider-receipts-v10-a-known.json`
@@ -1108,6 +1111,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-seal-v13.mjs`
 - `scripts/s2-008-campaign-seal-v14.mjs`
 - `scripts/s2-008-campaign-seal-v15.mjs`
+- `scripts/s2-008-campaign-seal-v16.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
 - `scripts/s2-008-campaign-seal-v4.mjs`
 - `scripts/s2-008-campaign-seal-v5.mjs`
@@ -1125,6 +1129,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-v14-pacing.mjs`
 - `scripts/s2-008-campaign-v15-approval.mjs`
 - `scripts/s2-008-campaign-v15-policy.mjs`
+- `scripts/s2-008-campaign-v16-approval.mjs`
+- `scripts/s2-008-campaign-v16-policy.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-campaign-v5-approval.mjs`
 - `scripts/s2-008-campaign-v5-draft.mjs`
@@ -1392,6 +1398,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-v13.test.mjs`
 - `tests/research/campaign-v14.test.mjs`
 - `tests/research/campaign-v15.test.mjs`
+- `tests/research/campaign-v16.test.mjs`
 - `tests/research/campaign-v4-draft.test.mjs`
 - `tests/research/campaign-v5-approval.test.mjs`
 - `tests/research/campaign-v6-probe-evidence.test.mjs`

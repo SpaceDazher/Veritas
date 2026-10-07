@@ -28,6 +28,11 @@ const activeV12 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistra
 const activeV13 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v13.in-force.json', 'utf8'));
 const activeV14 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v14.in-force.json', 'utf8'));
 const activeV15 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v15.in-force.json', 'utf8'));
+const activeCurrentMatch = /^preregistration\.v(15|16)\.in-force\.json$/.exec(activeManifest?.preregistration?.file ?? '');
+if (!activeCurrentMatch) throw new Error('TEST_ACTIVE_CAMPAIGN_VERSION_INVALID');
+const activeCurrentVersion = Number(activeCurrentMatch[1]);
+const activeCurrent = JSON.parse(fs.readFileSync(
+  'corpus/s2-008-campaign/preregistration.v' + activeCurrentVersion + '.in-force.json', 'utf8'));
 const v12Supersession = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration-v12-supersession.json', 'utf8'));
 const v11SupersessionBytes = fs.readFileSync('corpus/s2-008-campaign/preregistration-v11-supersession.json');
 const v11Supersession = JSON.parse(v11SupersessionBytes);
@@ -94,10 +99,17 @@ const v12Candidate = () => {
   return value;
 };
 
-test('canonical manifest is active v15 while lineage tests use pinned historical v11 and v12 manifests', () => {
-  assert.equal(activeManifest.preregistration.file, 'preregistration.v15.in-force.json');
+test('canonical manifest tracks signed active v15 before or v16 after successor sealing', () => {
+  assert.equal(activeManifest.preregistration.file, 'preregistration.v' + activeCurrentVersion + '.in-force.json');
   assert.equal(activeManifest.preregistration.status, 'IN_FORCE');
-  assert.equal(activeManifest.preregistration.preregistration_digest, activeV15.preregistration_digest);
+  assert.equal(activeManifest.preregistration.sealed_before_first_trial, true);
+  assert.equal(activeManifest.preregistration.preregistration_digest, activeCurrent.preregistration_digest);
+  assert.equal(activeCurrent.preregistration_digest, preregistrationDigest(activeCurrent));
+  assert.equal(sharedDigest(activeCurrent), activeCurrent.preregistration_digest);
+  assert.equal(activeCurrent.rule, 's2-008-prereg-v' + activeCurrentVersion);
+  assert.equal(activeCurrent.status, 'APPROVED');
+  assert.equal(activeCurrent.approval?.status, 'APPROVED');
+  assert.equal(activeCurrent.approval?.in_force, true);
   assert.equal(activeV15.rule, 's2-008-prereg-v15');
   assert.equal(activeV15.approval?.in_force, true);
   assert.equal(activeV14.approval?.in_force, true);

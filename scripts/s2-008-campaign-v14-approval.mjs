@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { canonicalDigest } from '../src/lib/verifier/canonical-json.mjs';
+import { assertContentSupersession } from '../src/lib/research/content-supersession.mjs';
 import { assertPreregistration, assertSourceLedger } from '../src/lib/research/index.mjs';
 import { FROZEN_MEMBERS, preregistrationDigest, scopeDrift, scientificBody } from './s2-008-campaign-approve.mjs';
 import { V14_MODEL_POLICY, V7_PI_SETTINGS, assertV14ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
@@ -66,11 +67,48 @@ const safeRead = (root, name) => {
   return fs.readFileSync(full);
 };
 
+
+function assertV16ActiveSuccessor(repoRoot, manifest) {
+  const v15Bytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v15-superseded.json');
+  const v16Bytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration.v16.in-force.json');
+  const supersessionBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v16-supersession.json');
+  if (sha(v15Bytes) !== 'fb9496773cd4acafb0fad4e5c860ae6208dea977c919115ffe89d148d141c348') {
+    throw new Error('V16_HISTORICAL_V15_BYTES_INVALID');
+  }
+  const v15 = parse(v15Bytes), v16 = parse(v16Bytes), supersession = parse(supersessionBytes);
+  assertPreregistration(v15);
+  assertPreregistration(v16);
+  if (v15.preregistration_digest !== '84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268' ||
+      v16.rule !== 's2-008-prereg-v16' || v16.preregistration_id !== 'xpr-s2-008c-16' ||
+      v16.status !== 'APPROVED' || v16.approval?.status !== 'APPROVED' ||
+      v16.approval?.authority !== 'HUMAN_OWNER' || v16.approval?.principal_id !== 'prn-s2007r-owner' ||
+      v16.approval?.label !== 'Daniil' || v16.approval?.in_force !== true ||
+      v16.approval?.signed_digest_over !== 'the scientific body: every member except approval, status and preregistration_digest' ||
+      v16.preregistration_digest !== preregistrationDigest(v16) ||
+      manifest?.preregistration?.file !== 'preregistration.v16.in-force.json' ||
+      manifest.preregistration.status !== 'IN_FORCE' ||
+      manifest.preregistration.preregistration_digest !== v16.preregistration_digest ||
+      manifest.superseded_preregistration?.file !== 'preregistration-v15-superseded.json' ||
+      manifest.superseded_preregistration.preregistration_digest !== v15.preregistration_digest) {
+    throw new Error('V16_HISTORICAL_ACTIVE_BINDING_INVALID');
+  }
+  assertContentSupersession(supersession, v15, v16);
+  const tail = { file: 'preregistration-v16-supersession.json',
+    supersession_id: supersession.supersession_id,
+    supersession_digest: supersession.supersession_digest,
+    reason: supersession.reason };
+  if (canonicalDigest(manifest.supersession_history?.at(-1) ?? null) !== canonicalDigest(tail) ||
+      canonicalDigest(manifest.supersession ?? null) !== canonicalDigest(tail)) {
+    throw new Error('V16_HISTORICAL_SUPERSESSION_MANIFEST_INVALID');
+  }
+}
+
 function historicalV13Manifest(manifest, base, supersession) {
   if (manifest?.preregistration?.file === BASE_FILE && manifest.preregistration.status === 'IN_FORCE') return manifest;
   const isV14 = manifest?.preregistration?.file === 'preregistration.v14.in-force.json';
   const isV15 = manifest?.preregistration?.file === 'preregistration.v15.in-force.json';
-  if ((!isV14 && !isV15) || manifest.preregistration.status !== 'IN_FORCE') {
+  const isV16 = manifest?.preregistration?.file === 'preregistration.v16.in-force.json';
+  if ((!isV14 && !isV15 && !isV16) || manifest.preregistration.status !== 'IN_FORCE') {
     throw new Error('V14_BASE_MANIFEST_INVALID');
   }
   const history = manifest.supersession_history;
@@ -78,12 +116,22 @@ function historicalV13Manifest(manifest, base, supersession) {
     item.file === 'preregistration-v13-supersession.json' &&
     item.supersession_digest === supersession?.supersession_digest) : -1;
   const successor = history?.[index + 1];
-  const expectedNext = isV15
+  const successorV15 = history?.[index + 2];
+  const successorV16 = history?.[index + 3];
+  const expectedNext = (isV15 || isV16)
     ? successor?.file === 'preregistration-v14-supersession.json' &&
       successor?.supersession_digest === 'c9e53c0cf3a0834136b22be61bb41936998d4a78e76f95cc2d3ec6b05a74b9a9'
     : true;
-  if (index < 0 || !expectedNext ||
-      manifest.superseded_preregistration?.file !== (isV15 ? 'preregistration-v14-superseded.json' : 'preregistration-v13-superseded.json') ||
+  const expectedV15 = !isV16 || (successorV15?.file === 'preregistration-v15-supersession.json' &&
+    successorV15?.supersession_digest === '4387b8d444737a41dbc2738115e55fb0c3a8cf6177cbcd1b4f3629d1cc0c9218');
+  const expectedV16 = !isV16 || (successorV16?.file === 'preregistration-v16-supersession.json' &&
+    history?.at(-1)?.file === 'preregistration-v16-supersession.json' &&
+    history.at(-1)?.supersession_digest === manifest.supersession?.supersession_digest &&
+    manifest.superseded_preregistration?.preregistration_digest === '84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268');
+  if (index < 0 || !expectedNext || !expectedV15 || !expectedV16 ||
+      manifest.superseded_preregistration?.file !== (isV16 ? 'preregistration-v15-superseded.json'
+        : isV15 ? 'preregistration-v14-superseded.json' : 'preregistration-v13-superseded.json') ||
+      (isV16 && manifest.superseded_preregistration.preregistration_digest !== '84e15b1b1276c548ad6486fd65a03782f0b9d463cef802d6dcd608accf744268') ||
       (isV14 && manifest.superseded_preregistration.preregistration_digest !== base.preregistration_digest)) {
     throw new Error('V14_BASE_MANIFEST_INVALID');
   }
@@ -101,6 +149,7 @@ export function readV14BaseInputs({ repoRoot = ROOT, allowHistorical = false } =
   if (sha(baseBytes) !== BASE_SHA) throw new Error('V14_BASE_BYTES_INVALID');
   const base = parse(baseBytes);
   const activeManifest = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/manifest.json'));
+  if (activeManifest.preregistration?.file === 'preregistration.v16.in-force.json') assertV16ActiveSuccessor(repoRoot, activeManifest);
   if (!allowHistorical && activeManifest.preregistration?.file !== BASE_FILE) throw new Error('V14_BASE_NOT_CURRENT');
   const supersessionBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v13-supersession.json');
   const supersession = parse(supersessionBytes);

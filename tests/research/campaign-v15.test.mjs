@@ -81,7 +81,7 @@ function paidEvidence(model) {
     known_calls: 3, known_tokens: 15, unknown_attempts: 0, known_provider_usd: 0, receipts } };
 }
 
-test("v15 routes image build/dry-run through v14 and rejects v16", () => {
+test("v15 routes image build/dry-run through v14 and recognizes v16", () => {
   assert.deepEqual(image.modelImagePaths("v15", { preseal: true }), {
     tag: "localhost/veritas-s2-008-model:v15",
     stagedPrereg: "corpus/s2-008-campaign/preregistration.v14.in-force.json",
@@ -96,7 +96,8 @@ test("v15 routes image build/dry-run through v14 and rejects v16", () => {
   assert.ok(policyInputs.sourceNames.includes("provider_model_endpoint_catalog"));
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v15"]), "v15");
   assert.equal(image.parseModelImageCliArgs(["node", "builder", "--v15", "--preseal", "--pi-package-dir", "/tmp/pi"]).version, "v15");
-  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v16"]), /MODEL_IMAGE_VERSION_INVALID/);
+  assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v16"]), "v16");
+  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v17"]), /MODEL_IMAGE_VERSION_INVALID/);
   assert.equal(image.modelImagePaths("v14").schema, "s2-008-model-image-pin/14");
 });
 
@@ -132,7 +133,7 @@ test("v15 pins exact raw model catalog bytes, zero prices, and only the free Goo
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test("v15 approval, prepare, run, and evaluator dispatch supports 15 and rejects 16", () => {
+test("v15 approval, prepare, run, and evaluator dispatch supports 15-16 and rejects 17", () => {
   assert.equal(approveRoute.parseArgs(["--version", "v15", "--principal", "prn-s2007r-owner", "--label", "Daniil"]).version, "v15");
   assert.equal(prepareRoute.parsePrepareMode(["--seal-v15"]), "seal-v15");
   assert.equal(runRoute.campaignCliMode({ v15: true }).requestedVersion, 15);
@@ -153,10 +154,14 @@ test("v15 approval, prepare, run, and evaluator dispatch supports 15 and rejects
     assert.equal(evalRoute.reserveV15EvaluationAccessRoot(target), target);
     assert.throws(() => evalRoute.reserveV15EvaluationAccessRoot(target), /V15_HOLDOUT_ACCESS_ALREADY_RECORDED/);
   } finally { fs.rmSync(accessRoot, { recursive: true, force: true }); }
-  assert.throws(() => approveRoute.parseArgs(["--version", "v16"]), /APPROVE_VERSION_INVALID/);
-  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v16"]), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => runRoute.campaignCliMode({ v16: true }), /CAMPAIGN_VERSION_INVALID/);
-  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v16.in-force.json" } }), null);
+  assert.equal(approveRoute.parseArgs(["--version", "v16", "--principal", "prn-s2007r-owner", "--label", "Daniil"]).version, "v16");
+  assert.equal(prepareRoute.parsePrepareMode(["--seal-v16"]), "seal-v16");
+  assert.equal(runRoute.campaignCliMode({ v16: true }).requestedVersion, 16);
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v16.in-force.json" } }), "v16");
+  assert.throws(() => approveRoute.parseArgs(["--version", "v17"]), /APPROVE_VERSION_INVALID/);
+  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v17"]), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => runRoute.campaignCliMode({ v17: true }), /CAMPAIGN_VERSION_INVALID/);
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v17.in-force.json" } }), null);
 });
 
 test("v15 base and prior closure bind raw v14 bytes and keep failed spend unknown", () => {

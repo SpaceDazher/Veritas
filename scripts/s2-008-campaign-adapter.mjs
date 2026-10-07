@@ -52,6 +52,8 @@ import { assertV7PresealPin } from './s2-008-campaign-v7-approval.mjs';
 import { assertV8ExecutorPolicy, assertV7ExecutorPolicy, assertV13ExecutorPolicy, assertV14ExecutorPolicy, credentialEnvNameForPreregistration, credentialEnvNamesForProvider, V7_CREDENTIAL_ENV_NAME } from './s2-008-campaign-credential-env.mjs';
 import { assertV15CredentialMetadata, assertV15ExecutorPolicy, assertV15ModelCatalogFiles } from './s2-008-campaign-v15-policy.mjs';
 import { assertV15PresealPin, assertV15PriorExecutionReconciliation, readV15BaseInputs, readV15PriorExecutionInputs } from './s2-008-campaign-v15-approval.mjs';
+import { assertV16CredentialMetadata, assertV16ExecutorPolicy, assertV16ModelCatalogFiles } from './s2-008-campaign-v16-policy.mjs';
+import { assertV16PresealPin, assertV16PriorExecutionReconciliation, readV16BaseInputs, readV16PriorExecutionInputs } from './s2-008-campaign-v16-approval.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -871,6 +873,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v12') return 12;
   if (rule === 's2-008-prereg-v13') return 13;
   if (rule === 's2-008-prereg-v15') return 15;
+  if (rule === 's2-008-prereg-v16') return 16;
   if (rule === 's2-008-prereg-v14') return 14;
   if (rule === 's2-008-prereg-v9') return 9;
   throw new Error('MODEL_PREREGISTRATION_VERSION_UNSUPPORTED');
@@ -885,14 +888,14 @@ export function modelTrialArgv({ armId, seed, dryRun = false, remainingTokens = 
   if (remainingTokens !== undefined && (!Number.isSafeInteger(remainingTokens) || remainingTokens < 0)) {
     throw new Error('SHARED_TOKEN_CAP_INVALID');
   }
-  if (version === 14 || version === 15) {
-    if (minStartIntervalMs !== 60000) throw new Error(version === 15 ? 'V15_MIN_START_INTERVAL_INVALID' : 'V14_MIN_START_INTERVAL_INVALID');
+  if (version === 14 || version === 15 || version === 16) {
+    if (minStartIntervalMs !== 60000) throw new Error(version === 16 ? 'V16_MIN_START_INTERVAL_INVALID' : version === 15 ? 'V15_MIN_START_INTERVAL_INVALID' : 'V14_MIN_START_INTERVAL_INVALID');
   } else if (minStartIntervalMs !== undefined) throw new Error('V14_MIN_START_INTERVAL_INVALID');
   return [
     '/usr/local/bin/node', MODEL_PROGRAM_IN_IMAGE, MODEL_INPUT_IN_IMAGE,
     '/tmp/model-out.json', armId, preregPath, String(seed),
     ...(remainingTokens === undefined ? [] : ['--remaining-tokens', String(remainingTokens)]),
-    ...([14, 15].includes(version) ? ['--min-start-interval-ms', String(minStartIntervalMs)] : []),
+    ...([14, 15, 16].includes(version) ? ['--min-start-interval-ms', String(minStartIntervalMs)] : []),
     ...(dryRun ? ['--dry-run'] : []),
   ];
 }
@@ -919,7 +922,17 @@ export function assertPinnedModelImage({
   if (prereg?.executor?.model_image?.content_commitment !== built.content_commitment) {
     throw new Error('MODEL_CONTENT_COMMITMENT_MISMATCH');
   }
-  if (version === 15) {
+  if (version === 16) {
+    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v16.in-force.json'));
+    assertV16ExecutorPolicy(prereg.executor);
+    assertV16ModelCatalogFiles();
+    assertV16PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    const baseInputs = readV16BaseInputs({ allowHistorical: true });
+    const prior = assertV16PriorExecutionReconciliation(baseInputs.base, readV16PriorExecutionInputs());
+    if (canonicalDigest(prereg.v15_prior_execution_reconciliation) !== canonicalDigest(prior)) {
+      throw new Error('MODEL_V16_PRIOR_RECONCILIATION_BINDING_MISMATCH');
+    }
+  } else if (version === 15) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v15.in-force.json'));
     assertV15ExecutorPolicy(prereg.executor);
     assertV15ModelCatalogFiles();
@@ -1041,7 +1054,9 @@ export async function runModelTrial({
   const pinned = assertPin({ pin, prereg, inspect });
   const v14Policy = prereg.rule === 's2-008-prereg-v14' ? assertV14ExecutorPolicy(prereg.executor) : null;
   const v15Policy = prereg.rule === 's2-008-prereg-v15' ? assertV15ExecutorPolicy(prereg.executor) : null;
-  const argv = modelTrialArgv({ armId, seed, dryRun, remainingTokens, preregRule: prereg.rule, minStartIntervalMs: (v15Policy ?? v14Policy)?.minStartIntervalMs });
+  const v16Policy = prereg.rule === 's2-008-prereg-v16' ? assertV16ExecutorPolicy(prereg.executor) : null;
+  const argv = modelTrialArgv({ armId, seed, dryRun, remainingTokens, preregRule: prereg.rule,
+    minStartIntervalMs: (v16Policy ?? v15Policy ?? v14Policy)?.minStartIntervalMs });
   let observation;
   let invocation = null;
   if (dryRun) {
@@ -1050,7 +1065,11 @@ export async function runModelTrial({
     });
     observation = await executeDry(invocation, { env: PODMAN_ENV });
   } else {
-    if (v15Policy) {
+    if (v16Policy) {
+      const envValue = processEnv?.[v16Policy.envName];
+      assertV16CredentialMetadata(prereg.executor,
+        { present: typeof envValue === 'string' && envValue.length > 0, fingerprint: credentialFingerprint(envValue) }, processEnv);
+    } else if (v15Policy) {
       try {
         const envValue = processEnv?.[v15Policy.envName];
         const fingerprint = credentialFingerprint(envValue);
@@ -1063,9 +1082,9 @@ export async function runModelTrial({
       image: pinned.imageId, argv, timeoutMs,
       name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-' + String(seed),
       provider: prereg.executor.provider,
-      envName: v15Policy?.envName ?? credentialEnvNameForPreregistration(prereg),
-      ...((v14Policy || v15Policy) ? { requireExplicitCredentialSource: true, credentialEnv: processEnv,
-        ...(v15Policy ? { expectedCredentialFingerprint: '8f7ea446a8707bea' } : {}) } : {}),
+      envName: v16Policy?.envName ?? v15Policy?.envName ?? credentialEnvNameForPreregistration(prereg),
+      ...((v14Policy || v15Policy || v16Policy) ? { requireExplicitCredentialSource: true, credentialEnv: processEnv,
+        ...((v15Policy || v16Policy) ? { expectedCredentialFingerprint: '8f7ea446a8707bea' } : {}) } : {}),
     });
     observation = paid.observation;
     invocation = paid.invocation;
