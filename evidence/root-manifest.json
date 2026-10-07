@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "7762cb4ae84a016557a1c3fbdc89f0248903e398",
-  "sourceTree": "bd007247aa6a19b0fff5ec3a2b7802ef06e0377c",
-  "trackedFileCount": 1491,
-  "manifestFileCount": 1486,
-  "payloadManifestSha256": "c72a52d4cd68564541c909e338999407b415d63d30e87c650b0feefd117fe391",
-  "fileManifestSha256": "10740f95afd3e2f208199cb0716540a9045465cf0ff1c2ef9a30135aa7946635",
+  "sourceCommit": "c8e260445d5d5344be6dce49a7cc7ca38dbe26e3",
+  "sourceTree": "06b83376ddd795a09767bb958590f348778c3511",
+  "trackedFileCount": 1497,
+  "manifestFileCount": 1492,
+  "payloadManifestSha256": "61c4e39e6b24d7f5425aaa9480df9b524baeb410c22c75bfacc1bcb803aa20d0",
+  "fileManifestSha256": "86f5c09c59952da568d747451391da5118ec50ba709101a35b42191d0538aecb",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2958,8 +2958,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "cb03a45cef7272658ffb871f879a6a08f9a1241d351e8da1674bf61ec56d3de0",
-      "bytes": 71832
+      "sha256": "6cc7cd33ebdcc3e468d27e7ae59cd96468c6b734c1b4e4da6e28d2dfea86ac53",
+      "bytes": 72273
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -4372,6 +4372,16 @@
       "bytes": 1920
     },
     {
+      "path": "evidence/s2-008-campaign/v16-a-stopped/generation-lookup.json",
+      "sha256": "714ed1084039e1f6ac5ac88ae552251523f13e6dd7c6abdd33ec0ab54e596190",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/s2-008-campaign/v16-a-stopped/owner-completeness-attestation.json",
+      "sha256": "d9882dbb65c1f642fbc089237040bd105a21f157408054898aee19ff0048b807",
+      "bytes": 546
+    },
+    {
       "path": "evidence/s2-008-campaign/v16-a-stopped/owner-execution-authorization.json",
       "sha256": "c4c751651da981cce1f2d12ad63a77adee4ef1332b574419f8404b060aa92bd2",
       "bytes": 665
@@ -4382,9 +4392,19 @@
       "bytes": 444
     },
     {
+      "path": "evidence/s2-008-campaign/v16-a-stopped/provider-observation-files.json",
+      "sha256": "48b30cfe548335a239cfac1e14539aa3a81890a050aa3b1d57f88e1a99cbd090",
+      "bytes": 1609
+    },
+    {
       "path": "evidence/s2-008-campaign/v16-a-stopped/reconciliation-required.json",
       "sha256": "07fa38734f9cca02e4fe6289674af259cda2169c2cb4ac7a91565132af2c0ffe",
       "bytes": 883
+    },
+    {
+      "path": "evidence/s2-008-campaign/v16-a-stopped/request-outcome-reconciliation.json",
+      "sha256": "5b295ee12198d1b453bbe3f0061acbc9fadf565d36b4ef4e8f7fbf63dac38da3",
+      "bytes": 1338
     },
     {
       "path": "evidence/s2-008-campaign/v16-a-stopped/run-v16-a.json",
@@ -4395,6 +4415,16 @@
       "path": "evidence/s2-008-campaign/v16-a-stopped/status.json",
       "sha256": "ca255935baf454aea6ebf325de2336d23e3dc6526f7aab45390c625e01834163",
       "bytes": 948
+    },
+    {
+      "path": "evidence/s2-008-campaign/v16-a-stopped/upstream-429-binding.json",
+      "sha256": "59d2d6302668c511863084450256b23f0a774765c2d5507b02860af709cecc5a",
+      "bytes": 676
+    },
+    {
+      "path": "evidence/s2-008-campaign/v16-a-stopped/upstream-429-observation.json",
+      "sha256": "0a4e9589d44cd1f6858c2257140a3a1125b760004eabf2a32d0eb578ad737b28",
+      "bytes": 685
     },
     {
       "path": "evidence/s2-008-campaign/v3-readiness-report.md",
