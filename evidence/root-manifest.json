@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "a41a49cf5318e5a226a034b569a58b81b54a5854",
-  "sourceTree": "1d17dddb8e543103993239b4457090484e942f34",
-  "trackedFileCount": 1447,
-  "manifestFileCount": 1442,
-  "payloadManifestSha256": "36c45322be0a27e1df3416d7b03cce5068e0cd4b6faa3a408e62225ac1b4519c",
-  "fileManifestSha256": "89e6c5a6c5e9848d976df14532b61f73680e23b818d0fcc8d17d15a16957e852",
+  "sourceCommit": "082e7da6f5099c5c64c4093dc713e5a9c418e45b",
+  "sourceTree": "a0c90d2c58e4376f22ae9703c12a7ec3b12e3d51",
+  "trackedFileCount": 1454,
+  "manifestFileCount": 1449,
+  "payloadManifestSha256": "6789c2b87931921be8113f1de1cdc9f51f2417bc3bb5b7d0a06101dcbf3822bf",
+  "fileManifestSha256": "f47f6d7521f0dac4ff467da516eeb73ddbbcd1ea57e7197a66c94bc4111d515a",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -2188,8 +2188,8 @@
     },
     {
       "path": "corpus/s2-008-campaign/manifest.json",
-      "sha256": "e839cdd434f58fac728d36e68556524f852e99b98f1bf4ff6a17cd031d73748e",
-      "bytes": 69407
+      "sha256": "365ce2aa5d79ef864b9412cd9a9932782bab118eb0974718b5a5b3bb0359a25d",
+      "bytes": 69959
     },
     {
       "path": "corpus/s2-008-campaign/preregistration-superseded.json",
@@ -2247,9 +2247,19 @@
       "bytes": 691
     },
     {
+      "path": "corpus/s2-008-campaign/preregistration-v14-superseded.json",
+      "sha256": "77fabbe9ef92c8dbc281a78f7242fa6ce8f42031b8a4642783a2e3869c3d40bc",
+      "bytes": 28400
+    },
+    {
       "path": "corpus/s2-008-campaign/preregistration-v14-supersession.json",
       "sha256": "4330a5ba0a429e9f8ea151773758ef29c3af75bd1c92c293ca3749371e65c13e",
       "bytes": 689
+    },
+    {
+      "path": "corpus/s2-008-campaign/preregistration-v15-supersession.json",
+      "sha256": "584d74cfcef703aa02626c0fc4de259c671a6109482bf0d3f46cd6d454ae1368",
+      "bytes": 757
     },
     {
       "path": "corpus/s2-008-campaign/preregistration-v3-superseded.json",
@@ -2400,6 +2410,21 @@
       "path": "corpus/s2-008-campaign/preregistration.v14.in-force.json",
       "sha256": "77fabbe9ef92c8dbc281a78f7242fa6ce8f42031b8a4642783a2e3869c3d40bc",
       "bytes": 28400
+    },
+    {
+      "path": "corpus/s2-008-campaign/preregistration.v15.approved.json",
+      "sha256": "bde6141e790045548f913239c5936fd91752786a42d6c5492d31890ccf275bc8",
+      "bytes": 30778
+    },
+    {
+      "path": "corpus/s2-008-campaign/preregistration.v15.draft.json",
+      "sha256": "13e552dc7293f8dfc6e0e92991559d1db288b10a2bf606400bb7af196454d9f2",
+      "bytes": 30729
+    },
+    {
+      "path": "corpus/s2-008-campaign/preregistration.v15.in-force.json",
+      "sha256": "fb9496773cd4acafb0fad4e5c860ae6208dea977c919115ffe89d148d141c348",
+      "bytes": 30777
     },
     {
       "path": "corpus/s2-008-campaign/preregistration.v2.approved.json",
@@ -2908,8 +2933,8 @@
     },
     {
       "path": "evidence/FILE_INVENTORY.md",
-      "sha256": "c714788b2d2a8e83cc11277c9aafab560dee2ee022bb272c11f84305b38c5a33",
-      "bytes": 68998
+      "sha256": "4276eb85c0a54a34da203ee011d3ded91aac3a03bc2117d3287666b3c6da418d",
+      "bytes": 69422
     },
     {
       "path": "evidence/frozen-manifest.json",
@@ -3415,6 +3440,16 @@
       "path": "evidence/s2-008-campaign/model-image-pin-v14.json",
       "sha256": "41d97befdd3a42da0a1e74d2f107490ab91c95d5142cbf2bf5202803b8791699",
       "bytes": 5383
+    },
+    {
+      "path": "evidence/s2-008-campaign/model-image-pin-v15-preseal.json",
+      "sha256": "c0c3ad03df0e440fdba6b57951f7da5b90404048a733a600b494af8e202820a6",
+      "bytes": 5990
+    },
+    {
+      "path": "evidence/s2-008-campaign/model-image-pin-v15.json",
+      "sha256": "e76d2bb7d437aa2d8cd7cee360a2b72c3455246091eeb23492018ee168b9e3f0",
+      "bytes": 5990
     },
     {
       "path": "evidence/s2-008-campaign/model-image-pin-v3.json",
