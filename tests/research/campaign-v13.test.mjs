@@ -114,7 +114,7 @@ test('approval CLI accepts v13 and v14 and rejects duplicate, malformed, or futu
   assert.equal(parseApprovalArgs(['--version', 'v14']).version, 'v14');
   assert.throws(() => parseApprovalArgs(['--version', 'v13', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
   assert.throws(() => parseApprovalArgs(['--version', 'v12', '--version', 'v13']), /APPROVE_VERSION_CONFLICT/);
-  for (const version of ['v013', 'v18', 'v1', 'v12x']) {
+  for (const version of ['v013', 'v19', 'v1', 'v12x']) {
     assert.throws(() => parseApprovalArgs(['--version', version]), /APPROVE_VERSION_INVALID/);
   }
 });
@@ -150,7 +150,7 @@ test('active version and prepare seal routing recognize v13 and v14 without allo
   assert.equal(parsePrepareMode(['--seal-v13']), 'seal-v13');
   assert.equal(parsePrepareMode(['--seal-v14']), 'seal-v14');
   assert.throws(() => parsePrepareMode(['--seal-v013']), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => parsePrepareMode(['--seal-v18']), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => parsePrepareMode(['--seal-v19']), /PREPARE_VERSION_INVALID/);
 });
 
 test('v13 model image preflight binds the exact public catalog bytes', () => {

@@ -153,7 +153,7 @@ test("v17 pins raw catalog response, exact free descriptor and Nvidia endpoint",
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test("v17 approval, prepare, run, and evaluator dispatch supports 17 and rejects 18", () => {
+test("v17 approval, prepare, run, and evaluator dispatch supports 17 and rejects 19", () => {
   assert.equal(approveRoute.parseArgs(["--version", "v17", "--principal", "prn-s2007r-owner", "--label", "Daniil"]).version, "v17");
   assert.equal(prepareRoute.parsePrepareMode(["--seal-v17"]), "seal-v17");
   assert.equal(runRoute.campaignCliMode({ v17: true }).requestedVersion, 17);
@@ -174,10 +174,10 @@ test("v17 approval, prepare, run, and evaluator dispatch supports 17 and rejects
     assert.equal(evalRoute.reserveV17EvaluationAccessRoot(target), target);
     assert.throws(() => evalRoute.reserveV17EvaluationAccessRoot(target), /V17_HOLDOUT_ACCESS_ALREADY_RECORDED/);
   } finally { fs.rmSync(accessRoot, { recursive: true, force: true }); }
-  assert.throws(() => approveRoute.parseArgs(["--version", "v18"]), /APPROVE_VERSION_INVALID/);
-  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v18"]), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => runRoute.campaignCliMode({ v18: true }), /CAMPAIGN_VERSION_INVALID/);
-  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v18.in-force.json" } }), null);
+  assert.throws(() => approveRoute.parseArgs(["--version", "v19"]), /APPROVE_VERSION_INVALID/);
+  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v19"]), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => runRoute.campaignCliMode({ v19: true }), /CAMPAIGN_VERSION_INVALID/);
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v19.in-force.json" } }), null);
 });
 
 test("v17 base and prior closure bind exact v16 bytes and preserve unknown failed outcomes", () => {
