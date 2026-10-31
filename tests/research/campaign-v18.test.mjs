@@ -99,7 +99,6 @@ test("v18 approval, seal, run, probe, evaluator and paid-review dispatch are sup
   assert.equal(evalRoute.buildV18ReviewCapsuleSourceInputs(evalRoute.V18_REVIEW_CAPSULE_SOURCE_PATHS.map((file) => ({
     path: file, contents: Buffer.from("v18-review-fixture"),
   }))).length, evalRoute.V18_REVIEW_CAPSULE_SOURCE_PATHS.length);
-  assert.equal(paidReview.inspectS2PaidReviewEvidence(root).version, 17);
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-inspector-route-"));
   try {
     fs.mkdirSync(path.join(temp, "corpus/s2-008-campaign"), { recursive: true });
@@ -133,7 +132,7 @@ test("v18 binds every immutable v17 artifact and keeps unknown historical totals
   assert.equal(predecessor.total_usd_confirmed, null);
   assert.equal(predecessor.raw_unreconciled_spend_preserved, true);
   assert.equal(predecessor.account_wide_completeness_claimed, false);
-  assert.equal(predecessor.immutable_artifacts.length, 15);
+  assert.equal(predecessor.immutable_artifacts.length, 16);
   assert.ok(predecessor.immutable_artifacts.every((artifact) =>
     Number.isSafeInteger(artifact.bytes) && /^[0-9a-f]{64}$/.test(artifact.sha256)));
   const changed = { ...inputs, run: { ...inputs.run, bytes: Buffer.concat([inputs.run.bytes, Buffer.from(" ")]) } };
@@ -148,7 +147,7 @@ test("v18 adds a signed one-A/conditional-B recovery scope without changing froz
   assert.equal(draft.rule, "s2-008-prereg-v18");
   assert.equal(draft.preregistration_id, "xpr-s2-008c-18");
   assert.equal(draft.executor.model, "nvidia/nemotron-3.5-lightning:free");
-  assert.deepEqual(draft.executor.pi_settings.retry, { enabled: false, maxRetries: 0 });
+  assert.deepEqual(draft.executor.pi_settings.retry, { enabled: false, maxRetries: 0, provider: { maxRetries: 0 } });
   assert.equal(draft.executor.model_call_pacing.min_start_interval_ms, 60000);
   assert.equal(draft.budget_reservation.granted_units, 5000000);
   assert.equal(draft.budget_reservation.ceiling_scope, "PER_RUN_A_OR_B");

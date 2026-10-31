@@ -86,7 +86,7 @@ function paidEvidence(model) {
     known_calls: 3, known_tokens: 15, unknown_attempts: 0, known_provider_usd: 0, receipts } };
 }
 
-test("v17 routes image build/dry-run through v16 and rejects v18", () => {
+test("v17 image build routing remains stable and unsupported v19 stays rejected", () => {
   assert.deepEqual(image.modelImagePaths("v17", { preseal: true }), {
     tag: "localhost/veritas-s2-008-model:v17",
     stagedPrereg: "corpus/s2-008-campaign/preregistration.v16.in-force.json",
@@ -102,6 +102,7 @@ test("v17 routes image build/dry-run through v16 and rejects v18", () => {
   assert.ok(policyInputs.sourceNames.includes("provider_model_catalog_response"));
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v17"]), "v17");
   assert.equal(image.modelImagePolicyInputs("s2-008-model-image-pin/17").sourceNames.includes("v17_model_policy"), true);
+  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v19"]), /MODEL_IMAGE_VERSION_INVALID/);
   assert.equal(image.modelImagePaths("v16").schema, "s2-008-model-image-pin/16");
 });
 
