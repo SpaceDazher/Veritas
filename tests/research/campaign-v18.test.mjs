@@ -127,6 +127,16 @@ function makeV18ImageContext(temp) {
 function createV18ARepoFixture(tempRoot, fixture) {
   const aRoot = path.join(tempRoot, "a-clone");
   execFileSync("git", ["clone", "--quiet", "--shared", "--no-hardlinks", root, aRoot]);
+  const v17Manifest = approval.readV18BaseInputs({ repoRoot: root, allowHistorical: true }).manifest;
+  fs.writeFileSync(path.join(aRoot, "corpus/s2-008-campaign/manifest.json"),
+    JSON.stringify(v17Manifest, null, 2) + "\n");
+  for (const relative of [
+    "corpus/s2-008-campaign/preregistration.v18.draft.json",
+    "corpus/s2-008-campaign/preregistration.v18.approved.json",
+    ...seal.V18_SEAL_TARGETS.map((name) => "corpus/s2-008-campaign/" + name),
+    "evidence/s2-008-campaign/model-image-pin-v18-preseal.json",
+    "evidence/s2-008-campaign/model-image-pin-v18.json",
+  ]) fs.rmSync(path.join(aRoot, relative), { force: true });
   for (const relative of image.modelImagePolicyInputs("s2-008-model-image-pin/18").stageFiles) {
     const source = path.join(root, relative);
     assert.ok(fs.existsSync(source), `missing bound fixture input ${relative}`);
@@ -767,8 +777,6 @@ test("v13-v17 allowHistorical readers use a validated v18 bridge without changin
     assert.equal(v17View.preregistration.file, "preregistration.v17.in-force.json");
     assert.equal(v17View.preregistration.sealed_before_first_trial, true);
     assert.equal(v17View.superseded_preregistration.superseded_by, "preregistration.v17.in-force.json");
-    fs.cpSync(path.join(root, "evidence/s2-008-campaign"), path.join(aRoot, "evidence/s2-008-campaign"),
-      { recursive: true, force: true });
     const readers = [
       [13, oldV13.readV13BaseInputs, "preregistration.v12.in-force.json", "preregistration-v12-supersession.json"],
       [14, oldV14.readV14BaseInputs, "preregistration.v13.in-force.json", "preregistration-v13-supersession.json"],
@@ -859,7 +867,7 @@ test("v18 runtime rejects a bad pin, mismatched credential, and mutated predeces
     dryRun: false, pin: v18RuntimePin, prereg: v18RuntimePrereg, remainingTokens: 4999999,
     inspect: v18RuntimeInspect, processEnv: { OPENROUTER_API_KEY: "synthetic-wrong-fingerprint" },
     executePaid: async () => { paidCalls += 1; return {}; },
-  }), /V18_CREDENTIAL_ENV_FINGERPRINT_MISMATCH/);
+  }), /V18_CREDENTIAL_METADATA_INVALID/);
 
   const tampered = structuredClone(v18RuntimePrereg);
   tampered.v17_prior_execution_reconciliation.known_tokens_lower_bound += 1;

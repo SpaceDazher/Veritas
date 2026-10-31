@@ -438,13 +438,17 @@ test("v17 receipt validation accepts only requested free ID or bound canonical f
 });
 
 
-const sealedV17RunnerInputs = () => ({
-  prereg: JSON.parse(fs.readFileSync(path.join(root, 'corpus/s2-008-campaign/preregistration.v17.in-force.json'))),
-  manifest: JSON.parse(fs.readFileSync(path.join(root, 'corpus/s2-008-campaign/manifest.json'))),
-  modelPin: JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v17.json'))),
-  expectedVersion: 17, write: false,
-  resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
-});
+const sealedV17RunnerInputs = () => {
+  const prereg = JSON.parse(fs.readFileSync(path.join(root, 'corpus/s2-008-campaign/preregistration.v17.in-force.json')));
+  return {
+    prereg,
+    manifest: { preregistration: { file: 'preregistration.v17.in-force.json', status: 'IN_FORCE',
+      preregistration_digest: prereg.preregistration_digest, sealed_before_first_trial: true } },
+    modelPin: JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v17.json'))),
+    expectedVersion: 17, write: false,
+    resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+  };
+};
 test('v17 runner checks the shared container pacer before a paid model launch', async () => {
   const input = sealedV17RunnerInputs();
   let now = Date.parse('2026-11-01T00:00:00.000Z'), pacerCalls = 0, modelCalls = 0;

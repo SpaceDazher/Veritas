@@ -56,6 +56,8 @@ import { assertV16CredentialMetadata, assertV16ExecutorPolicy, assertV16ModelCat
 import { assertV17CredentialMetadata, assertV17ExecutorPolicy, assertV17ModelCatalogFiles } from './s2-008-campaign-v17-policy.mjs';
 import { assertV16PresealPin, assertV16PriorExecutionReconciliation, readV16BaseInputs, readV16PriorExecutionInputs } from './s2-008-campaign-v16-approval.mjs';
 import { assertV17PresealPin, assertV17PriorExecutionReconciliation, readV17BaseInputs, readV17PriorExecutionInputs } from './s2-008-campaign-v17-approval.mjs';
+import { V18_MODEL_POLICY, assertV18CredentialMetadata, assertV18ExecutorPolicy, assertV18ModelCatalogFiles, assertV18RecoveryAuthorizationPolicy } from './s2-008-campaign-v18-policy.mjs';
+import { assertV18PresealPin, assertV18PriorExecutionReconciliation, readV18BaseInputs, readV18PriorExecutionInputs } from './s2-008-campaign-v18-approval.mjs';
 import { BASE_IMAGE, assertDigestPinned, normalizeDigest } from '../src/lib/isolation/image.mjs';
 import { SANDBOX_ISOLATION_EXECUTOR } from '../src/lib/isolation/profile.mjs';
 import { buildInvocation, executeIsolated, PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
@@ -926,7 +928,22 @@ export function assertPinnedModelImage({
   if (prereg?.executor?.model_image?.content_commitment !== built.content_commitment) {
     throw new Error('MODEL_CONTENT_COMMITMENT_MISMATCH');
   }
-  if (version === 17) {
+  if (version === 18) {
+    const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v18.in-force.json'));
+    assertV18ExecutorPolicy(prereg.executor);
+    assertV18ModelCatalogFiles(
+      path.join(REPO_ROOT, V18_MODEL_POLICY.catalog_file),
+      path.join(REPO_ROOT, V18_MODEL_POLICY.endpoint_catalog_file),
+      path.join(REPO_ROOT, V18_MODEL_POLICY.catalog_response_file),
+    );
+    assertV18PresealPin({ pin, baseBytes: preregBytes, commitment: prereg.executor.model_image.content_commitment });
+    readV18BaseInputs({ allowHistorical: true });
+    const prior = assertV18PriorExecutionReconciliation(readV18PriorExecutionInputs());
+    if (canonicalDigest(prereg.v17_prior_execution_reconciliation ?? null) !== canonicalDigest(prior)) {
+      throw new Error('MODEL_V18_PRIOR_RECONCILIATION_BINDING_MISMATCH');
+    }
+    assertV18RecoveryAuthorizationPolicy(prereg);
+  } else if (version === 17) {
     const preregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v17.in-force.json'));
     assertV17ExecutorPolicy(prereg.executor);
     assertV17ModelCatalogFiles();
@@ -1069,9 +1086,10 @@ export async function runModelTrial({
   const v14Policy = prereg.rule === 's2-008-prereg-v14' ? assertV14ExecutorPolicy(prereg.executor) : null;
   const v15Policy = prereg.rule === 's2-008-prereg-v15' ? assertV15ExecutorPolicy(prereg.executor) : null;
   const v16Policy = prereg.rule === 's2-008-prereg-v16' ? assertV16ExecutorPolicy(prereg.executor) : null;
-const v17Policy = prereg.rule === 's2-008-prereg-v17' ? assertV17ExecutorPolicy(prereg.executor) : null;
+  const v17Policy = prereg.rule === 's2-008-prereg-v17' ? assertV17ExecutorPolicy(prereg.executor) : null;
+  const v18Policy = prereg.rule === 's2-008-prereg-v18' ? assertV18ExecutorPolicy(prereg.executor) : null;
   const argv = modelTrialArgv({ armId, seed, dryRun, remainingTokens, preregRule: prereg.rule,
-    minStartIntervalMs: (v17Policy ?? v16Policy ?? v15Policy ?? v14Policy)?.minStartIntervalMs });
+    minStartIntervalMs: (v18Policy ?? v17Policy ?? v16Policy ?? v15Policy ?? v14Policy)?.minStartIntervalMs });
   let observation;
   let invocation = null;
   if (dryRun) {
@@ -1080,12 +1098,15 @@ const v17Policy = prereg.rule === 's2-008-prereg-v17' ? assertV17ExecutorPolicy(
     });
     observation = await executeDry(invocation, { env: PODMAN_ENV });
   } else {
-    if (v17Policy) {
+    if (v18Policy) {
+      const envValue = processEnv?.[v18Policy.envName];
+      assertV18CredentialMetadata(prereg.executor,
+        { present: typeof envValue === 'string' && envValue.length > 0, fingerprint: credentialFingerprint(envValue) }, processEnv);
+    } else if (v17Policy) {
       const envValue = processEnv?.[v17Policy.envName];
       assertV17CredentialMetadata(prereg.executor,
         { present: typeof envValue === 'string' && envValue.length > 0, fingerprint: credentialFingerprint(envValue) }, processEnv);
-    }
-if (v16Policy) {
+    } else if (v16Policy) {
       const envValue = processEnv?.[v16Policy.envName];
       assertV16CredentialMetadata(prereg.executor,
         { present: typeof envValue === 'string' && envValue.length > 0, fingerprint: credentialFingerprint(envValue) }, processEnv);
@@ -1102,9 +1123,9 @@ if (v16Policy) {
       image: pinned.imageId, argv, timeoutMs,
       name: 's2-008-model-v' + modelPreregVersion(prereg.rule) + '-' + String(seed),
       provider: prereg.executor.provider,
-      envName: v17Policy?.envName ?? v16Policy?.envName ?? v15Policy?.envName ?? credentialEnvNameForPreregistration(prereg),
-      ...((v14Policy || v15Policy || v16Policy || v17Policy) ? { requireExplicitCredentialSource: true, credentialEnv: processEnv,
-        ...((v15Policy || v16Policy || v17Policy) ? { expectedCredentialFingerprint: '8f7ea446a8707bea' } : {}) } : {}),
+      envName: v18Policy?.envName ?? v17Policy?.envName ?? v16Policy?.envName ?? v15Policy?.envName ?? credentialEnvNameForPreregistration(prereg),
+      ...((v14Policy || v15Policy || v16Policy || v17Policy || v18Policy) ? { requireExplicitCredentialSource: true, credentialEnv: processEnv,
+        ...((v15Policy || v16Policy || v17Policy || v18Policy) ? { expectedCredentialFingerprint: '8f7ea446a8707bea' } : {}) } : {}),
     });
     observation = paid.observation;
     invocation = paid.invocation;
