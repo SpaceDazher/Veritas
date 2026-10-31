@@ -809,6 +809,9 @@ if (mode === 'seal-v2') {
 } else if (mode === 'seal-v7') {
   const { sealV7OnDisk } = await import('./s2-008-campaign-seal-v7.mjs');
   console.log(JSON.stringify({ mode: 'seal-v7', ...sealV7OnDisk() }, null, 2));
+} else if (mode === 'seal-v18') {
+  const { sealV18OnDisk } = await import('./s2-008-campaign-seal-v18.mjs');
+  console.log(JSON.stringify({ mode: 'seal-v18', ...sealV18OnDisk() }, null, 2));
 } else if (mode === 'seal-v17') {
   const { sealV17OnDisk } = await import('./s2-008-campaign-seal-v17.mjs');
   console.log(JSON.stringify({ mode: 'seal-v17', ...sealV17OnDisk() }, null, 2));

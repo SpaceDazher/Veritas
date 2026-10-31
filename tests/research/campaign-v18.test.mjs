@@ -4,9 +4,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { canonicalDigest } from "../../src/lib/verifier/canonical-json.mjs";
+import { buildInvocation } from "../../src/lib/isolation/launch.mjs";
+import { SANDBOX_ISOLATION_EXECUTOR } from "../../src/lib/isolation/profile.mjs";
 import { FROZEN_MEMBERS, scopeDrift } from "../../scripts/s2-008-campaign-approve.mjs";
+import { preregistrationDigest } from "../../src/lib/research/index.mjs";
 import * as image from "../../scripts/s2-008-campaign-model-image.mjs";
 import * as approveRoute from "../../scripts/s2-008-campaign-approve.mjs";
 import * as prepareRoute from "../../scripts/s2-008-campaign-prepare-cli.mjs";
@@ -41,6 +45,7 @@ function makePin(schema, preregBytes) {
         : name === "provider_model_catalog" ? catalog.catalog_sha256
           : name === "provider_model_catalog_response" ? catalog.catalog_response_sha256
             : name === "provider_model_endpoint_catalog" ? catalog.endpoint_catalog_sha256
+        : name === "v18_predecessor_evidence" ? approval.V18_RECOVERY_EVIDENCE_DIGEST
               : sha(Buffer.from("v18-fixture:" + name))]));
   const covers = Object.keys(sources).filter((name) => name !== "prereg").sort();
   const commitment = canonicalDigest(Object.fromEntries(covers.map((key) => [key, sources[key]])));
@@ -67,6 +72,168 @@ function v18Fixture() {
   return fixtureCache;
 }
 
+function writeJson(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const bytes = Buffer.from(JSON.stringify(value, null, 2) + "\n");
+  fs.writeFileSync(file, bytes, { flag: "wx", mode: 0o600 });
+  return bytes;
+}
+
+function createV18ARepoFixture(tempRoot, fixture) {
+  const aRoot = path.join(tempRoot, "a-clone");
+  execFileSync("git", ["clone", "--quiet", "--shared", "--no-hardlinks", root, aRoot]);
+  for (const relative of image.modelImagePolicyInputs("s2-008-model-image-pin/18").stageFiles) {
+    const source = path.join(root, relative);
+    assert.ok(fs.existsSync(source), `missing bound fixture input ${relative}`);
+    const target = path.join(aRoot, relative);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(source, target);
+  }
+
+  const corpus = path.join(aRoot, "corpus/s2-008-campaign");
+  const evidence = path.join(aRoot, "evidence/s2-008-campaign");
+  writeJson(path.join(corpus, "preregistration.v18.draft.json"), fixture.draft);
+  writeJson(path.join(corpus, "preregistration.v18.approved.json"), fixture.signed);
+  writeJson(path.join(evidence, "model-image-pin-v18-preseal.json"), fixture.pin);
+  writeJson(path.join(evidence, "model-image-pin-v18.json"), fixture.finalPin);
+  seal.sealV18OnDisk(aRoot);
+  assert.equal(seal.checkV18OnDisk(aRoot).preregistration_digest, fixture.sealed.prereg.preregistration_digest);
+
+  const commit = execFileSync("git", ["-C", aRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  const tree = execFileSync("git", ["-C", aRoot, "rev-parse", "HEAD^{tree}"], { encoding: "utf8" }).trim();
+  const caseRows = JSON.parse(fs.readFileSync(path.join(root, "corpus/s2-008-campaign/cases/holdout.blind.json"), "utf8"));
+  const caseIds = caseRows.map((row) => row.case_id).sort();
+  assert.equal(caseIds.length, 126);
+  const context = adapter.campaignImageContextDigest();
+  const controlImageId = "sha256:" + "1".repeat(64);
+  const controlDigest = "sha256:" + "2".repeat(64);
+  const controlPin = {
+    kind: "s2-008-campaign-control-image-pin/1",
+    first: { imageId: controlImageId, digest: controlDigest, architecture: "amd64", context_digest: context, build_exit: 0 },
+    second: { imageId: controlImageId, digest: controlDigest, architecture: "amd64", context_digest: context, build_exit: 0 },
+    identical: true, context_digest_stable: true, source_base: { commit_sha: commit, tree_sha: tree },
+  };
+  assert.equal(adapter.validateControlImagePinEvidence(controlPin, { commit, tree }), true);
+  const runId = "s2-008c-v18-a-positive-fixture";
+  const nonce = "nonce-v18-positive-fixture";
+  const report = {
+    kind: "s2-008-campaign-v18-predictions/1", raw_run_id: runId, label: "a", nonce,
+    status: "MEASURED", preregistration_digest: fixture.sealed.prereg.preregistration_digest,
+    base: { commit_sha: commit, tree_sha: tree, worktree_dirty: false },
+    model_calls: 3, model_calls_is_lower_bound: false, spent_units: 15,
+    spent_units_is_lower_bound: false, unknown_model_attempts: 0, unreconciled_spend: false,
+    model_call_pacing: { min_start_interval_ms: 60000, container_starts: 3, wait_count: 2, waited_ms: 120000 },
+    control_image_pin: controlPin, trials: [],
+  };
+  const pinRelative = "evidence/s2-008-campaign/control-image-pin-v18-a.json";
+  const pinBytes = writeJson(path.join(aRoot, pinRelative), {
+    kind: "s2-008-campaign-control-image-pin-artifact/1", label: "a", raw_run_id: runId, nonce,
+    base: { commit_sha: commit, tree_sha: tree }, control_image_pin: controlPin,
+  });
+  report.control_image_pin_artifact = { file: pinRelative, bytes: pinBytes.length, sha256: sha(pinBytes) };
+
+  const provider = modelPolicy.V18_MODEL_POLICY.provider_name;
+  const model = modelPolicy.V18_MODEL_POLICY.model;
+  const createdAt = "2026-11-01T00:00:00.000Z";
+  const epoch = Math.floor(Date.parse(createdAt) / 1000);
+  const receiptRows = [];
+  const reconciliationRows = [];
+  const modelSidecars = [];
+  const samples = fixture.sealed.prereg.noise_rule.bootstrap_samples;
+  const timeoutMs = fixture.sealed.prereg.budget_reservation.trial_timeout_ms;
+
+  for (const trial of fixture.sealed.prereg.trial_list) {
+    const isModel = trial.arm_id === "arm-model-zai-glm53flash";
+    const seeds = [];
+    for (const [seedIndex, seed] of fixture.sealed.prereg.seed_rule.seeds.entries()) {
+      const rows = caseIds.map((case_id) => ({ case_id, predicted: "MINOR" }));
+      const sidecar = {
+        kind: "s2-008-campaign-predictions/1", run: "a", arm_id: trial.arm_id, seed,
+        unparsed: 0, model_calls: isModel ? 1 : null, spent_tokens: isModel ? 5 : null,
+        usd_spent: isModel ? 0 : null, outcome_class: isModel ? "MEASURED" : null, rows,
+      };
+      if (isModel) {
+        const generationId = `gen-${epoch}-${String(seedIndex + 1).padStart(16, "0")}`;
+        const caseId = `fixture-case-${seed}`;
+        const local = { generation_id: generationId, case_id: caseId, input: 3, output: 2,
+          cacheRead: 0, cacheWrite: 0, prompt_tokens: 3, totalTokens: 5,
+          prompt_token_basis: "input+cacheRead+cacheWrite", usage_components_consistent: true,
+          reported_cost_usd: null };
+        sidecar.accounting = { policy: "GENERATION_ID_REQUIRED", calls: 1, tokens: 5, rows: [local] };
+        const receipt = { id: generationId, provider, model, created_at: createdAt, http_status: 200,
+          native_prompt: 3, native_completion: 2, native_cached: 0, generation_time: 1,
+          cancelled: false, finish_reason: "stop", matches_local: true, total_cost: 0 };
+        receiptRows.push(receipt);
+        reconciliationRows.push({ generation_id: generationId, provider, case_id: caseId,
+          created_at: createdAt, input: 3, output: 2, cached: 0, total_tokens: 5, provider_reported_usd: 0 });
+      }
+      const relative = `evidence/s2-008-campaign/predictions-v18-a-${trial.trial_id}-${seed}.json`;
+      const sidecarBytes = writeJson(path.join(aRoot, relative), sidecar);
+      const predictionRef = { file: relative, digest: canonicalDigest(sidecar), rows: 126, unparsed: 0 };
+      let launch;
+      if (isModel) {
+        launch = { exit_code: 0, signal: null, timed_out: false, arm_report: {
+          outcome_class: "MEASURED", executor: { model_attempts: 1, model_calls: 1,
+            unknown_model_attempts: 0, model_call_pacing: { min_start_interval_ms: 60000,
+              call_starts: 1, wait_count: 0, waited_ms: 0 } },
+        } };
+        modelSidecars.push({ relative, sha256: sha(sidecarBytes) });
+      } else {
+        const pid = process.pid + 10000 + seedIndex;
+        const output = { kind: "s2-008-campaign-adapter-predict/1", arm_id: trial.arm_id, seed,
+          n_cases: 126, predictions: rows, container: { node_version: process.version, pid,
+            argv_tail: [trial.arm_id, String(seed)], cwd: "/opt/campaign", labels_seen: false } };
+        const invocation = buildInvocation(SANDBOX_ISOLATION_EXECUTOR, {
+          image: controlImageId,
+          argv: ["/usr/local/bin/node", "/opt/campaign/arm.mjs", "/opt/campaign/holdout.blind.json",
+            "/tmp/campaign-out.json", trial.arm_id, String(seed), String(samples)],
+          timeoutMs, name: `s2-008-campaign-${trial.arm_id}-${seed}`,
+        });
+        const record = { arm_id: trial.arm_id, seed, samples, podman: { executable: "podman", argv_prefix: [] },
+          container_argv: invocation.podmanArgv, image: controlImageId, image_break_requested: false,
+          axes: invocation.axes, exit_code: 0, signal: null, timed_out: false, stderr_excerpt: "",
+          banner: `ADAPTER_OK arm=${trial.arm_id} seed=${seed} n=126 predictions=126 pid=${pid} node=${process.version}`,
+          payload_chunks: 1, payload_error: null, output_digest: canonicalDigest(output),
+          predictions: { digest: canonicalDigest(sidecar), rows: 126, unparsed: 0 },
+          real_start: { proven: true, separate_process: true, container_pid: pid, host_pid: process.pid,
+            container_runtime_version: process.version, pin_rechecked_by: "src/lib/isolation/image.mjs#assertImageMatchesPin" } };
+        assert.equal(adapter.validateControlExecution({ ok: true, output, record }, { armId: trial.arm_id,
+          seed, samples, timeoutMs, runLabel: "a", caseIds, imageId: controlImageId, imageDigest: controlDigest }), true);
+        launch = { ...record, image_digest: controlDigest, arm_report: output,
+          control_execution: { kind: "s2-008-campaign-control-execution/1", outcome_class: "MEASURED_CONTROL",
+            pin_digest: canonicalDigest(controlPin), output_digest: canonicalDigest(output) },
+          predictions: record.predictions };
+      }
+      if (!isModel) launch.predictions = predictionRef;
+      seeds.push({ seed, outcome_class: isModel ? "MEASURED" : "MEASURED_CONTROL",
+        predictions: predictionRef, launch });
+    }
+    report.trials.push({ trial_id: trial.trial_id, arm_id: trial.arm_id, seeds });
+  }
+
+  const reportBytes = Buffer.from(JSON.stringify(report, null, 2) + "\n");
+  const reportPath = path.join(evidence, "run-v18-a.json");
+  fs.writeFileSync(reportPath, reportBytes, { flag: "wx", mode: 0o600 });
+  const receiptsRelative = "evidence/s2-008-campaign/provider-receipts-v18-a-positive-fixture.json";
+  const receipts = { status: "KNOWN_GENERATIONS_MATCH", run_id: runId, known_calls: 3,
+    known_tokens: 15, known_provider_usd: 0, unknown_attempts: 0, receipts: receiptRows };
+  const receiptsBytes = writeJson(path.join(aRoot, receiptsRelative), receipts);
+  writeJson(path.join(evidence, "reconciliation-v18-a.json"), {
+    kind: "s2-008-v18-a-reconciliation/1", status: "RECONCILED",
+    preregistration_digest: fixture.sealed.prereg.preregistration_digest, prior_run_id: runId,
+    prior_run_sha256: sha(reportBytes), provider: "openrouter", model,
+    sidecars: modelSidecars.map((row) => ({ file: row.relative, sha256: row.sha256 })),
+    known_receipts_file: receiptsRelative, known_receipts_sha256: sha(receiptsBytes),
+    completeness_basis: "KNOWN_ATTEMPTS_ALL_RECEIPTS",
+    completeness: { basis: "KNOWN_ATTEMPTS_ALL_RECEIPTS", all_local_attempts_accounted: true,
+      unfiltered_account_ledger_claimed: false, confirmed_by: null },
+    provider_rows_verified_via_api: true, completeness_verified_via_api: false,
+    local_model_attempts: 3, locally_accounted_model_calls: 3, matching_requests: 3,
+    unreconciled_attempts: 0, actual_tokens: 15, actual_usd: 0, rows: reconciliationRows,
+  });
+  return { aRoot, evidenceRoot: evidence, reportPath, modelSidecarPath: path.join(aRoot, modelSidecars[0].relative), reportBytes, runId };
+}
+
 test("v18 model-image build stages v17 before seal and commits the recovery policy", () => {
   assert.deepEqual(image.modelImagePaths("v18", { preseal: true }), {
     tag: "localhost/veritas-s2-008-model:v18",
@@ -91,6 +258,11 @@ test("v18 approval, seal, run, probe, evaluator and paid-review dispatch are sup
   assert.equal(prepareRoute.parsePrepareMode(["--seal-v18"]), "seal-v18");
   assert.equal(runRoute.campaignCliMode({ v18: true }).requestedVersion, 18);
   assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v18.in-force.json" } }), "v18");
+  const v17Prereg = JSON.parse(fs.readFileSync(path.join(root,
+    "corpus/s2-008-campaign/preregistration.v17.in-force.json"), "utf8"));
+  assert.deepEqual(evalRoute.validateV18ProbeEvidence({ prereg: v17Prereg }), {
+    ok: false, status: "NOT_RUN", reason: "V18_PREREGISTRATION_DIGEST_MISMATCH",
+  });
   assert.equal(probeRoute.resolveProbePreregistrationPath("corpus/s2-008-campaign/preregistration.v18.in-force.json", root),
     path.join(root, "corpus/s2-008-campaign/preregistration.v18.in-force.json"));
   assert.equal(path.basename(probeRoute.defaultProbeOutputPath({ rule: "s2-008-prereg-v18" }, root)), "probes-v18.json");
@@ -140,7 +312,7 @@ test("v18 binds every immutable v17 artifact and keeps unknown historical totals
 });
 
 test("v18 adds a signed one-A/conditional-B recovery scope without changing frozen science", () => {
-  const { baseInputs, restartInputs, pin, draft, signed } = v18Fixture();
+  const { baseInputs, restartInputs, pin, draft, signed, sealed } = v18Fixture();
   assert.equal(FROZEN_MEMBERS.length, 15);
   for (const member of FROZEN_MEMBERS) assert.deepEqual(draft[member], baseInputs.base[member], member);
   assert.equal(scopeDrift(baseInputs.base, draft), null);
@@ -158,23 +330,19 @@ test("v18 adds a signed one-A/conditional-B recovery scope without changing froz
   assert.equal(draft.recovery_authorization.authorization_scope.maximum_new_a_runs, 1);
   assert.equal(draft.recovery_authorization.authorization_scope.maximum_new_b_runs, 1);
   assert.equal(draft.recovery_authorization.authorization_scope.b_condition, "A_FULLY_MEASURED_AND_RECEIPTS_RECONCILED");
-  assert.equal(draft.recovery_authorization.authorization_scope.within_run_infra_retry_count, 0);
-  assert.equal(draft.recovery_authorization.authorization_scope.next_version_automatic, false);
-  assert.equal(signed.recovery_authorization.authority, "HUMAN_OWNER");
-  assert.equal(signed.recovery_authorization.principal_id, "prn-s2007r-owner");
-  assert.equal(signed.recovery_authorization.label, "Daniil");
-  assert.equal(approval.assertV18RecoveryAuthorization({
-    authorization: signed.recovery_authorization,
-    preregistrationId: signed.preregistration_id,
-    recoveryScopeDigest: signed.recovery_authorization.recovery_scope_digest,
-    priorInputs: restartInputs,
-  }).ok, true);
-  const altered = structuredClone(signed.recovery_authorization);
-  altered.predecessor.raw_run_sha256 = "0".repeat(64);
-  assert.throws(() => approval.assertV18RecoveryAuthorization({
-    authorization: altered, preregistrationId: signed.preregistration_id,
-    recoveryScopeDigest: altered.recovery_scope_digest, priorInputs: restartInputs,
-  }), /V18_RECOVERY_AUTHORIZATION_INVALID/);
+  assert.equal(draft.recovery_authorization.authorization_scope.same_run_retry_permitted, false);
+  assert.equal(draft.recovery_authorization.authorization_scope.on_infra, "RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO");
+  assert.equal(draft.recovery_authorization.authorization_scope.automatic_next_version_permitted, false);
+  assert.equal(signed.recovery_authorization.owner_approval.authority, "HUMAN_OWNER");
+  assert.equal(signed.recovery_authorization.owner_approval.principal_id, "prn-s2007r-owner");
+  assert.equal(signed.recovery_authorization.owner_approval.label, "Daniil");
+  assert.equal(approval.assertV18RecoveryAuthorization(sealed.prereg,
+    approval.assertV18PriorExecutionReconciliation(restartInputs)), true);
+  const altered = structuredClone(sealed.prereg);
+  altered.recovery_authorization.predecessor.prior_raw_run_sha256 = "0".repeat(64);
+  altered.preregistration_digest = preregistrationDigest(altered);
+  assert.throws(() => approval.assertV18RecoveryAuthorization(altered,
+    approval.assertV18PriorExecutionReconciliation(restartInputs)), /V18_RECOVERY_AUTHORIZATION_INVALID/);
   const alteredScience = structuredClone(draft);
   alteredScience.metric = { changed: true };
   assert.equal(scopeDrift(baseInputs.base, alteredScience)?.member, "metric");
@@ -233,7 +401,7 @@ test("v18 adapter pins the new prereg path and enforces the 60-second pacing con
 });
 
 
-test("v18 paid authorization is consumed once in shared state and B blocks until reconciled A", () => {
+test("v18 paid authorization is consumed once in shared state and B blocks until reconciled A", async () => {
   assert.equal(typeof approval.reserveV18RunAuthorization, "function");
   assert.equal(typeof approval.assertV18BEligibility, "function");
   const { sealed } = v18Fixture();
@@ -250,8 +418,103 @@ test("v18 paid authorization is consumed once in shared state and B blocks until
     assert.throws(() => approval.reserveV18RunAuthorization({ prereg: sealed.prereg, label: "a",
       runId: "s2-008c-v18-a-test-two", stateDir, repoRoot: root }),
     /V18_RUN_AUTHORIZATION_ALREADY_CONSUMED/);
-    assert.throws(() => approval.assertV18BEligibility({ repoRoot: root, prereg: sealed.prereg }),
+    await assert.rejects(() => approval.assertV18BEligibility({ repoRoot: root, prereg: sealed.prereg, stateDir }),
     /V18_B_REQUIRES_RECONCILED_A/);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 production reservation ignores environment path overrides across processes", () => {
+  const { sealed } = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-authorization-env-"));
+  const home = path.join(temp, "home");
+  const redirectOne = path.join(temp, "redirect-one");
+  const redirectTwo = path.join(temp, "redirect-two");
+  fs.mkdirSync(home, { recursive: true });
+  const approvalUrl = new URL("../../scripts/s2-008-campaign-v18-approval.mjs", import.meta.url).href;
+  const child = [
+    "import fs from 'node:fs';",
+    "import os from 'node:os';",
+    "os.homedir = () => process.env.VERITAS_V18_TEST_HOME;",
+    `const { reserveV18RunAuthorization } = await import(${JSON.stringify(approvalUrl)});`,
+    "const prereg = JSON.parse(fs.readFileSync(0, 'utf8'));",
+    "try {",
+    "  reserveV18RunAuthorization({ prereg, label: 'a', runId: process.env.VERITAS_V18_TEST_RUN_ID, repoRoot: process.env.VERITAS_V18_TEST_REPO });",
+    "  process.stdout.write('RESERVED');",
+    "} catch (error) {",
+    "  if (error?.message !== 'V18_RUN_AUTHORIZATION_ALREADY_CONSUMED') throw error;",
+    "  process.stdout.write('BLOCKED');",
+    "}",
+  ].join("\n");
+  const invoke = (override, runId) => execFileSync(process.execPath,
+    ["--input-type=module", "-e", child], {
+      cwd: root,
+      env: { PATH: process.env.PATH ?? "", TMPDIR: temp, VERITAS_V18_TEST_HOME: home,
+        VERITAS_V18_AUTHORIZATION_STATE: override,
+        VERITAS_V18_TEST_RUN_ID: runId, VERITAS_V18_TEST_REPO: root },
+      input: JSON.stringify(sealed.prereg), encoding: "utf8",
+    });
+  try {
+    assert.equal(invoke(redirectOne, "s2-008c-v18-a-env-first"), "RESERVED");
+    assert.equal(invoke(redirectTwo, "s2-008c-v18-a-env-second"), "BLOCKED");
+    const ledger = path.join(home, ".local/state/veritas/s2-008-v18-authorization",
+      sealed.prereg.preregistration_digest + "-a.json");
+    assert.equal(fs.existsSync(ledger), true);
+    assert.equal(fs.existsSync(redirectOne), false);
+    assert.equal(fs.existsSync(redirectTwo), false);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 production runner checks durable A reservation before dispatching any model adapter", async () => {
+  const { sealed, preregBytes, finalPin } = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-runner-reservation-"));
+  const stateDir = path.join(temp, "shared-state");
+  const out = path.join(temp, "must-not-be-written.json");
+  let modelCalls = 0;
+  try {
+    approval.reserveV18RunAuthorization({ prereg: sealed.prereg, label: "a",
+      runId: "s2-008c-v18-a-prereserved", stateDir, repoRoot: root });
+    const result = await runRoute.runV4Campaign({
+      label: "a", arm: "arm-model-zai-glm53flash", expectedVersion: 18, write: true, out,
+      prereg: sealed.prereg, preregistrationBytes: preregBytes, manifest: sealed.manifest,
+      modelPin: finalPin, authorizationStateDir: stateDir,
+      resolveBaseFn: () => ({ commit_sha: "a".repeat(40), tree_sha: "b".repeat(40), worktree_dirty: false }),
+      runModel: async () => { modelCalls += 1; throw new Error("UNEXPECTED_MODEL_DISPATCH"); },
+    });
+    assert.equal(result.code, "V18_RUN_AUTHORIZATION_ALREADY_CONSUMED");
+    assert.equal(result.launches, 0);
+    assert.equal(modelCalls, 0);
+    assert.equal(fs.existsSync(out), false);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 B accepts a fully validated A and rejects a changed A prediction sidecar", async () => {
+  const fixture = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-b-eligibility-"));
+  const stateDir = path.join(temp, "shared-state");
+  try {
+    const a = createV18ARepoFixture(temp, fixture);
+    approval.reserveV18RunAuthorization({ prereg: fixture.sealed.prereg, label: "a",
+      runId: a.runId, stateDir, repoRoot: root });
+    approval.completeV18RunAuthorization({ prereg: fixture.sealed.prereg, label: "a", runId: a.runId,
+      stateDir, reportPath: a.reportPath, evidenceRoot: a.evidenceRoot, repoRoot: root });
+    const eligible = await approval.assertV18BEligibility({ repoRoot: root, prereg: fixture.sealed.prereg,
+      stateDir, aEvidenceRoot: a.evidenceRoot });
+    assert.equal(eligible.ok, true);
+    assert.equal(eligible.tokens, 15);
+    assert.equal(eligible.usd, 0);
+
+    const tampered = JSON.parse(fs.readFileSync(a.modelSidecarPath, "utf8"));
+    tampered.rows[0].predicted = "MAJOR";
+    fs.writeFileSync(a.modelSidecarPath, JSON.stringify(tampered, null, 2) + "\n");
+    await assert.rejects(() => approval.assertV18BEligibility({ repoRoot: root,
+      prereg: fixture.sealed.prereg, stateDir, aEvidenceRoot: a.evidenceRoot }),
+    /V18_A_REQUIRES_MEASURED_RECEIPTS_RECONCILIATION|V18_B_REQUIRES_RECONCILED_A/);
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }

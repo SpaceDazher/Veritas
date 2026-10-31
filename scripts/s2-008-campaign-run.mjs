@@ -80,6 +80,9 @@ import { assertV16ExecutorPolicy } from './s2-008-campaign-v16-policy.mjs';
 import { assertV17ExecutorPolicy } from './s2-008-campaign-v17-policy.mjs';
 import { assertV16PresealPin, assertV16PriorExecutionReconciliation, readV16BaseInputs, readV16PriorExecutionInputs } from './s2-008-campaign-v16-approval.mjs';
 import { assertV17PresealPin, assertV17PriorExecutionReconciliation, readV17BaseInputs, readV17PriorExecutionInputs } from './s2-008-campaign-v17-approval.mjs';
+import { assertV18PresealPin, assertV18PriorExecutionReconciliation, assertV18RecoveryAuthorization,
+  assertV18BEligibility, completeV18RunAuthorization, readV18PriorExecutionInputs, reserveV18RunAuthorization } from './s2-008-campaign-v18-approval.mjs';
+import { assertV18ExecutorPolicy, assertV18PreregistrationPolicy } from './s2-008-campaign-v18-policy.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -1098,20 +1101,23 @@ function controlImagePinEvidenceValid(evidence, base) {
 export async function runV4Campaign({
   label = 'a', arm = null, seed = null, dryRun = false, write = true, out = null,
   prereg = null,
+  preregistrationBytes = null,
   manifest = JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, 'manifest.json'), 'utf8')),
   modelPin = null,
   dispatchableArms = DISPATCHABLE_MODEL_ARMS, expectedVersion = null,
   runModel = runModelTrial, runRegex = runTrial, buildRegex = buildImage, resolveBaseFn = resolveBase, now = () => Date.now(),
   containerPacer = null,
+  authorizationStateDir = null,
+  aEvidenceRoot = null,
 } = {}) {
   const safeLabel = String(label);
   if (!/^[a-z0-9][a-z0-9-]{0,19}$/.test(safeLabel)) throw new Error('RUN_LABEL_INVALID');
   const activeFile = manifest?.preregistration?.file;
-  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json', 'preregistration.v8.in-force.json', 'preregistration.v9.in-force.json', 'preregistration.v10.in-force.json', 'preregistration.v11.in-force.json', 'preregistration.v12.in-force.json', 'preregistration.v13.in-force.json', 'preregistration.v14.in-force.json', 'preregistration.v15.in-force.json', 'preregistration.v16.in-force.json', "preregistration.v17.in-force.json"].includes(activeFile)) {
+  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json', 'preregistration.v8.in-force.json', 'preregistration.v9.in-force.json', 'preregistration.v10.in-force.json', 'preregistration.v11.in-force.json', 'preregistration.v12.in-force.json', 'preregistration.v13.in-force.json', 'preregistration.v14.in-force.json', 'preregistration.v15.in-force.json', 'preregistration.v16.in-force.json', "preregistration.v17.in-force.json", 'preregistration.v18.in-force.json'].includes(activeFile)) {
     throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
   }
-  prereg = prereg ?? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8'));
-  const version = prereg.rule === 's2-008-prereg-v17' ? 17 : prereg.rule === 's2-008-prereg-v16' ? 16 : prereg.rule === 's2-008-prereg-v15' ? 15 : prereg.rule === 's2-008-prereg-v14' ? 14 : prereg.rule === 's2-008-prereg-v13' ? 13 : prereg.rule === 's2-008-prereg-v12' ? 12 : prereg.rule === 's2-008-prereg-v11' ? 11 : prereg.rule === 's2-008-prereg-v10' ? 10 : prereg.rule === 's2-008-prereg-v9' ? 9 : prereg.rule === 's2-008-prereg-v8' ? 8 : prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  prereg = prereg ?? (preregistrationBytes ? JSON.parse(Buffer.from(preregistrationBytes).toString('utf8')) : JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8')));
+  const version = prereg.rule === 's2-008-prereg-v18' ? 18 : prereg.rule === 's2-008-prereg-v17' ? 17 : prereg.rule === 's2-008-prereg-v16' ? 16 : prereg.rule === 's2-008-prereg-v15' ? 15 : prereg.rule === 's2-008-prereg-v14' ? 14 : prereg.rule === 's2-008-prereg-v13' ? 13 : prereg.rule === 's2-008-prereg-v12' ? 12 : prereg.rule === 's2-008-prereg-v11' ? 11 : prereg.rule === 's2-008-prereg-v10' ? 10 : prereg.rule === 's2-008-prereg-v9' ? 9 : prereg.rule === 's2-008-prereg-v8' ? 8 : prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
   if (expectedVersion !== null && expectedVersion !== version) throw new Error('ACTIVE_CAMPAIGN_VERSION_MISMATCH');
   const campaignKind = `s2-008-campaign-v${version}-predictions/1`;
   const base = resolveBaseFn();
@@ -1176,6 +1182,16 @@ export async function runV4Campaign({
     const prior = assertV17PriorExecutionReconciliation(baseInputs.base, readV17PriorExecutionInputs());
     if (canonicalDigest(prereg.v16_prior_execution_reconciliation) !== canonicalDigest(prior)) throw new Error('V17_PRIOR_V16_RECONCILIATION_BINDING_MISMATCH');
   }
+  let v18Prior = null;
+  if (prereg.rule === 's2-008-prereg-v18') {
+    assertV18PreregistrationPolicy(prereg);
+    v18Prior = assertV18PriorExecutionReconciliation(readV18PriorExecutionInputs({ repoRoot: REPO_ROOT }));
+    assertV18RecoveryAuthorization(prereg, v18Prior);
+    if (canonicalDigest(prereg.v17_prior_execution_reconciliation) !== canonicalDigest(v18Prior) ||
+        prereg.recovery_authorization.authorization_scope?.on_infra !== 'RECONCILIATION_REQUIRED_NOT_RETRY_NOT_ZERO') {
+      throw new Error('V18_PRIOR_V17_RECONCILIATION_BINDING_MISMATCH');
+    }
+  }
 if (prereg.rule === 's2-008-prereg-v16') {
     const baseInputs = readV16BaseInputs({ allowHistorical: true });
     const prior = assertV16PriorExecutionReconciliation(baseInputs.base, readV16PriorExecutionInputs());
@@ -1210,7 +1226,7 @@ if (prereg.rule === 's2-008-prereg-v16') {
   // Its arm would take a fresh 5m grant at every seed. Paid v4 is therefore
   // refused before building or launching anything; only a sealed successor
   // whose image contains the cap-aware arm may spend.
-  if (!dryRun && !['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule)) {
+  if (!dryRun && !['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17", 's2-008-prereg-v18'].includes(prereg.rule)) {
     const code = version === 6 ? 'MODEL_CREDENTIAL_ENV_RESEAL_REQUIRED'
       : version === 5 ? 'MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED' : 'MODEL_CAP_RESEAL_REQUIRED';
     return {
@@ -1235,8 +1251,8 @@ if (prereg.rule === 's2-008-prereg-v16') {
       preregistration_digest: prereg.preregistration_digest,
     };
   }
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule)) {
-    if (prereg.rule === 's2-008-prereg-v14' || prereg.rule === 's2-008-prereg-v15' || prereg.rule === 's2-008-prereg-v16' || prereg.rule === 's2-008-prereg-v17') assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17", 's2-008-prereg-v18'].includes(prereg.rule)) {
+    if (prereg.rule === 's2-008-prereg-v14' || prereg.rule === 's2-008-prereg-v15' || prereg.rule === 's2-008-prereg-v16' || prereg.rule === 's2-008-prereg-v17' || prereg.rule === 's2-008-prereg-v18') assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     else assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     if (prereg.holdout_access?.case_count !== 126) throw new Error('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH');
   }
@@ -1245,6 +1261,7 @@ if (prereg.rule === 's2-008-prereg-v16') {
   if (prereg.rule === 's2-008-prereg-v14') assertV14ExecutorPolicy(prereg.executor);
   if (prereg.rule === 's2-008-prereg-v15') assertV15ExecutorPolicy(prereg.executor);
   if (prereg.rule === 's2-008-prereg-v17') assertV17ExecutorPolicy(prereg.executor);
+  if (prereg.rule === 's2-008-prereg-v18') assertV18ExecutorPolicy(prereg.executor);
 if (prereg.rule === 's2-008-prereg-v16') assertV16ExecutorPolicy(prereg.executor);
   if (!dryRun && prereg.rule === 's2-008-prereg-v7') assertV7ExecutorPolicy(prereg.executor);
   const declaredPinPath = prereg.executor?.model_image?.built_image_pin;
@@ -1260,6 +1277,10 @@ if (prereg.rule === 's2-008-prereg-v16') assertV16ExecutorPolicy(prereg.executor
   if (version === 17) {
     const finalPreregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v17.in-force.json'));
     assertV17PresealPin({ pin: activeModelPin, baseBytes: finalPreregBytes, commitment: prereg.executor?.model_image?.content_commitment });
+  }
+  if (version === 18) {
+    const finalPreregBytes = preregistrationBytes ? Buffer.from(preregistrationBytes) : fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v18.in-force.json'));
+    assertV18PresealPin({ pin: activeModelPin, baseBytes: finalPreregBytes, commitment: prereg.executor?.model_image?.content_commitment });
   }
 if (version === 16) {
     const finalPreregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v16.in-force.json'));
@@ -1287,7 +1308,7 @@ if (version === 16) {
     };
   }
   const entries = arm === null ? prereg.trial_list : prereg.trial_list.filter((entry) => entry.arm_id === arm);
-  const controlCaseIds = [12, 13, 14, 15, 16, 17].includes(version)
+  const controlCaseIds = [12, 13, 14, 15, 16, 17, 18].includes(version)
     ? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, "cases/holdout.blind.json"), "utf8")).map((row) => row.case_id)
     : null;
   if (entries.length === 0) throw new Error('CAMPAIGN_ARM_NOT_PREREGISTERED');
@@ -1296,7 +1317,7 @@ if (version === 16) {
   if (write) {
     const reportTarget = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);
     const hasControlArms = entries.some((entry) => entry.arm_id !== 'arm-model-zai-glm53flash');
-    const controlPinTarget = [12, 13, 14, 15, 16, 17].includes(version) && hasControlArms
+    const controlPinTarget = [12, 13, 14, 15, 16, 17, 18].includes(version) && hasControlArms
       ? path.join(REPO_ROOT, 'evidence/s2-008-campaign', 'control-image-pin-v' + version + '-' + safeLabel + '.json') : null;
     const planned = [reportTarget, ...(controlPinTarget ? [controlPinTarget] : []), ...entries.flatMap((entry) => seeds.map((currentSeed) =>
       path.join(REPO_ROOT, 'evidence/s2-008-campaign', 'predictions-v' + version + '-' + safeLabel + '-' + entry.trial_id + '-' + currentSeed + '.json')))];
@@ -1324,7 +1345,7 @@ if (version === 16) {
   let controlImagePin = null;
   let controlImagePinArtifact = null;
   let controlPinBlocked = false;
-  if ([12, 13, 14, 15, 16, 17].includes(version) && hasControlArms) {
+  if ([12, 13, 14, 15, 16, 17, 18].includes(version) && hasControlArms) {
     try {
       const firstBuild = buildRegex();
       const secondBuild = buildRegex();
@@ -1352,9 +1373,23 @@ if (version === 16) {
       };
     }
   }
-  const regexPin = [12, 13, 14, 15, 16, 17].includes(version)
+  const regexPin = [12, 13, 14, 15, 16, 17, 18].includes(version)
     ? controlImagePin?.first ?? null
     : (hasControlArms ? buildRegex().pin : null);
+  const v18AuthorizationStateDir = productionPaidBackend ? null : authorizationStateDir;
+  let v18Authorization = null;
+  if (version === 18 && !dryRun && write && entries.some((entry) => entry.arm_id === 'arm-model-zai-glm53flash') && !controlPinBlocked) {
+    try {
+      if (safeLabel === 'b') await assertV18BEligibility({ repoRoot: REPO_ROOT, prereg,
+        stateDir: v18AuthorizationStateDir, aEvidenceRoot });
+      v18Authorization = reserveV18RunAuthorization({ prereg, label: safeLabel, runId,
+        stateDir: v18AuthorizationStateDir, repoRoot: REPO_ROOT });
+    } catch (error) {
+      const code = String(error?.message ?? 'V18_RUN_AUTHORIZATION_INVALID');
+      return { kind: campaignKind, status: 'BLOCKED', code, reason: code, spent_units: 0,
+        launches: 0, charges: [], trials: [], preregistration_digest: prereg.preregistration_digest };
+    }
+  }
   const trials = [];
   const charges = [];
   let spentUnits = 0;
@@ -1374,7 +1409,7 @@ if (version === 16) {
   let unknownModelAttempts = 0;
   let unknownModelAttemptsUnknown = false;
   const granted = prereg.budget_reservation.granted_units;
-  const v14ContainerPacer = [14, 15, 16, 17].includes(version) ? (containerPacer ?? createV14ContainerPacer()) : null;
+  const v14ContainerPacer = [14, 15, 16, 17, 18].includes(version) ? (containerPacer ?? createV14ContainerPacer()) : null;
   for (const entry of (controlPinBlocked ? [] : entries)) {
     const perSeed = [];
     for (const currentSeed of seeds) {
@@ -1422,7 +1457,7 @@ if (version === 16) {
             remainingTokens: version >= 5 ? granted - spentUnits : undefined,
             predictionsSink: sink, runLabel: safeLabel,
           });
-          if ([14, 15, 16, 17].includes(version) && !dryRun) {
+          if ([14, 15, 16, 17, 18].includes(version) && !dryRun) {
             const expiresAt = Date.parse(prereg.budget_reservation.expires_at);
             const paced = await v14ContainerPacer.run(launchModel, {
               shouldContinue: () => spentUnits < granted && Number(now()) < expiresAt,
@@ -1466,7 +1501,7 @@ if (version === 16) {
         };
       }
       const isModelArm = entry.arm_id === 'arm-model-zai-glm53flash';
-      if ([12, 13, 14, 15, 16, 17].includes(version) && !isModelArm) {
+      if ([12, 13, 14, 15, 16, 17, 18].includes(version) && !isModelArm) {
         const controlValid = controlImagePin !== null && validateControlExecution(result, {
           armId: entry.arm_id, seed: currentSeed, samples: prereg.noise_rule.bootstrap_samples,
           imageId: controlImagePin.first.imageId, imageDigest: controlImagePin.first.digest,
@@ -1482,7 +1517,7 @@ if (version === 16) {
           };
         }
       }
-      if ([12, 13, 14, 15, 16, 17].includes(version) && !isModelArm && result.ok === true && result.output !== null
+      if ([12, 13, 14, 15, 16, 17, 18].includes(version) && !isModelArm && result.ok === true && result.output !== null
           && result.record && controlImagePin !== null) {
         const controlOutcome = dryRun ? 'EXECUTED_CONTROL_DRY_RUN' : 'MEASURED_CONTROL';
         const outputDigest = canonicalDigest(result.output);
@@ -1574,7 +1609,7 @@ if (version === 16) {
     raw_run_id: runId, nonce, base,
     preregistration_digest: prereg.preregistration_digest,
     model_image_pin: { imageId: activeModelPin.first.imageId, digest: activeModelPin.first.digest, content_commitment: activeModelPin.first.content_commitment },
-    ...([12, 13, 14, 15, 16, 17].includes(version) && controlImagePin !== null ? {
+      ...([12, 13, 14, 15, 16, 17, 18].includes(version) && controlImagePin !== null ? {
       control_image_pin: controlImagePin,
       control_image_pin_artifact: controlImagePinArtifact,
     } : {}),
@@ -1585,7 +1620,7 @@ if (version === 16) {
     model_calls: modelCallsUnknown && !hasModelCallsReport ? null : modelCalls,
     model_calls_is_lower_bound: hasModelCallsReport && modelCallsIsLowerBound,
     unknown_model_attempts: unknownModelAttemptsUnknown ? null : unknownModelAttempts,
-    ...([14, 15, 16, 17].includes(version) ? { model_call_pacing: { min_start_interval_ms: v14ContainerPacer.snapshot().minStartIntervalMs,
+    ...([14, 15, 16, 17, 18].includes(version) ? { model_call_pacing: { min_start_interval_ms: v14ContainerPacer.snapshot().minStartIntervalMs,
       container_starts: v14ContainerPacer.snapshot().containerStarts,
       wait_count: v14ContainerPacer.snapshot().waitCount, waited_ms: v14ContainerPacer.snapshot().waitedMs } } : {}),
     launches, unknown_launch_attempts: unknownLaunchAttempts, charges, trials,
@@ -1593,6 +1628,9 @@ if (version === 16) {
   if (write) {
     const target = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);
     fs.writeFileSync(target, `${JSON.stringify(report, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
+    if (v18Authorization?.consumed) completeV18RunAuthorization({ prereg, label: safeLabel, runId,
+      stateDir: v18AuthorizationStateDir, reportPath: target,
+      evidenceRoot: path.join(REPO_ROOT, 'evidence/s2-008-campaign'), repoRoot: REPO_ROOT });
   }
   return report;
 }
@@ -1625,7 +1663,7 @@ export function productionPaidRunRefusal({ dryRun = false, label = 'a', write = 
 
 export function campaignCliMode(args = {}) {
   const versionKeys = Object.keys(args).filter((name) => /^v\d/.test(name));
-  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', "v17"]);
+  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', "v17", 'v18']);
   if (versionKeys.some((name) => !supported.has(name) || args[name] !== true)) {
     throw new Error('CAMPAIGN_VERSION_INVALID');
   }
@@ -1659,6 +1697,7 @@ if (!isEntry) {
     dryRun: args.dryRun === true,
     write: args.write === 'true' || (args.write !== 'false' && args.dryRun !== true),
     out: typeof args.out === 'string' ? args.out : null,
+    aEvidenceRoot: typeof args.aEvidenceRoot === 'string' ? args.aEvidenceRoot : null,
   });
   console.log(JSON.stringify(record, null, 2));
   if (record.status === 'BLOCKED' || record.status === 'BUDGET_STOPPED') process.exitCode = 4;

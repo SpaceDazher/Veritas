@@ -876,6 +876,7 @@ function modelPreregVersion(rule) {
   if (rule === 's2-008-prereg-v13') return 13;
   if (rule === 's2-008-prereg-v15') return 15;
   if (rule === 's2-008-prereg-v17') return 17;
+  if (rule === 's2-008-prereg-v18') return 18;
   if (rule === 's2-008-prereg-v16') return 16;
   if (rule === 's2-008-prereg-v14') return 14;
   if (rule === 's2-008-prereg-v9') return 9;
@@ -891,14 +892,14 @@ export function modelTrialArgv({ armId, seed, dryRun = false, remainingTokens = 
   if (remainingTokens !== undefined && (!Number.isSafeInteger(remainingTokens) || remainingTokens < 0)) {
     throw new Error('SHARED_TOKEN_CAP_INVALID');
   }
-  if (version === 14 || version === 15 || version === 16 || version === 17) {
-    if (minStartIntervalMs !== 60000) throw new Error(version === 17 ? 'V17_MIN_START_INTERVAL_INVALID' : version === 16 ? 'V16_MIN_START_INTERVAL_INVALID' : version === 15 ? 'V15_MIN_START_INTERVAL_INVALID' : 'V14_MIN_START_INTERVAL_INVALID');
+  if (version === 14 || version === 15 || version === 16 || version === 17 || version === 18) {
+    if (minStartIntervalMs !== 60000) throw new Error(version === 18 ? 'V18_MIN_START_INTERVAL_INVALID' : version === 17 ? 'V17_MIN_START_INTERVAL_INVALID' : version === 16 ? 'V16_MIN_START_INTERVAL_INVALID' : version === 15 ? 'V15_MIN_START_INTERVAL_INVALID' : 'V14_MIN_START_INTERVAL_INVALID');
   } else if (minStartIntervalMs !== undefined) throw new Error('V14_MIN_START_INTERVAL_INVALID');
   return [
     '/usr/local/bin/node', MODEL_PROGRAM_IN_IMAGE, MODEL_INPUT_IN_IMAGE,
     '/tmp/model-out.json', armId, preregPath, String(seed),
     ...(remainingTokens === undefined ? [] : ['--remaining-tokens', String(remainingTokens)]),
-    ...([14, 15, 16, 17].includes(version) ? ['--min-start-interval-ms', String(minStartIntervalMs)] : []),
+    ...([14, 15, 16, 17, 18].includes(version) ? ['--min-start-interval-ms', String(minStartIntervalMs)] : []),
     ...(dryRun ? ['--dry-run'] : []),
   ];
 }
