@@ -436,3 +436,42 @@ test("v17 receipt validation accepts only requested free ID or bound canonical f
     ...wrongProvider, version: 17, prereg: draft,
   }));
 });
+
+
+const sealedV17RunnerInputs = () => ({
+  prereg: JSON.parse(fs.readFileSync(path.join(root, 'corpus/s2-008-campaign/preregistration.v17.in-force.json'))),
+  manifest: JSON.parse(fs.readFileSync(path.join(root, 'corpus/s2-008-campaign/manifest.json'))),
+  modelPin: JSON.parse(fs.readFileSync(path.join(root, 'evidence/s2-008-campaign/model-image-pin-v17.json'))),
+  expectedVersion: 17, write: false,
+  resolveBaseFn: () => ({ commit_sha: 'a'.repeat(40), tree_sha: 'b'.repeat(40), worktree_dirty: false }),
+});
+test('v17 runner checks the shared container pacer before a paid model launch', async () => {
+  const input = sealedV17RunnerInputs();
+  let now = Date.parse('2026-11-01T00:00:00.000Z'), pacerCalls = 0, modelCalls = 0;
+  const result = await runRoute.runV4Campaign({ ...input, arm: 'arm-model-zai-glm53flash', now: () => now,
+    containerPacer: { run: async (_launch, { shouldContinue }) => {
+      pacerCalls += 1;
+      assert.equal(shouldContinue(), true);
+      now = Date.parse(input.prereg.budget_reservation.expires_at);
+      assert.equal(shouldContinue(), false);
+      return { proceeded: false, called: false };
+    }, snapshot: () => ({ minStartIntervalMs: 60000, containerStarts: 0, waitCount: 1, waitedMs: 60000 }) },
+    runModel: async () => { modelCalls += 1; throw new Error('UNEXPECTED_MODEL_LAUNCH'); },
+    buildRegex: () => { throw new Error('UNEXPECTED_CONTROL_BUILD'); },
+  });
+  assert.equal(pacerCalls, 1);
+  assert.equal(modelCalls, 0);
+  assert.equal(result.code, 'BUDGET_RESERVATION_EXPIRED');
+});
+test('v17 runner rejects unequal independent control builds before any model launch', async () => {
+  let builds = 0, launches = 0;
+  const result = await runRoute.runV4Campaign({ ...sealedV17RunnerInputs(), now: () => Date.parse('2026-11-01T00:00:00.000Z'),
+    buildRegex: () => ({ pin: { imageId: 'sha256:' + String(++builds).repeat(64),
+      digest: 'sha256:' + 'd'.repeat(64), architecture: 'amd64' }, context_digest: 'c'.repeat(64), build_exit: 0 }),
+    runModel: async () => { launches += 1; throw new Error('UNEXPECTED_MODEL_LAUNCH'); },
+    runRegex: async () => { launches += 1; throw new Error('UNEXPECTED_CONTROL_LAUNCH'); },
+  });
+  assert.equal(builds, 2);
+  assert.equal(launches, 0);
+  assert.equal(result.code, 'CONTROL_IMAGE_PIN_INVALID');
+});
