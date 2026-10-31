@@ -85,7 +85,7 @@ function paidEvidence(model) {
     known_calls: 3, known_tokens: 15, unknown_attempts: 0, known_provider_usd: 0, receipts } };
 }
 
-test("v16 routes image build/dry-run through v15 and rejects v17", () => {
+test("v16 routes image build/dry-run through v15 and rejects v18", () => {
   assert.deepEqual(image.modelImagePaths("v16", { preseal: true }), {
     tag: "localhost/veritas-s2-008-model:v16",
     stagedPrereg: "corpus/s2-008-campaign/preregistration.v15.in-force.json",
@@ -101,7 +101,7 @@ test("v16 routes image build/dry-run through v15 and rejects v17", () => {
   assert.ok(policyInputs.sourceNames.includes("provider_model_catalog_response"));
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v16"]), "v16");
   assert.equal(image.modelImagePolicyInputs("s2-008-model-image-pin/16").sourceNames.includes("v16_model_policy"), true);
-  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v17"]), /MODEL_IMAGE_VERSION_INVALID/);
+  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v18"]), /MODEL_IMAGE_VERSION_INVALID/);
   assert.equal(image.modelImagePaths("v15").schema, "s2-008-model-image-pin/15");
 });
 
@@ -173,10 +173,10 @@ test("v16 approval, prepare, run, and evaluator dispatch supports 16 and rejects
     assert.equal(evalRoute.reserveV16EvaluationAccessRoot(target), target);
     assert.throws(() => evalRoute.reserveV16EvaluationAccessRoot(target), /V16_HOLDOUT_ACCESS_ALREADY_RECORDED/);
   } finally { fs.rmSync(accessRoot, { recursive: true, force: true }); }
-  assert.throws(() => approveRoute.parseArgs(["--version", "v17"]), /APPROVE_VERSION_INVALID/);
-  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v17"]), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => runRoute.campaignCliMode({ v17: true }), /CAMPAIGN_VERSION_INVALID/);
-  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v17.in-force.json" } }), null);
+  assert.throws(() => approveRoute.parseArgs(["--version", "v18"]), /APPROVE_VERSION_INVALID/);
+  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v18"]), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => runRoute.campaignCliMode({ v18: true }), /CAMPAIGN_VERSION_INVALID/);
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v18.in-force.json" } }), null);
 });
 
 test("v16 base and prior closure bind exact v15 bytes and preserve unknown failed outcomes", () => {

@@ -97,7 +97,7 @@ test("v15 routes image build/dry-run through v14 and recognizes v16", () => {
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v15"]), "v15");
   assert.equal(image.parseModelImageCliArgs(["node", "builder", "--v15", "--preseal", "--pi-package-dir", "/tmp/pi"]).version, "v15");
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v16"]), "v16");
-  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v17"]), /MODEL_IMAGE_VERSION_INVALID/);
+  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v18"]), /MODEL_IMAGE_VERSION_INVALID/);
   assert.equal(image.modelImagePaths("v14").schema, "s2-008-model-image-pin/14");
 });
 
@@ -158,10 +158,10 @@ test("v15 approval, prepare, run, and evaluator dispatch supports 15-16 and reje
   assert.equal(prepareRoute.parsePrepareMode(["--seal-v16"]), "seal-v16");
   assert.equal(runRoute.campaignCliMode({ v16: true }).requestedVersion, 16);
   assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v16.in-force.json" } }), "v16");
-  assert.throws(() => approveRoute.parseArgs(["--version", "v17"]), /APPROVE_VERSION_INVALID/);
-  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v17"]), /PREPARE_VERSION_INVALID/);
-  assert.throws(() => runRoute.campaignCliMode({ v17: true }), /CAMPAIGN_VERSION_INVALID/);
-  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v17.in-force.json" } }), null);
+  assert.throws(() => approveRoute.parseArgs(["--version", "v18"]), /APPROVE_VERSION_INVALID/);
+  assert.throws(() => prepareRoute.parsePrepareMode(["--seal-v18"]), /PREPARE_VERSION_INVALID/);
+  assert.throws(() => runRoute.campaignCliMode({ v18: true }), /CAMPAIGN_VERSION_INVALID/);
+  assert.equal(evalRoute.activeCampaignVersion({ preregistration: { file: "preregistration.v18.in-force.json" } }), null);
 });
 
 test("v15 base and prior closure bind raw v14 bytes and keep failed spend unknown", () => {
