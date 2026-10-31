@@ -75,8 +75,8 @@ if (version === 16) return [...V16_REVIEW_CAPSULE_SOURCE_PATHS];
     'scripts/s2-008-campaign-model-image.mjs',
     'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json'];
 };
-const isCapsuleVersion = (version) => version === 11 || version === 12 || version === 13 || version === 14 || version === 15 || version === 16;
-const isControlPinVersion = (version) => version === 12 || version === 13 || version === 14 || version === 15 || version === 16;
+const isCapsuleVersion = (version) => version === 11 || version === 12 || version === 13 || version === 14 || version === 15 || version === 16 || version === 17;
+const isControlPinVersion = (version) => version === 12 || version === 13 || version === 14 || version === 15 || version === 16 || version === 17;
 const CONTROL_RAW_KEYS = Object.freeze([
   'arm_id', 'seed', 'samples', 'podman', 'container_argv', 'image', 'image_break_requested',
   'axes', 'exit_code', 'signal', 'timed_out', 'stderr_excerpt', 'banner', 'payload_chunks',
