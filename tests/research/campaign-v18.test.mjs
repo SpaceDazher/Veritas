@@ -523,6 +523,7 @@ test("v18 production reservation ignores environment path overrides across proce
     "import fs from 'node:fs';",
     "import os from 'node:os';",
     "os.homedir = () => process.env.VERITAS_V18_TEST_HOME;",
+    "os.userInfo = () => ({ homedir: process.env.VERITAS_V18_TEST_ACCOUNT_HOME });",
     `const { reserveV18RunAuthorization } = await import(${JSON.stringify(approvalUrl)});`,
     "const prereg = JSON.parse(fs.readFileSync(0, 'utf8'));",
     "try {",
@@ -533,17 +534,18 @@ test("v18 production reservation ignores environment path overrides across proce
     "  process.stdout.write('BLOCKED');",
     "}",
   ].join("\n");
-  const invoke = (override, runId) => execFileSync(process.execPath,
+  const invoke = (override, runId, untrustedHome) => execFileSync(process.execPath,
     ["--input-type=module", "-e", child], {
       cwd: root,
-      env: { PATH: process.env.PATH ?? "", TMPDIR: temp, VERITAS_V18_TEST_HOME: home,
+      env: { PATH: process.env.PATH ?? "", TMPDIR: temp, VERITAS_V18_TEST_HOME: untrustedHome,
+        VERITAS_V18_TEST_ACCOUNT_HOME: home,
         VERITAS_V18_AUTHORIZATION_STATE: override,
         VERITAS_V18_TEST_RUN_ID: runId, VERITAS_V18_TEST_REPO: root },
       input: JSON.stringify(sealed.prereg), encoding: "utf8",
     });
   try {
-    assert.equal(invoke(redirectOne, "s2-008c-v18-a-env-first"), "RESERVED");
-    assert.equal(invoke(redirectTwo, "s2-008c-v18-a-env-second"), "BLOCKED");
+    assert.equal(invoke(redirectOne, "s2-008c-v18-a-env-first", redirectOne), "RESERVED");
+    assert.equal(invoke(redirectTwo, "s2-008c-v18-a-env-second", redirectTwo), "BLOCKED");
     const ledger = path.join(home, ".local/state/veritas/s2-008-v18-authorization",
       sealed.prereg.preregistration_digest + "-a.json");
     assert.equal(fs.existsSync(ledger), true);
