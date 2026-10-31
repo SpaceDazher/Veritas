@@ -231,3 +231,28 @@ test("v18 adapter pins the new prereg path and enforces the 60-second pacing con
     remainingTokens: 1, preregRule: "s2-008-prereg-v18", minStartIntervalMs: 59999 }),
   /V18_MIN_START_INTERVAL_INVALID/);
 });
+
+
+test("v18 paid authorization is consumed once in shared state and B blocks until reconciled A", () => {
+  assert.equal(typeof approval.reserveV18RunAuthorization, "function");
+  assert.equal(typeof approval.assertV18BEligibility, "function");
+  const { sealed } = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-run-authorization-"));
+  const stateDir = path.join(temp, "shared-state");
+  try {
+    const dry = approval.reserveV18RunAuthorization({ prereg: sealed.prereg, label: "a",
+      runId: "dry-run", stateDir, dryRun: true, repoRoot: root });
+    assert.deepEqual(dry, { consumed: false, reason: "DRY_RUN" });
+    assert.equal(fs.existsSync(stateDir), false);
+    const first = approval.reserveV18RunAuthorization({ prereg: sealed.prereg, label: "a",
+      runId: "s2-008c-v18-a-test-one", stateDir, repoRoot: root });
+    assert.equal(first.consumed, true);
+    assert.throws(() => approval.reserveV18RunAuthorization({ prereg: sealed.prereg, label: "a",
+      runId: "s2-008c-v18-a-test-two", stateDir, repoRoot: root }),
+    /V18_RUN_AUTHORIZATION_ALREADY_CONSUMED/);
+    assert.throws(() => approval.assertV18BEligibility({ repoRoot: root, prereg: sealed.prereg }),
+    /V18_B_REQUIRES_RECONCILED_A/);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
