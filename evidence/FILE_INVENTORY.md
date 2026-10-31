@@ -1,6 +1,6 @@
 # Veritas tracked file inventory
 
-Generated from `git ls-files`; count: 1511.
+Generated from `git ls-files`; count: 1532.
 This list is authoritative for the committed tree. Missing screenshots/logs are intentionally absent rather than reported as present.
 
 - `.env.example`
@@ -900,6 +900,22 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `evidence/s2-008-campaign/v16-a-stopped/status.json`
 - `evidence/s2-008-campaign/v16-a-stopped/upstream-429-binding.json`
 - `evidence/s2-008-campaign/v16-a-stopped/upstream-429-observation.json`
+- `evidence/s2-008-campaign/v17-a-stopped/control-image-pin-v17-a.json`
+- `evidence/s2-008-campaign/v17-a-stopped/partial-accounting.json`
+- `evidence/s2-008-campaign/v17-a-stopped/predictions-v17-a-trl-s2-008c-01-20260926.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793462712-6lomKmXRaHbYZVDMPkVM.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793462774-xa7gar6aOjZvKJa8yWg3.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793462832-ZtEpuhojLUk42yHHkHc2.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793462892-wa7UIMr4xG4ab7w0Btf5.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793462952-QJFT6TdtM75kPuvFQ8lx.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793463012-9SRDqNLWGfBBBMrl3pXZ.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793463076-m70F1gJNfQyZvTNB84as.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793463132-MdxojDUo8V9BtGlZdqYg.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793463195-6uxQQFWYZX191Zn9zkuF.json`
+- `evidence/s2-008-campaign/v17-a-stopped/receipt-gen-1793463252-COJnaIbfT8Xjc5jK0jwg.json`
+- `evidence/s2-008-campaign/v17-a-stopped/request-outcome-reconciliation.json`
+- `evidence/s2-008-campaign/v17-a-stopped/run-v17-a.json`
+- `evidence/s2-008-campaign/v17-a-stopped/status.json`
 - `evidence/s2-008-campaign/v3-readiness-report.md`
 - `evidence/s2-008-campaign/verification-v8.json`
 - `evidence/s2-008-campaign/zero-network-auth-v6.json`
@@ -1144,6 +1160,7 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-seal-v15.mjs`
 - `scripts/s2-008-campaign-seal-v16.mjs`
 - `scripts/s2-008-campaign-seal-v17.mjs`
+- `scripts/s2-008-campaign-seal-v18.mjs`
 - `scripts/s2-008-campaign-seal-v3.mjs`
 - `scripts/s2-008-campaign-seal-v4.mjs`
 - `scripts/s2-008-campaign-seal-v5.mjs`
@@ -1165,6 +1182,8 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `scripts/s2-008-campaign-v16-policy.mjs`
 - `scripts/s2-008-campaign-v17-approval.mjs`
 - `scripts/s2-008-campaign-v17-policy.mjs`
+- `scripts/s2-008-campaign-v18-approval.mjs`
+- `scripts/s2-008-campaign-v18-policy.mjs`
 - `scripts/s2-008-campaign-v4-draft.mjs`
 - `scripts/s2-008-campaign-v5-approval.mjs`
 - `scripts/s2-008-campaign-v5-draft.mjs`
@@ -1433,7 +1452,9 @@ This list is authoritative for the committed tree. Missing screenshots/logs are 
 - `tests/research/campaign-v14.test.mjs`
 - `tests/research/campaign-v15.test.mjs`
 - `tests/research/campaign-v16.test.mjs`
+- `tests/research/campaign-v17-probe-wrapper.test.mjs`
 - `tests/research/campaign-v17.test.mjs`
+- `tests/research/campaign-v18.test.mjs`
 - `tests/research/campaign-v4-draft.test.mjs`
 - `tests/research/campaign-v5-approval.test.mjs`
 - `tests/research/campaign-v6-probe-evidence.test.mjs`

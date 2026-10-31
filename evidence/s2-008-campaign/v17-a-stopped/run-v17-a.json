@@ -1,0 +1,569 @@
+{
+  "kind": "s2-008-campaign-v17-predictions/1",
+  "status": "BLOCKED",
+  "code": "CHARGE_NOT_MEASURABLE",
+  "reason": "ARM_UNRECONCILED_SPEND:arm-model-zai-glm53flash",
+  "label": "a",
+  "dry_run": false,
+  "raw_run_id": "s2-008c-v17-a-3bfe162cc5774fa38a3a",
+  "nonce": "n-a-924cb4f61b7eb630",
+  "base": {
+    "commit_sha": "2854d0eddb34a2fb11b080bc6a7e9229c0077331",
+    "tree_sha": "5f2c475aefdbfe79b037eec518c03043cc1d4075",
+    "branch": "HEAD",
+    "worktree_dirty": false,
+    "tracked_files_of_this_track": 473,
+    "track_tracked": true
+  },
+  "preregistration_digest": "8a2df9a2c37751098a28706bddf71dcff5b58656886baabceff2712b2798742f",
+  "model_image_pin": {
+    "imageId": "sha256:4296b4571277a0f55c25c1a2b45e52e1d1e5241a03f1ff9dcdd2c1e1377a7c11",
+    "digest": "sha256:89902bc1205363efb350aea9ca8aa28e495f6ac44d8993193330148bb6d96cc3",
+    "content_commitment": "44815f774a882cc83e8fe544f9a98fcfca8c24ffa6a882236293b3c82c50789c"
+  },
+  "control_image_pin": {
+    "kind": "s2-008-campaign-control-image-pin/1",
+    "first": {
+      "imageId": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+      "digest": "sha256:d9c2a7c3ac64ff9d3e3e13f91316c092b9946f31d14932824f94e7bba781ee02",
+      "architecture": "amd64",
+      "context_digest": "a5dfd55cdc0ff3377b693cafcb82fc9db26530f81eac7feaf3e19f0d3f568f09",
+      "build_exit": 0
+    },
+    "second": {
+      "imageId": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+      "digest": "sha256:d9c2a7c3ac64ff9d3e3e13f91316c092b9946f31d14932824f94e7bba781ee02",
+      "architecture": "amd64",
+      "context_digest": "a5dfd55cdc0ff3377b693cafcb82fc9db26530f81eac7feaf3e19f0d3f568f09",
+      "build_exit": 0
+    },
+    "identical": true,
+    "context_digest_stable": true,
+    "source_base": {
+      "commit_sha": "2854d0eddb34a2fb11b080bc6a7e9229c0077331",
+      "tree_sha": "5f2c475aefdbfe79b037eec518c03043cc1d4075"
+    }
+  },
+  "control_image_pin_artifact": {
+    "file": "evidence/s2-008-campaign/control-image-pin-v17-a.json",
+    "bytes": 1296,
+    "sha256": "1874c8ba659c28c9b687d73b84b33a1ab5f86186290153419aceca6884d222e1"
+  },
+  "reservation": {
+    "id": "rsv-s2-008c-17",
+    "currency": "tokens",
+    "granted_units": 5000000
+  },
+  "spent_units": 11677,
+  "spent_units_is_lower_bound": true,
+  "unreconciled_spend": true,
+  "model_calls": 10,
+  "model_calls_is_lower_bound": true,
+  "unknown_model_attempts": 1,
+  "model_call_pacing": {
+    "min_start_interval_ms": 60000,
+    "container_starts": 1,
+    "wait_count": 0,
+    "waited_ms": 0
+  },
+  "launches": 1,
+  "unknown_launch_attempts": 0,
+  "charges": [
+    {
+      "trial": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seed": 20260926,
+      "units": 11677,
+      "unit": "EXECUTOR_REPORTED_TOKENS",
+      "source": "arm-reported tokens retained as a lower bound after refusal",
+      "spent_units_after": 11677,
+      "lower_bound": true,
+      "unreconciled_spend": true
+    }
+  ],
+  "trials": [
+    {
+      "trial_id": "trl-s2-008c-01",
+      "arm_id": "arm-model-zai-glm53flash",
+      "seeds": [
+        {
+          "seed": 20260926,
+          "outcome_class": "INFRA",
+          "predictions": {
+            "digest": "12991b621c4c1d12f9230544f3ed4e78280a61f723e1fb766bd5850fdc73f97c",
+            "rows": 10,
+            "unparsed": 0,
+            "file": "evidence/s2-008-campaign/predictions-v17-a-trl-s2-008c-01-20260926.json"
+          },
+          "launch": {
+            "arm_id": "arm-model-zai-glm53flash",
+            "seed": 20260926,
+            "image": "sha256:4296b4571277a0f55c25c1a2b45e52e1d1e5241a03f1ff9dcdd2c1e1377a7c11",
+            "image_digest": "sha256:89902bc1205363efb350aea9ca8aa28e495f6ac44d8993193330148bb6d96cc3",
+            "container_argv": [
+              "run",
+              "--rm",
+              "--pull=never",
+              "--network=none",
+              "--read-only",
+              "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m",
+              "--pids-limit",
+              "32",
+              "--memory",
+              "256m",
+              "--memory-swap",
+              "256m",
+              "--cpus",
+              "0.5",
+              "--env",
+              "HOME=/tmp",
+              "--env",
+              "TMPDIR=/tmp",
+              "--env",
+              "PI_HOME=/tmp/pi",
+              "--env",
+              "NODE_ENV=production",
+              "--cap-drop",
+              "all",
+              "--security-opt",
+              "no-new-privileges",
+              "--ipc=none",
+              "--user",
+              "65534:65534",
+              "--log-driver=none",
+              "--secret",
+              "sec-veritas-executor-credential",
+              "--env-file",
+              "/tmp/veritas-model-credential-HfQ41g/.sec-veritas-executor-credential.646566.0.env",
+              "--mount",
+              "type=bind,src=/tmp/veritas-campaign-egress-TBVY80/egress.sock,dst=/run/egress.sock",
+              "--name",
+              "s2-008-model-v17-20260926",
+              "sha256:4296b4571277a0f55c25c1a2b45e52e1d1e5241a03f1ff9dcdd2c1e1377a7c11",
+              "/usr/local/bin/node",
+              "/opt/veritas/scripts/s2-008-campaign-arm-model.mjs",
+              "/opt/veritas/corpus/s2-008-campaign/cases/holdout.blind.json",
+              "/tmp/model-out.json",
+              "arm-model-zai-glm53flash",
+              "/opt/veritas/corpus/s2-008-campaign/preregistration.v17.in-force.json",
+              "20260926",
+              "--remaining-tokens",
+              "5000000",
+              "--min-start-interval-ms",
+              "60000"
+            ],
+            "axes": {
+              "network": {
+                "policy": "allowlist",
+                "flag": "--network=none",
+                "allowlist": [
+                  {
+                    "host": "openrouter.ai",
+                    "ports": [
+                      443
+                    ]
+                  }
+                ],
+                "egressSocket": "/tmp/veritas-campaign-egress-TBVY80/egress.sock"
+              },
+              "filesystem": {
+                "rootFsReadOnly": true,
+                "writableTmpfs": [
+                  "/tmp"
+                ],
+                "mounts": [
+                  "/run/egress.sock"
+                ],
+                "denyLinkEscape": true,
+                "denyTraversal": true
+              },
+              "environment": {
+                "inherited": false,
+                "allowlist": [
+                  "HOME",
+                  "TMPDIR",
+                  "PI_HOME",
+                  "NODE_ENV"
+                ],
+                "pairs": [
+                  "HOME=/tmp",
+                  "TMPDIR=/tmp",
+                  "PI_HOME=/tmp/pi",
+                  "NODE_ENV=production"
+                ],
+                "secretHandles": [
+                  "sec-veritas-executor-credential"
+                ]
+              },
+              "process": {
+                "maxProcesses": 32,
+                "memoryMb": 256,
+                "memorySwapMb": 256,
+                "nanoCpus": 500000000,
+                "timeoutMs": 30540000
+              }
+            },
+            "exit_code": 10,
+            "signal": null,
+            "timed_out": false,
+            "stderr_excerpt": "",
+            "banner": "ADAPTER_OK arm=arm-model-zai-glm53flash seed=20260926 n=126 predictions=10 tokens=11677 usd=0.000000 dry_run=false pid=1 node=v22.23.3",
+            "payload_chunks": 1,
+            "payload_error": null,
+            "output_digest": "fa8d18d7cebc4ed63b4a0b1377faaee9f76030e9ea845a55bf331a4edbb990bf",
+            "arm_report": {
+              "kind": "s2-008-campaign-adapter-predict-model/1",
+              "accounting_schema": "s2-008-model-accounting/1",
+              "accounting": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "generation_id": "gen-1793462712-6lomKmXRaHbYZVDMPkVM",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 457,
+                  "output": 190,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 457,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 647,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "generation_id": "gen-1793462774-xa7gar6aOjZvKJa8yWg3",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 457,
+                  "output": 348,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 457,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 805,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "generation_id": "gen-1793462832-ZtEpuhojLUk42yHHkHc2",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 458,
+                  "output": 1240,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 458,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1698,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "generation_id": "gen-1793462892-wa7UIMr4xG4ab7w0Btf5",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 445,
+                  "output": 960,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 445,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1405,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "generation_id": "gen-1793462952-QJFT6TdtM75kPuvFQ8lx",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 444,
+                  "output": 977,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 444,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1421,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "generation_id": "gen-1793463012-9SRDqNLWGfBBBMrl3pXZ",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 461,
+                  "output": 1855,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 461,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 2316,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "generation_id": "gen-1793463076-m70F1gJNfQyZvTNB84as",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 445,
+                  "output": 673,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 445,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1118,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "generation_id": "gen-1793463132-MdxojDUo8V9BtGlZdqYg",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 444,
+                  "output": 171,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 444,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 615,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "generation_id": "gen-1793463195-6uxQQFWYZX191Zn9zkuF",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 453,
+                  "output": 597,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 453,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 1050,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "generation_id": "gen-1793463252-COJnaIbfT8Xjc5jK0jwg",
+                  "correlation_status": "CORRELATED",
+                  "correlation_issue": null,
+                  "input": 445,
+                  "output": 157,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "prompt_tokens": 445,
+                  "prompt_token_basis": "input+cacheRead+cacheWrite",
+                  "totalTokens": 602,
+                  "reported_cost_usd": 0,
+                  "usage_components_consistent": true,
+                  "usage_component_issue": null
+                }
+              ],
+              "failure_diagnostics": [
+                {
+                  "case_id": "32279b28dc4efc7e5936c4499d92145555936b21",
+                  "schema": "s2-008-failure-diagnostic/1",
+                  "started_at": "2026-10-31T16:15:11.381Z",
+                  "finished_at": "2026-10-31T16:15:22.224Z",
+                  "duration_ms": 10843,
+                  "cli_exit_code": null,
+                  "cli_signal": null,
+                  "stop_reason": "error",
+                  "error_category": "USAGE_NOT_REPORTED",
+                  "http_status": null,
+                  "provider_reported_status_prefix": null,
+                  "usage_status": "ZERO",
+                  "generation_ids": [],
+                  "generation_ids_truncated": false,
+                  "stdout": {
+                    "sha256": "47012b025e86b22593d01bdf81dd9f2130926d0a811e70079a11bcd7642ed487",
+                    "bytes": 8125
+                  },
+                  "stderr": {
+                    "sha256": null,
+                    "bytes": null
+                  },
+                  "error_message": {
+                    "sha256": "98123ccc69040363d9434252c4fad917e2548c4123cc330f2d891bdc4eb30865",
+                    "bytes": 18
+                  }
+                }
+              ],
+              "arm_id": "arm-model-zai-glm53flash",
+              "seed": 20260926,
+              "n_cases": 126,
+              "predictions": [
+                {
+                  "case_id": "c7427f4fc7aa6d5f43e9306c1bc8c7fabd82597d",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "2e3512f3f54bee399f607a8c12dff8cf96132e00",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a72a45b73f2c789aa47be664dede34abe51c346b",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "397ca84a4d8d393d59aca5312b75efbe68c1c481",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "8d73f973881062285123f24584f354bc891e8a52",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "029e4145eb5af985f7548b7feff641453b933fa0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "a7fca3f50bf86143888b7f2ecfc8ebbb0028c2f1",
+                  "predicted": "MAJOR",
+                  "raw_sha256": "d4dafe22025952b90183734cce3fbd77144e4464400ecbd61a8ed3d69b7d84cb"
+                },
+                {
+                  "case_id": "0c5ec15cf5597f0d119f610d15b23a0989e22ed5",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "ed058bdcd234674021bba3d6edcc4ecfbcade572",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                },
+                {
+                  "case_id": "9f5e94eac4a41db4401e1df780a2680af3fc7af0",
+                  "predicted": "MINOR",
+                  "raw_sha256": "373a33d6e4428a7d241123995967da7383d46457d03b4df65371d503d6ae67a6"
+                }
+              ],
+              "budget": {
+                "currency": "tokens",
+                "granted_tokens": 5000000,
+                "launch_cap_tokens": 5000000,
+                "spent_tokens": 11677,
+                "usd_spent": 0,
+                "measured_by": "pi --mode json final agent_end.messages assistant usage.totalTokens summed once per billed assistant message; pi runtime cost is an estimate, provider invoice not independently verified",
+                "exhausted": false,
+                "unreconciled_spend": true
+              },
+              "stop": {
+                "reason": "MODEL_USAGE_NOT_REPORTED",
+                "unreconciled_spend": true,
+                "spent_tokens_confirmed": 11677,
+                "stopped_before_case": "32279b28dc4efc7e5936c4499d92145555936b21"
+              },
+              "dry_run": false,
+              "outcome_class": "INFRA",
+              "executor": {
+                "provider": "openrouter",
+                "model": "nvidia/nemotron-3.5-lightning:free",
+                "credential_env_name": "OPENROUTER_API_KEY",
+                "pi_settings_sha256": "7594ba9dc4e02a8e0bd7b6c22b836c758cbb5968dbf76073a7c8c11508094c36",
+                "pi_model_registration_digest": "9eebffbb6f283644326d3eeee82e0724dbfcc5532c90224f363b420158dab592",
+                "pi_model_catalog_binding": {
+                  "file": "evidence/s2-008-campaign/provider-model-catalog-nvidia-v17.json",
+                  "sha256": "86169d2099cc8385856bcd780b50d4269486608b4db130eaf7620535685e19f5",
+                  "endpoint_file": "evidence/s2-008-campaign/provider-model-endpoints-nvidia-v17.json",
+                  "endpoint_sha256": "149341e3c6ae97478f640368f7877f7212469791ad84c0d18d831d29373eaf6c",
+                  "response_file": "evidence/s2-008-campaign/provider-model-catalog-response-nvidia-v17.json",
+                  "response_sha256": "9ebec09cfd65e64fb1c57b67cc96ea19558008134a6c12b018681c5d21e18710",
+                  "canonical_slug": "nvidia/nemotron-3.5-lightning-20260807",
+                  "endpoint_slug": "nvidia/nemotron-3.5-lightning-20260807:free",
+                  "prompt_price": "0",
+                  "completion_price": "0",
+                  "prompt_completion_pricing_source": "PROVIDER_CATALOG_LISTING_ONLY",
+                  "cache_pricing": "NOT_PROVIDED",
+                  "client_cost_authority": "ESTIMATE_ONLY_PROVIDER_RECEIPT_AUTHORITATIVE"
+                },
+                "credential_present": true,
+                "credential_in_argv": false,
+                "egress_route": {
+                  "via": "in-container loopback bridge",
+                  "host": "127.0.0.1",
+                  "port": 41027,
+                  "port_source": "BRIDGE_READY"
+                },
+                "model_calls": 10,
+                "model_attempts": 11,
+                "model_call_pacing": {
+                  "min_start_interval_ms": 60000,
+                  "call_starts": 11,
+                  "wait_count": 10,
+                  "waited_ms": 435092.8965610001
+                },
+                "unknown_model_attempts": 1,
+                "parallel_calls": 1,
+                "model_launch_timeout": {
+                  "holdout_case_count": 126,
+                  "per_model_call_timeout_ms": 180000,
+                  "min_start_interval_ms": 60000,
+                  "bridge_report_margin_ms": 300000,
+                  "total_container_timeout_ms": 30540000,
+                  "formula": "holdout_case_count * (per_model_call_timeout_ms + min_start_interval_ms) + bridge_report_margin_ms",
+                  "scope": "ONE_MODEL_CONTAINER_PER_SEED",
+                  "pi_argv_flags": [
+                    "--no-tools",
+                    "--no-extensions",
+                    "--no-skills"
+                  ]
+                },
+                "accounting_policy": "GENERATION_ID_REQUIRED",
+                "failure_diagnostics_policy": "BOUNDED_ALLOWLISTED_HASHES_ONLY"
+              },
+              "container": {
+                "node_version": "v22.23.3",
+                "pid": 1,
+                "argv_tail": [
+                  "arm-model-zai-glm53flash",
+                  "20260926",
+                  "--min-start-interval-ms",
+                  "60000"
+                ],
+                "cwd": "/",
+                "labels_seen": false
+              }
+            },
+            "predictions": {
+              "digest": "12991b621c4c1d12f9230544f3ed4e78280a61f723e1fb766bd5850fdc73f97c",
+              "rows": 10,
+              "unparsed": 0
+            },
+            "real_start": {
+              "proven": false,
+              "container_pid": 1,
+              "host_pid": 646566,
+              "separate_process": true,
+              "container_runtime_version": "v22.23.3",
+              "pin_rechecked_by": "assertPinnedModelImage"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "kind": "s2-008-v17-stopped-partial-accounting/1",
+  "status": "PARTIAL_KNOWN_RECEIPTS_VERIFIED",
+  "raw_run_id": "s2-008c-v17-a-3bfe162cc5774fa38a3a",
+  "raw_run_sha256": "2aa18416cdb8cd42c5800d872c6c7b95c42ef5694b1955e117a8a559fe7aa31c",
+  "known_local_calls": 10,
+  "known_receipts_verified": 10,
+  "local_tokens_lower_bound": 11677,
+  "known_provider_usd": 0,
+  "unknown_attempts": 1,
+  "unknown_attempt_tokens": null,
+  "unknown_attempt_usd": null,
+  "financially_reconciled": false,
+  "failure_reason": "MODEL_USAGE_NOT_REPORTED",
+  "failure_http_status": null,
+  "failed_attempt_window_utc": [
+    "2026-10-31T16:15:11.381Z",
+    "2026-10-31T16:15:22.224Z"
+  ],
+  "owner_ledger_confirmation": "PENDING",
+  "B": "NOT_RUN",
+  "independent_evaluation": "NOT_RUN",
+  "human_review": "PENDING",
+  "receipts": [
+    {
+      "generation_id": "gen-1793462712-6lomKmXRaHbYZVDMPkVM",
+      "api_http_status": 200,
+      "native_prompt": 457,
+      "native_completion": 190,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793462712-6lomKmXRaHbYZVDMPkVM.json",
+      "receipt_sha256": "35d15e86858f27bd66b3023a74c15628c691df507c4a10e95d121c87ed1bf4e9"
+    },
+    {
+      "generation_id": "gen-1793462774-xa7gar6aOjZvKJa8yWg3",
+      "api_http_status": 200,
+      "native_prompt": 457,
+      "native_completion": 348,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793462774-xa7gar6aOjZvKJa8yWg3.json",
+      "receipt_sha256": "c22874b6236cdbf68284d0c64e2bcb71db81b88e547869937b96b8738447fbd7"
+    },
+    {
+      "generation_id": "gen-1793462832-ZtEpuhojLUk42yHHkHc2",
+      "api_http_status": 200,
+      "native_prompt": 458,
+      "native_completion": 1240,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793462832-ZtEpuhojLUk42yHHkHc2.json",
+      "receipt_sha256": "312e2bbbb4e8f1d7f742be3ccad5751737dcf1371e4427a236548297e8ca982c"
+    },
+    {
+      "generation_id": "gen-1793462892-wa7UIMr4xG4ab7w0Btf5",
+      "api_http_status": 200,
+      "native_prompt": 445,
+      "native_completion": 960,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793462892-wa7UIMr4xG4ab7w0Btf5.json",
+      "receipt_sha256": "3a56e09c21e98878e245ef78611f9250f99436bdeadb351715348a406c92734e"
+    },
+    {
+      "generation_id": "gen-1793462952-QJFT6TdtM75kPuvFQ8lx",
+      "api_http_status": 200,
+      "native_prompt": 444,
+      "native_completion": 977,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793462952-QJFT6TdtM75kPuvFQ8lx.json",
+      "receipt_sha256": "f25d878d5f8eda51a65fc5f3e99382fa13ecd8e154c7cc9db04d6a99b6783eb3"
+    },
+    {
+      "generation_id": "gen-1793463012-9SRDqNLWGfBBBMrl3pXZ",
+      "api_http_status": 200,
+      "native_prompt": 461,
+      "native_completion": 1855,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793463012-9SRDqNLWGfBBBMrl3pXZ.json",
+      "receipt_sha256": "52c7d807539115c25a54b0a55a4d0e6888d8c6dc8ccbabbf06b1e45fd52959c4"
+    },
+    {
+      "generation_id": "gen-1793463076-m70F1gJNfQyZvTNB84as",
+      "api_http_status": 200,
+      "native_prompt": 445,
+      "native_completion": 673,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793463076-m70F1gJNfQyZvTNB84as.json",
+      "receipt_sha256": "03fac0844b860762bc40a34866bc54f6db6e6fb996df3056df4ab1c48ae2c2b2"
+    },
+    {
+      "generation_id": "gen-1793463132-MdxojDUo8V9BtGlZdqYg",
+      "api_http_status": 200,
+      "native_prompt": 444,
+      "native_completion": 171,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793463132-MdxojDUo8V9BtGlZdqYg.json",
+      "receipt_sha256": "00902ae9576f4e36fcdcd44f29f98f4b26769fb9a91a177b1a8436846b2fa189"
+    },
+    {
+      "generation_id": "gen-1793463195-6uxQQFWYZX191Zn9zkuF",
+      "api_http_status": 200,
+      "native_prompt": 453,
+      "native_completion": 597,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793463195-6uxQQFWYZX191Zn9zkuF.json",
+      "receipt_sha256": "1e4bf55310f952faa8cccbb4aa70bc408604978bf321980167fa81377ddd88ce"
+    },
+    {
+      "generation_id": "gen-1793463252-COJnaIbfT8Xjc5jK0jwg",
+      "api_http_status": 200,
+      "native_prompt": 445,
+      "native_completion": 157,
+      "native_cached": 0,
+      "total_cost": 0,
+      "matches_local": true,
+      "receipt_file": "receipt-gen-1793463252-COJnaIbfT8Xjc5jK0jwg.json",
+      "receipt_sha256": "b77e4fff52390c7917e0df11bb62dee144fc7cdc8ebee3a3b87ac59eeb216e5c"
+    }
+  ]
+}

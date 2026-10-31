@@ -1,0 +1,33 @@
+{
+  "kind": "s2-008-campaign-control-image-pin-artifact/1",
+  "label": "a",
+  "raw_run_id": "s2-008c-v17-a-3bfe162cc5774fa38a3a",
+  "nonce": "n-a-924cb4f61b7eb630",
+  "base": {
+    "commit_sha": "2854d0eddb34a2fb11b080bc6a7e9229c0077331",
+    "tree_sha": "5f2c475aefdbfe79b037eec518c03043cc1d4075"
+  },
+  "control_image_pin": {
+    "kind": "s2-008-campaign-control-image-pin/1",
+    "first": {
+      "imageId": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+      "digest": "sha256:d9c2a7c3ac64ff9d3e3e13f91316c092b9946f31d14932824f94e7bba781ee02",
+      "architecture": "amd64",
+      "context_digest": "a5dfd55cdc0ff3377b693cafcb82fc9db26530f81eac7feaf3e19f0d3f568f09",
+      "build_exit": 0
+    },
+    "second": {
+      "imageId": "sha256:30d48be42e8db50524ed711f8167609556add9ebb744e0416fe7cb5bf5d2f7a7",
+      "digest": "sha256:d9c2a7c3ac64ff9d3e3e13f91316c092b9946f31d14932824f94e7bba781ee02",
+      "architecture": "amd64",
+      "context_digest": "a5dfd55cdc0ff3377b693cafcb82fc9db26530f81eac7feaf3e19f0d3f568f09",
+      "build_exit": 0
+    },
+    "identical": true,
+    "context_digest_stable": true,
+    "source_base": {
+      "commit_sha": "2854d0eddb34a2fb11b080bc6a7e9229c0077331",
+      "tree_sha": "5f2c475aefdbfe79b037eec518c03043cc1d4075"
+    }
+  }
+}

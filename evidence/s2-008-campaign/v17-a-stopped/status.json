@@ -1,0 +1,32 @@
+{
+  "status": "FINISHED",
+  "revision": "2854d0eddb34a2fb11b080bc6a7e9229c0077331",
+  "model": "nvidia/nemotron-3.5-lightning:free",
+  "credential_fingerprint": "8f7ea446a8707bea",
+  "label": "a",
+  "started_at": "2026-10-31T16:05:08.309651+00:00",
+  "worker_pid": 646429,
+  "command": [
+    "node",
+    "scripts/s2-008-campaign-run.mjs",
+    "--v17",
+    "--label",
+    "a",
+    "--out",
+    "/home/daniil/.local/state/veritas/s2-008-v17-execution/paid-a-2854d0e/run-v17-a.json"
+  ],
+  "report": "/home/daniil/.local/state/veritas/s2-008-v17-execution/paid-a-2854d0e/run-v17-a.json",
+  "runner_pid": 646566,
+  "exit_status": 4,
+  "finished_at": "2026-10-31T16:15:22.659059+00:00",
+  "result": {
+    "status": "BLOCKED",
+    "code": "CHARGE_NOT_MEASURABLE",
+    "spent_units": 11677,
+    "model_calls": 10,
+    "model_attempts": null,
+    "unknown_model_attempts": 1,
+    "unreconciled_spend": true,
+    "raw_run_id": "s2-008c-v17-a-3bfe162cc5774fa38a3a"
+  }
+}
