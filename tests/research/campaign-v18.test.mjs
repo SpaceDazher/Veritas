@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { canonicalDigest } from "../../src/lib/verifier/canonical-json.mjs";
 import { buildInvocation } from "../../src/lib/isolation/launch.mjs";
@@ -19,6 +19,11 @@ import * as evalRoute from "../../scripts/s2-008-campaign-evaluate.mjs";
 import * as probeRoute from "../../scripts/s2-008-campaign-probes.mjs";
 import * as adapter from "../../scripts/s2-008-campaign-adapter.mjs";
 import * as paidReview from "../../scripts/s2-008-paid-review.mjs";
+import * as oldV13 from "../../scripts/s2-008-campaign-v13-approval.mjs";
+import * as oldV14 from "../../scripts/s2-008-campaign-v14-approval.mjs";
+import * as oldV15 from "../../scripts/s2-008-campaign-v15-approval.mjs";
+import * as oldV16 from "../../scripts/s2-008-campaign-v16-approval.mjs";
+const oldV17 = await import("../../scripts/s2-008-campaign-v17-approval.mjs");
 
 const approval = await import("../../scripts/s2-008-campaign-v18-approval.mjs").catch(() => ({}));
 const seal = await import("../../scripts/s2-008-campaign-seal-v18.mjs").catch(() => ({}));
@@ -77,6 +82,44 @@ function writeJson(file, value) {
   const bytes = Buffer.from(JSON.stringify(value, null, 2) + "\n");
   fs.writeFileSync(file, bytes, { flag: "wx", mode: 0o600 });
   return bytes;
+}
+
+const ARM_SCRIPT = path.join(root, "scripts/s2-008-campaign-arm-model.mjs");
+const BLIND_INPUT = path.join(root, "corpus/s2-008-campaign/cases/holdout.blind.json");
+function runArmKernel(temp, name, prereg, intervalMs = 60000) {
+  const preregPath = path.join(temp, `${name}.prereg.json`);
+  const outPath = path.join(temp, `${name}.out.json`);
+  writeJson(preregPath, prereg);
+  const child = spawnSync(process.execPath, [ARM_SCRIPT, BLIND_INPUT, outPath,
+    "arm-model-zai-glm53flash", preregPath, "20260926", "--dry-run", "--remaining-tokens", "5000000",
+    "--min-start-interval-ms", String(intervalMs)], { cwd: root, encoding: "utf8" });
+  if (child.error) throw child.error;
+  return { ...child, outPath };
+}
+
+function makeV18ImageContext(temp) {
+  const context = path.join(temp, "v18-image-context");
+  const veritas = path.join(context, "opt/veritas");
+  const baseFiles = [
+    "scripts/s2-008-campaign-arm-model.mjs", "scripts/s2-008-egress-bridge.mjs",
+    "src/lib/verifier/canonical-json.mjs", "corpus/s2-008-campaign/cases/holdout.blind.json",
+    image.modelImagePaths("v18").stagedPrereg, "scripts/s2-008-campaign-v6-timeout.mjs",
+    "scripts/s2-008-campaign-credential-env.mjs", "scripts/s2-008-campaign-v14-pacing.mjs",
+  ];
+  const files = new Set([...baseFiles, ...image.modelImagePolicyInputs("s2-008-model-image-pin/18").stageFiles,
+    "scripts/s2-008-campaign-v17-policy.mjs"]);
+  for (const relative of files) {
+    const target = path.join(veritas, relative);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, `fixture:${relative}\n`);
+  }
+  for (const relative of ["opt/pi/package.json", "opt/pi/npm-shrinkwrap.json", "opt/pi/dist/bundle/cli.js",
+    "usr/local/bin/pi", "Containerfile"]) {
+    const target = path.join(context, relative);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, `fixture:${relative}\n`);
+  }
+  return context;
 }
 
 function createV18ARepoFixture(tempRoot, fixture) {
@@ -515,6 +558,116 @@ test("v18 B accepts a fully validated A and rejects a changed A prediction sidec
     await assert.rejects(() => approval.assertV18BEligibility({ repoRoot: root,
       prereg: fixture.sealed.prereg, stateDir, aEvidenceRoot: a.evidenceRoot }),
     /V18_A_REQUIRES_MEASURED_RECEIPTS_RECONCILIATION|V18_B_REQUIRES_RECONCILED_A/);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 model image stages and hashes the transitive v17 policy dependency", () => {
+  const inputs = image.modelImagePolicyInputs("s2-008-model-image-pin/18");
+  assert.ok(inputs.stageFiles.includes("scripts/s2-008-campaign-v17-policy.mjs"));
+  assert.ok(inputs.sourceNames.includes("v17_model_policy"));
+
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-image-v17-policy-"));
+  try {
+    const context = makeV18ImageContext(temp);
+    const policyPath = path.join(context, "opt/veritas/scripts/s2-008-campaign-v17-policy.mjs");
+    const before = image.modelImageSourcesFromContext(context, { version: "v18" });
+    assert.equal(before.v17_model_policy, sha(fs.readFileSync(policyPath)));
+    fs.writeFileSync(policyPath, "tampered staged v17 policy\n");
+    const after = image.modelImageSourcesFromContext(context, { version: "v18" });
+    assert.notEqual(after.v17_model_policy, before.v17_model_policy);
+    assert.throws(() => image.assertModelImageSourcesStable(before, after), /MODEL_BUILD_CONTEXT_MUTATED/);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 arm kernel accepts the sealed signed preregistration for a zero-call dry run", () => {
+  const { sealed } = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-arm-kernel-dry-run-"));
+  try {
+    const child = runArmKernel(temp, "valid", sealed.prereg);
+    assert.equal(child.status, 0, child.stderr);
+    const record = JSON.parse(fs.readFileSync(child.outPath, "utf8"));
+    assert.equal(record.dry_run, true);
+    assert.equal(record.outcome_class, "DRY_RUN");
+    assert.equal(record.budget.granted_tokens, 5000000);
+    assert.equal(record.executor.provider, "openrouter");
+    assert.equal(record.executor.model, "nvidia/nemotron-3.5-lightning:free");
+    assert.equal(record.executor.model_call_pacing.min_start_interval_ms, 60000);
+    assert.equal(record.executor.model_calls, 0);
+    assert.equal(record.executor.model_attempts, 0);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 arm kernel refuses unsupported, unsigned, changed-digest, unsealed and sub-minute preregistrations", () => {
+  const { sealed } = v18Fixture();
+  const unsupported = structuredClone(sealed.prereg);
+  unsupported.rule = "s2-008-prereg-v19";
+  unsupported.preregistration_digest = preregistrationDigest(unsupported);
+  const unsigned = structuredClone(sealed.prereg);
+  unsigned.approval.status = null;
+  const digestChanged = structuredClone(sealed.prereg);
+  digestChanged.kernel_test_mutation = true;
+  const unsealed = structuredClone(sealed.prereg);
+  unsealed.approval.in_force = false;
+
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-arm-kernel-refusals-"));
+  try {
+    const cases = [
+      ["unsupported", unsupported, 60000, /PREREGISTRATION_VERSION_UNSUPPORTED/],
+      ["unsigned", unsigned, 60000, /PREREGISTRATION_NOT_APPROVED/],
+      ["digest-changed", digestChanged, 60000, /PREREGISTRATION_DIGEST_MISMATCH/],
+      ["unsealed", unsealed, 60000, /PREREGISTRATION_NOT_IN_FORCE/],
+      ["invalid-pacing", sealed.prereg, 59999, /V18_MODEL_POLICY_INVALID/],
+    ];
+    for (const [name, prereg, interval, expected] of cases) {
+      const child = runArmKernel(temp, name, prereg, interval);
+      assert.notEqual(child.status, 0, `${name} preregistration reached the model arm`);
+      assert.match(child.stderr, expected, `${name} preregistration was refused for the wrong reason`);
+      assert.equal(fs.existsSync(child.outPath), false, `${name} refusal wrote a run record`);
+    }
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v13-v17 allowHistorical readers use a validated v18 bridge without changing their raw signed bytes", () => {
+  const fixture = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-legacy-history-"));
+  try {
+    const aRoot = createV18ARepoFixture(temp, fixture).aRoot;
+    fs.cpSync(path.join(root, "evidence/s2-008-campaign"), path.join(aRoot, "evidence/s2-008-campaign"),
+      { recursive: true, force: true });
+    const readers = [
+      [13, oldV13.readV13BaseInputs, "preregistration.v12.in-force.json", "preregistration-v11-supersession.json"],
+      [14, oldV14.readV14BaseInputs, "preregistration.v13.in-force.json", "preregistration-v12-supersession.json"],
+      [15, oldV15.readV15BaseInputs, "preregistration.v14.in-force.json", "preregistration-v13-supersession.json"],
+      [16, oldV16.readV16BaseInputs, "preregistration.v15.in-force.json", "preregistration-v14-supersession.json"],
+      [17, oldV17.readV17BaseInputs, "preregistration.v16.in-force.json", "preregistration-v15-supersession.json"],
+    ];
+    for (const [version, read, preregFile, supersessionFile] of readers) {
+      const actual = read({ repoRoot: aRoot, allowHistorical: true });
+      const raw = fs.readFileSync(path.join(root, "corpus/s2-008-campaign", preregFile));
+      assert.deepEqual(actual.baseBytes, raw, `v${version} raw preregistration bytes changed`);
+      assert.equal(actual.activeManifest.preregistration.file, "preregistration.v18.in-force.json");
+      assert.equal(actual.manifest.preregistration.file, preregFile);
+      assert.equal(actual.manifest.preregistration.status, "IN_FORCE");
+      assert.equal(actual.manifest.preregistration.sealed_before_first_trial, true);
+      assert.equal(actual.manifest.preregistration.preregistration_digest, actual.base.preregistration_digest);
+      assert.equal(actual.manifest.supersession_history.at(-1).file, supersessionFile);
+      assert.equal(actual.manifest.supersession_history.at(-1).supersession_digest, actual.supersession.supersession_digest);
+    }
+
+    const manifestPath = path.join(aRoot, "corpus/s2-008-campaign/manifest.json");
+    const changedManifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    changedManifest.preregistration.preregistration_digest = "0".repeat(64);
+    fs.writeFileSync(manifestPath, JSON.stringify(changedManifest, null, 2) + "\n");
+    assert.throws(() => oldV17.readV17BaseInputs({ repoRoot: aRoot, allowHistorical: true }),
+      /V18_ACTIVE_PREREGISTRATION_BINDING_INVALID/);
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
