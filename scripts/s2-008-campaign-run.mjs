@@ -1287,7 +1287,7 @@ if (version === 16) {
     };
   }
   const entries = arm === null ? prereg.trial_list : prereg.trial_list.filter((entry) => entry.arm_id === arm);
-  const controlCaseIds = [12, 13, 14, 15].includes(version)
+  const controlCaseIds = [12, 13, 14, 15, 16, 17].includes(version)
     ? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, "cases/holdout.blind.json"), "utf8")).map((row) => row.case_id)
     : null;
   if (entries.length === 0) throw new Error('CAMPAIGN_ARM_NOT_PREREGISTERED');
@@ -1296,7 +1296,7 @@ if (version === 16) {
   if (write) {
     const reportTarget = out ?? path.join(REPO_ROOT, 'evidence/s2-008-campaign', `run-v${version}-${safeLabel}.json`);
     const hasControlArms = entries.some((entry) => entry.arm_id !== 'arm-model-zai-glm53flash');
-    const controlPinTarget = [12, 13, 14, 15].includes(version) && hasControlArms
+    const controlPinTarget = [12, 13, 14, 15, 16, 17].includes(version) && hasControlArms
       ? path.join(REPO_ROOT, 'evidence/s2-008-campaign', 'control-image-pin-v' + version + '-' + safeLabel + '.json') : null;
     const planned = [reportTarget, ...(controlPinTarget ? [controlPinTarget] : []), ...entries.flatMap((entry) => seeds.map((currentSeed) =>
       path.join(REPO_ROOT, 'evidence/s2-008-campaign', 'predictions-v' + version + '-' + safeLabel + '-' + entry.trial_id + '-' + currentSeed + '.json')))];
@@ -1324,7 +1324,7 @@ if (version === 16) {
   let controlImagePin = null;
   let controlImagePinArtifact = null;
   let controlPinBlocked = false;
-  if ([12, 13, 14, 15].includes(version) && hasControlArms) {
+  if ([12, 13, 14, 15, 16, 17].includes(version) && hasControlArms) {
     try {
       const firstBuild = buildRegex();
       const secondBuild = buildRegex();
@@ -1352,7 +1352,7 @@ if (version === 16) {
       };
     }
   }
-  const regexPin = [12, 13, 14, 15].includes(version)
+  const regexPin = [12, 13, 14, 15, 16, 17].includes(version)
     ? controlImagePin?.first ?? null
     : (hasControlArms ? buildRegex().pin : null);
   const trials = [];
@@ -1374,7 +1374,7 @@ if (version === 16) {
   let unknownModelAttempts = 0;
   let unknownModelAttemptsUnknown = false;
   const granted = prereg.budget_reservation.granted_units;
-  const v14ContainerPacer = [14, 15].includes(version) ? (containerPacer ?? createV14ContainerPacer()) : null;
+  const v14ContainerPacer = [14, 15, 16, 17].includes(version) ? (containerPacer ?? createV14ContainerPacer()) : null;
   for (const entry of (controlPinBlocked ? [] : entries)) {
     const perSeed = [];
     for (const currentSeed of seeds) {
@@ -1422,7 +1422,7 @@ if (version === 16) {
             remainingTokens: version >= 5 ? granted - spentUnits : undefined,
             predictionsSink: sink, runLabel: safeLabel,
           });
-          if ([14, 15].includes(version) && !dryRun) {
+          if ([14, 15, 16, 17].includes(version) && !dryRun) {
             const expiresAt = Date.parse(prereg.budget_reservation.expires_at);
             const paced = await v14ContainerPacer.run(launchModel, {
               shouldContinue: () => spentUnits < granted && Number(now()) < expiresAt,
@@ -1466,7 +1466,7 @@ if (version === 16) {
         };
       }
       const isModelArm = entry.arm_id === 'arm-model-zai-glm53flash';
-      if ([12, 13, 14, 15].includes(version) && !isModelArm) {
+      if ([12, 13, 14, 15, 16, 17].includes(version) && !isModelArm) {
         const controlValid = controlImagePin !== null && validateControlExecution(result, {
           armId: entry.arm_id, seed: currentSeed, samples: prereg.noise_rule.bootstrap_samples,
           imageId: controlImagePin.first.imageId, imageDigest: controlImagePin.first.digest,
@@ -1482,7 +1482,7 @@ if (version === 16) {
           };
         }
       }
-      if ([12, 13, 14, 15].includes(version) && !isModelArm && result.ok === true && result.output !== null
+      if ([12, 13, 14, 15, 16, 17].includes(version) && !isModelArm && result.ok === true && result.output !== null
           && result.record && controlImagePin !== null) {
         const controlOutcome = dryRun ? 'EXECUTED_CONTROL_DRY_RUN' : 'MEASURED_CONTROL';
         const outputDigest = canonicalDigest(result.output);
@@ -1574,7 +1574,7 @@ if (version === 16) {
     raw_run_id: runId, nonce, base,
     preregistration_digest: prereg.preregistration_digest,
     model_image_pin: { imageId: activeModelPin.first.imageId, digest: activeModelPin.first.digest, content_commitment: activeModelPin.first.content_commitment },
-    ...([12, 13, 14, 15].includes(version) && controlImagePin !== null ? {
+    ...([12, 13, 14, 15, 16, 17].includes(version) && controlImagePin !== null ? {
       control_image_pin: controlImagePin,
       control_image_pin_artifact: controlImagePinArtifact,
     } : {}),
@@ -1585,7 +1585,7 @@ if (version === 16) {
     model_calls: modelCallsUnknown && !hasModelCallsReport ? null : modelCalls,
     model_calls_is_lower_bound: hasModelCallsReport && modelCallsIsLowerBound,
     unknown_model_attempts: unknownModelAttemptsUnknown ? null : unknownModelAttempts,
-    ...([14, 15].includes(version) ? { model_call_pacing: { min_start_interval_ms: v14ContainerPacer.snapshot().minStartIntervalMs,
+    ...([14, 15, 16, 17].includes(version) ? { model_call_pacing: { min_start_interval_ms: v14ContainerPacer.snapshot().minStartIntervalMs,
       container_starts: v14ContainerPacer.snapshot().containerStarts,
       wait_count: v14ContainerPacer.snapshot().waitCount, waited_ms: v14ContainerPacer.snapshot().waitedMs } } : {}),
     launches, unknown_launch_attempts: unknownLaunchAttempts, charges, trials,
