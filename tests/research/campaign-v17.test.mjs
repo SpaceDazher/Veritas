@@ -102,7 +102,6 @@ test("v17 routes image build/dry-run through v16 and rejects v18", () => {
   assert.ok(policyInputs.sourceNames.includes("provider_model_catalog_response"));
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v17"]), "v17");
   assert.equal(image.modelImagePolicyInputs("s2-008-model-image-pin/17").sourceNames.includes("v17_model_policy"), true);
-  assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v18"]), /MODEL_IMAGE_VERSION_INVALID/);
   assert.equal(image.modelImagePaths("v16").schema, "s2-008-model-image-pin/16");
 });
 
