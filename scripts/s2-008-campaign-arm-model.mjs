@@ -67,6 +67,7 @@ export const ARM_ERRORS = Object.freeze({
   V14_PACING_STOPPED_BEFORE_CALL: 'V14_PACING_STOPPED_BEFORE_CALL',
   V15_PACING_STOPPED_BEFORE_CALL: 'V15_PACING_STOPPED_BEFORE_CALL',
   V16_PACING_STOPPED_BEFORE_CALL: 'V16_PACING_STOPPED_BEFORE_CALL',
+  V17_PACING_STOPPED_BEFORE_CALL: 'V17_PACING_STOPPED_BEFORE_CALL',
 });
 
 /**
@@ -565,7 +566,7 @@ export function callModel(subject, {
             models: [structuredClone(registration)],
           } } } : null;
         const models = piExecutor?.model?.endsWith(':free')
-          ? modelPolicyModule?.createV16PiModelsFile?.(piExecutor) ?? modelPolicyModule?.createV15PiModelsFile?.(piExecutor) ?? signedFreeRegistration
+          ? modelPolicyModule?.createV17PiModelsFile?.(piExecutor) ?? modelPolicyModule?.createV16PiModelsFile?.(piExecutor) ?? modelPolicyModule?.createV15PiModelsFile?.(piExecutor) ?? signedFreeRegistration
           : createV13PiModelsFile(piExecutor);
         if (!models) throw new Error('VERSIONED_PI_MODEL_REGISTRATION_REQUIRED');
         fs.writeFileSync(path.join(settingsDir, 'models.json'), JSON.stringify(models) + '\n', { mode: 0o600, flag: 'wx' });
@@ -623,7 +624,7 @@ export function callModel(subject, {
       stdout = paced.value;
     } else stdout = invoke();
   } catch (error) {
-    if (error?.message === ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL || error?.message === ARM_ERRORS.V15_PACING_STOPPED_BEFORE_CALL || error?.message === ARM_ERRORS.V16_PACING_STOPPED_BEFORE_CALL) throw error;
+    if (error?.message === ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL || error?.message === ARM_ERRORS.V15_PACING_STOPPED_BEFORE_CALL || error?.message === ARM_ERRORS.V16_PACING_STOPPED_BEFORE_CALL || error?.message === ARM_ERRORS.V17_PACING_STOPPED_BEFORE_CALL) throw error;
     finishFailure(ARM_ERRORS.PROVIDER_UNREACHABLE, error, error?.stdout, 'UNKNOWN');
   } finally {
     if (settingsDir) fs.rmSync(settingsDir, { recursive: true, force: true });
@@ -729,21 +730,22 @@ export async function main(argv, env = process.env, deps = {}) {
   const isV14 = prereg.rule === 's2-008-prereg-v14';
   const isV15 = prereg.rule === 's2-008-prereg-v15';
   const isV16 = prereg.rule === 's2-008-prereg-v16';
-  const usesV14Pacing = isV14 || isV15 || isV16;
+const isV17 = prereg.rule === 's2-008-prereg-v17';
+  const usesV14Pacing = isV14 || isV15 || isV16 || isV17;
   let versionedModelPolicy = null;
   let minStartIntervalMs = null;
   let v14Pacing = null;
   if (usesV14Pacing) {
     try {
       v14Pacing = await import('./s2-008-campaign-v14-pacing.mjs');
-      if (isV16) versionedModelPolicy = await import('./s2-008-campaign-v16-policy.mjs');
+      if (isV17) versionedModelPolicy = await import('./s2-008-campaign-v17-policy.mjs'); else if (isV16) versionedModelPolicy = await import('./s2-008-campaign-v16-policy.mjs');
       else if (isV15) versionedModelPolicy = await import('./s2-008-campaign-v15-policy.mjs');
-      const policy = isV16 ? versionedModelPolicy.assertV16ExecutorPolicy(prereg.executor)
+      const policy = isV17 ? versionedModelPolicy.assertV17ExecutorPolicy(prereg.executor) : isV16 ? versionedModelPolicy.assertV16ExecutorPolicy(prereg.executor)
         : isV15 ? versionedModelPolicy.assertV15ExecutorPolicy(prereg.executor) : assertV14ExecutorPolicy(prereg.executor);
       minStartIntervalMs = v14Pacing.assertV14MinStartInterval(Number(intervalText));
       if (String(minStartIntervalMs) !== intervalText || minStartIntervalMs !== policy.minStartIntervalMs ||
           !Number.isFinite(Date.parse(prereg.budget_reservation?.expires_at ?? ''))) throw new Error('MODEL_MIN_START_INTERVAL_INVALID');
-    } catch { process.stderr.write(isV16 ? 'V16_MODEL_POLICY_INVALID\n' : isV15 ? 'V15_MODEL_POLICY_INVALID\n' : 'V14_MODEL_POLICY_INVALID\n'); return 14; }
+    } catch { process.stderr.write(isV17 ? 'V17_MODEL_POLICY_INVALID\n' : isV16 ? 'V16_MODEL_POLICY_INVALID\n' : isV15 ? 'V15_MODEL_POLICY_INVALID\n' : 'V14_MODEL_POLICY_INVALID\n'); return 14; }
   } else if (intervalPositions.length !== 0) { process.stderr.write('V14_MIN_START_INTERVAL_INVALID\n'); return 14; }
 
   // AN UNAPPROVED PREREGISTRATION IS NOT A PREREGISTRATION. v2 exists on disk as a
@@ -770,7 +772,7 @@ export async function main(argv, env = process.env, deps = {}) {
     process.stderr.write(`${ARM_ERRORS.PREREG_DIGEST_MISMATCH}:signed=${String(prereg.preregistration_digest ?? '').slice(0, 16)}:recomputed=${recomputed.slice(0, 16)}\n`);
     return 8;
   }
-  if (['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16'].includes(prereg.rule) &&
+  if (['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule) &&
       canonicalDigest(prereg.failure_diagnostics_protocol ?? null) !== canonicalDigest(V11_FAILURE_DIAGNOSTICS_POLICY)) {
     process.stderr.write('V11_FAILURE_DIAGNOSTICS_POLICY_INVALID\n');
     return 14;
@@ -819,7 +821,7 @@ export async function main(argv, env = process.env, deps = {}) {
   let piSettingsDigest = null;
   let piExecutor = null;
   let timeoutMs = Number(reservation.trial_timeout_ms ?? 120000);
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16'].includes(prereg.rule)) {
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule)) {
     try {
       timeoutPolicy = usesV14Pacing ? v14Pacing.assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout)
         : (await import('./s2-008-campaign-v6-timeout.mjs')).assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
@@ -832,21 +834,21 @@ export async function main(argv, env = process.env, deps = {}) {
       return 12;
     }
     timeoutMs = timeoutPolicy.per_model_call_timeout_ms;
-    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16'].includes(prereg.rule)) {
+    if (['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule)) {
       try {
         const { assertV8ExecutorPolicy, assertV7ExecutorPolicy, createV7PiSettingsFile } = await import('./s2-008-campaign-credential-env.mjs');
-        const policy = prereg.rule === 's2-008-prereg-v16' ? versionedModelPolicy.assertV16ExecutorPolicy(prereg.executor)
+        const policy = prereg.rule === 's2-008-prereg-v17' ? versionedModelPolicy.assertV17ExecutorPolicy(prereg.executor) : prereg.rule === 's2-008-prereg-v16' ? versionedModelPolicy.assertV16ExecutorPolicy(prereg.executor)
           : prereg.rule === 's2-008-prereg-v15' ? versionedModelPolicy.assertV15ExecutorPolicy(prereg.executor)
           : prereg.rule === 's2-008-prereg-v14' ? assertV14ExecutorPolicy(prereg.executor)
           : prereg.rule === 's2-008-prereg-v13' ? assertV13ExecutorPolicy(prereg.executor)
           : (['s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12'].includes(prereg.rule)
             ? assertV8ExecutorPolicy : assertV7ExecutorPolicy)(prereg.executor);
         piSettings = policy.settings;
-        piExecutor = ['s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16'].includes(prereg.rule) ? prereg.executor : null;
+        piExecutor = ['s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule) ? prereg.executor : null;
         const settingsBytes = JSON.stringify(createV7PiSettingsFile(piSettings)) + String.fromCharCode(10);
         piSettingsDigest = createHash('sha256').update(settingsBytes).digest('hex');
       } catch {
-        process.stderr.write(prereg.rule === 's2-008-prereg-v16' ? 'V16_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v15' ? 'V15_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v14' ? 'V14_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v13' ? 'V13_MODEL_POLICY_INVALID\n' : 'V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
+        process.stderr.write(prereg.rule === 's2-008-prereg-v17' ? 'V17_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v16' ? 'V16_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v15' ? 'V15_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v14' ? 'V14_MODEL_POLICY_INVALID\n' : prereg.rule === 's2-008-prereg-v13' ? 'V13_MODEL_POLICY_INVALID\n' : 'V7_CREDENTIAL_ENV_OR_RETRY_POLICY_INVALID\n');
         return 13;
       }
     }
@@ -854,8 +856,8 @@ export async function main(argv, env = process.env, deps = {}) {
 
   const predictions = [];
   const accounting = [];
-  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16'].includes(prereg.rule);
-  const captureFailureDiagnostics = ['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16'].includes(prereg.rule);
+  const requireGenerationId = ['s2-008-prereg-v9', 's2-008-prereg-v10', 's2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule);
+  const captureFailureDiagnostics = ['s2-008-prereg-v11', 's2-008-prereg-v12', 's2-008-prereg-v13', 's2-008-prereg-v14', 's2-008-prereg-v15', 's2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule);
   const failureDiagnostics = [];
   let unknownModelAttempts = 0;
   const generationIdsSeen = new Set();
@@ -896,13 +898,13 @@ export async function main(argv, env = process.env, deps = {}) {
     if (!dryRun) modelAttempts += 1;
     try {
       result = invokeModel(String(row.subject ?? ''), { provider, model, envName, env: modelEnv, dryRun, timeoutMs, piSettings, piExecutor, modelPolicyModule: versionedModelPolicy, captureFailureDiagnostics, pacer,
-        pacingStopError: isV16 ? ARM_ERRORS.V16_PACING_STOPPED_BEFORE_CALL : isV15 ? ARM_ERRORS.V15_PACING_STOPPED_BEFORE_CALL : ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL, shouldContinue: () => spent < launchCap && (!usesV14Pacing || Number(wallNow()) < reservationExpiresAt) });
+        pacingStopError: isV17 ? ARM_ERRORS.V17_PACING_STOPPED_BEFORE_CALL : isV16 ? ARM_ERRORS.V16_PACING_STOPPED_BEFORE_CALL : isV15 ? ARM_ERRORS.V15_PACING_STOPPED_BEFORE_CALL : ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL, shouldContinue: () => spent < launchCap && (!usesV14Pacing || Number(wallNow()) < reservationExpiresAt) });
     } catch (error) {
       const code = String(error?.message ?? error).split(':')[0];
       if (captureFailureDiagnostics && error?.failure_diagnostic?.schema === 's2-008-failure-diagnostic/1') {
         failureDiagnostics.push({ case_id: String(row.case_id), ...error.failure_diagnostic });
       }
-      if (code === ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL || code === ARM_ERRORS.V15_PACING_STOPPED_BEFORE_CALL || code === ARM_ERRORS.V16_PACING_STOPPED_BEFORE_CALL) {
+      if (code === ARM_ERRORS.V14_PACING_STOPPED_BEFORE_CALL || code === ARM_ERRORS.V15_PACING_STOPPED_BEFORE_CALL || code === ARM_ERRORS.V16_PACING_STOPPED_BEFORE_CALL || code === ARM_ERRORS.V17_PACING_STOPPED_BEFORE_CALL) {
         modelAttempts = Math.max(0, modelAttempts - 1);
         stop = Object.freeze({ reason: 'BUDGET_RESERVATION_EXPIRED_BEFORE_MODEL_CALL', stopped_before_case: String(row.case_id),
           spent_tokens: spent, granted_tokens: launchCap, reservation_expires_at: reservation.expires_at });

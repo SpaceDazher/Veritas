@@ -57,8 +57,11 @@ import { assertV13ExecutorPolicy, assertV14ExecutorPolicy } from './s2-008-campa
 import { assertV15PreregistrationPolicy } from './s2-008-campaign-v15-policy.mjs';
 import { checkV15OnDisk } from './s2-008-campaign-seal-v15.mjs';
 import { assertV16ModelCatalogFiles, assertV16PreregistrationPolicy } from './s2-008-campaign-v16-policy.mjs';
+import { assertV17ModelCatalogFiles, assertV17PreregistrationPolicy } from './s2-008-campaign-v17-policy.mjs';
 import { assertV16PresealPin, assertV16PriorExecutionReconciliation, readV16BaseInputs, readV16PriorExecutionInputs } from './s2-008-campaign-v16-approval.mjs';
+import { assertV17PresealPin, assertV17PriorExecutionReconciliation, readV17BaseInputs, readV17PriorExecutionInputs } from './s2-008-campaign-v17-approval.mjs';
 import { checkV16OnDisk } from './s2-008-campaign-seal-v16.mjs';
+import { checkV17OnDisk } from './s2-008-campaign-seal-v17.mjs';
 import { assertV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 import { assertV14RestartReconciliation, readV14BaseInputs, readV14RestartInputs } from './s2-008-campaign-v14-approval.mjs';
 import { assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
@@ -524,7 +527,7 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
   const relative = path.relative(rootPath, candidate);
   const normalized = relative.split(path.sep).join('/');
   if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative) ||
-      !/^corpus\/s2-008-campaign\/preregistration\.v(?:[4-9]|1[0-6])\.in-force\.json$/.test(normalized)) {
+      !/^corpus\/s2-008-campaign\/preregistration\.v(?:[4-9]|1[0-7])\.in-force\.json$/.test(normalized)) {
     throw new Error('PROBE_PREREG_PATH_INVALID');
   }
   return candidate;
@@ -537,7 +540,23 @@ export function validateProbePreregistration({ prereg, manifest }) {
     const file = version === null ? null : `preregistration.v${version}.in-force.json`;
     if (version === 7) assertV7ExecutorPolicy(prereg.executor);
     if (version === 13) assertV13ExecutorPolicy(prereg.executor);
-    if (version === 16) {
+    if (version === 17) {
+      assertV17PreregistrationPolicy(prereg);
+      assertV17ModelCatalogFiles();
+      const seal = checkV17OnDisk();
+      if (seal.preregistration_digest !== prereg.preregistration_digest) {
+        return { ok: false, reason: 'PROBE_V17_SEALED_PREREGISTRATION_BINDING_MISMATCH' };
+      }
+      const baseInputs = readV17BaseInputs({ allowHistorical: true });
+      const prior = assertV17PriorExecutionReconciliation(baseInputs.base, readV17PriorExecutionInputs());
+      if (canonicalDigest(prereg.v16_prior_execution_reconciliation) !== canonicalDigest(prior)) {
+        return { ok: false, reason: 'PROBE_V17_V16_RECONCILIATION_BINDING_MISMATCH' };
+      }
+      const finalBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v17.in-force.json'));
+      const pin = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, prereg.executor?.model_image?.built_image_pin), 'utf8'));
+      assertV17PresealPin({ pin, baseBytes: finalBytes, commitment: prereg.executor?.model_image?.content_commitment });
+    }
+if (version === 16) {
       assertV16PreregistrationPolicy(prereg);
       assertV16ModelCatalogFiles();
       const seal = checkV16OnDisk();
@@ -620,7 +639,7 @@ export function childInvocationArgs(child, { preregPath = null, stateFile = null
 }
 
 export function defaultProbeOutputPath(prereg, rootPath = REPO_ROOT) {
-  const version = /^s2-008-prereg-v(6|7|8|9|10|11|12|13|14|15|16)$/.exec(prereg?.rule)?.[1];
+  const version = /^s2-008-prereg-v(6|7|8|9|10|11|12|13|14|15|16|17)$/.exec(prereg?.rule)?.[1];
   return version === undefined
     ? path.join(rootPath, 'evidence/s2-008-campaign/probes.json')
     : path.join(rootPath, `evidence/s2-008-campaign/probes-v${version}.json`);

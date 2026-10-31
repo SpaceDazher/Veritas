@@ -20,7 +20,7 @@ const OWNER = 'prn-s2007r-owner';
 const TASK = 'abt-s2-008-v11-fixture-012345abcdef';
 const DIGEST = 'a'.repeat(64);
 
-test('paid-review workflow accepts v14 through v16 while rejecting unsupported v17', async () => {
+test('paid-review workflow accepts v14 through v17 while rejecting unsupported v18', async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'veritas-paid-review-version-'));
   const options = {
     pool: null, evidenceRoot: root,
@@ -48,7 +48,12 @@ test('paid-review workflow accepts v14 through v16 while rejecting unsupported v
     const v16Status = await v16Workflow.status({ principalId: OWNER, taskId: v16Workflow.taskId });
     assert.equal(v16Status.version, 16);
     assert.equal(v16Status.fixture_only, true);
-    assert.throws(() => paid.createS2PaidReviewWorkflow({ ...options, version: 17 }),
+    const v17Workflow = paid.createS2PaidReviewWorkflow({ ...options, version: 17 });
+    assert.equal(v17Workflow.version, 17);
+    const v17Status = await v17Workflow.status({ principalId: OWNER, taskId: v17Workflow.taskId });
+    assert.equal(v17Status.version, 17);
+    assert.equal(v17Status.fixture_only, true);
+    assert.throws(() => paid.createS2PaidReviewWorkflow({ ...options, version: 18 }),
       (error) => error.code === 'PAID_REVIEW_VERSION_UNSUPPORTED');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

@@ -13,7 +13,7 @@ import { PODMAN_HOST } from '../src/lib/isolation/launch.mjs';
 import { BASE_IMAGE } from '../src/lib/isolation/image.mjs';
 import { replayA05Journal, setupA05Database } from './a-mvp05-runtime.mjs';
 import { createA05ReviewServer, hashA05ReviewToken } from './a-mvp05-review.mjs';
-import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, validateV12ProbeEvidence, validateV13ProbeEvidence, validateV14ProbeEvidence, validateV15ProbeEvidence, validateV16ProbeEvidence, V14_REVIEW_CAPSULE_SOURCE_PATHS, V15_REVIEW_CAPSULE_SOURCE_PATHS, V16_REVIEW_CAPSULE_SOURCE_PATHS, buildV15ReviewCapsuleSourceInputs, buildV16ReviewCapsuleSourceInputs, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
+import { decisionIndependent, scoreRecordedPredictions, scoreV4Trial, validateV11ProbeEvidence, validateV12ProbeEvidence, validateV13ProbeEvidence, validateV14ProbeEvidence, validateV15ProbeEvidence, validateV16ProbeEvidence, validateV17ProbeEvidence, V14_REVIEW_CAPSULE_SOURCE_PATHS, V15_REVIEW_CAPSULE_SOURCE_PATHS, V16_REVIEW_CAPSULE_SOURCE_PATHS, V17_REVIEW_CAPSULE_SOURCE_PATHS, buildV15ReviewCapsuleSourceInputs, buildV16ReviewCapsuleSourceInputs, buildV17ReviewCapsuleSourceInputs, verifyV4FrozenTable } from './s2-008-campaign-evaluate.mjs';
 import { contentCommitmentOf } from './s2-008-campaign-model-image.mjs';
 import { validateControlImagePinEvidence, validateControlExecution } from './s2-008-campaign-adapter.mjs';
 import { openRegistry, readJournal, verifyChain } from '../src/lib/research/registry.mjs';
@@ -27,8 +27,11 @@ import { V15_MODEL_POLICY, assertV15ExecutorPolicy, assertV15PreregistrationPoli
 import { assertV15PresealPin } from './s2-008-campaign-v15-approval.mjs';
 import { checkV15OnDisk } from './s2-008-campaign-seal-v15.mjs';
 import { V16_MODEL_POLICY, assertV16ExecutorPolicy, assertV16PreregistrationPolicy, assertV16ModelCatalogFiles } from './s2-008-campaign-v16-policy.mjs';
+import { V17_MODEL_POLICY, assertV17ExecutorPolicy, assertV17PreregistrationPolicy, assertV17ModelCatalogFiles } from './s2-008-campaign-v17-policy.mjs';
 import { V16_PRIOR_EXECUTION_FILES, assertV16PresealPin, assertV16PriorExecutionReconciliation, readV16BaseInputs, readV16PriorExecutionInputs } from './s2-008-campaign-v16-approval.mjs';
+import { V17_PRIOR_EXECUTION_FILES, assertV17PresealPin, assertV17PriorExecutionReconciliation, readV17BaseInputs, readV17PriorExecutionInputs } from './s2-008-campaign-v17-approval.mjs';
 import { checkV16OnDisk } from './s2-008-campaign-seal-v16.mjs';
+import { checkV17OnDisk } from './s2-008-campaign-seal-v17.mjs';
 import { assertV13PresealPin, assertV13RestartReconciliation, readV13BaseInputs, readV13PriorV12AInputs } from './s2-008-campaign-v13-approval.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -58,7 +61,8 @@ const V11_CAPSULE_SOURCE_PATHS = Object.freeze([
 ]);
 const capsuleSourcePaths = (version) => {
   if (version === 14) return [...V14_REVIEW_CAPSULE_SOURCE_PATHS];
-  if (version === 16) return [...V16_REVIEW_CAPSULE_SOURCE_PATHS];
+  if (version === 17) return [...V17_REVIEW_CAPSULE_SOURCE_PATHS];
+if (version === 16) return [...V16_REVIEW_CAPSULE_SOURCE_PATHS];
   if (version === 15) return [...V15_REVIEW_CAPSULE_SOURCE_PATHS];
   const paths = V11_CAPSULE_SOURCE_PATHS.map((value) =>
     version >= 12 && value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
@@ -480,7 +484,7 @@ export function validateS2PaidReviewPin({ pin, preregistrationSha256, blindSha25
         || !Object.values(first.sources).every(hash)
         || first.sources.prereg !== preregistrationSha256
         || first.sources.blind !== blindSha256
-        || ([14, 15, 16].includes(version) && !hash(first.sources.model_call_pacing_policy))) return { ok: false };
+        || ([14, 15, 16, 17].includes(version) && !hash(first.sources.model_call_pacing_policy))) return { ok: false };
     return { ok: true, contentCommitment: first.content_commitment, sourceDigest: first.source_digest };
   } catch {
     return { ok: false };
@@ -535,11 +539,11 @@ export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, ex
             || arm.n_cases !== 126 || !Array.isArray(arm.predictions) || arm.predictions.length !== 126
             || !Array.isArray(arm.accounting) || arm.accounting.length !== 0
             || arm.stop !== null
-            || ([14, 15, 16].includes(version) && (executor?.model_call_pacing?.min_start_interval_ms !== 60000
+            || ([14, 15, 16, 17].includes(version) && (executor?.model_call_pacing?.min_start_interval_ms !== 60000
               || executor.model_call_pacing.call_starts !== 0 || executor.model_call_pacing.wait_count !== 0
               || executor.model_call_pacing.waited_ms !== 0))) return { ok: false };
         if (expected.arm_id === V11_MODEL_ARM) {
-          if (!executor || executor.provider !== 'openrouter' || executor.model !== (version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
+          if (!executor || executor.provider !== 'openrouter' || executor.model !== (version === 17 ? V17_MODEL_POLICY.model : version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
               || executor.model_calls !== 0 || executor.model_attempts !== 0
               || executor.unknown_model_attempts !== 0 || executor.credential_present !== false
               || executor.credential_in_argv !== false || executor.egress_route !== null) return { ok: false };
@@ -853,14 +857,17 @@ export function validateS2PaidReviewGenerationAccounting({ report, sidecar, side
     const reconciled = reconById.get(id);
     const idEpoch = Number(id.match(/^gen-(\d{10})-/)?.[1]);
     const createdEpoch = canonicalInstant(receipt?.created_at) ? Math.floor(Date.parse(receipt.created_at) / 1000) : NaN;
-    const allowedModels = version === 16
+    const allowedModels = version === 17
+      ? [assertV17ExecutorPolicy(prereg?.executor).model, V17_MODEL_POLICY.endpoint_slug] : version === 16
       ? [assertV16ExecutorPolicy(prereg?.executor).model, V16_MODEL_POLICY.endpoint_slug]
       : version === 15
         ? [assertV15ExecutorPolicy(prereg?.executor).model, V15_MODEL_POLICY.catalog_slug]
         : version === 14
           ? [assertV14ExecutorPolicy(prereg?.executor).model, prereg.executor.pi_model_catalog_binding.canonical_slug]
           : [version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha'];
-    const providerBound = version === 16
+    const providerBound = version === 17
+      ? receipt?.provider === V17_MODEL_POLICY.provider_name
+        && reconciled?.provider === V17_MODEL_POLICY.provider_name : version === 16
       ? receipt?.provider === V16_MODEL_POLICY.provider_name
         && reconciled?.provider === V16_MODEL_POLICY.provider_name
       : version === 15
@@ -1236,7 +1243,8 @@ function validateReconciliationFile(reader, report, version, arm, preregDigest, 
       && reconciliation.prior_run_id === report.raw_run_id
       && reconciliation.prior_run_sha256 === reportBytes?.sha256
       && reconciliation.provider === 'openrouter'
-      && (version === 16
+      && (version === 17
+        ? [V17_MODEL_POLICY.model, V17_MODEL_POLICY.endpoint_slug].includes(reconciliation.model) : version === 16
         ? [V16_MODEL_POLICY.model, V16_MODEL_POLICY.endpoint_slug].includes(reconciliation.model)
         : version === 15
           ? [V15_MODEL_POLICY.model, V15_MODEL_POLICY.catalog_slug].includes(reconciliation.model)
@@ -1371,14 +1379,14 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   const reader = readerFor(root, reasons);
   const manifestPath = 'corpus/s2-008-campaign/manifest.json';
   const manifest = reader.json(manifestPath, /^corpus\/s2-008-campaign\/manifest\.json$/);
-  const versionMatch = manifest?.preregistration?.file?.match(/^preregistration\.v(10|11|12|13|14|15|16)\.in-force\.json$/);
+  const versionMatch = manifest?.preregistration?.file?.match(/^preregistration\.v(10|11|12|13|14|15|16|17)\.in-force\.json$/);
   const version = versionMatch ? Number(versionMatch[1]) : null;
   if (!versionMatch) addReason(reasons, 'ACTIVE_PREREGISTRATION_PATH_INVALID');
   if (manifest?.preregistration?.status !== 'IN_FORCE'
       || manifest?.preregistration?.sealed_before_first_trial !== true) addReason(reasons, 'ACTIVE_PREREGISTRATION_NOT_IN_FORCE');
 
   const preregPath = version ? 'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json' : null;
-  const prereg = preregPath ? reader.json(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13|14|15|16)\.in-force\.json$/) : null;
+  const prereg = preregPath ? reader.json(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13|14|15|16|17)\.in-force\.json$/) : null;
   let digest = null;
   let preregValid = false;
   if (prereg && version) {
@@ -1391,7 +1399,16 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         const seal = checkV15OnDisk(root);
         if (seal.preregistration_digest !== prereg.preregistration_digest) throw new Error('V15_SEAL_BINDING_INVALID');
       }
-      if (version === 16) {
+      if (version === 17) {
+        assertV17PreregistrationPolicy(prereg);
+        assertV17ModelCatalogFiles(
+          path.join(root, V17_MODEL_POLICY.catalog_file),
+          path.join(root, V17_MODEL_POLICY.endpoint_catalog_file),
+          path.join(root, V17_MODEL_POLICY.catalog_response_file));
+        const seal = checkV17OnDisk(root);
+        if (seal.preregistration_digest !== prereg.preregistration_digest) throw new Error('V17_SEAL_BINDING_INVALID');
+      }
+if (version === 16) {
         assertV16PreregistrationPolicy(prereg);
         assertV16ModelCatalogFiles(
           path.join(root, V16_MODEL_POLICY.catalog_file),
@@ -1422,6 +1439,13 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         && approval.becomes_in_force_when === 'scripts/s2-008-campaign-prepare.mjs --seal-v16 records this digest and supersession in the corpus manifest'
         && Number.isFinite(Date.parse(approval.issued_at)) && new Date(approval.issued_at).toISOString() === approval.issued_at
         && Date.parse(approval.issued_at) < Date.parse('2026-10-12T00:00:00.000Z'));
+const validV17Approval = version !== 17 || (approval && Object.keys(approval).sort().join(',') === v14ApprovalKeys
+        && approval.status === 'APPROVED' && approval.authority === 'HUMAN_OWNER' && approval.principal_id === OWNER
+        && approval.label === 'Daniil' && approval.in_force === true
+        && approval.signed_digest_over === 'the scientific body: every member except approval, status and preregistration_digest'
+        && approval.becomes_in_force_when === 'scripts/s2-008-campaign-prepare.mjs --seal-v17 records this digest and supersession in the corpus manifest'
+        && Number.isFinite(Date.parse(approval.issued_at)) && new Date(approval.issued_at).toISOString() === approval.issued_at
+        && Date.parse(approval.issued_at) < Date.parse('2026-11-07T00:00:00.000Z'));
       digest = canonicalDigest(body);
       preregValid = prereg.rule === 's2-008-prereg-v' + version
         && prereg.preregistration_id === 'xpr-s2-008c-' + String(version).padStart(2, '0')
@@ -1433,18 +1457,18 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         && approval?.signed_digest_over === 'the scientific body: every member except approval, status and preregistration_digest'
         && validV14Approval
         && validV15Approval
-        && validV16Approval
+        && validV16Approval && validV17Approval
         && storedDigest === digest
         && preregistrationDigest(prereg) === digest
         && manifest?.preregistration?.file === 'preregistration.v' + version + '.in-force.json'
         && manifest?.preregistration?.preregistration_digest === digest
         && prereg.executor?.provider === 'openrouter'
-        && prereg.executor?.model === (version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
+        && prereg.executor?.model === (version === 17 ? V17_MODEL_POLICY.model : version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
         && prereg.executor?.model_launch_timeout?.per_model_call_timeout_ms === 180000
-        && ([13, 14, 15, 16].includes(version) ? (prereg.budget_reservation?.granted_units === 5000000
+        && ([13, 14, 15, 16, 17].includes(version) ? (prereg.budget_reservation?.granted_units === 5000000
           && prereg.budget_reservation?.ceiling_scope === 'PER_RUN_A_OR_B'
-          && prereg.budget_reservation?.expires_at === '2026-10-12T00:00:00.000Z') : true)
-        && (![14, 15, 16].includes(version) || (prereg.executor?.model_call_pacing?.min_start_interval_ms === 60000
+          && prereg.budget_reservation?.expires_at === (version === 17 ? '2026-11-07T00:00:00.000Z' : '2026-10-12T00:00:00.000Z')) : true)
+        && (![14, 15, 16, 17].includes(version) || (prereg.executor?.model_call_pacing?.min_start_interval_ms === 60000
           && prereg.executor?.model_launch_timeout?.total_container_timeout_ms === 30540000
           && prereg.holdout_access?.case_count === 126))
         && prereg.executor?.model_launch_timeout?.pi_argv_flags?.includes('--no-tools')
@@ -1463,6 +1487,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   let v14PriorReconciliationStatus = 'NOT_INSPECTED';
   let v15PriorReconciliationStatus = 'NOT_INSPECTED';
   let v16PriorReconciliationStatus = 'NOT_INSPECTED';
+let v17PriorReconciliationStatus = 'NOT_INSPECTED';
   if (version === 12 && preregValid) {
     try {
       assertV12RestartReconciliation(prereg);
@@ -1604,13 +1629,13 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       v9: historyV9,
       v8: historyV8,
       v7: { status: 'UNKNOWN', tokens: null },
-      ...([12, 13, 14, 15, 16].includes(version) ? {
+      ...([12, 13, 14, 15, 16, 17].includes(version) ? {
         v10RestartReconciliationBinding: { status: v10RestartReconciliationStatus },
         v11: { status: v11PriorScanStatus, provider_completeness_claimed: false, tokens: null },
-        ...([13, 14, 15, 16].includes(version) ? { v12APriorReconciliationBinding: { status: v12APriorReconciliationStatus, account_completeness_claimed: false } } : {}),
-        ...([14, 15, 16].includes(version) ? { v13RestartReconciliationBinding: { status: v14PriorReconciliationStatus, account_completeness_claimed: false } } : {}),
+        ...([13, 14, 15, 16, 17].includes(version) ? { v12APriorReconciliationBinding: { status: v12APriorReconciliationStatus, account_completeness_claimed: false } } : {}),
+        ...([14, 15, 16, 17].includes(version) ? { v13RestartReconciliationBinding: { status: v14PriorReconciliationStatus, account_completeness_claimed: false } } : {}),
         ...(version === 15 ? { v14RequestOutcomeBinding: { status: v15PriorReconciliationStatus, financial_unknowns_preserved: true, account_completeness_claimed: false } } : {}),
-        ...(version === 16 ? { v15RequestOutcomeBinding: { status: v16PriorReconciliationStatus, financial_unknowns_preserved: true, account_completeness_claimed: false } } : {}),
+        ...(version === 17 ? { v16RequestOutcomeBinding: { status: v17PriorReconciliationStatus, financial_unknowns_preserved: true, account_completeness_claimed: false } } : version === 16 ? { v15RequestOutcomeBinding: { status: v16PriorReconciliationStatus, financial_unknowns_preserved: true, account_completeness_claimed: false } } : {}),
       } : {}),
       authorizedDiagnosticTokens: diagnosticTokens,
       priorKnownCampaignTokens: historyV10.status === 'RECONCILED' && historyV9.status === 'RECONCILED'
@@ -1676,9 +1701,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     else holdoutCaseIds = blindIndex.caseIds;
   }
   const pinPath = 'evidence/s2-008-campaign/model-image-pin-v' + (version ?? 10) + '.json';
-  const pin = reader.json(pinPath, /^evidence\/s2-008-campaign\/model-image-pin-v(?:10|11|12|13|14|15|16)\.json$/);
+  const pin = reader.json(pinPath, /^evidence\/s2-008-campaign\/model-image-pin-v(?:10|11|12|13|14|15|16|17)\.json$/);
   const preregBytes = preregPath
-    ? reader.text(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13|14|15|16)\.in-force\.json$/, false)
+    ? reader.text(preregPath, /^corpus\/s2-008-campaign\/preregistration\.v(?:10|11|12|13|14|15|16|17)\.in-force\.json$/, false)
     : null;
   const pinValidation = validateS2PaidReviewPin({
     pin, preregistrationSha256: preregBytes?.sha256, blindSha256, version,
@@ -1687,6 +1712,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   let v14PinValid = true;
   let v15PinValid = true;
   let v16PinValid = true;
+let v17PinValid = true;
   if (version === 13) {
     try { assertV13PresealPin({ pin, baseBytes: preregBytes?.bytes,
       commitment: prereg?.executor?.model_image?.content_commitment }); }
@@ -1700,12 +1726,16 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     try { assertV15PresealPin({ pin, baseBytes: preregBytes?.bytes, commitment: prereg?.executor?.model_image?.content_commitment }); }
     catch { v15PinValid = false; }
   }
-  if (version === 16) {
+  if (version === 17) {
+    try { assertV17PresealPin({ pin, baseBytes: preregBytes?.bytes, commitment: prereg?.executor?.model_image?.content_commitment }); }
+    catch { v17PinValid = false; }
+  }
+if (version === 16) {
     try { assertV16PresealPin({ pin, baseBytes: preregBytes?.bytes, commitment: prereg?.executor?.model_image?.content_commitment }); }
     catch { v16PinValid = false; }
   }
   const pinOk = isCapsuleVersion(version)
-    ? pinValidation.ok === true && (version !== 13 || v13PinValid) && (version !== 14 || v14PinValid) && (version !== 15 || v15PinValid) && (version !== 16 || v16PinValid)
+    ? pinValidation.ok === true && (version !== 13 || v13PinValid) && (version !== 14 || v14PinValid) && (version !== 15 || v15PinValid) && (version !== 16 || v16PinValid) && (version !== 17 || v17PinValid)
       && pin?.schema === 's2-008-model-image-pin/' + version
       && prereg?.executor?.model_image?.built_image_pin === pinPath
       && pin.first.content_commitment === prereg?.executor?.model_image?.content_commitment
@@ -1718,9 +1748,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       && /^sha256:[0-9a-f]{64}$/.test(pin.first.digest);
   if (!pinOk) addReason(reasons, 'MODEL_IMAGE_PIN_INVALID');
 
-  const probes = reader.json('evidence/s2-008-campaign/probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/probes-v(?:10|11|12|13|14|15|16)\.json$/);
-  const security = reader.json('evidence/s2-008-campaign/security-probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/security-probes-v(?:10|11|12|13|14|15|16)\.json$/);
-  const dry = reader.json('evidence/s2-008-campaign/dry-run-v' + (version ?? 10) + '-clean-base.json', /^evidence\/s2-008-campaign\/dry-run-v(?:10|11|12|13|14|15|16)-clean-base\.json$/);
+  const probes = reader.json('evidence/s2-008-campaign/probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/probes-v(?:10|11|12|13|14|15|16|17)\.json$/);
+  const security = reader.json('evidence/s2-008-campaign/security-probes-v' + (version ?? 10) + '.json', /^evidence\/s2-008-campaign\/security-probes-v(?:10|11|12|13|14|15|16|17)\.json$/);
+  const dry = reader.json('evidence/s2-008-campaign/dry-run-v' + (version ?? 10) + '-clean-base.json', /^evidence\/s2-008-campaign\/dry-run-v(?:10|11|12|13|14|15|16|17)-clean-base\.json$/);
   const base = basePair(probes);
   const securityBase = basePair(security);
   const dryBase = basePair(dry);
@@ -1825,7 +1855,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   let probeValidation = null;
   if (isCapsuleVersion(version)) {
     try {
-      const validateProbe = version === 16 ? validateV16ProbeEvidence : version === 15 ? validateV15ProbeEvidence : version === 14 ? validateV14ProbeEvidence : version === 13 ? validateV13ProbeEvidence : version === 12 ? validateV12ProbeEvidence : validateV11ProbeEvidence;
+      const validateProbe = version === 17 ? validateV17ProbeEvidence : version === 16 ? validateV16ProbeEvidence : version === 15 ? validateV15ProbeEvidence : version === 14 ? validateV14ProbeEvidence : version === 13 ? validateV13ProbeEvidence : version === 12 ? validateV12ProbeEvidence : validateV11ProbeEvidence;
       probeValidation = validateProbe({ campaignProbes: probes, securityControls: security,
         prereg, runA: armReports.a, runB: armReports.b });
       if (probeValidation?.ok !== true || probeValidation.status !== 'PASS') addReason(reasons, 'PROBE_OR_DRY_RUN_INVALID');
@@ -1848,9 +1878,9 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
     || (reasons.length === 0 && checksComplete && runsComplete && pinOk && dryValidation.ok === true
       && probeValidation?.ok === true && preregValid);
   const evaluation = canReadEvaluation
-    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12|13|14|15|16)\.json$/, false)
+    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12|13|14|15|16|17)\.json$/, false)
     : null;
-  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12|13|14|15|16)\.json$/, false);
+  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12|13|14|15|16|17)\.json$/, false);
   if (isCapsuleVersion(version) && !canReadEvaluation) {
     campaign.evaluationRecord = { status: 'NOT_RUN', recordedVerdict: null, recordedRemarks: null,
       linkage: 'NOT_VALIDATED', independentScoringValidation: 'WAITING_FOR_COMPLETE_A_B_AND_REQUIRED_CHECKS' };
@@ -1858,7 +1888,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
   } else if (!evaluation) addReason(reasons, 'EVALUATION_MISSING');
   else if (isCapsuleVersion(version)) {
     try {
-      const capturedSourcePaths = version === 16 ? [...V16_REVIEW_CAPSULE_SOURCE_PATHS] : version === 15 ? [...V15_REVIEW_CAPSULE_SOURCE_PATHS] : version === 14 ? [...V14_REVIEW_CAPSULE_SOURCE_PATHS] : [
+      const capturedSourcePaths = version === 17 ? [...V17_REVIEW_CAPSULE_SOURCE_PATHS] : version === 16 ? [...V16_REVIEW_CAPSULE_SOURCE_PATHS] : version === 15 ? [...V15_REVIEW_CAPSULE_SOURCE_PATHS] : version === 14 ? [...V14_REVIEW_CAPSULE_SOURCE_PATHS] : [
         'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json',
         'corpus/s2-008-campaign/manifest.json',
         'corpus/s2-008-campaign/frozen-table.v3.json',
@@ -1876,7 +1906,7 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
       const capturedSourceEntries = capturedSourcePaths.map((file) => {
         const allow = file.startsWith('corpus/')
           ? /^corpus\/s2-008-campaign\/(?:cases\/)?[A-Za-z0-9._-]+\.json$/
-          : V16_REVIEW_CAPSULE_SOURCE_PATHS.includes(file)
+          : (V17_REVIEW_CAPSULE_SOURCE_PATHS.includes(file) || V16_REVIEW_CAPSULE_SOURCE_PATHS.includes(file))
             ? new RegExp('^' + file.replace(/[.*+?^$()|[\]\\]/g, '\\$&') + '$')
             : [V15_MODEL_POLICY.catalog_file, V15_MODEL_POLICY.endpoint_catalog_file].includes(file)
               ? new RegExp('^' + file.replace(/[.*+?^$()|[\]\\]/g, '\\$&') + '$')
@@ -1886,7 +1916,8 @@ export function inspectS2PaidReviewEvidence(root = ROOT) {
         const value = reader.text(file, allow);
         return value ? { path: file, contents: value.bytes } : null;
       });
-      const capturedSourceInputs = version === 16
+      const capturedSourceInputs = version === 17
+        ? buildV17ReviewCapsuleSourceInputs(capturedSourceEntries) : version === 16
         ? buildV16ReviewCapsuleSourceInputs(capturedSourceEntries)
         : capturedSourceEntries.map((entry) => entry && ({ path: entry.path, bytes: entry.contents.length, sha256: hash(entry.contents) }));
       const runReportSha256 = {};

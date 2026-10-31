@@ -1,3 +1,4 @@
+import { historicalV16ManifestForV17 } from './s2-008-campaign-v17-approval.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -63,10 +64,12 @@ export function readV16BaseInputs({ repoRoot = ROOT, allowHistorical = false } =
   if (sha(baseBytes) !== BASE_SHA) throw new Error('V16_BASE_BYTES_INVALID');
   const base = parse(baseBytes);
   const activeManifest = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/manifest.json'));
-  if (!allowHistorical && activeManifest.preregistration?.file !== BASE_FILE) throw new Error('V16_BASE_NOT_CURRENT');
+  const historicalManifestView = allowHistorical && activeManifest.preregistration?.file === 'preregistration.v17.in-force.json'
+    ? historicalV16ManifestForV17(repoRoot, activeManifest) : activeManifest;
+  if (!allowHistorical && historicalManifestView.preregistration?.file !== BASE_FILE) throw new Error('V16_BASE_NOT_CURRENT');
   const supersessionBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v15-supersession.json');
   const supersession = parse(supersessionBytes);
-  const manifest = normalizeV15Manifest(activeManifest, base, supersession);
+  const manifest = normalizeV15Manifest(historicalManifestView, base, supersession);
   const table = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/frozen-table.v3.json'));
   const ledger = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/source-ledger.v3.json'));
   return { repoRoot, base, baseBytes, manifest, activeManifest, supersession, supersessionBytes, table, ledger };

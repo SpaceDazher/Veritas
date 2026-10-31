@@ -91,7 +91,7 @@ test("v17 routes image build/dry-run through v16 and rejects v18", () => {
     tag: "localhost/veritas-s2-008-model:v17",
     stagedPrereg: "corpus/s2-008-campaign/preregistration.v16.in-force.json",
     pinFile: "evidence/s2-008-campaign/model-image-pin-v17-preseal.json",
-    schema: "s2-008-model-image-pin/16",
+    schema: "s2-008-model-image-pin/17",
   });
   assert.equal(image.modelImagePaths("v17").stagedPrereg, "corpus/s2-008-campaign/preregistration.v17.in-force.json");
   const policyInputs = image.modelImagePolicyInputs("s2-008-model-image-pin/17");
@@ -103,7 +103,7 @@ test("v17 routes image build/dry-run through v16 and rejects v18", () => {
   assert.equal(image.modelImageVersionFromArgv(["node", "builder", "--v17"]), "v17");
   assert.equal(image.modelImagePolicyInputs("s2-008-model-image-pin/17").sourceNames.includes("v17_model_policy"), true);
   assert.throws(() => image.modelImageVersionFromArgv(["node", "builder", "--v18"]), /MODEL_IMAGE_VERSION_INVALID/);
-  assert.equal(image.modelImagePaths("v16").schema, "s2-008-model-image-pin/15");
+  assert.equal(image.modelImagePaths("v16").schema, "s2-008-model-image-pin/16");
 });
 
 test("v17 pins raw catalog response, exact free descriptor and Nvidia endpoint", () => {
@@ -146,7 +146,7 @@ test("v17 pins raw catalog response, exact free descriptor and Nvidia endpoint",
     assert.throws(() => modelPolicy.assertV17ModelCatalogFiles(changed, endpointsPath, responsePath), /V17_MODEL_CATALOG_ARTIFACT_INVALID/);
     fs.writeFileSync(changed, JSON.stringify({ ...descriptor, pricing: { prompt: "0", completion: "0.000001" } }));
     assert.throws(() => modelPolicy.assertV17ModelCatalogFiles(changed, endpointsPath, responsePath), /V17_MODEL_CATALOG_ARTIFACT_INVALID/);
-    fs.writeFileSync(changed, JSON.stringify({ ...descriptor, id: "poolside/laguna-s-2.1" }));
+    fs.writeFileSync(changed, JSON.stringify({ ...descriptor, id: "nvidia/nemotron-3.5-lightning" }));
     assert.throws(() => modelPolicy.assertV17ModelCatalogFiles(changed, endpointsPath, responsePath), /V17_MODEL_CATALOG_ARTIFACT_INVALID/);
     fs.writeFileSync(changed, JSON.stringify({ ...descriptor, canonical_slug: "nvidia/nemotron-3.5-lightning-20260807:free" }));
     assert.throws(() => modelPolicy.assertV17ModelCatalogFiles(changed, endpointsPath, responsePath), /V17_MODEL_CATALOG_ARTIFACT_INVALID/);
@@ -246,7 +246,7 @@ test("v17 draft binds exact free identity and preserves frozen science and bound
     assert.equal(scopeDrift(baseInputs.base, changed, [member]).member, member);
   }
   assert.equal(draft.rule, "s2-008-prereg-v17");
-  assert.equal(draft.preregistration_id, "xpr-s2-008c-16");
+  assert.equal(draft.preregistration_id, "xpr-s2-008c-17");
   assert.equal(draft.executor.model, "nvidia/nemotron-3.5-lightning:free");
   assert.equal(draft.executor.provider, "openrouter");
   assert.equal(draft.executor.credential_source, "EXPLICIT_PROCESS_ENV_ONLY");
@@ -300,7 +300,7 @@ test("v17 draft binds exact free identity and preserves frozen science and bound
 test("v17 real-document seal preserves v16/v14/v13 history and rejects digest drift", () => {
   const { baseInputs, restartInputs, pin, draft } = v17Inputs();
   const signed = approval.approveV17({ ...baseInputs, draft, pin, restartInputs,
-    principal: "prn-s2007r-owner", label: "Daniil", issuedAt: "2026-10-31T12:00:00.000Z" });
+    principal: "prn-s2007r-owner", label: "Daniil", issuedAt: "2026-10-31T10:00:00.000Z" });
   const result = seal.sealV17({ ...baseInputs, signed, draft, pin, restartInputs });
   const wrongSigner = structuredClone(signed);
   wrongSigner.approval.label = "Unapproved";
@@ -321,6 +321,16 @@ test("v17 real-document seal preserves v16/v14/v13 history and rejects digest dr
     fs.writeFileSync(path.join(temp, "corpus/s2-008-campaign/preregistration.v17.in-force.json"), JSON.stringify(result.prereg, null, 2) + "\n");
     fs.writeFileSync(path.join(temp, "corpus/s2-008-campaign/preregistration-v17-supersession.json"), JSON.stringify(result.supersession, null, 2) + "\n");
     fs.writeFileSync(path.join(temp, "corpus/s2-008-campaign/manifest.json"), JSON.stringify(result.manifest, null, 2) + "\n");
+
+    fs.writeFileSync(path.join(temp, "corpus/s2-008-campaign/preregistration.v17.draft.json"), JSON.stringify(draft, null, 2) + "\n");
+    fs.writeFileSync(path.join(temp, "corpus/s2-008-campaign/preregistration.v17.approved.json"), JSON.stringify(signed, null, 2) + "\n");
+    fs.writeFileSync(path.join(temp, "evidence/s2-008-campaign/model-image-pin-v17-preseal.json"), JSON.stringify(pin, null, 2) + "\n");
+    const finalPin = structuredClone(pin);
+    for (const stage of [finalPin.first, finalPin.second]) {
+      stage.sources.prereg = sha(Buffer.from(JSON.stringify(result.prereg, null, 2) + "\n"));
+      stage.source_digest = canonicalDigest(stage.sources);
+    }
+    fs.writeFileSync(path.join(temp, "evidence/s2-008-campaign/model-image-pin-v17.json"), JSON.stringify(finalPin, null, 2) + "\n");
     assert.equal(oldV16.readV16BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-15");
     assert.equal(oldV15.readV15BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-14");
     assert.equal(oldV14.readV14BaseInputs({ repoRoot: temp, allowHistorical: true }).base.preregistration_id, "xpr-s2-008c-13");
@@ -336,7 +346,7 @@ test("v17 runModelTrial refuses policy and credential drift before mocked dry or
   const { pin, draft } = v17Inputs();
   const prereg = { ...draft, status: "APPROVED",
     approval: { ...draft.approval, status: "APPROVED", principal_id: "prn-s2007r-owner",
-      label: "Daniil", issued_at: "2026-10-31T12:00:00.000Z", in_force: true } };
+      label: "Daniil", issued_at: "2026-10-31T10:00:00.000Z", in_force: true } };
   const assertPin = () => ({ imageId: pin.first.imageId });
   let dryCalls = 0, paidCalls = 0;
   const badInterval = structuredClone(prereg);
@@ -357,7 +367,7 @@ test("v17 runModelTrial refuses policy and credential drift before mocked dry or
   assert.equal(paidCalls, 0);
 });
 
-test("v17 callModel registers the exact free Laguna model and extracts a mocked billed JSONL response", () => {
+test("v17 callModel registers the exact free NVIDIA model and extracts a mocked billed JSONL response", () => {
   const { draft } = v17Inputs();
   const fakeCredential = "unit-test-only-synthetic-credential";
   const responseId = "gen-1791320426-AbcdefghijklmnopQRST";

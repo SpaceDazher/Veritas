@@ -77,7 +77,9 @@ import { assertV14ExecutorPolicy } from './s2-008-campaign-credential-env.mjs';
 import { assertV15ExecutorPolicy } from './s2-008-campaign-v15-policy.mjs';
 import { assertV15PresealPin, assertV15PriorExecutionReconciliation, readV15BaseInputs, readV15PriorExecutionInputs } from './s2-008-campaign-v15-approval.mjs';
 import { assertV16ExecutorPolicy } from './s2-008-campaign-v16-policy.mjs';
+import { assertV17ExecutorPolicy } from './s2-008-campaign-v17-policy.mjs';
 import { assertV16PresealPin, assertV16PriorExecutionReconciliation, readV16BaseInputs, readV16PriorExecutionInputs } from './s2-008-campaign-v16-approval.mjs';
+import { assertV17PresealPin, assertV17PriorExecutionReconciliation, readV17BaseInputs, readV17PriorExecutionInputs } from './s2-008-campaign-v17-approval.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const CORPUS_DIR = path.join(REPO_ROOT, 'corpus/s2-008-campaign');
@@ -1105,11 +1107,11 @@ export async function runV4Campaign({
   const safeLabel = String(label);
   if (!/^[a-z0-9][a-z0-9-]{0,19}$/.test(safeLabel)) throw new Error('RUN_LABEL_INVALID');
   const activeFile = manifest?.preregistration?.file;
-  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json', 'preregistration.v8.in-force.json', 'preregistration.v9.in-force.json', 'preregistration.v10.in-force.json', 'preregistration.v11.in-force.json', 'preregistration.v12.in-force.json', 'preregistration.v13.in-force.json', 'preregistration.v14.in-force.json', 'preregistration.v15.in-force.json', 'preregistration.v16.in-force.json'].includes(activeFile)) {
+  if (!['preregistration.v4.in-force.json', 'preregistration.v5.in-force.json', 'preregistration.v6.in-force.json', 'preregistration.v7.in-force.json', 'preregistration.v8.in-force.json', 'preregistration.v9.in-force.json', 'preregistration.v10.in-force.json', 'preregistration.v11.in-force.json', 'preregistration.v12.in-force.json', 'preregistration.v13.in-force.json', 'preregistration.v14.in-force.json', 'preregistration.v15.in-force.json', 'preregistration.v16.in-force.json', "preregistration.v17.in-force.json"].includes(activeFile)) {
     throw new Error('CAMPAIGN_PREREGISTRATION_NOT_IN_FORCE');
   }
   prereg = prereg ?? JSON.parse(fs.readFileSync(path.join(CORPUS_DIR, activeFile), 'utf8'));
-  const version = prereg.rule === 's2-008-prereg-v16' ? 16 : prereg.rule === 's2-008-prereg-v15' ? 15 : prereg.rule === 's2-008-prereg-v14' ? 14 : prereg.rule === 's2-008-prereg-v13' ? 13 : prereg.rule === 's2-008-prereg-v12' ? 12 : prereg.rule === 's2-008-prereg-v11' ? 11 : prereg.rule === 's2-008-prereg-v10' ? 10 : prereg.rule === 's2-008-prereg-v9' ? 9 : prereg.rule === 's2-008-prereg-v8' ? 8 : prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
+  const version = prereg.rule === 's2-008-prereg-v17' ? 17 : prereg.rule === 's2-008-prereg-v16' ? 16 : prereg.rule === 's2-008-prereg-v15' ? 15 : prereg.rule === 's2-008-prereg-v14' ? 14 : prereg.rule === 's2-008-prereg-v13' ? 13 : prereg.rule === 's2-008-prereg-v12' ? 12 : prereg.rule === 's2-008-prereg-v11' ? 11 : prereg.rule === 's2-008-prereg-v10' ? 10 : prereg.rule === 's2-008-prereg-v9' ? 9 : prereg.rule === 's2-008-prereg-v8' ? 8 : prereg.rule === 's2-008-prereg-v7' ? 7 : prereg.rule === 's2-008-prereg-v6' ? 6 : prereg.rule === 's2-008-prereg-v5' ? 5 : 4;
   if (expectedVersion !== null && expectedVersion !== version) throw new Error('ACTIVE_CAMPAIGN_VERSION_MISMATCH');
   const campaignKind = `s2-008-campaign-v${version}-predictions/1`;
   const base = resolveBaseFn();
@@ -1169,7 +1171,12 @@ export async function runV4Campaign({
       throw new Error('V11_RECONCILIATION_BINDING_MISMATCH');
     }
   }
-  if (prereg.rule === 's2-008-prereg-v16') {
+  if (prereg.rule === 's2-008-prereg-v17') {
+    const baseInputs = readV17BaseInputs({ allowHistorical: true });
+    const prior = assertV17PriorExecutionReconciliation(baseInputs.base, readV17PriorExecutionInputs());
+    if (canonicalDigest(prereg.v16_prior_execution_reconciliation) !== canonicalDigest(prior)) throw new Error('V17_PRIOR_V16_RECONCILIATION_BINDING_MISMATCH');
+  }
+if (prereg.rule === 's2-008-prereg-v16') {
     const baseInputs = readV16BaseInputs({ allowHistorical: true });
     const prior = assertV16PriorExecutionReconciliation(baseInputs.base, readV16PriorExecutionInputs());
     if (canonicalDigest(prereg.v15_prior_execution_reconciliation) !== canonicalDigest(prior)) throw new Error('V16_PRIOR_V15_RECONCILIATION_BINDING_MISMATCH');
@@ -1203,7 +1210,7 @@ export async function runV4Campaign({
   // Its arm would take a fresh 5m grant at every seed. Paid v4 is therefore
   // refused before building or launching anything; only a sealed successor
   // whose image contains the cap-aware arm may spend.
-  if (!dryRun && !['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16'].includes(prereg.rule)) {
+  if (!dryRun && !['s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule)) {
     const code = version === 6 ? 'MODEL_CREDENTIAL_ENV_RESEAL_REQUIRED'
       : version === 5 ? 'MODEL_TOTAL_TIMEOUT_RESEAL_REQUIRED' : 'MODEL_CAP_RESEAL_REQUIRED';
     return {
@@ -1228,8 +1235,8 @@ export async function runV4Campaign({
       preregistration_digest: prereg.preregistration_digest,
     };
   }
-  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16'].includes(prereg.rule)) {
-    if (prereg.rule === 's2-008-prereg-v14' || prereg.rule === 's2-008-prereg-v15' || prereg.rule === 's2-008-prereg-v16') assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
+  if (['s2-008-prereg-v6','s2-008-prereg-v7','s2-008-prereg-v8','s2-008-prereg-v9','s2-008-prereg-v10','s2-008-prereg-v11','s2-008-prereg-v12','s2-008-prereg-v13','s2-008-prereg-v14','s2-008-prereg-v15','s2-008-prereg-v16', "s2-008-prereg-v17"].includes(prereg.rule)) {
+    if (prereg.rule === 's2-008-prereg-v14' || prereg.rule === 's2-008-prereg-v15' || prereg.rule === 's2-008-prereg-v16' || prereg.rule === 's2-008-prereg-v17') assertV14ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     else assertV6ModelTimeoutPolicy(prereg.executor?.model_launch_timeout);
     if (prereg.holdout_access?.case_count !== 126) throw new Error('V6_MODEL_TIMEOUT_CASE_COUNT_MISMATCH');
   }
@@ -1237,7 +1244,8 @@ export async function runV4Campaign({
   if (prereg.rule === 's2-008-prereg-v13') assertV13ExecutorPolicy(prereg.executor);
   if (prereg.rule === 's2-008-prereg-v14') assertV14ExecutorPolicy(prereg.executor);
   if (prereg.rule === 's2-008-prereg-v15') assertV15ExecutorPolicy(prereg.executor);
-  if (prereg.rule === 's2-008-prereg-v16') assertV16ExecutorPolicy(prereg.executor);
+  if (prereg.rule === 's2-008-prereg-v17') assertV17ExecutorPolicy(prereg.executor);
+if (prereg.rule === 's2-008-prereg-v16') assertV16ExecutorPolicy(prereg.executor);
   if (!dryRun && prereg.rule === 's2-008-prereg-v7') assertV7ExecutorPolicy(prereg.executor);
   const declaredPinPath = prereg.executor?.model_image?.built_image_pin;
   if (declaredPinPath !== 'evidence/s2-008-campaign/model-image-pin-v' + version + '.json') {
@@ -1249,7 +1257,11 @@ export async function runV4Campaign({
     assertV13PresealPin({ pin: activeModelPin, baseBytes: finalPreregBytes,
       commitment: prereg.executor?.model_image?.content_commitment });
   }
-  if (version === 16) {
+  if (version === 17) {
+    const finalPreregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v17.in-force.json'));
+    assertV17PresealPin({ pin: activeModelPin, baseBytes: finalPreregBytes, commitment: prereg.executor?.model_image?.content_commitment });
+  }
+if (version === 16) {
     const finalPreregBytes = fs.readFileSync(path.join(CORPUS_DIR, 'preregistration.v16.in-force.json'));
     assertV16PresealPin({ pin: activeModelPin, baseBytes: finalPreregBytes, commitment: prereg.executor?.model_image?.content_commitment });
   }
@@ -1613,7 +1625,7 @@ export function productionPaidRunRefusal({ dryRun = false, label = 'a', write = 
 
 export function campaignCliMode(args = {}) {
   const versionKeys = Object.keys(args).filter((name) => /^v\d/.test(name));
-  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16']);
+  const supported = new Set(['v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', "v17"]);
   if (versionKeys.some((name) => !supported.has(name) || args[name] !== true)) {
     throw new Error('CAMPAIGN_VERSION_INVALID');
   }

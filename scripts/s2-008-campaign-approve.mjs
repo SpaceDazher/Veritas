@@ -118,7 +118,7 @@ export function parseArgs(argv) {
     else if (token === '--out') out.out = take();
     else if (token === '--version') {
       const version = take();
-      if (!/^v(?:2|[3-9]|1[0-6])$/.test(version)) throw new Error('APPROVE_VERSION_INVALID');
+      if (!/^v(?:2|[3-9]|1[0-7])$/.test(version)) throw new Error('APPROVE_VERSION_INVALID');
       if (explicitVersion !== null) throw new Error('APPROVE_VERSION_CONFLICT');
       explicitVersion = version;
       out.version = version;
@@ -346,6 +346,22 @@ async function main() {
     return null;
   }
   try {
+    if (args.version === 'v17') {
+      const { approveV17, readV17BaseInputs, readV17PriorExecutionInputs } = await import('./s2-008-campaign-v17-approval.mjs');
+      const inputs = readV17BaseInputs();
+      const restartInputs = readV17PriorExecutionInputs();
+      const signed = approveV17({
+        draft: JSON.parse(readFileSync(path.join(CORPUS_DIR, 'preregistration.v17.draft.json'), 'utf8')),
+        ...inputs,
+        pin: JSON.parse(readFileSync(path.resolve(CORPUS_DIR, '../../evidence/s2-008-campaign/model-image-pin-v17-preseal.json'), 'utf8')),
+        restartInputs, principal: args.principal, label: args.label, issuedAt: new Date().toISOString(),
+      });
+      const out = args.out ?? path.join(CORPUS_DIR, 'preregistration.v17.approved.json');
+      writeFileSync(out, JSON.stringify(signed, null, 2) + String.fromCharCode(10), { flag: 'wx', mode: 0o644 });
+      process.stdout.write(JSON.stringify({ written: out, preregistration_id: signed.preregistration_id,
+        preregistration_digest: signed.preregistration_digest, approved_by: signed.approval.principal_id, in_force: false }) + String.fromCharCode(10));
+      return signed;
+    }
     if (args.version === 'v16') {
       const { approveV16, readV16BaseInputs, readV16PriorExecutionInputs } = await import('./s2-008-campaign-v16-approval.mjs');
       const inputs = readV16BaseInputs();

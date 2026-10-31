@@ -1,3 +1,4 @@
+import { historicalV16ManifestForV17 } from './s2-008-campaign-v17-approval.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -138,12 +139,14 @@ export function readV13BaseInputs({ repoRoot = ROOT, allowHistorical = false } =
   const baseBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/' + BASE_FILE);
   const supersessionBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/' + BASE_SUPERSESSION_FILE);
   const activeManifest = JSON.parse(safeRead(repoRoot, 'corpus/s2-008-campaign/manifest.json'));
-  if (activeManifest.preregistration?.file === 'preregistration.v16.in-force.json') assertV16ActiveSuccessor(repoRoot, activeManifest);
+  const historicalManifestView = allowHistorical && activeManifest.preregistration?.file === 'preregistration.v17.in-force.json'
+    ? historicalV16ManifestForV17(repoRoot, activeManifest) : activeManifest;
+  if (historicalManifestView.preregistration?.file === 'preregistration.v16.in-force.json') assertV16ActiveSuccessor(repoRoot, historicalManifestView);
   const base = parse(baseBytes), table = JSON.parse(safeRead(repoRoot, 'corpus/s2-008-campaign/frozen-table.v3.json'));
   const ledger = JSON.parse(safeRead(repoRoot, 'corpus/s2-008-campaign/source-ledger.v3.json'));
   const supersession = parse(supersessionBytes);
-  if (activeManifest.preregistration?.file !== BASE_FILE && !allowHistorical) throw new Error('V13_BASE_NOT_CURRENT');
-  return { base, baseBytes, manifest: historicalV12BaseManifest(activeManifest, base),
+  if (historicalManifestView.preregistration?.file !== BASE_FILE && !allowHistorical) throw new Error('V13_BASE_NOT_CURRENT');
+  return { base, baseBytes, manifest: historicalV12BaseManifest(historicalManifestView, base),
     activeManifest, supersession, supersessionBytes, table, ledger };
 }
 
