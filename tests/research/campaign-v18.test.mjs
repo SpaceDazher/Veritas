@@ -329,6 +329,48 @@ test("v18 approval, seal, run, probe, evaluator and paid-review dispatch are sup
   }
 });
 
+test("v18 paid-review capsule producer and consumer bind all 16 predecessor artifacts", () => {
+  const sourcePaths = evalRoute.V18_REVIEW_CAPSULE_SOURCE_PATHS;
+  const predecessorPaths = sourcePaths.filter((file) => file.startsWith("evidence/s2-008-campaign/v17-a-stopped/"));
+  assert.equal(predecessorPaths.length, 16);
+  const sourceEntries = sourcePaths.map((file, index) => ({ path: file,
+    contents: Buffer.from(`v18-review-source:${index}:${file}`) }));
+  const capsuleInputs = evalRoute.buildV18ReviewCapsuleSourceInputs(sourceEntries);
+  assert.deepEqual(paidReview.capsuleSourcePaths(18), sourcePaths);
+  assert.deepEqual(paidReview.validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, capsuleInputs, { version: 18 }), { ok: true });
+  assert.deepEqual(paidReview.validateS2PaidReviewCapsuleSourceInputs(capsuleInputs.slice(1), capsuleInputs, { version: 18 }), { ok: false });
+  assert.deepEqual(paidReview.validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, capsuleInputs, { version: 19 }), { ok: false });
+});
+
+test("paid-review comparison reader accepts the active v18 comparison artifact name", () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-paid-review-comparison-"));
+  try {
+    const corpus = path.join(temp, "corpus/s2-008-campaign");
+    const evidence = path.join(temp, "evidence/s2-008-campaign");
+    fs.mkdirSync(corpus, { recursive: true });
+    fs.mkdirSync(evidence, { recursive: true });
+    fs.writeFileSync(path.join(corpus, "manifest.json"), JSON.stringify({
+      preregistration: { file: "preregistration.v18.in-force.json", status: "IN_FORCE", sealed_before_first_trial: true },
+    }));
+    fs.writeFileSync(path.join(evidence, "comparison-v18.json"), JSON.stringify({ kind: "v18-review-comparison-fixture" }));
+    const inspected = paidReview.inspectS2PaidReviewEvidence(temp);
+    const comparison = inspected.artifactManifest.find((entry) => entry.path === "evidence/s2-008-campaign/comparison-v18.json");
+    assert.equal(inspected.version, 18);
+    assert.match(comparison?.sha256 ?? "", /^[0-9a-f]{64}$/);
+    assert.equal(inspected.reasons.includes("COMPARISON_MISSING"), false);
+    assert.equal(inspected.reasons.includes("EVIDENCE_PATH_INVALID"), false);
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("paid-review evaluation and comparison path contracts accept v18 and reject v19", () => {
+  assert.equal(paidReview.PAID_REVIEW_RECORD_PATH_PATTERN.evaluation.test("evidence/s2-008-campaign/evaluation-v18.json"), true);
+  assert.equal(paidReview.PAID_REVIEW_RECORD_PATH_PATTERN.comparison.test("evidence/s2-008-campaign/comparison-v18.json"), true);
+  assert.equal(paidReview.PAID_REVIEW_RECORD_PATH_PATTERN.evaluation.test("evidence/s2-008-campaign/evaluation-v19.json"), false);
+  assert.equal(paidReview.PAID_REVIEW_RECORD_PATH_PATTERN.comparison.test("evidence/s2-008-campaign/comparison-v19.json"), false);
+});
+
 test("v18 binds every immutable v17 artifact and keeps unknown historical totals null", () => {
   assert.equal(typeof approval.readV18PriorExecutionInputs, "function");
   const inputs = approval.readV18PriorExecutionInputs({ repoRoot: root });
