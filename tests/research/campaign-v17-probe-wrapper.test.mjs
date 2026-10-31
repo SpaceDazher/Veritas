@@ -68,7 +68,7 @@ test('v17 probe validator accepts valid v17 evidence and rejects a different pre
       JSON.stringify(historicalV17, null, 2) + '\n');
     const inputs = v17ProbeInputs(repoRoot);
     const accepted = evalRoute.validateV17ProbeEvidence({ ...inputs, root: repoRoot });
-    assert.equal(accepted.ok, true);
+    assert.equal(accepted.ok, true, JSON.stringify(accepted));
     assert.equal(accepted.status, 'PASS');
 
     const wrongVersion = JSON.parse(fs.readFileSync(path.join(repoRoot,
