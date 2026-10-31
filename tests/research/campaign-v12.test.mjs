@@ -28,7 +28,7 @@ const activeV12 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistra
 const activeV13 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v13.in-force.json', 'utf8'));
 const activeV14 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v14.in-force.json', 'utf8'));
 const activeV15 = JSON.parse(fs.readFileSync('corpus/s2-008-campaign/preregistration.v15.in-force.json', 'utf8'));
-const activeCurrentMatch = /^preregistration\.v(15|16|17)\.in-force\.json$/.exec(activeManifest?.preregistration?.file ?? '');
+const activeCurrentMatch = /^preregistration\.v(15|16|17|18)\.in-force\.json$/.exec(activeManifest?.preregistration?.file ?? '');
 if (!activeCurrentMatch) throw new Error('TEST_ACTIVE_CAMPAIGN_VERSION_INVALID');
 const activeCurrentVersion = Number(activeCurrentMatch[1]);
 const activeCurrent = JSON.parse(fs.readFileSync(
@@ -99,7 +99,7 @@ const v12Candidate = () => {
   return value;
 };
 
-test('canonical manifest tracks signed active v15/v16/v17 across successor sealing', () => {
+test('canonical manifest tracks signed active v15/v16/v17/v18 across successor sealing', () => {
   assert.equal(activeManifest.preregistration.file, 'preregistration.v' + activeCurrentVersion + '.in-force.json');
   assert.equal(activeManifest.preregistration.status, 'IN_FORCE');
   assert.equal(activeManifest.preregistration.sealed_before_first_trial, true);
