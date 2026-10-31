@@ -536,7 +536,7 @@ export function resolveProbePreregistrationPath(requested, root = REPO_ROOT) {
 export function validateProbePreregistration({ prereg, manifest }) {
   try {
     const digest = preregistrationDigest(prereg);
-    const version = prereg?.rule === 's2-008-prereg-v16' ? 16 : prereg?.rule === 's2-008-prereg-v15' ? 15 : prereg?.rule === 's2-008-prereg-v14' ? 14 : prereg?.rule === 's2-008-prereg-v13' ? 13 : prereg?.rule === 's2-008-prereg-v12' ? 12 : prereg?.rule === 's2-008-prereg-v11' ? 11 : prereg?.rule === 's2-008-prereg-v10' ? 10 : prereg?.rule === 's2-008-prereg-v9' ? 9 : prereg?.rule === 's2-008-prereg-v8' ? 8 : prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
+    const version = prereg?.rule === 's2-008-prereg-v17' ? 17 : prereg?.rule === 's2-008-prereg-v16' ? 16 : prereg?.rule === 's2-008-prereg-v15' ? 15 : prereg?.rule === 's2-008-prereg-v14' ? 14 : prereg?.rule === 's2-008-prereg-v13' ? 13 : prereg?.rule === 's2-008-prereg-v12' ? 12 : prereg?.rule === 's2-008-prereg-v11' ? 11 : prereg?.rule === 's2-008-prereg-v10' ? 10 : prereg?.rule === 's2-008-prereg-v9' ? 9 : prereg?.rule === 's2-008-prereg-v8' ? 8 : prereg?.rule === 's2-008-prereg-v7' ? 7 : prereg?.rule === 's2-008-prereg-v6' ? 6 : null;
     const file = version === null ? null : `preregistration.v${version}.in-force.json`;
     if (version === 7) assertV7ExecutorPolicy(prereg.executor);
     if (version === 13) assertV13ExecutorPolicy(prereg.executor);
