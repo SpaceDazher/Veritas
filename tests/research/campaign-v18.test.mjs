@@ -798,3 +798,14 @@ test("v13-v17 allowHistorical readers use a validated v18 bridge without changin
     fs.rmSync(temp, { recursive: true, force: true });
   }
 });
+
+// The production build must accept the explicit pinned pi package source.
+test("v18 builder accepts an absolute pi source and rejects relative and duplicate sources", async () => {
+  const { parseModelImageCliArgs } = await import("../../scripts/s2-008-campaign-model-image.mjs");
+  assert.deepEqual(parseModelImageCliArgs(["node", "builder", "--v18", "--preseal", "--pi-package-dir", "/recovered/pi"]),
+    { version: "v18", preseal: true, packageRoot: "/recovered/pi" });
+  for (const argv of [
+    ["node", "builder", "--v18", "--pi-package-dir", "relative/pi"],
+    ["node", "builder", "--v18", "--pi-package-dir", "/pi", "--pi-package-dir", "/other"],
+  ]) assert.throws(() => parseModelImageCliArgs(argv), /MODEL_PI_PACKAGE_SOURCE_INVALID/);
+});

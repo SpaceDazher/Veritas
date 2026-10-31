@@ -94,7 +94,7 @@ export function parseModelImageCliArgs(argv = process.argv) {
     packageRoot = argv[index + 1];
     index += 1;
   }
-  if (seenPackageRoot && (!['v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17'].includes(version) || !path.isAbsolute(packageRoot))) {
+  if (seenPackageRoot && (!['v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18'].includes(version) || !path.isAbsolute(packageRoot))) {
     throw new Error('MODEL_PI_PACKAGE_SOURCE_INVALID');
   }
   if (['v11', 'v12', 'v13'].includes(version) && !seenPackageRoot) throw new Error('MODEL_PI_PACKAGE_SOURCE_REQUIRED');
