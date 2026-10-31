@@ -49,7 +49,7 @@ export function modelImagePolicyInputs(schema) {
       V16_MODEL_POLICY.catalog_file, V16_MODEL_POLICY.endpoint_catalog_file] : []),
     ...(version === 17 ? ['scripts/s2-008-campaign-v17-policy.mjs', V17_MODEL_POLICY.catalog_response_file,
       V17_MODEL_POLICY.catalog_file, V17_MODEL_POLICY.endpoint_catalog_file] : []),
-    ...(version === 18 ? ['scripts/s2-008-campaign-v18-policy.mjs', 'scripts/s2-008-campaign-v18-approval.mjs',
+    ...(version === 18 ? ['scripts/s2-008-campaign-v17-policy.mjs', 'scripts/s2-008-campaign-v18-policy.mjs', 'scripts/s2-008-campaign-v18-approval.mjs',
       'scripts/s2-008-campaign-seal-v18.mjs', ...V18_PRIOR_EXECUTION_FILES.map((row) => row[1]),
       V18_MODEL_POLICY.catalog_response_file, V18_MODEL_POLICY.catalog_file, V18_MODEL_POLICY.endpoint_catalog_file] : []),
   ];
@@ -63,7 +63,7 @@ export function modelImagePolicyInputs(schema) {
     ...(version === 15 ? ['provider_model_endpoint_catalog', 'v15_model_policy'] : []),
     ...(version === 16 ? ['provider_model_catalog_response', 'provider_model_endpoint_catalog', 'v16_model_policy'] : []),
     ...(version === 17 ? ['provider_model_catalog_response', 'provider_model_endpoint_catalog', 'v17_model_policy'] : []),
-    ...(version === 18 ? ['provider_model_catalog_response', 'provider_model_endpoint_catalog', 'v18_model_policy',
+    ...(version === 18 ? ['provider_model_catalog_response', 'provider_model_endpoint_catalog', 'v17_model_policy', 'v18_model_policy',
       'v18_approval_policy', 'v18_seal_policy', 'v18_predecessor_evidence'] : []),
   ].sort();
   return Object.freeze({ stageFiles: Object.freeze(stageFiles), sourceNames: Object.freeze(sourceNames) });

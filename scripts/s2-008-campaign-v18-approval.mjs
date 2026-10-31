@@ -204,7 +204,7 @@ export function assertV18PresealPin({ pin, baseBytes, commitment = null } = {}) 
   const result = assertVersionedPresealPin({ pin, baseBytes, commitment, version: 18,
     requiredSources: ['pi_runtime_tree','timeout_policy','credential_env_policy','pi_shrinkwrap','pi_package_manifest',
       'pi_launcher','provider_model_catalog','provider_model_catalog_response','provider_model_endpoint_catalog',
-      'v18_model_policy','v18_approval_policy','v18_seal_policy','v18_predecessor_evidence','model_call_pacing_policy'] });
+      'v17_model_policy','v18_model_policy','v18_approval_policy','v18_seal_policy','v18_predecessor_evidence','model_call_pacing_policy'] });
   if (pin.first.sources.provider_model_catalog !== V17_MODEL_POLICY.catalog_sha256 ||
       pin.first.sources.provider_model_catalog_response !== V17_MODEL_POLICY.catalog_response_sha256 ||
       pin.first.sources.provider_model_endpoint_catalog !== V17_MODEL_POLICY.endpoint_catalog_sha256 ||
@@ -332,7 +332,7 @@ export function approveV18({ draft, base, baseBytes, manifest, supersession, sup
   return Object.freeze(signed);
 }
 
-const defaultState = path.join(os.homedir(), '.local/state/veritas/s2-008-v18-authorization');
+const defaultState = path.join(os.userInfo().homedir, '.local/state/veritas/s2-008-v18-authorization');
 function authFile(stateDir, digest, label) {
   if (!['a', 'b'].includes(label)) throw new Error('V18_RUN_AUTHORIZATION_LABEL_INVALID');
   if (!/^[a-f0-9]{64}$/.test(digest ?? '')) throw new Error('V18_RUN_AUTHORIZATION_DIGEST_INVALID');

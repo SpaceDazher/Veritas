@@ -63,11 +63,11 @@ const V11_CAPSULE_SOURCE_PATHS = Object.freeze([
   'scripts/s2-008-campaign-evaluate.mjs',
   'scripts/s2-008-campaign-bootstrap.mjs',
 ]);
-const capsuleSourcePaths = (version) => {
+export const capsuleSourcePaths = (version) => {
   if (version === 14) return [...V14_REVIEW_CAPSULE_SOURCE_PATHS];
   if (version === 18) return [...V18_REVIEW_CAPSULE_SOURCE_PATHS];
   if (version === 17) return [...V17_REVIEW_CAPSULE_SOURCE_PATHS];
-if (version === 16) return [...V16_REVIEW_CAPSULE_SOURCE_PATHS];
+  if (version === 16) return [...V16_REVIEW_CAPSULE_SOURCE_PATHS];
   if (version === 15) return [...V15_REVIEW_CAPSULE_SOURCE_PATHS];
   const paths = V11_CAPSULE_SOURCE_PATHS.map((value) =>
     version >= 12 && value === 'corpus/s2-008-campaign/preregistration.v11.in-force.json'
@@ -82,6 +82,10 @@ if (version === 16) return [...V16_REVIEW_CAPSULE_SOURCE_PATHS];
 };
 const isCapsuleVersion = (version) => version === 11 || version === 12 || version === 13 || version === 14 || version === 15 || version === 16 || version === 17 || version === 18;
 const isControlPinVersion = (version) => version === 12 || version === 13 || version === 14 || version === 15 || version === 16 || version === 17 || version === 18;
+export const PAID_REVIEW_RECORD_PATH_PATTERN = Object.freeze({
+  evaluation: /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12|13|14|15|16|17|18)\.json$/,
+  comparison: /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12|13|14|15|16|17|18)\.json$/,
+});
 const CONTROL_RAW_KEYS = Object.freeze([
   'arm_id', 'seed', 'samples', 'podman', 'container_argv', 'image', 'image_break_requested',
   'axes', 'exit_code', 'signal', 'timed_out', 'stderr_excerpt', 'banner', 'payload_chunks',
@@ -1986,9 +1990,9 @@ if (version === 16) {
     || (reasons.length === 0 && checksComplete && runsComplete && pinOk && dryValidation.ok === true
       && probeValidation?.ok === true && preregValid);
   const evaluation = canReadEvaluation
-    ? reader.json(evaluationPath, /^evidence\/s2-008-campaign\/evaluation-v(?:10|11|12|13|14|15|16|17)\.json$/, false)
+    ? reader.json(evaluationPath, PAID_REVIEW_RECORD_PATH_PATTERN.evaluation, false)
     : null;
-  const comparison = reader.json(comparisonPath, /^evidence\/s2-008-campaign\/comparison-v(?:10|11|12|13|14|15|16|17)\.json$/, false);
+  const comparison = reader.json(comparisonPath, PAID_REVIEW_RECORD_PATH_PATTERN.comparison, false);
   if (isCapsuleVersion(version) && !canReadEvaluation) {
     campaign.evaluationRecord = { status: 'NOT_RUN', recordedVerdict: null, recordedRemarks: null,
       linkage: 'NOT_VALIDATED', independentScoringValidation: 'WAITING_FOR_COMPLETE_A_B_AND_REQUIRED_CHECKS' };
@@ -1996,25 +2000,11 @@ if (version === 16) {
   } else if (!evaluation) addReason(reasons, 'EVALUATION_MISSING');
   else if (isCapsuleVersion(version)) {
     try {
-      const capturedSourcePaths = version === 17 ? [...V17_REVIEW_CAPSULE_SOURCE_PATHS] : version === 16 ? [...V16_REVIEW_CAPSULE_SOURCE_PATHS] : version === 15 ? [...V15_REVIEW_CAPSULE_SOURCE_PATHS] : version === 14 ? [...V14_REVIEW_CAPSULE_SOURCE_PATHS] : [
-        'corpus/s2-008-campaign/preregistration.v' + version + '.in-force.json',
-        'corpus/s2-008-campaign/manifest.json',
-        'corpus/s2-008-campaign/frozen-table.v3.json',
-        'corpus/s2-008-campaign/cases/holdout.blind.json',
-        'scripts/s2-008-campaign-evaluate.mjs',
-        'scripts/s2-008-campaign-bootstrap.mjs',
-        ...([12, 13].includes(version) ? ['scripts/s2-008-campaign-adapter.mjs'] : []),
-        ...(version === 13 ? [
-          'scripts/s2-008-campaign-arm-model.mjs',
-          'scripts/s2-008-campaign-credential-env.mjs',
-          'scripts/s2-008-campaign-model-image.mjs',
-          'evidence/s2-008-campaign/provider-model-catalog-ling-v13.json',
-        ] : []),
-      ];
+      const capturedSourcePaths = capsuleSourcePaths(version);
       const capturedSourceEntries = capturedSourcePaths.map((file) => {
         const allow = file.startsWith('corpus/')
           ? /^corpus\/s2-008-campaign\/(?:cases\/)?[A-Za-z0-9._-]+\.json$/
-          : (V17_REVIEW_CAPSULE_SOURCE_PATHS.includes(file) || V16_REVIEW_CAPSULE_SOURCE_PATHS.includes(file))
+          : capsuleSourcePaths(version).includes(file)
             ? new RegExp('^' + file.replace(/[.*+?^$()|[\]\\]/g, '\\$&') + '$')
             : [V15_MODEL_POLICY.catalog_file, V15_MODEL_POLICY.endpoint_catalog_file].includes(file)
               ? new RegExp('^' + file.replace(/[.*+?^$()|[\]\\]/g, '\\$&') + '$')
@@ -2024,7 +2014,8 @@ if (version === 16) {
         const value = reader.text(file, allow);
         return value ? { path: file, contents: value.bytes } : null;
       });
-      const capturedSourceInputs = version === 17
+      const capturedSourceInputs = version === 18
+        ? buildV18ReviewCapsuleSourceInputs(capturedSourceEntries) : version === 17
         ? buildV17ReviewCapsuleSourceInputs(capturedSourceEntries) : version === 16
         ? buildV16ReviewCapsuleSourceInputs(capturedSourceEntries)
         : capturedSourceEntries.map((entry) => entry && ({ path: entry.path, bytes: entry.contents.length, sha256: hash(entry.contents) }));

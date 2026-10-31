@@ -11,6 +11,7 @@ import { assertV16PreregistrationPolicy } from './s2-008-campaign-v16-policy.mjs
 import { assertVersionedPresealPin } from './s2-008-campaign-v6-approval.mjs';
 import { assertV14ModelTimeoutPolicy, createV14ModelTimeoutPolicy } from './s2-008-campaign-v14-pacing.mjs';
 import { V17_MODEL_POLICY, assertV17ExecutorPolicy, assertV17ModelCatalogFiles, assertV17PreregistrationPolicy } from './s2-008-campaign-v17-policy.mjs';
+import { historicalV17ManifestForV18 } from './s2-008-campaign-seal-v18.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OWNER = 'prn-s2007r-owner', BASE_FILE = 'preregistration.v16.in-force.json';
@@ -97,9 +98,11 @@ export function readV17BaseInputs({ repoRoot = ROOT, allowHistorical = false } =
   const base = parse(baseBytes);
   const activeManifest = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/manifest.json'));
   if (!allowHistorical && activeManifest.preregistration?.file !== BASE_FILE) throw new Error('V17_BASE_NOT_CURRENT');
+  const historicalManifest = allowHistorical && activeManifest.preregistration?.file === 'preregistration.v18.in-force.json'
+    ? historicalV17ManifestForV18(repoRoot, activeManifest) : activeManifest;
   const supersessionBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v16-supersession.json');
   const supersession = parse(supersessionBytes);
-  const manifest = normalizeV16Manifest(activeManifest, base, supersession, { repoRoot, baseBytes });
+  const manifest = normalizeV16Manifest(historicalManifest, base, supersession, { repoRoot, baseBytes });
   const table = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/frozen-table.v3.json'));
   const ledger = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/source-ledger.v3.json'));
   return { repoRoot, base, baseBytes, manifest, activeManifest, supersession, supersessionBytes, table, ledger };
@@ -413,4 +416,13 @@ export function historicalV16ManifestForV17(repoRoot, manifest) {
   if (canonicalDigest(actual) !== canonicalDigest(manifest)) throw new Error('V17_ACTIVE_MANIFEST_INPUT_MISMATCH');
   assertV17SuccessorOnDisk(repoRoot);
   return readV17BaseInputs({ repoRoot, allowHistorical: true }).manifest;
+}
+
+/** Normalize an already-validated v17 view supplied by the v18 bridge. */
+export function historicalV16ManifestFromV17View(repoRoot, manifest) {
+  const baseBytes = safeRead(repoRoot, 'corpus/s2-008-campaign/' + BASE_FILE);
+  if (sha(baseBytes) !== BASE_SHA) throw new Error('V17_BASE_BYTES_INVALID');
+  const base = parse(baseBytes);
+  const supersession = parse(safeRead(repoRoot, 'corpus/s2-008-campaign/preregistration-v16-supersession.json'));
+  return normalizeV16Manifest(manifest, base, supersession, { repoRoot, baseBytes });
 }

@@ -7,6 +7,7 @@ import { assertContentSupersession, createContentSupersession } from '../src/lib
 import { scientificBody } from './s2-008-campaign-approve.mjs';
 import { approveV18, assertV18BaseBinding, assertV18PresealPin, assertV18PriorExecutionReconciliation,
   readV18BaseInputs, readV18PriorExecutionInputs } from './s2-008-campaign-v18-approval.mjs';
+import { historicalV16ManifestFromV17View } from './s2-008-campaign-v17-approval.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OWNER = 'prn-s2007r-owner';
@@ -143,4 +144,7 @@ export function historicalV17ManifestForV18(repoRoot, manifest) {
   if (canonicalDigest(actual) !== canonicalDigest(manifest)) throw new Error('V18_ACTIVE_MANIFEST_INPUT_MISMATCH');
   assertV18SuccessorOnDisk(repoRoot);
   return readV18BaseInputs({ repoRoot, allowHistorical: true }).manifest;
+}
+export function historicalV16ManifestForV18(repoRoot, manifest) {
+  return historicalV16ManifestFromV17View(repoRoot, historicalV17ManifestForV18(repoRoot, manifest));
 }
