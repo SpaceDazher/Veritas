@@ -747,3 +747,10 @@ test('v12 control pin artifact is bound to raw bytes, label, run identity, base,
   assert.equal(paid.validateS2PaidReviewControlPinArtifact({ ...input,
     report: { ...report, nonce: 'other-nonce' } }).ok, false);
 });
+
+
+test('the active signed successor is recognized by the read-only paid capsule inspector', () => {
+  const evidence = paid.inspectS2PaidReviewEvidence();
+  assert.ok(Number.isInteger(evidence.version));
+  assert.equal(evidence.reasons.includes('PAID_REVIEW_VERSION_UNSUPPORTED'), false);
+});
