@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "bd230c0856930cab13372473bdb9e59dbf3d667fdbd1493e2119dc2c378d36b0",
+  "replaced_by_preregistration_digest": "8a2df9a2c37751098a28706bddf71dcff5b58656886baabceff2712b2798742f",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "v17 binds the free NVIDIA Nemotron 3.5 Lightning model, NVIDIA-only OpenRouter routing with fallbacks disabled, the exact raw model catalog and endpoint listing, explicit process credential, 60-second pacing, preserved v16 unknown-outcome closure, and renewed A/B expiry while keeping frozen science unchanged.",
+  "supersession_id": "spr-0821a57a4870e203434751ef",
+  "supersession_digest": "87366860cd28346a03eec7c2ed21a9ee0648b3e4a0fb546714537e176e11b7e9"
+}
