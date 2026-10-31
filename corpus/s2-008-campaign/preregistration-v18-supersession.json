@@ -1,0 +1,10 @@
+{
+  "kind": "SUPERSESSION",
+  "supersedes": "8a2df9a2c37751098a28706bddf71dcff5b58656886baabceff2712b2798742f",
+  "replaced_by_preregistration_digest": "364ec9e1974f6cb31d1ea67f36bc943a4a51f83abce6c1f1b7b37fe7251325ac",
+  "expected_table_digest": "2e89457f3ad158508c69099e4187e4a045802a8b8a984248b07926236f231bf2",
+  "confidence": 0.9833333333333333,
+  "reason": "Owner-authorized v18 recovery: preserve frozen science, bind all classified v17 stopped evidence, permit one new A and only a fully measured, receipts-reconciled B.",
+  "supersession_id": "spr-bdcdfe5d5f0f9dbe54d0f37e",
+  "supersession_digest": "89e974ff5c44534d0b11ff14236596705355224a711ee647cc9b7665d67e11a5"
+}
