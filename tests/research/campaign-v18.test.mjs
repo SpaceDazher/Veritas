@@ -809,3 +809,63 @@ test("v18 builder accepts an absolute pi source and rejects relative and duplica
     ["node", "builder", "--v18", "--pi-package-dir", "/pi", "--pi-package-dir", "/other"],
   ]) assert.throws(() => parseModelImageCliArgs(argv), /MODEL_PI_PACKAGE_SOURCE_INVALID/);
 });
+
+const v18RuntimePrereg = JSON.parse(fs.readFileSync(path.join(root,
+  "corpus/s2-008-campaign/preregistration.v18.in-force.json"), "utf8"));
+const v18RuntimePin = JSON.parse(fs.readFileSync(path.join(root,
+  "evidence/s2-008-campaign/model-image-pin-v18.json"), "utf8"));
+const v18RuntimeInspect = () => ({
+  Id: v18RuntimePin.first.imageId,
+  Digest: v18RuntimePin.first.digest,
+  Architecture: v18RuntimePin.first.architecture,
+});
+
+test("v18 runtime adapter applies the signed pin and pacing before dry dispatch", async () => {
+  const invocations = [];
+  let paidCalls = 0;
+  const result = await adapter.runModelTrial({
+    armId: "arm-model-zai-glm53flash", seed: 20260926, timeoutMs: 30540000,
+    dryRun: true, pin: v18RuntimePin, prereg: v18RuntimePrereg, remainingTokens: 4999999,
+    inspect: v18RuntimeInspect,
+    executeDry: async (invocation) => {
+      invocations.push(invocation);
+      return { exitCode: 0, signal: null, timedOut: false, stdout: "", stderr: "" };
+    },
+    executePaid: async () => { paidCalls += 1; throw new Error("PAID_PATH_MUST_NOT_RUN"); },
+  });
+  assert.equal(invocations.length, 1);
+  assert.equal(result.record.arm_id, "arm-model-zai-glm53flash");
+  const argv = invocations[0].podmanArgv;
+  assert.ok(argv.includes("/opt/veritas/corpus/s2-008-campaign/preregistration.v18.in-force.json"));
+  assert.equal(argv[argv.indexOf("--min-start-interval-ms") + 1], "60000");
+  assert.deepEqual(argv.slice(argv.indexOf("--remaining-tokens"), argv.indexOf("--remaining-tokens") + 2),
+    ["--remaining-tokens", "4999999"]);
+  assert.ok(argv.includes("--dry-run"));
+  assert.equal(paidCalls, 0);
+});
+
+test("v18 runtime rejects a bad pin, mismatched credential, and mutated predecessor before side effects", async () => {
+  let dryCalls = 0;
+  let paidCalls = 0;
+  const wrongPin = { ...v18RuntimePin,
+    first: { ...v18RuntimePin.first, content_commitment: "sha256:" + "0".repeat(64) } };
+  await assert.rejects(adapter.runModelTrial({
+    armId: "arm-model-zai-glm53flash", seed: 20260926, timeoutMs: 30540000,
+    dryRun: true, pin: wrongPin, prereg: v18RuntimePrereg, inspect: v18RuntimeInspect,
+    executeDry: async () => { dryCalls += 1; return { exitCode: 0, stdout: "" }; },
+  }), /MODEL_CONTENT_COMMITMENT_MISMATCH/);
+  await assert.rejects(adapter.runModelTrial({
+    armId: "arm-model-zai-glm53flash", seed: 20260926, timeoutMs: 30540000,
+    dryRun: false, pin: v18RuntimePin, prereg: v18RuntimePrereg, remainingTokens: 4999999,
+    inspect: v18RuntimeInspect, processEnv: { OPENROUTER_API_KEY: "synthetic-wrong-fingerprint" },
+    executePaid: async () => { paidCalls += 1; return {}; },
+  }), /V18_CREDENTIAL_ENV_FINGERPRINT_MISMATCH/);
+
+  const tampered = structuredClone(v18RuntimePrereg);
+  tampered.v17_prior_execution_reconciliation.known_tokens_lower_bound += 1;
+  assert.throws(() => adapter.assertPinnedModelImage({
+    pin: v18RuntimePin, prereg: tampered, inspect: v18RuntimeInspect,
+  }), /MODEL_V18_PRIOR_RECONCILIATION_BINDING_MISMATCH/);
+  assert.equal(dryCalls, 0);
+  assert.equal(paidCalls, 0);
+});
