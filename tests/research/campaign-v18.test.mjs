@@ -19,6 +19,7 @@ import * as evalRoute from "../../scripts/s2-008-campaign-evaluate.mjs";
 import * as probeRoute from "../../scripts/s2-008-campaign-probes.mjs";
 import * as adapter from "../../scripts/s2-008-campaign-adapter.mjs";
 import * as paidReview from "../../scripts/s2-008-paid-review.mjs";
+import * as armRoute from "../../scripts/s2-008-campaign-arm-model.mjs";
 import * as oldV13 from "../../scripts/s2-008-campaign-v13-approval.mjs";
 import * as oldV14 from "../../scripts/s2-008-campaign-v14-approval.mjs";
 import * as oldV15 from "../../scripts/s2-008-campaign-v15-approval.mjs";
@@ -630,6 +631,73 @@ test("v18 arm kernel refuses unsupported, unsigned, changed-digest, unsealed and
       assert.match(child.stderr, expected, `${name} preregistration was refused for the wrong reason`);
       assert.equal(fs.existsSync(child.outPath), false, `${name} refusal wrote a run record`);
     }
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("v18 arm main uses v18 policy, pacing, credential route and strict generation accounting with a fake Pi process", async () => {
+  const { sealed } = v18Fixture();
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-arm-kernel-fake-pi-"));
+  const inputPath = path.join(temp, "blind.json");
+  const preregPath = path.join(temp, "prereg.json");
+  const outPath = path.join(temp, "out.json");
+  fs.copyFileSync(BLIND_INPUT, inputPath);
+  writeJson(preregPath, sealed.prereg);
+  let bridgeStarts = 0, callCount = 0, piExecCount = 0, stagedModels = null;
+  const piOutput = JSON.stringify({ type: "agent_end", sessionId: "session-v18-fixture", messages: [{
+    role: "assistant", responseId: "gen-1790000001-AbcdefghijklmnopQRST", stopReason: "stop",
+    content: [{ type: "text", text: "MINOR" }],
+    usage: { input: 4, output: 1, cacheRead: 0, cacheWrite: 0, totalTokens: 5, cost: { total: 0 } },
+  }] }) + "\n";
+  try {
+    const code = await armRoute.main([inputPath, outPath, "arm-model-zai-glm53flash", preregPath, "20260926",
+      "--remaining-tokens", "1", "--min-start-interval-ms", "60000"],
+    { OPENROUTER_API_KEY: "fixture-only-openrouter-value" }, {
+      startBridge: async () => {
+        bridgeStarts += 1;
+        return { host: "127.0.0.1", port: 18441, stop() {} };
+      },
+      pacer: {
+        runSync(invoke, { shouldContinue }) {
+          assert.equal(shouldContinue(), true);
+          return { proceeded: true, called: true, value: invoke() };
+        },
+        snapshot() { return { callsStarted: callCount, waitCount: 0, waitedMs: 0 }; },
+      },
+      callModel: (subject, options) => {
+        callCount += 1;
+        assert.equal(typeof options.modelPolicyModule?.assertV18ExecutorPolicy, "function");
+        assert.equal(options.provider, "openrouter");
+        assert.equal(options.model, "nvidia/nemotron-3.5-lightning:free");
+        assert.equal(options.envName, "OPENROUTER_API_KEY");
+        assert.deepEqual(options.piSettings, sealed.prereg.executor.pi_settings);
+        return armRoute.callModel(subject, { ...options,
+          execFile: (command, _args, execOptions) => {
+            piExecCount += 1;
+            assert.equal(command, "pi");
+            const settingsDir = execOptions.env.PI_CODING_AGENT_DIR;
+            stagedModels = JSON.parse(fs.readFileSync(path.join(settingsDir, "models.json"), "utf8"));
+            return piOutput;
+          },
+        });
+      },
+      writeStdout() {},
+    });
+    assert.equal(code, 0);
+    assert.equal(bridgeStarts, 1);
+    assert.equal(callCount, 1);
+    assert.equal(piExecCount, 1);
+    assert.deepEqual(stagedModels, modelPolicy.createV18PiModelsFile(sealed.prereg.executor));
+    const record = JSON.parse(fs.readFileSync(outPath, "utf8"));
+    assert.equal(record.accounting.length, 1);
+    assert.equal(record.accounting[0].correlation_status, "CORRELATED");
+    assert.equal(record.accounting[0].usage_components_consistent, true);
+    assert.equal(record.executor.model_calls, 1);
+    assert.equal(record.executor.model_attempts, 1);
+    assert.equal(record.executor.unknown_model_attempts, 0);
+    assert.equal(record.budget.unreconciled_spend, false);
+    assert.equal(record.stop.reason, "BUDGET_EXHAUSTED");
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
