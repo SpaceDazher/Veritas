@@ -41,6 +41,7 @@ function makePin(schema, preregBytes) {
     provider_model_catalog_response: catalog.catalog_response_file,
     provider_model_endpoint_catalog: catalog.endpoint_catalog_file,
     model_call_pacing_policy: "scripts/s2-008-campaign-v14-pacing.mjs",
+    v17_model_policy: "scripts/s2-008-campaign-v17-policy.mjs",
     v18_model_policy: "scripts/s2-008-campaign-v18-policy.mjs",
     v18_approval_policy: "scripts/s2-008-campaign-v18-approval.mjs",
     v18_seal_policy: "scripts/s2-008-campaign-seal-v18.mjs",
@@ -333,8 +334,10 @@ test("v18 paid-review capsule producer and consumer bind all 16 predecessor arti
   const sourcePaths = evalRoute.V18_REVIEW_CAPSULE_SOURCE_PATHS;
   const predecessorPaths = sourcePaths.filter((file) => file.startsWith("evidence/s2-008-campaign/v17-a-stopped/"));
   assert.equal(predecessorPaths.length, 16);
-  const sourceEntries = sourcePaths.map((file, index) => ({ path: file,
-    contents: Buffer.from(`v18-review-source:${index}:${file}`) }));
+  const { preregBytes } = v18Fixture();
+  const sourceEntries = sourcePaths.map((file) => ({ path: file,
+    contents: file === "corpus/s2-008-campaign/preregistration.v18.in-force.json"
+      ? preregBytes : fs.readFileSync(path.join(root, file)) }));
   const capsuleInputs = evalRoute.buildV18ReviewCapsuleSourceInputs(sourceEntries);
   assert.deepEqual(paidReview.capsuleSourcePaths(18), sourcePaths);
   assert.deepEqual(paidReview.validateS2PaidReviewCapsuleSourceInputs(capsuleInputs, capsuleInputs, { version: 18 }), { ok: true });
@@ -659,6 +662,12 @@ test("v18 arm kernel refuses unsupported, unsigned, changed-digest, unsealed and
   digestChanged.kernel_test_mutation = true;
   const unsealed = structuredClone(sealed.prereg);
   unsealed.approval.in_force = false;
+  const recoveryChanged = structuredClone(sealed.prereg);
+  recoveryChanged.v17_prior_execution_reconciliation.owner_completeness_attestation.UTC_interval = [
+    "2026-01-01T00:00:00Z", "2026-01-01T00:00:59Z",
+  ];
+  recoveryChanged.recovery_authorization.predecessor = structuredClone(recoveryChanged.v17_prior_execution_reconciliation);
+  recoveryChanged.preregistration_digest = preregistrationDigest(recoveryChanged);
 
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-arm-kernel-refusals-"));
   try {
@@ -667,6 +676,7 @@ test("v18 arm kernel refuses unsupported, unsigned, changed-digest, unsealed and
       ["unsigned", unsigned, 60000, /PREREGISTRATION_NOT_APPROVED/],
       ["digest-changed", digestChanged, 60000, /PREREGISTRATION_DIGEST_MISMATCH/],
       ["unsealed", unsealed, 60000, /PREREGISTRATION_NOT_IN_FORCE/],
+      ["recovery-changed", recoveryChanged, 60000, /V18_RECOVERY_AUTHORIZATION_INVALID/],
       ["invalid-pacing", sealed.prereg, 59999, /V18_MODEL_POLICY_INVALID/],
     ];
     for (const [name, prereg, interval, expected] of cases) {
@@ -728,7 +738,7 @@ test("v18 arm main uses v18 policy, pacing, credential route and strict generati
       },
       writeStdout() {},
     });
-    assert.equal(code, 0);
+    assert.equal(code, 6);
     assert.equal(bridgeStarts, 1);
     assert.equal(callCount, 1);
     assert.equal(piExecCount, 1);
@@ -752,14 +762,19 @@ test("v13-v17 allowHistorical readers use a validated v18 bridge without changin
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "v18-legacy-history-"));
   try {
     const aRoot = createV18ARepoFixture(temp, fixture).aRoot;
+    const v17View = seal.historicalV17ManifestForV18(aRoot,
+      JSON.parse(fs.readFileSync(path.join(aRoot, "corpus/s2-008-campaign/manifest.json"), "utf8")));
+    assert.equal(v17View.preregistration.file, "preregistration.v17.in-force.json");
+    assert.equal(v17View.preregistration.sealed_before_first_trial, true);
+    assert.equal(v17View.superseded_preregistration.superseded_by, "preregistration.v17.in-force.json");
     fs.cpSync(path.join(root, "evidence/s2-008-campaign"), path.join(aRoot, "evidence/s2-008-campaign"),
       { recursive: true, force: true });
     const readers = [
-      [13, oldV13.readV13BaseInputs, "preregistration.v12.in-force.json", "preregistration-v11-supersession.json"],
-      [14, oldV14.readV14BaseInputs, "preregistration.v13.in-force.json", "preregistration-v12-supersession.json"],
-      [15, oldV15.readV15BaseInputs, "preregistration.v14.in-force.json", "preregistration-v13-supersession.json"],
-      [16, oldV16.readV16BaseInputs, "preregistration.v15.in-force.json", "preregistration-v14-supersession.json"],
-      [17, oldV17.readV17BaseInputs, "preregistration.v16.in-force.json", "preregistration-v15-supersession.json"],
+      [13, oldV13.readV13BaseInputs, "preregistration.v12.in-force.json", "preregistration-v12-supersession.json"],
+      [14, oldV14.readV14BaseInputs, "preregistration.v13.in-force.json", "preregistration-v13-supersession.json"],
+      [15, oldV15.readV15BaseInputs, "preregistration.v14.in-force.json", "preregistration-v14-supersession.json"],
+      [16, oldV16.readV16BaseInputs, "preregistration.v15.in-force.json", "preregistration-v15-supersession.json"],
+      [17, oldV17.readV17BaseInputs, "preregistration.v16.in-force.json", "preregistration-v16-supersession.json"],
     ];
     for (const [version, read, preregFile, supersessionFile] of readers) {
       const actual = read({ repoRoot: aRoot, allowHistorical: true });
@@ -768,7 +783,6 @@ test("v13-v17 allowHistorical readers use a validated v18 bridge without changin
       assert.equal(actual.activeManifest.preregistration.file, "preregistration.v18.in-force.json");
       assert.equal(actual.manifest.preregistration.file, preregFile);
       assert.equal(actual.manifest.preregistration.status, "IN_FORCE");
-      assert.equal(actual.manifest.preregistration.sealed_before_first_trial, true);
       assert.equal(actual.manifest.preregistration.preregistration_digest, actual.base.preregistration_digest);
       assert.equal(actual.manifest.supersession_history.at(-1).file, supersessionFile);
       assert.equal(actual.manifest.supersession_history.at(-1).supersession_digest, actual.supersession.supersession_digest);
@@ -779,7 +793,7 @@ test("v13-v17 allowHistorical readers use a validated v18 bridge without changin
     changedManifest.preregistration.preregistration_digest = "0".repeat(64);
     fs.writeFileSync(manifestPath, JSON.stringify(changedManifest, null, 2) + "\n");
     assert.throws(() => oldV17.readV17BaseInputs({ repoRoot: aRoot, allowHistorical: true }),
-      /V18_ACTIVE_PREREGISTRATION_BINDING_INVALID/);
+      /V18_ACTIVE_MANIFEST_BINDING_INVALID/);
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
