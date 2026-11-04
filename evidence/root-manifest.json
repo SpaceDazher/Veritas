@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "scope": "All tracked Veritas payload and evidence files; self-referential metadata files are excluded explicitly",
   "algorithm": "SHA-256 raw file bytes",
-  "sourceCommit": "eecc537b4a31b68354fbab4824e869dc904bc3ea",
-  "sourceTree": "d9a6969ce87c62785efe4b097ccc77a07ad31501",
+  "sourceCommit": "317945ad46c70bef534ec245fa06d5634588edfb",
+  "sourceTree": "d0bf8994fc9b708f557556e04a9e5c788306070d",
   "trackedFileCount": 1539,
   "manifestFileCount": 1534,
-  "payloadManifestSha256": "46c82b518242e9b0e1a3f14a8bba1f6d45b1fed444511de74c1fbe7f666fc83d",
-  "fileManifestSha256": "a599d38d20bc92260d894a535d500988aa0e8480e1d79eae789e59436e03ff72",
+  "payloadManifestSha256": "ac5f46db5c9e8cc5d06aa6a355609445b51ff15a13f4b0ccff29b6f8cae35208",
+  "fileManifestSha256": "ed0be606fd7ab2d911780ff68f7767b209f292184af3c113b4d2c2b585ef43a6",
   "excludedSelfReferenceFiles": [
     "evidence/root-manifest.json",
     "evidence/closure-record.json",
@@ -6013,8 +6013,8 @@
     },
     {
       "path": "scripts/s2-008-paid-review.mjs",
-      "sha256": "96aae163b1426be2d70418f8004316f83557c7edd55741f32baa62e84aa36f28",
-      "bytes": 140938
+      "sha256": "520828390979a0aecd06e4bcb2f892cfbb3ab95bcb5f4d8d104eedee0d7a639a",
+      "bytes": 141050
     },
     {
       "path": "scripts/s2-008-replay.mjs",
@@ -6948,8 +6948,8 @@
     },
     {
       "path": "tests/agentboard/s2-008-paid-review-workflow.test.mjs",
-      "sha256": "f9eeb16ca87cc0f2354188100b3da06378b5a94973b19bacdb0ff74014ce1c46",
-      "bytes": 42847
+      "sha256": "3c5761043bb8aadd368f21fbea58d781ed8786001f5c3fd4eccd48822fb179db",
+      "bytes": 43762
     },
     {
       "path": "tests/agentboard/s2-008-paid-review.integration.test.mjs",
@@ -7283,8 +7283,8 @@
     },
     {
       "path": "tests/research/campaign-v18.test.mjs",
-      "sha256": "c856afe5288a954c7cea14c2c53c8d9c87d9092778942b537814e38deb1f2f94",
-      "bytes": 52848
+      "sha256": "d63ab248fea1f10cd57bf55262938504fca839e30efdd42fe3c88d1bbd9e2f30",
+      "bytes": 53357
     },
     {
       "path": "tests/research/campaign-v4-draft.test.mjs",
