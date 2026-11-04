@@ -606,7 +606,8 @@ test('fixture-only dry-run refuses absent accounting fields instead of treating 
 });
 
 
-test('v12 dry-run validates deterministic controls from the separately double-built control pin', () => {
+for (const version of [12, 18]) {
+test(`v${version} dry-run validates deterministic controls from the separately double-built control pin`, () => {
   const preregistrationDigest = 'a'.repeat(64);
   const modelPin = { imageId: 'sha256:' + '1'.repeat(64), digest: 'sha256:' + '2'.repeat(64), content_commitment: '3'.repeat(64) };
   const sourceBase = { commit_sha: 'c'.repeat(40), tree_sha: 'd'.repeat(40) };
@@ -638,7 +639,8 @@ test('v12 dry-run validates deterministic controls from the separately double-bu
           exit_code: 0, signal: null, timed_out: false, container_argv: ['run', '--network=none'],
           image: modelPin.imageId, image_digest: modelPin.digest,
           arm_report: { dry_run: true, outcome_class: 'DRY_RUN', n_cases: 126, predictions: controlRows,
-            accounting: [], stop: null, executor: { provider: 'openrouter', model: 'stealth/space-bunny-alpha',
+            accounting: [], stop: null, executor: { provider: 'openrouter', model: version === 18 ? 'nvidia/nemotron-3.5-lightning:free' : 'stealth/space-bunny-alpha',
+              model_call_pacing: { min_start_interval_ms: 60000, call_starts: 0, wait_count: 0, waited_ms: 0 },
               model_calls: 0, model_attempts: 0, unknown_model_attempts: 0,
               credential_present: false, credential_in_argv: false, egress_route: null } },
         },
@@ -663,7 +665,7 @@ test('v12 dry-run validates deterministic controls from the separately double-bu
       const outputDigest = canonicalDigest(armReport);
       return {
         seed, outcome_class: 'EXECUTED_CONTROL_DRY_RUN',
-        predictions: { digest: canonicalDigest(sidecar), rows: 126, unparsed: 0, file: 'predictions-v12-clean-base-' + trial.trial_id + '-' + seed + '.json' },
+        predictions: { digest: canonicalDigest(sidecar), rows: 126, unparsed: 0, file: 'predictions-v' + version + '-clean-base-' + trial.trial_id + '-' + seed + '.json' },
         launch: {
           arm_id: trial.arm_id, seed, samples, podman: { executable: 'podman', argv_prefix: [] },
           container_argv: [...invocation.podmanArgv], image: controlPin.first.imageId, image_break_requested: false,
@@ -680,7 +682,7 @@ test('v12 dry-run validates deterministic controls from the separately double-bu
       };
     }) })),
   };
-  const input = { version: 12, dry, preregistrationDigest, pin: modelPin,
+  const input = { version, dry, preregistrationDigest, pin: modelPin,
     expectedBase: { commit: sourceBase.commit_sha, tree: sourceBase.tree_sha },
     controlPin, expectedCaseIds: caseIds, samples, timeoutMs };
   assert.equal(paid.validateS2PaidReviewDryRun(input).ok, true);
@@ -713,7 +715,20 @@ test('v12 dry-run validates deterministic controls from the separately double-bu
   const forgedControlPin = structuredClone(input);
   forgedControlPin.controlPin = { ...forgedControlPin.controlPin, first: { ...forgedControlPin.controlPin.first, digest: 'sha256:' + '9'.repeat(64) } };
   assert.equal(paid.validateS2PaidReviewDryRun(forgedControlPin).ok, false);
+  if (version === 18) {
+    const wrongModel = structuredClone(input);
+    wrongModel.dry.trials[0].seeds[0].launch.arm_report.executor.model = 'stealth/space-bunny-alpha';
+    assert.equal(paid.validateS2PaidReviewDryRun(wrongModel).ok, false);
+    const missingPacing = structuredClone(input);
+    delete missingPacing.dry.trials[0].seeds[0].launch.arm_report.executor.model_call_pacing;
+    assert.equal(paid.validateS2PaidReviewDryRun(missingPacing).ok, false);
+    const startedCall = structuredClone(input);
+    startedCall.dry.trials[0].seeds[0].launch.arm_report.executor.model_call_pacing.call_starts = 1;
+    assert.equal(paid.validateS2PaidReviewDryRun(startedCall).ok, false);
+  }
+
 });
+}
 
 
 test('v12 control pin artifact is bound to raw bytes, label, run identity, base, and double builds', () => {

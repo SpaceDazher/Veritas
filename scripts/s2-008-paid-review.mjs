@@ -493,7 +493,7 @@ export function validateS2PaidReviewPin({ pin, preregistrationSha256, blindSha25
         || !Object.values(first.sources).every(hash)
         || first.sources.prereg !== preregistrationSha256
         || first.sources.blind !== blindSha256
-        || ([14, 15, 16, 17].includes(version) && !hash(first.sources.model_call_pacing_policy))) return { ok: false };
+        || ([14, 15, 16, 17, 18].includes(version) && !hash(first.sources.model_call_pacing_policy))) return { ok: false };
     return { ok: true, contentCommitment: first.content_commitment, sourceDigest: first.source_digest };
   } catch {
     return { ok: false };
@@ -548,11 +548,11 @@ export function validateS2PaidReviewDryRun({ dry, preregistrationDigest, pin, ex
             || arm.n_cases !== 126 || !Array.isArray(arm.predictions) || arm.predictions.length !== 126
             || !Array.isArray(arm.accounting) || arm.accounting.length !== 0
             || arm.stop !== null
-            || ([14, 15, 16, 17].includes(version) && (executor?.model_call_pacing?.min_start_interval_ms !== 60000
+            || ([14, 15, 16, 17, 18].includes(version) && (executor?.model_call_pacing?.min_start_interval_ms !== 60000
               || executor.model_call_pacing.call_starts !== 0 || executor.model_call_pacing.wait_count !== 0
               || executor.model_call_pacing.waited_ms !== 0))) return { ok: false };
         if (expected.arm_id === V11_MODEL_ARM) {
-          if (!executor || executor.provider !== 'openrouter' || executor.model !== (version === 17 ? V17_MODEL_POLICY.model : version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
+          if (!executor || executor.provider !== 'openrouter' || executor.model !== (version === 18 ? V18_MODEL_POLICY.model : version === 17 ? V17_MODEL_POLICY.model : version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
               || executor.model_calls !== 0 || executor.model_attempts !== 0
               || executor.unknown_model_attempts !== 0 || executor.credential_present !== false
               || executor.credential_in_argv !== false || executor.egress_route !== null) return { ok: false };
@@ -1570,12 +1570,12 @@ const validV17Approval = version !== 17 || (approval && Object.keys(approval).so
         && manifest?.preregistration?.file === 'preregistration.v' + version + '.in-force.json'
         && manifest?.preregistration?.preregistration_digest === digest
         && prereg.executor?.provider === 'openrouter'
-        && prereg.executor?.model === (version === 17 ? V17_MODEL_POLICY.model : version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
+        && prereg.executor?.model === (version === 18 ? V18_MODEL_POLICY.model : version === 17 ? V17_MODEL_POLICY.model : version === 16 ? V16_MODEL_POLICY.model : version === 15 ? V15_MODEL_POLICY.model : version === 14 ? V14_MODEL_POLICY.model : version === 13 ? V13_MODEL_POLICY.model : 'stealth/space-bunny-alpha')
         && prereg.executor?.model_launch_timeout?.per_model_call_timeout_ms === 180000
-        && ([13, 14, 15, 16, 17].includes(version) ? (prereg.budget_reservation?.granted_units === 5000000
+        && ([13, 14, 15, 16, 17, 18].includes(version) ? (prereg.budget_reservation?.granted_units === 5000000
           && prereg.budget_reservation?.ceiling_scope === 'PER_RUN_A_OR_B'
-          && prereg.budget_reservation?.expires_at === (version === 17 ? '2026-11-07T00:00:00.000Z' : '2026-10-12T00:00:00.000Z')) : true)
-        && (![14, 15, 16, 17].includes(version) || (prereg.executor?.model_call_pacing?.min_start_interval_ms === 60000
+          && prereg.budget_reservation?.expires_at === ([17, 18].includes(version) ? '2026-11-07T00:00:00.000Z' : '2026-10-12T00:00:00.000Z')) : true)
+        && (![14, 15, 16, 17, 18].includes(version) || (prereg.executor?.model_call_pacing?.min_start_interval_ms === 60000
           && prereg.executor?.model_launch_timeout?.total_container_timeout_ms === 30540000
           && prereg.holdout_access?.case_count === 126))
         && prereg.executor?.model_launch_timeout?.pi_argv_flags?.includes('--no-tools')

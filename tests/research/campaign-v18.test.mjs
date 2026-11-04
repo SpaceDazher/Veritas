@@ -877,3 +877,13 @@ test("v18 runtime rejects a bad pin, mismatched credential, and mutated predeces
   assert.equal(dryCalls, 0);
   assert.equal(paidCalls, 0);
 });
+
+test('v18 inspector recognizes a valid signed recovery before complete A/B evidence', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'v18-inspector-prereg-'));
+  try {
+    const aRoot = createV18ARepoFixture(temp, v18Fixture()).aRoot;
+    const result = paidReview.inspectS2PaidReviewEvidence(aRoot);
+    assert.equal(result.version, 18);
+    assert.equal(result.reasons.includes('ACTIVE_PREREGISTRATION_INVALID'), false);
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
